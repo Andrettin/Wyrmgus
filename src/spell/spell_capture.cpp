@@ -100,7 +100,7 @@
 			caster.Player->TotalKills++;
 		}
 		//Wyrmgus start
-		caster.Player->UnitTypeKills[target->Type->Slot]++;
+		caster.Player->UnitTypeKills[target->Type->GetIndex()]++;
 		
 		//distribute experience between nearby units belonging to the same player
 		if (!target->Type->BoolFlag[BUILDING_INDEX].value) {

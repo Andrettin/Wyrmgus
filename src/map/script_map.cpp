@@ -421,7 +421,7 @@ static int CclShowMapLocation(lua_State *l)
 
 	LuaCheckArgs(l, 4);
 	const char *unitname = LuaToString(l, 5);
-	CUnitType *unitType = UnitTypeByIdent(unitname);
+	CUnitType *unitType = CUnitType::Get(unitname);
 	if (!unitType) {
 		DebugPrint("Unable to find UnitType '%s'" _C_ unitname);
 		return 0;
@@ -1721,7 +1721,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, j + 1));
 				if (!unit_type) {
 					LuaError(l, "Unit type doesn't exist.");
 				}
@@ -1737,7 +1737,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, j + 1));
 				if (!unit_type) {
 					LuaError(l, "Unit type doesn't exist.");
 				}
@@ -1874,7 +1874,7 @@ static int CclDefineSite(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, j + 1));
 				if (!unit_type) {
 					LuaError(l, "Unit type doesn't exist.");
 				}
@@ -1959,7 +1959,7 @@ static int CclDefineSite(lua_State *l)
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, j + 1));
 				if (!unit_type) {
 					LuaError(l, "Unit type doesn't exist.");
 				}

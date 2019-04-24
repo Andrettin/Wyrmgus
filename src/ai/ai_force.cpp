@@ -315,8 +315,8 @@ void AiResetUnitTypeEquiv()
 */
 void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 {
-	int find = UnitTypeEquivs[a.Slot];
-	int replace = UnitTypeEquivs[b.Slot];
+	int find = UnitTypeEquivs[a.GetIndex()];
+	int replace = UnitTypeEquivs[b.GetIndex()];
 
 	//always record equivalencies with the lowest unit type
 	if (find < replace) {
@@ -342,7 +342,7 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 */
 int AiFindUnitTypeEquiv(const CUnitType &unit_type, int *result)
 {
-	const int search = UnitTypeEquivs[unit_type.Slot];
+	const int search = UnitTypeEquivs[unit_type.GetIndex()];
 	int count = 0;
 
 	for (int i = 0; i < UnitTypeMax + 1; ++i) {
@@ -360,7 +360,7 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return CUnitType::UnitTypes[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > CUnitType::UnitTypes[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		return CUnitType::Get(lhs)->MapDefaultStat.Variables[PRIORITY_INDEX].Value > CUnitType::Get(rhs)->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
 	}
 };
 
@@ -379,7 +379,7 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependencies(CUnitType::UnitTypes[usableTypes[i]], AiPlayer->Player)) {
+		if (!CheckDependencies(CUnitType::Get(usableTypes[i]), AiPlayer->Player)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;
@@ -404,13 +404,13 @@ public:
 	}
 	inline void operator()(const CUnit *const unit) const
 	{
-		data[UnitTypeEquivs[unit->Type->Slot]]++;
+		data[UnitTypeEquivs[unit->Type->GetIndex()]]++;
 		
 		const UnitClass *unit_class = unit->Type->Class;
 		if (unit_class != nullptr) {
 			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
 				if (class_unit_type != unit->Type) {
-					data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
+					data[UnitTypeEquivs[class_unit_type->GetIndex()]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
 			}
 		}
@@ -443,10 +443,10 @@ bool AiForce::IsBelongsTo(const CUnitType &type)
 	Completed = true;
 	for (unsigned int i = 0; i < UnitTypes.size(); ++i) {
 		const AiUnitType &aitype = UnitTypes[i];
-		const int slot = aitype.Type->Slot;
+		const int slot = aitype.Type->GetIndex();
 
 		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
-			if (UnitTypeEquivs[type.Slot] == slot || type.Class == aitype.Type->Class) {
+			if (UnitTypeEquivs[type.GetIndex()] == slot || type.Class == aitype.Type->Class) {
 				if (counter[slot] < aitype.Want - 1) {
 					Completed = false;
 				}
@@ -1146,7 +1146,7 @@ void AiForceManager::CheckUnits(int *counter)
 		if (force.State > AiForceAttackingState_Free && force.IsAttacking()) {
 			for (unsigned int j = 0; j < force.Size(); ++j) {
 				const CUnit *unit = force.Units[j];
-				attacking[unit->Type->Slot]++;
+				attacking[unit->Type->GetIndex()]++;
 			}
 		}
 	}
@@ -1160,10 +1160,10 @@ void AiForceManager::CheckUnits(int *counter)
 		}
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
 			const AiUnitType &aiut = force.UnitTypes[j];
-			const unsigned int t = aiut.Type->Slot;
+			const unsigned int t = aiut.Type->GetIndex();
 			const UnitClass *unit_class = aiut.Type->Class;
 			const int wantedCount = aiut.Want;
-			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::UnitTypes[t]);
+			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::Get(t));
 			if (t < AiHelpers.Equiv.size()) {
 				for (unsigned int k = 0; k < AiHelpers.Equiv[t].size(); ++k) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
@@ -1914,7 +1914,7 @@ void AiForceManager::CheckForceRecruitment()
 					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
-						type = CUnitType::UnitTypes[unit_type_id];
+						type = CUnitType::Get(unit_type_id);
 					}
 					if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
 						valid = false;
@@ -1950,7 +1950,7 @@ void AiForceManager::CheckForceRecruitment()
 					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
-						type = CUnitType::UnitTypes[unit_type_id];
+						type = CUnitType::Get(unit_type_id);
 					}
 					int count = force_template->Units[i].second;
 					

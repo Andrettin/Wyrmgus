@@ -216,7 +216,7 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 			
 			if (key == "unit_type") {
 				value = FindAndReplaceString(value, "_", "-");
-				unit_type = UnitTypeByIdent(value);
+				unit_type = CUnitType::Get(value);
 				if (!unit_type) {
 					fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
 				}
@@ -702,8 +702,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
 			int worker_type_id = CFaction::GetFactionClassUnitType(CPlayer::Players[i]->GetFaction(), UnitClass::Get("worker"));
-			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(CUnitType::UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
-				Vec2i worker_unit_offset((CUnitType::UnitTypes[worker_type_id]->TileSize - 1) / 2);
+			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(CUnitType::Get(worker_type_id)) == 0) { //only create if the player doesn't have any workers created in another manner
+				Vec2i worker_unit_offset((CUnitType::Get(worker_type_id)->TileSize - 1) / 2);
 				
 				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
 
@@ -731,7 +731,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CUnit *worker_unit = CreateUnit(worker_pos, *CUnitType::UnitTypes[worker_type_id], CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
+					CUnit *worker_unit = CreateUnit(worker_pos, *CUnitType::Get(worker_type_id), CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
 				}
 			}
 		}
@@ -1007,10 +1007,10 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (unit_type_id == -1) {
 					continue;
 				}
-				const CUnitType *type = CUnitType::UnitTypes[unit_type_id];
+				const CUnitType *type = CUnitType::Get(unit_type_id);
 				if (type->TerrainType) {
 					if ((type->TerrainType->Flags & MapFieldRoad) || (type->TerrainType->Flags & MapFieldRailroad)) {
-						pathway_type = CUnitType::UnitTypes[unit_type_id];
+						pathway_type = CUnitType::Get(unit_type_id);
 					}
 				}
 			}
@@ -1032,7 +1032,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (unit_type_id == -1) {
 					continue;
 				}
-				const CUnitType *type = CUnitType::UnitTypes[unit_type_id];
+				const CUnitType *type = CUnitType::Get(unit_type_id);
 				if (type->TerrainType) {
 					continue;
 				}

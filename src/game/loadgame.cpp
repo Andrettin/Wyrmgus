@@ -91,10 +91,6 @@ void CleanModules()
 	EndReplayLog();
 	CleanMessages();
 	
-	for (const std::function<void()> &clear_function : ClassClearFunctions) {
-		clear_function();
-	}
-
 	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();
@@ -113,7 +109,6 @@ void CleanModules()
 	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();
-	CleanUnitTypes();
 	CleanPlayers();
 	CleanSelections();
 	CleanGroups();
@@ -126,6 +121,10 @@ void CleanModules()
 	CleanReplayLog();
 	CSpell::ClearSpells();
 	FreePathfinder();
+	
+	for (const std::function<void()> &clear_function : ClassClearFunctions) {
+		clear_function();
+	}
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 }

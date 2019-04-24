@@ -106,7 +106,7 @@
 **    config files and during startup. As convention they start with
 **    "unit-" fe. "unit-farm".
 **  @note Don't use this member in game, use instead the pointer
-**  to this structure. See UnitTypeByIdent().
+**  to this structure. See CUnitType::Get().
 **
 **  CUnitType::Name
 **
@@ -482,9 +482,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CUnitType *> CUnitType::UnitTypes;	/// unit-types definition
-std::map<std::string, CUnitType *> UnitTypeMap;
-
 /**
 **  Next unit type are used hardcoded in the source.
 **
@@ -641,7 +638,7 @@ std::vector<CUnitType *> CUnitType::GetUnitUnitTypes()
 {
 	std::vector<CUnitType *> unit_types;
 	
-	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
 		if (!unit_type->IsUnitUnitType()) {
 			continue;
 		}
@@ -661,7 +658,7 @@ std::vector<CUnitType *> CUnitType::GetBuildingUnitTypes()
 {
 	std::vector<CUnitType *> unit_types;
 	
-	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
 		if (!unit_type->BoolFlag[BUILDING_INDEX].value) {
 			continue;
 		}
@@ -681,7 +678,7 @@ std::vector<CUnitType *> CUnitType::GetItemUnitTypes()
 {
 	std::vector<CUnitType *> unit_types;
 	
-	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
 		if (!unit_type->BoolFlag[ITEM_INDEX].value) {
 			continue;
 		}
@@ -690,6 +687,19 @@ std::vector<CUnitType *> CUnitType::GetItemUnitTypes()
 	}
 	
 	return unit_types;
+}
+
+/**
+**	@brief	Clean up the unit type module.
+*/
+void CUnitType::Clear()
+{
+	DebugPrint("FIXME: icon, sounds not freed.\n");
+	FreeAnimations();
+	
+	DataType<CUnitType>::Clear();
+	
+	UnitTypeVar.Clear();
 }
 
 /**
@@ -704,7 +714,7 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 {
 	if (key == "parent") {
 		value = FindAndReplaceString(value, "_", "-");
-		CUnitType *parent_type = UnitTypeByIdent(value);
+		CUnitType *parent_type = CUnitType::Get(value);
 		if (!parent_type) {
 			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
 		}
@@ -762,12 +772,6 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 	} else if (key == "priority") {
 		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 		this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
-	} else if (key == "description") {
-		this->Description = value;
-	} else if (key == "background") {
-		this->Background = value;
-	} else if (key == "quote") {
-		this->Quote = value;
 	} else if (key == "requirements_string") {
 		this->RequirementsString = value;
 	} else if (key == "experience_requirements_string") {
@@ -798,7 +802,7 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		}
 	} else if (key == "ai_drop") {
 		value = FindAndReplaceString(value, "_", "-");
-		CUnitType *drop_type = UnitTypeByIdent(value);
+		CUnitType *drop_type = CUnitType::Get(value);
 		if (drop_type) {
 			this->AiDrops.push_back(drop_type);
 		} else {
@@ -1009,7 +1013,7 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 				return true;
 			}
 			
-			CUnitType *item = UnitTypeByIdent(value);
+			CUnitType *item = CUnitType::Get(value);
 			if (!item) {
 				fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
 				return true;
@@ -1168,7 +1172,7 @@ void CUnitType::Initialize()
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (CCivilization *civilization : CCivilization::GetAll()) {
 			for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == this->Slot) {
+				if (iterator->second == this->GetIndex()) {
 					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
@@ -1176,7 +1180,7 @@ void CUnitType::Initialize()
 		}
 		for (CFaction *faction : CFaction::GetAll()) {
 			for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == this->Slot) {
+				if (iterator->second == this->GetIndex()) {
 					faction->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
@@ -1185,9 +1189,9 @@ void CUnitType::Initialize()
 		
 		if (this->GetCivilization() != nullptr && unit_class != nullptr) {
 			if (this->Faction != nullptr) {
-				this->Faction->ClassUnitTypes[unit_class] = this->Slot;
+				this->Faction->ClassUnitTypes[unit_class] = this->GetIndex();
 			} else {
-				this->GetCivilization()->ClassUnitTypes[unit_class] = this->Slot;
+				this->GetCivilization()->ClassUnitTypes[unit_class] = this->GetIndex();
 			}
 		}
 	}
@@ -1318,7 +1322,7 @@ void CUnitType::Initialize()
 	
 	// make units allowed by default
 	for (int i = 0; i < PlayerMax; ++i) {
-		AllowUnitId(*CPlayer::Players[i], this->Slot, 65536);
+		AllowUnitId(*CPlayer::Players[i], this->GetIndex(), 65536);
 	}
 	
 	this->Initialized = true;
@@ -1688,11 +1692,11 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	int value = 0;
 	int upgrade_value = 0;
 	
-	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Slot) {
-		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Slot].size(); ++i) {
+	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->GetIndex()) {
+		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->GetIndex()].size(); ++i) {
 			int local_upgrade_value = 1;
 			
-			local_upgrade_value += AiHelpers.ExperienceUpgrades[this->Slot][i]->GetAvailableLevelUpUpgrades();
+			local_upgrade_value += AiHelpers.ExperienceUpgrades[this->GetIndex()][i]->GetAvailableLevelUpUpgrades();
 			
 			if (local_upgrade_value > upgrade_value) {
 				upgrade_value = local_upgrade_value;
@@ -1702,8 +1706,8 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	
 	value += upgrade_value;
 	
-	if (((int) AiHelpers.LearnableAbilities.size()) > this->Slot) {
-		for (size_t i = 0; i != AiHelpers.LearnableAbilities[this->Slot].size(); ++i) {
+	if (((int) AiHelpers.LearnableAbilities.size()) > this->GetIndex()) {
+		for (size_t i = 0; i != AiHelpers.LearnableAbilities[this->GetIndex()].size(); ++i) {
 			value += 1;
 		}
 	}
@@ -1832,9 +1836,9 @@ CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(const CPlayer *player, con
 
 bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
 {
-	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Slot) {
-		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Slot].size(); ++i) {
-			if (type == AiHelpers.ExperienceUpgrades[this->Slot][i] || AiHelpers.ExperienceUpgrades[this->Slot][i]->CanExperienceUpgradeTo(type)) {
+	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->GetIndex()) {
+		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->GetIndex()].size(); ++i) {
+			if (type == AiHelpers.ExperienceUpgrades[this->GetIndex()][i] || AiHelpers.ExperienceUpgrades[this->GetIndex()][i]->CanExperienceUpgradeTo(type)) {
 				return true;
 			}
 		}
@@ -1907,7 +1911,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 	
 	if (potential_names.empty() && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
-		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == CFaction::GetFactionClassUnitType(faction, this->Class)) {
+		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Class)) {
 			civilization = faction->Civilization;
 		}
 		if (faction && faction->Civilization != civilization) {
@@ -2500,9 +2504,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 void UpdateStats(int reset)
 {
 	// Update players stats
-	for (std::vector<CUnitType *>::size_type j = 0; j < CUnitType::UnitTypes.size(); ++j) {
-		CUnitType &type = *CUnitType::UnitTypes[j];
-		UpdateUnitStats(type, reset);
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
+		UpdateUnitStats(*unit_type, reset);
 	}
 }
 
@@ -2559,14 +2562,14 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
 	}
 	file.printf("},\n\"unit-stock\", {");
-	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		if (stats.GetUnitStock(CUnitType::UnitTypes[i]) == type.DefaultStat.GetUnitStock(CUnitType::UnitTypes[i])) {
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
+		if (stats.GetUnitStock(unit_type) == type.DefaultStat.GetUnitStock(unit_type)) {
 			continue;
 		}
-		if (i) {
+		if (unit_type->GetIndex()) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", CUnitType::UnitTypes[i]->Ident.c_str(), stats.GetUnitStock(CUnitType::UnitTypes[i]));
+		file.printf("\"%s\", %d,", unit_type->Ident.c_str(), stats.GetUnitStock(unit_type));
 	}
 	//Wyrmgus end
 	file.printf("}})\n");
@@ -2584,38 +2587,18 @@ void SaveUnitTypes(CFile &file)
 	file.printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
-	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		const CUnitType &type = *CUnitType::UnitTypes[i];
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
 			if (CPlayer::Players[j]->Type != PlayerNobody) {
-				somethingSaved |= SaveUnitStats(type.Stats[j], type, j, file);
+				somethingSaved |= SaveUnitStats(unit_type->Stats[j], *unit_type, j, file);
 			}
 		}
 		if (somethingSaved) {
 			file.printf("\n");
 		}
 	}
-}
-
-/**
-**  Find unit-type by identifier.
-**
-**  @param ident  The unit-type identifier.
-**
-**  @return       Unit-type pointer.
-*/
-CUnitType *UnitTypeByIdent(const std::string &ident)
-{
-	std::map<std::string, CUnitType *>::iterator ret = UnitTypeMap.find(ident);
-	if (ret != UnitTypeMap.end()) {
-		return (*ret).second;
-	}
-	//Wyrmgus start
-//	fprintf(stderr, "Unit type \"%s\" does not exist.\n", ident.c_str());
-	//Wyrmgus end
-	return nullptr;
 }
 
 //Wyrmgus start
@@ -2632,35 +2615,6 @@ void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id)
 	UpgradeClassStringToIndex[class_name] = class_id;
 }
 //Wyrmgus end
-
-/**
-**  Allocate an empty unit-type slot.
-**
-**  @param ident  Identifier to identify the slot (malloced by caller!).
-**
-**  @return       New allocated (zeroed) unit-type pointer.
-*/
-CUnitType *NewUnitTypeSlot(const std::string &ident)
-{
-	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-	CUnitType *type = new CUnitType;
-
-	if (!type) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
-	type->Slot = CUnitType::UnitTypes.size();
-	type->Ident = ident;
-	type->BoolFlag.resize(new_bool_size);
-
-	type->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		type->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
-	}
-	CUnitType::UnitTypes.push_back(type);
-	UnitTypeMap[type->Ident] = type;
-	return type;
-}
 
 /**
 **  Draw unit-type on map.
@@ -2776,35 +2730,28 @@ static int GetStillFrame(const CUnitType &type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		CUnitType &type = *CUnitType::UnitTypes[i];
-		Assert(type.Slot == (int)i);
-
-		if (type.Animations == nullptr) {
-			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ type.Ident.c_str());
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
+		if (unit_type->Animations == nullptr) {
+			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ unit_type->Ident.c_str());
 			continue;
 		}
-		//  Add idents to hash.
-		UnitTypeMap[type.Ident] = CUnitType::UnitTypes[i];
 		
 		//Wyrmgus start
 		/*
 		// Determine still frame
-		type.StillFrame = GetStillFrame(type);
+		unit_type->StillFrame = GetStillFrame(type);
 
 		// Lookup BuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type.BuildingRules.begin();
-			 b < type.BuildingRules.end(); ++b) {
+		for (std::vector<CBuildRestriction *>::iterator b = unit_type->BuildingRules.begin(); b < unit_type->BuildingRules.end(); ++b) {
 			(*b)->Init();
 		}
 
 		// Lookup AiBuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type.AiBuildingRules.begin();
-			 b < type.AiBuildingRules.end(); ++b) {
+		for (std::vector<CBuildRestriction *>::iterator b = unit_type->AiBuildingRules.begin(); b < unit_type->AiBuildingRules.end(); ++b) {
 			(*b)->Init();
 		}
 		*/
-		InitUnitType(type);
+		InitUnitType(*unit_type);
 		//Wyrmgus end
 	}
 
@@ -2985,15 +2932,12 @@ void LoadUnitTypeSprite(CUnitType &type)
 int GetUnitTypesCount()
 {
 	int count = 0;
-	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		CUnitType &type = *CUnitType::UnitTypes[i];
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
+		if (unit_type->Missile.IsEmpty() == false) count++;
+		if (unit_type->FireMissile.IsEmpty() == false) count++;
+		if (unit_type->Explosion.IsEmpty() == false) count++;
 
-		if (type.Missile.IsEmpty() == false) count++;
-		if (type.FireMissile.IsEmpty() == false) count++;
-		if (type.Explosion.IsEmpty() == false) count++;
-
-
-		if (!type.Sprite) {
+		if (!unit_type->Sprite) {
 			count++;
 		}
 	}
@@ -3005,11 +2949,9 @@ int GetUnitTypesCount()
 */
 void LoadUnitTypes()
 {
-	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		CUnitType &type = *CUnitType::UnitTypes[i];
-
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (i + 1) * 100 / CUnitType::UnitTypes.size());
-		LoadUnitType(type);
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->GetIndex() + 1) * 100 / CUnitType::GetAll().size());
+		LoadUnitType(*unit_type);
 	}
 }
 
@@ -3040,7 +2982,7 @@ void LoadUnitType(CUnitType &type)
 	}
 	// Lookup corpse.
 	if (!type.CorpseName.empty()) {
-		type.CorpseType = UnitTypeByIdent(type.CorpseName);
+		type.CorpseType = CUnitType::Get(type.CorpseName);
 	}
 #ifndef DYNAMIC_LOAD
 	// Load Sprite
@@ -3059,9 +3001,36 @@ void CUnitTypeVar::Init()
 	// Variables.
 	Variable.resize(GetNumberVariable());
 	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-	for (unsigned int i = 0; i < CUnitType::UnitTypes.size(); ++i) { // adjust array for unit already defined
-		CUnitType::UnitTypes[i]->BoolFlag.resize(new_size);
+	for (CUnitType *unit_type : CUnitType::GetAll()) { // adjust array for unit already defined
+		unit_type->BoolFlag.resize(new_size);
 	}
+}
+
+/**
+**	@brief	Add a new unit type
+**
+**	@param	ident	The unit type's string identifier
+**
+**	@return	The new unit type
+*/
+CUnitType *CUnitType::Add(const std::string &ident)
+{
+	CUnitType *unit_type = DataType<CUnitType>::Add(ident);
+
+	if (!unit_type) {
+		fprintf(stderr, "Out of memory\n");
+		ExitFatal(-1);
+	}
+	
+	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+	unit_type->BoolFlag.resize(new_bool_size);
+
+	unit_type->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+		unit_type->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
+	}
+	
+	return unit_type;
 }
 
 void CUnitTypeVar::Clear()
@@ -3075,27 +3044,10 @@ void CUnitTypeVar::Clear()
 	DecoVar.clear();
 }
 
-/**
-**  Cleanup the unit-type module.
-*/
-void CleanUnitTypes()
-{
-	DebugPrint("FIXME: icon, sounds not freed.\n");
-	FreeAnimations();
-
-	// Clean all unit-types
-	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		delete CUnitType::UnitTypes[i];
-	}
-	CUnitType::UnitTypes.clear();
-	UnitTypeMap.clear();
-	UnitTypeVar.Clear();
-}
-
 //Wyrmgus start
 std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
-	const CUnitType *unit_type = UnitTypeByIdent(unit_type_ident);
+	const CUnitType *unit_type = CUnitType::Get(unit_type_ident);
 
 	if (unit_type) {
 		std::string unit_type_stats_string;

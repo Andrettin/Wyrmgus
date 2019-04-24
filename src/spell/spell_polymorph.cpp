@@ -56,7 +56,7 @@
 		++j;
 		if (!strcmp(value, "new-form")) {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = UnitTypeByIdent(value);
+			this->NewForm = CUnitType::Get(value);
 			if (!this->NewForm) {
 				this->NewForm = nullptr;
 				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
@@ -126,7 +126,7 @@
 			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->Type->GetCivilization(), target->Type->Class);
 		}
 		if (new_unit_type != -1) {
-			type = CUnitType::UnitTypes[new_unit_type];
+			type = CUnitType::Get(new_unit_type);
 		}
 	}
 	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != nullptr && this->Civilization != target->Character->Civilization) {
@@ -152,7 +152,7 @@
 			caster.Player->TotalKills++;
 		}
 		//Wyrmgus start
-		caster.Player->UnitTypeKills[target->Type->Slot]++;
+		caster.Player->UnitTypeKills[target->Type->GetIndex()]++;
 		
 		//distribute experience between nearby units belonging to the same player
 		if (!target->Type->BoolFlag[BUILDING_INDEX].value) {

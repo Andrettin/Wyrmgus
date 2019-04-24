@@ -227,7 +227,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->UnitClass = unit_class;
 					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
+						CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, k + 1));
 						if (!unit_type) {
 							LuaError(l, "Unit type doesn't exist.");
 						}
@@ -645,9 +645,9 @@ static int CclDefineAchievement(lua_State *l)
 			}
 		} else if (!strcmp(value, "CharacterType")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			const int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				achievement->CharacterType = CUnitType::UnitTypes[unit_type_id];
+			const CUnitType *unit_type = CUnitType::Get(unit_type_ident);
+			if (unit_type != nullptr) {
+				achievement->CharacterType = unit_type;
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}

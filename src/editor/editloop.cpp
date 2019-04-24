@@ -689,7 +689,7 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+		const CUnitType *type = CUnitType::Get(Editor.UnitTypes[i].c_str());
 		Assert(type && type->Icon.Icon);
 		const CIcon &icon = *type->Icon.Icon;
 
@@ -709,7 +709,7 @@ void RecalculateShownUnits()
 	Editor.ShownUnitTypes.clear();
 
 	for (size_t i = 0; i != Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+		const CUnitType *type = CUnitType::Get(Editor.UnitTypes[i]);
 		Editor.ShownUnitTypes.push_back(type);
 	}
 
@@ -2063,7 +2063,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			CurrentButtons[j].Level = 0;
 			CurrentButtons[j].Action = ButtonEditorUnit;
 			CurrentButtons[j].ValueStr = Editor.ShownUnitTypes[i]->Ident;
-			CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->Slot;
+			CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->GetIndex();
 			CurrentButtons[j].Popup = "popup-unit";
 		}
 		//Wyrmgus end
@@ -2438,14 +2438,12 @@ void CEditor::Init()
 	//Wyrmgus start
 	if (this->UnitTypes.size() == 0) {
 		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
-		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-			CUnitType &type = *CUnitType::UnitTypes[i];
-			
-			if (type.IsHiddenInEditor()) {
+		for (CUnitType *unit_type : CUnitType::GetAll()) {
+			if (unit_type->IsHiddenInEditor()) {
 				continue;
 			}
 			
-			this->UnitTypes.push_back(type.Ident);
+			this->UnitTypes.push_back(unit_type->Ident);
 		}
 	}
 	//Wyrmgus end
@@ -2546,7 +2544,7 @@ void CEditor::Init()
 	VisibleUnitIcons = CalculateVisibleIcons();
 
 	if (!StartUnitName.empty()) {
-		StartUnit = UnitTypeByIdent(StartUnitName);
+		StartUnit = CUnitType::Get(StartUnitName);
 	}
 	Select.Icon = nullptr;
 	Select.Load();

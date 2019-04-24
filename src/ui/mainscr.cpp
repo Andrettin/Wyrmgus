@@ -548,7 +548,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
 					if (i > 0 && j > 0 && unit.Orders[i - 1]->Action == UnitActionTrain) {
 						const COrder_Train &previous_order = *static_cast<COrder_Train *>(unit.Orders[i - 1]);
-						if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
+						if (previous_order.GetUnitType().GetIndex() == order.GetUnitType().GetIndex()) {
 							train_counter[j - 1]++;
 							continue;
 						}

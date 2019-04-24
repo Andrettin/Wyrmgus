@@ -84,9 +84,9 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "apply_to") {
 			value = FindAndReplaceString(value, "_", "-");
-			const int unit_type_id = UnitTypeIdByIdent(value.c_str());
-			if (unit_type_id != -1) {
-				this->ApplyTo[unit_type_id] = 'X';
+			const CUnitType *unit_type = CUnitType::Get(value);
+			if (unit_type != nullptr) {
+				this->ApplyTo[unit_type->GetIndex()] = 'X';
 			} else {
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 			}

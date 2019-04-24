@@ -178,7 +178,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "type") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
+			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
 				this->Type = unit_type;
 			} else {
@@ -261,7 +261,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 
 std::string GetItemEffectsString(const std::string &item_ident)
 {
-	const CUnitType *item = UnitTypeByIdent(item_ident);
+	const CUnitType *item = CUnitType::Get(item_ident);
 
 	if (item) {
 		std::string item_effects_string;

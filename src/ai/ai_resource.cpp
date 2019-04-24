@@ -434,8 +434,8 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool a
 	if (type.BoolFlag[BUILDING_INDEX].value) {
 		if (
 			include_upgrade
-			&& (type.Slot >= (int) AiHelpers.Build.size() || AiHelpers.Build[type.Slot].empty())
-			&& type.Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type.Slot].empty()
+			&& (type.GetIndex() >= (int) AiHelpers.Build.size() || AiHelpers.Build[type.GetIndex()].empty())
+			&& type.GetIndex() < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type.GetIndex()].empty()
 		) {
 			tablep = &AiHelpers.Upgrade;
 		} else {
@@ -444,16 +444,16 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool a
 	} else {
 		tablep = &AiHelpers.Train;
 	}
-	if (type.Slot >= (int) (*tablep).size()) {
+	if (type.GetIndex() >= (int) (*tablep).size()) {
 		return false;
 	}
-//	const size_t size = AiHelpers.Build[type.Slot].size();
-	const size_t size = (*tablep)[type.Slot].size();
+//	const size_t size = AiHelpers.Build[type.GetIndex()].size();
+	const size_t size = (*tablep)[type.GetIndex()].size();
 	//Wyrmgus end
 	for (size_t i = 0; i != size; ++i) {
 		//Wyrmgus start
-//		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
-		CUnitType &builder = *(*tablep)[type.Slot][i];
+//		CUnitType &builder = *AiHelpers.Build[type.GetIndex()][i];
+		CUnitType &builder = *(*tablep)[type.GetIndex()][i];
 		//Wyrmgus end
 
 		if ((player.GetUnitTypeAiActiveCount(&builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, builder)))
@@ -503,7 +503,7 @@ int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
 	for (int i = 0; i < size; ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 
-		counter[queue.Type->Slot] += queue.Want;
+		counter[queue.Type->GetIndex()] += queue.Want;
 	}
 	return size;
 }
@@ -551,7 +551,7 @@ void AiNewDepotRequest(CUnit &worker)
 	for (int i = 0; i < n; ++i) {
 		CUnitType &type = *AiHelpers.Depots[resource][i];
 
-		if (counter[type.Slot]) { // Already ordered.
+		if (counter[type.GetIndex()]) { // Already ordered.
 			return;
 		}
 		if (!AiRequestedTypeAllowed(*worker.Player, type)) {
@@ -719,9 +719,9 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		count_requested = std::max(count_requested, 1);
 
 		bool has_builder = false;
-		const size_t size = AiHelpers.Train[best_type->Slot].size();
+		const size_t size = AiHelpers.Train[best_type->GetIndex()].size();
 		for (size_t i = 0; i != size; ++i) {
-			CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
+			CUnitType &builder = *AiHelpers.Train[best_type->GetIndex()][i];
 
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(&builder) > 0) {
 				std::vector<CUnit *> builder_table;
@@ -745,7 +745,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		if (!has_builder) { //if doesn't have an already built builder, see if there's one in the requests already
 			for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 				const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-				if (queue.Landmass == landmass && std::find(AiHelpers.Train[best_type->Slot].begin(), AiHelpers.Train[best_type->Slot].end(), queue.Type) != AiHelpers.Train[best_type->Slot].end()) {
+				if (queue.Landmass == landmass && std::find(AiHelpers.Train[best_type->GetIndex()].begin(), AiHelpers.Train[best_type->GetIndex()].end(), queue.Type) != AiHelpers.Train[best_type->GetIndex()].end()) {
 					has_builder = true;
 					break;
 				}
@@ -753,9 +753,9 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		}
 		
 		if (!has_builder) { // if doesn't have a builder, request one
-			const size_t size = AiHelpers.Train[best_type->Slot].size();
+			const size_t size = AiHelpers.Train[best_type->GetIndex()].size();
 			for (size_t i = 0; i != size; ++i) {
-				CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
+				CUnitType &builder = *AiHelpers.Train[best_type->GetIndex()][i];
 				
 				if (!AiRequestedTypeAllowed(*AiPlayer->Player, builder)) {
 					continue;
@@ -803,7 +803,7 @@ static bool AiRequestSupply()
 
 	for (int i = 0; i < n; ++i) {
 		CUnitType &type = *AiHelpers.UnitLimit[0][i];
-		if (counter[type.Slot]) { // Already ordered.
+		if (counter[type.GetIndex()]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
 					   _C_ AiPlayer->Player->Index _C_ type->Name.c_str());
@@ -962,7 +962,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 
 	// Iterate them
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
-		CUnitType &type = *CUnitType::UnitTypes[usableTypes[currentType]];
+		CUnitType &type = *CUnitType::Get(usableTypes[currentType]);
 		int n;
 		std::vector<std::vector<CUnitType *> > *tablep;
 		//
@@ -975,12 +975,12 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 			n = AiHelpers.Train.size();
 			tablep = &AiHelpers.Train;
 		}
-		if (type.Slot >= n) { // Oops not known.
+		if (type.GetIndex() >= n) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
 		}
-		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
+		std::vector<CUnitType *> &table = (*tablep)[type.GetIndex()];
 		if (table.empty()) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -1135,12 +1135,12 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	const int n = AiHelpers.Upgrade.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade;
 
-	if (type.Slot >= n) { // Oops not known.
+	if (type.GetIndex() >= n) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
-	std::vector<CUnitType *> &table = tablep[type.Slot];
+	std::vector<CUnitType *> &table = tablep[type.GetIndex()];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -1301,8 +1301,8 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 				CUnitType &type = *AiHelpers.Mines[mine->GivesResource][i];
 
 				if (
-					type.Slot < (int) AiHelpers.Build.size()
-					&& std::find(AiHelpers.Build[type.Slot].begin(), AiHelpers.Build[type.Slot].end(), unit.Type) != AiHelpers.Build[type.Slot].end()
+					type.GetIndex() < (int) AiHelpers.Build.size()
+					&& std::find(AiHelpers.Build[type.GetIndex()].begin(), AiHelpers.Build[type.GetIndex()].end(), unit.Type) != AiHelpers.Build[type.GetIndex()].end()
 					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer->ID)
 				) {
 					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer->ID);
@@ -1317,9 +1317,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 	/*
 	int exploremask = 0;
 
-	for (size_t i = 0; i != CUnitType::UnitTypes.size(); ++i) {
-		const CUnitType *type = CUnitType::UnitTypes[i];
-
+	for (const CUnitType *type : CUnitType::GetAll()) {
 		if (type && type->GivesResource == resource) {
 			switch (type->UnitType) {
 				case UnitTypeLand:
@@ -1430,7 +1428,7 @@ static void AiProduceResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (unit.Type->Slot >= ((int) AiHelpers.ProducedResources.size()) || AiHelpers.ProducedResources[unit.Type->Slot].size() == 0 || !unit.Active) {
+		if (unit.Type->GetIndex() >= ((int) AiHelpers.ProducedResources.size()) || AiHelpers.ProducedResources[unit.Type->GetIndex()].size() == 0 || !unit.Active) {
 			continue;
 		}
 		
@@ -1440,8 +1438,8 @@ static void AiProduceResources()
 
 		int chosen_resource = 0;
 		int best_value = 0;
-		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->Slot].size(); ++j) {
-			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
+		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->GetIndex()].size(); ++j) {
+			int resource = AiHelpers.ProducedResources[unit.Type->GetIndex()][j];
 			
 			if (!CResource::GetAll()[resource]->LuxuryResource && AiCanSellResource(resource)) {
 				continue;
@@ -1918,12 +1916,12 @@ static int AiRepairUnit(CUnit &unit)
 	int n = AiHelpers.Repair.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
 	const CUnitType &type = *unit.Type;
-	if (type.Slot >= n) { // Oops not known.
+	if (type.GetIndex() >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}
-	std::vector<CUnitType *> &table = tablep[type.Slot];
+	std::vector<CUnitType *> &table = tablep[type.GetIndex()];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -2070,7 +2068,7 @@ static void AiCheckPathwayConstruction()
 
 	std::vector<CUnitType *> pathway_types;
 	
-	for (CUnitType *unit_type : CUnitType::UnitTypes) { //assumes the pathways are listed in order of speed bonus
+	for (CUnitType *unit_type : CUnitType::GetAll()) { //assumes the pathways are listed in order of speed bonus
 		if (!unit_type || !unit_type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 			continue;
 		}
@@ -2092,13 +2090,13 @@ static void AiCheckPathwayConstruction()
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
 	for (size_t i = 0; i != pathway_types.size(); ++i) {
-		if (pathway_types[i]->Slot >= n_t) { // Oops not known.
+		if (pathway_types[i]->GetIndex() >= n_t) { // Oops not known.
 			DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
 			return;
 		}
 		
-		std::vector<CUnitType *> &table = tablep[pathway_types[i]->Slot];
+		std::vector<CUnitType *> &table = tablep[pathway_types[i]->GetIndex()];
 		if (table.empty()) { // Oops not known.
 			DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
@@ -2156,7 +2154,7 @@ static void AiCheckPathwayConstruction()
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
 					int worker_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("worker"));
 					if (worker_type_id != -1) {
-						CUnitType *test_worker_type = CUnitType::UnitTypes[worker_type_id];
+						CUnitType *test_worker_type = CUnitType::Get(worker_type_id);
 						
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
@@ -2260,12 +2258,12 @@ static void AiCheckPathwayConstruction()
 						//
 						// Find a free worker, who can build pathways for this building
 						//
-						for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
+						for (unsigned int j = 0; j < tablep[pathway_types[p]->GetIndex()].size(); ++j) {
 							//
 							// The type is available
 							//
-							if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[pathway_types[p]->Slot][j])) {
-								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
+							if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[pathway_types[p]->GetIndex()][j])) {
+								if (AiBuildBuilding(*tablep[pathway_types[p]->GetIndex()][j], *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
 									built_pathway = true;
 									built_pathway_for_building = true;
 									break;
@@ -2304,7 +2302,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 	
-	CUnitType *town_hall_type = CUnitType::UnitTypes[town_hall_type_id];
+	CUnitType *town_hall_type = CUnitType::Get(town_hall_type_id);
 	
 	if (!CheckDependencies(town_hall_type, AiPlayer->Player)) {
 		return;
@@ -2312,13 +2310,13 @@ void AiCheckSettlementConstruction()
 
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
-	if (town_hall_type->Slot >= n_t) { // Oops not known.
+	if (town_hall_type->GetIndex() >= n_t) { // Oops not known.
 		DebugPrint("%d: AiCheckSettlementConstruction I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
 		return;
 	}
 		
-	std::vector<CUnitType *> &table = tablep[town_hall_type->Slot];
+	std::vector<CUnitType *> &table = tablep[town_hall_type->GetIndex()];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiCheckSettlementConstruction II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
@@ -2362,11 +2360,11 @@ void AiCheckSettlementConstruction()
 		//
 		// Find a free worker who can build a settlement on this site
 		//
-		for (unsigned int j = 0; j < tablep[town_hall_type->Slot].size(); ++j) {
+		for (unsigned int j = 0; j < tablep[town_hall_type->GetIndex()].size(); ++j) {
 			//
 			// The type is available
 			//
-			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->GetIndex()][j])) {
 				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 				requested_settlement = true;
 				break;
@@ -2397,7 +2395,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 	
-	CUnitType *dock_type = CUnitType::UnitTypes[dock_type_id];
+	CUnitType *dock_type = CUnitType::Get(dock_type_id);
 	
 	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *dock_type)) {
 		return;
@@ -2533,7 +2531,7 @@ void AiCheckBuildings()
 		int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_templates[i]->UnitClass);
 		CUnitType *type = nullptr;
 		if (unit_type_id != -1) {
-			type = CUnitType::UnitTypes[unit_type_id];
+			type = CUnitType::Get(unit_type_id);
 		}
 		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type, false, true)) {
 			continue;
@@ -2574,11 +2572,11 @@ void AiCheckBuildings()
 	CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
 	int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_template->UnitClass);
-	CUnitType *type = CUnitType::UnitTypes[unit_type_id];
+	CUnitType *type = CUnitType::Get(unit_type_id);
 	
-	if (type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[type->Slot].empty()) { //constructed by worker
+	if (type->GetIndex() < (int) AiHelpers.Build.size() && !AiHelpers.Build[type->GetIndex()].empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*type, 1);
-	} else if (type->Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type->Slot].empty()) { //upgraded to from another building
+	} else if (type->GetIndex() < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type->GetIndex()].empty()) { //upgraded to from another building
 		AiAddUpgradeToRequest(*type);
 	} else {
 		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", type->Ident.c_str());
@@ -2592,7 +2590,7 @@ static void AiCheckMinecartConstruction()
 		return;
 	}
 	
-	CUnitType *minecart_type = CUnitType::UnitTypes[minecart_type_id];
+	CUnitType *minecart_type = CUnitType::Get(minecart_type_id);
 		
 	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *minecart_type, false, false)) {
 		return;
@@ -2665,7 +2663,7 @@ static void AiCheckMinecartSalvaging()
 		return;
 	}
 	
-	CUnitType *minecart_type = CUnitType::UnitTypes[minecart_type_id];
+	CUnitType *minecart_type = CUnitType::Get(minecart_type_id);
 	std::vector<CUnit *> minecart_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *minecart_type, minecart_table, true);
 	

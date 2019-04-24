@@ -48,7 +48,7 @@ void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<std::string,
 	std::string value = property.second;
 	if (key == "unit_type") {
 		value = FindAndReplaceString(value, "_", "-");
-		this->UnitType = UnitTypeByIdent(value);
+		this->UnitType = CUnitType::Get(value);
 		if (!this->UnitType) {
 			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 		}

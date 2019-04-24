@@ -404,7 +404,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependencies(CUnitType::UnitTypes[button.Value], unit.Player, false, true);
+	return CheckDependencies(CUnitType::Get(button.Value), unit.Player, false, true);
 }
 
 /**

@@ -742,14 +742,14 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 	while (this->Variable[LEVELUP_INDEX].Value > 0 && upgrade_found && automatic_learning) {
 		upgrade_found = false;
 
-		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
+		if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Type->GetIndex()) {
 			std::vector<CUnitType *> potential_upgrades;
 			
-			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
+			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
-				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
+				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size(); ++i) {
+					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[this->Type->GetIndex()][i];
 					if (CheckDependencies(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
@@ -766,11 +766,11 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						}
 					}
 				}
-			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
-				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckDependencies(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
-						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
-							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
+			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size() == 1)) {
+				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size(); ++i) {
+					if (CheckDependencies(AiHelpers.ExperienceUpgrades[this->Type->GetIndex()][i], this, true)) {
+						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[this->Type->GetIndex()][i]) == this->Character->ForbiddenUpgrades.end()) {
+							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[this->Type->GetIndex()][i]);
 						}
 					}
 				}
@@ -789,11 +789,11 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		}
 			
 		if ((this->Player->AiEnabled || this->Character == nullptr) && this->Variable[LEVELUP_INDEX].Value) {
-			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
+			if (((int) AiHelpers.LearnableAbilities.size()) > this->Type->GetIndex()) {
 				std::vector<CUpgrade *> potential_abilities;
-				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-					if (this->CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
-						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
+				for (size_t i = 0; i != AiHelpers.LearnableAbilities[this->Type->GetIndex()].size(); ++i) {
+					if (this->CanLearnAbility(AiHelpers.LearnableAbilities[this->Type->GetIndex()][i])) {
+						potential_abilities.push_back(AiHelpers.LearnableAbilities[this->Type->GetIndex()][i]);
 					}
 				}
 				if (potential_abilities.size() > 0) {
@@ -833,21 +833,21 @@ void CUnit::Retrain()
 	//now, revert the unit's type to the level 1 one
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
 		bool found_previous_unit_type = false;
-		for (size_t i = 0; i != CUnitType::UnitTypes.size(); ++i) {
-			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), CUnitType::UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
+		for (CUnitType *unit_type : CUnitType::GetAll()) {
+			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
-			if (((int) AiHelpers.ExperienceUpgrades.size()) > i) {
-				for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[i].size(); ++j) {
-					if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
+			if (((int) AiHelpers.ExperienceUpgrades.size()) > unit_type->GetIndex()) {
+				for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[unit_type->GetIndex()].size(); ++j) {
+					if (AiHelpers.ExperienceUpgrades[unit_type->GetIndex()][j] == this->Type) {
 						this->Variable[LEVELUP_INDEX].Value += 1;
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 						this->Variable[LEVELUP_INDEX].Enable = 1;
-						TransformUnitIntoType(*this, *CUnitType::UnitTypes[i]);
+						TransformUnitIntoType(*this, *unit_type);
 						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
-							if (Character->Type->Slot != i) {
+							if (this->Character->Type != unit_type) {
 								if (Player->AiEnabled == false) {
-									Character->Type = CUnitType::UnitTypes[i];
+									this->Character->Type = unit_type;
 									SaveHero(Character);
 									CAchievement::CheckAchievements();
 								}
@@ -1397,7 +1397,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 	for (int i = (CUpgradeModifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
 		const CUpgradeModifier *modifier = CUpgradeModifier::UpgradeModifiers[i];
 		const CUpgrade *upgrade = AllUpgrades[modifier->UpgradeId];
-		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X' && upgrade->ItemSlot != nullptr) {
+		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X' && upgrade->ItemSlot != nullptr) {
 			if (
 				(
 					(button_action == ButtonAttack && ((upgrade->ItemSlot->Weapon && upgrade->Item->ItemClass->AllowArrows == false) || upgrade->ItemSlot->Arrows))
@@ -1508,7 +1508,7 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 				if (
-					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Weapon && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
+					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Weapon && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X')
 					|| (
 						modifier_upgrade->Ability
 						&& this->GetIndividualUpgrade(modifier_upgrade)
@@ -1540,7 +1540,7 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 			// remove the upgrade modifiers from shield technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1548,7 +1548,7 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 			// remove the upgrade modifiers from boots technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1556,7 +1556,7 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 			// remove the upgrade modifiers from arrows technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1726,7 +1726,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 				if (
-					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Weapon && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
+					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Weapon && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X')
 					|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
@@ -1752,7 +1752,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 			// restore the upgrade modifiers from shield technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1760,7 +1760,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 			// restore the upgrade modifiers from boots technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1768,7 +1768,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 			// restore the upgrade modifiers from arrows technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -2430,7 +2430,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		const CCivilization *civilization = this->Type->GetCivilization();
-		if (civilization != nullptr && civilization->GetIndex() != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
+		if (civilization != nullptr && civilization->GetIndex() != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
 			civilization = CCivilization::Get(this->Player->Race);
 		}
 		
@@ -2444,7 +2444,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->Type->Slot == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->Type->Class))
+					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->Type->GetIndex() == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->Type->Class))
 					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
@@ -3358,7 +3358,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	if (this->Player->GetFaction() != nullptr) {
 		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->Slot == CFaction::GetFactionClassUnitType(faction, this->Type->Class)) {
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->Class)) {
 			civilization = faction->Civilization;
 		}
 	}
@@ -3419,12 +3419,12 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			const CCivilization *civilization = this->Type->GetCivilization();
-			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Get(this->Player->Race) == civilization || this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class))) {
+			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Get(this->Player->Race) == civilization || this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class))) {
 				civilization = CCivilization::Get(this->Player->Race);
 			}
 			
 			const CFaction *faction = this->Type->GetFaction();
-			if (CCivilization::Get(this->Player->Race) == civilization && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
+			if (CCivilization::Get(this->Player->Race) == civilization && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
 				faction = this->Player->GetFaction();
 			}
 
@@ -3754,15 +3754,15 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 	// create metal rocks near metal resources
 	CUnitType *metal_rock_type = nullptr;
 	if (type.Ident == "unit-gold-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-gold-rock");
+		metal_rock_type = CUnitType::Get("unit-gold-rock");
 	} else if (type.Ident == "unit-silver-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-silver-rock");
+		metal_rock_type = CUnitType::Get("unit-silver-rock");
 	} else if (type.Ident == "unit-copper-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-copper-rock");
+		metal_rock_type = CUnitType::Get("unit-copper-rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-diamond-rock");
+		metal_rock_type = CUnitType::Get("unit-diamond-rock");
 	} else if (type.Ident == "unit-emerald-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-emerald-rock");
+		metal_rock_type = CUnitType::Get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileSize - 1) / 2);
@@ -4642,7 +4642,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 		const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
+		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->GetIndex()] == 'X') { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, modifier);
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
@@ -5335,13 +5335,13 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	int value = 0;
 	int upgrade_value = 0;
 	
-	if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
-		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-			if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
+	if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->GetIndex()) {
+		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->GetIndex()].size(); ++i) {
+			if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->GetIndex()][i]) == this->Character->ForbiddenUpgrades.end()) {
 				int local_upgrade_value = 1;
 				
 				if (!only_units) {
-					local_upgrade_value += AiHelpers.ExperienceUpgrades[Type->Slot][i]->GetAvailableLevelUpUpgrades();
+					local_upgrade_value += AiHelpers.ExperienceUpgrades[Type->GetIndex()][i]->GetAvailableLevelUpUpgrades();
 				}
 				
 				if (local_upgrade_value > upgrade_value) {
@@ -5353,9 +5353,9 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	value += upgrade_value;
 	
-	if (!only_units && ((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
-		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-			value += AiHelpers.LearnableAbilities[Type->Slot][i]->MaxLimit - this->GetIndividualUpgrade(AiHelpers.LearnableAbilities[Type->Slot][i]);
+	if (!only_units && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->GetIndex()) {
+		for (size_t i = 0; i != AiHelpers.LearnableAbilities[this->Type->GetIndex()].size(); ++i) {
+			value += AiHelpers.LearnableAbilities[this->Type->GetIndex()][i]->MaxLimit - this->GetIndividualUpgrade(AiHelpers.LearnableAbilities[this->Type->GetIndex()][i]);
 		}
 	}
 	
@@ -5578,7 +5578,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 				if (
 					(
 						modifier_upgrade->ItemSlot == item_slot
-						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X'
+						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X'
 					)
 					|| (item_slot->Weapon && modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->GetCurrentWeaponClass()) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item->Type->ItemClass) == modifier_upgrade->WeaponClasses.end())
 				) {
@@ -6945,7 +6945,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	}
 	
 	//Wyrmgus start
-	attacker.Player->UnitTypeKills[target.Type->Slot]++;
+	attacker.Player->UnitTypeKills[target.Type->GetIndex()]++;
 	
 	//distribute experience between nearby units belonging to the same player
 	if (!target.Type->BoolFlag[BUILDING_INDEX].value) {
@@ -7704,7 +7704,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		&& this->Type->BoolFlag[FAUNA_INDEX].value
 		&& this->Type->BoolFlag[ORGANIC_INDEX].value
 		&& unit.Type->BoolFlag[ORGANIC_INDEX].value
-		&& this->Type->Slot != unit.Type->Slot
+		&& this->Type != unit.Type
 	) {
 		if (
 			this->Type->BoolFlag[PREDATOR_INDEX].value

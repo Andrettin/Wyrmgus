@@ -96,7 +96,7 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 			this->Quantity = std::stoi(property.Value);
 		} else if (property.Key == "unit_type") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
+			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
 				this->UnitType = unit_type;
 			} else {

@@ -146,7 +146,7 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, con
 */
 void CBuildRestrictionDistance::Init()
 {
-	this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);
+	this->RestrictType = CUnitType::Get(this->RestrictTypeName);
 	this->RestrictClass = UnitClass::Get(this->RestrictClassName);
 }
 

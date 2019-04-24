@@ -90,7 +90,7 @@ bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string
 		}
 	} else if (key == "character_type") {
 		value = FindAndReplaceString(value, "_", "-");
-		const CUnitType *unit_type = UnitTypeByIdent(value);
+		const CUnitType *unit_type = CUnitType::Get(value);
 		if (unit_type) {
 			this->CharacterType = unit_type;
 		} else {

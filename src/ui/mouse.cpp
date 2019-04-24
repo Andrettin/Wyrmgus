@@ -336,10 +336,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
-				for (CUnitType *unit_type : CUnitType::UnitTypes) {
+				for (CUnitType *unit_type : CUnitType::GetAll()) {
 					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 						if (CheckDependencies(unit_type, unit.Player)) {
-							if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
+							if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.Type) != AiHelpers.Build[unit_type->GetIndex()].end()) {
 								dest.Blink = 4;
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
 								if (!acknowledged) {
@@ -365,7 +365,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					}
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
-					for (CUnitType *unit_type : CUnitType::UnitTypes) {
+					for (CUnitType *unit_type : CUnitType::GetAll()) {
 						if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 							if (CheckDependencies(unit_type, unit.Player)) {
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
@@ -501,9 +501,9 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
-		for (CUnitType *unit_type : CUnitType::UnitTypes) {
+		for (CUnitType *unit_type : CUnitType::GetAll()) {
 			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
-				if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
+				if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.Type) != AiHelpers.Build[unit_type->GetIndex()].end()) {
 					dest->Blink = 4;
 					SendCommandBuildBuilding(unit, dest->tilePos, *unit_type, flush, dest->MapLayer->ID);
 					if (!acknowledged) {
@@ -1185,7 +1185,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
 							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitActionTrain) {
 								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
-								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
+								if (previous_order.GetUnitType().GetIndex() == order.GetUnitType().GetIndex()) {
 									continue;
 								}
 							}
@@ -2678,7 +2678,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
 							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitActionTrain) {
 								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
-								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
+								if (previous_order.GetUnitType().GetIndex() == order.GetUnitType().GetIndex()) {
 									if (order_slot != -1) {
 										order_slot = i; //so that it removes the last training order of that unit type
 									}

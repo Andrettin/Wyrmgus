@@ -216,7 +216,7 @@ static void AiCheckUnits()
 	//  Look if some unit-types are missing.
 	int n = AiPlayer->UnitTypeRequests.size();
 	for (int i = 0; i < n; ++i) {
-		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
+		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->GetIndex();
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
 		const UnitClass *unit_class = AiPlayer->UnitTypeRequests[i].Type->Class;
 
@@ -250,7 +250,7 @@ static void AiCheckUnits()
 	//  Look if some upgrade-to are missing.
 	n = AiPlayer->UpgradeToRequests.size();
 	for (int i = 0; i < n; ++i) {
-		const unsigned int t = AiPlayer->UpgradeToRequests[i]->Slot;
+		const unsigned int t = AiPlayer->UpgradeToRequests[i]->GetIndex();
 		const int x = 1;
 
 		//  Add equivalent units
@@ -811,8 +811,8 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 	const int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (int i = 0; i < equivalentsCount; ++i) {
 		//Wyrmgus start
-//		if (AiRemoveFromBuilt2(pai, *CUnitType::UnitTypes[equivalents[i]])) {
-		if (AiRemoveFromBuilt2(pai, *CUnitType::UnitTypes[equivalents[i]], landmass, settlement)) {
+//		if (AiRemoveFromBuilt2(pai, *CUnitType::Get(equivalents[i]))) {
+		if (AiRemoveFromBuilt2(pai, *CUnitType::Get(equivalents[i]), landmass, settlement)) {
 		//Wyrmgus end
 			return;
 		}
@@ -888,8 +888,8 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, con
 
 	for (unsigned int i = 0; i < equivnb; ++i) {
 		//Wyrmgus start
-//		if (AiReduceMadeInBuilt2(pai, *CUnitType::UnitTypes[equivs[i]])) {
-		if (AiReduceMadeInBuilt2(pai, *CUnitType::UnitTypes[equivs[i]], landmass, settlement)) {
+//		if (AiReduceMadeInBuilt2(pai, *CUnitType::Get(equivs[i]))) {
+		if (AiReduceMadeInBuilt2(pai, *CUnitType::Get(equivs[i]), landmass, settlement)) {
 		//Wyrmgus end
 			return;
 		}
@@ -1433,7 +1433,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	} else { //remove the request of the unit the mercenary is substituting
 		int requested_unit_type_id = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->Class);
 		if (requested_unit_type_id != -1) {
-			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::UnitTypes[requested_unit_type_id], CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::Get(requested_unit_type_id), CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}
 	}
 	//Wyrmgus end
@@ -1615,9 +1615,9 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int lan
 	}
 	
 	if (include_upgrades) {
-		if (type->Slot < (int) AiHelpers.UpgradesTo.size()) {
-			for (size_t i = 0; i != AiHelpers.UpgradesTo[type->Slot].size(); ++i) {
-				count += AiGetUnitTypeCount(pai, AiHelpers.UpgradesTo[type->Slot][i], landmass, include_requests, include_upgrades);
+		if (type->GetIndex() < (int) AiHelpers.UpgradesTo.size()) {
+			for (size_t i = 0; i != AiHelpers.UpgradesTo[type->GetIndex()].size(); ++i) {
+				count += AiGetUnitTypeCount(pai, AiHelpers.UpgradesTo[type->GetIndex()][i], landmass, include_requests, include_upgrades);
 			}
 		}
 	}

@@ -167,7 +167,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "unit_type") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
+			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
 				if (this->Type == nullptr || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
 					this->Type = unit_type;
@@ -293,7 +293,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->HeroicIcon.Icon->Load();
 		} else if (key == "forbidden_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
+			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
 				this->ForbiddenUpgrades.push_back(unit_type);
 			} else {
@@ -426,11 +426,11 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	}
 		
 	//check if the abilities are correct for this character's unit type
-	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
+	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->GetIndex()) {
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			const CUpgrade *ability_upgrade = this->Abilities[i];
-			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), ability_upgrade) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
+			if (std::find(AiHelpers.LearnableAbilities[this->Type->GetIndex()].begin(), AiHelpers.LearnableAbilities[this->Type->GetIndex()].end(), ability_upgrade) == AiHelpers.LearnableAbilities[this->Type->GetIndex()].end()) {
 				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), ability_upgrade), this->Abilities.end());
 			}
 		}
@@ -1211,7 +1211,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			hero->Civilization = civilization;
 			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->Type->Class);
 			if (new_unit_type_id != -1) {
-				hero->Type = CUnitType::UnitTypes[new_unit_type_id];
+				hero->Type = CUnitType::Get(new_unit_type_id);
 				hero->Name = new_hero_name.c_str();
 				hero->FamilyName = new_hero_family_name.c_str();
 				SaveHero(hero);

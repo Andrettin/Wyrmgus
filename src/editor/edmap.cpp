@@ -385,7 +385,7 @@ constexpr int ROCK_TILE = 0x80;
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
 	const Vec2i mpos(UI.CurrentMapLayer->GetWidth(), UI.CurrentMapLayer->GetHeight());
-	CUnitType *typeptr = UnitTypeByIdent(unit_type);
+	CUnitType *typeptr = CUnitType::Get(unit_type);
 
 	if (!typeptr) { // Error
 		return;

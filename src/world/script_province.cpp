@@ -324,12 +324,12 @@ static int CclDefineProvince(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string building_type_ident = LuaToString(l, -1, j + 1);
-				int building_type = UnitTypeIdByIdent(building_type_ident);
-				if (building_type == -1) {
+				const CUnitType *building_type = CUnitType::Get(building_type_ident);
+				if (building_type == nullptr) {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ building_type_ident.c_str());
 				}
 				++j;
-				province->HistoricalSettlementBuildings[building_type][year] = LuaToBoolean(l, -1, j + 1);
+				province->HistoricalSettlementBuildings[building_type->GetIndex()][year] = LuaToBoolean(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "HistoricalModifiers")) {
 			if (!lua_istable(l, -1)) {

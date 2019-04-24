@@ -537,7 +537,7 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	if (dest) {
 		nc.Dest = UnitNumber(*dest);
 	} else if (type) {
-		nc.Dest = type->Slot;
+		nc.Dest = type->GetIndex();
 	} else {
 		nc.Dest = 0xFFFF; // -1
 	}

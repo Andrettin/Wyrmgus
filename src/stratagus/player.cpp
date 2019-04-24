@@ -683,9 +683,9 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-kills\", %i,", this->TotalKills);
 	//Wyrmgus start
 	file.printf("\n  \"unit-type-kills\", {");
-	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		if (this->UnitTypeKills[i] != 0) {
-			file.printf("\"%s\", %i, ", CUnitType::UnitTypes[i]->Ident.c_str(), this->UnitTypeKills[i]);
+	for (const CUnitType *unit_type : CUnitType::GetAll()) {
+		if (this->UnitTypeKills[unit_type->GetIndex()] != 0) {
+			file.printf("\"%s\", %i, ", unit_type->Ident.c_str(), this->UnitTypeKills[unit_type->GetIndex()]);
 		}
 	}
 	file.printf("},");
@@ -1275,7 +1275,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->Slot == CFaction::GetFactionClassUnitType(faction, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1533,12 +1533,12 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	if (town_hall_type_id == -1) {
 		return false;
 	}
-	CUnitType *town_hall_type = CUnitType::UnitTypes[town_hall_type_id];
+	CUnitType *town_hall_type = CUnitType::Get(town_hall_type_id);
 	
 	int stronghold_type_id = CFaction::GetFactionClassUnitType(this->Faction, UnitClass::Get("stronghold"));			
 	CUnitType *stronghold_type = nullptr;
 	if (stronghold_type_id != -1) {
-		stronghold_type = CUnitType::UnitTypes[stronghold_type_id];
+		stronghold_type = CUnitType::Get(stronghold_type_id);
 	}
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
@@ -1594,28 +1594,28 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 
 bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSite *settlement) const
 {
-	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
-		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Build[type->Slot][j]) > 0) {
+	if (type->BoolFlag[BUILDING_INDEX].value && type->GetIndex() < (int) AiHelpers.Build.size()) {
+		for (size_t j = 0; j < AiHelpers.Build[type->GetIndex()].size(); ++j) {
+			if (this->GetUnitTypeCount(AiHelpers.Build[type->GetIndex()][j]) > 0) {
 				return true;
 			}
 		}
-	} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Train.size()) {
-		for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Train[type->Slot][j]) > 0) {
+	} else if (!type->BoolFlag[BUILDING_INDEX].value && type->GetIndex() < (int) AiHelpers.Train.size()) {
+		for (size_t j = 0; j < AiHelpers.Train[type->GetIndex()].size(); ++j) {
+			if (this->GetUnitTypeCount(AiHelpers.Train[type->GetIndex()][j]) > 0) {
 				return true;
 			}
 		}
 	}
-	if (type->Slot < (int) AiHelpers.Upgrade.size()) {
-		for (size_t j = 0; j < AiHelpers.Upgrade[type->Slot].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Upgrade[type->Slot][j]) > 0) {
+	if (type->GetIndex() < (int) AiHelpers.Upgrade.size()) {
+		for (size_t j = 0; j < AiHelpers.Upgrade[type->GetIndex()].size(); ++j) {
+			if (this->GetUnitTypeCount(AiHelpers.Upgrade[type->GetIndex()][j]) > 0) {
 				if (!settlement) {
 					return true;
 				} else {
 					for (int i = 0; i < this->GetUnitCount(); ++i) {
 						CUnit &unit = this->GetUnit(i);
-						if (unit.Type == AiHelpers.Upgrade[type->Slot][j] && unit.Settlement == settlement) {
+						if (unit.Type == AiHelpers.Upgrade[type->GetIndex()][j] && unit.Settlement == settlement) {
 							return true;
 						}
 					}
@@ -1982,13 +1982,13 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 	return "";
 }
 
-void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building)
+void CPlayer::GetWorkerLandmasses(std::vector<int> &worker_landmasses, const CUnitType *building)
 {
-	for (unsigned int i = 0; i < AiHelpers.Build[building->Slot].size(); ++i) {
-		if (this->GetUnitTypeAiActiveCount(AiHelpers.Build[building->Slot][i])) {
+	for (unsigned int i = 0; i < AiHelpers.Build[building->GetIndex()].size(); ++i) {
+		if (this->GetUnitTypeAiActiveCount(AiHelpers.Build[building->GetIndex()][i])) {
 			std::vector<CUnit *> worker_table;
 
-			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->Slot][i], worker_table, true);
+			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->GetIndex()][i], worker_table, true);
 
 			for (size_t j = 0; j != worker_table.size(); ++j) {
 				int worker_landmass = CMap::Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer->ID);
@@ -2005,9 +2005,9 @@ std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
 	std::vector<CUpgrade *> researchable_upgrades;
 	for (std::map<const CUnitType *, int>::iterator iterator = this->UnitTypesAiActiveCount.begin(); iterator != this->UnitTypesAiActiveCount.end(); ++iterator) {
 		const CUnitType *type = iterator->first;
-		if (type->Slot < ((int) AiHelpers.ResearchedUpgrades.size())) {
-			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->Slot].size(); ++i) {
-				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->Slot][i];
+		if (type->GetIndex() < ((int) AiHelpers.ResearchedUpgrades.size())) {
+			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->GetIndex()].size(); ++i) {
+				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->GetIndex()][i];
 				if (std::find(researchable_upgrades.begin(), researchable_upgrades.end(), upgrade) == researchable_upgrades.end()) {
 					researchable_upgrades.push_back(upgrade);
 				}
@@ -2536,7 +2536,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					return false;
 				}
 				unit_types.clear();
-				unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
+				unit_types.push_back(CUnitType::Get(unit_type_id));
 			}
 
 			bool validated = false;
@@ -2574,7 +2574,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 								continue;
 							}
 							unit_types.clear();
-							unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
+							unit_types.push_back(CUnitType::Get(unit_type_id));
 						}
 
 						for (const CUnitType *unit_type : unit_types) {
@@ -2696,7 +2696,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 						return "You can no longer produce the required unit.";
 					}
 					unit_types.clear();
-					unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
+					unit_types.push_back(CUnitType::Get(unit_type_id));
 				}
 				
 				bool validated = false;
@@ -2739,7 +2739,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 									continue;
 								}
 								unit_types.clear();
-								unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
+								unit_types.push_back(CUnitType::Get(unit_type_id));
 							}
 
 							for (const CUnitType *unit_type : unit_types) {
@@ -3142,7 +3142,7 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 
 		if (unit.CurrentAction() == UnitActionUpgradeTo) {
 			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit.CurrentOrder());
-			if (order.GetUnitType().Slot == type.Slot) {
+			if (order.GetUnitType().GetIndex() == type.GetIndex()) {
 				++count;
 			}
 		}
@@ -3184,8 +3184,8 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 		Notify("%s", _("Total Unit Limit Reached"));
 		return -4;
 	}
-	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
-		Notify(_("Limit of %i reached for this unit type"), Allow.Units[type.Slot]);
+	if (GetUnitTotalCount(type) >= Allow.Units[type.GetIndex()]) {
+		Notify(_("Limit of %i reached for this unit type"), Allow.Units[type.GetIndex()]);
 		return -6;
 	}
 	return 1;
@@ -3601,7 +3601,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType &type) const
 */
 int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 {
-	return this->GetUnitTypeCount(UnitTypeByIdent(ident));
+	return this->GetUnitTypeCount(CUnitType::Get(ident));
 }
 
 /**

@@ -49,7 +49,7 @@
 		++j;
 		if (!strcmp(value, "unit-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = UnitTypeByIdent(value);
+			this->UnitType = CUnitType::Get(value);
 			if (!this->UnitType) {
 				this->UnitType = 0;
 				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);

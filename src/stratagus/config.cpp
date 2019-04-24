@@ -340,14 +340,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				trigger->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "unit_type") {
-			CUnitType *unit_type = UnitTypeByIdent(ident);
-			if (!unit_type) {
-				unit_type = NewUnitTypeSlot(ident);
-			}
-			if (!define_only) {
-				unit_type->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "upgrade") {
 			CUpgrade *upgrade = CUpgrade::New(ident);
 			if (!define_only) {

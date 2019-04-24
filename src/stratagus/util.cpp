@@ -1261,7 +1261,7 @@ std::string SeparateCapitalizedStringElements(const std::string &text)
 
 std::string GeneratePersonalName(const std::string &unit_type_ident)
 {
-	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-	return CUnitType::UnitTypes[unit_type_id]->GeneratePersonalName(nullptr, CUnitType::UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
+	const CUnitType *unit_type = CUnitType::Get(unit_type_ident);
+	return unit_type->GeneratePersonalName(nullptr, unit_type->DefaultStat.Variables[GENDER_INDEX].Value);
 }
 //Wyrmgus end

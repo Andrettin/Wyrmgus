@@ -34,7 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
+#include "data_type.h"
+#include "detailed_data_element.h"
 #include "missile/missile_config.h"
 #include "sound/unit_sound.h"
 #include "ui/icon_config.h"
@@ -59,6 +60,7 @@
 ----------------------------------------------------------------------------*/
 
 class CAnimations;
+class CBuildRestriction;
 class CCivilization;
 class CConstruction;
 class CDependency;
@@ -87,8 +89,6 @@ struct lua_State;
 
 constexpr int UnitSides = 8;
 constexpr int MaxAttackPos = 5;
-
-CUnitType *UnitTypeByIdent(const std::string &ident);
 
 enum GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
@@ -489,209 +489,24 @@ enum DistanceTypeType {
 	GreaterThanEqual
 };
 
-class CBuildRestriction
-{
-public:
-	virtual ~CBuildRestriction() {}
-	virtual void Init() {};
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
-	//Wyrmgus end
-};
-
-class CBuildRestrictionAnd : public CBuildRestriction
-{
-public:
-	virtual ~CBuildRestrictionAnd()
-	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			delete *i;
-		}
-		_or_list.clear();
-	}
-	virtual void Init()
-	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			(*i)->Init();
-		}
-	}
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
-
-	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
-public:
-	std::vector<CBuildRestriction *> _or_list;
-};
-
-//Wyrmgus start
-class CBuildRestrictionOr : public CBuildRestriction
-{
-public:
-	virtual ~CBuildRestrictionOr()
-	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			delete *i;
-		}
-		_or_list.clear();
-	}
-	virtual void Init()
-	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			(*i)->Init();
-		}
-	}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-
-	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
-public:
-	std::vector<CBuildRestriction *> _or_list;
-};
-//Wyrmgus end
-
-class CBuildRestrictionAddOn : public CBuildRestriction
-{
-	class functor
-	{
-	public:
-		functor(const CUnitType *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
-		inline bool operator()(const CUnit *const unit) const;
-	private:
-		const CUnitType *const Parent;   /// building that is unit is an addon too.
-		const Vec2i pos; //functor work position
-	};
-public:
-	virtual ~CBuildRestrictionAddOn() {}
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
-
-	Vec2i Offset = Vec2i(0, 0);	/// offset from the main building to place this
-	std::string ParentName;	/// building that is unit is an addon too.
-	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
-};
-
-class CBuildRestrictionOnTop : public CBuildRestriction
-{
-	class functor
-	{
-	public:
-		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
-		inline bool operator()(CUnit *const unit);
-		CUnit *ontop;   /// building that is unit is an addon too.
-	private:
-		const CUnitType *const Parent;  /// building that is unit is an addon too.
-		const Vec2i pos;  //functor work position
-	};
-public:
-	virtual ~CBuildRestrictionOnTop() {};
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
-
-	std::string ParentName;	/// building that is unit is an addon too.
-	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
-	int ReplaceOnDie = 0;	/// recreate the parent on destruction
-	int ReplaceOnBuild = 0;	/// remove the parent, or just build over it.
-};
-
-class CBuildRestrictionDistance : public CBuildRestriction
-{
-public:
-	virtual ~CBuildRestrictionDistance() {};
-	virtual void Init();
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
-
-	int Distance = 0;	/// distance to build (circle)
-	DistanceTypeType DistanceType;
-	std::string RestrictTypeName;
-	std::string RestrictTypeOwner;
-	const CUnitType *RestrictType = nullptr;
-	std::string RestrictClassName;
-	const UnitClass *RestrictClass = nullptr;
-	bool CheckBuilder = false;
-	bool Diagonal = true;
-};
-
-class CBuildRestrictionHasUnit : public CBuildRestriction
-{
-public:
-	virtual ~CBuildRestrictionHasUnit() {};
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
-	
-	int Count = 0;
-	DistanceTypeType CountType;
-	std::string RestrictTypeName;
-	CUnitType *RestrictType = nullptr;
-	std::string RestrictTypeOwner;
-};
-
-class CBuildRestrictionSurroundedBy : public CBuildRestriction
-{
-public:
-	virtual ~CBuildRestrictionSurroundedBy() {}
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); }
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
-	
-	int Distance = 0;
-	DistanceTypeType DistanceType = Equal;
-	int Count = 0;
-	DistanceTypeType CountType = Equal;
-	std::string RestrictTypeName;
-	std::string RestrictTypeOwner;
-	CUnitType *RestrictType = nullptr;
-	bool CheckBuilder = false;
-};
-
-//Wyrmgus start
-class CBuildRestrictionTerrain : public CBuildRestriction
-{
-public:
-	virtual ~CBuildRestrictionTerrain() {}
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-
-	std::string RestrictTerrainTypeName;
-	CTerrainType *RestrictTerrainType = nullptr;
-};
-//Wyrmgus end
-
 //Wyrmgus start
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType : public DataElement
+class CUnitType : public DetailedDataElement, public DataType<CUnitType>
 {
-	GDCLASS(CUnitType, DataElement)
+	GDCLASS(CUnitType, DetailedDataElement)
 	
 public:
 	CUnitType();
 	~CUnitType();
 	
+	static constexpr const char *ClassIdentifier = "unit_type";
+	
 	static std::vector<CUnitType *> GetUnitUnitTypes();
 	static std::vector<CUnitType *> GetBuildingUnitTypes();
 	static std::vector<CUnitType *> GetItemUnitTypes();
-
-	static std::vector<CUnitType *> UnitTypes;	/// All unit-types
+	static CUnitType *Add(const std::string &ident);
+	static void Clear();
 
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
@@ -724,21 +539,6 @@ public:
 		return this->Faction;
 	}
 
-	String GetDescription() const
-	{
-		return this->Description.c_str();
-	}
-	
-	String GetQuote() const
-	{
-		return this->Quote.c_str();
-	}
-	
-	String GetBackground() const
-	{
-		return this->Background.c_str();
-	}
-	
 	bool IsHidden() const
 	{
 		return this->BoolFlag[HIDDEN_INDEX].value;
@@ -791,9 +591,6 @@ private:
 	CCivilization *Civilization = nullptr;	/// Which civilization this unit belongs to, if any
 	CFaction *Faction = nullptr;	/// Which faction this unit belongs to, if any
 public:
-	std::string Description;		/// Description of the unit type
-	std::string Quote;				/// Quote of the unit type
-	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
@@ -812,7 +609,6 @@ public:
 	std::map<std::string, std::vector<CUnitType *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
 	std::map<std::string, std::vector<CUnitType *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
-	int Slot = 0;					/// Type as number
 	std::string File;				/// Sprite files
 	std::string ShadowFile;			/// Shadow file
 	//Wyrmgus start
@@ -995,6 +791,193 @@ protected:
 	static void _bind_methods();
 };
 
+class CBuildRestriction
+{
+public:
+	virtual ~CBuildRestriction() {}
+	virtual void Init() {};
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
+	//Wyrmgus end
+};
+
+class CBuildRestrictionAnd : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionAnd()
+	{
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
+			delete *i;
+		}
+		_or_list.clear();
+	}
+	virtual void Init()
+	{
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
+			(*i)->Init();
+		}
+	}
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
+
+	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+public:
+	std::vector<CBuildRestriction *> _or_list;
+};
+
+//Wyrmgus start
+class CBuildRestrictionOr : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionOr()
+	{
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
+			delete *i;
+		}
+		_or_list.clear();
+	}
+	virtual void Init()
+	{
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
+			(*i)->Init();
+		}
+	}
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+
+	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+public:
+	std::vector<CBuildRestriction *> _or_list;
+};
+//Wyrmgus end
+
+class CBuildRestrictionAddOn : public CBuildRestriction
+{
+	class functor
+	{
+	public:
+		functor(const CUnitType *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
+		inline bool operator()(const CUnit *const unit) const;
+	private:
+		const CUnitType *const Parent;   /// building that is unit is an addon too.
+		const Vec2i pos; //functor work position
+	};
+public:
+	virtual ~CBuildRestrictionAddOn() {}
+	virtual void Init() {this->Parent = CUnitType::Get(this->ParentName); }
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
+
+	Vec2i Offset = Vec2i(0, 0);	/// offset from the main building to place this
+	std::string ParentName;	/// building that is unit is an addon too.
+	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
+};
+
+class CBuildRestrictionOnTop : public CBuildRestriction
+{
+	class functor
+	{
+	public:
+		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
+		inline bool operator()(CUnit *const unit);
+		CUnit *ontop;   /// building that is unit is an addon too.
+	private:
+		const CUnitType *const Parent;  /// building that is unit is an addon too.
+		const Vec2i pos;  //functor work position
+	};
+public:
+	virtual ~CBuildRestrictionOnTop() {};
+	virtual void Init() {this->Parent = CUnitType::Get(this->ParentName);};
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
+
+	std::string ParentName;	/// building that is unit is an addon too.
+	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
+	int ReplaceOnDie = 0;	/// recreate the parent on destruction
+	int ReplaceOnBuild = 0;	/// remove the parent, or just build over it.
+};
+
+class CBuildRestrictionDistance : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionDistance() {};
+	virtual void Init();
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
+
+	int Distance = 0;	/// distance to build (circle)
+	DistanceTypeType DistanceType;
+	std::string RestrictTypeName;
+	std::string RestrictTypeOwner;
+	const CUnitType *RestrictType = nullptr;
+	std::string RestrictClassName;
+	const UnitClass *RestrictClass = nullptr;
+	bool CheckBuilder = false;
+	bool Diagonal = true;
+};
+
+class CBuildRestrictionHasUnit : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionHasUnit() {};
+	virtual void Init() { this->RestrictType = CUnitType::Get(this->RestrictTypeName); };
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
+	
+	int Count = 0;
+	DistanceTypeType CountType;
+	std::string RestrictTypeName;
+	CUnitType *RestrictType = nullptr;
+	std::string RestrictTypeOwner;
+};
+
+class CBuildRestrictionSurroundedBy : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionSurroundedBy() {}
+	virtual void Init() { this->RestrictType = CUnitType::Get(this->RestrictTypeName); }
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
+	
+	int Distance = 0;
+	DistanceTypeType DistanceType = Equal;
+	int Count = 0;
+	DistanceTypeType CountType = Equal;
+	std::string RestrictTypeName;
+	std::string RestrictTypeOwner;
+	CUnitType *RestrictType = nullptr;
+	bool CheckBuilder = false;
+};
+
+//Wyrmgus start
+class CBuildRestrictionTerrain : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionTerrain() {}
+	virtual void Init();
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+
+	std::string RestrictTerrainTypeName;
+	CTerrainType *RestrictTerrainType = nullptr;
+};
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -1136,12 +1119,12 @@ extern CUnitType *SettlementSiteUnitType;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
 extern CUnitType *CclGetUnitType(lua_State *l);  /// Access unit-type object
 extern void UnitTypeCclRegister();               /// Register ccl features
 
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
-extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 //Wyrmgus start
 extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
@@ -1150,7 +1133,6 @@ extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
-extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 						 int player, int frame, const PixelPos &screenPos);
@@ -1165,7 +1147,6 @@ extern void LoadUnitTypes();                     /// Load the unit-type data
 //Wyrmgus start
 extern void LoadUnitType(CUnitType &unittype);	/// Load a unittype
 //Wyrmgus end
-extern void CleanUnitTypes();                    /// Cleanup unit-type module
 
 // in script_unit_type.cpp
 
@@ -1181,8 +1162,6 @@ extern void SetModSound(const std::string &mod_file, const std::string &ident, c
 //Wyrmgus start
 extern std::string GetImageLayerNameById(int image_layer);
 extern int GetImageLayerIdByName(const std::string &image_layer);
-
-extern std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end
 
 #endif

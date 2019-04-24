@@ -162,7 +162,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "item_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CUnitType *unit_type = UnitTypeByIdent(value);
+			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ItemsEquipped.push_back(unit_type);
 			} else {
@@ -170,7 +170,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "item_not_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CUnitType *unit_type = UnitTypeByIdent(value);
+			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ItemsNotEquipped.push_back(unit_type);
 			} else {

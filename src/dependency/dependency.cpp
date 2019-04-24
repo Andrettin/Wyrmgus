@@ -115,7 +115,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	//
 	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
-		const CUnitType *unit_type = UnitTypeByIdent(button.ValueStr);
+		const CUnitType *unit_type = CUnitType::Get(button.ValueStr);
 		if (unit_type->Dependency) {
 			rules = unit_type->Dependency->GetString();
 		}
@@ -145,7 +145,7 @@ bool CheckDependencies(const CUnitType *target, const CPlayer *player, const boo
 		return false;
 	}
 	
-	if (UnitIdAllowed(*player, target->Slot) == 0) {
+	if (UnitIdAllowed(*player, target->GetIndex()) == 0) {
 		return false;
 	}
 	
@@ -197,7 +197,7 @@ bool CheckDependencies(const CUnitType *target, const CUnit *unit, const bool ig
 		return false;
 	}
 	
-	if (UnitIdAllowed(*unit->Player, target->Slot) == 0) {
+	if (UnitIdAllowed(*unit->Player, target->GetIndex()) == 0) {
 		return false;
 	}
 	
@@ -265,7 +265,7 @@ static int CclDefineDependency(lua_State *l)
 			CDependency *dependency = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
-				const CUnitType *unit_type = UnitTypeByIdent(required);
+				const CUnitType *unit_type = CUnitType::Get(required);
 				if (!unit_type) {
 					LuaError(l, "Invalid unit type: \"%s\"" _C_ required);
 				}
@@ -308,7 +308,7 @@ static int CclDefineDependency(lua_State *l)
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
-		CUnitType *unit_type = UnitTypeByIdent(target);
+		CUnitType *unit_type = CUnitType::Get(target);
 		if (!unit_type) {
 			LuaError(l, "Invalid unit type: \"%s\"" _C_ target);
 		}
@@ -357,7 +357,7 @@ static int CclDefinePredependency(lua_State *l)
 			CDependency *dependency = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
-				const CUnitType *unit_type = UnitTypeByIdent(required);
+				const CUnitType *unit_type = CUnitType::Get(required);
 				if (!unit_type) {
 					LuaError(l, "Invalid unit type: \"%s\"" _C_ required);
 				}
@@ -400,7 +400,7 @@ static int CclDefinePredependency(lua_State *l)
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
-		CUnitType *unit_type = UnitTypeByIdent(target);
+		CUnitType *unit_type = CUnitType::Get(target);
 		if (!unit_type) {
 			LuaError(l, "Invalid unit type: \"%s\"" _C_ target);
 		}
@@ -439,7 +439,7 @@ static int CclCheckDependency(lua_State *l)
 	const CPlayer *player = CPlayer::Players[plynr];
 	
 	if (!strncmp(object, "unit-", 5)) {
-		const CUnitType *unit_type = UnitTypeByIdent(object);
+		const CUnitType *unit_type = CUnitType::Get(object);
 		if (!unit_type) {
 			LuaError(l, "Invalid unit type: \"%s\"" _C_ object);
 		}

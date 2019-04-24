@@ -1285,17 +1285,17 @@ static int GetPlayerData(const int player, const char *prop, const char *arg)
 	//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);
-		CUnitType *type = UnitTypeByIdent(unit);
+		CUnitType *type = CUnitType::Get(unit);
 		Assert(type);
 		return CPlayer::Players[player]->GetUnitTypeCount(type);
 	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
 		const std::string unit(arg);
-		CUnitType *type = UnitTypeByIdent(unit);
+		CUnitType *type = CUnitType::Get(unit);
 		Assert(type);
 		return CPlayer::Players[player]->GetUnitTypeUnderConstructionCount(type);
 	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
 		const std::string unit(arg);
-		CUnitType *type = UnitTypeByIdent(unit);
+		CUnitType *type = CUnitType::Get(unit);
 		Assert(type);
 		return CPlayer::Players[player]->GetUnitTypeAiActiveCount(type);
 	} else if (!strcmp(prop, "AiEnabled")) {
@@ -1569,7 +1569,7 @@ std::string EvalString(const StringDesc *s)
 					} else if (unit->Elixir != nullptr) {
 						return unit->Elixir->Quote;
 					} else {
-						return unit->Type->Quote;
+						return unit->Type->GetQuote().utf8().get_data();
 					}
 				} else {
 					return unit->Unique->Quote;
@@ -1581,8 +1581,10 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
-				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->GetFaction() != nullptr && (CCivilization::Get(unit->Settlement->SiteUnit->Player->Race) == civilization || unit->Settlement->SiteUnit->Type->Slot == CFaction::GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->GetFaction(), unit->Settlement->SiteUnit->Type->Class))) {
-					civilization = CCivilization::Get(unit->Settlement->SiteUnit->Player->Race);
+				const CUnit *site_unit = unit->Settlement->SiteUnit;
+				const CPlayer *site_player = site_unit->Player;
+				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type->GetIndex() == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->Class))) {
+					civilization = CCivilization::Get(site_player->Race);
 				}
 				return unit->Settlement->GetCulturalName(civilization);
 			} else {
@@ -1655,14 +1657,14 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeDescription : // name of the unit type's description
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Description;
+				return (**type).GetDescription().utf8().get_data();
 			} else { // ERROR.
 				return std::string();
 			}
 		case EString_TypeQuote : // name of the unit type's quote
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Quote;
+				return (**type).GetQuote().utf8().get_data();
 			} else { // ERROR.
 				return std::string();
 			}
@@ -3697,7 +3699,7 @@ void DeleteModFaction(const std::string &faction_name)
 
 void DeleteModUnitType(const std::string &unit_type_ident)
 {
-	CUnitType *unit_type = UnitTypeByIdent(unit_type_ident.c_str());
+	CUnitType *unit_type = CUnitType::Get(unit_type_ident);
 	
 	if (Editor.Running == EditorEditing) {
 		std::vector<CUnit *> units_to_remove;
@@ -3718,19 +3720,19 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 	}
 	for (CCivilization *civilization : CCivilization::GetAll()) {
 		for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
-			if (iterator->second == unit_type->Slot) {
+			if (iterator->second == unit_type->GetIndex()) {
 				civilization->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
 	for (CFaction *faction : CFaction::GetAll()) {
 		for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
-			if (iterator->second == unit_type->Slot) {
+			if (iterator->second == unit_type->GetIndex()) {
 				faction->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
-	for (CUnitType *other_unit_type : CUnitType::UnitTypes) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
+	for (CUnitType *other_unit_type : CUnitType::GetAll()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
 		if (std::find(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type) != other_unit_type->Trains.end()) {
 			other_unit_type->Trains.erase(std::remove(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type), other_unit_type->Trains.end());
 		}
@@ -3749,27 +3751,26 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		if (UnitButtonTable[j]->UnitMask.find(unit_type->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
 			UnitButtonTable[j]->UnitMask = FindAndReplaceString(UnitButtonTable[j]->UnitMask, unit_type->Ident + ",", "");
 		}
-		if (UnitButtonTable[j]->Value == unit_type->Slot && UnitButtonTable[j]->ValueStr == unit_type->Ident) {
+		if (UnitButtonTable[j]->Value == unit_type->GetIndex() && UnitButtonTable[j]->ValueStr == unit_type->Ident) {
 			delete UnitButtonTable[j];
 			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
 		}
 	}
-	UnitTypeMap.erase(unit_type->Ident);
-	delete unit_type;
-	CUnitType::UnitTypes.erase(std::remove(CUnitType::UnitTypes.begin(), CUnitType::UnitTypes.end(), unit_type), CUnitType::UnitTypes.end());
+	
+	CUnitType::Remove(unit_type);
 }
 
 void DisableMod(const std::string &mod_file)
 {
-	int unit_types_size = CUnitType::UnitTypes.size();
+	int unit_types_size = CUnitType::GetAll().size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {
 		
-		if (CUnitType::UnitTypes[i]->Mod == mod_file) {
-			DeleteModUnitType(CUnitType::UnitTypes[i]->Ident);
+		if (CUnitType::Get(i)->Mod == mod_file) {
+			DeleteModUnitType(CUnitType::Get(i)->Ident);
 		}
 	}
 		
-	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+	for (CUnitType *unit_type : CUnitType::GetAll()) {
 		if (unit_type->ModTrains.find(mod_file) != unit_type->ModTrains.end()) {
 			unit_type->ModTrains.erase(mod_file);
 			unit_type->RemoveButtons(-1, mod_file);

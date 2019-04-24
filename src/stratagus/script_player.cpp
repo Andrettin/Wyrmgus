@@ -351,10 +351,10 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, j + 1, k + 1));
+				CUnitType *unit_type = CUnitType::Get(LuaToString(l, j + 1, k + 1));
 				++k;
 				if (unit_type) {
-					this->UnitTypeKills[unit_type->Slot] = LuaToNumber(l, j + 1, k + 1);
+					this->UnitTypeKills[unit_type->GetIndex()] = LuaToNumber(l, j + 1, k + 1);
 				}
 			}
 		} else if (!strcmp(value, "lost-town-hall-timer")) {
@@ -501,7 +501,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->UnitClass = unit_class;
 					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, n + 1));
+						CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, n + 1));
 						if (!unit_type) {
 							LuaError(l, "Unit type doesn't exist.");
 						}
@@ -1739,7 +1739,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	if (civilization && unit_class != nullptr) {
 		int unit_type_id = CCivilization::GetCivilizationClassUnitType(civilization, unit_class);
 		if (unit_type_id != -1) {
-			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
+			unit_type_ident = CUnitType::Get(unit_type_id)->Ident;
 		}
 	}
 		
@@ -1784,7 +1784,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	if (unit_class != nullptr) {
 		int unit_type_id = CFaction::GetFactionClassUnitType(faction, unit_class);
 		if (unit_type_id != -1) {
-			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
+			unit_type_ident = CUnitType::Get(unit_type_id)->Ident;
 		}
 	}
 		
@@ -3006,7 +3006,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		CUnitType *type = CclGetUnitType(l);
 		Assert(type);
-		lua_pushnumber(l, p->UnitTypeKills[type->Slot]);
+		lua_pushnumber(l, p->UnitTypeKills[type->GetIndex()]);
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "SpeedResourcesHarvest")) {

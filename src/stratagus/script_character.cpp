@@ -120,10 +120,10 @@ static int CclDefineCharacter(lua_State *l)
 			character->HairVariation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				if (character->Type == nullptr || character->Type == CUnitType::UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(CUnitType::UnitTypes[unit_type_id])) {
-					character->Type = CUnitType::UnitTypes[unit_type_id];
+			CUnitType *unit_type = CUnitType::Get(unit_type_ident);
+			if (unit_type != nullptr) {
+				if (character->Type == nullptr || character->Type == unit_type || character->Type->CanExperienceUpgradeTo(unit_type)) {
+					character->Type = unit_type;
 					if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 						character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 					}
@@ -352,9 +352,9 @@ static int CclDefineCharacter(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						std::string item_ident = LuaToString(l, -1, k + 1);
-						int item_type_id = UnitTypeIdByIdent(item_ident);
-						if (item_type_id != -1) {
-							item->Type = CUnitType::UnitTypes[item_type_id];
+						CUnitType *item_type = CUnitType::Get(item_ident);
+						if (item_type != nullptr) {
+							item->Type = item_type;
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							character->Items.erase(std::remove(character->Items.begin(), character->Items.end(), item), character->Items.end());
@@ -443,9 +443,9 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-				if (unit_type_id != -1) {
-					character->ForbiddenUpgrades.push_back(CUnitType::UnitTypes[unit_type_id]);
+				CUnitType *unit_type = CUnitType::Get(unit_type_ident);
+				if (unit_type != nullptr) {
+					character->ForbiddenUpgrades.push_back(unit_type);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
@@ -565,10 +565,10 @@ static int CclDefineCharacter(lua_State *l)
 	}
 	
 	//check if the abilities are correct for this character's unit type
-	if (character->Type != nullptr && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
+	if (character->Type != nullptr && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->GetIndex()) {
 		int ability_count = (int) character->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
+			if (std::find(AiHelpers.LearnableAbilities[character->Type->GetIndex()].begin(), AiHelpers.LearnableAbilities[character->Type->GetIndex()].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->GetIndex()].end()) {
 				character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
 			}
 		}
@@ -625,9 +625,9 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->HairVariation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				hero->Type = CUnitType::UnitTypes[unit_type_id];
+			CUnitType *unit_type = CUnitType::Get(unit_type_ident);
+			if (unit_type != nullptr) {
+				hero->Type = unit_type;
 				if (hero->Level < hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 					hero->Level = hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 				}
@@ -712,9 +712,9 @@ static int CclDefineCustomHero(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						std::string item_ident = LuaToString(l, -1, k + 1);
-						int item_type_id = UnitTypeIdByIdent(item_ident);
-						if (item_type_id != -1) {
-							item->Type = CUnitType::UnitTypes[item_type_id];
+						CUnitType *item_type = CUnitType::Get(item_ident);
+						if (item_type != nullptr) {
+							item->Type = item_type;
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							hero->Items.erase(std::remove(hero->Items.begin(), hero->Items.end(), item), hero->Items.end());
@@ -825,9 +825,9 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-				if (unit_type_id != -1) {
-					hero->ForbiddenUpgrades.push_back(CUnitType::UnitTypes[unit_type_id]);
+				CUnitType *unit_type = CUnitType::Get(unit_type_ident);
+				if (unit_type != nullptr) {
+					hero->ForbiddenUpgrades.push_back(unit_type);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
@@ -854,10 +854,10 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 	
 	//check if the abilities are correct for this hero's unit type
-	if (hero->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->Type->Slot) {
+	if (hero->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->Type->GetIndex()) {
 		int ability_count = (int) hero->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[hero->Type->Slot].begin(), AiHelpers.LearnableAbilities[hero->Type->Slot].end(), hero->Abilities[i]) == AiHelpers.LearnableAbilities[hero->Type->Slot].end()) {
+			if (std::find(AiHelpers.LearnableAbilities[hero->Type->GetIndex()].begin(), AiHelpers.LearnableAbilities[hero->Type->GetIndex()].end(), hero->Abilities[i]) == AiHelpers.LearnableAbilities[hero->Type->GetIndex()].end()) {
 				hero->Abilities.erase(std::remove(hero->Abilities.begin(), hero->Abilities.end(), hero->Abilities[i]), hero->Abilities.end());
 			}
 		}

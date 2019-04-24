@@ -93,7 +93,7 @@ void Wyrmgus::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_achievements"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CAchievement::GetAll()); });
 	
-	ClassDB::bind_method(D_METHOD("get_unit_type", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return UnitTypeByIdent(ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_unit_type", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CUnitType::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_unit_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetUnitUnitTypes()); });
 	ClassDB::bind_method(D_METHOD("get_building_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetBuildingUnitTypes()); });
 	ClassDB::bind_method(D_METHOD("get_item_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetItemUnitTypes()); });
