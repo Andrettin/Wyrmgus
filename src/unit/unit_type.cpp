@@ -2112,9 +2112,6 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CUnitType *unit_type){ return const_cast<CWord *>(unit_type->NameWord); });
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
-	ClassDB::bind_method(D_METHOD("get_description"), &CUnitType::GetDescription);
-	ClassDB::bind_method(D_METHOD("get_quote"), &CUnitType::GetQuote);
-	ClassDB::bind_method(D_METHOD("get_background"), &CUnitType::GetBackground);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CUnitType::IsHidden);
 	ClassDB::bind_method(D_METHOD("is_hidden_in_editor"), &CUnitType::IsHiddenInEditor);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CUnitType::GetIcon);
