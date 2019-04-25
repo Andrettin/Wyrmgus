@@ -2831,6 +2831,12 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "StartPosY")) {
 		lua_pushnumber(l, p->StartPos.y);
 		return 1;
+	} else if (!strcmp(data, "StartMapLayer")) {
+		lua_pushnumber(l, p->StartMapLayer);
+		return 1;
+	} else if (!strcmp(data, "AiName")) {
+		lua_pushstring(l, p->AiName.c_str());
+		return 1;
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 
@@ -3066,6 +3072,21 @@ static int CclGetPlayerData(lua_State *l)
 			DebugPrint(" wrong ident %s\n" _C_ ident);
 		}
 		return 1;
+	} else if (!strcmp(data, "IsAllied")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->IsAllied(*CPlayer::Players[second_player]));
+		return 1;
+	} else if (!strcmp(data, "IsEnemy")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->IsEnemy(*CPlayer::Players[second_player]));
+		return 1;
+	} else if (!strcmp(data, "IsSharedVision")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->IsSharedVision(*CPlayer::Players[second_player]));
+		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "HasContactWith")) {
 		LuaCheckArgs(l, 3);
@@ -3158,15 +3179,22 @@ static int CclSetPlayerData(lua_State *l)
 
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
+	} else if (!strcmp(data, "Type")) {
+		p->Type = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "RaceName")) {
-		if (GameRunning) {
-			p->SetFaction(nullptr);
-		}
-
 		const char *civilization_ident = LuaToString(l, 3);
 		CCivilization *civilization = CCivilization::Get(civilization_ident);
-		if (civilization) {
-			p->SetCivilization(civilization->GetIndex());
+		
+		if (Editor.Running == EditorNotRunning) {
+			if (GameRunning) {
+				p->SetFaction(nullptr);
+			}
+
+			if (civilization) {
+				p->SetCivilization(civilization->GetIndex());
+			}
+		} else {
+			p->Race = civilization->GetIndex();
 		}
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {

@@ -854,8 +854,13 @@ void CreatePlayer(int type)
 	if (NumPlayers == PlayerMax) { // already done for bigmaps!
 		return;
 	}
+	
 	CPlayer &player = *CPlayer::Players[NumPlayers];
 	player.Index = NumPlayers;
+	
+	if (type != PlayerNeutral && type != PlayerNobody && type != PlayerComputer && type != PlayerPerson && type != PlayerRescuePassive && type != PlayerRescueActive) {
+		fprintf(stderr, "Error in the CreatePlayer function: trying to assign invalid player type \"%d\" to player \"%d\".\n", type, player.Index);
+	}
 
 	player.Init(type);
 }
