@@ -425,7 +425,7 @@ public:
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
-	IconConfig GetIcon() const;
+	CIcon *GetIcon() const;
 	CIcon *GetButtonIcon(int button_action) const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;

@@ -249,7 +249,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	if (province->Owner == GrandStrategyGame.PlayerFaction || work != nullptr) { // only show foreign works that are predefined
 		std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
 		if (author != nullptr) {
-			work_creation_message += "The " + FullyDecapitalizeString(author->Type->GetName().utf8().get_data()) + " " + author->GetFullName().utf8().get_data() + " ";
+			work_creation_message += "The " + FullyDecapitalizeString(author->UnitType->GetName().utf8().get_data()) + " " + author->GetFullName().utf8().get_data() + " ";
 		} else {
 			work_creation_message += "A sage ";
 		}
@@ -647,7 +647,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 	std::vector<CGrandStrategyHero *> potential_authors;
 	
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (this->Heroes[i]->Type->Class != nullptr && this->Heroes[i]->Type->Class->Ident == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
+		if (this->Heroes[i]->UnitType->Class != nullptr && this->Heroes[i]->UnitType->Class->Ident == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
 			potential_authors.push_back(this->Heroes[i]);
 		}
 	}
@@ -765,7 +765,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			new_minister_message += this->Ministers[title]->GetFullName().utf8().get_data();
 			new_minister_message += "!\\n\\n";
 			new_minister_message += "Type: ";
-			new_minister_message += this->Ministers[title]->Type->GetName().utf8().get_data();
+			new_minister_message += this->Ministers[title]->UnitType->GetName().utf8().get_data();
 			new_minister_message += "\\n";
 			new_minister_message += "Trait: ";
 			new_minister_message += this->Ministers[title]->Trait->GetName().utf8().get_data();
@@ -993,8 +993,8 @@ void CGrandStrategyHero::Die()
 void CGrandStrategyHero::SetType(int unit_type_id)
 {
 	//if the hero's unit type changed
-	if (unit_type_id != this->Type->GetIndex()) {
-		this->Type = CUnitType::Get(unit_type_id);
+	if (unit_type_id != this->UnitType->GetIndex()) {
+		this->UnitType = CUnitType::Get(unit_type_id);
 	}
 	
 	this->UpdateAttributes();
@@ -1007,7 +1007,7 @@ bool CGrandStrategyHero::IsAlive()
 
 bool CGrandStrategyHero::IsVisible()
 {
-	return this->Type->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->Gender == this->Type->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
+	return this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->Gender == this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
 }
 
 bool CGrandStrategyHero::IsGenerated()
@@ -1017,9 +1017,9 @@ bool CGrandStrategyHero::IsGenerated()
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
 {
-	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->Type->Class != nullptr && this->Type->Class->Ident == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->UnitType->Class != nullptr && this->UnitType->Class->Ident == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->Type->Class != nullptr && this->Type->Class->Ident != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->UnitType->Class != nullptr && this->UnitType->Class->Ident != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
@@ -1110,7 +1110,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 
 std::string CGrandStrategyHero::GetBestDisplayTitle()
 {
-	std::string best_title = this->Type->GetName().utf8().get_data();
+	std::string best_title = this->UnitType->GetName().utf8().get_data();
 	int best_title_type = MaxCharacterTitles;
 	/*
 	for (size_t i = 0; i < this->Titles.size(); ++i) {

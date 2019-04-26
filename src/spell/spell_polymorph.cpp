@@ -129,7 +129,7 @@
 			type = CUnitType::Get(new_unit_type);
 		}
 	}
-	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != nullptr && this->Civilization != target->Character->Civilization) {
+	if (target->Character && target->Character->Custom && target->Character->GetCivilization() != nullptr && this->Civilization != nullptr && this->Civilization != target->Character->GetCivilization()) {
 		target->Character->Civilization = this->Civilization;
 		SaveHero(target->Character);
 	}
@@ -200,7 +200,7 @@
 //	target->Release();
 	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
 		if (target->Player->AiEnabled == false) {
-			target->Character->Type = type;
+			target->Character->UnitType = type;
 			SaveHero(target->Character);
 		}
 	}

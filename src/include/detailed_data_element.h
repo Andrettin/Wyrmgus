@@ -58,19 +58,6 @@ public:
 	{
 	}
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Icon);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	bool IsHidden() const
 	{
@@ -92,14 +79,21 @@ public:
 		return this->Background;
 	}
 	
-private:
-	bool Hidden = false;	/// whether the data element is hidden
+	virtual CIcon *GetIcon() const
+	{
+		return this->Icon;
+	}
+	
+protected: //this is protected because lua functions still use it
+	void SetIcon(const String &icon_ident);
+	
 protected: //these are protected because lua functions still use them
+	bool Hidden = false;	/// whether the data element is hidden
 	String Description;		/// the description of the data element from an in-game universe perspective
 	String Quote;			/// a quote relating to the data element
 	String Background;		/// the background of the data element, a description from a perspective outside of the game's universe
-public:
-	Property<CIcon *, DetailedDataElement> Icon = nullptr;	/// the icon of the data element
+private:
+	CIcon *Icon = nullptr;	/// the icon of the data element
 	
 protected:
 	static void _bind_methods();

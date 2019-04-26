@@ -1734,7 +1734,7 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (!CheckDependencies(character->Type, this, true)) {
+	if (!CheckDependencies(character->GetUnitType(), this, true)) {
 		return false;
 	}
 	

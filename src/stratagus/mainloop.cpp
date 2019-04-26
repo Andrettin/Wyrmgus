@@ -264,7 +264,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			CPlayer::GetThisPlayer()->FreeWorkers[0]->GetIcon().Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->Index);
+			CPlayer::GetThisPlayer()->FreeWorkers[0]->GetIcon()->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->Index);
 		}
 		
 		//draw icon if there are units with available level up upgrades
@@ -272,7 +272,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
-			CPlayer::GetThisPlayer()->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
+			CPlayer::GetThisPlayer()->LevelUpUnits[0]->GetIcon()->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
 		}
 		
 		//draw icon if the player has a hero
@@ -280,7 +280,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
-			CPlayer::GetThisPlayer()->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
+			CPlayer::GetThisPlayer()->Heroes[i]->GetIcon()->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
 		}
 		
 		DrawPopups();
@@ -630,8 +630,8 @@ void GameMainLoop()
 		
 		if (!IsNetworkGame() && CPlayer::GetThisPlayer() && CurrentCustomHero != nullptr) {
 			Vec2i resPos;
-			FindNearestDrop(*CurrentCustomHero->Type, CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
-			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
+			FindNearestDrop(*CurrentCustomHero->UnitType, CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
+			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->UnitType, CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
 			custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
 		}
 		

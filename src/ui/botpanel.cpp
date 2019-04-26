@@ -1193,7 +1193,7 @@ void CButtonPanel::Draw()
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !CUnitType::Get(buttons[i].Value)->Icon.Name.empty()) {
 			button_icon = CUnitType::Get(buttons[i].Value)->Icon.Icon;
 		} else if (buttons[i].Action == ButtonBuy) {
-			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
+			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon();
 		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
 			button_icon = AllUpgrades[buttons[i].Value]->Icon;
 		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->GetIcon() != nullptr) {
@@ -2203,9 +2203,9 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
 				if (!IsNetworkGame() && Selected[i]->Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
-					if (Selected[i]->Character->Type->GetIndex() != type.GetIndex()) {
+					if (Selected[i]->Character->UnitType->GetIndex() != type.GetIndex()) {
 						if (Selected[i]->Player->AiEnabled == false) {
-							Selected[i]->Character->Type = CUnitType::Get(CurrentButtons[button].Value);
+							Selected[i]->Character->UnitType = CUnitType::Get(CurrentButtons[button].Value);
 							SaveHero(Selected[i]->Character);
 							CAchievement::CheckAchievements();
 						}

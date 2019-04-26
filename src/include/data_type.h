@@ -36,6 +36,8 @@
 
 #include "config.h"
 
+#include <core/ustring.h>
+
 #include <functional>
 #include <map>
 #include <string>
@@ -148,6 +150,30 @@ public:
 		}
 		
 		return nullptr;
+	}
+	
+	/**
+	**	@brief	Get an instance of the class by its string identifier
+	**
+	**	@param	ident	The instance's string identifier
+	**
+	**	@return	The instance if found, or null otherwise
+	*/
+	static inline T *Get(const char *ident, const bool should_find = true)
+	{
+		return T::Get(std::string(ident), should_find);
+	}
+	
+	/**
+	**	@brief	Get an instance of the class by its string identifier
+	**
+	**	@param	ident	The instance's string identifier
+	**
+	**	@return	The instance if found, or null otherwise
+	*/
+	static inline T *Get(const String &ident, const bool should_find = true)
+	{
+		return T::Get(ident.utf8().get_data(), should_find);
 	}
 	
 	/**

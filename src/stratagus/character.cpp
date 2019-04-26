@@ -165,19 +165,25 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					this->FamilyName = this->FamilyNameWord->GetAnglicizedName();
 				}
 			}
+		} else if (key == "description") {
+			this->Description = value.c_str();
+		} else if (key == "background") {
+			this->Background = value.c_str();
+		} else if (key == "quote") {
+			this->Quote = value.c_str();
 		} else if (key == "unit_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
-				if (this->Type == nullptr || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
-					this->Type = unit_type;
-					if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-						this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+				if (this->UnitType == nullptr || this->UnitType == unit_type || this->UnitType->CanExperienceUpgradeTo(unit_type)) {
+					this->UnitType = unit_type;
+					if (this->Level < this->UnitType->DefaultStat.Variables[LEVEL_INDEX].Value) {
+						this->Level = this->UnitType->DefaultStat.Variables[LEVEL_INDEX].Value;
 					}
 					
 					if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
-						if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-							this->Gender = this->Type->DefaultStat.Variables[GENDER_INDEX].Value;
+						if (this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+							this->Gender = this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value;
 						}
 					}
 				}
@@ -406,9 +412,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
-	if (this->Type != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->UnitType != nullptr && this->UnitType->BoolFlag[FAUNA_INDEX].value) {
 		if (name_changed) {
-			this->Type->PersonalNames[this->Gender].push_back(this->Name.utf8().get_data());
+			this->UnitType->PersonalNames[this->Gender].push_back(this->Name.utf8().get_data());
 		}
 	} else if (this->Civilization) {
 		if (name_changed) {
@@ -420,25 +426,25 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	if (this->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (this->Type != nullptr && this->Type->Traits.size() == 1) {
-			this->Trait = this->Type->Traits[0];
+		if (this->UnitType != nullptr && this->UnitType->Traits.size() == 1) {
+			this->Trait = this->UnitType->Traits[0];
 		}
 	}
 		
 	//check if the abilities are correct for this character's unit type
-	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->GetIndex()) {
+	if (this->UnitType != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->UnitType->GetIndex()) {
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			const CUpgrade *ability_upgrade = this->Abilities[i];
-			if (std::find(AiHelpers.LearnableAbilities[this->Type->GetIndex()].begin(), AiHelpers.LearnableAbilities[this->Type->GetIndex()].end(), ability_upgrade) == AiHelpers.LearnableAbilities[this->Type->GetIndex()].end()) {
+			if (std::find(AiHelpers.LearnableAbilities[this->UnitType->GetIndex()].begin(), AiHelpers.LearnableAbilities[this->UnitType->GetIndex()].end(), ability_upgrade) == AiHelpers.LearnableAbilities[this->UnitType->GetIndex()].end()) {
 				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), ability_upgrade), this->Abilities.end());
 			}
 		}
 	}
 	
 	if (this->NameWord != nullptr) {
-		if (this->Type != nullptr && this->Type->GetSpecies() != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
-			this->NameWord->ChangeSpecimenNameWeight(this->Type->GetSpecies(), this->Gender, 1);
+		if (this->UnitType != nullptr && this->UnitType->GetSpecies() != nullptr && this->UnitType->BoolFlag[FAUNA_INDEX].value) {
+			this->NameWord->ChangeSpecimenNameWeight(this->UnitType->GetSpecies(), this->Gender, 1);
 		} else {
 			this->NameWord->ChangePersonalNameWeight(this->Gender, 1);
 		}
@@ -627,7 +633,7 @@ void CCharacter::GenerateMissingDates()
 
 int CCharacter::GetMartialAttribute() const
 {
-	if ((this->Type->Class != nullptr && this->Type->Class->Ident == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+	if ((this->UnitType->Class != nullptr && this->UnitType->Class->Ident == "thief") || this->UnitType->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
 	} else {
 		return StrengthAttribute;
@@ -717,7 +723,7 @@ bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 
 bool CCharacter::IsUsable() const
 {
-	if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->Type->DefaultStat.Variables[GENDER_INDEX].Value) {
+	if (this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
 	
@@ -753,7 +759,7 @@ bool CCharacter::CanWorship() const
 		return false; //the character cannot worship a deity if it is itself a deity
 	}
 	
-	if (this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->UnitType->BoolFlag[FAUNA_INDEX].value) {
 		return false; //the character cannot worship a deity if it is not sentient
 	}
 	
@@ -788,16 +794,16 @@ String CCharacter::GetFullName() const
 	return full_name;
 }
 
-IconConfig CCharacter::GetIcon() const
+CIcon *CCharacter::GetIcon() const
 {
 	if (this->Level >= 3 && this->HeroicIcon.Icon) {
-		return this->HeroicIcon;
+		return this->HeroicIcon.Icon;
 	} else if (this->Icon.Icon) {
-		return this->Icon;
-	} else if (!this->HairVariation.empty() && this->Type->GetVariation(this->HairVariation) != nullptr && !this->Type->GetVariation(this->HairVariation)->Icon.Name.empty()) {
-		return this->Type->GetVariation(this->HairVariation)->Icon;
+		return this->Icon.Icon;
+	} else if (!this->HairVariation.empty() && this->UnitType->GetVariation(this->HairVariation) != nullptr && !this->UnitType->GetVariation(this->HairVariation)->Icon.Name.empty()) {
+		return this->UnitType->GetVariation(this->HairVariation)->Icon.Icon;
 	} else {
-		return this->Type->Icon;
+		return this->UnitType->GetIcon();
 	}
 }
 
@@ -826,13 +832,13 @@ CPersistentItem *CCharacter::GetItem(const CUnit *item) const
 
 void CCharacter::UpdateAttributes()
 {
-	if (this->Type == nullptr) {
+	if (this->UnitType == nullptr) {
 		return;
 	}
 	
 	for (int i = 0; i < MaxAttributes; ++i) {
 		int var = GetAttributeVariableIndex(i);
-		this->Attributes[i] = this->Type->DefaultStat.Variables[var].Value;
+		this->Attributes[i] = this->UnitType->DefaultStat.Variables[var].Value;
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			if (
 				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
@@ -849,7 +855,16 @@ void CCharacter::UpdateAttributes()
 void CCharacter::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CCharacter *character){ return character->NameWord; });
+	ClassDB::bind_method(D_METHOD("get_extra_name"), &CCharacter::GetExtraName);
+	ClassDB::bind_method(D_METHOD("get_family_name"), &CCharacter::GetFamilyName);
 	ClassDB::bind_method(D_METHOD("get_family_name_word"), [](const CCharacter *character){ return character->FamilyNameWord; });
+	ClassDB::bind_method(D_METHOD("is_usable"), &CCharacter::IsUsable);
+	ClassDB::bind_method(D_METHOD("get_civilization"), &CCharacter::GetCivilization);
+	ClassDB::bind_method(D_METHOD("get_faction"), [](const CCharacter *character){ return const_cast<CFaction *>(character->GetFaction()); });
+	ClassDB::bind_method(D_METHOD("get_unit_type"), &CCharacter::GetUnitType);
+	ClassDB::bind_method(D_METHOD("get_level"), &CCharacter::GetLevel);
+	ClassDB::bind_method(D_METHOD("get_deities"), [](const CCharacter *character){ return VectorToGodotArray(character->Deities); });
+	ClassDB::bind_method(D_METHOD("get_abilities"), [](const CCharacter *character){ return VectorToGodotArray(character->Abilities); });
 }
 
 int GetAttributeVariableIndex(int attribute)
@@ -963,8 +978,8 @@ void SaveHero(CCharacter *hero)
 			fprintf(fd, "\tCivilization = \"%s\",\n", hero->Civilization->GetIdent().utf8().get_data());
 		}
 	}
-	if (hero->Type != nullptr) {
-		fprintf(fd, "\tType = \"%s\",\n", hero->Type->Ident.c_str());
+	if (hero->UnitType != nullptr) {
+		fprintf(fd, "\tType = \"%s\",\n", hero->UnitType->Ident.c_str());
 	}
 	if (hero->Custom) {
 		if (hero->Trait != nullptr) {
@@ -1215,9 +1230,9 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			
 			//now, update the hero
 			hero->Civilization = civilization;
-			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->Type->Class);
+			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->UnitType->Class);
 			if (new_unit_type_id != -1) {
-				hero->Type = CUnitType::Get(new_unit_type_id);
+				hero->UnitType = CUnitType::Get(new_unit_type_id);
 				hero->Name = new_hero_name.c_str();
 				hero->FamilyName = new_hero_family_name.c_str();
 				SaveHero(hero);

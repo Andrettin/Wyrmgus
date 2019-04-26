@@ -145,9 +145,30 @@ public:
 		return this->FamilyName;
 	}
 	
+	CCivilization *GetCivilization() const
+	{
+		return this->Civilization;
+	}
+	
+	const CFaction *GetFaction() const
+	{
+		return this->Faction;
+	}
+	
 	CReligion *GetReligion() const;
 	CLanguage *GetLanguage() const;
 	CCalendar *GetCalendar() const;
+	
+	CUnitType *GetUnitType() const
+	{
+		return this->UnitType;
+	}
+	
+	int GetLevel() const
+	{
+		return this->Level;
+	}
+	
 	bool IsParentOf(const std::string &child_full_name) const;
 	bool IsChildOf(const std::string &parent_full_name) const;
 	bool IsSiblingOf(const std::string &sibling_full_name) const;
@@ -157,7 +178,7 @@ public:
 	bool CanWorship() const;
 	bool HasMajorDeity() const;
 	String GetFullName() const;
-	IconConfig GetIcon() const;
+	virtual CIcon *GetIcon() const override;
 	CPersistentItem *GetItem(const CUnit *item) const;
 	void UpdateAttributes();
 	void SaveHistory(CFile &file);		/// Save generated history data for the character
@@ -166,7 +187,9 @@ public:
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 	CCivilization *Civilization = nullptr;	/// Culture to which the character belongs
+private:
 	const CFaction *Faction = nullptr;	/// Faction to which the character belongs
+public:
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
@@ -179,9 +202,9 @@ private:
 	CWord *FamilyNameWord = nullptr;	/// the word for the character's family name
 public:
 	std::string HairVariation;	/// Name of the character's hair variation
-	IconConfig Icon;					/// Character's icon
-	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
-	CUnitType *Type = nullptr;
+	IconConfig Icon;			/// Character's icon
+	IconConfig HeroicIcon;		/// Character's heroic icon (level 3 and upper)
+	CUnitType *UnitType = nullptr;
 	const CUpgrade *Trait = nullptr;
 	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
 	CCharacter *Father = nullptr;		/// Character's father

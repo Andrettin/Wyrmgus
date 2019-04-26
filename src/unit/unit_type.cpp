@@ -746,12 +746,6 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		if (!this->Animations) {
 			fprintf(stderr, "Animations \"%s\" do not exist.\n", value.c_str());
 		}
-	} else if (key == "icon") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Icon.Name = value;
-		this->Icon.Icon = nullptr;
-		this->Icon.Load();
-		this->Icon.Icon->Load();
 	} else if (key == "tile_width") {
 		this->TileSize.x = std::stoi(value);
 	} else if (key == "tile_height") {
@@ -1473,11 +1467,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
 	this->BuildingRulesString = parent_type->BuildingRulesString;
 	this->Elixir = parent_type->Elixir;
-	this->Icon.Name = parent_type->Icon.Name;
-	this->Icon.Icon = nullptr;
-	if (!this->Icon.Name.empty()) {
-		this->Icon.Load();
-	}
+	this->Icon = parent_type->Icon;
 	for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
 		this->Spells.push_back(parent_type->Spells[i]);
 	}
@@ -2112,9 +2102,7 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CUnitType *unit_type){ return const_cast<CWord *>(unit_type->NameWord); });
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
-	ClassDB::bind_method(D_METHOD("is_hidden"), &CUnitType::IsHidden);
 	ClassDB::bind_method(D_METHOD("is_hidden_in_editor"), &CUnitType::IsHiddenInEditor);
-	ClassDB::bind_method(D_METHOD("get_icon"), &CUnitType::GetIcon);
 	ClassDB::bind_method(D_METHOD("get_terrain_type"), [](const CUnitType *unit_type){ return unit_type->TerrainType; });
 	
 	ClassDB::bind_method(D_METHOD("get_stat_strings"), [](const CUnitType *unit_type){ return VectorToGodotArray(unit_type->GetStatStrings()); });
@@ -2965,11 +2953,6 @@ void LoadUnitTypes()
 //Wyrmgus start
 void LoadUnitType(CUnitType &type)
 {
-	// Lookup icons.
-	if (!type.Icon.Name.empty()) {
-		type.Icon.Load();
-	}
-
 	for (CUnitTypeVariation *variation : type.Variations) {
 		if (!variation->Icon.Name.empty()) {
 			variation->Icon.Load();

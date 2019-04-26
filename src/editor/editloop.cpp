@@ -690,8 +690,8 @@ static void CalculateMaxIconSize()
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
 		const CUnitType *type = CUnitType::Get(Editor.UnitTypes[i].c_str());
-		Assert(type && type->Icon.Icon);
-		const CIcon &icon = *type->Icon.Icon;
+		Assert(type && type->GetIcon());
+		const CIcon &icon = *type->GetIcon();
 
 		IconWidth = std::max(IconWidth, icon.G->Width);
 		IconHeight = std::max(IconHeight, icon.G->Height);
@@ -1168,7 +1168,7 @@ static void DrawEditorPanel_StartIcon()
 	int y = UI.InfoPanel.Y + 5;
 
 	if (Editor.StartUnit) {
-		CIcon *icon = Editor.StartUnit->Icon.Icon;
+		CIcon *icon = Editor.StartUnit->GetIcon();
 		Assert(icon);
 		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
 		unsigned int flag = 0;
@@ -2345,9 +2345,9 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	int StartUnitWidth = Editor.StartUnit ?
-						 Editor.StartUnit->Icon.Icon->G->Width : CMap::Map.GetCurrentPixelTileSize().x + 7;
+						 Editor.StartUnit->GetIcon()->G->Width : CMap::Map.GetCurrentPixelTileSize().x + 7;
 	int StartUnitHeight = Editor.StartUnit ?
-						  Editor.StartUnit->Icon.Icon->G->Height : CMap::Map.GetCurrentPixelTileSize().y + 7;
+						  Editor.StartUnit->GetIcon()->G->Height : CMap::Map.GetCurrentPixelTileSize().y + 7;
 	//Wyrmgus start
 //	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
 //		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth

@@ -84,10 +84,8 @@ static int CclDefineUniqueItem(lua_State *l)
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
 		} else if (!strcmp(value, "Icon")) {
-			item->Icon.Name = LuaToString(l, -1);
-			item->Icon.Icon = nullptr;
-			item->Icon.Load();
-			item->Icon.Icon->Load();
+			item->Icon = CIcon::Get(LuaToString(l, -1));
+			item->Icon->Load();
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(affix_ident);
@@ -270,7 +268,11 @@ static int CclGetUniqueItemData(lua_State *l)
 		lua_pushboolean(l, item->CanDrop());
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, item->GetIcon().Name.c_str());
+		if (item->GetIcon() != nullptr) {
+			lua_pushstring(l, item->GetIcon()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

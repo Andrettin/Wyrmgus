@@ -195,19 +195,19 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		hBar = 5;
 		hAll = 7;
 	}
-	y += unit.Type->Icon.Icon->G->Height;
+	y += unit.Type->GetIcon()->G->Height;
 	//Wyrmgus start
 	/*
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-		unit.Type->Icon.Icon->G->Width + 8, hAll);
+		unit.Type->GetIcon()->G->Width + 8, hAll);
 	*/
 	if (Preference.BarFrameG) {
 		Preference.BarFrameG->DrawClip(x - 2 - 4, y + 4 - 4);
 		Video.FillRectangleClip(ColorBlack, x - 2, y + 4,
-			unit.Type->Icon.Icon->G->Width + 6 - 2, hBar);
+			unit.Type->GetIcon()->G->Width + 6 - 2, hBar);
 	} else {
 		Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-			unit.Type->Icon.Icon->G->Width + 8, hAll);
+			unit.Type->GetIcon()->G->Width + 8, hAll);
 	}
 	//Wyrmgus end
 
@@ -241,7 +241,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 			//Wyrmgus end
 		}
 
-		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
+		f = (f * (unit.Type->GetIcon()->G->Width + 6)) / 100;
 		Video.FillRectangleClip(color, x - 2, y + 4,
 			f > 1 ? f - 2 : 0, hBar);
 		//Wyrmgus start
@@ -262,8 +262,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 static void UiDrawManaBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
-	y += unit.Type->Icon.Icon->G->Height;
-	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->G->Width, 4);
+	y += unit.Type->GetIcon()->G->Height;
+	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->GetIcon()->G->Width, 4);
 
 	//Wyrmgus start
 //	if (unit.Stats->Variables[MANA_INDEX].Max) {
@@ -273,7 +273,7 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 //		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
 		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableValue)) / unit.GetModifiedVariable(MANA_INDEX, VariableMax);
 		//Wyrmgus end
-		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
+		f = (f * (unit.Type->GetIcon()->G->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
@@ -609,8 +609,8 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		 //Wyrmgus end
 
 		//Wyrmgus start
-//		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer());
+//		type.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+		unit.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 		//Wyrmgus end
 	}
 }
@@ -692,8 +692,8 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			continue;
 		}
 		//Wyrmgus start
-//		CIcon &icon = *uins->Type->Icon.Icon;
-		CIcon &icon = *uins->GetIcon().Icon;
+//		CIcon &icon = *uins->Type->GetIcon();
+		CIcon &icon = *uins->GetIcon();
 		//Wyrmgus end
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
@@ -704,7 +704,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer());
+		uins->GetIcon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer());
 		//Wyrmgus end
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
@@ -739,7 +739,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
-		CIcon &icon = *uins->GetIcon().Icon;
+		CIcon &icon = *uins->GetIcon();
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   IconActive : 0;
@@ -751,7 +751,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index);
+		uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index);
 		++j;
 	}
 }
@@ -1072,7 +1072,7 @@ void DrawPopups()
 				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 					continue;
 				}
-				CIcon &icon = *uins->GetIcon().Icon;
+				CIcon &icon = *uins->GetIcon();
 				
 				int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 						   IconActive : 0;
@@ -1084,7 +1084,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index);
+				uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index);
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					if (!Preference.NoStatusLineTooltips) {
@@ -2009,12 +2009,12 @@ static void InfoPanel_draw_multiple_selection()
 	DrawInfoPanelBackground(0);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		//Wyrmgus start
-//		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
+//		const CIcon &icon = *Selected[i]->Type->GetIcon();
 		//Wyrmgus end
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
-		Selected[i]->GetIcon().Icon->DrawUnitIcon(*UI.SelectedButtons[i].Style,
+		Selected[i]->GetIcon()->DrawUnitIcon(*UI.SelectedButtons[i].Style,
 		//Wyrmgus end
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,

@@ -1383,12 +1383,12 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		Vec2i unit_raw_pos(std::get<0>(this->Heroes[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		CCharacter *hero = std::get<1>(this->Heroes[i]);
-		Vec2i unit_offset((hero->Type->TileSize - 1) / 2);
+		Vec2i unit_offset((hero->UnitType->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.GenerateUnitLocation(hero->Type, std::get<2>(this->Heroes[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.GenerateUnitLocation(hero->UnitType, std::get<2>(this->Heroes[i]), map_start_pos, map_end - Vec2i(1, 1), z);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
@@ -1408,11 +1408,11 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			} else {
 				player = CPlayer::Players[PlayerNumNeutral];
 			}
-			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
+			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->UnitType, player, z);
 			unit->SetCharacter(hero->Ident);
 			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
-				player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
+				player->ChangeUnitTypeAiActiveCount(hero->UnitType, -1);
 			}
 		}
 	}
@@ -1475,7 +1475,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		if (character->Faction == nullptr && !character->Type->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
+		if (character->GetFaction() == nullptr && !character->GetUnitType()->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
 			continue;
 		}
 		
@@ -1483,7 +1483,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		const CFaction *hero_faction = character->Faction;
+		const CFaction *hero_faction = character->GetFaction();
 		for (int i = ((int) character->HistoricalFactions.size() - 1); i >= 0; --i) {
 			if (start_date.ContainsDate(character->HistoricalFactions[i].first)) {
 				hero_faction = character->HistoricalFactions[i].second;
@@ -1531,10 +1531,10 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		} else {
 			hero_player = CPlayer::Players[PlayerNumNeutral];
 		}
-		CUnit *unit = CreateUnit(hero_pos - character->Type->GetTileCenterPosOffset(), *character->Type, hero_player, z);
+		CUnit *unit = CreateUnit(hero_pos - character->GetUnitType()->GetTileCenterPosOffset(), *character->GetUnitType(), hero_player, z);
 		unit->SetCharacter(character->Ident);
 		unit->Active = 0;
-		hero_player->ChangeUnitTypeAiActiveCount(character->Type, -1);
+		hero_player->ChangeUnitTypeAiActiveCount(character->GetUnitType(), -1);
 	}
 }
 

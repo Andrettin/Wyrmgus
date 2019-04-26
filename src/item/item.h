@@ -34,8 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "ui/icon_config.h"
-
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -44,6 +42,7 @@
 
 class CCharacter;
 class CConfigData;
+class CIcon;
 class CUnitType;
 class CUpgrade;
 class CSpell;
@@ -54,7 +53,7 @@ class CUniqueItem
 public:
 	bool CanDrop() const;				/// Check whether this unique item can drop
 	int GetMagicLevel() const;			/// Get this unique item's magic level
-	IconConfig GetIcon() const;
+	CIcon *GetIcon() const;
 
 	int ResourcesHeld = 0;
 	std::string Ident;
@@ -62,7 +61,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	IconConfig Icon;			/// Unique item's icon (if it differs from that of its type)
+	CIcon *Icon = nullptr;		/// Unique item's icon (if it differs from that of its type)
 	CUnitType *Type = nullptr;	/// Item type of the item
 	CUpgrade *Prefix = nullptr;
 	CUpgrade *Suffix = nullptr;

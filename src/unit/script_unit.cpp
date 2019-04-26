@@ -61,6 +61,7 @@
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_find.h"
@@ -1801,7 +1802,11 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Icon")) {
-		lua_pushstring(l, unit->GetIcon().Name.c_str());
+		if (unit->GetIcon() != nullptr) {
+			lua_pushstring(l, unit->GetIcon()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(value, "PlayerType")) {

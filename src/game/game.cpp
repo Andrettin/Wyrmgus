@@ -628,8 +628,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!unit_type->File.empty() && (!unit_type->Parent || unit_type->File != unit_type->Parent->File)) {
 				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", unit_type->File.c_str(), unit_type->Width, unit_type->Height);
 			}
-			if (!unit_type->Icon.Name.empty() && (!unit_type->Parent || unit_type->Icon.Name != unit_type->Parent->Icon.Name)) {
-				f->printf("\tIcon = \"%s\",\n", unit_type->Icon.Name.c_str());
+			if (unit_type->GetIcon() != nullptr && (!unit_type->Parent || unit_type->GetIcon() != unit_type->Parent->GetIcon())) {
+				f->printf("\tIcon = \"%s\",\n", unit_type->GetIcon()->Ident.c_str());
 			}
 			if (unit_type->Animations != nullptr && (!unit_type->Parent || unit_type->Animations != unit_type->Parent->Animations)) {
 				f->printf("\tAnimations = \"%s\",\n", unit_type->Animations->Ident.c_str());

@@ -845,9 +845,9 @@ void CUnit::Retrain()
 						this->Variable[LEVELUP_INDEX].Enable = 1;
 						TransformUnitIntoType(*this, *unit_type);
 						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
-							if (this->Character->Type != unit_type) {
+							if (this->Character->UnitType != unit_type) {
 								if (Player->AiEnabled == false) {
-									this->Character->Type = unit_type;
+									this->Character->UnitType = unit_type;
 									SaveHero(Character);
 									CAchievement::CheckAchievements();
 								}
@@ -938,12 +938,12 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->ExtraName = this->Character->GetExtraName().utf8().get_data();
 	this->FamilyName = this->Character->GetFamilyName().utf8().get_data();
 	
-	if (this->Character->Type != nullptr) {
-		if (this->Character->Type != this->Type) { //set type to that of the character
-			TransformUnitIntoType(*this, *this->Character->Type);
+	if (this->Character->UnitType != nullptr) {
+		if (this->Character->UnitType != this->Type) { //set type to that of the character
+			TransformUnitIntoType(*this, *this->Character->UnitType);
 		}
 		
-		memcpy(Variable, this->Character->Type->Stats[this->Player->Index].Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+		memcpy(Variable, this->Character->UnitType->Stats[this->Player->Index].Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 	} else {
 		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_ident.c_str());
 		return;
@@ -990,8 +990,8 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	}
 	
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
-	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
-		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value, false);
+	if (this->Variable[LEVEL_INDEX].Value < this->Character->GetLevel()) {
+		this->IncreaseLevel(this->Character->GetLevel() - this->Variable[LEVEL_INDEX].Value, false);
 	}
 	
 	this->Variable[XP_INDEX].Enable = 1;
@@ -1357,7 +1357,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 					continue;
 				}
 			} else {
-				if (equipment_unit->GetIcon().Icon == nullptr) {
+				if (equipment_unit->GetIcon() == nullptr) {
 					continue;
 				}
 			}
@@ -1374,7 +1374,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 		if (button_action == ButtonStandGround) {
 			this->ButtonIcons[button_action] = button_unit->Type->ButtonIcons.find(button_action)->second.Icon;
 		} else {
-			this->ButtonIcons[button_action] = button_unit->GetIcon().Icon;
+			this->ButtonIcons[button_action] = button_unit->GetIcon();
 		}
 		return;
 	}
@@ -1443,7 +1443,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 				continue;
 			}
 		} else {
-			if (equipment_unit_type->Icon.Icon == nullptr) {
+			if (equipment_unit_type->GetIcon() == nullptr) {
 				continue;
 			}
 		}
@@ -1456,7 +1456,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 		if (button_action == ButtonStandGround) {
 			this->ButtonIcons[button_action] = button_unit_type->ButtonIcons.find(button_action)->second.Icon;
 		} else {
-			this->ButtonIcons[button_action] = button_unit_type->Icon.Icon;
+			this->ButtonIcons[button_action] = button_unit_type->GetIcon();
 		}
 		return;
 	}
@@ -2229,8 +2229,8 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	int unique_chance = 5; //0.5% chance of the unit being unique
 	if (dropper != nullptr) {
 		if (dropper->Character) { //if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
-			magic_affix_chance *= dropper->Character->Level;
-			unique_chance *= dropper->Character->Level;
+			magic_affix_chance *= dropper->Character->GetLevel();
+			unique_chance *= dropper->Character->GetLevel();
 		} else if (dropper->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper is a building, multiply the chances of the drop being magic or unique by a factor according to whether the building itself is magic/unique
 			int chance_multiplier = 2;
 			if (dropper->Unique) {
@@ -2444,8 +2444,8 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->Type->GetIndex() == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->Type->Class))
-					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
+					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->UnitType->GetIndex() == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->UnitType->Class))
+					&& CheckDependencies(iterator->second->UnitType, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
 				}
@@ -2472,7 +2472,7 @@ void CUnit::UpdateSoldUnits()
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
 			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->UnitType, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
@@ -6452,21 +6452,21 @@ CConstruction *CUnit::GetConstruction() const
 	}
 }
 
-IconConfig CUnit::GetIcon() const
+CIcon *CUnit::GetIcon() const
 {
-	if (this->Character != nullptr && this->Character->Level >= 3 && this->Character->HeroicIcon.Icon) {
-		return this->Character->HeroicIcon;
+	if (this->Character != nullptr && this->Character->GetLevel() >= 3 && this->Character->HeroicIcon.Icon) {
+		return this->Character->HeroicIcon.Icon;
 	} else if (this->Character != nullptr && this->Character->Icon.Icon) {
-		return this->Character->Icon;
-	} else if (this->Unique != nullptr && this->Unique->Icon.Icon) {
+		return this->Character->Icon.Icon;
+	} else if (this->Unique != nullptr && this->Unique->Icon != nullptr) {
 		return this->Unique->Icon;
 	}
 	
 	const CUnitTypeVariation *variation = this->GetVariation();
 	if (variation && variation->Icon.Icon) {
-		return variation->Icon;
+		return variation->Icon.Icon;
 	} else {
-		return this->Type->Icon;
+		return this->Type->GetIcon();
 	}
 }
 

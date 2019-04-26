@@ -97,12 +97,12 @@ bool CUniqueItem::CanDrop() const
 	return true;
 }
 
-IconConfig CUniqueItem::GetIcon() const
+CIcon *CUniqueItem::GetIcon() const
 {
-	if (this->Icon.Icon) {
+	if (this->Icon != nullptr) {
 		return this->Icon;
 	} else {
-		return this->Type->Icon;
+		return this->Type->GetIcon();
 	}
 }
 

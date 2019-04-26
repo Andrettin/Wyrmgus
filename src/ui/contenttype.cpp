@@ -271,12 +271,12 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	//Wyrmgus start
-//	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
-	if (unitToDraw && unitToDraw->GetIcon().Icon) {
+//	if (unitToDraw && unitToDraw->Type->GetIcon()) {
+	if (unitToDraw && unitToDraw->GetIcon()) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		unitToDraw->Type->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
-		unitToDraw->GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
+//		unitToDraw->GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
+		unitToDraw->GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
 		//Wyrmgus end
 			//Wyrmgus start
 //			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);

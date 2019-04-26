@@ -97,6 +97,12 @@ public:
 				}
 				
 				property_value = Variant(StringToBool(this->Value));
+			} else if (property_info->type == Variant::OBJECT) {
+				if (this->Operator != CConfigOperator::Assignment) {
+					throw std::runtime_error("Wrong operator enumeration index for string property \"" + this->Key + "\": " + std::to_string((long long) this->Operator) + ".");
+				}
+				
+				property_value = Variant(String(this->Value.c_str())); //for objects, call the setter with a string, and the appropriate conversion will be done in it
 			} else {
 				throw std::runtime_error("Failed to set property \"" + this->Key + "\", as the variant type of the property is neither string, nor integer, nor boolean.");
 			}

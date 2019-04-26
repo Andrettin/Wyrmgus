@@ -170,7 +170,6 @@ static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
 static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
 static const char ETHEREAL_KEY[] = "Ethereal";
 static const char HIDDENOWNERSHIP_KEY[] = "HiddenOwnership";
-static const char HIDDEN_KEY[] = "Hidden";
 static const char INVERTEDSOUTHEASTARMS_KEY[] = "InvertedSoutheastArms";
 static const char INVERTEDEASTARMS_KEY[] = "InvertedEastArms";
 //Wyrmgus end
@@ -343,7 +342,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
 							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
 							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY,
-							   ETHEREAL_KEY, HIDDENOWNERSHIP_KEY, HIDDEN_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
+							   ETHEREAL_KEY, HIDDENOWNERSHIP_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
 							   //Wyrmgus end
 							  };
 
@@ -735,6 +734,8 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "Unit type %s not defined" _C_ parent_ident.c_str());
 			}
 			type->SetParent(parent_type);
+		} else if (!strcmp(value, "Hidden")) {
+			type->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
@@ -1060,12 +1061,7 @@ static int CclDefineUnitType(lua_State *l)
 				DebugPrint("Warning animation '%s' not found\n" _C_ LuaToString(l, -1));
 			}
 		} else if (!strcmp(value, "Icon")) {
-			type->Icon.Name = LuaToString(l, -1);
-			type->Icon.Icon = nullptr;
-			//Wyrmgus start
-			type->Icon.Load();
-			type->Icon.Icon->Load();
-			//Wyrmgus end
+			type->SetIcon(LuaToString(l, -1));
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2450,7 +2446,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, type->Icon.Name.c_str());
+		if (type->GetIcon() != nullptr) {
+			lua_pushstring(l, type->GetIcon()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Costs")) {
 		LuaCheckArgs(l, 3);
@@ -3435,7 +3435,7 @@ void UpdateUnitVariables(CUnit &unit)
 
 	unit.Variable[LEVEL_INDEX].Max = 100000;
 	if (!IsNetworkGame() && unit.Character != nullptr && unit.Player->AiEnabled == false) {
-		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->Level) { //save level, if unit has a persistent character
+		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->GetLevel()) { //save level, if unit has a persistent character
 			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
 			SaveHero(unit.Character);
 			CAchievement::CheckAchievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained

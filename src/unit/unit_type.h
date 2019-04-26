@@ -216,7 +216,6 @@ enum {
 	BLUNTDAMAGE_INDEX,
 	ETHEREAL_INDEX,					/// is only visible by units with ethereal vision.
 	HIDDENOWNERSHIP_INDEX,
-	HIDDEN_INDEX,
 	INVERTEDSOUTHEASTARMS_INDEX,
 	INVERTEDEASTARMS_INDEX,
 	//Wyrmgus end
@@ -540,19 +539,9 @@ public:
 		return this->Faction;
 	}
 
-	bool IsHidden() const
-	{
-		return this->BoolFlag[HIDDEN_INDEX].value;
-	}
-	
 	bool IsHiddenInEditor() const
 	{
-		return this->IsHidden() || this->TerrainType != nullptr || this->Icon.Name.empty() || this->BoolFlag[VANISHES_INDEX].value;
-	}
-	
-	CIcon *GetIcon() const
-	{
-		return this->Icon.Icon;
+		return this->IsHidden() || this->TerrainType != nullptr || this->GetIcon() == nullptr || this->BoolFlag[VANISHES_INDEX].value;
 	}
 	
 	bool IsUnitUnitType() const
