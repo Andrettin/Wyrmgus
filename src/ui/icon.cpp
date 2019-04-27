@@ -106,7 +106,7 @@ bool CIcon::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		this->G = CPlayerColorGraphic::New(file, size.x, size.y);
-		this->File = file;
+		this->File = file.c_str();
 		this->Size = size;
 	} else {
 		return false;
@@ -343,9 +343,9 @@ void CIcon::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_frame", "frame"), [](CIcon *icon, const int frame){ icon->Frame = frame; });
 	ClassDB::bind_method(D_METHOD("get_frame"), &CIcon::GetFrame);
-	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
-	
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "frame"), "set_frame", "get_frame");
+	
+	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
 }
 
 /**

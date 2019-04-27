@@ -134,15 +134,17 @@ public:
 		return this->Frame;
 	}
 	
-	String GetFile() const
+	const String &GetFile() const
 	{
-		return this->File.c_str();
+		return this->File;
 	}
 	
 public:
 	CPlayerColorGraphic *G = nullptr;		/// graphic data
 	CPlayerColorGraphic *GScale = nullptr;	/// icon when drawn grayscaled
-	std::string File;						/// the file containing the icon graphics
+private:
+	String File;							/// the file containing the icon graphics
+public:
 	Vec2i Size = Vec2i(0, 0);				/// the size of the icon, in pixels
 private:
 	int Frame = 0;							/// frame number in graphic
