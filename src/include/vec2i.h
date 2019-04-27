@@ -30,6 +30,16 @@
 #ifndef VEC2I_H
 #define VEC2I_H
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include <core/math/vector2.h>
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
 template <typename T>
 class Vec2T
 {
@@ -39,11 +49,25 @@ public:
 
 	template <typename T2>
 	Vec2T(Vec2T<T2> v) : x(v.x), y(v.y) {}
+	
+	operator Vector2i() const
+	{
+		return Vector2i(this->x, this->y);
+	}
+	
+	operator Vector2() const
+	{
+		return Vector2(this->x, this->y);
+	}
+	
 public:
 	T x = 0;
 	T y = 0;
 };
 
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
 template <typename T, typename T2>
 inline bool operator == (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
