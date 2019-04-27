@@ -74,8 +74,7 @@ T ConvertFromString(const std::string &str)
 	} else if constexpr(std::is_same_v<T, String>) {
 		return String(str.c_str());
 	} else if constexpr(std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_const_t<std::remove_pointer_t<T>>>, std::remove_const_t<std::remove_pointer_t<T>>>) {
-		std::string ident = FindAndReplaceString(str, "_", "-");
-		return std::remove_const_t<std::remove_pointer_t<T>>::Get(ident);
+		return std::remove_const_t<std::remove_pointer_t<T>>::Get(str);
 	} else {
 		fprintf(stderr, "Cannot convert from a string to the designated type.\n");
 		return T();

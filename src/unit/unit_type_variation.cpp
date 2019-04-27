@@ -149,19 +149,16 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_class_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
 			const ItemClass *item_class = ItemClass::Get(value);
 			if (item_class != nullptr) {
 				this->ItemClassesEquipped.push_back(item_class);
 			}
 		} else if (key == "item_class_not_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
 			const ItemClass *item_class = ItemClass::Get(value);
 			if (item_class != nullptr) {
 				this->ItemClassesNotEquipped.push_back(item_class);
 			}
 		} else if (key == "item_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ItemsEquipped.push_back(unit_type);
@@ -169,7 +166,6 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_not_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ItemsNotEquipped.push_back(unit_type);
@@ -177,25 +173,21 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "terrain") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CTerrainType *terrain_type = CTerrainType::Get(value);
 			if (terrain_type != nullptr) {
 				this->Terrains.push_back(terrain_type);
 			}
 		} else if (key == "forbidden_terrain") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CTerrainType *terrain_type = CTerrainType::Get(value);
 			if (terrain_type != nullptr) {
 				this->TerrainsForbidden.push_back(terrain_type);
 			}
 		} else if (key == "season") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CSeason *season = CSeason::Get(value);
 			if (season != nullptr) {
 				this->Seasons.push_back(season);
 			}
 		} else if (key == "forbidden_season") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CSeason *season = CSeason::Get(value);
 			if (season != nullptr) {
 				this->ForbiddenSeasons.push_back(season);

@@ -101,13 +101,11 @@ CMapTemplate::~CMapTemplate()
 bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "plane") {
-		value = FindAndReplaceString(value, "_", "-");
 		CPlane *plane = CPlane::Get(value);
 		if (plane) {
 			this->Plane = plane;
 		}
 	} else if (key == "world") {
-		value = FindAndReplaceString(value, "_", "-");
 		CWorld *world = CWorld::Get(value);
 		if (world) {
 			this->World = world;
@@ -139,7 +137,6 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 	} else if (key == "max_y") {
 		this->MaxPos.y = std::stoi(value);
 	} else if (key == "main_template") {
-		value = FindAndReplaceString(value, "_", "-");
 		CMapTemplate *main_template = CMapTemplate::Get(value);
 		this->MainTemplate = main_template;
 		main_template->Subtemplates.push_back(this);
@@ -151,21 +148,18 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 		}
 		this->SurfaceLayer = main_template->SurfaceLayer;
 	} else if (key == "upper_template") {
-		value = FindAndReplaceString(value, "_", "-");
 		CMapTemplate *upper_template = CMapTemplate::Get(value);
 		if (upper_template) {
 			this->UpperTemplate = upper_template;
 			upper_template->LowerTemplate = this;
 		}
 	} else if (key == "lower_template") {
-		value = FindAndReplaceString(value, "_", "-");
 		CMapTemplate *lower_template = CMapTemplate::Get(value);
 		if (lower_template) {
 			this->LowerTemplate = lower_template;
 			lower_template->UpperTemplate = this;
 		}
 	} else if (key == "adjacent_template") {
-		value = FindAndReplaceString(value, "_", "-");
 		CMapTemplate *adjacent_template = CMapTemplate::Get(value);
 		if (adjacent_template) {
 			this->AdjacentTemplates.push_back(adjacent_template);
@@ -174,13 +168,11 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 			}
 		}
 	} else if (key == "base_terrain_type") {
-		value = FindAndReplaceString(value, "_", "-");
 		CTerrainType *terrain_type = CTerrainType::Get(value);
 		if (terrain_type) {
 			this->BaseTerrainType = terrain_type;
 		}
 	} else if (key == "base_overlay_terrain_type") {
-		value = FindAndReplaceString(value, "_", "-");
 		CTerrainType *terrain_type = CTerrainType::Get(value);
 		if (terrain_type) {
 			this->BaseOverlayTerrainType = terrain_type;
@@ -215,7 +207,6 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 			std::string value = property.Value;
 			
 			if (key == "unit_type") {
-				value = FindAndReplaceString(value, "_", "-");
 				unit_type = CUnitType::Get(value);
 				if (!unit_type) {
 					fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
@@ -1615,8 +1606,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		}
 		
 		if (property.Key == "terrain_type") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->TerrainType = CTerrainType::Get(value);
+			this->TerrainType = CTerrainType::Get(property.Value);
 		} else if (property.Key == "seed_count") {
 			this->SeedCount = std::stoi(property.Value);
 		} else if (property.Key == "expansion_chance") {
@@ -1628,8 +1618,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		} else if (property.Key == "use_subtemplate_borders_as_seeds") {
 			this->UseSubtemplateBordersAsSeeds = StringToBool(property.Value);
 		} else if (property.Key == "target_terrain_type") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			const CTerrainType *target_terrain_type = CTerrainType::Get(value);
+			const CTerrainType *target_terrain_type = CTerrainType::Get(property.Value);
 			if (target_terrain_type) {
 				this->TargetTerrainTypes.push_back(target_terrain_type);
 			}

@@ -59,9 +59,8 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 		}
 		
 		if (property.Key == "dialogue") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CDialogue *dialogue = CDialogue::Get(value);
-			if (dialogue) {
+			CDialogue *dialogue = CDialogue::Get(property.Value);
+			if (dialogue != nullptr) {
 				this->Dialogue = dialogue;
 			}
 		} else {
@@ -95,12 +94,9 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 		if (property.Key == "quantity") {
 			this->Quantity = std::stoi(property.Value);
 		} else if (property.Key == "unit_type") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CUnitType *unit_type = CUnitType::Get(value);
-			if (unit_type) {
+			CUnitType *unit_type = CUnitType::Get(property.Value);
+			if (unit_type != nullptr) {
 				this->UnitType = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
 			}
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", property.Key.c_str());

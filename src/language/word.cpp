@@ -116,8 +116,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 		}
 	} else if (section->Tag == "specimen_name") {
 		for (const CConfigData *sub_section : section->Sections) {
-			std::string species_ident = FindAndReplaceString(sub_section->Tag, "_", "-");
-			CSpecies *species = CSpecies::Get(species_ident);
+			CSpecies *species = CSpecies::Get(sub_section->Tag);
 			
 			if (species == nullptr) {
 				continue;

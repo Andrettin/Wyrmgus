@@ -242,19 +242,16 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		} else if (property.Key == "pixel_height") {
 			this->PixelTileSize.y = std::stoi(property.Value);
 		} else if (property.Key == "base_terrain_type") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CTerrainType *base_terrain_type = CTerrainType::Get(value);
+			CTerrainType *base_terrain_type = CTerrainType::Get(property.Value);
 			this->BaseTerrainTypes.push_back(base_terrain_type);
 		} else if (property.Key == "inner_border_terrain_type") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CTerrainType *border_terrain_type = CTerrainType::Get(value);
+			CTerrainType *border_terrain_type = CTerrainType::Get(property.Value);
 			this->InnerBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
 			border_terrain_type->OuterBorderTerrains.push_back(this);
 			border_terrain_type->BorderTerrains.push_back(this);
 		} else if (property.Key == "outer_border_terrain_type") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CTerrainType *border_terrain_type = CTerrainType::Get(value);
+			CTerrainType *border_terrain_type = CTerrainType::Get(property.Value);
 			this->OuterBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
 			border_terrain_type->InnerBorderTerrains.push_back(this);
@@ -282,8 +279,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				}
 				
 				if (property.Key == "season") {
-					std::string value = FindAndReplaceString(property.Value, "_", "-");
-					season = CSeason::Get(value);
+					season = CSeason::Get(property.Value);
 				} else if (property.Key == "graphics") {
 					season_graphics_file = property.Value;
 					if (!CanAccessFile(season_graphics_file.c_str())) {
@@ -320,14 +316,12 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				}
 				
 				if (property.Key == "terrain_type") {
-					std::string value = FindAndReplaceString(property.Value, "_", "-");
-					CTerrainType *transition_terrain = CTerrainType::Get(value);
+					CTerrainType *transition_terrain = CTerrainType::Get(property.Value);
 					if (transition_terrain != nullptr) {
 						transition_terrain_id = transition_terrain->GetIndex();
 					}
 				} else if (property.Key == "transition_type") {
-					std::string value = FindAndReplaceString(property.Value, "_", "-");
-					transition_type = GetTransitionTypeIdByName(value);
+					transition_type = GetTransitionTypeIdByName(property.Value);
 				} else if (property.Key == "tile") {
 					tiles.push_back(std::stoi(property.Value));
 				} else {

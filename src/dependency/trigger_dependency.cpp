@@ -47,7 +47,6 @@ void CTriggerDependency::ProcessConfigDataProperty(const std::pair<std::string, 
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "trigger") {
-		value = FindAndReplaceString(value, "_", "-");
 		this->Trigger = CTrigger::GetTrigger(value);
 	} else {
 		fprintf(stderr, "Invalid trigger dependency property: \"%s\".\n", key.c_str());

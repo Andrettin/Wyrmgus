@@ -83,7 +83,6 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 		std::string value = property.Value;
 		
 		if (key == "apply_to") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ApplyTo[unit_type->GetIndex()] = 'X';

@@ -177,12 +177,9 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "type") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = CUnitType::Get(value);
-			if (unit_type) {
+			if (unit_type != nullptr) {
 				this->Type = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "prefix") {
 			value = FindAndReplaceString(value, "_", "-");

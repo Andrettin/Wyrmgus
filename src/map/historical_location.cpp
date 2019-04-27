@@ -62,11 +62,9 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Date = CDate::FromString(value);
 		} else if (property.Key == "map_template") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->MapTemplate = CMapTemplate::Get(value);
+			this->MapTemplate = CMapTemplate::Get(property.Value);
 		} else if (property.Key == "site") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->Site = CSite::Get(value);
+			this->Site = CSite::Get(property.Value);
 			if (this->Site) {
 				this->MapTemplate = this->Site->MapTemplate;
 				this->Position = this->Site->Position;

@@ -274,7 +274,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 	for (size_t i = 0; i < config_data_list.size(); ++i) {
 		CConfigData *config_data = config_data_list[i];
 		std::string ident = config_data->Ident;
-		ident = FindAndReplaceString(ident, "_", "-");
+		ident = FindAndReplaceString(ident, "_", "-"); //for backwards compatibility with the Lua code
 		
 		if (ident.empty() && config_data->Tag != "button") {
 			fprintf(stderr, "String identifier is empty for config data belonging to tag \"%s\".\n", config_data->Tag.c_str());

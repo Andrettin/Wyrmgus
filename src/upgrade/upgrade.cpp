@@ -249,12 +249,9 @@ CUpgrade::~CUpgrade()
 bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "icon") {
-		value = FindAndReplaceString(value, "_", "-");
 		CIcon *icon = CIcon::Get(value);
 		if (icon != nullptr) {
 			this->Icon = icon;
-		} else {
-			fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
 		}
 	} else if (key == "class") {
 		value = FindAndReplaceString(value, "_", "-");
@@ -269,13 +266,11 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 		
 		this->Class = class_id;
 	} else if (key == "civilization") {
-		value = FindAndReplaceString(value, "_", "-");
 		const CCivilization *civilization = CCivilization::Get(value);
 		if (civilization) {
 			this->Civilization = civilization->GetIndex();
 		}
 	} else if (key == "faction") {
-		value = FindAndReplaceString(value, "_", "-");
 		const CFaction *faction = CFaction::Get(value);
 		if (faction) {
 			this->Faction = faction->GetIndex();
@@ -283,13 +278,11 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 	} else if (key == "ability") {
 		this->Ability = StringToBool(value);
 	} else if (key == "item_slot") {
-		value = FindAndReplaceString(value, "_", "-");
 		const ::ItemSlot *item_slot = ItemSlot::Get(value);
 		if (item_slot != nullptr) {
 			this->ItemSlot = item_slot;
 		}
 	} else if (key == "item") {
-		value = FindAndReplaceString(value, "_", "-");
 		CUnitType *item = CUnitType::Get(value);
 		if (item != nullptr) {
 			this->Item = item;

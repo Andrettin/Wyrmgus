@@ -65,10 +65,8 @@ CHistoricalUnit::~CHistoricalUnit()
 bool CHistoricalUnit::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "unit_type") {
-		value = FindAndReplaceString(value, "_", "-");
 		this->UnitType = CUnitType::Get(value);
 	} else if (key == "faction") {
-		value = FindAndReplaceString(value, "_", "-");
 		this->Faction = CFaction::Get(value);
 	} else if (key == "start_date") {
 		value = FindAndReplaceString(value, "_", "-");

@@ -71,7 +71,6 @@ void CAchievement::CheckAchievements()
 bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "player_color") {
-		value = FindAndReplaceString(value, "_", "-");
 		CPlayerColor *player_color = CPlayerColor::Get(value);
 		if (player_color != nullptr) {
 			this->PlayerColor = player_color;
@@ -83,13 +82,11 @@ bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string
 		this->Icon.Load();
 		this->Icon.Icon->Load();
 	} else if (key == "character") {
-		value = FindAndReplaceString(value, "_", "-");
 		const CCharacter *character = CCharacter::Get(value);
 		if (character) {
 			this->Character = character;
 		}
 	} else if (key == "character_type") {
-		value = FindAndReplaceString(value, "_", "-");
 		const CUnitType *unit_type = CUnitType::Get(value);
 		if (unit_type) {
 			this->CharacterType = unit_type;

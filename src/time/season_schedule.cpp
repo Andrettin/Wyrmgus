@@ -106,7 +106,6 @@ bool CSeasonSchedule::ProcessConfigDataSection(const CConfigData *section)
 			std::string value = property.Value;
 			
 			if (key == "season") {
-				value = FindAndReplaceString(value, "_", "-");
 				season = CSeason::Get(value);
 			} else if (key == "days") {
 				hours = std::stoi(value) * this->HoursPerDay;

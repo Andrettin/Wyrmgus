@@ -132,7 +132,6 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		std::string value = property.Value;
 		
 		if (key == "time_of_day") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->TimeOfDay = CTimeOfDay::Get(value);
 		} else if (key == "hours") {
 			this->Schedule->TotalHours -= this->Hours; //remove old amount of hours from the schedule, if it has already been defined before
@@ -158,7 +157,6 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 				std::string value = property.Value;
 				
 				if (key == "season") {
-					value = FindAndReplaceString(value, "_", "-");
 					season = CSeason::Get(value);
 				} else if (key == "hours") {
 					season_hours = std::stoi(value);

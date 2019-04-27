@@ -145,7 +145,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value.c_str();
 			name_changed = true;
 		} else if (key == "name_word") {
-			value = FindAndReplaceString(value, "_", "-");
 			CWord *name_word = CWord::Get(value);
 			if (name_word != nullptr) {
 				this->NameWord = name_word;
@@ -157,7 +156,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->FamilyName = value.c_str();
 			family_name_changed = true;
 		} else if (key == "family_name_word") {
-			value = FindAndReplaceString(value, "_", "-");
 			CWord *family_name_word = CWord::Get(value);
 			if (family_name_word != nullptr) {
 				this->FamilyNameWord = family_name_word;
@@ -172,7 +170,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quote") {
 			this->Quote = value.c_str();
 		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
 				if (this->UnitType == nullptr || this->UnitType == unit_type || this->UnitType->CanExperienceUpgradeTo(unit_type)) {
@@ -193,13 +190,11 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->Civilization = CCivilization::Get(value);
 		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = CFaction::Get(value);
-			if (faction) {
-				if (!this->Faction) {
+			if (faction != nullptr) {
+				if (this->Faction == nullptr) {
 					this->Faction = faction;
 				}
 				this->Factions.push_back(faction);
@@ -229,7 +224,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "violent_death") {
 			this->ViolentDeath = StringToBool(value);
 		} else if (key == "father") {
-			value = FindAndReplaceString(value, "_", "-");
 			CCharacter *father = CCharacter::Get(value);
 			if (father) {
 				if (father->Gender == MaleGender || !father->Initialized) {
@@ -253,7 +247,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (key == "mother") {
-			value = FindAndReplaceString(value, "_", "-");
 			CCharacter *mother = CCharacter::Get(value);
 			if (mother) {
 				if (mother->Gender == FemaleGender || !mother->Initialized) {
@@ -277,7 +270,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (key == "deity") {
-			value = FindAndReplaceString(value, "_", "-");
 			CDeity *deity = CDeity::Get(value);
 			if (deity) {
 				this->Deities.push_back(deity);
@@ -298,7 +290,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->HeroicIcon.Load();
 			this->HeroicIcon.Icon->Load();
 		} else if (key == "forbidden_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type) {
 				this->ForbiddenUpgrades.push_back(unit_type);
@@ -330,7 +321,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "preferred_deity_domain") {
-			value = FindAndReplaceString(value, "_", "-");
 			CDeityDomain *deity_domain = CDeityDomain::Get(value);
 			if (deity_domain) {
 				this->PreferredDeityDomains.push_back(deity_domain);
@@ -379,7 +369,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					end_date = CDate::FromString(value);
 				} else if (key == "faction") {
-					value = FindAndReplaceString(value, "_", "-");
 					title_faction = CFaction::Get(value);
 				} else {
 					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.c_str());

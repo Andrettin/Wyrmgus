@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "config.h"
+#include "util.h"
 
 #include <core/ustring.h>
 
@@ -139,14 +140,16 @@ public:
 	*/
 	static inline T *Get(const std::string &ident, const bool should_find = true)
 	{
-		std::map<std::string, T *>::const_iterator find_iterator = DataType<T>::InstancesByIdent.find(ident);
+		std::string processed_ident = FindAndReplaceString(ident, "_", "-"); //remove this when data elements are no longer used in Lua
+		
+		std::map<std::string, T *>::const_iterator find_iterator = DataType<T>::InstancesByIdent.find(processed_ident);
 		
 		if (find_iterator != DataType<T>::InstancesByIdent.end()) {
 			return find_iterator->second;
 		}
 		
 		if (should_find) {
-			fprintf(stderr, "Invalid \"%s\" instance: \"%s\".\n", T::ClassIdentifier, ident.c_str());
+			fprintf(stderr, "Invalid \"%s\" instance: \"%s\".\n", T::ClassIdentifier, processed_ident.c_str());
 		}
 		
 		return nullptr;
@@ -238,11 +241,13 @@ public:
 	*/
 	static inline T *Add(const std::string &ident)
 	{
+		std::string processed_ident = FindAndReplaceString(ident, "_", "-"); //remove this when data elements are no longer used in Lua
+		
 		T *instance = new T;
-		instance->Ident = ident;
+		instance->Ident = processed_ident;
 		instance->Index = DataType<T>::Instances.size();
 		DataType<T>::Instances.push_back(instance);
-		DataType<T>::InstancesByIdent[ident] = instance;
+		DataType<T>::InstancesByIdent[processed_ident] = instance;
 		
 		return instance;
 	}

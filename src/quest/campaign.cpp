@@ -91,9 +91,8 @@ CCampaign *CCampaign::GetCurrentCampaign()
 bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "faction") {
-		value = FindAndReplaceString(value, "_", "-");
 		CFaction *faction = CFaction::Get(value);
-		if (faction) {
+		if (faction != nullptr) {
 			this->Faction = faction;
 		}
 	} else if (key == "start_date") {
@@ -138,7 +137,6 @@ bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
 			std::string value = property.Value;
 			
 			if (key == "map_template") {
-				value = FindAndReplaceString(value, "_", "-");
 				map_template = CMapTemplate::Get(value);
 				if (map_size.x == 0) {
 					map_size.x = map_template->Width;

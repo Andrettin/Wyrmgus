@@ -713,14 +713,12 @@ void CUnitType::Clear()
 bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "parent") {
-		value = FindAndReplaceString(value, "_", "-");
 		CUnitType *parent_type = CUnitType::Get(value);
 		if (!parent_type) {
 			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
 		}
 		this->SetParent(parent_type);
 	} else if (key == "name_word") {
-		value = FindAndReplaceString(value, "_", "-");
 		const CWord *name_word = CWord::Get(value);
 		if (name_word != nullptr) {
 			this->NameWord = name_word;
@@ -729,15 +727,13 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 			}
 		}
 	} else if (key == "civilization") {
-		value = FindAndReplaceString(value, "_", "-");
 		CCivilization *civilization = CCivilization::Get(value);
-		if (civilization) {
+		if (civilization != nullptr) {
 			this->Civilization = civilization;
 		}
 	} else if (key == "faction") {
-		value = FindAndReplaceString(value, "_", "-");
 		CFaction *faction = CFaction::Get(value);
-		if (faction) {
+		if (faction != nullptr) {
 			this->Faction = faction;
 		}
 	} else if (key == "animations") {
@@ -798,29 +794,23 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		this->CorpseName = value;
 		this->CorpseType = nullptr;
 	} else if (key == "weapon_class") {
-		value = FindAndReplaceString(value, "_", "-");
 		const ::ItemClass *weapon_class = ::ItemClass::Get(value);
 		if (weapon_class != nullptr) {
 			this->WeaponClasses.push_back(weapon_class);
 		}
 	} else if (key == "ai_drop") {
-		value = FindAndReplaceString(value, "_", "-");
 		CUnitType *drop_type = CUnitType::Get(value);
-		if (drop_type) {
+		if (drop_type != nullptr) {
 			this->AiDrops.push_back(drop_type);
-		} else {
-			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 		}
 	} else if (key == "item_class") {
-		value = FindAndReplaceString(value, "_", "-");
 		const ::ItemClass *item_class = ::ItemClass::Get(value);
 		if (item_class != nullptr) {
 			this->ItemClass = item_class;
 		}
 	} else if (key == "species") {
-		value = FindAndReplaceString(value, "_", "-");
 		CSpecies *species = CSpecies::Get(value);
-		if (species) {
+		if (species != nullptr) {
 			this->Species = species;
 			this->Species->UnitType = this;
 		}
@@ -1006,9 +996,6 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			
 			std::string key = property.Key;
 			std::string value = property.Value;
-			
-			key = FindAndReplaceString(key, "_", "-");
-			value = FindAndReplaceString(value, "_", "-");
 			
 			const ItemSlot *item_slot = ItemSlot::Get(key);
 			if (item_slot == nullptr) {

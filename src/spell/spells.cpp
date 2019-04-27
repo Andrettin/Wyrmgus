@@ -434,7 +434,6 @@ bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value
 			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 		}
 	} else if (key == "item_spell") {
-		value = FindAndReplaceString(value, "_", "-");
 		const ItemClass *item_class = ItemClass::Get(value);
 		if (item_class != nullptr) {
 			this->ItemSpell.insert(item_class);
@@ -1000,15 +999,13 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		} else if (property.Key == "faction_unit") {
 			this->FactionUnit = StringToCondition(property.Value);
 		} else if (property.Key == "civilization_equivalent") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			const CCivilization *civilization = CCivilization::Get(value);
-			if (civilization) {
+			const CCivilization *civilization = CCivilization::Get(property.Value);
+			if (civilization != nullptr) {
 				this->CivilizationEquivalent = civilization->GetIndex();
 			}
 		} else if (property.Key == "faction_equivalent") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CFaction *faction = CFaction::Get(value);
-			if (faction) {
+			CFaction *faction = CFaction::Get(property.Value);
+			if (faction != nullptr) {
 				this->FactionEquivalent = faction;
 			}
 		} else {

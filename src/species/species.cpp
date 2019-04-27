@@ -69,14 +69,12 @@ bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string val
 		value = FindAndReplaceString(value, "_", "-");
 		this->ChildUpgrade = value;
 	} else if (key == "home_plane") {
-		value = FindAndReplaceString(value, "_", "-");
 		CPlane *plane = CPlane::Get(value);
 		if (plane) {
 			this->HomePlane = plane;
 			plane->Species.push_back(this);
 		}
 	} else if (key == "homeworld") {
-		value = FindAndReplaceString(value, "_", "-");
 		CWorld *world = CWorld::Get(value);
 		if (world) {
 			this->Homeworld = world;

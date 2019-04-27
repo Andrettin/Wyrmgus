@@ -64,11 +64,8 @@ bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 	} else if (key == "position_y") {
 		this->Position.y = std::stoi(value);
 	} else if (key == "map_template") {
-		value = FindAndReplaceString(value, "_", "-");
 		this->MapTemplate = CMapTemplate::Get(value);
 	} else if (key == "core") {
-		value = FindAndReplaceString(value, "_", "-");
-		
 		CFaction *faction = CFaction::Get(value);
 		if (faction != nullptr) {
 			this->Cores.push_back(faction);
@@ -111,9 +108,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 				continue;
 			}
 			
-			std::string key = FindAndReplaceString(property.Key, "_", "-");
-			
-			const CCivilization *civilization = CCivilization::Get(key);
+			const CCivilization *civilization = CCivilization::Get(property.Key);
 			
 			if (civilization) {
 				this->CulturalNames[civilization] = property.Value;
@@ -133,8 +128,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				date = CDate::FromString(value);
 			} else if (property.Key == "faction") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				owner_faction = CFaction::Get(value);
+				owner_faction = CFaction::Get(property.Value);
 			} else {
 				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.c_str());
 			}
@@ -161,11 +155,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				end_date = CDate::FromString(value);
 			} else if (property.Key == "building_class") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				building_class = UnitClass::Get(value);
-				if (building_class == nullptr) {
-					fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());
-				}
+				building_class = UnitClass::Get(property.Value);
 			} else if (property.Key == "unique") {
 				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				unique = GetUniqueItem(value);
@@ -173,8 +163,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 					fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
 				}
 			} else if (property.Key == "faction") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				building_owner_faction = CFaction::Get(value);
+				building_owner_faction = CFaction::Get(property.Value);
 			} else {
 				fprintf(stderr, "Invalid historical building property: \"%s\".\n", property.Key.c_str());
 			}

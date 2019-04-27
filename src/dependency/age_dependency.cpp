@@ -47,7 +47,6 @@ void CAgeDependency::ProcessConfigDataProperty(const std::pair<std::string, std:
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "age") {
-		value = FindAndReplaceString(value, "_", "-");
 		this->Age = CAge::Get(value);
 	} else {
 		fprintf(stderr, "Invalid age dependency property: \"%s\".\n", key.c_str());

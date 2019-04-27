@@ -118,7 +118,6 @@ void CDeity::Clear()
 bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "pantheon") {
-		value = FindAndReplaceString(value, "_", "-");
 		this->Pantheon = CPantheon::Get(value);
 	} else if (key == "gender") {
 		value = FindAndReplaceString(value, "_", "-");
@@ -126,20 +125,17 @@ bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value
 	} else if (key == "major") {
 		this->Major = StringToBool(value);
 	} else if (key == "civilization") {
-		value = FindAndReplaceString(value, "_", "-");
 		CCivilization *civilization = CCivilization::Get(value);
 		if (civilization != nullptr) {
 			this->Civilizations.push_back(civilization);
 			civilization->Deities.push_back(this);
 		}
 	} else if (key == "religion") {
-		value = FindAndReplaceString(value, "_", "-");
 		CReligion *religion = CReligion::Get(value);
 		if (religion) {
 			this->Religions.push_back(religion);
 		}
 	} else if (key == "domain") {
-		value = FindAndReplaceString(value, "_", "-");
 		CDeityDomain *deity_domain = CDeityDomain::Get(value);
 		if (deity_domain) {
 			this->Domains.push_back(deity_domain);
@@ -157,7 +153,6 @@ bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value
 		this->Icon.Load();
 		this->Icon.Icon->Load();
 	} else if (key == "home_plane") {
-		value = FindAndReplaceString(value, "_", "-");
 		CPlane *plane = CPlane::Get(value);
 		if (plane) {
 			this->HomePlane = plane;
@@ -180,7 +175,6 @@ bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value
 			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 		}
 	} else if (key == "holy_order") {
-		value = FindAndReplaceString(value, "_", "-");
 		CFaction *holy_order = CFaction::Get(value);
 		if (holy_order) {
 			this->HolyOrders.push_back(holy_order);
@@ -209,10 +203,7 @@ bool CDeity::ProcessConfigDataSection(const CConfigData *section)
 				continue;
 			}
 			
-			std::string key = property.Key;
-			key = FindAndReplaceString(key, "_", "-");
-			
-			const CCivilization *civilization = CCivilization::Get(key);
+			const CCivilization *civilization = CCivilization::Get(property.Key);
 			
 			if (civilization) {
 				this->CulturalNames[civilization] = property.Value;

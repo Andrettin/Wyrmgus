@@ -54,14 +54,12 @@
 bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "lower_category") {
-		value = FindAndReplaceString(value, "_", "-");
 		CSpeciesCategory *category = CSpeciesCategory::Get(value);
 		if (category) {
 			this->LowerCategories.push_back(category);
 			category->UpperCategory = this;
 		}
 	} else if (key == "upper_category") {
-		value = FindAndReplaceString(value, "_", "-");
 		CSpeciesCategory *category = CSpeciesCategory::Get(value);
 		if (category) {
 			this->UpperCategory = category;
