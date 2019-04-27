@@ -2310,12 +2310,22 @@ static int CclGetStratagusHomepage(lua_State *l)
 
 
 /**
-**	@brief	Get user directory
+**	@brief	Get the user directory
 */
 static int CclGetUserDirectory(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushstring(l, Wyrmgus::GetInstance()->GetUserDirectory().utf8().get_data());
+	return 1;
+}
+
+/**
+**	@brief	Mark Wyrmgus as initialized
+*/
+static int CclInitialized(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	Wyrmgus::GetInstance()->emit_signal("initialized");
 	return 1;
 }
 
@@ -2383,6 +2393,7 @@ void LuaRegisterModules()
 	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
 	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
 	lua_register(Lua, "GetUserDirectory", CclGetUserDirectory);
+	lua_register(Lua, "Initialized", CclInitialized);
 
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
