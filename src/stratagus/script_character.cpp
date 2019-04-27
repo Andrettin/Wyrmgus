@@ -160,16 +160,16 @@ static int CclDefineCharacter(lua_State *l)
 			if (father) {
 				if (father->Gender == MaleGender || !father->IsInitialized()) {
 					character->Father = father;
-					if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
+					if (!father->IsParentOf(character)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(character);
 					}
 					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
 					for (size_t i = 0; i < father->Children.size(); ++i) {
 						if (father->Children[i]->Ident != character_ident) {
-							if (!character->IsSiblingOf(father->Children[i]->Ident)) {
+							if (!character->IsSiblingOf(father->Children[i])) {
 								character->Siblings.push_back(father->Children[i]);
 							}
-							if (!father->Children[i]->IsSiblingOf(character_ident)) {
+							if (!father->Children[i]->IsSiblingOf(character)) {
 								father->Children[i]->Siblings.push_back(character);
 							}
 						}
@@ -186,16 +186,16 @@ static int CclDefineCharacter(lua_State *l)
 			if (mother) {
 				if (mother->Gender == FemaleGender || !mother->IsInitialized()) {
 					character->Mother = mother;
-					if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
+					if (!mother->IsParentOf(character)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(character);
 					}
 					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
 					for (size_t i = 0; i < mother->Children.size(); ++i) {
 						if (mother->Children[i]->Ident != character_ident) {
-							if (!character->IsSiblingOf(mother->Children[i]->Ident)) {
+							if (!character->IsSiblingOf(mother->Children[i])) {
 								character->Siblings.push_back(mother->Children[i]);
 							}
-							if (!mother->Children[i]->IsSiblingOf(character_ident)) {
+							if (!mother->Children[i]->IsSiblingOf(character)) {
 								mother->Children[i]->Siblings.push_back(character);
 							}
 						}
@@ -217,16 +217,16 @@ static int CclDefineCharacter(lua_State *l)
 					} else {
 						child->Mother = character;
 					}
-					if (!character->IsParentOf(child_ident)) { //check whether the character has already been set as a parent of the child
+					if (!character->IsParentOf(child)) { //check whether the character has already been set as a parent of the child
 						character->Children.push_back(child);
 					}
 					// see if the character's other children aren't already included in the child's siblings, and if they aren't, add them (and add the character to the siblings' sibling list too)
 					for (size_t i = 0; i < character->Children.size(); ++i) {
 						if (character->Children[i] != child) {
-							if (!child->IsSiblingOf(character->Children[i]->Ident)) {
+							if (!child->IsSiblingOf(character->Children[i])) {
 								child->Siblings.push_back(character->Children[i]);
 							}
-							if (!character->Children[i]->IsSiblingOf(child_ident)) {
+							if (!character->Children[i]->IsSiblingOf(child)) {
 								character->Children[i]->Siblings.push_back(child);
 							}
 						}
@@ -984,32 +984,32 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Father")) {
-		if (character->Father != nullptr) {
-			lua_pushstring(l, character->Father->Ident.c_str());
+		if (character->GetFather() != nullptr) {
+			lua_pushstring(l, character->GetFather()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Mother")) {
-		if (character->Mother != nullptr) {
-			lua_pushstring(l, character->Mother->Ident.c_str());
+		if (character->GetMother() != nullptr) {
+			lua_pushstring(l, character->GetMother()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Children")) {
-		lua_createtable(l, character->Children.size(), 0);
-		for (size_t i = 1; i <= character->Children.size(); ++i)
+		lua_createtable(l, character->GetChildren().size(), 0);
+		for (size_t i = 1; i <= character->GetChildren().size(); ++i)
 		{
-			lua_pushstring(l, character->Children[i-1]->Ident.c_str());
+			lua_pushstring(l, character->GetChildren()[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "Siblings")) {
-		lua_createtable(l, character->Siblings.size(), 0);
-		for (size_t i = 1; i <= character->Siblings.size(); ++i)
+		lua_createtable(l, character->GetSiblings().size(), 0);
+		for (size_t i = 1; i <= character->GetSiblings().size(); ++i)
 		{
-			lua_pushstring(l, character->Siblings[i-1]->Ident.c_str());
+			lua_pushstring(l, character->GetSiblings()[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

@@ -169,9 +169,29 @@ public:
 		return this->Level;
 	}
 	
-	bool IsParentOf(const std::string &child_full_name) const;
-	bool IsChildOf(const std::string &parent_full_name) const;
-	bool IsSiblingOf(const std::string &sibling_full_name) const;
+	CCharacter *GetFather() const
+	{
+		return this->Father;
+	}
+	
+	CCharacter *GetMother() const
+	{
+		return this->Mother;
+	}
+	
+	const std::vector<CCharacter *> &GetChildren() const
+	{
+		return this->Children;
+	}
+	
+	const std::vector<CCharacter *> &GetSiblings() const
+	{
+		return this->Siblings;
+	}
+	
+	bool IsParentOf(const CCharacter *character) const;
+	bool IsChildOf(const CCharacter *character) const;
+	bool IsSiblingOf(const CCharacter *character) const;
 	bool IsItemEquipped(const CPersistentItem *item) const;
 	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
@@ -207,14 +227,18 @@ public:
 	CUnitType *UnitType = nullptr;
 	const CUpgrade *Trait = nullptr;
 	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
+private:
 	CCharacter *Father = nullptr;		/// Character's father
 	CCharacter *Mother = nullptr;		/// Character's mother
+public:
 	LuaCallback *Conditions = nullptr;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 	std::map<const ItemSlot *, std::vector<CPersistentItem *>> EquippedItems;	/// Equipped items of the character, per slot
+private:
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
+public:
 	std::vector<CFaction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<CDeity *> GeneratedDeities;		/// Deities picked during history generation for this character to worship

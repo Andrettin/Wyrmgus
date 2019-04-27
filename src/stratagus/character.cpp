@@ -228,16 +228,16 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			if (father) {
 				if (father->Gender == MaleGender || !father->Initialized) {
 					this->Father = father;
-					if (!father->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the father
+					if (!father->IsParentOf(this)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(this);
 					}
 					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
 					for (CCharacter *sibling : father->Children) {
 						if (sibling != this) {
-							if (!this->IsSiblingOf(sibling->Ident)) {
+							if (!this->IsSiblingOf(sibling)) {
 								this->Siblings.push_back(sibling);
 							}
-							if (!sibling->IsSiblingOf(this->Ident)) {
+							if (!sibling->IsSiblingOf(this)) {
 								sibling->Siblings.push_back(this);
 							}
 						}
@@ -251,16 +251,16 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			if (mother) {
 				if (mother->Gender == FemaleGender || !mother->Initialized) {
 					this->Mother = mother;
-					if (!mother->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the mother
+					if (!mother->IsParentOf(this)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(this);
 					}
 					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
 					for (CCharacter *sibling : mother->Children) {
 						if (sibling != this) {
-							if (!this->IsSiblingOf(sibling->Ident)) {
+							if (!this->IsSiblingOf(sibling)) {
 								this->Siblings.push_back(sibling);
 							}
-							if (!sibling->IsSiblingOf(this->Ident)) {
+							if (!sibling->IsSiblingOf(this)) {
 								sibling->Siblings.push_back(this);
 							}
 						}
@@ -666,32 +666,23 @@ CCalendar *CCharacter::GetCalendar() const
 	return CCalendar::BaseCalendar;
 }
 
-bool CCharacter::IsParentOf(const std::string &child_ident) const
+bool CCharacter::IsParentOf(const CCharacter *character) const
 {
-	for (size_t i = 0; i < this->Children.size(); ++i) {
-		if (this->Children[i]->Ident == child_ident) {
-			return true;
-		}
-	}
-	return false;
+	return std::find(this->Children.begin(), this->Children.end(), character) != this->Children.end();
 }
 
-bool CCharacter::IsChildOf(const std::string &parent_ident) const
+bool CCharacter::IsChildOf(const CCharacter *character) const
 {
-	if ((this->Father != nullptr && this->Father->Ident == parent_ident) || (this->Mother != nullptr && this->Mother->Ident == parent_ident)) {
+	if (character != nullptr && (this->Father == character || this->Mother == character)) {
 		return true;
 	}
+	
 	return false;
 }
 
-bool CCharacter::IsSiblingOf(const std::string &sibling_ident) const
+bool CCharacter::IsSiblingOf(const CCharacter *character) const
 {
-	for (size_t i = 0; i < this->Siblings.size(); ++i) {
-		if (this->Siblings[i]->Ident == sibling_ident) {
-			return true;
-		}
-	}
-	return false;
+	return std::find(this->Siblings.begin(), this->Siblings.end(), character) != this->Siblings.end();
 }
 
 bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
@@ -853,6 +844,10 @@ void CCharacter::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction"), [](const CCharacter *character){ return const_cast<CFaction *>(character->GetFaction()); });
 	ClassDB::bind_method(D_METHOD("get_unit_type"), &CCharacter::GetUnitType);
 	ClassDB::bind_method(D_METHOD("get_level"), &CCharacter::GetLevel);
+	ClassDB::bind_method(D_METHOD("get_father"), &CCharacter::GetFather);
+	ClassDB::bind_method(D_METHOD("get_mother"), &CCharacter::GetMother);
+	ClassDB::bind_method(D_METHOD("get_children"), [](const CCharacter *character){ return VectorToGodotArray(character->GetChildren()); });
+	ClassDB::bind_method(D_METHOD("get_siblings"), [](const CCharacter *character){ return VectorToGodotArray(character->GetSiblings()); });
 	ClassDB::bind_method(D_METHOD("get_deities"), [](const CCharacter *character){ return VectorToGodotArray(character->Deities); });
 	ClassDB::bind_method(D_METHOD("get_abilities"), [](const CCharacter *character){ return VectorToGodotArray(character->Abilities); });
 }
