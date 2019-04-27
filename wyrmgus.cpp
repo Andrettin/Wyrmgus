@@ -117,6 +117,7 @@ void Wyrmgus::_bind_methods()
 
 	ClassDB::bind_method(D_METHOD("number_to_roman_numeral", "number"), &Wyrmgus::NumberToRomanNumeral);
 	
+	ADD_SIGNAL(MethodInfo("initialized"));
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
 	
