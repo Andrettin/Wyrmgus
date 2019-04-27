@@ -100,6 +100,7 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_building_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetBuildingUnitTypes()); });
 	ClassDB::bind_method(D_METHOD("get_item_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetItemUnitTypes()); });
 	
+	ClassDB::bind_method(D_METHOD("get_character", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CCharacter::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_characters"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCharacter::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_this_player"), [](const Wyrmgus *wyrmgus){ return CPlayer::GetThisPlayer(); });

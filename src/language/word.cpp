@@ -284,7 +284,7 @@ void CWord::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_derives_to"), [](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
 	
 	ClassDB::bind_method(D_METHOD("is_personal_name"), [](const CWord *word){ return word->PersonalNameWeights.empty() == false; });
-	ClassDB::bind_method(D_METHOD("is_family_name"), [](const CWord *word){ return word->FamilyNameWeight == 0; });
+	ClassDB::bind_method(D_METHOD("is_family_name"), [](const CWord *word){ return word->FamilyNameWeight != 0; });
 	ClassDB::bind_method(D_METHOD("get_specimen_name_species"), [](const CWord *word){
 		Array specimen_name_species;
 		for (const auto &element : word->SpecimenNameWeights) {
@@ -292,6 +292,6 @@ void CWord::_bind_methods()
 		}
 		return specimen_name_species;
 	});
-	ClassDB::bind_method(D_METHOD("is_ship_name"), [](const CWord *word){ return word->ShipNameWeight == 0; });
-	ClassDB::bind_method(D_METHOD("is_settlement_name"), [](const CWord *word){ return word->SettlementNameWeight == 0; });
+	ClassDB::bind_method(D_METHOD("is_ship_name"), [](const CWord *word){ return word->ShipNameWeight != 0; });
+	ClassDB::bind_method(D_METHOD("is_settlement_name"), [](const CWord *word){ return word->SettlementNameWeight != 0; });
 }

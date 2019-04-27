@@ -847,6 +847,7 @@ void CCharacter::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_extra_name"), &CCharacter::GetExtraName);
 	ClassDB::bind_method(D_METHOD("get_family_name"), &CCharacter::GetFamilyName);
 	ClassDB::bind_method(D_METHOD("get_family_name_word"), [](const CCharacter *character){ return character->FamilyNameWord; });
+	ClassDB::bind_method(D_METHOD("get_full_name"), &CCharacter::GetFullName);
 	ClassDB::bind_method(D_METHOD("is_usable"), &CCharacter::IsUsable);
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CCharacter::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), [](const CCharacter *character){ return const_cast<CFaction *>(character->GetFaction()); });
