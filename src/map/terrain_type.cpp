@@ -321,7 +321,8 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 						transition_terrain_id = transition_terrain->GetIndex();
 					}
 				} else if (property.Key == "transition_type") {
-					transition_type = GetTransitionTypeIdByName(property.Value);
+					std::string value = FindAndReplaceString(property.Value, "_", "-");
+					transition_type = GetTransitionTypeIdByName(value);
 				} else if (property.Key == "tile") {
 					tiles.push_back(std::stoi(property.Value));
 				} else {
