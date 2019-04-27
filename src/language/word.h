@@ -141,10 +141,8 @@ private:
 	static inline bool InitializeClass()
 	{
 		REGISTER_PROPERTY(DerivesFrom);
-		REGISTER_PROPERTY(Gender);
 		REGISTER_PROPERTY(Language);
 		REGISTER_PROPERTY(Meanings);
-		REGISTER_PROPERTY(Type);
 		
 		return true;
 	}
@@ -164,6 +162,16 @@ public:
 		} else {
 			return this->GetName();
 		}
+	}
+	
+	const CWordType *GetType() const
+	{
+		return this->Type;
+	}
+	
+	const CGrammaticalGender *GetGender() const
+	{
+		return this->Gender;
 	}
 	
 	void ChangePersonalNameWeight(const int gender, const int change);
@@ -239,9 +247,9 @@ public:
 	};
 private:
 	String AnglicizedName;		/// the anglicized version of the word
+	const CWordType *Type = nullptr;	/// word type
+	const CGrammaticalGender *Gender = nullptr;		/// the grammatical gender of the noun or article
 public:
-	ExposedProperty<const CWordType *> Type = nullptr;	/// word type
-	ExposedProperty<const CGrammaticalGender *> Gender = nullptr;		/// the grammatical gender of the noun or article
 	int GrammaticalNumber = -1;						/// grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic = false;							/// whether the word is archaic (whether it is used in current speech)
 	std::map<std::tuple<int, int>, String> NumberCaseInflections;	/// for nouns, mapped to grammatical number and grammatical case

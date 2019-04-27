@@ -272,4 +272,26 @@ void CWord::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_anglicized_name", "anglicized_name"), [](CWord *word, const String &anglicized_name){ word->AnglicizedName = anglicized_name; });
 	ClassDB::bind_method(D_METHOD("get_anglicized_name"), &CWord::GetAnglicizedName);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "anglicized_name"), "set_anglicized_name", "get_anglicized_name");
+	
+	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), [](CWord *word, const String &type_ident){ word->Type = CWordType::Get(type_ident); });
+	ClassDB::bind_method(D_METHOD("get_type"), [](const CWord *word){ return const_cast<CWordType *>(word->GetType()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "type"), "set_type", "get_type");
+	
+	ClassDB::bind_method(D_METHOD("set_gender", "gender_ident"), [](CWord *word, const String &gender_ident){ word->Gender = CGrammaticalGender::Get(gender_ident); });
+	ClassDB::bind_method(D_METHOD("get_gender"), [](const CWord *word){ return const_cast<CGrammaticalGender *>(word->GetGender()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "gender"), "set_gender", "get_gender");
+	
+	ClassDB::bind_method(D_METHOD("get_derives_to"), [](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
+	
+	ClassDB::bind_method(D_METHOD("is_personal_name"), [](const CWord *word){ return word->PersonalNameWeights.empty() == false; });
+	ClassDB::bind_method(D_METHOD("is_family_name"), [](const CWord *word){ return word->FamilyNameWeight == 0; });
+	ClassDB::bind_method(D_METHOD("get_specimen_name_species"), [](const CWord *word){
+		Array specimen_name_species;
+		for (const auto &element : word->SpecimenNameWeights) {
+			specimen_name_species.push_back(const_cast<CSpecies *>(element.first));
+		}
+		return specimen_name_species;
+	});
+	ClassDB::bind_method(D_METHOD("is_ship_name"), [](const CWord *word){ return word->ShipNameWeight == 0; });
+	ClassDB::bind_method(D_METHOD("is_settlement_name"), [](const CWord *word){ return word->SettlementNameWeight == 0; });
 }

@@ -79,8 +79,9 @@ constexpr int IconCommandButton = 32;	/// is the icon a command button
 
 #include "data_element.h"
 #include "data_type.h"
-#include "property.h"
 #include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -144,9 +145,7 @@ public:
 	CPlayerColorGraphic *GScale = nullptr;	/// icon when drawn grayscaled
 private:
 	String File;							/// the file containing the icon graphics
-public:
-	Vec2i Size = Vec2i(0, 0);				/// the size of the icon, in pixels
-private:
+	Vector2i Size = Vector2i(0, 0);			/// the size of the icon, in pixels
 	int Frame = 0;							/// frame number in graphic
 public:
 	//Wyrmgus start

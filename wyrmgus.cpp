@@ -9,6 +9,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "hair_color.h"
+#include "language/word.h"
 #include "literary_text.h"
 #include "player.h"
 #include "player_color.h"
@@ -110,6 +111,8 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_planes"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CPlane::GetAll()); });
 	ClassDB::bind_method(D_METHOD("get_world", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CWorld::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_worlds"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CWorld::GetAll()); });
+
+	ClassDB::bind_method(D_METHOD("get_word", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CWord::Get(ident); });
 
 	ClassDB::bind_method(D_METHOD("number_to_roman_numeral", "number"), &Wyrmgus::NumberToRomanNumeral);
 	

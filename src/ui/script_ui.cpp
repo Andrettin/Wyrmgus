@@ -1163,7 +1163,7 @@ static int CclDefineIcon(lua_State *l)
 
 	std::string ident;
 	std::string file;
-	Vec2i size(0, 0);
+	Vector2i size(0, 0);
 	int frame = 0;
 	
 	//  Parse the list:
@@ -1175,7 +1175,7 @@ static int CclDefineIcon(lua_State *l)
 		} else if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			CclGetPos(l, &size.x, &size.y);
+			CclGetPos(l, &size.width, &size.height);
 		} else if (!strcmp(value, "Frame")) {
 			frame = LuaToNumber(l, -1);
 		} else {
@@ -1187,7 +1187,7 @@ static int CclDefineIcon(lua_State *l)
 	icon->File = file.c_str();
 	icon->Size = size;
 	icon->Frame = frame;
-	icon->G = CPlayerColorGraphic::New(icon->File.utf8().get_data(), icon->Size.x, icon->Size.y);
+	icon->G = CPlayerColorGraphic::New(icon->File.utf8().get_data(), icon->Size.width, icon->Size.height);
 	
 	return 0;
 }

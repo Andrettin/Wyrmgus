@@ -3464,8 +3464,8 @@ static int CclGetLanguageWordData(lua_State *l)
 	const char *data = LuaToString(l, 3);
 
 	if (!strcmp(data, "Type")) {
-		if (word->Type != nullptr) {
-			lua_pushstring(l, word->Type->GetIdent().utf8().get_data());
+		if (word->GetType() != nullptr) {
+			lua_pushstring(l, word->GetType()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3478,8 +3478,8 @@ static int CclGetLanguageWordData(lua_State *l)
 		lua_pushstring(l, "");
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		if (word->Gender != nullptr) {
-			lua_pushstring(l, word->Gender->GetIdent().utf8().get_data());
+		if (word->GetGender() != nullptr) {
+			lua_pushstring(l, word->GetGender()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
