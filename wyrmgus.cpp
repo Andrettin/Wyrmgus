@@ -17,6 +17,7 @@
 #include "quest/campaign.h"
 #include "script.h"
 #include "skin_color.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "util.h"
 #include "src/include/version.h"
@@ -85,6 +86,9 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CHairColor::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CPlayerColor::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_skin_color", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CSkinColor::Get(ident); });
+	
+	ClassDB::bind_method(D_METHOD("get_icon", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CIcon::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_icons"),[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CIcon::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_civilization", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CCivilization::Get(ident); });
 	
