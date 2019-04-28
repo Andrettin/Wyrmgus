@@ -57,7 +57,16 @@
 */
 bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "family_name") {
+	if (key == "personal_name") { //add as a personal name for all possible genders
+		const bool value_bool = StringToBool(value);
+		
+		if (value_bool) {
+			for (const CGender *gender : CGender::GetAll()) {
+				this->PersonalNameWeights[gender] = 1;
+				this->Language->AddPersonalNameWord(this, gender);
+			}
+		}
+	} else if (key == "family_name") {
 		const bool value_bool = StringToBool(value);
 		
 		if (value_bool) {
@@ -116,6 +125,35 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			}
 		}
 	} else if (section->Tag == "specimen_name") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = FindAndReplaceString(property.Key, "_", "-");
+			CSpecies *species = CSpecies::Get(key);
+			
+			if (species == nullptr) {
+				fprintf(stderr, "Invalid species: \"%s\".\n", key.c_str());
+				continue;
+			}
+			
+			if (species->GetGenders().empty()) {
+				fprintf(stderr, "Species has no genders: \"%s\".\n", key.c_str());
+				continue;
+			}
+			
+			const bool value_bool = StringToBool(property.Value);
+			if (value_bool) {
+				for (const CGender *gender : species->GetGenders()) { //add for all possible genders of the species
+					this->SpecimenNameWeights[species][gender] = 1;
+					this->Language->AddSpecimenNameWord(this, species, gender);
+					species->AddSpecimenNameWord(this, gender);
+				}
+			}
+		}
+		
 		for (const CConfigData *sub_section : section->Sections) {
 			CSpecies *species = CSpecies::Get(sub_section->Tag);
 			
@@ -284,14 +322,30 @@ void CWord::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_derives_to"), [](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
 	
-	ClassDB::bind_method(D_METHOD("is_personal_name"), [](const CWord *word){ return word->PersonalNameWeights.empty() == false; });
+	ClassDB::bind_method(D_METHOD("get_personal_name_genders"), [](const CWord *word){
+		Array genders;
+		for (const auto &element : word->PersonalNameWeights) {
+			genders.push_back(const_cast<CGender *>(element.first));
+		}
+		return genders;
+	});
 	ClassDB::bind_method(D_METHOD("is_family_name"), [](const CWord *word){ return word->FamilyNameWeight != 0; });
 	ClassDB::bind_method(D_METHOD("get_specimen_name_species"), [](const CWord *word){
-		Array specimen_name_species;
+		Array species;
 		for (const auto &element : word->SpecimenNameWeights) {
-			specimen_name_species.push_back(const_cast<CSpecies *>(element.first));
+			species.push_back(const_cast<CSpecies *>(element.first));
 		}
-		return specimen_name_species;
+		return species;
+	});
+	ClassDB::bind_method(D_METHOD("get_specimen_name_genders", "species"), [](const CWord *word, Object *species){
+		Array genders;
+		auto find_iterator = word->SpecimenNameWeights.find(static_cast<CSpecies *>(species));
+		if (find_iterator != word->SpecimenNameWeights.end()) {
+			for (const auto &element : find_iterator->second) {
+				genders.push_back(const_cast<CGender *>(element.first));
+			}
+		}
+		return genders;
 	});
 	ClassDB::bind_method(D_METHOD("is_ship_name"), [](const CWord *word){ return word->ShipNameWeight != 0; });
 	ClassDB::bind_method(D_METHOD("is_settlement_name"), [](const CWord *word){ return word->SettlementNameWeight != 0; });

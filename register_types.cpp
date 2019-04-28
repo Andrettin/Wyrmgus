@@ -69,6 +69,7 @@
 #include "religion/religion.h"
 #include "school_of_magic.h"
 #include "skin_color.h"
+#include "species/gender.h"
 #include "species/species.h"
 #include "species/species_category.h"
 #include "species/species_category_rank.h"
@@ -115,6 +116,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CDialogue>();
 	ClassDB::register_class<CDynasty>();
 	ClassDB::register_class<CFaction>();
+	ClassDB::register_class<CGender>();
 	ClassDB::register_class<CGrammaticalGender>();
 	ClassDB::register_class<CHistoricalUnit>();
 	ClassDB::register_class<CIcon>();

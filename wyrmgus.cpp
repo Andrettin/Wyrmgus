@@ -17,6 +17,7 @@
 #include "quest/campaign.h"
 #include "script.h"
 #include "skin_color.h"
+#include "species/gender.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "util.h"
@@ -106,6 +107,8 @@ void Wyrmgus::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_character", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CCharacter::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_characters"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCharacter::GetAll()); });
+	
+	ClassDB::bind_method(D_METHOD("get_genders"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CGender::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_this_player"), [](const Wyrmgus *wyrmgus){ return CPlayer::GetThisPlayer(); });
 	
