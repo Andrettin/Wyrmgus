@@ -1913,7 +1913,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->PersonalNames.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				const CGender *gender = CGender::Get(LuaToString(l, -1, j + 1));
+				const CGender *gender = CGender::Get(LuaToString(l, -1, j + 1), false);
 				if (gender != nullptr) {
 					++j;
 				}

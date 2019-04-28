@@ -1078,7 +1078,7 @@ static int CclDefineCivilization(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const CGender *gender = CGender::Get(LuaToString(l, -1, k + 1));
+				const CGender *gender = CGender::Get(LuaToString(l, -1, k + 1), false);
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
@@ -1948,7 +1948,7 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const CGender *gender = CGender::Get(LuaToString(l, -1, k + 1));
+				const CGender *gender = CGender::Get(LuaToString(l, -1, k + 1), false);
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
