@@ -206,7 +206,7 @@ bool CDeity::ProcessConfigDataSection(const CConfigData *section)
 			const CCivilization *civilization = CCivilization::Get(property.Key);
 			
 			if (civilization) {
-				this->CulturalNames[civilization] = property.Value;
+				this->CulturalNames[civilization] = String(property.Value.c_str());
 			}
 		}
 	} else {
@@ -245,13 +245,20 @@ void CDeity::Initialize()
 **
 **	@return	The name if present, or an empty string otherwise
 */
-std::string CDeity::GetCulturalName(const CCivilization *civilization) const
+String CDeity::GetCulturalName(const CCivilization *civilization) const
 {
-	std::map<const CCivilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+	std::map<const CCivilization *, String>::const_iterator find_iterator = this->CulturalNames.find(civilization);
 	
 	if (find_iterator != this->CulturalNames.end()) {
 		return find_iterator->second;
 	}
 	
-	return std::string();
+	return String();
+}
+
+void CDeity::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_cultural_name", "civilization"), [](const CDeity *deity, Object *civilization){ return deity->GetCulturalName(static_cast<CCivilization *>(civilization)); });
+	ClassDB::bind_method(D_METHOD("is_major"), &CDeity::IsMajor);
+	ClassDB::bind_method(D_METHOD("get_domains"), [](const CDeity *deity){ return VectorToGodotArray(deity->GetDomains()); });
 }

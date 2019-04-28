@@ -77,10 +77,22 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	std::string GetCulturalName(const CCivilization *civilization) const;
+	bool IsMajor() const
+	{
+		return this->Major;
+	}
+	
+	String GetCulturalName(const CCivilization *civilization) const;
+	
+	const std::vector<CDeityDomain *> &GetDomains() const
+	{
+		return this->Domains;
+	}
 	
 	int Gender = 0;								/// Deity's gender
+private:
 	bool Major = false;							/// Whether the deity is a major one or not
+public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
@@ -95,12 +107,12 @@ public:
 	std::vector<CDeityDomain *> Domains;
 	std::vector<CFaction *> HolyOrders;			/// Holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
-	std::map<const CCivilization *, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+	std::map<const CCivilization *, String> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
 	friend int CclDefineDeity(lua_State *l);
 	
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

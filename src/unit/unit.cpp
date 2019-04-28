@@ -6513,7 +6513,7 @@ std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::Get(CPlayer::GetThisPlayer()->Race));
+			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::Get(CPlayer::GetThisPlayer()->Race)).utf8().get_data();
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;

@@ -2440,20 +2440,20 @@ static int CclDefineDeity(lua_State *l)
 				}
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
-				deity->CulturalNames[civilization] = cultural_name;
+				deity->CulturalNames[civilization] = String(cultural_name.c_str());
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	if (deity->Major && deity->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) {
+	if (deity->IsMajor() && deity->GetDomains().size() > MAJOR_DEITY_DOMAIN_MAX) {
 		deity->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
-	} else if (!deity->Major && deity->Domains.size() > MINOR_DEITY_DOMAIN_MAX) {
+	} else if (!deity->IsMajor() && deity->GetDomains().size() > MINOR_DEITY_DOMAIN_MAX) {
 		deity->Domains.resize(MINOR_DEITY_DOMAIN_MAX);
 	}
 	
-	for (CDeityDomain *domain : deity->Domains) {
+	for (CDeityDomain *domain : deity->GetDomains()) {
 		for (CUpgrade *ability : domain->Abilities) {
 			if (std::find(deity->Abilities.begin(), deity->Abilities.end(), ability) == deity->Abilities.end()) {
 				deity->Abilities.push_back(ability);
@@ -3585,7 +3585,7 @@ static int CclGetDeityData(lua_State *l)
 		lua_pushstring(l, deity->Quote.c_str());
 		return 1;
 	} else if (!strcmp(data, "Major")) {
-		lua_pushboolean(l, deity->Major);
+		lua_pushboolean(l, deity->IsMajor());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
 		if (deity->HomePlane) {
@@ -3614,10 +3614,10 @@ static int CclGetDeityData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Domains")) {
-		lua_createtable(l, deity->Domains.size(), 0);
-		for (size_t i = 1; i <= deity->Domains.size(); ++i)
+		lua_createtable(l, deity->GetDomains().size(), 0);
+		for (size_t i = 1; i <= deity->GetDomains().size(); ++i)
 		{
-			lua_pushstring(l, deity->Domains[i-1]->Ident.c_str());
+			lua_pushstring(l, deity->GetDomains()[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3635,7 +3635,7 @@ static int CclGetDeityData(lua_State *l)
 		}
 		
 		const CCivilization *civilization = CCivilization::Get(LuaToString(l, 3));
-		lua_pushstring(l, deity->GetCulturalName(civilization).c_str());
+		lua_pushstring(l, deity->GetCulturalName(civilization).utf8().get_data());
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {

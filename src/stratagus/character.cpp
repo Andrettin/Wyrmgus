@@ -471,7 +471,7 @@ void CCharacter::GenerateHistory()
 					continue; //don't use deities that have no corresponding deity upgrade for the character
 				}
 				
-				if (deity->Major == has_major_deity) {
+				if (deity->IsMajor() == has_major_deity) {
 					continue; //try to get a major deity if the character has none, or a minor deity otherwise
 				}
 				
@@ -487,7 +487,7 @@ void CCharacter::GenerateHistory()
 				
 				bool has_domains = true;
 				for (size_t k = 0; k < this->PreferredDeityDomains.size(); ++k) {
-					if (std::find(deity->Domains.begin(), deity->Domains.end(), this->PreferredDeityDomains[k]) != deity->Domains.end()) {
+					if (std::find(deity->GetDomains().begin(), deity->GetDomains().end(), this->PreferredDeityDomains[k]) != deity->GetDomains().end()) {
 						score++;
 					}
 				}
@@ -753,8 +753,8 @@ bool CCharacter::CanWorship() const
 */
 bool CCharacter::HasMajorDeity() const
 {
-	for (size_t i = 0; i < this->Deities.size(); ++i) {
-		if (this->Deities[i]->Major) {
+	for (const CDeity *deity : this->Deities) {
+		if (deity->IsMajor()) {
 			return true;
 		}
 	}

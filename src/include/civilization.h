@@ -42,6 +42,7 @@
 #include "ui/ui.h" // for the UI fillers
 
 #include <core/object.h>
+#include <core/variant.h>
 
 #include <map>
 #include <string>
