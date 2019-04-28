@@ -124,6 +124,7 @@ public:
 			if (data_element.has_method(addition_method_name)) {
 				const Variant *args[1] = { &value };
 				data_element.call(addition_method_name, args, 1, Variant::CallError());
+				return true;
 			}
 		}
 		
@@ -135,6 +136,7 @@ public:
 			if (data_element.has_method(subtraction_method_name)) {
 				const Variant *args[1] = { &value };
 				data_element.call(subtraction_method_name, args, 1, Variant::CallError());
+				return true;
 			}
 		}
 		
