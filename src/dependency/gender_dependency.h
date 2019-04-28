@@ -40,6 +40,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGender;
 class CPlayer;
 class CUnit;
 
@@ -56,7 +57,7 @@ public:
 	virtual std::string GetString(const std::string &prefix = "") const override;
 
 private:
-	int Gender = -1;
+	const CGender *Gender = nullptr;
 };
 
 #endif

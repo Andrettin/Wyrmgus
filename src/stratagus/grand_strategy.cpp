@@ -45,6 +45,7 @@
 #include "player.h"
 #include "results.h"
 #include "sound/sound_server.h"
+#include "species/gender.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -793,13 +794,13 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
-			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->GetGender()->GetIdent() == "male") { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
 				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName().utf8().get_data());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
-			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->Gender == MaleGender) {
+			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->GetGender()->GetIdent() == "male") {
 				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName().utf8().get_data());
 				return;
 			}
@@ -1007,7 +1008,7 @@ bool CGrandStrategyHero::IsAlive()
 
 bool CGrandStrategyHero::IsVisible()
 {
-	return this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->Gender == this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
+	return this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value == 0 || (this->GetGender()->GetIndex() + 1) == this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
 }
 
 bool CGrandStrategyHero::IsGenerated()

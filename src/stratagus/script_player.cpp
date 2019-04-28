@@ -72,6 +72,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "script.h"
+#include "species/gender.h"
 #include "species/species.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
@@ -1035,14 +1036,12 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
-				if (gender_id == -1) {
-					gender_id = NoGender;
-				} else {
+				const CGender *gender = CGender::Get(LuaToString(l, -1, j + 1));
+				if (gender != nullptr) {
 					++j;
 				}
 				
-				civilization->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+				civilization->PersonalNames[gender].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "UnitClassNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -1079,7 +1078,7 @@ static int CclDefineCivilization(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int gender = GetGenderIdByName(LuaToString(l, -1, k + 1));
+				const CGender *gender = CGender::Get(LuaToString(l, -1, k + 1));
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
@@ -1949,7 +1948,7 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int gender = GetGenderIdByName(LuaToString(l, -1, k + 1));
+				const CGender *gender = CGender::Get(LuaToString(l, -1, k + 1));
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
@@ -2321,7 +2320,7 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->Pantheon = CPantheon::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
+			deity->Gender = CGender::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
 			deity->Major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -3119,9 +3118,9 @@ static int CclGetPlayerData(lua_State *l)
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
 		int title_type_id = GetCharacterTitleIdByName(title_type_ident);
-		int gender_id = GetGenderIdByName(gender_ident);
+		const CGender *gender = CGender::Get(gender_ident);
 		
-		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender_id).c_str());
+		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).c_str());
 		return 1;
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
@@ -3639,7 +3638,11 @@ static int CclGetDeityData(lua_State *l)
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, GetGenderNameById(deity->Gender).c_str());
+		if (deity->GetGender() != nullptr) {
+			lua_pushstring(l, deity->GetGender()->GetIdent().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

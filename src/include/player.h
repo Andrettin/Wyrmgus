@@ -77,6 +77,7 @@ class CDeityDomain;
 class CDynasty;
 class CFaction;
 class CFile;
+class CGender;
 class CGraphic;
 class CProvince;
 class CPlane;
@@ -269,7 +270,7 @@ public:
 	bool CanRecruitHero(const CCharacter *character, bool ignore_neutral = false) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
-	std::string GetCharacterTitleName(int title_type, int gender) const;
+	std::string GetCharacterTitleName(int title_type, const CGender *gender) const;
 	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
 	std::vector<CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end

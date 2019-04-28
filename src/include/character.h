@@ -52,6 +52,7 @@ class CDeityDomain;
 class CDependency;
 class CFaction;
 class CFile;
+class CGender;
 class CHistoricalLocation;
 class CMapTemplate;
 class CLanguage;
@@ -67,18 +68,6 @@ class CWord;
 class ItemSlot;
 class LuaCallback;
 struct lua_State;
-
-/**
-**  Indexes into gender array.
-*/
-enum Genders {
-	NoGender,
-	MaleGender,
-	FemaleGender,
-	AsexualGender, //i.e. slimes reproduce asexually
-
-	MaxGenders
-};
 
 enum Attributes {
 	StrengthAttribute,
@@ -155,6 +144,11 @@ public:
 		return this->Faction;
 	}
 	
+	const CGender *GetGender() const
+	{
+		return this->Gender;
+	}
+	
 	CReligion *GetReligion() const;
 	CLanguage *GetLanguage() const;
 	CCalendar *GetCalendar() const;
@@ -209,8 +203,8 @@ public:
 	CCivilization *Civilization = nullptr;	/// Culture to which the character belongs
 private:
 	const CFaction *Faction = nullptr;	/// Faction to which the character belongs
+	const CGender *Gender = nullptr;	/// the character's gender
 public:
-	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath = false;	/// If historical death was violent
@@ -290,8 +284,6 @@ extern void SetCurrentCustomHero(const std::string &hero_ident);
 extern std::string GetCurrentCustomHero();
 extern void ChangeCustomHeroCivilization(const std::string &hero_name, const std::string &civilization_ident, const std::string &new_hero_name, const std::string &new_hero_family_name);
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
-extern std::string GetGenderNameById(int gender);
-extern int GetGenderIdByName(const std::string &gender);
 extern std::string GetCharacterTitleNameById(int title);
 extern int GetCharacterTitleIdByName(const std::string &title);
 extern bool IsMinisterialTitle(int title);

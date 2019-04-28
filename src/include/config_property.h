@@ -38,6 +38,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -99,7 +100,7 @@ public:
 				property_value = Variant(StringToBool(this->Value));
 			} else if (property_info->type == Variant::OBJECT) {
 				if (this->Operator != CConfigOperator::Assignment) {
-					throw std::runtime_error("Wrong operator enumeration index for string property \"" + this->Key + "\": " + std::to_string((long long) this->Operator) + ".");
+					throw std::runtime_error("Wrong operator enumeration index for object property \"" + this->Key + "\": " + std::to_string((long long) this->Operator) + ".");
 				}
 				
 				property_value = Variant(String(this->Value.c_str())); //for objects, call the setter with a string, and the appropriate conversion will be done in it
@@ -113,6 +114,28 @@ public:
 			}
 			
 			return true;
+		}
+		
+		//if the operator is for addition, see if the class has any method with "add_" prefixed to the given property name
+		if (this->Operator == CConfigOperator::Addition) {
+			String addition_method_name = "add_";
+			addition_method_name += this->Key.c_str();
+			Variant value = String(this->Value.c_str());
+			if (data_element.has_method(addition_method_name)) {
+				const Variant *args[1] = { &value };
+				data_element.call(addition_method_name, args, 1, Variant::CallError());
+			}
+		}
+		
+		//if the operator is for subtraction, see if the class has any method with "remove_" prefixed to the given property name
+		if (this->Operator == CConfigOperator::Subtraction) {
+			String subtraction_method_name = "remove_";
+			subtraction_method_name += this->Key.c_str();
+			Variant value = String(this->Value.c_str());
+			if (data_element.has_method(subtraction_method_name)) {
+				const Variant *args[1] = { &value };
+				data_element.call(subtraction_method_name, args, 1, Variant::CallError());
+			}
 		}
 		
 		return false;

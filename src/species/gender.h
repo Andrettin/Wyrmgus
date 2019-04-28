@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name gender_dependency.cpp - The gender dependency source file */
+/**@name gender.h - The gender header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,49 +27,42 @@
 //      02111-1307, USA.
 //
 
+#ifndef __GENDER_H__
+#define __GENDER_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "dependency/gender_dependency.h"
-
-#include "character.h"
-#include "map/map.h"
-#include "map/map_layer.h"
-#include "player.h"
-#include "species/gender.h"
-#include "unit/unit.h"
-#include "util.h"
+#include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Definition
 ----------------------------------------------------------------------------*/
 
-void CGenderDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+class CGender : public DataElement, public DataType<CGender>
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "gender") {
-		this->Gender = CGender::Get(value);
-	} else {
-		fprintf(stderr, "Invalid gender dependency property: \"%s\".\n", key.c_str());
+	DATA_TYPE(CGender, DataElement)
+	
+public:
+	static constexpr const char *ClassIdentifier = "gender";
+	
+	/**
+	**	@brief	Get whether individuals belonging to this gender count as the "father" of their children
+	**
+	**	@return	True if the gender is a father gender, or false otherwise
+	*/
+	bool IsFather() const
+	{
+		return this->Father;
 	}
-}
+	
+private:
+	bool Father = false;
+	
+protected:
+	static void _bind_methods();
+};
 
-bool CGenderDependency::Check(const CPlayer *player, const bool ignore_units) const
-{
-	return true;
-}
-
-bool CGenderDependency::Check(const CUnit *unit, const bool ignore_units) const
-{
-	return unit->Variable[GENDER_INDEX].Value == (this->Gender->GetIndex() + 1);
-}
-
-std::string CGenderDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Gender->GetIdent().utf8().get_data() + '\n';
-	return str;
-}
+#endif

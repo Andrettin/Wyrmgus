@@ -40,6 +40,7 @@
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/word_type.h"
+#include "species/gender.h"
 #include "species/species.h"
 
 /*----------------------------------------------------------------------------
@@ -101,17 +102,17 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			}
 			
 			std::string key = FindAndReplaceString(property.Key, "_", "-");
-			const int gender_index = GetGenderIdByName(key);
+			const CGender *gender = CGender::Get(key);
 			
-			if (gender_index == -1) {
+			if (gender == nullptr) {
 				fprintf(stderr, "Invalid gender: \"%s\".\n", key.c_str());
 				continue;
 			}
 			
 			const bool value_bool = StringToBool(property.Value);
 			if (value_bool) {
-				this->PersonalNameWeights[gender_index] = 1;
-				this->Language->AddPersonalNameWord(this, gender_index);
+				this->PersonalNameWeights[gender] = 1;
+				this->Language->AddPersonalNameWord(this, gender);
 			}
 		}
 	} else if (section->Tag == "specimen_name") {
@@ -129,18 +130,18 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 				}
 				
 				std::string key = FindAndReplaceString(property.Key, "_", "-");
-				const int gender_index = GetGenderIdByName(key);
+				const CGender *gender = CGender::Get(key);
 				
-				if (gender_index == -1) {
+				if (gender == nullptr) {
 					fprintf(stderr, "Invalid gender: \"%s\".\n", key.c_str());
 					continue;
 				}
 				
 				const bool value_bool = StringToBool(property.Value);
 				if (value_bool) {
-					this->SpecimenNameWeights[species][gender_index] = 1;
-					this->Language->AddSpecimenNameWord(this, species, gender_index);
-					species->AddSpecimenNameWord(this, gender_index);
+					this->SpecimenNameWeights[species][gender] = 1;
+					this->Language->AddSpecimenNameWord(this, species, gender);
+					species->AddSpecimenNameWord(this, gender);
 				}
 			}
 		}
@@ -194,25 +195,25 @@ void CWord::SetLanguage(CLanguage *language)
 	}
 }
 
-void CWord::ChangePersonalNameWeight(const int gender, const int change)
+void CWord::ChangePersonalNameWeight(const CGender *gender, const int change)
 {
-	std::map<int, int>::iterator find_iterator = this->PersonalNameWeights.find(gender);
+	std::map<const CGender *, int>::iterator find_iterator = this->PersonalNameWeights.find(gender);
 	if (find_iterator != this->PersonalNameWeights.end()) {
 		find_iterator->second += change;
 	} else {
-		fprintf(stderr, "Tried to increase personal name weight for gender \"%s\" for word \"%s\", but the word is not set to be a personal name for that gender.\n", GetGenderNameById(gender).c_str(), this->GetIdent().utf8().get_data());
+		fprintf(stderr, "Tried to increase personal name weight for gender \"%s\" for word \"%s\", but the word is not set to be a personal name for that gender.\n", gender->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
 	}
 }
 
-void CWord::ChangeSpecimenNameWeight(const CSpecies *species, const int gender, const int change)
+void CWord::ChangeSpecimenNameWeight(const CSpecies *species, const CGender *gender, const int change)
 {
-	std::map<const CSpecies *, std::map<int, int>>::iterator find_iterator = this->SpecimenNameWeights.find(species);
+	std::map<const CSpecies *, std::map<const CGender *, int>>::iterator find_iterator = this->SpecimenNameWeights.find(species);
 	if (find_iterator != this->SpecimenNameWeights.end()) {
-		std::map<int, int>::iterator sub_find_iterator = find_iterator->second.find(gender);
+		std::map<const CGender *, int>::iterator sub_find_iterator = find_iterator->second.find(gender);
 		if (sub_find_iterator != find_iterator->second.end()) {
 			sub_find_iterator->second += change;
 		} else {
-			fprintf(stderr, "Tried to increase personal name weight for species \"%s\" and gender \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species and gender combination.\n", species->GetIdent().utf8().get_data(), GetGenderNameById(gender).c_str(), this->GetIdent().utf8().get_data());
+			fprintf(stderr, "Tried to increase personal name weight for species \"%s\" and gender \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species and gender combination.\n", species->GetIdent().utf8().get_data(), gender->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
 		}
 	} else {
 		fprintf(stderr, "Tried to increase personal name weight for species \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species.\n", species->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());

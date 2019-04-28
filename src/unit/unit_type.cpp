@@ -1534,7 +1534,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	for (size_t i = 0; i < parent_type->StartingResources.size(); ++i) {
 		this->StartingResources.push_back(parent_type->StartingResources[i]);
 	}
-	for (std::map<int, std::vector<std::string>>::iterator iterator = parent_type->PersonalNames.begin(); iterator != parent_type->PersonalNames.end(); ++iterator) {
+	for (auto iterator = parent_type->PersonalNames.begin(); iterator != parent_type->PersonalNames.end(); ++iterator) {
 		for (size_t i = 0; i < iterator->second.size(); ++i) {
 			this->PersonalNames[iterator->first].push_back(iterator->second[i]);				
 		}
@@ -1838,7 +1838,7 @@ std::string CUnitType::GetNamePlural() const
 	return GetPluralForm(this->GetName().utf8().get_data());
 }
 
-std::string CUnitType::GeneratePersonalName(const CFaction *faction, const int gender) const
+std::string CUnitType::GeneratePersonalName(const CFaction *faction, const CGender *gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
@@ -1853,7 +1853,7 @@ std::string CUnitType::GeneratePersonalName(const CFaction *faction, const int g
 	return "";
 }
 
-bool CUnitType::IsPersonalNameValid(const std::string &name, const CFaction *faction, const int gender) const
+bool CUnitType::IsPersonalNameValid(const std::string &name, const CFaction *faction, const CGender *gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -1868,16 +1868,16 @@ bool CUnitType::IsPersonalNameValid(const std::string &name, const CFaction *fac
 	return false;
 }
 
-std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *faction, const int gender) const
+std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *faction, const CGender *gender) const
 {
 	std::vector<std::string> potential_names;
 	
-	if (this->PersonalNames.find(NoGender) != this->PersonalNames.end()) {
-		for (size_t i = 0; i < this->PersonalNames.find(NoGender)->second.size(); ++i) {
-			potential_names.push_back(this->PersonalNames.find(NoGender)->second[i]);
+	if (this->PersonalNames.find(nullptr) != this->PersonalNames.end()) {
+		for (size_t i = 0; i < this->PersonalNames.find(nullptr)->second.size(); ++i) {
+			potential_names.push_back(this->PersonalNames.find(nullptr)->second[i]);
 		}
 	}
-	if (gender != -1 && gender != NoGender && this->PersonalNames.find(gender) != this->PersonalNames.end()) {
+	if (gender != nullptr && this->PersonalNames.find(gender) != this->PersonalNames.end()) {
 		for (size_t i = 0; i < this->PersonalNames.find(gender)->second.size(); ++i) {
 			potential_names.push_back(this->PersonalNames.find(gender)->second[i]);
 		}
@@ -1921,12 +1921,12 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 				}
 			}
 			
-			if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
-				for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
-					potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
+			if (civilization->GetPersonalNames().find(nullptr) != civilization->GetPersonalNames().end()) {
+				for (size_t i = 0; i < civilization->GetPersonalNames().find(nullptr)->second.size(); ++i) {
+					potential_names.push_back(civilization->GetPersonalNames().find(nullptr)->second[i]);
 				}
 			}
-			if (gender != -1 && gender != NoGender && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
+			if (gender != nullptr && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
 				for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
 					potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
 				}

@@ -50,6 +50,7 @@ class Currency;
 class CDeity;
 class CDynasty;
 class CForceTemplate;
+class CGender;
 class CIcon;
 class CPlayerColor;
 class CUpgrade;
@@ -189,7 +190,7 @@ public:
 	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
+	std::map<int, std::map<const CGender *, std::map<int, std::map<int, std::string>>>> MinisterTitles; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<const UnitClass *, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction

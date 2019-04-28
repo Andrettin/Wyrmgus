@@ -57,6 +57,7 @@ class CCalendar;
 class Currency;
 class CDeity;
 class CForceTemplate;
+class CGender;
 class CLanguage;
 class CPlayerColor;
 class CQuest;
@@ -219,7 +220,7 @@ public:
 		return std::vector<CAiBuildingTemplate *>();
 	}
 	
-	const std::map<int, std::vector<std::string>> &GetPersonalNames() const
+	const std::map<const CGender *, std::vector<std::string>> &GetPersonalNames() const
 	{
 		if (this->PersonalNames.size() > 0) {
 			return this->PersonalNames;
@@ -292,14 +293,14 @@ public:
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
 	std::map<int, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::map<const CGender *, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use nullptr for names which should be available for both genders)
 	std::map<const UnitClass *, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 	std::vector<std::string> ShipNames;			/// Ship names for the civilization
 	std::vector<CDeity *> Deities;
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
+	std::map<int, std::map<const CGender *, std::map<int, std::map<int, std::string>>>> MinisterTitles; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<const UnitClass *, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
 	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization

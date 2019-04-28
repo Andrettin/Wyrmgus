@@ -47,6 +47,7 @@
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "script.h"
+#include "species/gender.h"
 #include "spell/spells.h"
 #include "time/timeline.h"
 #include "ui/icon.h"
@@ -158,7 +159,7 @@ static int CclDefineCharacter(lua_State *l)
 			std::string father_ident = LuaToString(l, -1);
 			CCharacter *father = CCharacter::Get(father_ident);
 			if (father) {
-				if (father->Gender == MaleGender || !father->IsInitialized()) {
+				if (father->Gender->IsFather() || !father->IsInitialized()) {
 					character->Father = father;
 					if (!father->IsParentOf(character)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(character);
@@ -175,7 +176,7 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_ident.c_str() _C_ character_ident.c_str());
+					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't of a correct gender for that (the gender is \"%s\")." _C_ father_ident.c_str() _C_ character_ident.c_str() _C_ father->GetGender()->GetIdent().utf8().get_data());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ father_ident.c_str());
@@ -184,7 +185,7 @@ static int CclDefineCharacter(lua_State *l)
 			std::string mother_ident = LuaToString(l, -1);
 			CCharacter *mother = CCharacter::Get(mother_ident);
 			if (mother) {
-				if (mother->Gender == FemaleGender || !mother->IsInitialized()) {
+				if (!mother->Gender->IsFather() || !mother->IsInitialized()) {
 					character->Mother = mother;
 					if (!mother->IsParentOf(character)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(character);
@@ -201,7 +202,7 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_ident.c_str() _C_ character_ident.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
+					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't of a correct gender for that (the gender is \"%s\")." _C_ mother_ident.c_str() _C_ character_ident.c_str() _C_ mother->GetGender()->GetIdent().utf8().get_data());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_ident.c_str());
@@ -212,7 +213,7 @@ static int CclDefineCharacter(lua_State *l)
 				std::string child_ident = LuaToString(l, -1, j + 1);
 				CCharacter *child = CCharacter::Get(child_ident);
 				if (child) {
-					if (character->Gender == MaleGender) {
+					if (character->Gender->IsFather()) {
 						child->Father = character;
 					} else {
 						child->Mother = character;
@@ -236,7 +237,7 @@ static int CclDefineCharacter(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "Gender")) {
-			character->Gender = GetGenderIdByName(LuaToString(l, -1));
+			character->Gender = CGender::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			character->Icon.Name = LuaToString(l, -1);
 			character->Icon.Icon = nullptr;
@@ -558,9 +559,9 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
-	if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
+	if (character->Gender == nullptr) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
 		if (character->UnitType != nullptr && character->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			character->Gender = character->UnitType->DefaultStat.Variables[GENDER_INDEX].Value;
+			character->Gender = CGender::Get(character->UnitType->DefaultStat.Variables[GENDER_INDEX].Value - 1);
 		}
 	}
 	
@@ -645,7 +646,7 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			hero->Civilization = CCivilization::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
+			hero->Gender = CGender::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			hero->Level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -847,9 +848,9 @@ static int CclDefineCustomHero(lua_State *l)
 		}
 	}
 	
-	if (hero->Gender == NoGender) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
+	if (hero->Gender == nullptr) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
 		if (hero->UnitType != nullptr && hero->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			hero->Gender = hero->UnitType->DefaultStat.Variables[GENDER_INDEX].Value;
+			hero->Gender = CGender::Get(hero->UnitType->DefaultStat.Variables[GENDER_INDEX].Value - 1);
 		}
 	}
 	
@@ -949,7 +950,11 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushboolean(l, character->ViolentDeath);
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
+		if (character->GetGender() != nullptr) {
+			lua_pushstring(l, character->GetGender()->GetIdent().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->GetLevel());
@@ -1075,7 +1080,11 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
+		if (character->GetGender() != nullptr) {
+			lua_pushstring(l, character->GetGender()->GetIdent().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->GetLevel());

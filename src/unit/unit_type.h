@@ -65,6 +65,7 @@ class CCivilization;
 class CConstruction;
 class CDependency;
 class CFile;
+class CGender;
 class CGraphic;
 class CPlayer;
 class CPlayerColorGraphic;
@@ -566,9 +567,9 @@ public:
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(const CFaction *faction, const int gender) const;
-	bool IsPersonalNameValid(const std::string &name, const CFaction *faction, const int gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(const CFaction *faction, const int gender) const;
+	std::string GeneratePersonalName(const CFaction *faction, const CGender *gender) const;
+	bool IsPersonalNameValid(const std::string &name, const CFaction *faction, const CGender *gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(const CFaction *faction, const CGender *gender) const;
 	
 	std::vector<String> GetStatStrings() const;
 	//Wyrmgus end
@@ -627,7 +628,7 @@ private:
 public:
 	CTerrainType *TerrainType = nullptr;				/// The terrain type which the unit type becomes after being built
 	std::vector<const ::ItemClass *> WeaponClasses;		/// Weapon classes that the unit type can use (if the unit type uses a weapon)
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::map<const CGender *, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use nullptr for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

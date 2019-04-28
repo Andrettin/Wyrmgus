@@ -42,6 +42,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGender;
 class CSpeciesCategoryRank;
 class CWord;
 
@@ -100,8 +101,17 @@ public:
 		return upper_categories;
 	}
 	
-	void AddSpecimenNameWord(CWord *word, const int gender);
-	const std::vector<CWord *> &GetSpecimenNameWords(const int gender);
+	const std::vector<const CGender *> &GetGenders() const
+	{
+		if (this->Genders.empty() && this->UpperCategory != nullptr) {
+			return this->UpperCategory->GetGenders();
+		}
+		
+		return this->Genders;
+	}
+	
+	void AddSpecimenNameWord(CWord *word, const CGender *gender);
+	const std::vector<CWord *> &GetSpecimenNameWords(const CGender *gender);
 	
 	Property<String> CommonName;	/// the common name of members of the species category
 	Property<String> CommonNamePlural;	/// the plural of the common name of members of the species category
@@ -110,7 +120,8 @@ public:
 private:
 	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories directly below this one
 	CSpeciesCategory *UpperCategory = nullptr;	/// the category directly above this one
-	std::map<int, std::vector<CWord *>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the gender for which they can be used
+	std::vector<const CGender *> Genders;
+	std::map<const CGender *, std::vector<CWord *>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the gender for which they can be used
 
 protected:
 	static void _bind_methods();

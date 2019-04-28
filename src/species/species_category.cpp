@@ -36,6 +36,7 @@
 #include "species/species_category.h"
 
 #include "config.h"
+#include "species/gender.h"
 #include "species/species_category_rank.h"
 #include "util.h"
 
@@ -72,7 +73,7 @@ bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::st
 	return true;
 }
 
-void CSpeciesCategory::AddSpecimenNameWord(CWord *word, const int gender)
+void CSpeciesCategory::AddSpecimenNameWord(CWord *word, const CGender *gender)
 {
 	this->SpecimenNameWords[gender].push_back(word);
 	
@@ -81,7 +82,7 @@ void CSpeciesCategory::AddSpecimenNameWord(CWord *word, const int gender)
 	}
 }
 
-const std::vector<CWord *> &CSpeciesCategory::GetSpecimenNameWords(const int gender)
+const std::vector<CWord *> &CSpeciesCategory::GetSpecimenNameWords(const CGender *gender)
 {
 	if (!this->SpecimenNameWords[gender].empty()) {
 		return this->SpecimenNameWords[gender];
@@ -100,4 +101,14 @@ void CSpeciesCategory::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_upper_category"), [](const CSpeciesCategory *category){ return category->UpperCategory; });
 	ClassDB::bind_method(D_METHOD("get_all_upper_categories"), [](const CSpeciesCategory *category){ return VectorToGodotArray(category->GetAllUpperCategories()); });
+	
+	ClassDB::bind_method(D_METHOD("set_genders", "genders"), [](CSpeciesCategory *category, const PoolStringArray &genders){
+		category->Genders.clear();
+		PoolStringArray::Read read = genders.read();
+		for (int i = 0; i < genders.size(); ++i) {
+			category->Genders.push_back(CGender::Get(read[i]));
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_genders"), [](const CSpeciesCategory *category){ return VectorToGodotArray(category->Genders); });
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "genders"), "set_genders", "get_genders");
 }

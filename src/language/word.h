@@ -42,6 +42,7 @@
 ----------------------------------------------------------------------------*/
 
 class CDependency;
+class CGender;
 class CGrammaticalGender;
 class CLanguage;
 class CSpecies;
@@ -174,11 +175,11 @@ public:
 		return this->Gender;
 	}
 	
-	void ChangePersonalNameWeight(const int gender, const int change);
+	void ChangePersonalNameWeight(const CGender *gender, const int change);
 	
-	int GetPersonalNameWeight(const int gender) const
+	int GetPersonalNameWeight(const CGender *gender) const
 	{
-		std::map<int, int>::const_iterator find_iterator = this->PersonalNameWeights.find(gender);
+		std::map<const CGender *, int>::const_iterator find_iterator = this->PersonalNameWeights.find(gender);
 		if (find_iterator != this->PersonalNameWeights.end()) {
 			return find_iterator->second;
 		}
@@ -200,13 +201,13 @@ public:
 		return this->FamilyNameWeight;
 	}
 	
-	void ChangeSpecimenNameWeight(const CSpecies *species, const int gender, const int change);
+	void ChangeSpecimenNameWeight(const CSpecies *species, const CGender *gender, const int change);
 	
-	int GetSpecimenNameWeight(const CSpecies *species, const int gender) const
+	int GetSpecimenNameWeight(const CSpecies *species, const CGender *gender) const
 	{
-		std::map<const CSpecies *, std::map<int, int>>::const_iterator find_iterator = this->SpecimenNameWeights.find(species);
+		std::map<const CSpecies *, std::map<const CGender *, int>>::const_iterator find_iterator = this->SpecimenNameWeights.find(species);
 		if (find_iterator != this->SpecimenNameWeights.end()) {
-			std::map<int, int>::const_iterator sub_find_iterator = find_iterator->second.find(gender);
+			std::map<const CGender *, int>::const_iterator sub_find_iterator = find_iterator->second.find(gender);
 			if (sub_find_iterator != find_iterator->second.end()) {
 				return sub_find_iterator->second;
 			}
@@ -289,9 +290,9 @@ public:
 	int Number = -1;
 	
 private:
-	std::map<int, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
+	std::map<const CGender *, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
 	int FamilyNameWeight = 0;
-	std::map<const CSpecies *, std::map<int, int>> SpecimenNameWeights;	/// the weight of this word for name generation for species individuals, mapped to each possible gender for the name generation
+	std::map<const CSpecies *, std::map<const CGender *, int>> SpecimenNameWeights;	/// the weight of this word for name generation for species individuals, mapped to each possible gender for the name generation
 	int ShipNameWeight = 0;					/// the weight of this word for ship name generation
 	int SettlementNameWeight = 0;
 	

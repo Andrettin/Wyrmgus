@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "map/terrain_type.h"
+#include "species/gender.h"
 #include "species/species_category.h"
 #include "util.h"
 #include "world/plane.h"
@@ -177,7 +178,16 @@ std::vector<CSpeciesCategory *> CSpecies::GetAllCategories() const
 	return categories;
 }
 
-void CSpecies::AddSpecimenNameWord(CWord *word, const int gender)
+const std::vector<const CGender *> &CSpecies::GetGenders() const
+{
+	if (this->Genders.empty() && this->Category != nullptr) {
+		return this->Category->GetGenders();
+	}
+	
+	return this->Genders;
+}
+	
+void CSpecies::AddSpecimenNameWord(CWord *word, const CGender *gender)
 {
 	this->SpecimenNameWords[gender].push_back(word);
 	
@@ -186,7 +196,7 @@ void CSpecies::AddSpecimenNameWord(CWord *word, const int gender)
 	}
 }
 
-const std::vector<CWord *> &CSpecies::GetSpecimenNameWords(const int gender)
+const std::vector<CWord *> &CSpecies::GetSpecimenNameWords(const CGender *gender)
 {
 	if (!this->SpecimenNameWords[gender].empty()) {
 		return this->SpecimenNameWords[gender];
@@ -204,4 +214,8 @@ void CSpecies::_bind_methods()
 	BIND_PROPERTIES();
 	
 	ClassDB::bind_method(D_METHOD("get_all_categories"), [](const CSpecies *species){ return VectorToGodotArray(species->GetAllCategories()); });
+	
+	ClassDB::bind_method(D_METHOD("add_gender", "gender"), [](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
+	ClassDB::bind_method(D_METHOD("remove_gender", "gender"), [](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
+	ClassDB::bind_method(D_METHOD("get_genders"), [](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
 }

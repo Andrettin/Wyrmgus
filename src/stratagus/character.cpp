@@ -53,6 +53,7 @@
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
+#include "species/gender.h"
 #include "spell/spells.h"
 #include "time/calendar.h"
 #include "ui/icon.h"
@@ -178,9 +179,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 						this->Level = this->UnitType->DefaultStat.Variables[LEVEL_INDEX].Value;
 					}
 					
-					if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+					if (this->Gender == nullptr) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
 						if (this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-							this->Gender = this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value;
+							this->Gender = CGender::Get(this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value - 1);
 						}
 					}
 				}
@@ -188,7 +189,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "gender") {
-			this->Gender = GetGenderIdByName(value);
+			this->Gender = CGender::Get(value);
 		} else if (key == "civilization") {
 			this->Civilization = CCivilization::Get(value);
 		} else if (key == "faction") {
@@ -226,7 +227,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "father") {
 			CCharacter *father = CCharacter::Get(value);
 			if (father) {
-				if (father->Gender == MaleGender || !father->Initialized) {
+				if (father->Gender->IsFather() || !father->Initialized) {
 					this->Father = father;
 					if (!father->IsParentOf(this)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(this);
@@ -249,7 +250,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "mother") {
 			CCharacter *mother = CCharacter::Get(value);
 			if (mother) {
-				if (mother->Gender == FemaleGender || !mother->Initialized) {
+				if (!mother->Gender->IsFather() || !mother->Initialized) {
 					this->Mother = mother;
 					if (!mother->IsParentOf(this)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(this);
@@ -703,7 +704,7 @@ bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 
 bool CCharacter::IsUsable() const
 {
-	if (this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value) {
+	if (this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value != 0 && (this->Gender->GetIndex() + 1) != this->UnitType->DefaultStat.Variables[GENDER_INDEX].Value) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
 	
@@ -956,10 +957,10 @@ void SaveHero(CCharacter *hero)
 		if (!hero->GetFamilyName().empty()) {
 			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->GetFamilyName().utf8().get_data());
 		}
-		if (hero->Gender != NoGender) {
-			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
+		if (hero->GetGender() != nullptr) {
+			fprintf(fd, "\tGender = \"%s\",\n", hero->GetGender()->GetIdent().utf8().get_data());
 		}
-		if (hero->Civilization) {
+		if (hero->Civilization != nullptr) {
 			fprintf(fd, "\tCivilization = \"%s\",\n", hero->Civilization->GetIdent().utf8().get_data());
 		}
 	}
@@ -1274,36 +1275,6 @@ bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &h
 	}
 	
 	return true;
-}
-
-std::string GetGenderNameById(int gender)
-{
-	if (gender == NoGender) {
-		return "no-gender";
-	} else if (gender == MaleGender) {
-		return "male";
-	} else if (gender == FemaleGender) {
-		return "female";
-	} else if (gender == AsexualGender) {
-		return "asexual";
-	}
-
-	return "";
-}
-
-int GetGenderIdByName(const std::string &gender)
-{
-	if (gender == "no-gender") {
-		return NoGender;
-	} else if (gender == "male") {
-		return MaleGender;
-	} else if (gender == "female") {
-		return FemaleGender;
-	} else if (gender == "asexual") {
-		return AsexualGender;
-	}
-
-	return -1;
 }
 
 std::string GetCharacterTitleNameById(int title)

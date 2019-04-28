@@ -41,6 +41,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGender;
 class CPlane;
 class CSpeciesCategory;
 class CTerrainType;
@@ -96,6 +97,8 @@ public:
 		return this->UnitType;
 	}
 	
+	const std::vector<const CGender *> &GetGenders() const;
+	
 	bool IsNativeToTerrainType(const CTerrainType *terrain_type) const
 	{
 		return std::find(this->NativeTerrainTypes.begin(), this->NativeTerrainTypes.end(), terrain_type) != this->NativeTerrainTypes.end();
@@ -105,8 +108,8 @@ public:
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
 	std::vector<CSpeciesCategory *> GetAllCategories() const;
 	
-	void AddSpecimenNameWord(CWord *word, const int gender);
-	const std::vector<CWord *> &GetSpecimenNameWords(const int gender);
+	void AddSpecimenNameWord(CWord *word, const CGender *gender);
+	const std::vector<CWord *> &GetSpecimenNameWords(const CGender *gender);
 	
 public:
 	ExposedProperty<String> NamePlural;
@@ -123,9 +126,9 @@ private:
 	CPlane *HomePlane = nullptr;
 	CWorld *Homeworld = nullptr;
 	CUnitType *UnitType = nullptr;
+	std::vector<const CGender *> Genders;
 public:
 	ExposedProperty<std::vector<CTerrainType *>> NativeTerrainTypes;	/// in which terrains does this species live
-	;	
 	ExposedProperty<std::vector<CSpecies *>> EvolvesFrom {		/// from which species this one can evolve
 		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
 		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
@@ -150,7 +153,7 @@ public:
 	};
 	
 private:
-	std::map<int, std::vector<CWord *>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the gender for which they can be used
+	std::map<const CGender *, std::vector<CWord *>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the gender for which they can be used
 	
 	friend int CclDefineSpecies(lua_State *l);
 	friend int CclDefineUnitType(lua_State *l);

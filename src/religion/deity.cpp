@@ -42,6 +42,7 @@
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
+#include "species/gender.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade.h"
 #include "world/plane.h"
@@ -120,8 +121,7 @@ bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value
 	if (key == "pantheon") {
 		this->Pantheon = CPantheon::Get(value);
 	} else if (key == "gender") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Gender = GetGenderIdByName(value);
+		this->Gender = CGender::Get(value);
 	} else if (key == "major") {
 		this->Major = StringToBool(value);
 	} else if (key == "civilization") {

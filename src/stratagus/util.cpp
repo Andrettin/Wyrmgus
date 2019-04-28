@@ -34,6 +34,7 @@
 //Wyrmgus start
 #include "network/network.h"
 //Wyrmgus end
+#include "species/gender.h"
 
 #include <boost/tokenizer.hpp>
 
@@ -1262,6 +1263,6 @@ std::string SeparateCapitalizedStringElements(const std::string &text)
 std::string GeneratePersonalName(const std::string &unit_type_ident)
 {
 	const CUnitType *unit_type = CUnitType::Get(unit_type_ident);
-	return unit_type->GeneratePersonalName(nullptr, unit_type->DefaultStat.Variables[GENDER_INDEX].Value);
+	return unit_type->GeneratePersonalName(nullptr, CGender::Get(unit_type->DefaultStat.Variables[GENDER_INDEX].Value - 1));
 }
 //Wyrmgus end

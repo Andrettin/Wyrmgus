@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name gender_dependency.cpp - The gender dependency source file */
+/**@name gender.cpp - The gender source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,43 +33,15 @@
 
 #include "stratagus.h"
 
-#include "dependency/gender_dependency.h"
-
-#include "character.h"
-#include "map/map.h"
-#include "map/map_layer.h"
-#include "player.h"
 #include "species/gender.h"
-#include "unit/unit.h"
-#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CGenderDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CGender::_bind_methods()
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "gender") {
-		this->Gender = CGender::Get(value);
-	} else {
-		fprintf(stderr, "Invalid gender dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CGenderDependency::Check(const CPlayer *player, const bool ignore_units) const
-{
-	return true;
-}
-
-bool CGenderDependency::Check(const CUnit *unit, const bool ignore_units) const
-{
-	return unit->Variable[GENDER_INDEX].Value == (this->Gender->GetIndex() + 1);
-}
-
-std::string CGenderDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Gender->GetIdent().utf8().get_data() + '\n';
-	return str;
+	ClassDB::bind_method(D_METHOD("set_father", "father"), [](CGender *gender, const bool father){ gender->Father = father; });
+	ClassDB::bind_method(D_METHOD("is_father"), &CGender::IsFather);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "father"), "set_father", "is_father");
 }

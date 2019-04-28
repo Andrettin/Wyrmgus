@@ -63,6 +63,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unit_sound.h"
+#include "species/gender.h"
 #include "species/species.h"
 #include "species/species_category.h"
 #include "spell/spells.h"
@@ -1774,9 +1775,12 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Quote")) {
 			type->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
-			type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
-			type->DefaultStat.Variables[GENDER_INDEX].Value = GetGenderIdByName(LuaToString(l, -1));
-			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
+			const CGender *gender = CGender::Get(LuaToString(l, -1));
+			if (gender != nullptr) {
+				type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
+				type->DefaultStat.Variables[GENDER_INDEX].Value = gender->GetIndex() + 1;
+				type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
+			}
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
@@ -1909,14 +1913,12 @@ static int CclDefineUnitType(lua_State *l)
 			type->PersonalNames.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
-				if (gender_id == -1) {
-					gender_id = NoGender;
-				} else {
+				const CGender *gender = CGender::Get(LuaToString(l, -1, j + 1));
+				if (gender != nullptr) {
 					++j;
 				}
 				
-				type->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+				type->PersonalNames[gender].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "Mod")) {
 			type->Mod = LuaToString(l, -1);

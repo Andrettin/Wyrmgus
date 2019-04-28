@@ -81,6 +81,8 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound.h"
+#include "species/gender.h"
+#include "species/species.h"
 #include "spell/spells.h"
 #include "time/time_of_day.h"
 #include "translate.h"
@@ -2207,7 +2209,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, droppedUnit->Variable[GENDER_INDEX].Value);
+				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, CGender::Get(droppedUnit->Variable[GENDER_INDEX].Value - 1));
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
@@ -2870,10 +2872,21 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//assign a gender to the unit
-		if (this->Variable[GENDER_INDEX].Value == NoGender && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
-			this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
-			this->Variable[GENDER_INDEX].Max = MaxGenders;
-			this->Variable[GENDER_INDEX].Enable = 1;
+		if (this->Variable[GENDER_INDEX].Value == 0 && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set; upper values equal the index of the gender plus 1
+			CSpecies *species = nullptr;
+			if (this->Type->GetSpecies() != nullptr) {
+				species = this->Type->GetSpecies();
+			} else if (this->Type->GetCivilization() != nullptr) {
+				species = this->Type->GetCivilization()->GetSpecies();
+			}
+			if (species != nullptr) {
+				const std::vector<const CGender *> &genders = species->GetGenders();
+				if (!genders.empty()) {
+					this->Variable[GENDER_INDEX].Value = genders[SyncRand(genders.size())]->GetIndex() + 1;
+					this->Variable[GENDER_INDEX].Max = CGender::GetAll().size();
+					this->Variable[GENDER_INDEX].Enable = 1;
+				}
+			}
 		}
 		
 		//generate a personal name for the unit, if applicable
@@ -3374,13 +3387,13 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->Variable[GENDER_INDEX].Value)) {
+	if (!this->Type->IsPersonalNameValid(this->Name, faction, CGender::Get(this->Variable[GENDER_INDEX].Value - 1))) {
 		// first see if can translate the current personal name
 		std::string new_personal_name = language != nullptr ? language->TranslateName(this->Name.c_str()).utf8().get_data() : this->Name;
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
-			this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
+			this->Name = this->Type->GeneratePersonalName(faction, CGender::Get(this->Variable[GENDER_INDEX].Value - 1));
 		}
 	}
 	

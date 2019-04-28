@@ -41,6 +41,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGender;
 class CSpecies;
 class CWord;
 
@@ -66,12 +67,12 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 
 public:
-	void AddPersonalNameWord(CWord *word, const int gender);
-	const std::vector<CWord *> &GetPersonalNameWords(const int gender);
+	void AddPersonalNameWord(CWord *word, const CGender *gender);
+	const std::vector<CWord *> &GetPersonalNameWords(const CGender *gender);
 	void AddFamilyNameWord(CWord *word);
 	const std::vector<CWord *> &GetFamilyNameWords() const;
-	void AddSpecimenNameWord(CWord *word, const CSpecies *species, const int gender);
-	const std::vector<CWord *> &GetSpecimenNameWords(const CSpecies *species, const int gender);
+	void AddSpecimenNameWord(CWord *word, const CSpecies *species, const CGender *gender);
+	const std::vector<CWord *> &GetSpecimenNameWords(const CSpecies *species, const CGender *gender);
 	void AddShipNameWord(CWord *word);
 	const std::vector<CWord *> &GetShipNameWords() const;
 	void AddSettlementNameWord(CWord *word);
@@ -80,9 +81,9 @@ public:
 	Property<CLanguageFamily *> Family;			/// the family to which this language family belongs
 	
 private:
-	std::map<int, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
+	std::map<const CGender *, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
 	std::vector<CWord *> FamilyNameWords;
-	std::map<const CSpecies *, std::map<int, std::vector<CWord *>>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the species and gender for which they can be used
+	std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the species and gender for which they can be used
 	std::vector<CWord *> ShipNameWords;
 	std::vector<CWord *> SettlementNameWords;
 	

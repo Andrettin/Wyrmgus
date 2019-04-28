@@ -39,6 +39,7 @@
 #include "language/language_family.h"
 #include "language/word.h"
 #include "language/word_type.h"
+#include "species/gender.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -66,7 +67,7 @@ void CLanguage::RemoveWord(CWord *word)
 	}
 }
 
-void CLanguage::AddPersonalNameWord(CWord *word, const int gender)
+void CLanguage::AddPersonalNameWord(CWord *word, const CGender *gender)
 {
 	this->PersonalNameWords[gender].push_back(word);
 	
@@ -75,7 +76,7 @@ void CLanguage::AddPersonalNameWord(CWord *word, const int gender)
 	}
 }
 
-const std::vector<CWord *> &CLanguage::GetPersonalNameWords(const int gender)
+const std::vector<CWord *> &CLanguage::GetPersonalNameWords(const CGender *gender)
 {
 	if (!this->PersonalNameWords[gender].empty()) {
 		return this->PersonalNameWords[gender];
@@ -110,7 +111,7 @@ const std::vector<CWord *> &CLanguage::GetFamilyNameWords() const
 	return this->FamilyNameWords;
 }
 
-void CLanguage::AddSpecimenNameWord(CWord *word, const CSpecies *species, const int gender)
+void CLanguage::AddSpecimenNameWord(CWord *word, const CSpecies *species, const CGender *gender)
 {
 	this->SpecimenNameWords[species][gender].push_back(word);
 	
@@ -119,7 +120,7 @@ void CLanguage::AddSpecimenNameWord(CWord *word, const CSpecies *species, const 
 	}
 }
 
-const std::vector<CWord *> &CLanguage::GetSpecimenNameWords(const CSpecies *species, const int gender)
+const std::vector<CWord *> &CLanguage::GetSpecimenNameWords(const CSpecies *species, const CGender *gender)
 {
 	if (!this->SpecimenNameWords[species][gender].empty()) {
 		return this->SpecimenNameWords[species][gender];

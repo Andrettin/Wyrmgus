@@ -45,6 +45,7 @@
 class CCivilization;
 class CDeityDomain;
 class CFaction;
+class CGender;
 class CPantheon;
 class CPlane;
 class CReligion;
@@ -77,6 +78,11 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
+	const CGender *GetGender() const
+	{
+		return this->Gender;
+	}
+	
 	bool IsMajor() const
 	{
 		return this->Major;
@@ -89,8 +95,8 @@ public:
 		return this->Domains;
 	}
 	
-	int Gender = 0;								/// Deity's gender
 private:
+	const CGender *Gender = nullptr;			/// the deity's gender
 	bool Major = false;							/// Whether the deity is a major one or not
 public:
 	std::string Description;

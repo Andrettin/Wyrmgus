@@ -34,12 +34,13 @@
 #include "stratagus.h"
 
 #include "language/language_family.h"
+#include "species/gender.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CLanguageFamily::AddPersonalNameWord(CWord *word, const int gender)
+void CLanguageFamily::AddPersonalNameWord(CWord *word, const CGender *gender)
 {
 	this->PersonalNameWords[gender].push_back(word);
 	
@@ -48,7 +49,7 @@ void CLanguageFamily::AddPersonalNameWord(CWord *word, const int gender)
 	}
 }
 
-const std::vector<CWord *> &CLanguageFamily::GetPersonalNameWords(const int gender)
+const std::vector<CWord *> &CLanguageFamily::GetPersonalNameWords(const CGender *gender)
 {
 	if (!this->PersonalNameWords[gender].empty()) {
 		return this->PersonalNameWords[gender];
@@ -83,7 +84,7 @@ const std::vector<CWord *> &CLanguageFamily::GetFamilyNameWords() const
 	return this->FamilyNameWords;
 }
 
-void CLanguageFamily::AddSpecimenNameWord(CWord *word, const CSpecies *species, const int gender)
+void CLanguageFamily::AddSpecimenNameWord(CWord *word, const CSpecies *species, const CGender *gender)
 {
 	this->SpecimenNameWords[species][gender].push_back(word);
 	
@@ -92,7 +93,7 @@ void CLanguageFamily::AddSpecimenNameWord(CWord *word, const CSpecies *species, 
 	}
 }
 
-const std::vector<CWord *> &CLanguageFamily::GetSpecimenNameWords(const CSpecies *species, const int gender)
+const std::vector<CWord *> &CLanguageFamily::GetSpecimenNameWords(const CSpecies *species, const CGender *gender)
 {
 	if (!this->SpecimenNameWords[species][gender].empty()) {
 		return this->SpecimenNameWords[species][gender];
