@@ -118,7 +118,7 @@ public:
 		
 		//if the operator is for addition, see if the class has any method with "add_" prefixed to the given property name
 		if (this->Operator == CConfigOperator::Addition) {
-			String addition_method_name = "add_";
+			String addition_method_name = "add_to_";
 			addition_method_name += this->Key.c_str();
 			Variant value = String(this->Value.c_str());
 			if (data_element.has_method(addition_method_name)) {
@@ -130,7 +130,7 @@ public:
 		
 		//if the operator is for subtraction, see if the class has any method with "remove_" prefixed to the given property name
 		if (this->Operator == CConfigOperator::Subtraction) {
-			String subtraction_method_name = "remove_";
+			String subtraction_method_name = "remove_from_";
 			subtraction_method_name += this->Key.c_str();
 			Variant value = String(this->Value.c_str());
 			if (data_element.has_method(subtraction_method_name)) {

@@ -107,7 +107,7 @@ extern bool EnableAssert;
 extern bool EnableUnitDebug;
 
 extern void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr);
-extern void PrintOnStdOut(const char *format, ...);
+extern void PrintOnStdErr(const char *format, ...);
 
 /**
 **  Assert a condition. If cond is not true abort with file,line.
@@ -119,7 +119,7 @@ extern void PrintOnStdOut(const char *format, ...);
 **  Print debug information with function name.
 */
 #define DebugPrint(args) \
-	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdOut(args); } } while (0)
+	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdErr(args); } } while (0)
 
 /*============================================================================
 ==  Definitions

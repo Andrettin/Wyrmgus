@@ -648,7 +648,7 @@ int UTF8GetNext(const std::string &text, int curpos)
 
 void PrintLocation(const char *file, int line, const char *funcName)
 {
-	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
+	fprintf(stderr, "%s:%d: %s: ", file, line, funcName);
 }
 
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
@@ -665,13 +665,13 @@ void AbortAt(const char *file, int line, const char *funcName, const char *condi
 	abort();
 }
 
-void PrintOnStdOut(const char *format, ...)
+void PrintOnStdErr(const char *format, ...)
 {
 	va_list valist;
 	va_start(valist, format);
 	vprintf(format, valist);
 	va_end(valist);
-	fflush(stdout);
+	fflush(stderr);
 }
 
 //Wyrmgus start

@@ -159,24 +159,20 @@ static int CclDefineCharacter(lua_State *l)
 			std::string father_ident = LuaToString(l, -1);
 			CCharacter *father = CCharacter::Get(father_ident);
 			if (father) {
-				if (father->Gender->IsFather() || !father->IsInitialized()) {
-					character->Father = father;
-					if (!father->IsParentOf(character)) { //check whether the character has already been set as a child of the father
-						father->Children.push_back(character);
-					}
-					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-					for (size_t i = 0; i < father->Children.size(); ++i) {
-						if (father->Children[i]->Ident != character_ident) {
-							if (!character->IsSiblingOf(father->Children[i])) {
-								character->Siblings.push_back(father->Children[i]);
-							}
-							if (!father->Children[i]->IsSiblingOf(character)) {
-								father->Children[i]->Siblings.push_back(character);
-							}
+				character->Father = father;
+				if (!father->IsParentOf(character)) { //check whether the character has already been set as a child of the father
+					father->Children.push_back(character);
+				}
+				// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+				for (size_t i = 0; i < father->Children.size(); ++i) {
+					if (father->Children[i]->Ident != character_ident) {
+						if (!character->IsSiblingOf(father->Children[i])) {
+							character->Siblings.push_back(father->Children[i]);
+						}
+						if (!father->Children[i]->IsSiblingOf(character)) {
+							father->Children[i]->Siblings.push_back(character);
 						}
 					}
-				} else {
-					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't of a correct gender for that (the gender is \"%s\")." _C_ father_ident.c_str() _C_ character_ident.c_str() _C_ father->GetGender()->GetIdent().utf8().get_data());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ father_ident.c_str());
@@ -185,24 +181,20 @@ static int CclDefineCharacter(lua_State *l)
 			std::string mother_ident = LuaToString(l, -1);
 			CCharacter *mother = CCharacter::Get(mother_ident);
 			if (mother) {
-				if (!mother->Gender->IsFather() || !mother->IsInitialized()) {
-					character->Mother = mother;
-					if (!mother->IsParentOf(character)) { //check whether the character has already been set as a child of the mother
-						mother->Children.push_back(character);
-					}
-					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-					for (size_t i = 0; i < mother->Children.size(); ++i) {
-						if (mother->Children[i]->Ident != character_ident) {
-							if (!character->IsSiblingOf(mother->Children[i])) {
-								character->Siblings.push_back(mother->Children[i]);
-							}
-							if (!mother->Children[i]->IsSiblingOf(character)) {
-								mother->Children[i]->Siblings.push_back(character);
-							}
+				character->Mother = mother;
+				if (!mother->IsParentOf(character)) { //check whether the character has already been set as a child of the mother
+					mother->Children.push_back(character);
+				}
+				// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+				for (size_t i = 0; i < mother->Children.size(); ++i) {
+					if (mother->Children[i]->Ident != character_ident) {
+						if (!character->IsSiblingOf(mother->Children[i])) {
+							character->Siblings.push_back(mother->Children[i]);
+						}
+						if (!mother->Children[i]->IsSiblingOf(character)) {
+							mother->Children[i]->Siblings.push_back(character);
 						}
 					}
-				} else {
-					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't of a correct gender for that (the gender is \"%s\")." _C_ mother_ident.c_str() _C_ character_ident.c_str() _C_ mother->GetGender()->GetIdent().utf8().get_data());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_ident.c_str());

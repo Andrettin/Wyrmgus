@@ -82,9 +82,8 @@ extern int LuaCall(int narg, int clear, bool exitOnError = true);
 #define LuaError(l, args) \
 	do { \
 		PrintFunction(); \
-		fprintf(stdout, args); \
-		fprintf(stdout, "\n"); \
-		lua_pushfstring(l, args); lua_error(l); \
+		fprintf(stderr, args); \
+		fprintf(stderr, "\n"); \
 	} while (0)
 
 #define LuaCheckArgs(l, args) \

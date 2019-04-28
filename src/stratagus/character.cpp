@@ -227,7 +227,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "father") {
 			CCharacter *father = CCharacter::Get(value);
 			if (father) {
-				if (father->Gender->IsFather() || !father->Initialized) {
+				if (!father->IsInitialized() || father->Gender->IsFather()) {
 					this->Father = father;
 					if (!father->IsParentOf(this)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(this);
@@ -250,7 +250,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "mother") {
 			CCharacter *mother = CCharacter::Get(value);
 			if (mother) {
-				if (!mother->Gender->IsFather() || !mother->Initialized) {
+				if (!mother->IsInitialized() || !mother->Gender->IsFather()) {
 					this->Mother = mother;
 					if (!mother->IsParentOf(this)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(this);

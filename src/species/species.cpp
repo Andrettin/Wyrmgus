@@ -215,7 +215,7 @@ void CSpecies::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_all_categories"), [](const CSpecies *species){ return VectorToGodotArray(species->GetAllCategories()); });
 	
-	ClassDB::bind_method(D_METHOD("add_gender", "gender"), [](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
-	ClassDB::bind_method(D_METHOD("remove_gender", "gender"), [](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
+	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), [](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
+	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), [](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
 	ClassDB::bind_method(D_METHOD("get_genders"), [](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
 }

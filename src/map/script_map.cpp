@@ -493,7 +493,7 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 	int i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {
 		PrintFunction();
-		fprintf(stdout, "Opacity should be 0 - 256\n");
+		fprintf(stderr, "Opacity should be 0 - 256\n");
 		i = 100;
 	}
 	FogOfWarOpacity = i;
@@ -519,13 +519,13 @@ static int CclSetForestRegeneration(lua_State *l)
 	/*
 	if (i < 0 || i > 255) {
 		PrintFunction();
-		fprintf(stdout, "Regeneration speed should be 0 - 255\n");
+		fprintf(stderr, "Regeneration speed should be 0 - 255\n");
 		i = 100;
 	}
 	*/
 	if (i < 0) {
 		PrintFunction();
-		fprintf(stdout, "Regeneration speed should be greater than 0\n");
+		fprintf(stderr, "Regeneration speed should be greater than 0\n");
 		i = 100;
 	}
 	//Wyrmgus end

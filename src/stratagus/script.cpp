@@ -261,7 +261,7 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 			LuaCall(0, 1);
 		}
 	} else {
-		report(status, true);
+		report(status, false);
 	}
 	return status;
 }

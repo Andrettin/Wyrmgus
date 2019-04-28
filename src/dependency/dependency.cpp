@@ -266,18 +266,22 @@ static int CclDefineDependency(lua_State *l)
 			
 			if (!strncmp(required, "unit-", 5)) {
 				const CUnitType *unit_type = CUnitType::Get(required);
-				if (!unit_type) {
-					LuaError(l, "Invalid unit type: \"%s\"" _C_ required);
+				if (unit_type != nullptr) {
+					dependency = new CUnitTypeDependency(unit_type, count > 0 ? count : 1);
 				}
-				dependency = new CUnitTypeDependency(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade-", 8)) {
 				const CUpgrade *upgrade = CUpgrade::Get(required);
-				if (!upgrade) {
-					LuaError(l, "Invalid upgrade: \"%s\"" _C_ required);
+				if (upgrade != nullptr) {
+					dependency = new CUpgradeDependency(upgrade);
+				} else {
+					fprintf(stderr, "Invalid upgrade: \"%s\".\n", required);
 				}
-				dependency = new CUpgradeDependency(upgrade);
 			} else {
-				LuaError(l, "Invalid required type for dependency: \"%s\"" _C_ required);
+				fprintf(stderr, "Invalid required type for dependency: \"%s\".\n", required);
+			}
+			
+			if (dependency == nullptr) {
+				continue;
 			}
 			
 			if (count == 0) {
@@ -309,18 +313,18 @@ static int CclDefineDependency(lua_State *l)
 	
 	if (!strncmp(target, "unit-", 5)) {
 		CUnitType *unit_type = CUnitType::Get(target);
-		if (!unit_type) {
-			LuaError(l, "Invalid unit type: \"%s\"" _C_ target);
+		if (unit_type != nullptr) {
+			unit_type->Dependency = dependency;
 		}
-		unit_type->Dependency = dependency;
 	} else if (!strncmp(target, "upgrade-", 8)) {
 		CUpgrade *upgrade = CUpgrade::Get(target);
-		if (!upgrade) {
-			LuaError(l, "Invalid upgrade: \"%s\"" _C_ target);
+		if (upgrade != nullptr) {
+			upgrade->Dependency = dependency;
+		} else {
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", target);
 		}
-		upgrade->Dependency = dependency;
 	} else {
-		LuaError(l, "Invalid dependency target: \"%s\"" _C_ target);
+		fprintf(stderr, "Invalid dependency target: \"%s\".\n", target);
 	}
 	
 	return 0;

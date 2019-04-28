@@ -65,7 +65,7 @@ static int CclAStar(lua_State *l)
 			i = LuaToNumber(l, j + 1);
 			if (i <= 3) {
 				PrintFunction();
-				fprintf(stdout, "Fixed unit crossing cost must be strictly > 3\n");
+				fprintf(stderr, "Fixed unit crossing cost must be strictly > 3\n");
 			} else {
 				AStarFixedUnitCrossingCost = i;
 			}
@@ -74,7 +74,7 @@ static int CclAStar(lua_State *l)
 			i = LuaToNumber(l, j + 1);
 			if (i <= 3) {
 				PrintFunction();
-				fprintf(stdout, "Moving unit crossing cost must be strictly > 3\n");
+				fprintf(stderr, "Moving unit crossing cost must be strictly > 3\n");
 			} else {
 				AStarMovingUnitCrossingCost = i;
 			}
@@ -87,7 +87,7 @@ static int CclAStar(lua_State *l)
 			i = LuaToNumber(l, j + 1);
 			if (i < 0) {
 				PrintFunction();
-				fprintf(stdout, "Unseen Terrain Cost must be non-negative\n");
+				fprintf(stderr, "Unseen Terrain Cost must be non-negative\n");
 			} else {
 				AStarUnknownTerrainCost = i;
 			}

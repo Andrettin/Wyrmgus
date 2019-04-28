@@ -38,6 +38,7 @@
 #include "ai/force_template.h"
 #include "civilization.h"
 #include "faction.h"
+#include "grand_strategy.h"
 #include "luacallback.h"
 #include "player.h"
 #include "player_color.h"
@@ -111,6 +112,14 @@ bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string val
 		if (other_faction != nullptr) {
 			this->DevelopsTo.push_back(other_faction);
 			other_faction->DevelopsFrom.push_back(this);
+		}
+	} else if (key == "default_tier") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int faction_tier = GetFactionTierIdByName(value);
+		if (faction_tier != -1) {
+			this->DefaultTier = faction_tier;
+		} else {
+			fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.c_str());
 		}
 	} else {
 		return false;

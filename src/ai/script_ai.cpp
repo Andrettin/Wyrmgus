@@ -133,7 +133,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 		end = list.find(",", begin);
 		if (!unitName.empty()) {
 			Assert(unitName[0] != ',');
-			res.push_back(CUnitType::Get(unitName.c_str()));
+			res.push_back(CUnitType::Get(unitName.c_str(), false));
 		}
 	}
 	return res;

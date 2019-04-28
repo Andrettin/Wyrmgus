@@ -588,7 +588,7 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 	
 	if (l < 0) {
 		PrintFunction();
-		fprintf(stdout, "Could not read from UDP socket\n");
+		fprintf(stderr, "Could not read from UDP socket\n");
 		return -1;
 	}
 
