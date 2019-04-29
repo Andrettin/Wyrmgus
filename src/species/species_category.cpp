@@ -36,6 +36,7 @@
 #include "species/species_category.h"
 
 #include "config.h"
+#include "language/word.h"
 #include "species/gender.h"
 #include "species/species_category_rank.h"
 #include "util.h"

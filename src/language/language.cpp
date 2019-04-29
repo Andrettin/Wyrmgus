@@ -51,7 +51,7 @@ CWord *CLanguage::GetWord(const String &name, const CWordType *word_type, const 
 		if (
 			word->GetName() == name
 			&& (word_type == nullptr || word->GetType() == word_type)
-			&& (word_meanings.size() == 0 || word->Meanings == word_meanings)
+			&& (word_meanings.size() == 0 || word->GetMeanings() == word_meanings)
 		) {
 			return word;
 		}

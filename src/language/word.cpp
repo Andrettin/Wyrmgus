@@ -110,7 +110,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 			for (const CGender *gender : CGender::GetAll()) {
 				this->PersonalNameWeights[gender] = 1;
 				this->Language->AddPersonalNameWord(this, gender);
-				CWord::PersonalNameWords[gender].push_back(word);
+				CWord::PersonalNameWords[gender].push_back(this);
 			}
 		}
 	} else if (key == "family_name") {
@@ -119,7 +119,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 		if (value_bool) {
 			this->FamilyNameWeight = 1;
 			this->Language->AddFamilyNameWord(this);
-			CWord::FamilyNameWords.push_back(word);
+			CWord::FamilyNameWords.push_back(this);
 		}
 	} else if (key == "ship_name") {
 		const bool value_bool = StringToBool(value);
@@ -127,7 +127,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 		if (value_bool) {
 			this->ShipNameWeight = 1;
 			this->Language->AddShipNameWord(this);
-			CWord::ShipNameWords.push_back(word);
+			CWord::ShipNameWords.push_back(this);
 		}
 	} else if (key == "settlement_name") {
 		const bool value_bool = StringToBool(value);
@@ -135,7 +135,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 		if (value_bool) {
 			this->SettlementNameWeight = 1;
 			this->Language->AddSettlementNameWord(this);
-			CWord::SettlementNameWords.push_back(word);
+			CWord::SettlementNameWords.push_back(this);
 		}
 	} else {
 		return false;
@@ -172,7 +172,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			if (value_bool) {
 				this->PersonalNameWeights[gender] = 1;
 				this->Language->AddPersonalNameWord(this, gender);
-				CWord::PersonalNameWords[gender].push_back(word);
+				CWord::PersonalNameWords[gender].push_back(this);
 			}
 		}
 	} else if (section->Tag == "specimen_name") {
@@ -201,7 +201,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 					this->SpecimenNameWeights[species][gender] = 1;
 					this->Language->AddSpecimenNameWord(this, species, gender);
 					species->AddSpecimenNameWord(this, gender);
-					CWord::SpecimenNameWords[species][gender].push_back(word);
+					CWord::SpecimenNameWords[species][gender].push_back(this);
 				}
 			}
 		}
@@ -232,7 +232,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 					this->SpecimenNameWeights[species][gender] = 1;
 					this->Language->AddSpecimenNameWord(this, species, gender);
 					species->AddSpecimenNameWord(this, gender);
-					CWord::SpecimenNameWords[species][gender].push_back(word);
+					CWord::SpecimenNameWords[species][gender].push_back(this);
 				}
 			}
 		}
@@ -262,30 +262,6 @@ void CWord::Initialize()
 	this->Initialized = true;
 }
 	
-/**
-**	@brief	Set the language of the word
-**
-**	@param	language	The language to be set
-*/
-void CWord::SetLanguage(CLanguage *language)
-{
-	if (this->Language != nullptr) {
-		this->Language->Words.erase(std::remove(this->Language->Words.begin(), this->Language->Words.end(), this), this->Language->Words.end());
-		for (CLanguage *dialect : this->Language->Dialects) {
-			dialect->Words.erase(std::remove(dialect->Words.begin(), dialect->Words.end(), this), dialect->Words.end());
-		}
-	}
-	
-	this->Language.Value = language;
-	
-	if (this->Language != nullptr) {
-		this->Language->Words.push_back(this);
-		for (CLanguage *dialect : this->Language->Dialects) {
-			dialect->Words.push_back(this); //copy the word over for dialects
-		}
-	}
-}
-
 void CWord::ChangePersonalNameWeight(const CGender *gender, const int change)
 {
 	std::map<const CGender *, int>::iterator find_iterator = this->PersonalNameWeights.find(gender);
@@ -359,11 +335,29 @@ String CWord::GetParticiple(const int grammatical_tense)
 
 void CWord::_bind_methods()
 {
-	BIND_PROPERTIES();
-	
 	ClassDB::bind_method(D_METHOD("set_anglicized_name", "anglicized_name"), [](CWord *word, const String &anglicized_name){ word->AnglicizedName = anglicized_name; });
 	ClassDB::bind_method(D_METHOD("get_anglicized_name"), &CWord::GetAnglicizedName);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "anglicized_name"), "set_anglicized_name", "get_anglicized_name");
+	
+	ClassDB::bind_method(D_METHOD("set_language", "language_ident"), [](CWord *word, const String &language_ident){
+		if (word->Language != nullptr) {
+			word->Language->Words.erase(std::remove(word->Language->Words.begin(), word->Language->Words.end(), word), word->Language->Words.end());
+			for (CLanguage *dialect : word->Language->Dialects) {
+				dialect->Words.erase(std::remove(dialect->Words.begin(), dialect->Words.end(), word), dialect->Words.end());
+			}
+		}
+		
+		word->Language = CLanguage::Get(language_ident);
+		
+		if (word->Language != nullptr) {
+			word->Language->Words.push_back(word);
+			for (CLanguage *dialect : word->Language->Dialects) {
+				dialect->Words.push_back(word); //copy the word over for dialects
+			}
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_language"), [](const CWord *word){ return const_cast<CLanguage *>(word->GetLanguage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "language"), "set_language", "get_language");
 	
 	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), [](CWord *word, const String &type_ident){ word->Type = CWordType::Get(type_ident); });
 	ClassDB::bind_method(D_METHOD("get_type"), [](const CWord *word){ return const_cast<CWordType *>(word->GetType()); });
@@ -373,7 +367,23 @@ void CWord::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_gender"), [](const CWord *word){ return const_cast<CGrammaticalGender *>(word->GetGender()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "gender"), "set_gender", "get_gender");
 	
+	ClassDB::bind_method(D_METHOD("set_derives_from", "derives_from_ident"), [](CWord *word, const String &derives_from_ident){
+		if (word->DerivesFrom != nullptr) {
+			word->DerivesFrom->DerivesTo.erase(std::remove(word->DerivesFrom->DerivesTo.begin(), word->DerivesFrom->DerivesTo.end(), word), word->DerivesFrom->DerivesTo.end());
+		}
+		word->DerivesFrom = word;
+		if (word != nullptr) {
+			word->DerivesTo.push_back(word);
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_derives_from"), &CWord::GetDerivesFrom);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "derives_from"), "set_derives_from", "get_derives_from");
+	
 	ClassDB::bind_method(D_METHOD("get_derives_to"), [](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_meanings", "meaning"), [](CWord *word, const String &meaning){ word->Meanings.push_back(meaning); });
+	ClassDB::bind_method(D_METHOD("remove_from_meanings", "meaning"), [](CWord *word, const String &meaning){ word->Meanings.erase(std::remove(word->Meanings.begin(), word->Meanings.end(), meaning), word->Meanings.end()); });
+	ClassDB::bind_method(D_METHOD("get_meanings"), [](const CWord *word){ return VectorToGodotArray(word->Meanings); });
 	
 	ClassDB::bind_method(D_METHOD("get_personal_name_genders"), [](const CWord *word){
 		Array genders;

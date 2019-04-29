@@ -1295,7 +1295,12 @@ static int CclDefineLanguageWord(lua_State *l)
 			CLanguage *language = CLanguage::Get(LuaToString(l, -1));
 			
 			if (language) {
-				word->SetLanguage(language);
+				word->Language = language;
+				
+				word->Language->Words.push_back(word);
+				for (CLanguage *dialect : word->Language->Dialects) {
+					dialect->Words.push_back(word); //copy the word over for dialects
+				}
 			} else {
 				LuaError(l, "Language not found.");
 			}
@@ -3474,8 +3479,8 @@ static int CclGetLanguageWordData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Meaning")) {
-		for (size_t i = 0; i < word->Meanings.size(); ++i) {
-			lua_pushstring(l, word->Meanings[i].utf8().get_data());
+		for (size_t i = 0; i < word->GetMeanings().size(); ++i) {
+			lua_pushstring(l, word->GetMeanings()[i].utf8().get_data());
 			return 1;
 		}
 		lua_pushstring(l, "");

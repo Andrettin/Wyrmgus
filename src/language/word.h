@@ -139,18 +139,6 @@ public:
 	static constexpr const char *ClassIdentifier = "word";
 	static constexpr int MinimumWordsForNameGeneration = 10;	/// the minimum quantity of words desired for name generation
 	
-private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(DerivesFrom);
-		REGISTER_PROPERTY(Language);
-		REGISTER_PROPERTY(Meanings);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	static void Clear();
 	
@@ -160,7 +148,7 @@ public:
 	static const std::vector<CWord *> &GetShipNameWords();
 	static const std::vector<CWord *> &GetSettlementNameWords();
 
-private
+private:
 	static std::map<const CGender *, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
 	static std::vector<CWord *> FamilyNameWords;
 	static std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the species and gender for which they can be used
@@ -182,6 +170,11 @@ public:
 		}
 	}
 	
+	const CLanguage *GetLanguage() const
+	{
+		return this->Language;
+	}
+	
 	const CWordType *GetType() const
 	{
 		return this->Type;
@@ -190,6 +183,16 @@ public:
 	const CGrammaticalGender *GetGender() const
 	{
 		return this->Gender;
+	}
+	
+	const std::vector<String> &GetMeanings() const
+	{
+		return this->Meanings;
+	}
+	
+	CWord *GetDerivesFrom() const
+	{
+		return this->DerivesFrom;
 	}
 	
 	void ChangePersonalNameWeight(const CGender *gender, const int change);
@@ -252,19 +255,10 @@ public:
 	{
 		return !this->PersonalNameWeights.empty() || this->FamilyNameWeight != 0 || !this->SpecimenNameWeights.empty() || this->ShipNameWeight != 0 || this->SettlementNameWeight != 0;
 	}
-	
-private:
-	void SetLanguage(CLanguage *language);
 
-public:
-	Property<CLanguage *> Language {					/// the language the word belongs to
-		Property<CLanguage *>::ValueType(nullptr),
-		Property<CLanguage *>::SetterType([this](CLanguage *language) {
-			this->SetLanguage(language);
-		})
-	};
 private:
-	String AnglicizedName;		/// the anglicized version of the word
+	CLanguage *Language = nullptr;		/// the language the word belongs to
+	String AnglicizedName;				/// the anglicized version of the word
 	const CWordType *Type = nullptr;	/// word type
 	const CGrammaticalGender *Gender = nullptr;		/// the grammatical gender of the noun or article
 public:
@@ -274,19 +268,10 @@ public:
 	std::map<std::tuple<int, int, int, int>, String> NumberPersonTenseMoodInflections;	/// for verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
 	String ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// for adjectives
 	String Participles[MaxGrammaticalTenses];	/// for verbs
-	ExposedProperty<std::vector<String>> Meanings;		/// meanings of the word in English
-	ExposedProperty<CWord *> DerivesFrom {    	/// from which word does this word derive
-		ExposedProperty<CWord *>::ValueType(nullptr),
-		ExposedProperty<CWord *>::SetterType([this](CWord *word) {
-			if (this->DerivesFrom.Value != nullptr) {
-				this->DerivesFrom->DerivesTo.erase(std::remove(this->DerivesFrom->DerivesTo.begin(), this->DerivesFrom->DerivesTo.end(), this), this->DerivesFrom->DerivesTo.end());
-			}
-			this->DerivesFrom.Value = word;
-			if (word != nullptr) {
-				word->DerivesTo.push_back(this);
-			}
-		})
-	};
+private:
+	std::vector<String> Meanings;		/// meanings of the word in English
+	CWord *DerivesFrom = nullptr;		/// from which word does this word derive
+public:
 	std::vector<CWord *> DerivesTo;				/// which words derive from this word
 	CWord *CompoundElements[MaxAffixTypes];    	/// from which compound elements is this word formed
 	std::vector<CWord *> CompoundElementOf[MaxAffixTypes];	/// which words are formed from this word as a compound element

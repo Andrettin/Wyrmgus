@@ -34,6 +34,7 @@
 #include "stratagus.h"
 
 #include "language/language_family.h"
+#include "language/word.h"
 #include "species/gender.h"
 
 /*----------------------------------------------------------------------------
