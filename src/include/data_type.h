@@ -231,7 +231,6 @@ public:
 		return DataType<T>::Instances;
 	}
 	
-	
 	/**
 	**	@brief	Add a new instance of the class
 	**
@@ -253,6 +252,21 @@ public:
 	}
 	
 	/**
+	**	@brief	Add a string identifier alias for an instance of the class
+	**
+	**	@param	ident	The instance's string identifier
+	**	@param	alias	The string identifier alias for the instance
+	*/
+	static inline void AddAlias(const std::string &ident, const std::string &alias)
+	{
+		std::string processed_alias = FindAndReplaceString(alias, "_", "-"); //remove this when data elements are no longer used in Lua
+		
+		T *instance = T::Get(ident);
+		
+		DataType<T>::InstancesByIdent[processed_alias] = instance;
+	}
+	
+	/**
 	**	@brief	Remove an instance of the class
 	**
 	**	@param	instance	The instance
@@ -260,6 +274,18 @@ public:
 	static inline void Remove(T *instance)
 	{
 		DataType<T>::InstancesByIdent.erase(instance->Ident);
+		
+		//remove aliases as well
+		std::vector<std::string> aliases;
+		for (const auto &element : DataType<T>::InstancesByIdent) {
+			if (element.second == instance && element.first != instance->Ident) {
+				aliases.push_back(element.first);
+			}
+		}
+		for (const std::string &alias : aliases) {
+			DataType<T>::InstancesByIdent.erase(alias);
+		}
+		
 		DataType<T>::Instances.erase(std::remove(DataType<T>::Instances.begin(), DataType<T>::Instances.end(), instance), DataType<T>::Instances.end());
 		delete instance;
 	}
@@ -313,6 +339,7 @@ private:
 			//FIXME: this conditional is only temporarily needed while the civilization classes doesn't inherit from DataElement
 			CConfigData::DataTypeGetFunctions[T::ClassIdentifier] = [](const std::string &ident) -> DataElement * { return T::Get(ident); };
 			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(T::GetOrAdd);
+			CConfigData::DataTypeAddAliasFunctions[T::ClassIdentifier] = std::function<void(const std::string &, const std::string &)>(T::AddAlias);
 		}
 		
 		//register the clear function of the class

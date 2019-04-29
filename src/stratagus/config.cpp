@@ -255,6 +255,8 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 		//value
 		if (key == "ident") {
 			(*current_config_data)->Ident = token;
+		} else if (key == "alias") {
+			(*current_config_data)->Aliases.push_back(token);
 		} else {
 			(*current_config_data)->Properties.push_back(CConfigProperty(key, property_operator, token));
 		}
@@ -293,6 +295,15 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			if (!define_only) {
 				data_element->ProcessConfigData(config_data);
+			}
+			
+			//add aliases for the data element
+			std::map<std::string, std::function<void(const std::string &, const std::string &)>>::const_iterator add_alias_find_iterator = CConfigData::DataTypeAddAliasFunctions.find(config_data->Tag);
+			
+			if (add_alias_find_iterator != CConfigData::DataTypeAddAliasFunctions.end()) {
+				for (const std::string &alias : config_data->Aliases) {
+					add_alias_find_iterator->second(ident, alias);
+				}
 			}
 		} else if (config_data->Tag == "animations") {
 			CAnimations *animations = AnimationsByIdent(ident);

@@ -72,6 +72,7 @@ public:
 	
 	static inline std::map<std::string, std::function<DataElement *(const std::string &)>> DataTypeGetFunctions;	/// functions for getting data type instances, mapped to the string identifier of their respective class
 	static inline std::map<std::string, std::function<DataElement *(const std::string &)>> DataTypeGetOrAddFunctions;	/// functions for getting or adding data type instances, mapped to the string identifier of their respective class
+	static inline std::map<std::string, std::function<DataElement *(const std::string &)>> DataTypeAddAliasFunctions;	/// functions for adding aliases for data type instances, mapped to the string identifier of their respective class
 	
 	template <typename T>
 	void Process(T &data_element) const
@@ -91,6 +92,7 @@ public:
 	
 	std::string Tag;
 	std::string Ident;
+	std::vector<std::string> Aliases;	/// alias string identifiers for the data element
 	CConfigData *Parent = nullptr;
 	std::vector<CConfigProperty> Properties;
 	std::vector<CConfigData *> Sections;
