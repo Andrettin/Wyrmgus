@@ -44,8 +44,54 @@
 #include "species/species.h"
 
 /*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+
+std::map<const CGender *, std::vector<CWord *>> CWord::PersonalNameWords;
+std::vector<CWord *> CWord::FamilyNameWords;
+std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> CWord::SpecimenNameWords;
+std::vector<CWord *> CWord::ShipNameWords;
+std::vector<CWord *> CWord::SettlementNameWords;
+
+/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+void CWord::Clear()
+{
+	CWord::PersonalNameWords.clear();
+	CWord::FamilyNameWords.clear();
+	CWord::SpecimenNameWords.clear();
+	CWord::ShipNameWords.clear();
+	CWord::SettlementNameWords.clear();
+
+	DataType<CWord>::Clear();
+}
+
+const std::vector<CWord *> &CWord::GetPersonalNameWords(const CGender *gender)
+{
+	return CWord::PersonalNameWords[gender];
+}
+
+const std::vector<CWord *> &CWord::GetFamilyNameWords()
+{
+	return CWord::FamilyNameWords;
+}
+
+const std::vector<CWord *> &CWord::GetSpecimenNameWords(const CSpecies *species, const CGender *gender)
+{
+	return CWord::SpecimenNameWords[species][gender];
+}
+
+const std::vector<CWord *> &CWord::GetShipNameWords()
+{
+	return CWord::ShipNameWords;
+}
+
+const std::vector<CWord *> &CWord::GetSettlementNameWords()
+{
+	return CWord::SettlementNameWords;
+}
 
 /**
 **	@brief	Process a property in the data provided by a configuration file
@@ -64,6 +110,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 			for (const CGender *gender : CGender::GetAll()) {
 				this->PersonalNameWeights[gender] = 1;
 				this->Language->AddPersonalNameWord(this, gender);
+				CWord::PersonalNameWords[gender].push_back(word);
 			}
 		}
 	} else if (key == "family_name") {
@@ -72,6 +119,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 		if (value_bool) {
 			this->FamilyNameWeight = 1;
 			this->Language->AddFamilyNameWord(this);
+			CWord::FamilyNameWords.push_back(word);
 		}
 	} else if (key == "ship_name") {
 		const bool value_bool = StringToBool(value);
@@ -79,6 +127,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 		if (value_bool) {
 			this->ShipNameWeight = 1;
 			this->Language->AddShipNameWord(this);
+			CWord::ShipNameWords.push_back(word);
 		}
 	} else if (key == "settlement_name") {
 		const bool value_bool = StringToBool(value);
@@ -86,6 +135,7 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 		if (value_bool) {
 			this->SettlementNameWeight = 1;
 			this->Language->AddSettlementNameWord(this);
+			CWord::SettlementNameWords.push_back(word);
 		}
 	} else {
 		return false;
@@ -122,6 +172,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			if (value_bool) {
 				this->PersonalNameWeights[gender] = 1;
 				this->Language->AddPersonalNameWord(this, gender);
+				CWord::PersonalNameWords[gender].push_back(word);
 			}
 		}
 	} else if (section->Tag == "specimen_name") {
@@ -150,6 +201,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 					this->SpecimenNameWeights[species][gender] = 1;
 					this->Language->AddSpecimenNameWord(this, species, gender);
 					species->AddSpecimenNameWord(this, gender);
+					CWord::SpecimenNameWords[species][gender].push_back(word);
 				}
 			}
 		}
@@ -180,6 +232,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 					this->SpecimenNameWeights[species][gender] = 1;
 					this->Language->AddSpecimenNameWord(this, species, gender);
 					species->AddSpecimenNameWord(this, gender);
+					CWord::SpecimenNameWords[species][gender].push_back(word);
 				}
 			}
 		}

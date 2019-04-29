@@ -137,6 +137,7 @@ class CWord : public DataElement, public DataType<CWord>
 	
 public:
 	static constexpr const char *ClassIdentifier = "word";
+	static constexpr int MinimumWordsForNameGeneration = 10;	/// the minimum quantity of words desired for name generation
 	
 private:
 	static inline bool InitializeClass()
@@ -149,6 +150,22 @@ private:
 	}
 	
 	static inline bool ClassInitialized = InitializeClass();
+	
+public:
+	static void Clear();
+	
+	static const std::vector<CWord *> &GetPersonalNameWords(const CGender *gender);
+	static const std::vector<CWord *> &GetFamilyNameWords();
+	static const std::vector<CWord *> &GetSpecimenNameWords(const CSpecies *species, const CGender *gender);
+	static const std::vector<CWord *> &GetShipNameWords();
+	static const std::vector<CWord *> &GetSettlementNameWords();
+
+private
+	static std::map<const CGender *, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
+	static std::vector<CWord *> FamilyNameWords;
+	static std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the species and gender for which they can be used
+	static std::vector<CWord *> ShipNameWords;
+	static std::vector<CWord *> SettlementNameWords;
 
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value);

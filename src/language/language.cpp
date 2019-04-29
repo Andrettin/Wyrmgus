@@ -78,7 +78,7 @@ void CLanguage::AddPersonalNameWord(CWord *word, const CGender *gender)
 
 const std::vector<CWord *> &CLanguage::GetPersonalNameWords(const CGender *gender)
 {
-	if (!this->PersonalNameWords[gender].empty()) {
+	if (this->PersonalNameWords[gender].size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->PersonalNameWords[gender];
 	}
 	
@@ -86,7 +86,7 @@ const std::vector<CWord *> &CLanguage::GetPersonalNameWords(const CGender *gende
 		return this->Family->GetPersonalNameWords(gender);
 	}
 	
-	return this->PersonalNameWords[gender];
+	return CWord::GetPersonalNameWords(gender);
 }
 
 void CLanguage::AddFamilyNameWord(CWord *word)
@@ -100,7 +100,7 @@ void CLanguage::AddFamilyNameWord(CWord *word)
 
 const std::vector<CWord *> &CLanguage::GetFamilyNameWords() const
 {
-	if (!this->FamilyNameWords.empty()) {
+	if (this->FamilyNameWords.size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->FamilyNameWords;
 	}
 	
@@ -108,7 +108,7 @@ const std::vector<CWord *> &CLanguage::GetFamilyNameWords() const
 		return this->Family->GetFamilyNameWords();
 	}
 	
-	return this->FamilyNameWords;
+	return CWord::GetFamilyNameWords();
 }
 
 void CLanguage::AddSpecimenNameWord(CWord *word, const CSpecies *species, const CGender *gender)
@@ -122,7 +122,7 @@ void CLanguage::AddSpecimenNameWord(CWord *word, const CSpecies *species, const 
 
 const std::vector<CWord *> &CLanguage::GetSpecimenNameWords(const CSpecies *species, const CGender *gender)
 {
-	if (!this->SpecimenNameWords[species][gender].empty()) {
+	if (this->SpecimenNameWords[species][gender].size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->SpecimenNameWords[species][gender];
 	}
 	
@@ -144,7 +144,7 @@ void CLanguage::AddShipNameWord(CWord *word)
 
 const std::vector<CWord *> &CLanguage::GetShipNameWords() const
 {
-	if (!this->ShipNameWords.empty()) {
+	if (this->ShipNameWords.size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->ShipNameWords;
 	}
 	
@@ -152,7 +152,7 @@ const std::vector<CWord *> &CLanguage::GetShipNameWords() const
 		return this->Family->GetShipNameWords();
 	}
 	
-	return this->ShipNameWords;
+	return CWord::GetShipNameWords();
 }
 
 void CLanguage::AddSettlementNameWord(CWord *word)
@@ -166,7 +166,7 @@ void CLanguage::AddSettlementNameWord(CWord *word)
 
 const std::vector<CWord *> &CLanguage::GetSettlementNameWords() const
 {
-	if (!this->SettlementNameWords.empty()) {
+	if (this->SettlementNameWords.size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->SettlementNameWords;
 	}
 	
@@ -174,7 +174,7 @@ const std::vector<CWord *> &CLanguage::GetSettlementNameWords() const
 		return this->Family->GetSettlementNameWords();
 	}
 	
-	return this->SettlementNameWords;
+	return CWord::GetSettlementNameWords();
 }
 
 /**

@@ -36,6 +36,7 @@
 #include "species/species.h"
 
 #include "config.h"
+#include "language/word.h"
 #include "map/terrain_type.h"
 #include "species/gender.h"
 #include "species/species_category.h"
@@ -198,7 +199,7 @@ void CSpecies::AddSpecimenNameWord(CWord *word, const CGender *gender)
 
 const std::vector<CWord *> &CSpecies::GetSpecimenNameWords(const CGender *gender)
 {
-	if (!this->SpecimenNameWords[gender].empty()) {
+	if (this->SpecimenNameWords[gender].size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->SpecimenNameWords[gender];
 	}
 	

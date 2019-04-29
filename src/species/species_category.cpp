@@ -84,7 +84,7 @@ void CSpeciesCategory::AddSpecimenNameWord(CWord *word, const CGender *gender)
 
 const std::vector<CWord *> &CSpeciesCategory::GetSpecimenNameWords(const CGender *gender)
 {
-	if (!this->SpecimenNameWords[gender].empty()) {
+	if (this->SpecimenNameWords[gender].size() >= CWord::MinimumWordsForNameGeneration) {
 		return this->SpecimenNameWords[gender];
 	}
 	
