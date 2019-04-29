@@ -436,6 +436,10 @@ void CMinimap::UpdateTerrain(int z)
 				base_tile = mf.SolidTile;
 			}
 			//Wyrmgus end
+
+			if (!terrain) {
+				continue;
+			}
 			
 			//Wyrmgus start
 			int tilepitch = terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;

@@ -364,6 +364,10 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	
 	//Wyrmgus start
 	CTerrainType *terrain = CTerrainType::Get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
+	if (!terrain) {
+		fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", tileset.getTerrainName(tile.tileinfo.BaseTerrain).c_str());
+		return;
+	}
 	if (terrain->Overlay) {
 		if (terrain->Flags & MapFieldForest) {
 			this->SetTerrain(CTerrainType::Get(tileset.solidTerrainTypes[3].TerrainName));
@@ -372,9 +376,6 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 		}
 	}
 	this->SetTerrain(terrain);
-	if (!terrain) {
-		fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", tileset.getTerrainName(tile.tileinfo.BaseTerrain).c_str());
-	}
 	//Wyrmgus end
 }
 
