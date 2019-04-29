@@ -835,6 +835,10 @@ static int CclDefineCivilization(lua_State *l)
 			civilization->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
 			civilization->Playable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "VictoryBackgroundFile")) {
+			civilization->VictoryBackgroundFile = LuaToString(l, -1);
+		} else if (!strcmp(value, "DefeatBackgroundFile")) {
+			civilization->DefeatBackgroundFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "Species")) {
 			CSpecies *species = CSpecies::Get(LuaToString(l, -1));
 			if (species != nullptr) {

@@ -205,6 +205,42 @@ public:
 		return this->DefaultPlayerColor;
 	}
 	
+	/**
+	**	@brief	Get the civilization's victory background file
+	**
+	**	@return	The civilization's victory background file
+	*/
+	const String &GetVictoryBackgroundFile() const
+	{
+		if (!this->VictoryBackgroundFile.empty()) {
+			return this->VictoryBackgroundFile;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetVictoryBackgroundFile();
+		}
+		
+		return this->VictoryBackgroundFile;
+	}
+	
+	/**
+	**	@brief	Get the civilization's defeat background file
+	**
+	**	@return	The civilization's defeat background file
+	*/
+	const String &GetDefeatBackgroundFile() const
+	{
+		if (!this->DefeatBackgroundFile.empty()) {
+			return this->DefeatBackgroundFile;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetDefeatBackgroundFile();
+		}
+		
+		return this->DefeatBackgroundFile;
+	}
+	
 	std::vector<CForceTemplate *> GetForceTemplates(const int force_type) const;
 	
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const
@@ -304,6 +340,10 @@ public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<const UnitClass *, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
 	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization
+private:
+	String VictoryBackgroundFile;
+	String DefeatBackgroundFile;
+public:
 	std::vector<CFiller> UIFillers;
 	std::map<int, IconConfig> ButtonIcons;		/// icons for button actions
 	
