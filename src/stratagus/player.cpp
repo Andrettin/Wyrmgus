@@ -1281,7 +1281,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, unit.Type->GetClass())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();

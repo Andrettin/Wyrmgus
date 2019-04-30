@@ -2387,8 +2387,8 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Class")) {
 		if (type->ItemClass != nullptr) {
 			lua_pushstring(l, type->ItemClass->Ident.c_str());
-		} else if (type->Class != nullptr) {
-			lua_pushstring(l, type->Class->Ident.c_str());
+		} else if (type->GetClass() != nullptr) {
+			lua_pushstring(l, type->GetClass()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

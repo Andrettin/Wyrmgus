@@ -50,10 +50,11 @@ void CLanguageFamily::AddPersonalNameWord(CWord *word, const CGender *gender)
 	}
 }
 
-const std::vector<CWord *> &CLanguageFamily::GetPersonalNameWords(const CGender *gender)
+const std::vector<CWord *> &CLanguageFamily::GetPersonalNameWords(const CGender *gender) const
 {
-	if (this->PersonalNameWords[gender].size() >= CWord::MinimumWordsForNameGeneration) {
-		return this->PersonalNameWords[gender];
+	auto find_iterator = this->PersonalNameWords.find(gender);
+	if (find_iterator != this->PersonalNameWords.end() && find_iterator->second.size() >= CWord::MinimumWordsForNameGeneration) {
+		return find_iterator->second;
 	}
 	
 	if (this->Family != nullptr) {
@@ -94,17 +95,44 @@ void CLanguageFamily::AddSpecimenNameWord(CWord *word, const CSpecies *species, 
 	}
 }
 
-const std::vector<CWord *> &CLanguageFamily::GetSpecimenNameWords(const CSpecies *species, const CGender *gender)
+const std::vector<CWord *> &CLanguageFamily::GetSpecimenNameWords(const CSpecies *species, const CGender *gender) const
 {
-	if (this->SpecimenNameWords[species][gender].size() >= CWord::MinimumWordsForNameGeneration) {
-		return this->SpecimenNameWords[species][gender];
+	auto find_iterator = this->SpecimenNameWords.find(species);
+	if (find_iterator != this->SpecimenNameWords.end()) {
+		auto sub_find_iterator = find_iterator->second.find(gender);
+		if (sub_find_iterator != find_iterator->second.end() && sub_find_iterator->second.size() >= CWord::MinimumWordsForNameGeneration) {
+			return sub_find_iterator->second;
+		}
 	}
 	
 	if (this->Family != nullptr) {
 		return this->Family->GetSpecimenNameWords(species, gender);
 	}
 	
-	return this->SpecimenNameWords[species][gender];
+	return CWord::GetSpecimenNameWords(species, gender);
+}
+
+void CLanguageFamily::AddUnitNameWord(CWord *word, const UnitClass *unit_class)
+{
+	this->UnitNameWords[unit_class].push_back(word);
+	
+	if (this->Family != nullptr) {
+		this->Family->AddUnitNameWord(word, unit_class);
+	}
+}
+
+const std::vector<CWord *> &CLanguageFamily::GetUnitNameWords(const UnitClass *unit_class) const
+{
+	auto find_iterator = this->UnitNameWords.find(unit_class);
+	if (find_iterator != this->UnitNameWords.end() && find_iterator->second.size() >= CWord::MinimumWordsForNameGeneration) {
+		return find_iterator->second;
+	}
+	
+	if (this->Family != nullptr) {
+		return this->Family->GetUnitNameWords(unit_class);
+	}
+	
+	return CWord::GetUnitNameWords(unit_class);
 }
 
 void CLanguageFamily::AddShipNameWord(CWord *word)

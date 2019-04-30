@@ -48,10 +48,8 @@ class CAnimation;
 class CBuildRestrictionOnTop;
 class CConstructionFrame;
 class CFile;
-class Missile;
-//Wyrmgus start
 class CCharacter;
-//Wyrmgus end
+class CLanguage;
 class CMapField;
 class CMapLayer;
 class COrder;
@@ -69,8 +67,10 @@ class CUnitTypeVariation;
 class CUpgrade;
 class CVariable;
 class CViewport;
+class CWord;
 class ItemClass;
 class ItemSlot;
+class Missile;
 class PathFinderData;
 struct lua_State;
 
@@ -165,7 +165,10 @@ public:
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
-	void UpdatePersonalName(bool update_settlement_name = true);
+	std::vector<String> GetPotentialNames() const;
+	void GenerateName();
+	bool IsNameValid() const;
+	void UpdatePersonalName(const bool update_settlement_name = true);
 	void UpdateExtraName();
 	void UpdateSettlement();
 	void UpdateBuildingSettlementAssignment(CSite *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
@@ -420,7 +423,6 @@ public:
 	bool LevelCheck(const int level) const;
 	bool IsAbilityEmpowered(const CUpgrade *ability) const;
 	bool IsSpellEmpowered(const CSpell *spell) const;
-	bool IsNameValid() const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
@@ -432,6 +434,7 @@ public:
 	std::string GetName() const;
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
+	const CLanguage *GetLanguage() const;
 	//Wyrmgus end
 	
 	void IncreaseVariable(const int index);

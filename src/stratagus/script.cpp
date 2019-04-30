@@ -1583,7 +1583,7 @@ std::string EvalString(const StringDesc *s)
 				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
 				const CUnit *site_unit = unit->Settlement->SiteUnit;
 				const CPlayer *site_player = site_unit->Player;
-				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type->GetIndex() == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->Class))) {
+				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type->GetIndex() == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->GetClass()))) {
 					civilization = CCivilization::Get(site_player->Race);
 				}
 				return unit->Settlement->GetCulturalName(civilization);
@@ -1641,8 +1641,8 @@ std::string EvalString(const StringDesc *s)
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
 					str = (**type).ItemClass->Ident.c_str();
-				} else if ((**type).Class != nullptr) {
-					str = (**type).Class->Ident.c_str();
+				} else if ((**type).GetClass() != nullptr) {
+					str = (**type).GetClass()->Ident.c_str();
 				}
 				str[0] = toupper(str[0]);
 				size_t loc;

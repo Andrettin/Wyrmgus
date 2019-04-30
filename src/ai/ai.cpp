@@ -218,7 +218,7 @@ static void AiCheckUnits()
 	for (int i = 0; i < n; ++i) {
 		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->GetIndex();
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
-		const UnitClass *unit_class = AiPlayer->UnitTypeRequests[i].Type->Class;
+		const UnitClass *unit_class = AiPlayer->UnitTypeRequests[i].Type->GetClass();
 
 		// Add equivalent units
 		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UnitTypeRequests[i].Type);
@@ -339,7 +339,7 @@ static void AiCheckUnits()
 						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
 							AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[k];
 							if (
-								mercenary_type->Class == queue.Type->Class
+								mercenary_type->GetClass() == queue.Type->GetClass()
 								&& queue.Want > queue.Made
 								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
 								&& (!queue.Settlement || queue.Settlement == mercenary_building->Settlement)
@@ -1431,7 +1431,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		int requested_unit_type_id = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->Class);
+		int requested_unit_type_id = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->GetClass());
 		if (requested_unit_type_id != -1) {
 			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::Get(requested_unit_type_id), CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}

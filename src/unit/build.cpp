@@ -188,7 +188,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (this->RestrictClass != nullptr && this->RestrictClass == table[i]->Type->Class) || (!this->RestrictType && this->RestrictClass == nullptr && this->RestrictTypeOwner.size() > 0)) &&
+			(this->RestrictType == table[i]->Type || (this->RestrictClass != nullptr && this->RestrictClass == table[i]->Type->GetClass()) || (!this->RestrictType && this->RestrictClass == nullptr && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
 			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||

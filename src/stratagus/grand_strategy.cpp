@@ -314,7 +314,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->MilitaryScore += this->Units[unit_type->GetIndex()] * (new_owner_military_score_bonus - old_owner_military_score_bonus);
 				this->OffensiveMilitaryScore += this->Units[unit_type->GetIndex()] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
-		} else if (unit_type->Class != nullptr && unit_type->Class->Ident == "worker") {
+		} else if (unit_type->GetClass() != nullptr && unit_type->GetClass()->Ident == "worker") {
 			int militia_unit_type = -1;
 			if (unit_type->GetCivilization() != nullptr) {
 				militia_unit_type = CCivilization::GetCivilizationClassUnitType(unit_type->GetCivilization(), UnitClass::Get("militia"));
@@ -346,8 +346,8 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	
 	//if this province has an equivalent building for its civilization/faction, use that instead
 	if (CUnitType::Get(building_id)->GetCivilization() != nullptr) {
-		if (this->GetClassUnitType(CUnitType::Get(building_id)->Class) != building_id && this->GetClassUnitType(CUnitType::Get(building_id)->Class) != -1) {
-			building_id = this->GetClassUnitType(CUnitType::Get(building_id)->Class);
+		if (this->GetClassUnitType(CUnitType::Get(building_id)->GetClass()) != building_id && this->GetClassUnitType(CUnitType::Get(building_id)->GetClass()) != -1) {
+			building_id = this->GetClassUnitType(CUnitType::Get(building_id)->GetClass());
 		}
 	}
 				
@@ -364,7 +364,7 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 		}
 	}
 	
-	if (CUnitType::Get(building_id)->Class != nullptr && CUnitType::Get(building_id)->Class->Ident == "stronghold") { //increase the military score of the province, if this building is a stronghold
+	if (CUnitType::Get(building_id)->GetClass() != nullptr && CUnitType::Get(building_id)->GetClass()->Ident == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
 	}
 }
@@ -409,7 +409,7 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		this->OffensiveMilitaryScore += change * (CUnitType::Get(unit_type_id)->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
 	}
 	
-	if (CUnitType::Get(unit_type_id)->Class != nullptr && CUnitType::Get(unit_type_id)->Class->Ident == "worker") {
+	if (CUnitType::Get(unit_type_id)->GetClass() != nullptr && CUnitType::Get(unit_type_id)->GetClass()->Ident == "worker") {
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
@@ -648,7 +648,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 	std::vector<CGrandStrategyHero *> potential_authors;
 	
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (this->Heroes[i]->UnitType->Class != nullptr && this->Heroes[i]->UnitType->Class->Ident == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
+		if (this->Heroes[i]->UnitType->GetClass() != nullptr && this->Heroes[i]->UnitType->GetClass()->Ident == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
 			potential_authors.push_back(this->Heroes[i]);
 		}
 	}
@@ -1018,9 +1018,9 @@ bool CGrandStrategyHero::IsGenerated()
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
 {
-	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->UnitType->Class != nullptr && this->UnitType->Class->Ident == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->UnitType->GetClass() != nullptr && this->UnitType->GetClass()->Ident == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->UnitType->Class != nullptr && this->UnitType->Class->Ident != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->UnitType->GetClass() != nullptr && this->UnitType->GetClass()->Ident != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
@@ -1570,7 +1570,7 @@ std::string GetFactionTier(std::string civilization_name, std::string faction_na
 
 bool IsGrandStrategyUnit(const CUnitType &type)
 {
-	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != nullptr && type.Class->Ident != "caravan") {
+	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.GetClass() != nullptr && type.GetClass()->Ident != "caravan") {
 		return true;
 	}
 	return false;
@@ -1578,7 +1578,7 @@ bool IsGrandStrategyUnit(const CUnitType &type)
 
 bool IsMilitaryUnit(const CUnitType &type)
 {
-	if (IsGrandStrategyUnit(type) && type.Class != nullptr && type.Class->Ident != "worker") {
+	if (IsGrandStrategyUnit(type) && type.GetClass() != nullptr && type.GetClass()->Ident != "worker") {
 		return true;
 	}
 	return false;

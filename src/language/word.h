@@ -47,6 +47,7 @@ class CGrammaticalGender;
 class CLanguage;
 class CSpecies;
 class CWordType;
+class UnitClass;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -145,6 +146,7 @@ public:
 	static const std::vector<CWord *> &GetPersonalNameWords(const CGender *gender);
 	static const std::vector<CWord *> &GetFamilyNameWords();
 	static const std::vector<CWord *> &GetSpecimenNameWords(const CSpecies *species, const CGender *gender);
+	static const std::vector<CWord *> &GetUnitNameWords(const UnitClass *unit_class);
 	static const std::vector<CWord *> &GetShipNameWords();
 	static const std::vector<CWord *> &GetSettlementNameWords();
 
@@ -152,6 +154,7 @@ private:
 	static std::map<const CGender *, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
 	static std::vector<CWord *> FamilyNameWords;
 	static std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the species and gender for which they can be used
+	static std::map<const UnitClass *, std::vector<CWord *>> UnitNameWords;	/// the words used for unit name generation, mapped to the unit class for which they can be used
 	static std::vector<CWord *> ShipNameWords;
 	static std::vector<CWord *> SettlementNameWords;
 
@@ -236,6 +239,18 @@ public:
 		return 0;
 	}
 	
+	void ChangeUnitNameWeight(const UnitClass *unit_class, const int change);
+	
+	int GetUnitNameWeight(const UnitClass *unit_class) const
+	{
+		std::map<const UnitClass *, int>::const_iterator find_iterator = this->UnitNameWeights.find(unit_class);
+		if (find_iterator != this->UnitNameWeights.end()) {
+			return find_iterator->second;
+		}
+		
+		return 0;
+	}
+	
 	int GetShipNameWeight() const
 	{
 		return this->ShipNameWeight;
@@ -253,7 +268,7 @@ public:
 	
 	bool IsProperName() const
 	{
-		return !this->PersonalNameWeights.empty() || this->FamilyNameWeight != 0 || !this->SpecimenNameWeights.empty() || this->ShipNameWeight != 0 || this->SettlementNameWeight != 0;
+		return !this->PersonalNameWeights.empty() || this->FamilyNameWeight != 0 || !this->SpecimenNameWeights.empty() || !this->UnitNameWeights.empty() || this->ShipNameWeight != 0 || this->SettlementNameWeight != 0;
 	}
 
 private:
@@ -295,12 +310,13 @@ private:
 	std::map<const CGender *, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
 	int FamilyNameWeight = 0;
 	std::map<const CSpecies *, std::map<const CGender *, int>> SpecimenNameWeights;	/// the weight of this word for name generation for species individuals, mapped to each possible gender for the name generation
+	std::map<const UnitClass *, int> UnitNameWeights;	/// the weight of this word for unit name generation, mapped to each possible gender for the name generation
 	int ShipNameWeight = 0;					/// the weight of this word for ship name generation
 	int SettlementNameWeight = 0;
 	
 public:
-	CDependency *Predependency = nullptr;	/// the predependency for the word to be used as a personal name
-	CDependency *Dependency = nullptr;		/// the dependency for the word to be used as a personal name
+	CDependency *Predependency = nullptr;	/// the predependency for the word to be used as a given name
+	CDependency *Dependency = nullptr;		/// the dependency for the word to be used as a given name
 	
 	String Mod;						/// to which mod (or map), if any, this word belongs
 	

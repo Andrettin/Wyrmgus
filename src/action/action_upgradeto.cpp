@@ -298,8 +298,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval)
-					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != newtype.GetCivilization()->GetUnitClassNames(newtype.Class))
-					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != CCivilization::Get(player.Race)->GetUnitClassNames(newtype.Class))
+					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.GetClass()) != newtype.GetCivilization()->GetUnitClassNames(newtype.GetClass()))
+					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.GetClass()) != CCivilization::Get(player.Race)->GetUnitClassNames(newtype.GetClass()))
 				)
 			)
 		)
@@ -384,7 +384,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 				if (
 					(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
-					|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == newtype.Class)
+					|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == newtype.GetClass())
 				) {
 					if (!objective->Settlement || objective->Settlement == unit.Settlement) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);

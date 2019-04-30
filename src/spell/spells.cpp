@@ -248,12 +248,12 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->CivilizationEquivalent != -1) {
-		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->GetIndex() == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->GetIndex() == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Get(condition->CivilizationEquivalent)->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Get(condition->CivilizationEquivalent), caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->GetIndex() == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->GetIndex() == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Get(condition->CivilizationEquivalent)->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Get(condition->CivilizationEquivalent), caster.Type->GetClass()) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->Civilization || CFaction::GetFactionClassUnitType(condition->FactionEquivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->Civilization || CFaction::GetFactionClassUnitType(condition->FactionEquivalent, caster.Type->GetClass()) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

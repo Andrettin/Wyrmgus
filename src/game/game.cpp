@@ -622,8 +622,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (unit_type->GetFaction() != nullptr) {
 				f->printf("\tFaction = \"%s\",\n", unit_type->GetFaction()->GetIdent().utf8().get_data());
 			}
-			if (unit_type->Class != nullptr) {
-				f->printf("\tClass = \"%s\",\n", unit_type->Class->Ident.c_str());
+			if (unit_type->GetClass() != nullptr) {
+				f->printf("\tClass = \"%s\",\n", unit_type->GetClass()->GetIdent().utf8().get_data());
 			}
 			if (!unit_type->File.empty() && (!unit_type->Parent || unit_type->File != unit_type->Parent->File)) {
 				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", unit_type->File.c_str(), unit_type->Width, unit_type->Height);

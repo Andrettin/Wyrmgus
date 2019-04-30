@@ -85,8 +85,9 @@ void CSpeciesCategory::AddSpecimenNameWord(CWord *word, const CGender *gender)
 
 const std::vector<CWord *> &CSpeciesCategory::GetSpecimenNameWords(const CGender *gender)
 {
-	if (this->SpecimenNameWords[gender].size() >= CWord::MinimumWordsForNameGeneration) {
-		return this->SpecimenNameWords[gender];
+	auto find_iterator = this->SpecimenNameWords.find(gender);
+	if (find_iterator != this->SpecimenNameWords.end() && find_iterator->second.size() >= CWord::MinimumWordsForNameGeneration) {
+		return find_iterator->second;
 	}
 	
 	if (this->UpperCategory != nullptr) {

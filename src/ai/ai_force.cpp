@@ -406,7 +406,7 @@ public:
 	{
 		data[UnitTypeEquivs[unit->Type->GetIndex()]]++;
 		
-		const UnitClass *unit_class = unit->Type->Class;
+		const UnitClass *unit_class = unit->Type->GetClass();
 		if (unit_class != nullptr) {
 			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
 				if (class_unit_type != unit->Type) {
@@ -446,7 +446,7 @@ bool AiForce::IsBelongsTo(const CUnitType &type)
 		const int slot = aitype.Type->GetIndex();
 
 		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
-			if (UnitTypeEquivs[type.GetIndex()] == slot || type.Class == aitype.Type->Class) {
+			if (UnitTypeEquivs[type.GetIndex()] == slot || type.GetClass() == aitype.Type->GetClass()) {
 				if (counter[slot] < aitype.Want - 1) {
 					Completed = false;
 				}
@@ -1161,7 +1161,7 @@ void AiForceManager::CheckUnits(int *counter)
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
 			const AiUnitType &aiut = force.UnitTypes[j];
 			const unsigned int t = aiut.Type->GetIndex();
-			const UnitClass *unit_class = aiut.Type->Class;
+			const UnitClass *unit_class = aiut.Type->GetClass();
 			const int wantedCount = aiut.Want;
 			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::Get(t));
 			if (t < AiHelpers.Equiv.size()) {

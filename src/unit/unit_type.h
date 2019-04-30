@@ -530,6 +530,11 @@ public:
 	
 	void SetParent(CUnitType *parent_type);
 	
+	const UnitClass *GetClass() const
+	{
+		return this->Class;
+	}
+	
 	CCivilization *GetCivilization() const
 	{
 		return this->Civilization;
@@ -568,7 +573,6 @@ public:
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(const CFaction *faction, const CGender *gender) const;
-	bool IsPersonalNameValid(const std::string &name, const CFaction *faction, const CGender *gender) const;
 	std::vector<std::string> GetPotentialPersonalNames(const CFaction *faction, const CGender *gender) const;
 	
 	std::vector<String> GetStatStrings() const;
@@ -576,13 +580,13 @@ public:
 
 public:
 	CUnitType *Parent = nullptr;	/// Parent unit type
-	//Wyrmgus start
-	UnitClass *Class = nullptr;		/// Class identifier (i.e. infantry, archer, etc.)
 private:
+	UnitClass *Class = nullptr;		/// Class identifier (i.e. infantry, archer, etc.)
 	const CWord *NameWord = nullptr;		/// the word for the unit type's name
 	CCivilization *Civilization = nullptr;	/// Which civilization this unit belongs to, if any
 	CFaction *Faction = nullptr;	/// Which faction this unit belongs to, if any
 public:
+	//Wyrmgus start
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type

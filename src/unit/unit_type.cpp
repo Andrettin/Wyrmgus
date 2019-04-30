@@ -1853,21 +1853,6 @@ std::string CUnitType::GeneratePersonalName(const CFaction *faction, const CGend
 	return "";
 }
 
-bool CUnitType::IsPersonalNameValid(const std::string &name, const CFaction *faction, const CGender *gender) const
-{
-	if (name.empty()) {
-		return false;
-	}
-	
-	std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
-	
-	if (std::find(potential_names.begin(), potential_names.end(), name) != potential_names.end()) {
-		return true;
-	}
-
-	return false;
-}
-
 std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *faction, const CGender *gender) const
 {
 	std::vector<std::string> potential_names;
@@ -1885,12 +1870,10 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 	
 	if (potential_names.empty() && this->BoolFlag[FAUNA_INDEX].value && this->GetSpecies() != nullptr) {
 		const std::vector<CWord *> &specimen_name_words = this->GetSpecies()->GetSpecimenNameWords(gender);
-		if (!specimen_name_words.empty()) {
-			for (const CWord *name_word : specimen_name_words) {
-				const int weight = name_word->GetSpecimenNameWeight(this->GetSpecies(), gender);
-				for (int i = 0; i < weight; ++i) {
-					potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
-				}
+		for (const CWord *name_word : specimen_name_words) {
+			const int weight = name_word->GetSpecimenNameWeight(this->GetSpecies(), gender);
+			for (int i = 0; i < weight; ++i) {
+				potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
 			}
 		}
 	}
@@ -1911,12 +1894,10 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
 			if (language != nullptr) {
 				const std::vector<CWord *> &personal_name_words = language->GetPersonalNameWords(gender);
-				if (!personal_name_words.empty()) {
-					for (const CWord *name_word : personal_name_words) {
-						const int weight = name_word->GetPersonalNameWeight(gender);
-						for (int i = 0; i < weight; ++i) {
-							potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
-						}
+				for (const CWord *name_word : personal_name_words) {
+					const int weight = name_word->GetPersonalNameWeight(gender);
+					for (int i = 0; i < weight; ++i) {
+						potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
 					}
 				}
 			}
@@ -1932,27 +1913,39 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 				}
 			}
 		} else {
-			if (this->Class != nullptr && civilization->GetUnitClassNames(this->Class).size() > 0) {
-				return civilization->GetUnitClassNames(this->Class);
-			}
-			
-			if (this->UnitType == UnitTypeNaval) { // if is a ship
-				if (faction && faction->GetShipNames().size() > 0) {
-					return faction->GetShipNames();
+			if (this->Class != nullptr) {
+				for (const std::string &name : civilization->GetUnitClassNames(this->Class)) {
+					potential_names.push_back(name);
 				}
 				
-				if (civilization->GetShipNames().size() > 0) {
-					return civilization->GetShipNames();
+				if (language != nullptr) {
+					const std::vector<CWord *> &unit_class_name_words = language->GetUnitNameWords(this->Class);
+					for (const CWord *name_word : unit_class_name_words) {
+						const int weight = name_word->GetUnitNameWeight(this->GetClass());
+						for (int i = 0; i < weight; ++i) {
+							potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
+						}
+					}
+				}
+			}
+			
+			if (potential_names.empty() && this->UnitType == UnitTypeNaval) { // if is a ship
+				if (faction) {
+					for (const std::string &name : faction->GetShipNames()) {
+						potential_names.push_back(name);
+					}
+				}
+				
+				for (const std::string &name : civilization->GetShipNames()) {
+					potential_names.push_back(name);
 				}
 				
 				if (language != nullptr) {
 					const std::vector<CWord *> &ship_name_words = language->GetShipNameWords();
-					if (!ship_name_words.empty()) {
-						for (const CWord *name_word : ship_name_words) {
-							const int weight = name_word->GetShipNameWeight();
-							for (int i = 0; i < weight; ++i) {
-								potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
-							}
+					for (const CWord *name_word : ship_name_words) {
+						const int weight = name_word->GetShipNameWeight();
+						for (int i = 0; i < weight; ++i) {
+							potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
 						}
 					}
 				}

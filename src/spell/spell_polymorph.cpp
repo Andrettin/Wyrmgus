@@ -118,12 +118,12 @@
 	if (this->NewForm == nullptr) {
 		int new_unit_type = -1;
 		if (this->Civilization != nullptr && this->Faction != nullptr && this->Civilization == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
-			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->Type->Class);
+			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->Type->GetClass());
 		} else if (this->Civilization != nullptr && this->Civilization != target->Type->GetCivilization()) {
-			new_unit_type = CCivilization::GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
+			new_unit_type = CCivilization::GetCivilizationClassUnitType(this->Civilization, target->Type->GetClass());
 		}
 		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->GetFaction() != nullptr) {
-			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->Type->GetCivilization(), target->Type->Class);
+			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->Type->GetCivilization(), target->Type->GetClass());
 		}
 		if (new_unit_type != -1) {
 			type = CUnitType::Get(new_unit_type);

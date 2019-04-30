@@ -42,6 +42,7 @@
 #include "language/word_type.h"
 #include "species/gender.h"
 #include "species/species.h"
+#include "unit/unit_class.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -50,6 +51,7 @@
 std::map<const CGender *, std::vector<CWord *>> CWord::PersonalNameWords;
 std::vector<CWord *> CWord::FamilyNameWords;
 std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> CWord::SpecimenNameWords;
+std::map<const UnitClass *, std::vector<CWord *>> CWord::UnitNameWords;
 std::vector<CWord *> CWord::ShipNameWords;
 std::vector<CWord *> CWord::SettlementNameWords;
 
@@ -62,6 +64,7 @@ void CWord::Clear()
 	CWord::PersonalNameWords.clear();
 	CWord::FamilyNameWords.clear();
 	CWord::SpecimenNameWords.clear();
+	CWord::UnitNameWords.clear();
 	CWord::ShipNameWords.clear();
 	CWord::SettlementNameWords.clear();
 
@@ -81,6 +84,11 @@ const std::vector<CWord *> &CWord::GetFamilyNameWords()
 const std::vector<CWord *> &CWord::GetSpecimenNameWords(const CSpecies *species, const CGender *gender)
 {
 	return CWord::SpecimenNameWords[species][gender];
+}
+
+const std::vector<CWord *> &CWord::GetUnitNameWords(const UnitClass *unit_class)
+{
+	return CWord::UnitNameWords[unit_class];
 }
 
 const std::vector<CWord *> &CWord::GetShipNameWords()
@@ -234,6 +242,28 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 					species->AddSpecimenNameWord(this, gender);
 					CWord::SpecimenNameWords[species][gender].push_back(this);
 				}
+			}
+		}
+	} else if (section->Tag == "unit_name") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = FindAndReplaceString(property.Key, "_", "-");
+			const UnitClass *unit_class = UnitClass::Get(key);
+			
+			if (unit_class == nullptr) {
+				fprintf(stderr, "Invalid unit class: \"%s\".\n", key.c_str());
+				continue;
+			}
+			
+			const bool value_bool = StringToBool(property.Value);
+			if (value_bool) {
+				this->UnitNameWeights[unit_class] = 1;
+				this->Language->AddUnitNameWord(this, unit_class);
+				CWord::UnitNameWords[unit_class].push_back(this);
 			}
 		}
 	} else if (section->Tag == "dependencies") {

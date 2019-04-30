@@ -2209,7 +2209,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, CGender::Get(droppedUnit->Variable[GENDER_INDEX].Value - 1));
+				droppedUnit->GenerateName();
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
@@ -2432,7 +2432,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		const CCivilization *civilization = this->Type->GetCivilization();
-		if (civilization != nullptr && civilization->GetIndex() != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
+		if (civilization != nullptr && civilization->GetIndex() != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass())) {
 			civilization = CCivilization::Get(this->Player->Race);
 		}
 		
@@ -2446,7 +2446,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->UnitType->GetIndex() == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->UnitType->Class))
+					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->UnitType->GetIndex() == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->UnitType->GetClass()))
 					&& CheckDependencies(iterator->second->UnitType, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
@@ -2826,7 +2826,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 					if (
 						(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
-						|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.Class)
+						|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.GetClass())
 					) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 					}
@@ -3356,7 +3356,169 @@ void CUnit::UpdateXPRequired()
 	this->Variable[XP_INDEX].Enable = 1;
 }
 
-void CUnit::UpdatePersonalName(bool update_settlement_name)
+/**
+**	@brief	Get the potential personal name words for this unit
+**
+**	@return	The potential personal name words
+*/
+std::vector<String> CUnit::GetPotentialNames() const
+{
+	std::vector<String> potential_names;
+	
+	const CGender *gender = nullptr;
+	if (this->Variable[GENDER_INDEX].Value != 0) {
+		gender = CGender::Get(this->Variable[GENDER_INDEX].Value - 1);
+	}
+	
+	if (this->Type->PersonalNames.find(nullptr) != this->Type->PersonalNames.end()) {
+		for (size_t i = 0; i < this->Type->PersonalNames.find(nullptr)->second.size(); ++i) {
+			potential_names.push_back(this->Type->PersonalNames.find(nullptr)->second[i].c_str());
+		}
+	}
+	if (gender != nullptr && this->Type->PersonalNames.find(gender) != this->Type->PersonalNames.end()) {
+		for (size_t i = 0; i < this->Type->PersonalNames.find(gender)->second.size(); ++i) {
+			potential_names.push_back(this->Type->PersonalNames.find(gender)->second[i].c_str());
+		}
+	}
+	
+	if (this->Type->BoolFlag[FAUNA_INDEX].value) {
+		if (this->Type->GetSpecies() != nullptr) {
+			const std::vector<CWord *> &specimen_name_words = this->Type->GetSpecies()->GetSpecimenNameWords(gender);
+			for (const CWord *name_word : specimen_name_words) {
+				if (!CheckDependencies(name_word, this)) {
+					continue;
+				}
+				
+				const int weight = name_word->GetSpecimenNameWeight(this->Type->GetSpecies(), gender);
+				for (int i = 0; i < weight; ++i) {
+					potential_names.push_back(name_word->GetAnglicizedName());
+				}
+			}
+		}
+	} else if (this->Type->GetCivilization() != nullptr) {
+		const CCivilization *civilization = this->Type->GetCivilization();
+		const CFaction *faction = nullptr;
+		if (this->Player->GetFaction() != nullptr) {
+			faction = this->Player->GetFaction();
+			
+			if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+				civilization = faction->Civilization;
+			}
+		}
+		if (faction && faction->Civilization != civilization) {
+			faction = nullptr;
+		}
+		if (this->Type->GetFaction() != nullptr && !faction) {
+			faction = this->Type->GetFaction();
+		}
+		
+		const CLanguage *language = this->GetLanguage();
+		
+		if (language != nullptr) {
+			if (this->Type->BoolFlag[ORGANIC_INDEX].value) {
+				const std::vector<CWord *> &personal_name_words = language->GetPersonalNameWords(gender);
+				for (const CWord *name_word : personal_name_words) {
+					if (!CheckDependencies(name_word, this)) {
+						continue;
+					}
+					
+					const int weight = name_word->GetPersonalNameWeight(gender);
+					for (int i = 0; i < weight; ++i) {
+						potential_names.push_back(name_word->GetAnglicizedName());
+					}
+				}
+				
+				if (civilization->GetPersonalNames().find(nullptr) != civilization->GetPersonalNames().end()) {
+					for (size_t i = 0; i < civilization->GetPersonalNames().find(nullptr)->second.size(); ++i) {
+						potential_names.push_back(civilization->GetPersonalNames().find(nullptr)->second[i].c_str());
+					}
+				}
+				if (gender != nullptr && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
+					for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
+						potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i].c_str());
+					}
+				}
+			} else {
+				if (this->Type->GetClass() != nullptr) {
+					const std::vector<CWord *> &unit_class_name_words = language->GetUnitNameWords(this->Type->GetClass());
+					for (const CWord *name_word : unit_class_name_words) {
+						if (!CheckDependencies(name_word, this)) {
+							continue;
+						}
+						
+						const int weight = name_word->GetUnitNameWeight(this->Type->GetClass());
+						for (int i = 0; i < weight; ++i) {
+							potential_names.push_back(name_word->GetAnglicizedName());
+						}
+					}
+					
+					for (const std::string &name : civilization->GetUnitClassNames(this->Type->GetClass())) {
+						potential_names.push_back(name.c_str());
+					}
+				}
+				
+				if (potential_names.size() < CWord::MinimumWordsForNameGeneration && this->Type->UnitType == UnitTypeNaval) { // if is a ship
+					const std::vector<CWord *> &ship_name_words = language->GetShipNameWords();
+					for (const CWord *name_word : ship_name_words) {
+						if (!CheckDependencies(name_word, this)) {
+							continue;
+						}
+						
+						const int weight = name_word->GetShipNameWeight();
+						for (int i = 0; i < weight; ++i) {
+							potential_names.push_back(name_word->GetAnglicizedName());
+						}
+					}
+					
+					if (faction) {
+						for (const std::string &name : faction->GetShipNames()) {
+							potential_names.push_back(name.c_str());
+						}
+					}
+					
+					for (const std::string &name : civilization->GetShipNames()) {
+						potential_names.push_back(name.c_str());
+					}
+				}
+			}
+		}
+	}
+	
+	return potential_names;
+}
+
+/**
+**	@brief	Generate a name for the unit
+*/
+void CUnit::GenerateName()
+{
+	std::vector<String> potential_names = this->GetPotentialNames();
+	
+	if (!potential_names.empty()) {
+		const String chosen_name = potential_names[SyncRand(potential_names.size())];
+		this->Name = chosen_name.utf8().get_data();
+	}
+}
+
+/**
+**	@brief	Get whether the unit's name is valid
+**
+**	@return	True if the name is valid, or false otherwise
+*/
+bool CUnit::IsNameValid() const
+{
+	std::vector<String> potential_names = this->GetPotentialNames();
+	
+	for (const String &name : potential_names) {
+		if (String(this->Name.c_str()) == name) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void CUnit::UpdatePersonalName(const bool update_settlement_name)
 {
 	if (this->Character != nullptr) {
 		return;
@@ -3371,7 +3533,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	if (this->Player->GetFaction() != nullptr) {
 		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->Class)) {
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
 			civilization = faction->Civilization;
 		}
 	}
@@ -3387,13 +3549,13 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (!this->Type->IsPersonalNameValid(this->Name, faction, CGender::Get(this->Variable[GENDER_INDEX].Value - 1))) {
+	if (!this->IsNameValid()) {
 		// first see if can translate the current personal name
 		std::string new_personal_name = language != nullptr ? language->TranslateName(this->Name.c_str()).utf8().get_data() : this->Name;
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
-			this->Name = this->Type->GeneratePersonalName(faction, CGender::Get(this->Variable[GENDER_INDEX].Value - 1));
+			this->GenerateName();
 		}
 	}
 	
@@ -3432,12 +3594,12 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			const CCivilization *civilization = this->Type->GetCivilization();
-			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Get(this->Player->Race) == civilization || this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class))) {
+			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Get(this->Player->Race) == civilization || this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass()))) {
 				civilization = CCivilization::Get(this->Player->Race);
 			}
 			
 			const CFaction *faction = this->Type->GetFaction();
-			if (CCivilization::Get(this->Player->Race) == civilization && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
+			if (CCivilization::Get(this->Player->Race) == civilization && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass())) {
 				faction = this->Player->GetFaction();
 			}
 
@@ -6585,6 +6747,26 @@ std::string CUnit::GetMessageName() const
 	}
 	
 	return name + " (" + GetTypeName() + ")";
+}
+
+const CLanguage *CUnit::GetLanguage() const
+{
+	const CCivilization *civilization = this->Type->GetCivilization();
+	
+	const CFaction *faction = nullptr;
+	if (this->Player->GetFaction() != nullptr) {
+		faction = this->Player->GetFaction();
+		
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+			civilization = faction->Civilization;
+		}
+	}
+	
+	if (civilization != nullptr) {
+		return civilization->GetLanguage();
+	}
+	
+	return nullptr;
 }
 //Wyrmgus end
 

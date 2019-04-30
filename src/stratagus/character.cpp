@@ -623,7 +623,7 @@ void CCharacter::GenerateMissingDates()
 
 int CCharacter::GetMartialAttribute() const
 {
-	if ((this->UnitType->Class != nullptr && this->UnitType->Class->Ident == "thief") || this->UnitType->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+	if ((this->UnitType->GetClass() != nullptr && this->UnitType->GetClass()->Ident == "thief") || this->UnitType->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
 	} else {
 		return StrengthAttribute;
@@ -1216,7 +1216,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			
 			//now, update the hero
 			hero->Civilization = civilization;
-			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->UnitType->Class);
+			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->UnitType->GetClass());
 			if (new_unit_type_id != -1) {
 				hero->UnitType = CUnitType::Get(new_unit_type_id);
 				hero->Name = new_hero_name.c_str();
