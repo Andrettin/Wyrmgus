@@ -63,6 +63,7 @@
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/dialogue.h"
+#include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
@@ -128,6 +129,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CPantheon>();
 	ClassDB::register_class<CPlane>();
 	ClassDB::register_class<CPlayer>();
+	ClassDB::register_class<CQuest>();
 	ClassDB::register_class<CReligion>();
 	ClassDB::register_class<CResource>();
 	ClassDB::register_class<CSchoolOfMagic>();
