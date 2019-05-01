@@ -42,6 +42,7 @@
 #include "language/word_type.h"
 #include "species/gender.h"
 #include "species/species.h"
+#include "species/species_category.h"
 #include "unit/unit_class.h"
 
 /*----------------------------------------------------------------------------
@@ -207,6 +208,13 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			if (value_bool) {
 				for (const CGender *gender : species->GetGenders()) { //add for all possible genders of the species
 					this->SpecimenNameWeights[species][gender] = 1;
+					
+					const CSpeciesCategory *species_category = species->GetCategory();
+					while (species_category != nullptr) {
+						this->CategorySpecimenNameWeights[species_category][gender] = 1;
+						species_category = species_category->GetUpperCategory();
+					}
+					
 					this->Language->AddSpecimenNameWord(this, species, gender);
 					species->AddSpecimenNameWord(this, gender);
 					CWord::SpecimenNameWords[species][gender].push_back(this);
@@ -238,6 +246,13 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 				const bool value_bool = StringToBool(property.Value);
 				if (value_bool) {
 					this->SpecimenNameWeights[species][gender] = 1;
+					
+					const CSpeciesCategory *species_category = species->GetCategory();
+					while (species_category != nullptr) {
+						this->CategorySpecimenNameWeights[species_category][gender] = 1;
+						species_category = species_category->GetUpperCategory();
+					}
+					
 					this->Language->AddSpecimenNameWord(this, species, gender);
 					species->AddSpecimenNameWord(this, gender);
 					CWord::SpecimenNameWords[species][gender].push_back(this);
@@ -309,12 +324,69 @@ void CWord::ChangeSpecimenNameWeight(const CSpecies *species, const CGender *gen
 		std::map<const CGender *, int>::iterator sub_find_iterator = find_iterator->second.find(gender);
 		if (sub_find_iterator != find_iterator->second.end()) {
 			sub_find_iterator->second += change;
+			
+			if (species->GetCategory() != nullptr) {
+				this->ChangeCategorySpecimenNameWeight(species->GetCategory(), gender, change);
+			}
 		} else {
 			fprintf(stderr, "Tried to increase personal name weight for species \"%s\" and gender \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species and gender combination.\n", species->GetIdent().utf8().get_data(), gender->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
 		}
 	} else {
 		fprintf(stderr, "Tried to increase personal name weight for species \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species.\n", species->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
 	}
+}
+
+int CWord::GetSpecimenNameWeight(const CSpecies *species, const CGender *gender) const
+{
+	std::map<const CSpecies *, std::map<const CGender *, int>>::const_iterator find_iterator = this->SpecimenNameWeights.find(species);
+	if (find_iterator != this->SpecimenNameWeights.end()) {
+		std::map<const CGender *, int>::const_iterator sub_find_iterator = find_iterator->second.find(gender);
+		if (sub_find_iterator != find_iterator->second.end()) {
+			return sub_find_iterator->second;
+		}
+	}
+	
+	if (species->GetCategory() != nullptr) {
+		return this->GetCategorySpecimenNameWeight(species->GetCategory(), gender);
+	}
+	
+	return 0;
+}
+
+void CWord::ChangeCategorySpecimenNameWeight(const CSpeciesCategory *species_category, const CGender *gender, const int change)
+{
+	std::map<const CSpeciesCategory *, std::map<const CGender *, int>>::iterator find_iterator = this->CategorySpecimenNameWeights.find(species_category);
+	if (find_iterator != this->CategorySpecimenNameWeights.end()) {
+		std::map<const CGender *, int>::iterator sub_find_iterator = find_iterator->second.find(gender);
+		if (sub_find_iterator != find_iterator->second.end()) {
+			sub_find_iterator->second += change;
+			
+			if (species_category->GetUpperCategory() != nullptr) {
+				this->ChangeCategorySpecimenNameWeight(species_category->GetUpperCategory(), gender, change);
+			}
+		} else {
+			fprintf(stderr, "Tried to increase personal name weight for species category \"%s\" and gender \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species category and gender combination.\n", species_category->GetIdent().utf8().get_data(), gender->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
+		}
+	} else {
+		fprintf(stderr, "Tried to increase personal name weight for species category \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species category.\n", species_category->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
+	}
+}
+
+int CWord::GetCategorySpecimenNameWeight(const CSpeciesCategory *species_category, const CGender *gender) const
+{
+	std::map<const CSpeciesCategory *, std::map<const CGender *, int>>::const_iterator find_iterator = this->CategorySpecimenNameWeights.find(species_category);
+	if (find_iterator != this->CategorySpecimenNameWeights.end()) {
+		std::map<const CGender *, int>::const_iterator sub_find_iterator = find_iterator->second.find(gender);
+		if (sub_find_iterator != find_iterator->second.end()) {
+			return sub_find_iterator->second;
+		}
+	}
+	
+	if (species_category->GetUpperCategory() != nullptr) {
+		return this->GetCategorySpecimenNameWeight(species_category->GetUpperCategory(), gender);
+	}
+	
+	return 0;
 }
 
 String CWord::GetNounInflection(const int grammatical_number, const int grammatical_case)

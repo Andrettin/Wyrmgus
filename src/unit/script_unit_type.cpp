@@ -3669,17 +3669,17 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Category")) {
-		if (species->Category != nullptr) {
-			lua_pushstring(l, species->Category->GetIdent().utf8().get_data());
+		if (species->GetCategory() != nullptr) {
+			lua_pushstring(l, species->GetCategory()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Sapient")) {
-		lua_pushboolean(l, species->Sapient);
+		lua_pushboolean(l, species->IsSapient());
 		return 1;
 	} else if (!strcmp(data, "Prehistoric")) {
-		lua_pushboolean(l, species->Prehistoric);
+		lua_pushboolean(l, species->IsPrehistoric());
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, species->ChildUpgrade.c_str());

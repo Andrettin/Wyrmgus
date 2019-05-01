@@ -89,13 +89,13 @@ public:
 		return this->UpperCategory;
 	}
 	
-	std::vector<CSpeciesCategory *> GetAllUpperCategories() const
+	std::vector<const CSpeciesCategory *> GetAllUpperCategories() const
 	{
 		if (this->UpperCategory == nullptr) {
-			return std::vector<CSpeciesCategory *>();
+			return std::vector<const CSpeciesCategory *>();
 		}
 		
-		std::vector<CSpeciesCategory *> upper_categories = this->UpperCategory->GetAllUpperCategories();
+		std::vector<const CSpeciesCategory *> upper_categories = this->UpperCategory->GetAllUpperCategories();
 		upper_categories.push_back(this->UpperCategory);
 		
 		return upper_categories;

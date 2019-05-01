@@ -46,6 +46,7 @@ class CGender;
 class CGrammaticalGender;
 class CLanguage;
 class CSpecies;
+class CSpeciesCategory;
 class CWordType;
 class UnitClass;
 struct lua_State;
@@ -230,19 +231,9 @@ public:
 	}
 	
 	void ChangeSpecimenNameWeight(const CSpecies *species, const CGender *gender, const int change);
-	
-	int GetSpecimenNameWeight(const CSpecies *species, const CGender *gender) const
-	{
-		std::map<const CSpecies *, std::map<const CGender *, int>>::const_iterator find_iterator = this->SpecimenNameWeights.find(species);
-		if (find_iterator != this->SpecimenNameWeights.end()) {
-			std::map<const CGender *, int>::const_iterator sub_find_iterator = find_iterator->second.find(gender);
-			if (sub_find_iterator != find_iterator->second.end()) {
-				return sub_find_iterator->second;
-			}
-		}
-		
-		return 0;
-	}
+	int GetSpecimenNameWeight(const CSpecies *species, const CGender *gender) const;
+	void ChangeCategorySpecimenNameWeight(const CSpeciesCategory *species_category, const CGender *gender, const int change);
+	int GetCategorySpecimenNameWeight(const CSpeciesCategory *species_category, const CGender *gender) const;
 	
 	void ChangeUnitNameWeight(const UnitClass *unit_class, const int change);
 	
@@ -317,6 +308,7 @@ private:
 	std::map<const CGender *, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
 	int FamilyNameWeight = 0;
 	std::map<const CSpecies *, std::map<const CGender *, int>> SpecimenNameWeights;	/// the weight of this word for name generation for species individuals, mapped to each possible gender for the name generation
+	std::map<const CSpeciesCategory *, std::map<const CGender *, int>> CategorySpecimenNameWeights;	/// the weight of this word for name generation for species category individuals, mapped to each possible gender for the name generation
 	std::map<const UnitClass *, int> UnitNameWeights;	/// the weight of this word for unit name generation, mapped to each possible gender for the name generation
 	int ShipNameWeight = 0;					/// the weight of this word for ship name generation
 	int SettlementNameWeight = 0;
