@@ -285,7 +285,7 @@ void CWord::Initialize()
 		fprintf(stderr, "Word \"%s\" has not been assigned to any language.\n", this->GetIdent().utf8().get_data());
 	}
 	
-	if (this->Type == nullptr && !this->IsProperName()) {
+	if (this->Type == nullptr && !this->Meanings.empty()) {
 		fprintf(stderr, "Word \"%s\" has no type.\n", this->GetIdent().utf8().get_data());
 	}
 	
@@ -414,6 +414,10 @@ void CWord::_bind_methods()
 	ClassDB::bind_method(D_METHOD("add_to_meanings", "meaning"), [](CWord *word, const String &meaning){ word->Meanings.push_back(meaning); });
 	ClassDB::bind_method(D_METHOD("remove_from_meanings", "meaning"), [](CWord *word, const String &meaning){ word->Meanings.erase(std::remove(word->Meanings.begin(), word->Meanings.end(), meaning), word->Meanings.end()); });
 	ClassDB::bind_method(D_METHOD("get_meanings"), [](const CWord *word){ return VectorToGodotArray(word->Meanings); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_compound_elements", "compound_element"), [](CWord *word, const String &compound_element){ word->CompoundElements.push_back(CWord::Get(compound_element)); });
+	ClassDB::bind_method(D_METHOD("remove_from_compound_elements", "compound_element"), [](CWord *word, const String &compound_element){ word->CompoundElements.erase(std::remove(word->CompoundElements.begin(), word->CompoundElements.end(), CWord::Get(compound_element)), word->CompoundElements.end()); });
+	ClassDB::bind_method(D_METHOD("get_compound_elements"), [](const CWord *word){ return VectorToGodotArray(word->CompoundElements); });
 	
 	ClassDB::bind_method(D_METHOD("get_personal_name_genders"), [](const CWord *word){
 		Array genders;

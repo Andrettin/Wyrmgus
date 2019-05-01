@@ -1419,10 +1419,11 @@ static int CclDefineLanguageWord(lua_State *l)
 
 				if (affix_language && affix_word_type != nullptr) {
 					String affix_word = LuaToString(l, -1, j + 1);
-					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
+					CWord *compound_element = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
-					if (word->CompoundElements[affix_type] != nullptr) {
-						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
+					if (compound_element != nullptr) {
+						word->CompoundElements.push_back(compound_element);
+						compound_element->CompoundElementOf.push_back(word);
 					} else {
 						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ affix_word.utf8().get_data() _C_ affix_language->GetIdent().utf8().get_data() _C_ affix_word_type->GetIdent().utf8().get_data());
 					}

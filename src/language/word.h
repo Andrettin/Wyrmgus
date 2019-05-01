@@ -198,6 +198,11 @@ public:
 		return this->DerivesFrom;
 	}
 	
+	const std::vector<CWord *> GetCompoundElements() const
+	{
+		return this->CompoundElements;
+	}
+	
 	void ChangePersonalNameWeight(const CGender *gender, const int change);
 	
 	int GetPersonalNameWeight(const CGender *gender) const
@@ -288,8 +293,10 @@ private:
 	CWord *DerivesFrom = nullptr;		/// from which word does this word derive
 public:
 	std::vector<CWord *> DerivesTo;				/// which words derive from this word
-	CWord *CompoundElements[MaxAffixTypes];    	/// from which compound elements is this word formed
-	std::vector<CWord *> CompoundElementOf[MaxAffixTypes];	/// which words are formed from this word as a compound element
+private:
+	std::vector<CWord *> CompoundElements;    	/// from which compound elements is this word formed
+public:
+	std::vector<CWord *> CompoundElementOf;		/// which words are formed from this word as a compound element
 	
 	// noun-specific variables
 	bool Uncountable = false;		/// whether the noun is uncountable or not
