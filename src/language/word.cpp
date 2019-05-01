@@ -199,14 +199,10 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 				continue;
 			}
 			
-			if (species->GetGenders().empty()) {
-				fprintf(stderr, "Species has no genders: \"%s\".\n", key.c_str());
-				continue;
-			}
-			
 			const bool value_bool = StringToBool(property.Value);
 			if (value_bool) {
-				for (const CGender *gender : species->GetGenders()) { //add for all possible genders of the species
+				//add name for the species for all genders (we use all genders instead of only the species' gender itself because the name will be passed up to the species category as well, and names regardless of gender should be applied to other genders if used by a species with different genders; e.g. a species of sparrow with four genders should be able to use gender-agnostic names from other birds for all of their genders
+				for (const CGender *gender : CGender::GetAll()) {
 					this->SpecimenNameWeights[species][gender] = 1;
 					
 					const CSpeciesCategory *species_category = species->GetCategory();

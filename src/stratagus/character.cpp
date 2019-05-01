@@ -434,9 +434,23 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	
 	if (this->NameWord != nullptr) {
 		if (this->UnitType != nullptr && this->UnitType->GetSpecies() != nullptr && this->UnitType->BoolFlag[FAUNA_INDEX].value) {
-			this->NameWord->ChangeSpecimenNameWeight(this->UnitType->GetSpecies(), this->Gender, 1);
+			if (this->Gender != nullptr) {
+				this->NameWord->ChangeSpecimenNameWeight(this->UnitType->GetSpecies(), this->Gender, 1);
+			} else {
+				//add name weight for all genders
+				for (const CGender *gender : CGender::GetAll()) {
+					this->NameWord->ChangeSpecimenNameWeight(this->UnitType->GetSpecies(), gender, 1);
+				}
+			}
 		} else {
-			this->NameWord->ChangePersonalNameWeight(this->Gender, 1);
+			if (this->Gender != nullptr) {
+				this->NameWord->ChangePersonalNameWeight(this->Gender, 1);
+			} else {
+				//add name weight for all genders
+				for (const CGender *gender : CGender::GetAll()) {
+					this->NameWord->ChangePersonalNameWeight(gender, 1);
+				}
+			}
 		}
 	}
 
