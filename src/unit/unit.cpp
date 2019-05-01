@@ -1274,6 +1274,8 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	}
 	if (type_variations.size() > 0) {
 		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type, image_layer);
+	} else {
+		this->SetVariation(nullptr, new_type, image_layer);
 	}
 }
 
