@@ -55,6 +55,7 @@
 #include "faction.h"
 #include "game/game.h"
 //Wyrmgus end
+#include "game/trigger_effect.h"
 //Wyrmgus start
 #include "iocompat.h"
 //Wyrmgus end
@@ -2330,9 +2331,9 @@ void CPlayer::UpdateQuestPool()
 	this->AvailableQuests.clear();
 	
 	std::vector<CQuest *> potential_quests;
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (this->CanAcceptQuest(Quests[i])) {
-			potential_quests.push_back(Quests[i]);
+	for (CQuest *quest : CQuest::GetAll()) {
+		if (this->CanAcceptQuest(quest)) {
+			potential_quests.push_back(quest);
 		}
 	}
 	
@@ -2372,19 +2373,19 @@ void CPlayer::AvailableQuestsChanged()
 			}
 			
 			const CQuest *quest = this->AvailableQuests[UnitButtonTable[i]->Value];
-			UnitButtonTable[i]->Hint = "Quest: " + quest->Name;
-			UnitButtonTable[i]->Description = quest->Description + "\n \nObjectives:";
+			UnitButtonTable[i]->Hint = "Quest: " + std::string(quest->GetName().utf8().get_data());
+			UnitButtonTable[i]->Description = std::string(quest->GetDescription().utf8().get_data()) + "\n \nObjectives:";
 			for (size_t j = 0; j < quest->Objectives.size(); ++j) {
 				UnitButtonTable[i]->Description += "\n- " + quest->Objectives[j]->ObjectiveString;
 			}
 			for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j) {
 				UnitButtonTable[i]->Description += "\n" + quest->ObjectiveStrings[j];
 			}
-			if (!quest->Rewards.empty()) {
-				UnitButtonTable[i]->Description += "\n \nRewards: " + quest->Rewards;
+			if (!quest->GetRewardsString().empty()) {
+				UnitButtonTable[i]->Description += "\n \nRewards: " + std::string(quest->GetRewardsString().utf8().get_data());
 			}
-			if (!quest->Hint.empty()) {
-				UnitButtonTable[i]->Description += "\n \nHint: " + quest->Hint;
+			if (!quest->GetHint().empty()) {
+				UnitButtonTable[i]->Description += "\n \nHint: " + std::string(quest->GetHint().utf8().get_data());
 			}
 			if (quest->HighestCompletedDifficulty > DifficultyNoDifficulty) {
 				std::string highest_completed_difficulty;
@@ -2459,9 +2460,13 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
-	if (quest->AcceptEffects) {
-		quest->AcceptEffects->pushPreamble();
-		quest->AcceptEffects->run();
+	if (quest->AcceptEffectsLua) {
+		quest->AcceptEffectsLua->pushPreamble();
+		quest->AcceptEffectsLua->run();
+	}
+	
+	for (const CTriggerEffect *effect : quest->GetAcceptEffects()) {
+		effect->Do(this);
 	}
 	
 	this->AvailableQuestsChanged();
@@ -2484,25 +2489,31 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
-	if (quest->CompletionEffects) {
-		quest->CompletionEffects->pushPreamble();
-		quest->CompletionEffects->run();
+	if (quest->CompletionEffectsLua) {
+		quest->CompletionEffectsLua->pushPreamble();
+		quest->CompletionEffectsLua->run();
+	}
+	
+	for (const CTriggerEffect *effect : quest->GetCompletionEffects()) {
+		effect->Do(this);
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
 		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
 		SaveQuestCompletion();
 		std::string rewards_string;
-		if (!quest->Rewards.empty()) {
-			rewards_string = "Rewards: " + quest->Rewards;
+		if (!quest->GetRewardsString().empty()) {
+			rewards_string = "Rewards: " + std::string(quest->GetRewardsString().utf8().get_data());
 		}
 		
 		int icon_frame = 0;
-		if (quest->Icon.Icon != nullptr) {
-			icon_frame = quest->Icon.Icon->GetFrame();
+		std::string icon_ident;
+		if (quest->GetIcon() != nullptr) {
+			icon_frame = quest->GetIcon()->GetFrame();
+			icon_ident = quest->GetIcon()->Ident;
 		}
 		
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) icon_frame) + ") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + std::string(quest->GetName().utf8().get_data()) + " quest!\\n\\n" + rewards_string + "\", nil, \"" + icon_ident + "\", \"" + (quest->GetPlayerColor() ? quest->GetPlayerColor()->Ident : "") + "\", " + std::to_string((long long) icon_frame) + ") end;");
 	}
 }
 
@@ -2512,13 +2523,17 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
-	if (quest->FailEffects) {
-		quest->FailEffects->pushPreamble();
-		quest->FailEffects->run();
+	if (quest->FailEffectsLua) {
+		quest->FailEffectsLua->pushPreamble();
+		quest->FailEffectsLua->run();
+	}
+	
+	for (const CTriggerEffect *effect : quest->GetFailEffects()) {
+		effect->Do(this);
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + std::string(quest->GetName().utf8().get_data()) + " quest! " + fail_reason + "\", nil, \"" + quest->GetIcon()->Ident + "\", \"" + quest->GetPlayerColor()->Ident + "\") end;");
 	}
 }
 
@@ -2535,7 +2550,7 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 
 bool CPlayer::CanAcceptQuest(CQuest *quest)
 {
-	if (quest->Hidden || quest->CurrentCompleted || quest->Unobtainable) {
+	if (quest->IsHidden() || quest->CurrentCompleted || quest->Unobtainable) {
 		return false;
 	}
 	
@@ -2660,10 +2675,12 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 		quest->Conditions->pushPreamble();
 		quest->Conditions->run(1);
-		return quest->Conditions->popBoolean();
-	} else {
-		return true;
+		if (!quest->Conditions->popBoolean()) {
+			return false;
+		}
 	}
+	
+	return CheckDependencies(quest, this);
 }
 
 bool CPlayer::HasCompletedQuest(CQuest *quest)

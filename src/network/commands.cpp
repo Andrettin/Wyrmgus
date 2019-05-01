@@ -172,7 +172,7 @@ void SendCommandQuest(CUnit &unit, CQuest *quest)
 		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->Ident.c_str(), -1);
 		CommandQuest(unit, quest);
 	} else {
-		NetworkSendCommand(MessageCommandQuest, unit, quest->ID, 0, NoUnitP, nullptr, 0);
+		NetworkSendCommand(MessageCommandQuest, unit, quest->GetIndex(), 0, NoUnitP, nullptr, 0);
 	}
 }
 
@@ -1092,8 +1092,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandLearnAbility(unit, *AllUpgrades[arg1]);
 			break;
 		case MessageCommandQuest: {
-			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, Quests[arg1]->Ident.c_str(), -1);
-			CommandQuest(unit, Quests[arg1]);
+			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, CQuest::Get(arg1)->Ident.c_str(), -1);
+			CommandQuest(unit, CQuest::Get(arg1));
 			break;
 		}
 		case MessageCommandBuy: {

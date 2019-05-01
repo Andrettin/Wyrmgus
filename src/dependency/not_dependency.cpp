@@ -49,6 +49,13 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CNotDependency::~CNotDependency()
+{
+	for (CDependency *dependency : this->Dependencies) {
+		delete dependency;
+	}
+}
+
 void CNotDependency::ProcessConfigDataSection(const CConfigData *section)
 {
 	CDependency *dependency = nullptr;

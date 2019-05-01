@@ -955,7 +955,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "rally-point")) {
 		SendCommandRallyPoint(*unit, pos);
 	} else if (!strcmp(action, "quest")) {
-		SendCommandQuest(*unit, GetQuest(val));
+		SendCommandQuest(*unit, CQuest::Get(val));
 	} else if (!strcmp(action, "buy")) {
 		SendCommandBuy(*unit, dunit, num);
 	} else if (!strcmp(action, "produce-resource")) {

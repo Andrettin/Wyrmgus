@@ -95,11 +95,9 @@ bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string
 		}
 	} else if (key == "required_quest") {
 		value = FindAndReplaceString(value, "_", "-");
-		const CQuest *required_quest = GetQuest(value);
-		if (required_quest) {
+		const CQuest *required_quest = CQuest::Get(value);
+		if (required_quest != nullptr) {
 			this->RequiredQuests.push_back(required_quest);
-		} else {
-			fprintf(stderr, "Quest \"%s\" does not exist.\n", value.c_str());
 		}
 	} else {
 		return false;
@@ -151,7 +149,7 @@ bool CAchievement::CanObtain() const
 	}
 	
 	for (const CQuest *required_quest : this->RequiredQuests) {
-		if (!required_quest->Completed || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
+		if (!required_quest->IsCompleted() || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
 			return false;
 		}
 	}
@@ -192,7 +190,7 @@ int CAchievement::GetProgress() const
 	int progress = 0;
 	
 	for (const CQuest *required_quest : this->RequiredQuests) {
-		if (required_quest->Completed && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
+		if (required_quest->IsCompleted() && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
 			progress++;
 		}
 	}

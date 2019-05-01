@@ -75,13 +75,7 @@ static int CclDefineQuest(lua_State *l)
 	}
 
 	std::string quest_ident = LuaToString(l, 1);
-	CQuest *quest = GetQuest(quest_ident);
-	if (!quest) {
-		quest = new CQuest;
-		quest->ID = Quests.size();
-		Quests.push_back(quest);
-		quest->Ident = quest_ident;
-	}
+	CQuest *quest = CQuest::GetOrAdd(quest_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -120,7 +114,7 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "CompletionSpeech")) {
 			quest->CompletionSpeech = LuaToString(l, -1);
 		} else if (!strcmp(value, "Rewards")) {
-			quest->Rewards = LuaToString(l, -1);
+			quest->RewardsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
@@ -130,9 +124,9 @@ static int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
-			int color = GetPlayerColorIndexByName(color_name);
-			if (color != -1) {
-				quest->PlayerColor = color;
+			const CPlayerColor *player_color = CPlayerColor::Get(color_name);
+			if (player_color != nullptr) {
+				quest->PlayerColor = player_color;
 			} else {
 				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
 			}
@@ -147,10 +141,8 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Unfailable")) {
 			quest->Unfailable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			quest->Icon.Name = LuaToString(l, -1);
-			quest->Icon.Icon = nullptr;
-			quest->Icon.Load();
-			quest->Icon.Icon->Load();
+			quest->Icon = CIcon::Get(LuaToString(l, -1));
+			quest->Icon->Load();
 		} else if (!strcmp(value, "QuestGiver")) {
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
 			CCharacter *quest_giver = CCharacter::Get(quest_giver_name);
@@ -170,11 +162,11 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Conditions")) {
 			quest->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "AcceptEffects")) {
-			quest->AcceptEffects = new LuaCallback(l, -1);
+			quest->AcceptEffectsLua = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CompletionEffects")) {
-			quest->CompletionEffects = new LuaCallback(l, -1);
+			quest->CompletionEffectsLua = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "FailEffects")) {
-			quest->FailEffects = new LuaCallback(l, -1);
+			quest->FailEffectsLua = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "ObjectiveStrings")) {
 			quest->ObjectiveStrings.clear();
 			const int args = lua_rawlen(l, -1);
@@ -227,7 +219,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->UnitClass = unit_class;
 					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, k + 1));
+						const CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, k + 1));
 						if (!unit_type) {
 							LuaError(l, "Unit type doesn't exist.");
 						}
@@ -284,7 +276,7 @@ static int CclDefineQuest(lua_State *l)
 		}
 	}
 	
-	if (!quest->Hidden && quest->Civilization != -1 && std::find(CCivilization::Get(quest->Civilization)->Quests.begin(), CCivilization::Get(quest->Civilization)->Quests.end(), quest) == CCivilization::Get(quest->Civilization)->Quests.end()) {
+	if (!quest->IsHidden() && quest->Civilization != -1 && std::find(CCivilization::Get(quest->Civilization)->Quests.begin(), CCivilization::Get(quest->Civilization)->Quests.end(), quest) == CCivilization::Get(quest->Civilization)->Quests.end()) {
 		CCivilization::Get(quest->Civilization)->Quests.push_back(quest);
 	}
 	
@@ -293,10 +285,10 @@ static int CclDefineQuest(lua_State *l)
 
 static int CclGetQuests(lua_State *l)
 {
-	lua_createtable(l, Quests.size(), 0);
-	for (size_t i = 1; i <= Quests.size(); ++i)
+	lua_createtable(l, CQuest::GetAll().size(), 0);
+	for (size_t i = 1; i <= CQuest::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, Quests[i-1]->Ident.c_str());
+		lua_pushstring(l, CQuest::GetAll()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -313,19 +305,18 @@ static int CclGetQuestData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string quest_ident = LuaToString(l, 1);
-	const CQuest *quest = GetQuest(quest_ident);
+	const CQuest *quest = CQuest::Get(quest_ident);
 	if (!quest) {
-		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_ident.c_str());
 		lua_pushnil(l);
 		return 0;
 	}
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, quest->Name.c_str());
+		lua_pushstring(l, quest->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, quest->Description.c_str());
+		lua_pushstring(l, quest->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		lua_pushstring(l, quest->World.c_str());
@@ -377,13 +368,17 @@ static int CclGetQuestData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		lua_pushstring(l, PlayerColorNames[quest->PlayerColor].c_str());
+		if (quest->GetPlayerColor() != nullptr) {
+			lua_pushstring(l, quest->GetPlayerColor()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
-		lua_pushboolean(l, quest->Hidden);
+		lua_pushboolean(l, quest->IsHidden());
 		return 1;
 	} else if (!strcmp(data, "Completed")) {
-		lua_pushboolean(l, quest->Completed);
+		lua_pushboolean(l, quest->IsCompleted());
 		return 1;
 	} else if (!strcmp(data, "Competitive")) {
 		lua_pushboolean(l, quest->Competitive);
@@ -392,7 +387,11 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushnumber(l, quest->HighestCompletedDifficulty);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, quest->Icon.Name.c_str());
+		if (quest->GetIcon() != nullptr) {
+			lua_pushstring(l, quest->GetIcon()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "QuestGiver")) {
 		lua_pushstring(l, quest->QuestGiver->Ident.c_str());
@@ -458,7 +457,7 @@ static int CclDefineCampaign(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
-				CQuest *required_quest = GetQuest(quest_ident);
+				CQuest *required_quest = CQuest::Get(quest_ident);
 				if (required_quest) {
 					campaign->RequiredQuests.push_back(required_quest);
 				} else {
@@ -656,7 +655,7 @@ static int CclDefineAchievement(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
-				CQuest *required_quest = GetQuest(quest_ident);
+				CQuest *required_quest = CQuest::Get(quest_ident);
 				if (required_quest) {
 					achievement->RequiredQuests.push_back(required_quest);
 				} else {

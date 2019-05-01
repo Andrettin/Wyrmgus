@@ -100,11 +100,9 @@ bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string va
 		this->StartDate = CDate::FromString(value);
 	} else if (key == "required_quest") {
 		value = FindAndReplaceString(value, "_", "-");
-		CQuest *quest = GetQuest(value);
-		if (quest) {
+		CQuest *quest = CQuest::Get(value);
+		if (quest != nullptr) {
 			this->RequiredQuests.push_back(quest);
-		} else {
-			fprintf(stderr, "Invalid quest: \"%s\".\n", value.c_str());
 		}
 	} else {
 		return false;

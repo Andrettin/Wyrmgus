@@ -757,8 +757,8 @@ void CTrigger::ClearActiveTriggers()
 	CTrigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		Quests[i]->CurrentCompleted = false;
+	for (CQuest *quest : CQuest::GetAll()) {
+		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
 	
@@ -773,6 +773,10 @@ CTrigger::~CTrigger()
 	
 	if (this->Effects) {
 		delete this->Effects;
+	}
+	
+	for (CTriggerEffect *effect : this->TriggerEffects) {
+		delete effect;
 	}
 }
 
@@ -816,17 +820,7 @@ bool CTrigger::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "effects") {
 		for (const CConfigData *subsection : section->Sections) {
-			CTriggerEffect *trigger_effect = nullptr;
-			
-			if (subsection->Tag == "call_dialogue") {
-				trigger_effect = new CCallDialogueTriggerEffect;
-			} else if (subsection->Tag == "create_unit") {
-				trigger_effect = new CCreateUnitTriggerEffect;
-			} else {
-				fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", subsection->Tag.c_str());
-			}
-			
-			trigger_effect->ProcessConfigData(subsection);
+			CTriggerEffect *trigger_effect = CTriggerEffect::FromConfigData(subsection);
 			this->TriggerEffects.push_back(trigger_effect);
 		}
 	} else if (section->Tag == "dependencies") {

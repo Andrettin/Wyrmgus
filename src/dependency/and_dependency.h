@@ -54,7 +54,8 @@ class CAndDependency : public CDependency
 {
 public:
 	CAndDependency() {}
-	CAndDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
+	CAndDependency(const std::vector<CDependency *> &dependencies) : Dependencies(dependencies) {}
+	~CAndDependency();
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const override;
@@ -87,7 +88,7 @@ public:
 	}
 
 private:
-	std::vector<const CDependency *> Dependencies;	/// The dependencies of which all should be true
+	std::vector<CDependency *> Dependencies;	/// The dependencies of which all should be true
 };
 
 #endif

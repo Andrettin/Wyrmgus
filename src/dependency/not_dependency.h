@@ -54,11 +54,13 @@ class CNotDependency : public CDependency
 {
 public:
 	CNotDependency() {}
-	CNotDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
-	CNotDependency(const CDependency *dependency)
+	CNotDependency(const std::vector<CDependency *> &dependencies) : Dependencies(dependencies) {}
+	CNotDependency(CDependency *dependency)
 	{
 		this->Dependencies.push_back(dependency);
 	}
+	
+	~CNotDependency();
 	
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const override;
@@ -88,7 +90,7 @@ public:
 	}
 
 private:
-	std::vector<const CDependency *> Dependencies;	/// The dependencies of which none should be true
+	std::vector<CDependency *> Dependencies;	/// The dependencies of which none should be true
 };
 
 #endif

@@ -438,7 +438,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				CQuest *quest = CQuest::Get(LuaToString(l, j + 1, k + 1));
 				if (quest) {
 					this->CurrentQuests.push_back(quest);
 				}
@@ -449,7 +449,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				CQuest *quest = CQuest::Get(LuaToString(l, j + 1, k + 1));
 				if (quest) {
 					this->CompletedQuests.push_back(quest);
 					if (quest->Competitive) {
@@ -474,7 +474,7 @@ void CPlayer::Load(lua_State *l)
 					value = LuaToString(l, -1, n + 1);
 					++n;
 					if (!strcmp(value, "quest")) {
-						objective->Quest = GetQuest(LuaToString(l, -1, n + 1));
+						objective->Quest = CQuest::Get(LuaToString(l, -1, n + 1));
 						if (!objective->Quest) {
 							LuaError(l, "Quest doesn't exist.");
 						}
@@ -3104,7 +3104,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HasQuest")) {
 		LuaCheckArgs(l, 3);
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		CQuest *quest = CQuest::Get(LuaToString(l, 3));
 		if (std::find(p->CurrentQuests.begin(), p->CurrentQuests.end(), quest) != p->CurrentQuests.end()) {
 			lua_pushboolean(l, true);
 		} else {
@@ -3113,7 +3113,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "CompletedQuest")) {
 		LuaCheckArgs(l, 3);
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		CQuest *quest = CQuest::Get(LuaToString(l, 3));
 		if (std::find(p->CompletedQuests.begin(), p->CompletedQuests.end(), quest) != p->CompletedQuests.end()) {
 			lua_pushboolean(l, true);
 		} else {
@@ -3310,17 +3310,17 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Team")) {
 		p->Team = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "AcceptQuest")) {
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		CQuest *quest = CQuest::Get(LuaToString(l, 3));
 		if (quest) {
 			p->AcceptQuest(quest);
 		}
 	} else if (!strcmp(data, "CompleteQuest")) {
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		CQuest *quest = CQuest::Get(LuaToString(l, 3));
 		if (quest) {
 			p->CompleteQuest(quest);
 		}
 	} else if (!strcmp(data, "FailQuest")) {
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		CQuest *quest = CQuest::Get(LuaToString(l, 3));
 		if (quest) {
 			p->FailQuest(quest);
 		}

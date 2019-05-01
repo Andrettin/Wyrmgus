@@ -1471,7 +1471,7 @@ void MessagesDisplay::DrawMessages()
 					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 								Video.Height - 1);
 				}
-				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->Name.c_str())));
+				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->GetName().utf8().get_data())));
 				if (z == 0) {
 					PopClipping();
 				}

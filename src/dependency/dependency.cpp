@@ -239,7 +239,7 @@ static int CclDefineDependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<const CDependency *> and_dependencies;
+	std::vector<CDependency *> and_dependencies;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -249,7 +249,7 @@ static int CclDefineDependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<const CDependency *> dependencies;
+		std::vector<CDependency *> dependencies;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);
@@ -335,7 +335,7 @@ static int CclDefinePredependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<const CDependency *> and_dependencies;
+	std::vector<CDependency *> and_dependencies;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -345,7 +345,7 @@ static int CclDefinePredependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<const CDependency *> dependencies;
+		std::vector<CDependency *> dependencies;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);

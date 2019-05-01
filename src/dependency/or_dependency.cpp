@@ -49,6 +49,13 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+COrDependency::~COrDependency()
+{
+	for (CDependency *dependency : this->Dependencies) {
+		delete dependency;
+	}
+}
+
 void COrDependency::ProcessConfigDataSection(const CConfigData *section)
 {
 	CDependency *dependency = nullptr;

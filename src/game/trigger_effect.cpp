@@ -36,79 +36,34 @@
 #include "game/trigger_effect.h"
 
 #include "config.h"
-#include "config_operator.h"
-#include "quest/dialogue.h"
-#include "unit/unit.h"
-#include "unit/unit_type.h"
+#include "game/call_dialogue_trigger_effect.h"
+#include "game/change_resource_trigger_effect.h"
+#include "game/create_unit_trigger_effect.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Create a trigger effect from config data
 **
 **	@param	config_data	The configuration data
 */
-void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+CTriggerEffect *CTriggerEffect::FromConfigData(const CConfigData *config_data)
 {
-	for (const CConfigProperty &property : config_data->Properties) {
-		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-			continue;
-		}
-		
-		if (property.Key == "dialogue") {
-			CDialogue *dialogue = CDialogue::Get(property.Value);
-			if (dialogue != nullptr) {
-				this->Dialogue = dialogue;
-			}
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", property.Key.c_str());
-		}
+	CTriggerEffect *trigger_effect = nullptr;
+	
+	if (config_data->Tag == "call_dialogue") {
+		trigger_effect = new CCallDialogueTriggerEffect;
+	} else if (config_data->Tag == "change_resource") {
+		trigger_effect = new CChangeResourceTriggerEffect;
+	} else if (config_data->Tag == "create_unit") {
+		trigger_effect = new CCreateUnitTriggerEffect;
+	} else {
+		fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", config_data->Tag.c_str());
 	}
 	
-	if (!this->Dialogue) {
-		fprintf(stderr, "Call dialogue trigger effect has no dialogue.\n");
-	}
-}
-
-void CCallDialogueTriggerEffect::Do(CPlayer *player) const
-{
-	this->Dialogue->Call(player->Index);
-}
-
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
-{
-	for (const CConfigProperty &property : config_data->Properties) {
-		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-			continue;
-		}
-		
-		if (property.Key == "quantity") {
-			this->Quantity = std::stoi(property.Value);
-		} else if (property.Key == "unit_type") {
-			CUnitType *unit_type = CUnitType::Get(property.Value);
-			if (unit_type != nullptr) {
-				this->UnitType = unit_type;
-			}
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", property.Key.c_str());
-		}
-	}
+	trigger_effect->ProcessConfigData(config_data);
 	
-	if (!this->UnitType) {
-		fprintf(stderr, "Create unit trigger effect has no unit type.\n");
-	}
-}
-
-void CCreateUnitTriggerEffect::Do(CPlayer *player) const
-{
-	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
+	return trigger_effect;
 }

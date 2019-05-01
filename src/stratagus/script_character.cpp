@@ -796,8 +796,8 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_name = LuaToString(l, -1, j + 1);
-				if (GetQuest(quest_name) != nullptr) {
-					hero->QuestsInProgress.push_back(GetQuest(quest_name));
+				if (CQuest::Get(quest_name) != nullptr) {
+					hero->QuestsInProgress.push_back(CQuest::Get(quest_name));
 				} else {
 					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
 				}
@@ -807,8 +807,8 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_name = LuaToString(l, -1, j + 1);
-				if (GetQuest(quest_name) != nullptr) {
-					hero->QuestsCompleted.push_back(GetQuest(quest_name));
+				if (CQuest::Get(quest_name) != nullptr) {
+					hero->QuestsCompleted.push_back(CQuest::Get(quest_name));
 				} else {
 					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
 				}

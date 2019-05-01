@@ -92,7 +92,6 @@ protected: //these are protected because lua functions still use them
 	String Description;		/// the description of the data element from an in-game universe perspective
 	String Quote;			/// a quote relating to the data element
 	String Background;		/// the background of the data element, a description from a perspective outside of the game's universe
-private:
 	CIcon *Icon = nullptr;	/// the icon of the data element
 	
 protected:

@@ -34,9 +34,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "ui/icon_config.h"
+#include "data_type.h"
+#include "detailed_data_element.h"
 
-#include <vector>
+#include <core/object.h>
+
 #include <tuple>
 
 /*----------------------------------------------------------------------------
@@ -44,16 +46,20 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
+class CDependency;
 class CDialogue;
 class CFaction;
 class CMapTemplate;
+class CPlayerColor;
 class CQuest;
 class CSite;
+class CTriggerEffect;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
 class UnitClass;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Enumerations
@@ -82,6 +88,10 @@ enum ObjectiveTypes {
 class CQuestObjective
 {
 public:
+	static CQuestObjective *FromConfigData(const CConfigData *config_data);
+	
+	void ProcessConfigData(const CConfigData *config_data);
+
 	int ObjectiveType = -1;
 	int Quantity = 1;
 	int Resource = -1;
@@ -102,19 +112,52 @@ public:
 	int Counter = 0;
 };
 
-class CQuest
+class CQuest : public DetailedDataElement, public DataType<CQuest>
 {
+	DATA_TYPE(CQuest, DetailedDataElement)
+	
 public:
 	~CQuest();
+	
+	static constexpr const char *ClassIdentifier = "quest";
+	
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	
+	const CPlayerColor *GetPlayerColor() const
+	{
+		return this->PlayerColor;
+	}
+	
+	const String &GetHint() const
+	{
+		return this->Hint;
+	}
+	
+	const String &GetRewardsString() const
+	{
+		return this->RewardsString;
+	}
 	
 	bool IsCompleted() const
 	{
 		return this->Completed;
 	}
 	
-	std::string Ident;				/// Ident of the quest
-	std::string Name;				/// Name of the quest
-	std::string Description;		/// Description of the quest
+	const std::vector<CTriggerEffect *> &GetAcceptEffects() const
+	{
+		return this->AcceptEffects;
+	}
+	
+	const std::vector<CTriggerEffect *> &GetCompletionEffects() const
+	{
+		return this->CompletionEffects;
+	}
+	
+	const std::vector<CTriggerEffect *> &GetFailEffects() const
+	{
+		return this->FailEffects;
+	}
+	
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -129,48 +172,63 @@ public:
 	std::string StartSpeech;		/// Speech given by the quest giver when offering the quest
 	std::string InProgressSpeech;	/// Speech given by the quest giver while the quest is in progress
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
-	std::string Rewards;			/// Description of the quest's rewards
-	std::string Hint;				/// Quest hint
-	int ID = -1;
-	int Civilization = -1;				/// Which civilization the quest belongs to
-	int PlayerColor = 0;				/// Player color used for the quest's icon
+private:
+	String RewardsString;			/// description of the quest's rewards
+	String Hint;					/// quest hint
+public:
+	int Civilization = -1;			/// which civilization the quest belongs to
+private:
+	const CPlayerColor *PlayerColor = nullptr;	/// the player color used for the quest's icon
+public:
 	int HighestCompletedDifficulty = -1;
-	bool Hidden = false;				/// Whether the quest is hidden
+private:
 	bool Completed = false;				/// Whether the quest has been completed
+public:
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others
 	bool Unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
 	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool Unfailable = false;			/// Whether the quest can fail normally
-	IconConfig Icon;					/// Quest's icon
 	CCharacter *QuestGiver = nullptr;	/// Quest giver
 	CDialogue *IntroductionDialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
-	LuaCallback *AcceptEffects = nullptr;
-	LuaCallback *CompletionEffects = nullptr;
-	LuaCallback *FailEffects = nullptr;
+	LuaCallback *AcceptEffectsLua = nullptr;
+	LuaCallback *CompletionEffectsLua = nullptr;
+	LuaCallback *FailEffectsLua = nullptr;
+private:
+	std::vector<CTriggerEffect *> AcceptEffects;
+	std::vector<CTriggerEffect *> CompletionEffects;
+	std::vector<CTriggerEffect *> FailEffects;
+public:
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
+	
+public:
+	CDependency *Predependency = nullptr;	/// the predependency for the quest
+	CDependency *Dependency = nullptr;		/// the dependency for the quest
+	
+	friend int CclDefineQuest(lua_State *l);
+	friend void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save);
+
+protected:
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CQuest *> Quests;
 extern CQuest *CurrentQuest;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern void CleanQuests();
 extern void SaveQuestCompletion();
 std::string GetQuestObjectiveTypeNameById(int objective_type);
 extern int GetQuestObjectiveTypeIdByName(const std::string &objective_type);
-extern CQuest *GetQuest(const std::string &quest_ident);
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();

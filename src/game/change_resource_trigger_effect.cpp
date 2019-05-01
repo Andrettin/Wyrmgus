@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name or_dependency.h - The or-dependency header file. */
+/**@name change_resource_trigger_effect.cpp - The change resource trigger effect source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,68 +27,59 @@
 //      02111-1307, USA.
 //
 
-#ifndef __OR_DEPENDENCY_H__
-#define __OR_DEPENDENCY_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "dependency/dependency.h"
+#include "stratagus.h"
 
-#include <vector>
+#include "game/change_resource_trigger_effect.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CConfigData;
-class CPlayer;
-class CUnit;
+#include "config.h"
+#include "config_operator.h"
+#include "economy/resource.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
---  Definition
+--  Functions
 ----------------------------------------------------------------------------*/
 
-class COrDependency : public CDependency
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CChangeResourceTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
-public:
-	COrDependency() {}
-	COrDependency(const std::vector<CDependency *> &dependencies) : Dependencies(dependencies) {}
-	~COrDependency();
-	
-	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const override;
-	
-	virtual std::string GetString(const std::string &prefix = "") const override
-	{
-		int element_count = 0;
-		
-		for (const CDependency *dependency : this->Dependencies) {
-			if (!dependency->GetString(prefix + '\t').empty()) {
-				element_count++;
-			}
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
 		}
 		
-		if (element_count >= 1) {
-			std::string str;
-			if (element_count > 1) {
-				str += prefix + "OR:\n";
+		if (property.Key == "quantity") {
+			this->Quantity = std::stoi(property.Value);
+		} else if (property.Key == "resource") {
+			const CResource *resource = CResource::Get(property.Value);
+			if (resource != nullptr) {
+				this->Resource = resource;
 			}
-		
-			for (const CDependency *dependency : this->Dependencies) {
-				str += dependency->GetString((element_count > 1) ? prefix + '\t' : prefix);
-			}
-
-			return str;
 		} else {
-			return std::string();
+			fprintf(stderr, "Invalid change resource trigger effect property: \"%s\".\n", property.Key.c_str());
 		}
 	}
+	
+	if (!this->Resource) {
+		fprintf(stderr, "Change resource trigger effect has no resource.\n");
+	}
+}
 
-private:
-	std::vector<CDependency *> Dependencies;	/// The dependencies of which one should be true
-};
-
-#endif
+/**
+**	@brief	Do the effect
+**
+**	@param	player	The player for which to do the effect
+*/
+void CChangeResourceTriggerEffect::Do(CPlayer *player) const
+{
+	player->ChangeResource(this->Resource->GetIndex(), this->Quantity, true);
+}

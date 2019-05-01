@@ -51,6 +51,7 @@ class ButtonAction;
 class CDependency
 {
 public:
+	virtual ~CDependency() {}
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);

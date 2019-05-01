@@ -49,6 +49,13 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CAndDependency::~CAndDependency()
+{
+	for (CDependency *dependency : this->Dependencies) {
+		delete dependency;
+	}
+}
+
 void CAndDependency::ProcessConfigDataSection(const CConfigData *section)
 {
 	CDependency *dependency = nullptr;

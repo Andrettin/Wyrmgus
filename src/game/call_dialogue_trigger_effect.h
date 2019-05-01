@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name or_dependency.h - The or-dependency header file. */
+/**@name call_dialogue_trigger_effect.h - The call dialogue trigger effect header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,68 +27,33 @@
 //      02111-1307, USA.
 //
 
-#ifndef __OR_DEPENDENCY_H__
-#define __OR_DEPENDENCY_H__
+#ifndef __CALL_DIALOGUE_TRIGGER_EFFECT_H__
+#define __CALL_DIALOGUE_TRIGGER_EFFECT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "dependency/dependency.h"
-
-#include <vector>
+#include "game/trigger_effect.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CDialogue;
 class CPlayer;
-class CUnit;
 
-/*----------------------------------------------------------------------------
---  Definition
-----------------------------------------------------------------------------*/
-
-class COrDependency : public CDependency
+/**
+**	@brief	The call dialogue trigger effect
+*/
+class CCallDialogueTriggerEffect : public CTriggerEffect
 {
 public:
-	COrDependency() {}
-	COrDependency(const std::vector<CDependency *> &dependencies) : Dependencies(dependencies) {}
-	~COrDependency();
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
-	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const override;
-	
-	virtual std::string GetString(const std::string &prefix = "") const override
-	{
-		int element_count = 0;
-		
-		for (const CDependency *dependency : this->Dependencies) {
-			if (!dependency->GetString(prefix + '\t').empty()) {
-				element_count++;
-			}
-		}
-		
-		if (element_count >= 1) {
-			std::string str;
-			if (element_count > 1) {
-				str += prefix + "OR:\n";
-			}
-		
-			for (const CDependency *dependency : this->Dependencies) {
-				str += dependency->GetString((element_count > 1) ? prefix + '\t' : prefix);
-			}
-
-			return str;
-		} else {
-			return std::string();
-		}
-	}
-
-private:
-	std::vector<CDependency *> Dependencies;	/// The dependencies of which one should be true
+	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
 };
 
 #endif

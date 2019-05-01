@@ -36,37 +36,35 @@
 #include "quest/quest.h"
 
 #include "character.h"
+#include "dependency/and_dependency.h"
+#include "faction.h"
 #include "game/game.h"
+#include "game/trigger_effect.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "item/item.h"
 #include "luacallback.h"
+#include "map/site.h"
 #include "parameters.h"
+#include "player_color.h"
 #include "quest/achievement.h"
 #include "script.h"
+#include "ui/icon.h"
+#include "unit/unit_class.h"
+#include "unit/unit_type.h"
+#include "upgrade/upgrade.h"
 
 #include <ctype.h>
-
-#include <string>
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CQuest *> Quests;
 CQuest *CurrentQuest = nullptr;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-void CleanQuests()
-{
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		delete Quests[i];
-	}
-	Quests.clear();
-}
 
 void SaveQuestCompletion()
 {
@@ -93,9 +91,9 @@ void SaveQuestCompletion()
 	
 	fprintf(fd, "\n");
 	
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (Quests[i]->Completed) {
-			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", Quests[i]->Ident.c_str(), Quests[i]->HighestCompletedDifficulty);
+	for (const CQuest *quest : CQuest::GetAll()) {
+		if (quest->IsCompleted()) {
+			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", quest->Ident.c_str(), quest->HighestCompletedDifficulty);
 		}
 	}
 	
@@ -160,39 +158,180 @@ int GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 	return -1;
 }
 
-CQuest *GetQuest(const std::string &quest_ident)
-{
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (quest_ident == Quests[i]->Ident) {
-			return Quests[i];
-		}
-	}
-	
-	for (size_t i = 0; i < Quests.size(); ++i) { // for backwards compatibility
-		if (NameToIdent(quest_ident) == Quests[i]->Ident) {
-			return Quests[i];
-		}
-	}
-	
-	return nullptr;
-}
-
 CQuest::~CQuest()
 {
 	if (this->Conditions) {
 		delete Conditions;
 	}
-	if (this->AcceptEffects) {
-		delete AcceptEffects;
+	if (this->AcceptEffectsLua) {
+		delete AcceptEffectsLua;
 	}
-	if (this->CompletionEffects) {
-		delete CompletionEffects;
+	if (this->CompletionEffectsLua) {
+		delete CompletionEffectsLua;
 	}
-	if (this->FailEffects) {
-		delete FailEffects;
+	if (this->FailEffectsLua) {
+		delete FailEffectsLua;
 	}
-	for (size_t i = 0; i < this->Objectives.size(); ++i) {
-		delete this->Objectives[i];
+	
+	for (CQuestObjective *objective : this->Objectives) {
+		delete objective;
+	}
+	
+	for (CTriggerEffect *effect : this->AcceptEffects) {
+		delete effect;
+	}
+	for (CTriggerEffect *effect : this->CompletionEffects) {
+		delete effect;
+	}
+	for (CTriggerEffect *effect : this->FailEffects) {
+		delete effect;
+	}
+	
+	if (this->Predependency != nullptr) {
+		delete this->Predependency;
+	}
+	if (this->Dependency != nullptr) {
+		delete this->Dependency;
+	}
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CQuest::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "accept_effects" || section->Tag == "completion_effects" || section->Tag == "fail_effects") {
+		for (const CConfigData *subsection : section->Sections) {
+			CTriggerEffect *trigger_effect = CTriggerEffect::FromConfigData(subsection);
+			
+			if (section->Tag == "accept_effects") {
+				this->AcceptEffects.push_back(trigger_effect);
+			} else if (section->Tag == "completion_effects") {
+				this->CompletionEffects.push_back(trigger_effect);
+			} else if (section->Tag == "fail_effects") {
+				this->FailEffects.push_back(trigger_effect);
+			}
+		}
+	} else if (section->Tag == "objectives") {
+		for (const CConfigData *subsection : section->Sections) {
+			CQuestObjective *objective = CQuestObjective::FromConfigData(subsection);
+			objective->Quest = this;
+			this->Objectives.push_back(objective);
+		}
+	} else if (section->Tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		this->Dependency->ProcessConfigData(section);
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+void CQuest::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_player_color", "player_color_ident"), [](CQuest *quest, const String &player_color_ident){ quest->PlayerColor = CPlayerColor::Get(player_color_ident); });
+	ClassDB::bind_method(D_METHOD("get_player_color"), [](const CQuest *quest){ return const_cast<CPlayerColor *>(quest->GetPlayerColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "player_color"), "set_player_color", "get_player_color");
+	
+	ClassDB::bind_method(D_METHOD("set_hint", "hint"), [](CQuest *quest, const String &hint){ quest->Hint = hint; });
+	ClassDB::bind_method(D_METHOD("get_hint"), &CQuest::GetHint);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "hint"), "set_hint", "get_hint");
+	
+	ClassDB::bind_method(D_METHOD("set_rewards_string", "rewards_string"), [](CQuest *quest, const String &rewards_string){ quest->RewardsString = rewards_string; });
+	ClassDB::bind_method(D_METHOD("get_rewards_string"), &CQuest::GetRewardsString);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "rewards_string"), "set_rewards_string", "get_rewards_string");
+}
+
+/**
+**	@brief	Create a quest objective from config data
+**
+**	@param	config_data	The configuration data
+*/
+CQuestObjective *CQuestObjective::FromConfigData(const CConfigData *config_data)
+{
+	CQuestObjective *objective = new CQuestObjective;
+	
+	std::string objective_type_tag = FindAndReplaceString(config_data->Tag, "_", "-");
+	objective->ObjectiveType = GetQuestObjectiveTypeIdByName(objective_type_tag);
+	if (objective->ObjectiveType == -1) {
+		fprintf(stderr, "Invalid quest objective type: \"%s\".\n", config_data->Tag.c_str());
+		return objective;
+	}
+	
+	if (objective->ObjectiveType == HeroMustSurviveObjectiveType) {
+		objective->Quantity = 0;
+	}
+	
+	objective->ProcessConfigData(config_data);
+	
+	return objective;
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CQuestObjective::ProcessConfigData(const CConfigData *config_data)
+{
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		if (property.Key == "objective_string") {
+			this->ObjectiveString = property.Value;
+		} else if (property.Key == "quantity") {
+			this->Quantity = std::stoi(property.Value);
+		} else if (property.Key == "resource") {
+			const CResource *resource = CResource::Get(property.Value);
+			if (resource != nullptr) {
+				this->Resource = resource->GetIndex();
+			}
+		} else if (property.Key == "unit_class") {
+			const ::UnitClass *unit_class = UnitClass::Get(property.Value);
+			if (unit_class != nullptr) {
+				this->UnitClass = unit_class;
+			}
+		} else if (property.Key == "unit_type") {
+			const CUnitType *unit_type = CUnitType::Get(property.Value);
+			if (unit_type != nullptr) {
+				this->UnitTypes.push_back(unit_type);
+			}
+		} else if (property.Key == "upgrade") {
+			const CUpgrade *upgrade = CUpgrade::Get(property.Value);
+			if (upgrade != nullptr) {
+				this->Upgrade = upgrade;
+			}
+		} else if (property.Key == "character") {
+			const CCharacter *character = CCharacter::Get(property.Value);
+			if (character != nullptr) {
+				this->Character = character;
+			}
+		} else if (property.Key == "unique") {
+			const CUniqueItem *unique = GetUniqueItem(property.Value);
+			if (unique != nullptr) {
+				this->Unique = unique;
+			}
+		} else if (property.Key == "site") {
+			const CSite *site = CSite::Get(property.Value);
+			if (site != nullptr) {
+				this->Settlement = site;
+			}
+		} else if (property.Key == "faction") {
+			const CFaction *faction = CFaction::Get(property.Value);
+			if (faction != nullptr) {
+				this->Faction = faction;
+			}
+		} else {
+			fprintf(stderr, "Invalid quest objective property: \"%s\".\n", property.Key.c_str());
+		}
 	}
 }
 
@@ -201,7 +340,7 @@ void SetCurrentQuest(const std::string &quest_ident)
 	if (quest_ident.empty()) {
 		CurrentQuest = nullptr;
 	} else {
-		CurrentQuest = GetQuest(quest_ident);
+		CurrentQuest = CQuest::Get(quest_ident);
 	}
 }
 
@@ -216,7 +355,7 @@ std::string GetCurrentQuest()
 
 void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save)
 {
-	CQuest *quest = GetQuest(quest_ident);
+	CQuest *quest = CQuest::Get(quest_ident);
 	if (!quest) {
 		return;
 	}
