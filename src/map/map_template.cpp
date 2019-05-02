@@ -253,10 +253,12 @@ void CMapTemplate::Initialize()
 {
 	this->Initialized = true;
 	
-	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority
+	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
 		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](CMapTemplate *a, CMapTemplate *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
+			} else if ((a->Width * a->Height) != (b->Width * b->Height)) {
+				return (a->Width * a->Height) > (b->Width * b->Height);
 			} else {
 				return a->Ident < b->Ident;
 			}
