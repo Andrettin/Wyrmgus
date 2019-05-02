@@ -106,3 +106,34 @@ bool CHistoricalUnit::ProcessConfigDataSection(const CConfigData *section)
 	
 	return true;
 }
+
+/**
+**	@brief	Initialize the historical unit
+*/
+void CHistoricalUnit::Initialize()
+{
+	if (this->UnitType == nullptr) {
+		fprintf(stderr, "Historical unit \"%s\" does not have a unit type.\n", this->GetIdent().utf8().get_data());
+	}
+	
+	if (this->Faction == nullptr) {
+		fprintf(stderr, "Historical unit \"%s\" does not have a faction.\n", this->GetIdent().utf8().get_data());
+	}
+	
+	if (this->HistoricalLocations.empty()) {
+		fprintf(stderr, "Historical unit \"%s\" does not have any historical locations.\n", this->GetIdent().utf8().get_data());
+	}
+	
+	this->Initialized = true;
+}
+
+void CHistoricalUnit::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_quantity", "quantity"), [](CHistoricalUnit *historical_unit, const int quantity){ historical_unit->Quantity = quantity; });
+	ClassDB::bind_method(D_METHOD("get_quantity"), &CHistoricalUnit::GetQuantity);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "quantity"), "set_quantity", "get_quantity");
+	
+	ClassDB::bind_method(D_METHOD("set_resources_held", "resources_held"), [](CHistoricalUnit *historical_unit, const int resources_held){ historical_unit->ResourcesHeld = resources_held; });
+	ClassDB::bind_method(D_METHOD("get_resources_held"), &CHistoricalUnit::GetResourcesHeld);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "resources_held"), "set_resources_held", "get_resources_held");
+}

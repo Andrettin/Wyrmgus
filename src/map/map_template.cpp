@@ -1411,9 +1411,8 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 	}
 	
 	for (CHistoricalUnit *historical_unit : CHistoricalUnit::GetAll()) {
-		if ( //historical units aren't implemented if their date isn't set
-			historical_unit->StartDate.Year == 0
-			|| !start_date.ContainsDate(historical_unit->StartDate)
+		if (
+			(historical_unit->StartDate.Year != 0 && !start_date.ContainsDate(historical_unit->StartDate))
 			|| (historical_unit->EndDate.Year != 0 && start_date.ContainsDate(historical_unit->EndDate))
 		) { 
 			continue;
@@ -1462,8 +1461,14 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		} else {
 			unit_player = CPlayer::Players[PlayerNumNeutral];
 		}
-		for (int i = 0; i < historical_unit->Quantity; ++i) {
+		for (int i = 0; i < historical_unit->GetQuantity(); ++i) {
 			CUnit *unit = CreateUnit(unit_pos - historical_unit->UnitType->GetTileCenterPosOffset(), *historical_unit->UnitType, unit_player, z);
+			if (historical_unit->GetResourcesHeld() != 0) {
+				unit->SetResourcesHeld(historical_unit->GetResourcesHeld());
+				unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->GetResourcesHeld();
+				unit->Variable[GIVERESOURCE_INDEX].Max = historical_unit->GetResourcesHeld();
+				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+			}
 		}
 	}
 	
