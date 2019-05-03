@@ -1677,7 +1677,7 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<const CHistoric
 	
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
 		const CHistoricalLocation *historical_location = historical_location_list[i];
-		if (start_date.ContainsDate(historical_location->Date)) {
+		if (historical_location->Date.Year == 0 || start_date.ContainsDate(historical_location->Date)) {
 			if (historical_location->MapTemplate == this) {
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;
