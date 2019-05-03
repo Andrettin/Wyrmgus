@@ -1721,7 +1721,7 @@ bool CPlayer::CanChooseDynasty(const CDynasty *dynasty, bool pre)
 **
 **  @param character    Hero.
 */
-bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) const
+bool CPlayer::CanRecruitHero(const CCharacter *character, const bool ignore_neutral) const
 {
 	if (character->Deity != nullptr) { //character is a deity
 		return false;
@@ -1735,7 +1735,10 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (!character->Factions.empty() && (this->Faction == nullptr || std::find(character->Factions.begin(), character->Factions.end(), this->Faction) == character->Factions.end())) {
+	if ( //the player must either be of the character's faction, or own the character's home site (while being of the correct civilization), to recruit them
+		!character->Factions.empty() && (this->Faction == nullptr || std::find(character->Factions.begin(), character->Factions.end(), this->Faction) == character->Factions.end())
+		&& (character->GetHomeSite() == nullptr || !this->HasSettlement(character->GetHomeSite()))
+	) {
 		return false;
 	}
 	

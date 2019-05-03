@@ -48,6 +48,7 @@
 #include "language/word.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "parameters.h"
 #include "player.h"
 #include "quest/quest.h"
@@ -200,6 +201,8 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				}
 				this->Factions.push_back(faction);
 			}
+		} else if (key == "home_site") {
+			this->HomeSite = CSite::Get(value);
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->HairVariation = value;
@@ -859,6 +862,7 @@ void CCharacter::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_mother"), &CCharacter::GetMother);
 	ClassDB::bind_method(D_METHOD("get_children"), [](const CCharacter *character){ return VectorToGodotArray(character->GetChildren()); });
 	ClassDB::bind_method(D_METHOD("get_siblings"), [](const CCharacter *character){ return VectorToGodotArray(character->GetSiblings()); });
+	ClassDB::bind_method(D_METHOD("get_home_site"), [](const CCharacter *character){ return const_cast<CSite *>(character->GetHomeSite()); });
 	ClassDB::bind_method(D_METHOD("get_deities"), [](const CCharacter *character){ return VectorToGodotArray(character->Deities); });
 	ClassDB::bind_method(D_METHOD("get_abilities"), [](const CCharacter *character){ return VectorToGodotArray(character->Abilities); });
 }

@@ -2424,13 +2424,13 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	for (size_t i = 0; i < this->SoldUnits.size(); ++i) {
-		DestroyAllInside(*this->SoldUnits[i]);
-		LetUnitDie(*this->SoldUnits[i]);
+	for (CUnit *sold_unit : this->SoldUnits) {
+		DestroyAllInside(*sold_unit);
+		LetUnitDie(*sold_unit);
 	}
 	this->SoldUnits.clear();
 	
-	std::vector<CUnitType *> potential_items;
+	std::vector<const CUnitType *> potential_items;
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		const CCivilization *civilization = this->Type->GetCivilization();
@@ -2440,8 +2440,14 @@ void CUnit::UpdateSoldUnits()
 		
 		if (CurrentQuest == nullptr) {
 			for (CCharacter *character : CCharacter::GetAll()) {
-				if (this->Player->CanRecruitHero(character)) {
-					potential_heroes.push_back(character);
+				if (this->CanRecruitHero(character)) {
+					int weight = 1;
+					if (this->Settlement != nullptr && this->Settlement == character->GetHomeSite()) {
+						weight = 10; //a character is ten times as likely to be picked in their home site than other characters
+					}
+					for (int i = 0; i < weight; ++i) {
+						potential_heroes.push_back(character);
+					}
 				}
 			}
 		}
@@ -2456,9 +2462,9 @@ void CUnit::UpdateSoldUnits()
 			}
 		}
 	} else {
-		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
-			if (CheckDependencies(this->Type->SoldUnits[i], this)) {
-				potential_items.push_back(this->Type->SoldUnits[i]);
+		for (const CUnitType *sold_unit_type : this->Type->SoldUnits) {
+			if (CheckDependencies(sold_unit_type, this)) {
+				potential_items.push_back(sold_unit_type);
 			}
 		}
 	}
@@ -2480,7 +2486,7 @@ void CUnit::UpdateSoldUnits()
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
-			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
+			const CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
@@ -2521,9 +2527,33 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 }
 
 /**
-**  Produce a resource
+**	@brief	Get whether this unit can recruit a given hero
 **
-**  @param resource  Resource to be produced.
+**	@param	character	The character
+**
+**	@return	True if the hero can be recruited, or false otherwise
+*/
+bool CUnit::CanRecruitHero(const CCharacter *character) const
+{
+	if (!this->Player->CanRecruitHero(character)) {
+		return false;
+	}
+	
+	//if the player is not of the character's faction (and the character has a faction), then they must own the character's home site, and this unit must belong to that site
+	if (
+		!character->Factions.empty() && (this->Player->GetFaction() == nullptr || std::find(character->Factions.begin(), character->Factions.end(), this->Player->GetFaction()) == character->Factions.end())
+		&& (character->GetHomeSite() == nullptr || character->GetHomeSite() != this->Settlement)
+	) {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Produce a resource
+**
+**	@param	resource	Resource to be produced.
 */
 void CUnit::ProduceResource(const int resource)
 {

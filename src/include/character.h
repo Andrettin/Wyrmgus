@@ -186,6 +186,12 @@ public:
 	bool IsParentOf(const CCharacter *character) const;
 	bool IsChildOf(const CCharacter *character) const;
 	bool IsSiblingOf(const CCharacter *character) const;
+	
+	const CSite *GetHomeSite() const
+	{
+		return this->HomeSite;
+	}
+	
 	bool IsItemEquipped(const CPersistentItem *item) const;
 	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
@@ -229,6 +235,7 @@ public:
 private:
 	CCharacter *Father = nullptr;		/// Character's father
 	CCharacter *Mother = nullptr;		/// Character's mother
+	const CSite *HomeSite = nullptr;			/// the home site of the character
 public:
 	LuaCallback *Conditions = nullptr;
 	CDependency *Predependency = nullptr;

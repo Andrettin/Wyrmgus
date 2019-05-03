@@ -46,9 +46,9 @@
 
 class CAnimation;
 class CBuildRestrictionOnTop;
+class CCharacter;
 class CConstructionFrame;
 class CFile;
-class CCharacter;
 class CLanguage;
 class CMapField;
 class CMapLayer;
@@ -234,6 +234,7 @@ public:
 	void GenerateUnique(CUnit *dropper, CPlayer *dropper_player);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
+	bool CanRecruitHero(const CCharacter *character) const;
 	void ProduceResource(const int resource);
 	void SellResource(const int resource, const int player);
 	void BuyResource(const int resource, const int player);
