@@ -801,7 +801,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			}
 		}
 
-		if (pos.x < 0 || pos.x >= map_template->Width || pos.y < 0 || pos.y >= map_template->Height) {
+		if (pos.x < 0 || pos.x >= map_template->GetWidth() || pos.y < 0 || pos.y >= map_template->GetHeight()) {
 			break;
 		}
 
@@ -987,9 +987,9 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 	}
 	map_filename += ".map";
 	
-	for (int x = 0; x < map_template->Width; ++x) {
-		for (int y = 0; y < map_template->Height; ++y) {
-			unsigned int index = x + y * map_template->Width;
+	for (int x = 0; x < map_template->GetWidth(); ++x) {
+		for (int y = 0; y < map_template->GetHeight(); ++y) {
+			unsigned int index = x + y * map_template->GetWidth();
 			CTerrainType *terrain = nullptr;
 			if (!overlay && index < map_template->TileTerrains.size() && map_template->TileTerrains[index] != -1) {
 				terrain = TerrainTypes[map_template->TileTerrains[index]];
@@ -1007,8 +1007,8 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 	try {
 		fw = CreateFileWriter(map_filename);
 
-		for (int y = 0; y < map_template->Height; ++y) {
-			for (int x = 0; x < map_template->Width; ++x) {
+		for (int y = 0; y < map_template->GetHeight(); ++y) {
+			for (int x = 0; x < map_template->GetWidth(); ++x) {
 				fw->printf("%s", map_terrains[x][y].c_str());
 			}
 			fw->printf("\n");
@@ -1753,8 +1753,8 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 	
 	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
-		map_template->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map_template->Width - 1) / 2);
-		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->Height - 1) / 2);
+		map_template->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map_template->GetWidth() - 1) / 2);
+		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->GetHeight() - 1) / 2);
 	}
 	
 	return 0;

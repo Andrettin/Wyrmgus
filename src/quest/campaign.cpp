@@ -137,10 +137,10 @@ bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
 			if (key == "map_template") {
 				map_template = CMapTemplate::Get(value);
 				if (map_size.x == 0) {
-					map_size.x = map_template->Width;
+					map_size.x = map_template->GetWidth();
 				}
 				if (map_size.y == 0) {
-					map_size.y = map_template->Height;
+					map_size.y = map_template->GetHeight();
 				}
 			} else if (key == "start_x") {
 				start_pos.x = std::stoi(value);

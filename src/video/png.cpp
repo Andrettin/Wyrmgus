@@ -556,8 +556,8 @@ void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, cons
 		return;
 	}
 
-	const size_t imageWidth = map_template->Width;
-	const size_t imageHeight = map_template->Height;
+	const size_t imageWidth = map_template->GetWidth();
+	const size_t imageHeight = map_template->GetHeight();
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -623,8 +623,8 @@ void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, cons
 			}
 		}
 		
-		for (int y = 0; y < map_template->Height; ++y) {
-			for (int x = 0; x < map_template->Width; ++x) {
+		for (int y = 0; y < map_template->GetHeight(); ++y) {
+			for (int x = 0; x < map_template->GetWidth(); ++x) {
 				row[x * 3 + 0] = 0;
 				row[x * 3 + 1] = 0;
 				row[x * 3 + 2] = 0;

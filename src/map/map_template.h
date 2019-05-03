@@ -40,6 +40,8 @@
 #include "time/date.h"
 #include "vec2i.h"
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -92,10 +94,6 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		REGISTER_PROPERTY(Width);
-		REGISTER_PROPERTY(Height);
-		REGISTER_PROPERTY(Scale);
-		REGISTER_PROPERTY(Priority);
 		REGISTER_PROPERTY(Overland);
 		REGISTER_PROPERTY(OutputTerrainImage);
 		
@@ -110,6 +108,26 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
+	
+	int GetWidth() const
+	{
+		return this->Width;
+	}
+	
+	int GetHeight() const
+	{
+		return this->Height;
+	}
+	
+	int GetScale() const
+	{
+		return this->Scale;
+	}
+	
+	int GetPriority() const
+	{
+		return this->Priority;
+	}
 	
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
@@ -126,11 +144,15 @@ public:
 	std::string OverlayTerrainFile;
 	std::string TerrainImage;
 	std::string OverlayTerrainImage;
-	ExposedProperty<int> Width = 0;
-	ExposedProperty<int> Height = 0;
-	ExposedProperty<int> Scale = 1;						/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
+private:
+	int Width = 0;
+	int Height = 0;
+	int Scale = 1;		/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
+public:
 	int SurfaceLayer = 0;							/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
-	Property<int> Priority = 0;						/// the priority of this map template, for the order of application of subtemplates
+private:
+	int Priority = 0;	/// the priority of this map template, for the order of application of subtemplates
+public:
 	Property<bool> Overland = false;				/// Whether this is an overland map
 	ExposedProperty<bool> OutputTerrainImage = false;
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
@@ -138,10 +160,14 @@ public:
 	Vec2i MaxPos = Vec2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)
 	Vec2i CurrentStartPos = Vec2i(0, 0);
 	PixelSize PixelTileSize = Vec2i(32, 32);
-	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
-	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
-	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer
-	std::vector<const CMapTemplate *> AdjacentTemplates;		/// Map templates adjacent to this one
+	CMapTemplate *MainTemplate = nullptr;					/// main template in which this one is located, if this is a subtemplate
+	CMapTemplate *UpperTemplate = nullptr;					/// map template corresponding to this one in the upper layer
+	CMapTemplate *LowerTemplate = nullptr;					/// map template corresponding to this one in the lower layer
+	std::set<const CMapTemplate *> AdjacentTemplates;		/// map templates adjacent to this one
+	std::set<const CMapTemplate *> NorthOfTemplates;		/// map templates to which this one is to the north of
+	std::set<const CMapTemplate *> SouthOfTemplates;		/// map templates to which this one is to the north of
+	std::set<const CMapTemplate *> WestOfTemplates;			/// map templates to which this one is to the west of
+	std::set<const CMapTemplate *> EastOfTemplates;			/// map templates to which this one is to the east of
 	CPlane *Plane = nullptr;
 	CWorld *World = nullptr;
 	CTerrainType *BaseTerrainType = nullptr;
@@ -166,7 +192,7 @@ public:
 	friend int CclDefineMapTemplate(lua_State *l);
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif
