@@ -1964,16 +1964,16 @@ static int CclDefineUnitType(lua_State *l)
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (CCivilization *civilization : CCivilization::GetAll()) {
-			for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == type->GetIndex()) {
+			for (std::map<const UnitClass *, const CUnitType *>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == type) {
 					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
 			}
 		}
 		for (CFaction *faction : CFaction::GetAll()) {
-			for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == type->GetIndex()) {
+			for (std::map<const UnitClass *, const CUnitType *>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == type) {
 					faction->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
@@ -1982,9 +1982,9 @@ static int CclDefineUnitType(lua_State *l)
 		
 		if (type->GetCivilization() != nullptr && unit_class != nullptr) {
 			if (type->GetFaction() != nullptr) {
-				type->GetFaction()->ClassUnitTypes[unit_class] = type->GetIndex();
+				type->GetFaction()->ClassUnitTypes[unit_class] = type;
 			} else {
-				type->GetCivilization()->ClassUnitTypes[unit_class] = type->GetIndex();
+				type->GetCivilization()->ClassUnitTypes[unit_class] = type;
 			}
 		}
 	}

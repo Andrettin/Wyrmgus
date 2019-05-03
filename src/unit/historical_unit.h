@@ -45,6 +45,7 @@
 class CFaction;
 class CHistoricalLocation;
 class CUnitType;
+class UnitClass;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -64,9 +65,34 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
+	const UnitClass *GetUnitClass() const
+	{
+		return this->UnitClass;
+	}
+	
+	const CUnitType *GetUnitType() const
+	{
+		return this->UnitType;
+	}
+	
+	const CFaction *GetFaction() const
+	{
+		return this->Faction;
+	}
+	
 	int GetQuantity() const
 	{
 		return this->Quantity;
+	}
+	
+	const CDate &GetStartDate() const
+	{
+		return this->StartDate;
+	}
+	
+	const CDate &GetEndDate() const
+	{
+		return this->EndDate;
 	}
 	
 	int GetResourcesHeld() const
@@ -74,18 +100,26 @@ public:
 		return this->ResourcesHeld;
 	}
 	
-public:
-	CUnitType *UnitType = nullptr;	/// the unit's unit type
-	CFaction *Faction = nullptr;	/// the unit's faction
+	const std::vector<const CHistoricalLocation *> &GetHistoricalLocations() const
+	{
+		return this->HistoricalLocations;
+	}
+	
+	const std::map<CDate, const CFaction *> &GetHistoricalOwners() const
+	{
+		return this->HistoricalOwners;
+	}
+	
 private:
+	const ::UnitClass *UnitClass = nullptr;	/// the unit's class
+	const CUnitType *UnitType = nullptr;	/// the unit's unit type
+	const CFaction *Faction = nullptr;		/// the unit's faction
 	int Quantity = 1;	/// how many in-game units does this historical unit result in when applied
-public:
 	CDate StartDate;	/// when the unit starts being active
 	CDate EndDate;		/// when the unit ceases being active (e.g. when it is disbanded)
-private:
 	int ResourcesHeld = 0;	/// how much of the unit's resource, if any, does the unit contain
-public:
-	std::vector<CHistoricalLocation *> HistoricalLocations;	/// historical locations for the unit
+	std::vector<const CHistoricalLocation *> HistoricalLocations;	/// historical locations for the unit
+	std::map<CDate, const CFaction *> HistoricalOwners;				/// historical owners for the unit
 
 protected:
 	static void _bind_methods();

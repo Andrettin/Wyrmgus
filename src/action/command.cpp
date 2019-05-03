@@ -842,8 +842,8 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z, CSite *settlement)
+//void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, int flush)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, int flush, const int z, const CSite *settlement)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -1036,8 +1036,8 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
-void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
+//void CommandTrainUnit(CUnit &unit, const CUnitType &type, const int)
+void CommandTrainUnit(CUnit &unit, const CUnitType &type, const int player, const int)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -1149,7 +1149,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
+void CommandUpgradeTo(CUnit &unit, const CUnitType &type, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1175,7 +1175,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
 */
-void CommandTransformIntoType(CUnit &unit, CUnitType &type)
+void CommandTransformIntoType(CUnit &unit, const CUnitType &type)
 {
 	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTransformInto) {
 		return;

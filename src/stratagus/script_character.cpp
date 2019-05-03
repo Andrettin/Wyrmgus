@@ -532,12 +532,7 @@ static int CclDefineCharacter(lua_State *l)
 	}
 	
 	if (!redefinition) {
-		if (character->UnitType->BoolFlag[FAUNA_INDEX].value) {
-			character->UnitType->PersonalNames[character->Gender].push_back(character->GetName().utf8().get_data());
-			for (size_t i = 0; i < alternate_names.size(); ++i) {
-				character->UnitType->PersonalNames[character->Gender].push_back(alternate_names[i]);
-			}
-		} else if (character->Civilization) {
+		if (!character->UnitType->BoolFlag[FAUNA_INDEX].value && character->Civilization) {
 			character->Civilization->PersonalNames[character->Gender].push_back(character->GetName().utf8().get_data());
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
 				character->Civilization->PersonalNames[character->Gender].push_back(alternate_names[i]);

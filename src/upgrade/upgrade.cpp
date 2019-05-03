@@ -189,7 +189,7 @@ int CUnitStats::GetPrice() const
 	return cost;
 }
 
-int CUnitStats::GetUnitStock(CUnitType *unit_type) const
+int CUnitStats::GetUnitStock(const CUnitType *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
 		return this->UnitStock.find(unit_type)->second;
@@ -198,7 +198,7 @@ int CUnitStats::GetUnitStock(CUnitType *unit_type) const
 	}
 }
 
-void CUnitStats::SetUnitStock(CUnitType *unit_type, int quantity)
+void CUnitStats::SetUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -213,7 +213,7 @@ void CUnitStats::SetUnitStock(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUnitStats::ChangeUnitStock(CUnitType *unit_type, int quantity)
+void CUnitStats::ChangeUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
@@ -872,7 +872,7 @@ static int CclDefineModifier(lua_State *l)
 			um->Modifier.ResourceDemand[resId] = LuaToNumber(l, j + 1, 3);
 		} else if (!strcmp(key, "unit-stock")) {
 			std::string value = LuaToString(l, j + 1, 2);
-			CUnitType *unit_type = CUnitType::Get(value);
+			const CUnitType *unit_type = CUnitType::Get(value);
 			um->Modifier.SetUnitStock(unit_type, LuaToNumber(l, j + 1, 3));
 		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
@@ -1609,9 +1609,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				//Wyrmgus end
 			}
 			
-			for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-				CUnitType *unit_type = iterator->first;
-				int unit_stock = iterator->second;
+			for (std::map<const CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+				const CUnitType *unit_type = iterator->first;
+				const int unit_stock = iterator->second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, unit_stock);
 				}
@@ -1726,9 +1726,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						//Wyrmgus end
 					}
 					
-					for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-						CUnitType *unit_type = iterator->first;
-						int unit_stock = iterator->second;
+					for (std::map<const CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+						const CUnitType *unit_type = iterator->first;
+						const int unit_stock = iterator->second;
 						if (unit_stock < 0) {
 							unit.ChangeUnitStock(unit_type, unit_stock);
 						}
@@ -1900,9 +1900,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				//Wyrmgus end
 			}
 			
-			for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-				CUnitType *unit_type = iterator->first;
-				int unit_stock = iterator->second;
+			for (std::map<const CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+				const CUnitType *unit_type = iterator->first;
+				const int unit_stock = iterator->second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, - unit_stock);
 				}
@@ -2021,9 +2021,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						//Wyrmgus end
 					}
 					
-					for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-						CUnitType *unit_type = iterator->first;
-						int unit_stock = iterator->second;
+					for (std::map<const CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+						const CUnitType *unit_type = iterator->first;
+						const int unit_stock = iterator->second;
 						if (unit_stock > 0) {
 							unit.ChangeUnitStock(unit_type, - unit_stock);
 						}
@@ -2145,9 +2145,9 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		//Wyrmgus end
 	}
 	
-	for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
-		int unit_stock = iterator->second;
+	for (std::map<const CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+		const CUnitType *unit_type = iterator->first;
+		const int unit_stock = iterator->second;
 		if (unit_stock < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock);
 		}
@@ -2244,9 +2244,9 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		//Wyrmgus end
 	}
 	
-	for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
-		int unit_stock = iterator->second;
+	for (std::map<const CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+		const CUnitType *unit_type = iterator->first;
+		const int unit_stock = iterator->second;
 		if (unit_stock > 0) {
 			unit.ChangeUnitStock(unit_type, - unit_stock);
 		}

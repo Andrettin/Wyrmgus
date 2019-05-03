@@ -445,8 +445,8 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, in
 ** @param flush   Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z)
+//void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, const int flush)
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, const int flush, const int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -541,8 +541,8 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param flush   Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
-void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush)
+//void SendCommandTrainUnit(CUnit &unit, const CUnitType &what, const int flush)
+void SendCommandTrainUnit(CUnit &unit, const CUnitType &what, const int player, const int flush)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -586,7 +586,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
+void SendCommandUpgradeTo(CUnit &unit, const CUnitType &what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);

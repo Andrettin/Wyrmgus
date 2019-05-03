@@ -153,7 +153,7 @@ public:
 	CLanguage *GetLanguage() const;
 	CCalendar *GetCalendar() const;
 	
-	CUnitType *GetUnitType() const
+	const CUnitType *GetUnitType() const
 	{
 		return this->UnitType;
 	}
@@ -196,6 +196,11 @@ public:
 	CPersistentItem *GetItem(const CUnit *item) const;
 	void UpdateAttributes();
 	void SaveHistory(CFile &file);		/// Save generated history data for the character
+	
+	const std::vector<const CHistoricalLocation *> &GetHistoricalLocations() const
+	{
+		return this->HistoricalLocations;
+	}
 
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
@@ -218,7 +223,7 @@ public:
 	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;			/// Character's icon
 	IconConfig HeroicIcon;		/// Character's heroic icon (level 3 and upper)
-	CUnitType *UnitType = nullptr;
+	const CUnitType *UnitType = nullptr;
 	const CUpgrade *Trait = nullptr;
 	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
 private:
@@ -246,9 +251,11 @@ public:
 	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
-	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
-	std::vector<std::pair<CDate, CFaction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
-	std::vector<CHistoricalLocation *> HistoricalLocations;	/// historical locations of the character
+	std::vector<const CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
+	std::vector<std::pair<CDate, CFaction *>> HistoricalFactions;	/// historical factions of the character, with the date of the character's faction change
+private:
+	std::vector<const CHistoricalLocation *> HistoricalLocations;	/// historical locations of the character
+public:
 	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 	

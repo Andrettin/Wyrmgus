@@ -91,7 +91,7 @@ class AiUnitType
 {
 public:
 	unsigned int Want = 0;		/// number of this unit-type wanted
-	CUnitType *Type = nullptr;	/// unit-type self
+	const CUnitType *Type = nullptr;	/// unit-type self
 };
 
 /**
@@ -276,13 +276,13 @@ class AiBuildQueue
 public:
 	unsigned int Want = 0;		/// requested number
 	unsigned int Made = 0;		/// built number
-	CUnitType *Type = nullptr;	/// unit-type
+	const CUnitType *Type = nullptr;	/// unit-type
 	unsigned long Wait = 0;		/// wait until this cycle
 	Vec2i Pos = Vec2i(-1, -1);	/// build near pos on map
 	//Wyrmgus start
 	int MapLayer = 0;
 	int Landmass = 0;
-	CSite *Settlement = nullptr;
+	const CSite *Settlement = nullptr;
 	//Wyrmgus end
 };
 
@@ -479,11 +479,11 @@ extern PlayerAi *AiPlayer; /// Current AI player
 extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
 //Wyrmgus start
-//extern void AiAddUnitTypeRequest(CUnitType &type, int count);
-extern void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass = 0, CSite *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+//extern void AiAddUnitTypeRequest(const CUnitType &type, int count);
+extern void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int landmass = 0, CSite *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 //Wyrmgus end
 /// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(CUnitType &type);
+extern void AiAddUpgradeToRequest(const CUnitType &type);
 /// Add research request to resource manager
 extern void AiAddResearchRequest(CUpgrade *upgrade);
 /// Periodic called resource manager handler
@@ -518,7 +518,7 @@ extern void AiCheckBuildings();
 /// Find nice building place
 //Wyrmgus start
 //extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSite *settlement = nullptr);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const CSite *settlement = nullptr);
 //Wyrmgus end
 
 //

@@ -37,8 +37,8 @@ class CSite;
 class COrder_Build : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
+//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building, const int z, const CSite *settlement);
 	//Wyrmgus end
 public:
 	COrder_Build() : COrder(UnitActionBuild)
@@ -57,7 +57,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	void ConvertUnitType(const CUnit &unit, const CUnitType &newType);
 	//Wyrmgus end
 
 	virtual void AiUnitKilled(CUnit &unit);
@@ -75,14 +75,14 @@ private:
 	bool BuildFromOutside(CUnit &unit) const;
 	void HelpBuild(CUnit &unit, CUnit &building);
 private:
-	CUnitType *Type = nullptr;	/// build a unit of this unit-type
+	const CUnitType *Type = nullptr;	/// build a unit of this unit-type
 	CUnitPtr BuildingUnit;		/// unit builded.
 	int State = 0;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
-	CSite *Settlement = nullptr;
+	const CSite *Settlement = nullptr;
 	//Wyrmgus end
 };
 

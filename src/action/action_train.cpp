@@ -61,8 +61,8 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-// /* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
-/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player)
+// /* static */ COrder *COrder::NewActionTrain(CUnit &trainer, const CUnitType &type)
+/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, const CUnitType &type, const int player)
 //Wyrmgus end
 {
 	COrder_Train *order = new COrder_Train;
@@ -244,7 +244,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	CUnitType &nType = *this->Type;
+	const CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	
 	//Wyrmgus start

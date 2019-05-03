@@ -143,10 +143,10 @@ int CFaction::GetFactionIndex(const std::string &faction_ident)
 	}
 }
 
-int CFaction::GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class)
+const CUnitType *CFaction::GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class)
 {
 	if (faction == nullptr || unit_class == nullptr) {
-		return -1;
+		return nullptr;
 	}
 	
 	if (faction->ClassUnitTypes.find(unit_class) != faction->ClassUnitTypes.end()) {

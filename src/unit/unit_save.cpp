@@ -415,8 +415,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
-	for (std::map<CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<const CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
+		const CUnitType *unit_type = iterator->first;
 		
 		if (unit.GetUnitStock(unit_type) != 0) {
 			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStock(unit_type));

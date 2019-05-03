@@ -1746,9 +1746,9 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	CCivilization *civilization = CCivilization::Get(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization && unit_class != nullptr) {
-		int unit_type_id = CCivilization::GetCivilizationClassUnitType(civilization, unit_class);
-		if (unit_type_id != -1) {
-			unit_type_ident = CUnitType::Get(unit_type_id)->Ident;
+		const CUnitType *unit_type = CCivilization::GetCivilizationClassUnitType(civilization, unit_class);
+		if (unit_type != nullptr) {
+			unit_type_ident = unit_type->Ident;
 		}
 	}
 		
@@ -1791,9 +1791,9 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	}
 	std::string unit_type_ident;
 	if (unit_class != nullptr) {
-		int unit_type_id = CFaction::GetFactionClassUnitType(faction, unit_class);
-		if (unit_type_id != -1) {
-			unit_type_ident = CUnitType::Get(unit_type_id)->Ident;
+		const CUnitType *unit_type = CFaction::GetFactionClassUnitType(faction, unit_class);
+		if (unit_type != nullptr) {
+			unit_type_ident = unit_type->Ident;
 		}
 	}
 		

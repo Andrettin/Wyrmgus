@@ -120,7 +120,7 @@ public:
 	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
 	const CMapTemplate *GetTopMapTemplate() const;
-	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
+	Vec2i GetBestLocationMapPosition(const std::vector<const CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;

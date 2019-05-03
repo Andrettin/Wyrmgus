@@ -68,8 +68,8 @@ constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = nullptr);
+//static int AiMakeUnit(const CUnitType &type, const Vec2i &nearPos);
+static int AiMakeUnit(const CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, const CSite *settlement = nullptr);
 //Wyrmgus end
 
 /**
@@ -314,8 +314,8 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **  @note            We must check if the dependencies are fulfilled.
 */
 //Wyrmgus start
-//static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = nullptr)
+//static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, const Vec2i &nearPos)
+static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, const CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -911,8 +911,8 @@ static bool AiRequestSupply()
 **  @note        We must check if the dependencies are fulfilled.
 */
 //Wyrmgus start
-//static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSite *settlement = nullptr)
+//static bool AiTrainUnit(const CUnitType &type, const CUnitType &what)
+static bool AiTrainUnit(const CUnitType &type, const CUnitType &what, const int landmass = 0, const CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -952,8 +952,8 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 **  @note        We must check if the dependencies are fulfilled.
 */
 //Wyrmgus start
-//static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, CSite *settlement)
+//static int AiMakeUnit(const CUnitType &typeToMake, const Vec2i &nearPos)
+static int AiMakeUnit(const CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	// Find equivalents unittypes.
@@ -1096,7 +1096,7 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
+static bool AiUpgradeTo(const CUnitType &type, const CUnitType &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1118,7 +1118,7 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 **
 **  @param type  FIXME: docu
 */
-void AiAddUpgradeToRequest(CUnitType &type)
+void AiAddUpgradeToRequest(const CUnitType &type)
 {
 	// Check if resources are available.
 	const int resourceNeeded = AiCheckUnitTypeCosts(type);
@@ -1175,7 +1175,7 @@ static void AiCheckingWork()
 	const int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		CUnitType &type = *queuep->Type;
+		const CUnitType &type = *queuep->Type;
 		
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 			queuep->Settlement
@@ -2152,10 +2152,8 @@ static void AiCheckPathwayConstruction()
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					int worker_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("worker"));
-					if (worker_type_id != -1) {
-						CUnitType *test_worker_type = CUnitType::Get(worker_type_id);
-						
+					const CUnitType *test_worker_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("worker"));
+					if (test_worker_type != nullptr) {
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
@@ -2297,12 +2295,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	int town_hall_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("town-hall"));			
-	if (town_hall_type_id == -1) {
-		return;
-	}
-	
-	CUnitType *town_hall_type = CUnitType::Get(town_hall_type_id);
+	const CUnitType *town_hall_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("town-hall"));			
 	
 	if (!CheckDependencies(town_hall_type, AiPlayer->Player)) {
 		return;
@@ -2390,12 +2383,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	int dock_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("dock"));			
-	if (dock_type_id == -1) {
-		return;
-	}
-	
-	CUnitType *dock_type = CUnitType::Get(dock_type_id);
+	const CUnitType *dock_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("dock"));			
 	
 	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *dock_type)) {
 		return;
@@ -2528,16 +2516,12 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_templates[i]->UnitClass);
-		CUnitType *type = nullptr;
-		if (unit_type_id != -1) {
-			type = CUnitType::Get(unit_type_id);
-		}
-		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type, false, true)) {
+		const CUnitType *unit_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_templates[i]->UnitClass);
+		if (!unit_type || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type, false, true)) {
 			continue;
 		}
 		
-		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the building if it is going to use up a resource that is currently needed
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) { //don't request the building if it is going to use up a resource that is currently needed
 			continue;
 		}
 		
@@ -2547,8 +2531,8 @@ void AiCheckBuildings()
 		want_counter[building_templates[i]->UnitClass]++;
 			
 		if (have_counter.find(building_templates[i]->UnitClass) == have_counter.end() || have_with_requests_counter.find(building_templates[i]->UnitClass) == have_with_requests_counter.end()) { //initialize values
-			have_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, false, true);
-			have_with_requests_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, true, true);
+			have_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, unit_type, 0, false, true);
+			have_with_requests_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, unit_type, 0, true, true);
 		}
 			
 		if (have_with_requests_counter[building_templates[i]->UnitClass] >= want_counter[building_templates[i]->UnitClass]) {
@@ -2571,26 +2555,20 @@ void AiCheckBuildings()
 	
 	CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_template->UnitClass);
-	CUnitType *type = CUnitType::Get(unit_type_id);
+	const CUnitType *unit_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_template->UnitClass);
 	
-	if (type->GetIndex() < (int) AiHelpers.Build.size() && !AiHelpers.Build[type->GetIndex()].empty()) { //constructed by worker
-		AiAddUnitTypeRequest(*type, 1);
-	} else if (type->GetIndex() < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type->GetIndex()].empty()) { //upgraded to from another building
-		AiAddUpgradeToRequest(*type);
+	if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && !AiHelpers.Build[unit_type->GetIndex()].empty()) { //constructed by worker
+		AiAddUnitTypeRequest(*unit_type, 1);
+	} else if (unit_type->GetIndex() < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[unit_type->GetIndex()].empty()) { //upgraded to from another building
+		AiAddUpgradeToRequest(*unit_type);
 	} else {
-		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", type->Ident.c_str());
+		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", unit_type->Ident.c_str());
 	}
 }
 
 static void AiCheckMinecartConstruction()
 {
-	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
-	if (minecart_type_id == -1) {
-		return;
-	}
-	
-	CUnitType *minecart_type = CUnitType::Get(minecart_type_id);
+	const CUnitType *minecart_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
 		
 	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *minecart_type, false, false)) {
 		return;
@@ -2658,12 +2636,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
-	if (minecart_type_id == -1) {
-		return;
-	}
-	
-	CUnitType *minecart_type = CUnitType::Get(minecart_type_id);
+	const CUnitType *minecart_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
 	std::vector<CUnit *> minecart_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *minecart_type, minecart_table, true);
 	
@@ -2727,8 +2700,8 @@ void AiCheckWorkers()
 **  @todo         FIXME: should store the end of list and not search it.
 */
 //Wyrmgus start
-//void AiAddUnitTypeRequest(CUnitType &type, int count)
-void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, CSite *settlement, const Vec2i pos, int z)
+//void AiAddUnitTypeRequest(const CUnitType &type, int count)
+void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int landmass, CSite *settlement, const Vec2i pos, int z)
 //Wyrmgus end
 {
 	AiBuildQueue queue;

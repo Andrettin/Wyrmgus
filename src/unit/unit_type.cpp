@@ -1161,16 +1161,16 @@ void CUnitType::Initialize()
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (CCivilization *civilization : CCivilization::GetAll()) {
-			for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == this->GetIndex()) {
+			for (std::map<const UnitClass *, const CUnitType *>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == this) {
 					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
 			}
 		}
 		for (CFaction *faction : CFaction::GetAll()) {
-			for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == this->GetIndex()) {
+			for (std::map<const UnitClass *, const CUnitType *>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == this) {
 					faction->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
@@ -1179,9 +1179,9 @@ void CUnitType::Initialize()
 		
 		if (this->GetCivilization() != nullptr && unit_class != nullptr) {
 			if (this->Faction != nullptr) {
-				this->Faction->ClassUnitTypes[unit_class] = this->GetIndex();
+				this->Faction->ClassUnitTypes[unit_class] = this;
 			} else {
-				this->GetCivilization()->ClassUnitTypes[unit_class] = this->GetIndex();
+				this->GetCivilization()->ClassUnitTypes[unit_class] = this;
 			}
 		}
 	}
@@ -1880,7 +1880,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 	
 	if (potential_names.empty() && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
-		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Class)) {
+		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this == CFaction::GetFactionClassUnitType(faction, this->Class)) {
 			civilization = faction->Civilization;
 		}
 		if (faction && faction->Civilization != civilization) {
@@ -2137,8 +2137,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					type.MapDefaultStat.Variables[i].Enable = iterator->second.Variables[i].Enable;
 				}
 			}
-			for (std::map<CUnitType *, int>::const_iterator unit_stock_iterator = iterator->second.UnitStock.begin(); unit_stock_iterator != iterator->second.UnitStock.end(); ++unit_stock_iterator) {
-				CUnitType *unit_type = unit_stock_iterator->first;
+			for (std::map<const CUnitType *, int>::const_iterator unit_stock_iterator = iterator->second.UnitStock.begin(); unit_stock_iterator != iterator->second.UnitStock.end(); ++unit_stock_iterator) {
+				const CUnitType *unit_type = unit_stock_iterator->first;
 				int unit_stock = unit_stock_iterator->second;
 				type.MapDefaultStat.ChangeUnitStock(unit_type, unit_stock);
 			}

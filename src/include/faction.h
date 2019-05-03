@@ -108,7 +108,7 @@ public:
 	static constexpr const char *ClassIdentifier = "faction";
 	
 	static int GetFactionIndex(const std::string &faction_ident);
-	static int GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class);
+	static const CUnitType *GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class);
 	static int GetFactionClassUpgrade(const CFaction *faction, const int class_id);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
 	
@@ -193,8 +193,8 @@ public:
 	std::map<int, std::map<const CGender *, std::map<int, std::map<int, std::string>>>> MinisterTitles; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
-	std::map<const UnitClass *, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
-	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
+	std::map<const UnitClass *, const CUnitType *> ClassUnitTypes;		/// the unit type of a particular unit class for the faction
+	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for the faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)

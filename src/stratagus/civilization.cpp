@@ -46,10 +46,10 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int CCivilization::GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class)
+const CUnitType *CCivilization::GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class)
 {
 	if (civilization == nullptr || unit_class == nullptr) {
-		return -1;
+		return nullptr;
 	}
 	
 	if (civilization->ClassUnitTypes.find(unit_class) != civilization->ClassUnitTypes.end()) {
@@ -60,7 +60,7 @@ int CCivilization::GetCivilizationClassUnitType(const CCivilization *civilizatio
 		return CCivilization::GetCivilizationClassUnitType(civilization->ParentCivilization, unit_class);
 	}
 	
-	return -1;
+	return nullptr;
 }
 
 int CCivilization::GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id)

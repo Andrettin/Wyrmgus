@@ -91,16 +91,16 @@ public:
 	bool operator != (const CUnitStats &rhs) const;
 	
  	int GetPrice() const;
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
+	int GetUnitStock(const CUnitType *unit_type) const;
+	void SetUnitStock(const CUnitType *unit_type, const int quantity);
+	void ChangeUnitStock(const CUnitType *unit_type, const int quantity);
 public:
 	CVariable *Variables = nullptr;	/// user defined variable.
 	int Costs[MaxCosts];			/// current costs of the unit
 	int Storing[MaxCosts];			/// storage increasing
 	int ImproveIncomes[MaxCosts];	/// Gives player an improved income
 	int ResourceDemand[MaxCosts];	/// Resource demand
-	std::map<CUnitType *, int> UnitStock;	/// Units in stock
+	std::map<const CUnitType *, int> UnitStock;	/// Units in stock
 };
 
 /**

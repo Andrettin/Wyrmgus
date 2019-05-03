@@ -128,8 +128,8 @@ extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush,
 //Wyrmgus end
 /// Prepare command build
 //Wyrmgus start
-//extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, CSite *settlement = nullptr);
+//extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &, int flush);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &, int flush, const int z = 0, const CSite *settlement = nullptr);
 //Wyrmgus end
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);
@@ -144,15 +144,15 @@ extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
 /// Prepare command train
 //Wyrmgus start
-//extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
-extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush);
+//extern void CommandTrainUnit(CUnit &unit, const CUnitType &what, const int flush);
+extern void CommandTrainUnit(CUnit &unit, const CUnitType &what, const int player, const int flush);
 //Wyrmgus end
 /// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, const CUnitType &what, int flush);
 /// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
+extern void CommandTransformIntoType(CUnit &unit, const CUnitType &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
@@ -252,8 +252,8 @@ extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int fl
 //Wyrmgus end
 /// Send build building command
 //Wyrmgus start
-//extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush);
-extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z = 0);
+//extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, const int flush);
+extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, const int flush, const int z = 0);
 //Wyrmgus end
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit, bool salvage = false);
@@ -268,13 +268,13 @@ extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
 /// Send train command
 //Wyrmgus start
-//extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
-extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush);
+//extern void SendCommandTrainUnit(CUnit &unit, const CUnitType &what, const int flush);
+extern void SendCommandTrainUnit(CUnit &unit, const CUnitType &what, const int player, const int flush);
 //Wyrmgus end
 /// Send cancel training command
 extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+extern void SendCommandUpgradeTo(CUnit &unit, const CUnitType &what, int flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
 //Wyrmgus start

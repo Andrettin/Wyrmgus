@@ -315,13 +315,13 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->OffensiveMilitaryScore += this->Units[unit_type->GetIndex()] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
 		} else if (unit_type->GetClass() != nullptr && unit_type->GetClass()->Ident == "worker") {
-			int militia_unit_type = -1;
+			const CUnitType *militia_unit_type = nullptr;
 			if (unit_type->GetCivilization() != nullptr) {
 				militia_unit_type = CCivilization::GetCivilizationClassUnitType(unit_type->GetCivilization(), UnitClass::Get("militia"));
 			}
-			if (militia_unit_type != -1) {
-				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0);
-				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type] : 0);
+			if (militia_unit_type != nullptr) {
+				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->GetIndex()] : 0);
+				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type->GetIndex()] : 0);
 				if (old_owner_military_score_bonus != new_owner_military_score_bonus) {
 					this->MilitaryScore += this->Units[unit_type->GetIndex()] * ((new_owner_military_score_bonus - old_owner_military_score_bonus) / 2);
 				}
@@ -413,12 +413,12 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		int militia_unit_type = -1;
+		const CUnitType *militia_unit_type = nullptr;
 		if (CUnitType::Get(unit_type_id)->GetCivilization() != nullptr) {
 			militia_unit_type = CCivilization::GetCivilizationClassUnitType(CUnitType::Get(unit_type_id)->GetCivilization(), UnitClass::Get("militia"));
 		}
-		if (militia_unit_type != -1) {
-			this->MilitaryScore += change * ((CUnitType::Get(militia_unit_type)->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
+		if (militia_unit_type != nullptr) {
+			this->MilitaryScore += change * ((militia_unit_type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->GetIndex()] : 0)) / 2);
 		}
 	}
 	
@@ -590,10 +590,12 @@ int CGrandStrategyProvince::GetPopulation()
 int CGrandStrategyProvince::GetClassUnitType(const UnitClass *unit_class)
 {
 	if (this->Civilization != -1) {
-		return CCivilization::GetCivilizationClassUnitType(CCivilization::Get(this->Civilization), unit_class);
-	} else {
-		return -1;
+		const CUnitType *unit_type = CCivilization::GetCivilizationClassUnitType(CCivilization::Get(this->Civilization), unit_class);
+		if (unit_type != nullptr) {
+			return unit_type->GetIndex();
+		}
 	}
+	return -1;
 }
 
 int CGrandStrategyProvince::GetDesirabilityRating()

@@ -116,7 +116,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-int CUpgradeModifier::GetUnitStock(CUnitType *unit_type) const
+int CUpgradeModifier::GetUnitStock(const CUnitType *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
 		return this->UnitStock.find(unit_type)->second;
@@ -125,7 +125,7 @@ int CUpgradeModifier::GetUnitStock(CUnitType *unit_type) const
 	}
 }
 
-void CUpgradeModifier::SetUnitStock(CUnitType *unit_type, int quantity)
+void CUpgradeModifier::SetUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -140,7 +140,7 @@ void CUpgradeModifier::SetUnitStock(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUpgradeModifier::ChangeUnitStock(CUnitType *unit_type, int quantity)
+void CUpgradeModifier::ChangeUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }

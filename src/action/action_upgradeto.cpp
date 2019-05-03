@@ -67,7 +67,7 @@ constexpr int CANCEL_UPGRADE_COSTS_FACTOR = 100;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionTransformInto(CUnitType &type)
+/* static */ COrder *COrder::NewActionTransformInto(const CUnitType &type)
 {
 	COrder_TransformInto *order = new COrder_TransformInto;
 
@@ -75,7 +75,7 @@ constexpr int CANCEL_UPGRADE_COSTS_FACTOR = 100;
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
+/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, const CUnitType &type)
 {
 	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
@@ -214,10 +214,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	//Wyrmgus start
-	for (std::map<CUnitType *, int>::iterator iterator = unit.UnitStock.begin(); iterator != unit.UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<const CUnitType *, int>::iterator iterator = unit.UnitStock.begin(); iterator != unit.UnitStock.end(); ++iterator) {
+		const CUnitType *unit_type = iterator->first;
 		
-		int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
+		const int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
 		if (unit_stock_change < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock_change);
 		}
@@ -440,7 +440,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 }
 
 //Wyrmgus start
-void COrder_TransformInto::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_TransformInto::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 {
 	const CPlayer &player = *unit.Player;
 	this->Type = &newType;
@@ -569,7 +569,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 }
 
 //Wyrmgus start
-void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 {
 	const CPlayer &player = *unit.Player;
 	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];

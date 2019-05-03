@@ -165,7 +165,7 @@ class BuildingPlaceFinder
 public:
 	//Wyrmgus start
 //	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
-	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, CSite *settlement) :
+	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, const bool ignore_exploration, const int z, const int landmass, const CSite *settlement) :
 	//Wyrmgus end
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
@@ -194,7 +194,7 @@ private:
 	//Wyrmgus start
 	int z;
 	int landmass;
-	CSite *settlement;
+	const CSite *settlement;
 	bool IgnoreExploration;
 	//Wyrmgus end
 };
@@ -258,8 +258,8 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 **  @return  True if place found, false if no found.
 */
 //Wyrmgus start
-//static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos)
-static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSite *settlement = nullptr)
+//static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, const bool checkSurround, Vec2i *resultPos)
+static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, const bool checkSurround, Vec2i *resultPos, const bool ignore_exploration, const int z, const int landmass = 0, const CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -616,7 +616,7 @@ static bool AiFindMiningPlace(const CUnit &worker,
 */
 //Wyrmgus start
 //bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos)
-bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, CSite *settlement)
+bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	// Find a good place for a new hall

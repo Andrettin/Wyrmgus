@@ -38,6 +38,7 @@
 #include "config.h"
 #include "faction.h"
 #include "map/historical_location.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
@@ -49,7 +50,7 @@
 */
 CHistoricalUnit::~CHistoricalUnit()
 {
-	for (CHistoricalLocation *historical_location : this->HistoricalLocations) {
+	for (const CHistoricalLocation *historical_location : this->HistoricalLocations) {
 		delete historical_location;
 	}
 }
@@ -64,11 +65,7 @@ CHistoricalUnit::~CHistoricalUnit()
 */
 bool CHistoricalUnit::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "unit_type") {
-		this->UnitType = CUnitType::Get(value);
-	} else if (key == "faction") {
-		this->Faction = CFaction::Get(value);
-	} else if (key == "start_date") {
+	if (key == "start_date") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->StartDate = CDate::FromString(value);
 	} else if (key == "end_date") {
@@ -100,6 +97,27 @@ bool CHistoricalUnit::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		this->HistoricalLocations.push_back(historical_location);
+	} else if (section->Tag == "historical_owner") {
+		CDate date;
+		const CFaction *owner_faction = nullptr;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			if (property.Key == "date") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
+				date = CDate::FromString(value);
+			} else if (property.Key == "faction") {
+				owner_faction = CFaction::Get(property.Value);
+			} else {
+				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.c_str());
+			}
+		}
+		
+		this->HistoricalOwners[date] = owner_faction;
 	} else {
 		return false;
 	}
@@ -112,8 +130,8 @@ bool CHistoricalUnit::ProcessConfigDataSection(const CConfigData *section)
 */
 void CHistoricalUnit::Initialize()
 {
-	if (this->UnitType == nullptr) {
-		fprintf(stderr, "Historical unit \"%s\" does not have a unit type.\n", this->GetIdent().utf8().get_data());
+	if (this->UnitType == nullptr && this->UnitClass == nullptr) {
+		fprintf(stderr, "Historical unit \"%s\" has neither a unit type nor a unit class.\n", this->GetIdent().utf8().get_data());
 	}
 	
 	if (this->HistoricalLocations.empty()) {
@@ -125,6 +143,18 @@ void CHistoricalUnit::Initialize()
 
 void CHistoricalUnit::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_unit_class", "unit_class_ident"), [](CHistoricalUnit *historical_unit, const String &unit_class_ident){ historical_unit->UnitClass = UnitClass::Get(unit_class_ident); });
+	ClassDB::bind_method(D_METHOD("get_unit_class"), [](const CHistoricalUnit *historical_unit){ return const_cast<UnitClass *>(historical_unit->GetUnitClass()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unit_class"), "set_unit_class", "get_unit_class");
+	
+	ClassDB::bind_method(D_METHOD("set_unit_type", "unit_type_ident"), [](CHistoricalUnit *historical_unit, const String &unit_type_ident){ historical_unit->UnitType = CUnitType::Get(unit_type_ident); });
+	ClassDB::bind_method(D_METHOD("get_unit_type"), [](const CHistoricalUnit *historical_unit){ return const_cast<CUnitType *>(historical_unit->GetUnitType()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unit_type"), "set_unit_type", "get_unit_type");
+	
+	ClassDB::bind_method(D_METHOD("set_faction", "faction_ident"), [](CHistoricalUnit *historical_unit, const String &faction_ident){ historical_unit->Faction = CFaction::Get(faction_ident); });
+	ClassDB::bind_method(D_METHOD("get_faction"), [](const CHistoricalUnit *historical_unit){ return const_cast<CFaction *>(historical_unit->GetFaction()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
+	
 	ClassDB::bind_method(D_METHOD("set_quantity", "quantity"), [](CHistoricalUnit *historical_unit, const int quantity){ historical_unit->Quantity = quantity; });
 	ClassDB::bind_method(D_METHOD("get_quantity"), &CHistoricalUnit::GetQuantity);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "quantity"), "set_quantity", "get_quantity");

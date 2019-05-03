@@ -326,8 +326,8 @@ static void AiCheckUnits()
 				}
 
 				bool mercenary_recruited = false;
-				for (std::map<CUnitType *, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
-					CUnitType *mercenary_type = iterator->first;
+				for (std::map<const CUnitType *, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
+					const CUnitType *mercenary_type = iterator->first;
 					if (
 						iterator->second
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
@@ -1216,7 +1216,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 */
 //Wyrmgus start
 //void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
-void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, CSite *settlement)
+void AiCanNotBuild(const CUnit &unit, const CUnitType &what, const int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
@@ -1238,7 +1238,7 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, CSite
 */
 //Wyrmgus start
 //void AiCanNotReach(CUnit &unit, const CUnitType &what)
-void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, CSite *settlement)
+void AiCanNotReach(CUnit &unit, const CUnitType &what, const int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	Assert(unit.Player->Type != PlayerPerson);
@@ -1431,9 +1431,9 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		int requested_unit_type_id = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->GetClass());
-		if (requested_unit_type_id != -1) {
-			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::Get(requested_unit_type_id), CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+		const CUnitType *requested_unit_type = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->GetClass());
+		if (requested_unit_type != nullptr) {
+			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}
 	}
 	//Wyrmgus end

@@ -113,10 +113,10 @@
 	if (!target) {
 		return 0;
 	}
-	CUnitType *type = this->NewForm;
+	const CUnitType *unit_type = this->NewForm;
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
-		int new_unit_type = -1;
+		const CUnitType *new_unit_type = nullptr;
 		if (this->Civilization != nullptr && this->Faction != nullptr && this->Civilization == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
 			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->Type->GetClass());
 		} else if (this->Civilization != nullptr && this->Civilization != target->Type->GetCivilization()) {
@@ -125,15 +125,15 @@
 		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->GetFaction() != nullptr) {
 			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->Type->GetCivilization(), target->Type->GetClass());
 		}
-		if (new_unit_type != -1) {
-			type = CUnitType::Get(new_unit_type);
+		if (new_unit_type != nullptr) {
+			unit_type = new_unit_type;
 		}
 	}
 	if (target->Character && target->Character->Custom && target->Character->GetCivilization() != nullptr && this->Civilization != nullptr && this->Civilization != target->Character->GetCivilization()) {
 		target->Character->Civilization = this->Civilization;
 		SaveHero(target->Character);
 	}
-	if (type == nullptr) {
+	if (unit_type == nullptr) {
 		return 0;
 	}
 //	const Vec2i pos(goalPos - type.GetHalfTileSize());
@@ -172,22 +172,22 @@
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	//Wyrmgus start
 //	Vec2i resPos;
-//	FindNearestDrop(type, pos, resPos, LookingW);
-	TransformUnitIntoType(*target, *type);
+//	FindNearestDrop(unit_type, pos, resPos, LookingW);
+	TransformUnitIntoType(*target, *unit_type);
 	//Wyrmgus end
 	if (this->PlayerNeutral == 1) {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, type, CPlayer::Players[PlayerNumNeutral]);
+//		MakeUnitAndPlace(resPos, unit_type, CPlayer::Players[PlayerNumNeutral]);
 		target->ChangeOwner(*CPlayer::Players[PlayerNumNeutral]);
 		//Wyrmgus end
 	} else if (this->PlayerNeutral == 2) {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, type, caster.Player);
+//		MakeUnitAndPlace(resPos, unit_type, caster.Player);
 		target->ChangeOwner(*caster.Player);
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, type, target->Player);
+//		MakeUnitAndPlace(resPos, unit_type, target->Player);
 		//Wyrmgus end
 	}
 	//Wyrmgus start
@@ -200,7 +200,7 @@
 //	target->Release();
 	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
 		if (target->Player->AiEnabled == false) {
-			target->Character->UnitType = type;
+			target->Character->UnitType = unit_type;
 			SaveHero(target->Character);
 		}
 	}

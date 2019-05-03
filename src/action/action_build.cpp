@@ -84,8 +84,8 @@ enum {
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement)
+///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building, const int z, const CSite *settlement)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -288,7 +288,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 }
 
-static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, CSite *settlement)
+static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landmass, const CSite *settlement)
 {
 	const CPlayer &player = *unit.Player;
 	bool isOk = true;
@@ -492,7 +492,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 }
 
 //Wyrmgus start
-void COrder_Build::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_Build::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 {
 	this->Type = &newType;
 }

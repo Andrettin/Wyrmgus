@@ -78,7 +78,7 @@ public:
 	
 	static constexpr const char *ClassIdentifier = "civilization";
 	
-	static int GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class);
+	static const CUnitType *GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class);
 	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
 	static std::vector<CFiller> GetCivilizationUIFillers(const CCivilization *civilization);
 	
@@ -338,7 +338,7 @@ public:
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::map<int, std::map<const CGender *, std::map<int, std::map<int, std::string>>>> MinisterTitles; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
-	std::map<const UnitClass *, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
+	std::map<const UnitClass *, const CUnitType *> ClassUnitTypes;		/// the unit type of a particular unit class for the civilization
 	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization
 private:
 	String VictoryBackgroundFile;

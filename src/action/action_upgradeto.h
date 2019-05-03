@@ -34,7 +34,7 @@
 
 class COrder_TransformInto : public COrder
 {
-	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
+	friend COrder *COrder::NewActionTransformInto(const CUnitType &type);
 public:
 	COrder_TransformInto() : COrder(UnitActionTransformInto) {}
 
@@ -50,18 +50,18 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	void ConvertUnitType(const CUnit &unit, const CUnitType &newType);
 	const CUnitType &GetUnitType() const { return *Type; }
 	//Wyrmgus end
 
 private:
-	CUnitType *Type = nullptr;	/// Transform unit into this unit-type
+	const CUnitType *Type = nullptr;	/// Transform unit into this unit-type
 };
 
 
 class COrder_UpgradeTo : public COrder
 {
-	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, const CUnitType &type);
 public:
 	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo) {}
 
@@ -80,13 +80,13 @@ public:
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	void ConvertUnitType(const CUnit &unit, const CUnitType &newType);
 	//Wyrmgus end
 	
 	const CUnitType &GetUnitType() const { return *Type; }
 	
 private:
-	CUnitType *Type = nullptr;	/// upgrade to this unit-type
+	const CUnitType *Type = nullptr;	/// upgrade to this unit-type
 	int Ticks = 0;				/// Ticks to complete
 };
 

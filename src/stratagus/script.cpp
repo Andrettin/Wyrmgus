@@ -1583,7 +1583,7 @@ std::string EvalString(const StringDesc *s)
 				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
 				const CUnit *site_unit = unit->Settlement->SiteUnit;
 				const CPlayer *site_player = site_unit->Player;
-				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type->GetIndex() == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->GetClass()))) {
+				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->GetClass()))) {
 					civilization = CCivilization::Get(site_player->Race);
 				}
 				return unit->Settlement->GetCulturalName(civilization);
@@ -3719,15 +3719,15 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		RecalculateShownUnits();
 	}
 	for (CCivilization *civilization : CCivilization::GetAll()) {
-		for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
-			if (iterator->second == unit_type->GetIndex()) {
+		for (std::map<const UnitClass *, const CUnitType *>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
+			if (iterator->second == unit_type) {
 				civilization->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
 	for (CFaction *faction : CFaction::GetAll()) {
-		for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
-			if (iterator->second == unit_type->GetIndex()) {
+		for (std::map<const UnitClass *, const CUnitType *>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
+			if (iterator->second == unit_type) {
 				faction->ClassUnitTypes.erase(iterator->first);
 			}
 		}

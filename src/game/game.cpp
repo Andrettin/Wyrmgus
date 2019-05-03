@@ -652,9 +652,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
-			for (std::map<CUnitType *, int>::const_iterator iterator = unit_type->DefaultStat.UnitStock.begin(); iterator != unit_type->DefaultStat.UnitStock.end(); ++iterator) {
-				CUnitType *unit_type = iterator->first;
-				int unit_stock = iterator->second;
+			for (std::map<const CUnitType *, int>::const_iterator iterator = unit_type->DefaultStat.UnitStock.begin(); iterator != unit_type->DefaultStat.UnitStock.end(); ++iterator) {
+				const CUnitType *unit_type = iterator->first;
+				const int unit_stock = iterator->second;
 				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(unit_type))) {
 					f->printf("\"%s\", ", unit_type->Ident.c_str());
 					f->printf("%d, ", unit_stock);
@@ -902,7 +902,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModDefaultStats[CMap::Map.Info.Filename].ImproveIncomes[j], DefaultResourceNames[j].c_str());
 					}
 				}
-				for (std::map<CUnitType *, int>::const_iterator iterator = unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.begin(); iterator != unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.end(); ++iterator) {
+				for (std::map<const CUnitType *, int>::const_iterator iterator = unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.begin(); iterator != unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.end(); ++iterator) {
 					const CUnitType *unit_type = iterator->first;
 					int unit_stock = iterator->second;
 					if (unit_stock != 0) {

@@ -391,12 +391,12 @@ public:
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
 	int GetPrice() const;
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
-	int GetUnitStockReplenishmentTimer(CUnitType *unit_type) const;
-	void SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
-	void ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
+	int GetUnitStock(const CUnitType *unit_type) const;
+	void SetUnitStock(const CUnitType *unit_type, const int quantity);
+	void ChangeUnitStock(const CUnitType *unit_type, const int quantity);
+	int GetUnitStockReplenishmentTimer(const CUnitType *unit_type) const;
+	void SetUnitStockReplenishmentTimer(const CUnitType *unit_type, const int quantity);
+	void ChangeUnitStockReplenishmentTimer(const CUnitType *unit_type, const int quantity);
 	int GetResourceStep(const int resource) const;
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const CUnitType *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
@@ -529,8 +529,8 @@ public:
 	//Wyrmgus end
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
-	std::map<CUnitType *, int> UnitStock; 						/// How many of each unit type this unit has stocked
-	std::map<CUnitType *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
+	std::map<const CUnitType *, int> UnitStock; 						/// How many of each unit type this unit has stocked
+	std::map<const CUnitType *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked

@@ -1911,17 +1911,13 @@ void AiForceManager::CheckForceRecruitment()
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
 					const UnitClass *unit_class = faction_force_templates[i]->Units[j].first;
-					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
-					CUnitType *type = nullptr;
-					if (unit_type_id != -1) {
-						type = CUnitType::Get(unit_type_id);
-					}
-					if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+					const CUnitType *unit_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
+					if (!unit_type || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
 						break;
 					}
 					
-					if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the force if it is going to use up a resource that is currently needed
+					if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) { //don't request the force if it is going to use up a resource that is currently needed
 						valid = false;
 						break;
 					}
@@ -1947,16 +1943,12 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Role = AiForceRoleDefault;
 				for (size_t i = 0; i < force_template->Units.size(); ++i) {
 					const UnitClass *unit_class = force_template->Units[i].first;
-					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
-					CUnitType *type = nullptr;
-					if (unit_type_id != -1) {
-						type = CUnitType::Get(unit_type_id);
-					}
+					const CUnitType *unit_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
 					int count = force_template->Units[i].second;
 					
 					AiUnitType newaiut;
 					newaiut.Want = count;
-					newaiut.Type = type;
+					newaiut.Type = unit_type;
 					new_force.UnitTypes.push_back(newaiut);
 				}
 				AiAssignFreeUnitsToForce(new_force_id);

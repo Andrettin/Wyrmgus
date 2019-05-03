@@ -142,8 +142,8 @@ public:
 	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
 	//Wyrmgus start
-//	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
+//	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building);
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building, const int z, const CSite *settlement);
 	//Wyrmgus end
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);
@@ -174,15 +174,15 @@ public:
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
 	//Wyrmgus start
-//	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
-	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type, int player);
+//	static COrder *NewActionTrain(CUnit &trainer, const CUnitType &type);
+	static COrder *NewActionTrain(CUnit &trainer, const CUnitType &type, const int player);
 	//Wyrmgus end
-	static COrder *NewActionTransformInto(CUnitType &type);
+	static COrder *NewActionTransformInto(const CUnitType &type);
 	//Wyrmgus start
 //	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
 	//Wyrmgus end
-	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	static COrder *NewActionUpgradeTo(CUnit &unit, const CUnitType &type);
 	//Wyrmgus start
 	static COrder *NewActionUse(CUnit &dest);
 	static COrder *NewActionTrade(CUnit &dest, CUnit &home_market);

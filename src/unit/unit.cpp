@@ -2434,7 +2434,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		const CCivilization *civilization = this->Type->GetCivilization();
-		if (civilization != nullptr && civilization->GetIndex() != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass())) {
+		if (civilization != nullptr && civilization->GetIndex() != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass())) {
 			civilization = CCivilization::Get(this->Player->Race);
 		}
 		
@@ -2448,7 +2448,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->UnitType->GetIndex() == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->UnitType->GetClass()))
+					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->UnitType == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->UnitType->GetClass()))
 					&& CheckDependencies(iterator->second->UnitType, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
@@ -3403,7 +3403,7 @@ std::vector<String> CUnit::GetPotentialNames() const
 		if (this->Player->GetFaction() != nullptr) {
 			faction = this->Player->GetFaction();
 			
-			if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+			if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
 				civilization = faction->Civilization;
 			}
 		}
@@ -3535,7 +3535,7 @@ void CUnit::UpdatePersonalName(const bool update_settlement_name)
 	if (this->Player->GetFaction() != nullptr) {
 		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
 			civilization = faction->Civilization;
 		}
 	}
@@ -3596,12 +3596,12 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			const CCivilization *civilization = this->Type->GetCivilization();
-			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Get(this->Player->Race) == civilization || this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass()))) {
+			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Get(this->Player->Race) == civilization || this->Type == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass()))) {
 				civilization = CCivilization::Get(this->Player->Race);
 			}
 			
 			const CFaction *faction = this->Type->GetFaction();
-			if (CCivilization::Get(this->Player->Race) == civilization && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass())) {
+			if (CCivilization::Get(this->Player->Race) == civilization && this->Type == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->GetClass())) {
 				faction = this->Player->GetFaction();
 			}
 
@@ -5835,7 +5835,7 @@ int CUnit::GetPrice() const
 	return cost;
 }
 
-int CUnit::GetUnitStock(CUnitType *unit_type) const
+int CUnit::GetUnitStock(const CUnitType *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
 		return this->UnitStock.find(unit_type)->second;
@@ -5844,7 +5844,7 @@ int CUnit::GetUnitStock(CUnitType *unit_type) const
 	}
 }
 
-void CUnit::SetUnitStock(CUnitType *unit_type, int quantity)
+void CUnit::SetUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5859,12 +5859,12 @@ void CUnit::SetUnitStock(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUnit::ChangeUnitStock(CUnitType *unit_type, int quantity)
+void CUnit::ChangeUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-int CUnit::GetUnitStockReplenishmentTimer(CUnitType *unit_type) const
+int CUnit::GetUnitStockReplenishmentTimer(const CUnitType *unit_type) const
 {
 	if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
 		return this->UnitStockReplenishmentTimers.find(unit_type)->second;
@@ -5873,7 +5873,7 @@ int CUnit::GetUnitStockReplenishmentTimer(CUnitType *unit_type) const
 	}
 }
 
-void CUnit::SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
+void CUnit::SetUnitStockReplenishmentTimer(const CUnitType *unit_type, const int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5888,7 +5888,7 @@ void CUnit::SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUnit::ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
+void CUnit::ChangeUnitStockReplenishmentTimer(const CUnitType *unit_type, const int quantity)
 {
 	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
 }
@@ -6759,7 +6759,7 @@ const CLanguage *CUnit::GetLanguage() const
 	if (this->Player->GetFaction() != nullptr) {
 		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->GetIndex() == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
 			civilization = faction->Civilization;
 		}
 	}
@@ -8132,8 +8132,8 @@ void CUnit::HandleBuffsEachCycle()
 		}
 	}
 
-	for (std::map<CUnitType *, int>::const_iterator iterator = this->Type->Stats[this->Player->Index].UnitStock.begin(); iterator != this->Type->Stats[this->Player->Index].UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<const CUnitType *, int>::const_iterator iterator = this->Type->Stats[this->Player->Index].UnitStock.begin(); iterator != this->Type->Stats[this->Player->Index].UnitStock.end(); ++iterator) {
+		const CUnitType *unit_type = iterator->first;
 		int unit_stock = iterator->second;
 		
 		if (unit_stock <= 0) {

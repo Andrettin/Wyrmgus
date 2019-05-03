@@ -70,9 +70,9 @@ public:
 	
 	void ProcessConfigData(const CConfigData *config_data);
 	
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
+	int GetUnitStock(const CUnitType *unit_type) const;
+	void SetUnitStock(const CUnitType *unit_type, const int quantity);
+	void ChangeUnitStock(const CUnitType *unit_type, const int quantity);
 
 	int UpgradeId = 0;						/// used to filter required modifier
 
@@ -80,7 +80,7 @@ public:
 	int *ModifyPercent = nullptr;			/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];			/// improve incomes
-	std::map<CUnitType *, int> UnitStock;	/// unit stock
+	std::map<const CUnitType *, int> UnitStock;	/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?

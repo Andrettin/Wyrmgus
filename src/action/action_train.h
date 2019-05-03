@@ -35,8 +35,8 @@
 class COrder_Train : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
-	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player);
+//	friend COrder *COrder::NewActionTrain(CUnit &trainer, const CUnitType &type);
+	friend COrder *COrder::NewActionTrain(CUnit &trainer, const CUnitType &type, const int player);
 	//Wyrmgus end
 public:
 	COrder_Train() : COrder(UnitActionTrain) {}
@@ -59,7 +59,7 @@ public:
 	const CUnitType &GetUnitType() const { return *Type; }
 	
 private:
-	CUnitType *Type = nullptr;	/// train a unit of this unit-type
+	const CUnitType *Type = nullptr;	/// train a unit of this unit-type
 	//Wyrmgus start
 	int Player = 0;				/// Player doing the training (needed for neutral building training)
 	//Wyrmgus end

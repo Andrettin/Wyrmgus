@@ -86,7 +86,7 @@ CCharacter::~CCharacter()
 		delete Conditions;
 	}
 	
-	for (CHistoricalLocation *historical_location : this->HistoricalLocations) {
+	for (const CHistoricalLocation *historical_location : this->HistoricalLocations) {
 		delete historical_location;
 	}
 	
@@ -402,11 +402,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
-	if (this->UnitType != nullptr && this->UnitType->BoolFlag[FAUNA_INDEX].value) {
-		if (name_changed) {
-			this->UnitType->PersonalNames[this->Gender].push_back(this->Name.utf8().get_data());
-		}
-	} else if (this->Civilization) {
+	if (!this->UnitType->BoolFlag[FAUNA_INDEX].value && this->Civilization) {
 		if (name_changed) {
 			this->Civilization->PersonalNames[this->Gender].push_back(this->Name.utf8().get_data());
 		}
@@ -857,7 +853,7 @@ void CCharacter::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_usable"), &CCharacter::IsUsable);
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CCharacter::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), [](const CCharacter *character){ return const_cast<CFaction *>(character->GetFaction()); });
-	ClassDB::bind_method(D_METHOD("get_unit_type"), &CCharacter::GetUnitType);
+	ClassDB::bind_method(D_METHOD("get_unit_type"), [](const CCharacter *character){ return const_cast<CUnitType *>(character->GetUnitType()); });
 	ClassDB::bind_method(D_METHOD("get_level"), &CCharacter::GetLevel);
 	ClassDB::bind_method(D_METHOD("get_father"), &CCharacter::GetFather);
 	ClassDB::bind_method(D_METHOD("get_mother"), &CCharacter::GetMother);
@@ -1230,9 +1226,9 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			
 			//now, update the hero
 			hero->Civilization = civilization;
-			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->UnitType->GetClass());
-			if (new_unit_type_id != -1) {
-				hero->UnitType = CUnitType::Get(new_unit_type_id);
+			const CUnitType *new_unit_type = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->UnitType->GetClass());
+			if (new_unit_type != nullptr) {
+				hero->UnitType = new_unit_type;
 				hero->Name = new_hero_name.c_str();
 				hero->FamilyName = new_hero_family_name.c_str();
 				SaveHero(hero);
