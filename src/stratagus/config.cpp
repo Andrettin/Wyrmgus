@@ -222,7 +222,7 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 							(*current_config_data) = parent_config_data;
 						}
 					} else {
-						throw std::runtime_error("Tried closing atag \"" + tag_name + "\" while the open tag was \"%s\".");
+						throw std::runtime_error("Tried closing a tag \"" + tag_name + "\" while the open tag was \"%s\".");
 					}
 				} else {
 					throw std::runtime_error("Tried closing tag \"" + tag_name + "\" before any tag had been opened.");
