@@ -54,8 +54,11 @@ public:
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
 private:
-	int Quantity = 1;				/// Quantity of units created
-	const CUnitType *UnitType = nullptr;	/// Unit type to be created
+	int Quantity = 1;				/// quantity of units created
+	const CUnitType *UnitType = nullptr;	/// unit type to be created
+	const CFaction *Faction = nullptr;	/// the faction of the player for which the unit should be created; if none is given, then the trigger player will be used
+	CCharacter *Character = nullptr;
+	const CSite *Site = nullptr;	/// the site where the unit should be created
 };
 
 #endif

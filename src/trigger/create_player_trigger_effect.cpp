@@ -85,9 +85,9 @@ void CCreatePlayerTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 */
 void CCreatePlayerTriggerEffect::Do(CPlayer *player) const
 {
-	CPlayer *player = GetOrAddFactionPlayer(this->Faction);
+	CPlayer *new_player = GetOrAddFactionPlayer(this->Faction);
 	
-	if (player == nullptr) {
+	if (new_player == nullptr) {
 		fprintf(stderr, "Failed to create player for faction \"%s\".\n", this->Faction->GetIdent().utf8().get_data());
 		return;
 	}
@@ -95,7 +95,7 @@ void CCreatePlayerTriggerEffect::Do(CPlayer *player) const
 	if (this->StartSite != nullptr) {
 		const CUnit *site_unit = this->StartSite->SiteUnit;
 		if (site_unit != nullptr) {
-			player->SetStartView(site_unit->tilePos, site_unit->MapLayer->GetIndex());
+			new_player->SetStartView(site_unit->tilePos, site_unit->MapLayer->GetIndex());
 		} else {
 			fprintf(stderr, "Player start site \"%s\" has no site unit.\n", this->StartSite->GetIdent().utf8().get_data());
 		}
