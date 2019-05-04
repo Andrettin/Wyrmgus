@@ -103,10 +103,16 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
+	int GetRandomChance() const
+	{
+		return this->RandomChance;
+	}
+	
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
-	bool OnlyOnce = false;				/// Whether the trigger should occur only once in a game
-	bool CampaignOnly = false;			/// Whether the trigger should only occur in the campaign mode
+	bool OnlyOnce = false;				/// whether the trigger should occur only once in a game
+	bool CampaignOnly = false;			/// whether the trigger should only occur in the campaign mode
+	int RandomChance = 100;				/// the chance that this trigger will be triggered every time it is checked
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
 	CDependency *Predependency = nullptr;
@@ -114,7 +120,7 @@ public:
 	std::vector<CTriggerEffect *> TriggerEffects;
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #define ANY_UNIT ((const CUnitType *)0)
