@@ -1201,6 +1201,10 @@ void CButtonPanel::Draw()
 		}
 		//Wyrmgus end
 		
+		if (button_icon == nullptr) {
+			throw std::runtime_error("No icon for button with button action \"" + GetButtonActionNameById(buttons[i].Action) + "\", button value \"" + buttons[i].ValueStr + "\"");
+		}
+		
 		if (cooldownSpell) {
 			//Wyrmgus start
 //			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos,
