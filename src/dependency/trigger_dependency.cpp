@@ -35,8 +35,8 @@
 
 #include "dependency/trigger_dependency.h"
 
-#include "game/trigger.h"
 #include "player.h"
+#include "trigger/trigger.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

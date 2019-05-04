@@ -40,7 +40,6 @@
 #include "construct.h"
 #include "dependency/dependency.h"
 #include "game/replay.h"
-#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -59,6 +58,7 @@
 #include "sound/sound_server.h"
 #include "spell/spells.h"
 #include "time/calendar.h"
+#include "trigger/trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/icon.h"

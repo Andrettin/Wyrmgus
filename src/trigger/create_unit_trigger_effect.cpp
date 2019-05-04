@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger_effect.cpp - The trigger effect source file. */
+/**@name create_unit_trigger_effect.cpp - The create unit trigger effect source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,37 +33,56 @@
 
 #include "stratagus.h"
 
-#include "game/trigger_effect.h"
+#include "trigger/create_unit_trigger_effect.h"
 
 #include "config.h"
-#include "game/call_dialogue_trigger_effect.h"
-#include "game/change_resource_trigger_effect.h"
-#include "game/create_unit_trigger_effect.h"
+#include "config_operator.h"
+#include "player.h"
+#include "unit/unit.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Create a trigger effect from config data
+**	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data
 */
-CTriggerEffect *CTriggerEffect::FromConfigData(const CConfigData *config_data)
+void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
-	CTriggerEffect *trigger_effect = nullptr;
-	
-	if (config_data->Tag == "call_dialogue") {
-		trigger_effect = new CCallDialogueTriggerEffect;
-	} else if (config_data->Tag == "change_resource") {
-		trigger_effect = new CChangeResourceTriggerEffect;
-	} else if (config_data->Tag == "create_unit") {
-		trigger_effect = new CCreateUnitTriggerEffect;
-	} else {
-		fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", config_data->Tag.c_str());
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		if (property.Key == "quantity") {
+			this->Quantity = std::stoi(property.Value);
+		} else if (property.Key == "unit_type") {
+			const CUnitType *unit_type = CUnitType::Get(property.Value);
+			if (unit_type != nullptr) {
+				this->UnitType = unit_type;
+			}
+		} else {
+			fprintf(stderr, "Invalid create unit trigger effect property: \"%s\".\n", property.Key.c_str());
+		}
 	}
 	
-	trigger_effect->ProcessConfigData(config_data);
-	
-	return trigger_effect;
+	if (!this->UnitType) {
+		fprintf(stderr, "Create unit trigger effect has no unit type.\n");
+	}
+}
+
+/**
+**	@brief	Do the effect
+**
+**	@param	player	The player for which to do the effect
+*/
+void CCreateUnitTriggerEffect::Do(CPlayer *player) const
+{
+	for (int i = 0; i < this->Quantity; ++i) {
+		CUnit *unit = CreateUnit(player->StartPos, *this->UnitType, player, player->StartMapLayer);
+	}
 }

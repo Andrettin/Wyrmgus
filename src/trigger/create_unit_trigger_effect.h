@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name change_resource_trigger_effect.h - The change resource trigger effect header file. */
+/**@name create_unit_trigger_effect.h - The create unit trigger effect header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,14 +27,14 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CHANGE_RESOURCE_TRIGGER_EFFECT_H__
-#define __CHANGE_RESOURCE_TRIGGER_EFFECT_H__
+#ifndef __CREATE_UNIT_TRIGGER_EFFECT_H__
+#define __CREATE_UNIT_TRIGGER_EFFECT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "game/trigger_effect.h"
+#include "trigger/trigger_effect.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -42,19 +42,19 @@
 
 class CConfigData;
 class CPlayer;
-class CResource;
+class CUnitType;
 
 /**
-**	@brief	The change resource trigger effect
+**	@brief	The create unit trigger effect
 */
-class CChangeResourceTriggerEffect : public CTriggerEffect
+class CCreateUnitTriggerEffect : public CTriggerEffect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
-	int Quantity = 1;				/// the quantity to change of the resource
-	const CResource *Resource = nullptr;
+	int Quantity = 1;				/// Quantity of units created
+	const CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
 
 #endif

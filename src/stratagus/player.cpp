@@ -55,7 +55,6 @@
 #include "faction.h"
 #include "game/game.h"
 //Wyrmgus end
-#include "game/trigger_effect.h"
 //Wyrmgus start
 #include "iocompat.h"
 //Wyrmgus end
@@ -89,6 +88,7 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
+#include "trigger/trigger_effect.h"
 #include "ui/button_action.h"
 #include "ui/icon.h"
 #include "ui/ui.h"

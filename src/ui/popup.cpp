@@ -36,13 +36,13 @@
 #include "ui/popup.h"
 
 #include "dependency/dependency.h"
-#include "game/trigger.h"
 #include "item/item_class.h"
 #include "player.h"
 #include "spell/spells.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
+#include "trigger/trigger.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
 //Wyrmgus start

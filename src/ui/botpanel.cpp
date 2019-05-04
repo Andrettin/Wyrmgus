@@ -49,7 +49,6 @@
 #include "commands.h"
 #include "dependency/dependency.h"
 #include "faction.h"
-#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -73,6 +72,7 @@
 #include "sound/sound.h"
 #include "spell/spells.h"
 #include "translate.h"
+#include "trigger/trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/icon.h"

@@ -51,7 +51,6 @@
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/replay.h"
-#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -86,6 +85,7 @@
 #include "spell/spells.h"
 #include "time/calendar.h"
 #include "translate.h"
+#include "trigger/trigger.h"
 #include "ui/button_action.h"
 #include "ui/icon.h"
 #include "ui/interface.h"

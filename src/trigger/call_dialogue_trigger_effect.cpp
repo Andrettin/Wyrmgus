@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name call_dialogue_trigger_effect.h - The call dialogue trigger effect header file. */
+/**@name call_dialogue_trigger_effect.cpp - The call dialogue trigger effect source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,33 +27,57 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CALL_DIALOGUE_TRIGGER_EFFECT_H__
-#define __CALL_DIALOGUE_TRIGGER_EFFECT_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "game/trigger_effect.h"
+#include "stratagus.h"
+
+#include "trigger/call_dialogue_trigger_effect.h"
+
+#include "config.h"
+#include "config_operator.h"
+#include "player.h"
+#include "quest/dialogue.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Functions
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-class CDialogue;
-class CPlayer;
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+{
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		if (property.Key == "dialogue") {
+			CDialogue *dialogue = CDialogue::Get(property.Value);
+			if (dialogue != nullptr) {
+				this->Dialogue = dialogue;
+			}
+		} else {
+			fprintf(stderr, "Invalid call dialogue trigger effect property: \"%s\".\n", property.Key.c_str());
+		}
+	}
+	
+	if (!this->Dialogue) {
+		fprintf(stderr, "Call dialogue trigger effect has no dialogue.\n");
+	}
+}
 
 /**
-**	@brief	The call dialogue trigger effect
+**	@brief	Do the effect
+**
+**	@param	player	The player for which to do the effect
 */
-class CCallDialogueTriggerEffect : public CTriggerEffect
+void CCallDialogueTriggerEffect::Do(CPlayer *player) const
 {
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
-	
-	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
-};
-
-#endif
+	this->Dialogue->Call(player->Index);
+}

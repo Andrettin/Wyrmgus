@@ -45,7 +45,6 @@
 //Wyrmgus end
 #include "faction.h"
 #include "game/game.h"
-#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -64,6 +63,7 @@
 //Wyrmgus end
 #include "time/timeline.h"
 #include "translate.h"
+#include "trigger/trigger.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

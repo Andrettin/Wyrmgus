@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name create_unit_trigger_effect.h - The create unit trigger effect header file. */
+/**@name call_dialogue_trigger_effect.h - The call dialogue trigger effect header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,34 +27,33 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CREATE_UNIT_TRIGGER_EFFECT_H__
-#define __CREATE_UNIT_TRIGGER_EFFECT_H__
+#ifndef __CALL_DIALOGUE_TRIGGER_EFFECT_H__
+#define __CALL_DIALOGUE_TRIGGER_EFFECT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "game/trigger_effect.h"
+#include "trigger/trigger_effect.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CDialogue;
 class CPlayer;
-class CUnitType;
 
 /**
-**	@brief	The create unit trigger effect
+**	@brief	The call dialogue trigger effect
 */
-class CCreateUnitTriggerEffect : public CTriggerEffect
+class CCallDialogueTriggerEffect : public CTriggerEffect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
-	int Quantity = 1;				/// Quantity of units created
-	const CUnitType *UnitType = nullptr;	/// Unit type to be created
+	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
 };
 
 #endif

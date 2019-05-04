@@ -33,12 +33,11 @@
 
 #include "stratagus.h"
 
-#include "game/trigger.h"
+#include "trigger/trigger.h"
 
 #include "config.h"
 #include "dependency/and_dependency.h"
 #include "dependency/dependency.h"
-#include "game/trigger_effect.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -51,6 +50,7 @@
 //Wyrmgus end
 #include "results.h"
 #include "script.h"
+#include "trigger/trigger_effect.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

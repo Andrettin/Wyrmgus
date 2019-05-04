@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name call_dialogue_trigger_effect.cpp - The call dialogue trigger effect source file. */
+/**@name change_resource_trigger_effect.cpp - The change resource trigger effect source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,12 +33,12 @@
 
 #include "stratagus.h"
 
-#include "game/call_dialogue_trigger_effect.h"
+#include "trigger/change_resource_trigger_effect.h"
 
 #include "config.h"
 #include "config_operator.h"
+#include "economy/resource.h"
 #include "player.h"
-#include "quest/dialogue.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -49,7 +49,7 @@
 **
 **	@param	config_data	The configuration data
 */
-void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+void CChangeResourceTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
@@ -57,18 +57,20 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 			continue;
 		}
 		
-		if (property.Key == "dialogue") {
-			CDialogue *dialogue = CDialogue::Get(property.Value);
-			if (dialogue != nullptr) {
-				this->Dialogue = dialogue;
+		if (property.Key == "quantity") {
+			this->Quantity = std::stoi(property.Value);
+		} else if (property.Key == "resource") {
+			const CResource *resource = CResource::Get(property.Value);
+			if (resource != nullptr) {
+				this->Resource = resource;
 			}
 		} else {
-			fprintf(stderr, "Invalid call dialogue trigger effect property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid change resource trigger effect property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	
-	if (!this->Dialogue) {
-		fprintf(stderr, "Call dialogue trigger effect has no dialogue.\n");
+	if (!this->Resource) {
+		fprintf(stderr, "Change resource trigger effect has no resource.\n");
 	}
 }
 
@@ -77,7 +79,7 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 **
 **	@param	player	The player for which to do the effect
 */
-void CCallDialogueTriggerEffect::Do(CPlayer *player) const
+void CChangeResourceTriggerEffect::Do(CPlayer *player) const
 {
-	this->Dialogue->Call(player->Index);
+	player->ChangeResource(this->Resource->GetIndex(), this->Quantity, true);
 }
