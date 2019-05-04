@@ -772,8 +772,8 @@ void CPlayer::Save(CFile &file) const
 		if (objective->Resource != -1) {
 			file.printf("\"resource\", \"%s\",", DefaultResourceNames[objective->Resource].c_str());
 		}
-		if (objective->UnitClass != nullptr) {
-			file.printf("\"unit-class\", \"%s\",", objective->UnitClass->Ident.c_str());
+		for (const UnitClass *unit_class : objective->UnitClasses) {
+			file.printf("\"unit-class\", \"%s\",", unit_class->Ident.c_str());
 		}
 		for (const CUnitType *unit_type : objective->UnitTypes) {
 			file.printf("\"unit-type\", \"%s\",", unit_type->Ident.c_str());
@@ -2451,7 +2451,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		player_objective->ObjectiveString = quest_objective->ObjectiveString;
 		player_objective->Quantity = quest_objective->Quantity;
 		player_objective->Resource = quest_objective->Resource;
-		player_objective->UnitClass = quest_objective->UnitClass;
+		player_objective->UnitClasses = quest_objective->UnitClasses;
 		player_objective->UnitTypes = quest_objective->UnitTypes;
 		player_objective->Upgrade = quest_objective->Upgrade;
 		player_objective->Character = quest_objective->Character;
@@ -2564,15 +2564,17 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	int recruit_heroes_quantity = 0;
 	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 		CQuestObjective *objective = quest->Objectives[i];
-		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+		if (objective->ObjectiveType == BuildUnitsObjectiveType) {
 			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
-			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-				const CUnitType *unit_type = CFaction::GetFactionClassUnitType(this->Faction, objective->UnitClass);
-				if (unit_type == nullptr) {
-					return false;
+			
+			for (const UnitClass *unit_class : objective->UnitClasses) {
+				const CUnitType *unit_class_type = CFaction::GetFactionClassUnitType(this->Faction, unit_class);
+				
+				if (unit_class_type == nullptr) {
+					continue;
 				}
-				unit_types.clear();
-				unit_types.push_back(unit_type);
+				
+				unit_types.push_back(unit_class_type);
 			}
 
 			bool validated = false;
@@ -2601,16 +2603,18 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					if (second_objective == objective) {
 						continue;
 					}
-						
-					if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+					
+					if (second_objective->ObjectiveType == BuildUnitsObjectiveType) {
 						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
-						if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-							const CUnitType *unit_type = CFaction::GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
-							if (unit_type == nullptr) {
+						
+						for (const UnitClass *unit_class : second_objective->UnitClasses) {
+							const CUnitType *unit_class_type = CFaction::GetFactionClassUnitType(this->Faction, unit_class);
+							
+							if (unit_class_type == nullptr) {
 								continue;
 							}
-							unit_types.clear();
-							unit_types.push_back(unit_type);
+							
+							unit_types.push_back(unit_class_type);
 						}
 
 						for (const CUnitType *unit_type : unit_types) {
@@ -2725,20 +2729,22 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		if (objective->Quest != quest) {
 			continue;
 		}
-		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+		if (objective->ObjectiveType == BuildUnitsObjectiveType) {
 			if (objective->Counter < objective->Quantity) {
 				std::vector<const CUnitType *> unit_types = objective->UnitTypes;
-				if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-					const CUnitType *unit_type = CFaction::GetFactionClassUnitType(this->Faction, objective->UnitClass);
-					if (unit_type == nullptr) {
-						return "You can no longer produce the required unit.";
+
+				for (const UnitClass *unit_class : objective->UnitClasses) {
+					const CUnitType *unit_class_type = CFaction::GetFactionClassUnitType(this->Faction, unit_class);
+					
+					if (unit_class_type == nullptr) {
+						continue;
 					}
-					unit_types.clear();
-					unit_types.push_back(unit_type);
+					
+					unit_types.push_back(unit_class_type);
 				}
 				
 				bool validated = false;
-				std::string validation_error;
+				std::string validation_error = "You can no longer produce the required unit.";
 				for (const CUnitType *unit_type : unit_types) {
 					if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 						validation_error = "You no longer hold the required settlement.";
@@ -2769,15 +2775,17 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 							continue;
 						}
 						
-						if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+						if (second_objective->ObjectiveType == BuildUnitsObjectiveType) {
 							std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
-							if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-								const CUnitType *unit_type = CFaction::GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
-								if (unit_type == nullptr) {
+							
+							for (const UnitClass *unit_class : second_objective->UnitClasses) {
+								const CUnitType *unit_class_type = CFaction::GetFactionClassUnitType(this->Faction, unit_class);
+								
+								if (unit_class_type == nullptr) {
 									continue;
 								}
-								unit_types.clear();
-								unit_types.push_back(unit_type);
+								
+								unit_types.push_back(unit_class_type);
 							}
 
 							for (const CUnitType *unit_type : unit_types) {

@@ -69,7 +69,6 @@ enum ObjectiveTypes {
 	GatherResourceObjectiveType,
 	HaveResourceObjectiveType,
 	BuildUnitsObjectiveType,
-	BuildUnitsOfClassObjectiveType,
 	DestroyUnitsObjectiveType,
 	ResearchUpgradeObjectiveType,
 	RecruitHeroObjectiveType,
@@ -95,9 +94,9 @@ public:
 	int ObjectiveType = -1;
 	int Quantity = 1;
 	int Resource = -1;
-	const UnitClass *UnitClass = nullptr;
 	std::string ObjectiveString;
 	CQuest *Quest = nullptr;
+	std::vector<const UnitClass *> UnitClasses;
 	std::vector<const CUnitType *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 	const CCharacter *Character = nullptr;

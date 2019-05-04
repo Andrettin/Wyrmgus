@@ -500,7 +500,7 @@ void CPlayer::Load(lua_State *l)
 						if (unit_class == nullptr) {
 							LuaError(l, "Unit class doesn't exist.");
 						}
-						objective->UnitClass = unit_class;
+						objective->UnitClasses.push_back(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
 						CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, n + 1));
 						if (!unit_type) {

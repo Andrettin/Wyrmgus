@@ -113,6 +113,11 @@ public:
 		return this->Height;
 	}
 	
+	int GetIndex() const
+	{
+		return this->ID;
+	}
+	
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
 	void RegenerateForest();

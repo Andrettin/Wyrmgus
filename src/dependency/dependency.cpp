@@ -145,7 +145,7 @@ bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
 {
 	if (this->ChecksAllPlayers()) {
 		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody || p->GetIndex() == PlayerNumNeutral) {
+			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
 				continue;
 			}
 			

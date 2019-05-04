@@ -836,7 +836,7 @@ bool CTrigger::ProcessConfigDataSection(const CConfigData *section)
 void CTrigger::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_random_chance", "random_chance"), [](CTrigger *trigger, const int random_chance){ trigger->RandomChance = random_chance; });
-	ClassDB::bind_method(D_METHOD("get_random_chance"), &CTrigger::GetRandomChance;
+	ClassDB::bind_method(D_METHOD("get_random_chance"), &CTrigger::GetRandomChance);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "random_chance"), "set_random_chance", "get_random_chance");
 }
 

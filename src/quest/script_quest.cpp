@@ -217,7 +217,7 @@ static int CclDefineQuest(lua_State *l)
 						if (unit_class == nullptr) {
 							LuaError(l, "Unit class doesn't exist.");
 						}
-						objective->UnitClass = unit_class;
+						objective->UnitClasses.push_back(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
 						const CUnitType *unit_type = CUnitType::Get(LuaToString(l, -1, k + 1));
 						if (!unit_type) {

@@ -39,6 +39,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "faction.h"
+#include "map/map_layer.h"
 #include "map/site.h"
 #include "player.h"
 #include "unit/unit.h"

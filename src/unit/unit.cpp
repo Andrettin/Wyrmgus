@@ -2854,15 +2854,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				//Wyrmgus end
 			} else {
 				player.TotalUnits++;
-				
-				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
-					if (
-						(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
-						|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.GetClass())
-					) {
-						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
-					}
-				}
 			}
 		}
 		
@@ -2927,6 +2918,20 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		}
 		
 		this->UpdateSoldUnits();
+		
+		for (CPlayerQuestObjective *objective : player.QuestObjectives) {
+			if (
+				objective->ObjectiveType == BuildUnitsObjectiveType
+				&& (
+					std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end()
+					|| std::find(objective->UnitClasses.begin(), objective->UnitClasses.end(), type.GetClass()) != objective->UnitClasses.end()
+				)
+			) {
+				if (!objective->Settlement || objective->Settlement == this->Settlement) {
+					objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
+				}
+			}
+		}
 	}
 	//Wyrmgus end
 }
@@ -7188,7 +7193,14 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	for (size_t i = 0; i < attacker.Player->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = attacker.Player->QuestObjectives[i];
 		if (
-			(objective->ObjectiveType == DestroyUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end() && (!objective->Settlement || objective->Settlement == target.Settlement))
+			(
+				objective->ObjectiveType == DestroyUnitsObjectiveType
+				&& (
+					std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end()
+					|| std::find(objective->UnitClasses.begin(), objective->UnitClasses.end(), target.Type->GetClass()) != objective->UnitClasses.end()
+				)
+				&& (!objective->Settlement || objective->Settlement == target.Settlement)
+			)
 			|| (objective->ObjectiveType == DestroyHeroObjectiveType && target.Character && objective->Character == target.Character)
 			|| (objective->ObjectiveType == DestroyUniqueObjectiveType && target.Unique && objective->Unique == target.Unique)
 		) {

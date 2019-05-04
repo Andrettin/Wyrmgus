@@ -40,8 +40,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCharacter;
 class CConfigData;
+class CFaction;
 class CPlayer;
+class CSite;
 class CUnitType;
 
 /**

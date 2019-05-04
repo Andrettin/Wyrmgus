@@ -72,7 +72,7 @@ public:
 	
 	bool ChecksNeutralPlayer() const
 	{
-		return this->CheckNeutralPlayers;
+		return this->CheckNeutralPlayer;
 	}
 	
 private:

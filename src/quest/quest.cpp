@@ -108,8 +108,6 @@ std::string GetQuestObjectiveTypeNameById(int objective_type)
 		return "have-resource";
 	} else if (objective_type == BuildUnitsObjectiveType) {
 		return "build-units";
-	} else if (objective_type == BuildUnitsOfClassObjectiveType) {
-		return "build-units-of-class";
 	} else if (objective_type == DestroyUnitsObjectiveType) {
 		return "destroy-units";
 	} else if (objective_type == ResearchUpgradeObjectiveType) {
@@ -137,8 +135,6 @@ int GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 		return HaveResourceObjectiveType;
 	} else if (objective_type == "build-units") {
 		return BuildUnitsObjectiveType;
-	} else if (objective_type == "build-units-of-class") {
-		return BuildUnitsOfClassObjectiveType;
 	} else if (objective_type == "destroy-units") {
 		return DestroyUnitsObjectiveType;
 	} else if (objective_type == "research-upgrade") {
@@ -297,7 +293,7 @@ void CQuestObjective::ProcessConfigData(const CConfigData *config_data)
 		} else if (property.Key == "unit_class") {
 			const ::UnitClass *unit_class = UnitClass::Get(property.Value);
 			if (unit_class != nullptr) {
-				this->UnitClass = unit_class;
+				this->UnitClasses.push_back(unit_class);
 			}
 		} else if (property.Key == "unit_type") {
 			const CUnitType *unit_type = CUnitType::Get(property.Value);
