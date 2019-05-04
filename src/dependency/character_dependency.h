@@ -41,6 +41,7 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
+class CFaction;
 class CPlayer;
 class CUnit;
 
@@ -60,6 +61,8 @@ public:
 
 private:
 	const CCharacter *Character = nullptr;
+	const CFaction *Faction = nullptr;	/// the faction to check the ownership of the character for; if this isn't provided, the dependency will check instead if the triggering player owns the character, or if the unit is the character
+	bool Enemy = false;	/// whether the player or unit should be checked to see if they are an enemy of the character
 };
 
 #endif

@@ -36,6 +36,7 @@
 #include "dependency/character_dependency.h"
 
 #include "character.h"
+#include "faction.h"
 #include "player.h"
 #include "unit/unit.h"
 
@@ -49,6 +50,10 @@ void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string
 	std::string value = property.second;
 	if (key == "character") {
 		this->Character = CCharacter::Get(value);
+	} else if (key == "faction") {
+		this->Faction = CFaction::Get(value);
+	} else if (key == "enemy") {
+		this->Enemy = StringToBool(value);
 	} else {
 		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
 	}
@@ -56,11 +61,37 @@ void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string
 
 bool CCharacterDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
+	if (this->Faction != nullptr) {
+		CPlayer *faction_player = GetFactionPlayer(this->Faction);
+		
+		if (faction_player == nullptr) { //no player belongs to that faction, so naturally the character can't be owned by it
+			return false;
+		}
+		
+		return faction_player->HasHero(this->Character);
+	} else if (this->Enemy) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
+				continue;
+			}
+			
+			if (p->HasHero(this->Character) && player->IsEnemy(*p)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	return player->HasHero(this->Character);
 }
 
 bool CCharacterDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
+	if (this->Faction != nullptr || this->Enemy) {
+		return this->CheckInternal(unit->Player, ignore_units);
+	}
+	
 	return unit->Character == this->Character;
 }
 
