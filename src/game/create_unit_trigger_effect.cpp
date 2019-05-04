@@ -83,6 +83,6 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 void CCreateUnitTriggerEffect::Do(CPlayer *player) const
 {
 	for (int i = 0; i < this->Quantity; ++i) {
-		CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
+		CUnit *unit = CreateUnit(player->StartPos, *this->UnitType, player, player->StartMapLayer);
 	}
 }
