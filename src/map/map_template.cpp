@@ -1083,7 +1083,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
 				const CUnitType *unit_type = CFaction::GetFactionClassUnitType(site_owner, std::get<2>(site->HistoricalBuildings[j]));
-				if (unit_type->TerrainType) {
+				if (unit_type != nullptr && unit_type->TerrainType) {
 					if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
 						pathway_type = unit_type;
 					}

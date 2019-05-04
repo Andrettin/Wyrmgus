@@ -338,12 +338,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		if (section->Tag == "historical_location") {
 			CHistoricalLocation *historical_location = new CHistoricalLocation;
 			historical_location->ProcessConfigData(section);
-				
-			if (historical_location->Date.Year == 0 || !historical_location->MapTemplate) {
-				delete historical_location;
-				continue;
-			}
-			
 			this->HistoricalLocations.push_back(historical_location);
 		} else if (section->Tag == "historical_title") {
 			int title = -1;

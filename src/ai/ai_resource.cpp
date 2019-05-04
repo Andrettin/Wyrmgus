@@ -2297,7 +2297,7 @@ void AiCheckSettlementConstruction()
 
 	const CUnitType *town_hall_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("town-hall"));			
 	
-	if (!CheckDependencies(town_hall_type, AiPlayer->Player)) {
+	if (town_hall_type == nullptr || !CheckDependencies(town_hall_type, AiPlayer->Player)) {
 		return;
 	}
 
@@ -2385,7 +2385,7 @@ void AiCheckDockConstruction()
 
 	const CUnitType *dock_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("dock"));			
 	
-	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *dock_type)) {
+	if (dock_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *dock_type)) {
 		return;
 	}
 
@@ -2570,7 +2570,7 @@ static void AiCheckMinecartConstruction()
 {
 	const CUnitType *minecart_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
 		
-	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *minecart_type, false, false)) {
+	if (minecart_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *minecart_type, false, false)) {
 		return;
 	}
 	
@@ -2637,6 +2637,11 @@ static void AiCheckMinecartConstruction()
 static void AiCheckMinecartSalvaging()
 {
 	const CUnitType *minecart_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
+	
+	if (minecart_type == nullptr) {
+		return;
+	}
+	
 	std::vector<CUnit *> minecart_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *minecart_type, minecart_table, true);
 	

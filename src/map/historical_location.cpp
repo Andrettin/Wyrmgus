@@ -78,10 +78,6 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	if (this->Date.Year == 0) {
-		fprintf(stderr, "Historical location has no date.\n");
-	}
-	
 	if (!this->MapTemplate) {
 		fprintf(stderr, "Historical location has no map template.\n");
 	}
