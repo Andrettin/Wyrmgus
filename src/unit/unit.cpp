@@ -1408,9 +1408,9 @@ void CUnit::ChooseButtonIcon(const int button_action)
 					|| (button_action == ButtonStop && upgrade->ItemSlot->Shield)
 					|| (button_action == ButtonMove && upgrade->ItemSlot->Boots)
 				)
-				&& upgrade->Item->Icon.Icon != nullptr
+				&& upgrade->Item->GetIcon() != nullptr
 			) {
-				this->ButtonIcons[button_action] = upgrade->Item->Icon.Icon;
+				this->ButtonIcons[button_action] = upgrade->Item->GetIcon();
 				return;
 			} else if (button_action == ButtonStandGround && (upgrade->ItemSlot->Weapon || upgrade->ItemSlot->Arrows) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
 				this->ButtonIcons[button_action] = upgrade->Item->ButtonIcons.find(button_action)->second.Icon;

@@ -518,8 +518,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
 			CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-//			CIcon &icon = *order.GetUnitType().Icon.Icon;
-			CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+//			CIcon *icon = order.GetUnitType().Icon.Icon;
+			const CIcon *icon = (variation && variation->Icon.Icon) ? variation->Icon.Icon : order.GetUnitType().GetIcon();
 			//Wyrmgus end
 			//Wyrmgus start
 //			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
@@ -531,8 +531,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			//Wyrmgus start
-//			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer());
+//			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer());
 			//Wyrmgus end
 		}
 	} else {
@@ -557,7 +557,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 						break;
 					}
 					CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-					CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+					const CIcon *icon = (variation && variation->Icon.Icon) ? variation->Icon.Icon : order.GetUnitType().GetIcon();
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -567,8 +567,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
-//					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer());
+//					icon->DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+					icon->DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer());
 					//Wyrmgus end
 					train_counter.push_back(1);
 					++j;
@@ -638,15 +638,15 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 
-				CIcon &icon = *order.GetUnitType().Icon.Icon;
+				const CIcon *icon = order.GetUnitType().GetIcon();
 				unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
+//				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
 			return true;

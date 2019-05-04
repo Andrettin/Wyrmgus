@@ -1190,8 +1190,8 @@ void CButtonPanel::Draw()
 			button_icon = CUnitType::Get(buttons[i].Value)->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && CUnitType::Get(buttons[i].Value)->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !CUnitType::Get(buttons[i].Value)->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
 			button_icon = CUnitType::Get(buttons[i].Value)->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !CUnitType::Get(buttons[i].Value)->Icon.Name.empty()) {
-			button_icon = CUnitType::Get(buttons[i].Value)->Icon.Icon;
+		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && CUnitType::Get(buttons[i].Value)->GetIcon() != nullptr) {
+			button_icon = CUnitType::Get(buttons[i].Value)->GetIcon();
 		} else if (buttons[i].Action == ButtonBuy) {
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon();
 		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {

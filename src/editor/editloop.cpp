@@ -845,7 +845,7 @@ static void DrawUnitIcons()
 		}
 		//Wyrmgus start
 //		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::Get("icon-level-up");
+		const CIcon *icon = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->GetIcon() : CIcon::Get("icon-level-up");
 		//Wyrmgus end
 		const PixelPos pos(x, y);
 
@@ -862,7 +862,7 @@ static void DrawUnitIcons()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->Index);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->Index);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -872,7 +872,7 @@ static void DrawUnitIcons()
 //			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 //									icon.G->Width - 2, icon.G->Height - 2);
 			Video.DrawRectangleClip(ColorGreen, x, y,
-									icon.G->Width, icon.G->Height);
+									icon->G->Width, icon->G->Height);
 			//Wyrmgus end
 		}
 		if (i == Editor.CursorUnitIndex) {

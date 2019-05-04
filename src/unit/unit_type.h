@@ -639,7 +639,6 @@ public:
 	CAnimations *Animations = nullptr;	/// Animation scripts
 	int StillFrame = 0;					/// Still frame
 
-	IconConfig Icon;				/// Icon to display for this unit
 	MissileConfig Missile;			/// Missile weapon
 	//Wyrmgus start
 	MissileConfig FireMissile;		/// Missile weapon if the unit has fire damage
