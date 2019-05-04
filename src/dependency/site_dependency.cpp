@@ -35,6 +35,7 @@
 
 #include "dependency/site_dependency.h"
 
+#include "faction.h"
 #include "map/site.h"
 #include "player.h"
 #include "unit/unit.h"
@@ -49,6 +50,8 @@ void CSiteDependency::ProcessConfigDataProperty(const std::pair<std::string, std
 	std::string value = property.second;
 	if (key == "site") {
 		this->Site = CSite::Get(value);
+	} else if (key == "faction") {
+		this->Faction = CFaction::Get(value);
 	} else {
 		fprintf(stderr, "Invalid site dependency property: \"%s\".\n", key.c_str());
 	}
@@ -56,11 +59,25 @@ void CSiteDependency::ProcessConfigDataProperty(const std::pair<std::string, std
 
 bool CSiteDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
+	if (this->Faction != nullptr) {
+		CPlayer *faction_player = GetFactionPlayer(this->Faction);
+		
+		if (faction_player == nullptr) { //no player belongs to that faction, so naturally the site can't be owned by it
+			return false;
+		}
+		
+		return faction_player->HasSettlement(this->Site);
+	}
+	
 	return player->HasSettlement(this->Site);
 }
 
 bool CSiteDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
+	if (this->Faction != nullptr) {
+		return this->CheckInternal(nullptr, ignore_units);
+	}
+	
 	return unit->Settlement == this->Site;
 }
 
