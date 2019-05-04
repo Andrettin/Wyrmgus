@@ -41,19 +41,31 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCharacter;
 class CDialogueNode;
+class CDialogueOption;
+class CFaction;
+class CUnitType;
 class LuaCallback;
 
 class CDialogue : public DataElement, public DataType<CDialogue>
 {
+	DATA_TYPE(CDialogue, DataElement)
+	
 public:
 	~CDialogue();
 	
 	static constexpr const char *ClassIdentifier = "dialogue";
 	
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	
 	void Call(const int player) const;
 	
-	std::vector<CDialogueNode *> Nodes;	/// The nodes of the dialogue
+	std::vector<const CDialogueNode *> Nodes;	/// the nodes of the dialogue
+	std::map<std::string, const CDialogueNode *> NodesByIdent;	/// the nodes of the dialogue which have an ident, mapped to it
+	
+protected:
+	static void _bind_methods();
 };
 
 class CDialogueNode
@@ -61,20 +73,36 @@ class CDialogueNode
 public:
 	~CDialogueNode();
 	
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	void Call(const int player) const;
 	void OptionEffect(const int option, const int player) const;
 	
-	int ID = -1;
-	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
-	std::string SpeakerPlayer;			/// name of the player to whom the speaker belongs
-	std::string Speaker;
+	std::string Ident;						/// identifier for the node, needed for links, but not necessary for all nodes
+	int Index = -1;
+	const CCharacter *Character = nullptr;	/// the speaker character
+	const CUnitType *UnitType = nullptr;	/// the speaker unit type (the speaker will be a random unit of this type)
+	const CFaction *Faction = nullptr;		/// the faction to which the speaker belongs
+	std::string SpeakerName;				/// speaker name, replaces the name of the character or unit
 	std::string Text;
 	CDialogue *Dialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *ImmediateEffects = nullptr;
-	std::vector<std::string> Options;
-	std::vector<LuaCallback *> OptionEffects;
-	std::vector<std::string> OptionTooltips;
+	std::vector<CDialogueOption *> Options;
+};
+
+class CDialogueOption
+{
+public:
+	~CDialogueOption();
+	
+	void ProcessConfigData(const CConfigData *config_data);
+	
+	std::string Name;
+	LuaCallback *EffectsLua;
+	std::string Tooltip;
+	CDialogue *Dialogue = nullptr;
+	std::vector<const CDialogueNode *> Nodes;
 };
 
 /*----------------------------------------------------------------------------

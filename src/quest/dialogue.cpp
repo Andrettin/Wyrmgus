@@ -35,8 +35,11 @@
 
 #include "quest/dialogue.h"
 
+#include "character.h"
+#include "faction.h"
 #include "luacallback.h"
 #include "script.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -44,9 +47,31 @@
 
 CDialogue::~CDialogue()
 {
-	for (CDialogueNode *node : this->Nodes) {
+	for (const CDialogueNode *node : this->Nodes) {
 		delete node;
 	}
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CDialogue::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "dialogue_node") {
+		CDialogueNode *node = new CDialogueNode;
+		node->Index = this->Nodes.size();
+		node->Dialogue = this;
+		this->Nodes.push_back(node);
+		node->ProcessConfigData(section);
+	} else {
+		return false;
+	}
+	
+	return true;
 }
 
 void CDialogue::Call(const int player) const
@@ -56,6 +81,10 @@ void CDialogue::Call(const int player) const
 	}
 	
 	this->Nodes[0]->Call(player);
+}
+
+void CDialogue::_bind_methods()
+{
 }
 
 CDialogueNode::~CDialogueNode()
@@ -68,8 +97,51 @@ CDialogueNode::~CDialogueNode()
 		delete ImmediateEffects;
 	}
 	
-	for (LuaCallback *option_effect : this->OptionEffects) {
-		delete option_effect;
+	for (const CDialogueOption *option : this->Options) {
+		delete option;
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CDialogueNode::ProcessConfigData(const CConfigData *config_data)
+{
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		if (property.Key == "ident") {
+			this->Ident = property.Value;
+			this->Dialogue->NodesByIdent[this->Ident] = this;
+		} else if (property.Key == "character") {
+			this->Character = CCharacter::Get(property.Value);
+		} else if (property.Key == "unit_type") {
+			this->UnitType = CUnitType::Get(property.Value);
+		} else if (property.Key == "faction") {
+			this->Faction = CFaction::Get(property.Value);
+		} else if (property.Key == "speaker_name") {
+			this->SpeakerName = property.Value;
+		} else if (property.Key == "text") {
+			this->Text = property.Value;
+		} else {
+			fprintf(stderr, "Invalid dialogue node property: \"%s\".\n", property.Key.c_str());
+		}
+	}
+	
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "option") {
+			CDialogueOption *option = new CDialogueOption;
+			option->Dialogue = this->Dialogue;
+			this->Options.push_back(option);
+			option->ProcessConfigData(section);
+		} else {
+			fprintf(stderr, "Invalid dialogue node section: \"%s\".\n", section->Tag.c_str());
+		}
 	}
 }
 
@@ -79,8 +151,8 @@ void CDialogueNode::Call(const int player) const
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
 		if (this->Conditions->popBoolean() == false) {
-			if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-				this->Dialogue->Nodes[this->ID + 1]->Call(player);
+			if ((this->Index + 1) < (int) this->Dialogue->Nodes.size()) {
+				this->Dialogue->Nodes[this->Index + 1]->Call(player);
 			}
 			return;
 		}
@@ -93,18 +165,18 @@ void CDialogueNode::Call(const int player) const
 	
 	std::string lua_command = "Event(";
 	
-	if (this->SpeakerType == "character") {
-		lua_command += "FindHero(\"" + this->Speaker;
-	} else if (this->SpeakerType == "unit") {
-		lua_command += "FindUnit(\"" + this->Speaker;
+	if (this->Character != nullptr) {
+		lua_command += "FindHero(\"" + this->Character->Ident;
+	} else if (this->UnitType != nullptr) {
+		lua_command += "FindUnit(\"" + this->UnitType->Ident;
 	} else {
-		lua_command += "\"" + this->Speaker + "\", ";
+		lua_command += "\"" + this->SpeakerName + "\", ";
 	}
 	
-	if (this->SpeakerType == "character" || this->SpeakerType == "unit") {
+	if (this->Character != nullptr || this->UnitType != nullptr) {
 		lua_command += "\"";
-		if (!this->SpeakerPlayer.empty()) {
-			lua_command += ", GetFactionPlayer(\"" + this->SpeakerPlayer + "\")";
+		if (this->Faction != nullptr) {
+			lua_command += ", GetFactionPlayer(\"" + this->Faction->Ident + "\")";
 		}
 		lua_command += "), ";
 	}
@@ -121,7 +193,7 @@ void CDialogueNode::Call(const int player) const
 			} else {
 				first = false;
 			}
-			lua_command += "\"" + this->Options[i] + "\"";
+			lua_command += "\"" + this->Options[i]->Name + "\"";
 		}
 	} else {
 		lua_command += "\"~!Continue\"";
@@ -138,12 +210,12 @@ void CDialogueNode::Call(const int player) const
 				first = false;
 			}
 			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) i) + ", " + std::to_string((long long) player) + ");";
+			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->Index) + ", " + std::to_string((long long) i) + ", " + std::to_string((long long) player) + ");";
 			lua_command += " end";
 		}
 	} else {
 		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
+		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->Index) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
 		lua_command += " end";
 	}
 	lua_command += "}, ";
@@ -151,16 +223,16 @@ void CDialogueNode::Call(const int player) const
 	lua_command += "nil, nil, nil, ";
 	
 	lua_command += "{";
-	if (this->OptionTooltips.size() > 0) {
+	if (this->Options.size() > 0) {
 		lua_command += "OptionTooltips = {";
 		bool first = true;
-		for (size_t i = 0; i < this->OptionTooltips.size(); ++i) {
+		for (size_t i = 0; i < this->Options.size(); ++i) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
 				first = false;
 			}
-			lua_command += "\"" + this->OptionTooltips[i] + "\"";
+			lua_command += "\"" + this->Options[i]->Tooltip + "\"";
 		}
 		lua_command += "}";
 	}
@@ -173,12 +245,57 @@ void CDialogueNode::Call(const int player) const
 
 void CDialogueNode::OptionEffect(const int option, const int player) const
 {
-	if ((int) this->OptionEffects.size() > option && this->OptionEffects[option]) {
-		this->OptionEffects[option]->pushPreamble();
-		this->OptionEffects[option]->run();
+	if ((int) this->Options.size() > option && this->Options[option]->EffectsLua) {
+		this->Options[option]->EffectsLua->pushPreamble();
+		this->Options[option]->EffectsLua->run();
 	}
-	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-		this->Dialogue->Nodes[this->ID + 1]->Call(player);
+	if ((this->Index + 1) < (int) this->Dialogue->Nodes.size()) {
+		this->Dialogue->Nodes[this->Index + 1]->Call(player);
+	}
+}
+
+CDialogueOption::~CDialogueOption()
+{
+	if (this->EffectsLua) {
+		delete this->EffectsLua;
+	}
+	
+	for (const CDialogueNode *node : this->Nodes) {
+		delete node;
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CDialogueOption::ProcessConfigData(const CConfigData *config_data)
+{
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		if (property.Key == "name") {
+			this->Name = property.Value;
+		} else if (property.Key == "tooltip") {
+			this->Tooltip = property.Value;
+		} else {
+			fprintf(stderr, "Invalid dialogue option property: \"%s\".\n", property.Key.c_str());
+		}
+	}
+	
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "node") {
+			CDialogueNode *node = new CDialogueNode;
+			node->Dialogue = this->Dialogue;
+			this->Nodes.push_back(node);
+			node->ProcessConfigData(section);
+		} else {
+			fprintf(stderr, "Invalid dialogue option section: \"%s\".\n", section->Tag.c_str());
+		}
 	}
 }
 

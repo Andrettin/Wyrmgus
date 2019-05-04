@@ -55,10 +55,6 @@
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -765,7 +761,7 @@ static int CclDefineDialogue(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				CDialogueNode *node = new CDialogueNode;
-				node->ID = dialogue->Nodes.size();
+				node->Index = dialogue->Nodes.size();
 				dialogue->Nodes.push_back(node);
 				node->Dialogue = dialogue;
 				if (!lua_istable(l, -1)) {
@@ -776,11 +772,17 @@ static int CclDefineDialogue(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "speaker")) {
-						node->SpeakerType = LuaToString(l, -1, k + 1);
+						std::string speaker_type = LuaToString(l, -1, k + 1);
 						++k;
-						node->Speaker = LuaToString(l, -1, k + 1);
+						if (speaker_type == "character") {
+							node->Character = CCharacter::Get(LuaToString(l, -1, k + 1));
+						} else if (speaker_type == "unit") {
+							node->UnitType = CUnitType::Get(LuaToString(l, -1, k + 1));
+						} else {
+							node->SpeakerName = LuaToString(l, -1, k + 1);
+						}
 					} else if (!strcmp(value, "speaker-player")) {
-						node->SpeakerPlayer = LuaToString(l, -1, k + 1);
+						node->Faction = CFaction::Get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "text")) {
 						node->Text = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "conditions")) {
@@ -795,15 +797,23 @@ static int CclDefineDialogue(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
-							node->Options.push_back(LuaToString(l, -1, n + 1));
+							if (n >= (int) node->Options.size()) {
+								CDialogueOption *option = new CDialogueOption;
+								node->Options.push_back(option);
+							}
+							node->Options[n]->Name = LuaToString(l, -1, n + 1);
 						}
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "option-effects")) {
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
+							if (n >= (int) node->Options.size()) {
+								CDialogueOption *option = new CDialogueOption;
+								node->Options.push_back(option);
+							}
 							lua_rawgeti(l, -1, n + 1);
-							node->OptionEffects.push_back(new LuaCallback(l, -1));
+							node->Options[n]->EffectsLua = new LuaCallback(l, -1);
 							lua_pop(l, 1);
 						}
 						lua_pop(l, 1);
@@ -811,7 +821,11 @@ static int CclDefineDialogue(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
-							node->OptionTooltips.push_back(LuaToString(l, -1, n + 1));
+							if (n >= (int) node->Options.size()) {
+								CDialogueOption *option = new CDialogueOption;
+								node->Options.push_back(option);
+							}
+							node->Options[n]->Tooltip = LuaToString(l, -1, n + 1);
 						}
 						lua_pop(l, 1);
 					} else {

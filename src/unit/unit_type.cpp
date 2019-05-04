@@ -2113,7 +2113,7 @@ void CUnitType::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_stat_strings"), [](const CUnitType *unit_type){ return VectorToGodotArray(unit_type->GetStatStrings()); });
 	
-	ClassDB::bind_method(D_METHOD("set_repair_hp", "repair_hp"), [](CUnitType *unit_type, const int repair_hp){ unit_type->RepairHp = repair_hp; });
+	ClassDB::bind_method(D_METHOD("set_repair_hp", "repair_hp"), [](CUnitType *unit_type, const int repair_hp){ unit_type->RepairHP = repair_hp; });
 	ClassDB::bind_method(D_METHOD("get_repair_hp"), &CUnitType::GetRepairHP);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "repair_hp"), "set_repair_hp", "get_repair_hp");
 	
