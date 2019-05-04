@@ -54,7 +54,7 @@ void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string
 	}
 }
 
-bool CCharacterDependency::Check(const CPlayer *player, const bool ignore_units) const
+bool CCharacterDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	return player->HasHero(this->Character);
 }

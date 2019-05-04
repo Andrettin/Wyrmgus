@@ -58,7 +58,7 @@ void CGenderDependency::ProcessConfigDataProperty(const std::pair<std::string, s
 	}
 }
 
-bool CGenderDependency::Check(const CPlayer *player, const bool ignore_units) const
+bool CGenderDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	return true;
 }

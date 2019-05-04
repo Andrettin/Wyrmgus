@@ -53,7 +53,7 @@ void CTriggerDependency::ProcessConfigDataProperty(const std::pair<std::string, 
 	}
 }
 
-bool CTriggerDependency::Check(const CPlayer *player, const bool ignore_units) const
+bool CTriggerDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	//checks whether a trigger has already fired
 	

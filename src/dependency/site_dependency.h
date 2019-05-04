@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade_dependency.cpp - The upgrade dependency source file */
+/**@name site_dependency.h - The site dependency header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,50 +27,39 @@
 //      02111-1307, USA.
 //
 
+#ifndef __SITE_DEPENDENCY_H__
+#define __SITE_DEPENDENCY_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "dependency/upgrade_dependency.h"
-
-#include "player.h"
-#include "unit/unit.h"
-#include "upgrade/upgrade.h"
-#include "upgrade/upgrade_structs.h"
+#include "dependency/dependency.h"
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::Get(value);
-		if (!this->Upgrade) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-		}
-	} else {
-		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.c_str());
-	}
-}
+class CPlayer;
+class CSite;
+class CUnit;
 
-bool CUpgradeDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
-{
-	return UpgradeIdAllowed(*player, this->Upgrade->ID) == 'R';
-}
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
-bool CUpgradeDependency::Check(const CUnit *unit, const bool ignore_units) const
+class CSiteDependency : public CDependency
 {
-	return this->Check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->Upgrade);
-}
+public:
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+private:
+	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const override;
+public:
+	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
 
-std::string CUpgradeDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Upgrade->GetName().utf8().get_data() + '\n';
-	return str;
-}
+private:
+	const CSite *Site = nullptr;
+};
+
+#endif

@@ -36,14 +36,6 @@
 #include "dependency/and_dependency.h"
 
 #include "config.h"
-#include "dependency/age_dependency.h"
-#include "dependency/character_dependency.h"
-#include "dependency/not_dependency.h"
-#include "dependency/or_dependency.h"
-#include "dependency/season_dependency.h"
-#include "dependency/trigger_dependency.h"
-#include "dependency/unit_type_dependency.h"
-#include "dependency/upgrade_dependency.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -51,41 +43,18 @@
 
 CAndDependency::~CAndDependency()
 {
-	for (CDependency *dependency : this->Dependencies) {
+	for (const CDependency *dependency : this->Dependencies) {
 		delete dependency;
 	}
 }
 
 void CAndDependency::ProcessConfigDataSection(const CConfigData *section)
 {
-	CDependency *dependency = nullptr;
-	if (section->Tag == "and") {
-		dependency = new CAndDependency;
-	} else if (section->Tag == "or") {
-		dependency = new COrDependency;
-	} else if (section->Tag == "not") {
-		dependency = new CNotDependency;
-	} else if (section->Tag == "unit_type") {
-		dependency = new CUnitTypeDependency;
-	} else if (section->Tag == "upgrade") {
-		dependency = new CUpgradeDependency;
-	} else if (section->Tag == "age") {
-		dependency = new CAgeDependency;
-	} else if (section->Tag == "character") {
-		dependency = new CCharacterDependency;
-	} else if (section->Tag == "season") {
-		dependency = new CSeasonDependency;
-	} else if (section->Tag == "trigger") {
-		dependency = new CTriggerDependency;
-	} else {
-		fprintf(stderr, "Invalid and dependency property: \"%s\".\n", section->Tag.c_str());
-		return;
-	}
-	dependency->ProcessConfigData(section);
+	const CDependency *dependency = CDependency::FromConfigData(section);
 	this->Dependencies.push_back(dependency);
 }
 
-bool CAndDependency::Check(const CPlayer *player, const bool ignore_units) const
+bool CAndDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	for (const CDependency *dependency : this->Dependencies) {
 		if (!dependency->Check(player, ignore_units)) {

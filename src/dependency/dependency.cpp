@@ -38,9 +38,14 @@
 
 #include "config.h"
 #include "config_operator.h"
+#include "dependency/age_dependency.h"
 #include "dependency/and_dependency.h"
+#include "dependency/character_dependency.h"
 #include "dependency/not_dependency.h"
 #include "dependency/or_dependency.h"
+#include "dependency/season_dependency.h"
+#include "dependency/site_dependency.h"
+#include "dependency/trigger_dependency.h"
 #include "dependency/unit_type_dependency.h"
 #include "dependency/upgrade_dependency.h"
 #include "faction.h"
@@ -62,6 +67,44 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	@brief	Create a dependency from config data
+**
+**	@param	config_data	The configuration data
+*/
+CDependency *CDependency::FromConfigData(const CConfigData *config_data)
+{
+	CDependency *dependency = nullptr;
+	
+	if (config_data->Tag == "and") {
+		dependency = new CAndDependency;
+	} else if (config_data->Tag == "or") {
+		dependency = new COrDependency;
+	} else if (config_data->Tag == "not") {
+		dependency = new CNotDependency;
+	} else if (config_data->Tag == "unit_type") {
+		dependency = new CUnitTypeDependency;
+	} else if (config_data->Tag == "upgrade") {
+		dependency = new CUpgradeDependency;
+	} else if (config_data->Tag == "age") {
+		dependency = new CAgeDependency;
+	} else if (config_data->Tag == "character") {
+		dependency = new CCharacterDependency;
+	} else if (config_data->Tag == "season") {
+		dependency = new CSeasonDependency;
+	} else if (config_data->Tag == "site") {
+		dependency = new CSiteDependency;
+	} else if (config_data->Tag == "trigger") {
+		dependency = new CTriggerDependency;
+	} else {
+		fprintf(stderr, "Invalid dependency type: \"%s\".\n", config_data->Tag.c_str());
+	}
+	
+	dependency->ProcessConfigData(config_data);
+	
+	return dependency;
+}
+
+/**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data
@@ -76,6 +119,8 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 		
 		if (property.Key == "check_all_players") {
 			this->CheckAllPlayers = StringToBool(property.Value);
+		} else if (property.Key == "check_neutral_player") {
+			this->CheckNeutralPlayer = StringToBool(property.Value);
 		} else {
 			this->ProcessConfigDataProperty(std::pair<std::string, std::string>(property.Key, property.Value));
 		}
@@ -94,6 +139,31 @@ void CDependency::ProcessConfigDataProperty(const std::pair<std::string, std::st
 void CDependency::ProcessConfigDataSection(const CConfigData *section)
 {
 	fprintf(stderr, "Invalid dependency property: \"%s\".\n", section->Tag.c_str());
+}
+
+bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
+{
+	if (this->ChecksAllPlayers()) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody || p->GetIndex() == PlayerNumNeutral) {
+				continue;
+			}
+			
+			if (!this->CheckInternal(p, ignore_units)) {
+				return false;
+			}
+		}
+	} else if (this->ChecksNeutralPlayer()) {
+		if (!this->CheckInternal(CPlayer::Players[PlayerNumNeutral], ignore_units)) {
+			return false;
+		}
+	} else {
+		if (!this->CheckInternal(player, ignore_units)) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 bool CDependency::Check(const CUnit *unit, bool ignore_units) const
@@ -159,23 +229,7 @@ bool CheckDependencies(const CUnitType *target, const CPlayer *player, const boo
 		return true;
 	}
 	
-	if (dependency->ChecksAllPlayers()) {
-		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody) {
-				continue;
-			}
-			
-			if (!dependency->Check(p, ignore_units)) {
-				return false;
-			}
-		}
-	} else {
-		if (!dependency->Check(player, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
+	return dependency->Check(player, ignore_units);
 }
 
 bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_predependency, const bool is_neutral_use)
@@ -212,23 +266,7 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool
 		return true;
 	}
 	
-	if (dependency->ChecksAllPlayers()) {
-		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody) {
-				continue;
-			}
-			
-			if (!dependency->Check(p, ignore_units)) {
-				return false;
-			}
-		}
-	} else {
-		if (!dependency->Check(player, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
+	return dependency->Check(player, ignore_units);
 }
 
 bool CheckDependencies(const CUnitType *target, const CUnit *unit, const bool ignore_units, const bool is_predependency)
@@ -279,7 +317,7 @@ static int CclDefineDependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<CDependency *> and_dependencies;
+	std::vector<const CDependency *> and_dependencies;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -289,7 +327,7 @@ static int CclDefineDependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<CDependency *> dependencies;
+		std::vector<const CDependency *> dependencies;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);
@@ -375,7 +413,7 @@ static int CclDefinePredependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<CDependency *> and_dependencies;
+	std::vector<const CDependency *> and_dependencies;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -385,7 +423,7 @@ static int CclDefinePredependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<CDependency *> dependencies;
+		std::vector<const CDependency *> dependencies;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);

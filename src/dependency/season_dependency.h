@@ -52,7 +52,9 @@ class CSeasonDependency : public CDependency
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const override;
+private:
+	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const override;
+public:
 	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const override;
 	virtual std::string GetString(const std::string &prefix = "") const override;
 

@@ -55,7 +55,7 @@ void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<std::string,
 	}
 }
 
-bool CUnitTypeDependency::Check(const CPlayer *player, const bool ignore_units) const
+bool CUnitTypeDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	if (ignore_units) {
 		return true;

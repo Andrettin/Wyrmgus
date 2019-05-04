@@ -53,7 +53,7 @@ void CAgeDependency::ProcessConfigDataProperty(const std::pair<std::string, std:
 	}
 }
 
-bool CAgeDependency::Check(const CPlayer *player, const bool ignore_units) const
+bool CAgeDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	return player->Age == this->Age;
 }

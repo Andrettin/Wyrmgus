@@ -52,10 +52,16 @@ class CDependency
 {
 public:
 	virtual ~CDependency() {}
+	
+	static CDependency *FromConfigData(const CConfigData *config_data);
+	
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
-	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const = 0;
+	bool Check(const CPlayer *player, const bool ignore_units = false) const;
+private:
+	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const = 0;
+public:
 	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const;
 	virtual std::string GetString(const std::string &prefix = "") const = 0; //get the dependency as a string
 	
@@ -64,8 +70,14 @@ public:
 		return this->CheckAllPlayers;
 	}
 	
+	bool ChecksNeutralPlayer() const
+	{
+		return this->CheckNeutralPlayers;
+	}
+	
 private:
 	bool CheckAllPlayers = false;
+	bool CheckNeutralPlayer = false;	/// whether the neutral player should be checked instead of the given player
 };
 
 /*----------------------------------------------------------------------------
@@ -95,24 +107,8 @@ extern bool CheckDependencies(const T *target, const CPlayer *player, const bool
 	if (dependency == nullptr) {
 		return true;
 	}
-	
-	if (dependency->ChecksAllPlayers()) {
-		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody) {
-				continue;
-			}
-			
-			if (!dependency->Check(p, ignore_units)) {
-				return false;
-			}
-		}
-	} else {
-		if (!dependency->Check(player, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
+		
+	return dependency->Check(player, ignore_units);
 }
 
 /// Check dependencies for unit
@@ -126,11 +122,13 @@ extern bool CheckDependencies(const T *target, const CUnit *unit, const bool ign
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->Check(unit, ignore_units);
-	} else {
-		return !target->Dependency || target->Dependency->Check(unit, ignore_units);
+	const CDependency *dependency = is_predependency ? target->Predependency : target->Dependency;
+	
+	if (dependency == nullptr) {
+		return true;
 	}
+	
+	return dependency->Check(unit, ignore_units);
 }
 
 #endif
