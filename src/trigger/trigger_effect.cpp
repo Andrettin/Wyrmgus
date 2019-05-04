@@ -38,6 +38,7 @@
 #include "config.h"
 #include "trigger/call_dialogue_trigger_effect.h"
 #include "trigger/change_resource_trigger_effect.h"
+#include "trigger/create_player_trigger_effect.h"
 #include "trigger/create_unit_trigger_effect.h"
 
 /*----------------------------------------------------------------------------
@@ -57,6 +58,8 @@ CTriggerEffect *CTriggerEffect::FromConfigData(const CConfigData *config_data)
 		trigger_effect = new CCallDialogueTriggerEffect;
 	} else if (config_data->Tag == "change_resource") {
 		trigger_effect = new CChangeResourceTriggerEffect;
+	} else if (config_data->Tag == "create_player") {
+		trigger_effect = new CCreatePlayerTriggerEffect;
 	} else if (config_data->Tag == "create_unit") {
 		trigger_effect = new CCreateUnitTriggerEffect;
 	} else {

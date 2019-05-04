@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name change_resource_trigger_effect.h - The change resource trigger effect header file. */
+/**@name create_player_trigger_effect.h - The create player trigger effect header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CHANGE_RESOURCE_TRIGGER_EFFECT_H__
-#define __CHANGE_RESOURCE_TRIGGER_EFFECT_H__
+#ifndef __CREATE_PLAYER_TRIGGER_EFFECT_H__
+#define __CREATE_PLAYER_TRIGGER_EFFECT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -41,21 +41,22 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CFaction;
 class CPlayer;
-class CResource;
+class CSite;
 
 /**
-**	@brief	The change resource trigger effect
+**	@brief	The create player trigger effect
 */
-class CChangeResourceTriggerEffect : public CTriggerEffect
+class CCreatePlayerTriggerEffect : public CTriggerEffect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
+	virtual void Do(CPlayer *player) const;	/// performs the trigger effect
 	
 private:
-	int Quantity = 1;				/// the quantity to change of the resource
-	const CResource *Resource = nullptr;
+	const CFaction *Faction = nullptr;	/// the faction of the player to be created
+	const CSite *StartSite = nullptr;	/// the site to use to set the player's starting location
 };
 
 #endif

@@ -53,6 +53,7 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
+private:
 	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
 };
 

@@ -53,6 +53,7 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
+private:
 	int Quantity = 1;				/// Quantity of units created
 	const CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
