@@ -905,6 +905,8 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 			CPlayer::Players[i]->Resources[StoneCost] = 2500;
 			
 			if (GameRunning) {
+				AiInit(*CPlayer::Players[i]);
+				
 				CPlayer::GetThisPlayer()->Notify(_("The %s faction has been founded!"), faction->GetName().utf8().get_data());
 			}
 			
