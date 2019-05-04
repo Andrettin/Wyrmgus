@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name call_dialogue_trigger_effect.h - The call dialogue trigger effect header file. */
+/**@name accept_quest_trigger_effect.h - The accept quest trigger effect header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CALL_DIALOGUE_TRIGGER_EFFECT_H__
-#define __CALL_DIALOGUE_TRIGGER_EFFECT_H__
+#ifndef __ACCEPT_QUEST_TRIGGER_EFFECT_H__
+#define __ACCEPT_QUEST_TRIGGER_EFFECT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -41,20 +41,20 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CDialogue;
 class CPlayer;
+class CQuest;
 
 /**
-**	@brief	The call dialogue trigger effect
+**	@brief	The accept quest trigger effect
 */
-class CCallDialogueTriggerEffect : public CTriggerEffect
+class CAcceptQuestTriggerEffect : public CTriggerEffect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;	/// performs the trigger effect
 	
 private:
-	const CDialogue *Dialogue = nullptr;	/// the dialogue to be called
+	CQuest *Quest = nullptr;	/// the quest to be accepted
 };
 
 #endif

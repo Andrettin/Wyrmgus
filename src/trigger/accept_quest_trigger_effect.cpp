@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name call_dialogue_trigger_effect.h - The call dialogue trigger effect header file. */
+/**@name accept_quest_trigger_effect.cpp - The accept quest trigger effect source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,34 +27,57 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CALL_DIALOGUE_TRIGGER_EFFECT_H__
-#define __CALL_DIALOGUE_TRIGGER_EFFECT_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "trigger/trigger_effect.h"
+#include "stratagus.h"
+
+#include "trigger/accept_quest_trigger_effect.h"
+
+#include "config.h"
+#include "config_operator.h"
+#include "player.h"
+#include "quest/quest.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Functions
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-class CDialogue;
-class CPlayer;
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CAcceptQuestTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+{
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		if (property.Key == "quest") {
+			CQuest *quest = CQuest::Get(property.Value);
+			if (quest != nullptr) {
+				this->Quest = quest;
+			}
+		} else {
+			fprintf(stderr, "Invalid accept quest trigger effect property: \"%s\".\n", property.Key.c_str());
+		}
+	}
+	
+	if (this->Quest == nullptr) {
+		fprintf(stderr, "Accept quest trigger effect has no quest.\n");
+	}
+}
 
 /**
-**	@brief	The call dialogue trigger effect
+**	@brief	Do the effect
+**
+**	@param	player	The player for which to do the effect
 */
-class CCallDialogueTriggerEffect : public CTriggerEffect
+void CAcceptQuestTriggerEffect::Do(CPlayer *player) const
 {
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void Do(CPlayer *player) const;	/// performs the trigger effect
-	
-private:
-	const CDialogue *Dialogue = nullptr;	/// the dialogue to be called
-};
-
-#endif
+	player->AcceptQuest(this->Quest);
+}

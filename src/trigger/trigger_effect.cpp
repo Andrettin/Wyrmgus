@@ -36,6 +36,7 @@
 #include "trigger/trigger_effect.h"
 
 #include "config.h"
+#include "trigger/accept_quest_trigger_effect.h"
 #include "trigger/call_dialogue_trigger_effect.h"
 #include "trigger/change_resource_trigger_effect.h"
 #include "trigger/create_player_trigger_effect.h"
@@ -54,7 +55,9 @@ CTriggerEffect *CTriggerEffect::FromConfigData(const CConfigData *config_data)
 {
 	CTriggerEffect *trigger_effect = nullptr;
 	
-	if (config_data->Tag == "call_dialogue") {
+	if (config_data->Tag == "accept_quest") {
+		trigger_effect = new CAcceptQuestTriggerEffect;
+	} else if (config_data->Tag == "call_dialogue") {
 		trigger_effect = new CCallDialogueTriggerEffect;
 	} else if (config_data->Tag == "change_resource") {
 		trigger_effect = new CChangeResourceTriggerEffect;
