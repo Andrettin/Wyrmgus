@@ -868,12 +868,12 @@ static int CclCreateUnit(lua_State *l)
 	const int playerno = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	if (playerno == -1) {
-		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
+		fprintf(stderr, "CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
 		LuaError(l, "bad player");
 		return 0;
 	}
 	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
-		printf("CreateUnit: player %d does not exist\n", playerno);
+		fprintf(stderr, "CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
 	}
@@ -943,12 +943,12 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	ipos.y = transporter->tilePos.y;
 
 	if (playerno == -1) {
-		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
+		fprintf(stderr, "CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
 		LuaError(l, "bad player");
 		return 0;
 	}
 	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
-		printf("CreateUnit: player %d does not exist\n", playerno);
+		fprintf(stderr, "CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
 	}
@@ -1017,12 +1017,12 @@ static int CclCreateUnitOnTop(lua_State *l)
 	int z = on_top->MapLayer->ID;
 
 	if (playerno == -1) {
-		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
+		fprintf(stderr, "CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
 		LuaError(l, "bad player");
 		return 0;
 	}
 	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
-		printf("CreateUnit: player %d does not exist\n", playerno);
+		fprintf(stderr, "CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
 	}
