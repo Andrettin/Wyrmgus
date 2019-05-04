@@ -2347,7 +2347,7 @@ void CPlayer::UpdateQuestPool()
 		}
 	}
 	
-	int max_quest_pool_size = 3 - ((int) this->CurrentQuests.size());
+	int max_quest_pool_size = CQuest::MaxQuestsPerPlayer - ((int) this->CurrentQuests.size());
 	for (int i = 0; i < max_quest_pool_size; ++i) { // fill the quest pool with up to three quests
 		if (potential_quests.size() == 0) {
 			break;
@@ -2486,13 +2486,12 @@ void CPlayer::AcceptQuest(CQuest *quest)
 
 void CPlayer::CompleteQuest(CQuest *quest)
 {
-	if (std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end()) {
-		return;
+	
+	this->RemoveCurrentQuest(quest);
+	
+	if (std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) == this->CompletedQuests.end()) {
+		this->CompletedQuests.push_back(quest);
 	}
-	
-	RemoveCurrentQuest(quest);
-	
-	this->CompletedQuests.push_back(quest);
 	if (quest->Competitive) {
 		quest->CurrentCompleted = true;
 	}
@@ -2564,7 +2563,9 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		return false;
 	}
 	
-	if (std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest) != this->CurrentQuests.end() || std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end()) {
+	if (
+		std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest) != this->CurrentQuests.end()
+		|| (!quest->IsRepeatable() && std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end())) {
 		return false;
 	}
 	
@@ -2958,18 +2959,25 @@ int CPlayer::GetResource(const int resource, const int type)
 **  @param value     How many of this resource (can be negative).
 **  @param store     If true, sets the building store resources, else the overall resources.
 */
-void CPlayer::ChangeResource(const int resource, const int value, const bool store)
+void CPlayer::ChangeResource(const int resource_index, const int value, const bool store)
 {
+	const CResource *resource = CResource::Get(resource_index);
+	if (resource->FinalResource != resource_index && resource->FinalResource != -1) {
+		//if this is not the final resource, change the final resource instead, with the given conversion rate
+		this->ChangeResource(resource->FinalResource, value * resource->FinalResourceConversionRate / 100, store);
+		return;
+	}
+	
 	if (value < 0) {
-		const int fromStore = std::min(this->StoredResources[resource], abs(value));
-		this->StoredResources[resource] -= fromStore;
-		this->Resources[resource] -= abs(value) - fromStore;
-		this->Resources[resource] = std::max(this->Resources[resource], 0);
+		const int fromStore = std::min(this->StoredResources[resource_index], abs(value));
+		this->StoredResources[resource_index] -= fromStore;
+		this->Resources[resource_index] -= abs(value) - fromStore;
+		this->Resources[resource_index] = std::max(this->Resources[resource_index], 0);
 	} else {
-		if (store && this->MaxResources[resource] != -1) {
-			this->StoredResources[resource] += std::min(value, this->MaxResources[resource] - this->StoredResources[resource]);
+		if (store && this->MaxResources[resource_index] != -1) {
+			this->StoredResources[resource_index] += std::min(value, this->MaxResources[resource_index] - this->StoredResources[resource_index]);
 		} else {
-			this->Resources[resource] += value;
+			this->Resources[resource_index] += value;
 		}
 	}
 }

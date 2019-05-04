@@ -119,6 +119,7 @@ public:
 	~CQuest();
 	
 	static constexpr const char *ClassIdentifier = "quest";
+	static constexpr int MaxQuestsPerPlayer = 4;	/// the maximum amount of quests a player can have
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
@@ -140,6 +141,11 @@ public:
 	bool IsCompleted() const
 	{
 		return this->Completed;
+	}
+	
+	bool IsRepeatable() const
+	{
+		return this->Repeatable;
 	}
 	
 	const std::vector<CTriggerEffect *> &GetAcceptEffects() const
@@ -188,6 +194,9 @@ public:
 	bool Unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
 	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool Unfailable = false;			/// Whether the quest can fail normally
+private:
+	bool Repeatable = false;			/// whether the quest is repeatable
+public:
 	CCharacter *QuestGiver = nullptr;	/// Quest giver
 	CDialogue *IntroductionDialogue = nullptr;
 	LuaCallback *Conditions = nullptr;

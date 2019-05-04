@@ -241,6 +241,10 @@ void CQuest::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_rewards_string", "rewards_string"), [](CQuest *quest, const String &rewards_string){ quest->RewardsString = rewards_string; });
 	ClassDB::bind_method(D_METHOD("get_rewards_string"), &CQuest::GetRewardsString);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "rewards_string"), "set_rewards_string", "get_rewards_string");
+	
+	ClassDB::bind_method(D_METHOD("set_repeatable", "repeatable"), [](CQuest *quest, const bool repeatable){ quest->Repeatable = repeatable; });
+	ClassDB::bind_method(D_METHOD("is_repeatable"), &CQuest::IsRepeatable);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "repeatable"), "set_repeatable", "is_repeatable");
 }
 
 /**
