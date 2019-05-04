@@ -746,6 +746,8 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		this->TileSize.x = std::stoi(value);
 	} else if (key == "tile_height") {
 		this->TileSize.y = std::stoi(value);
+	} else if (key == "neutral_minimap_color") {
+		this->NeutralMinimapColorRGB = CColor::FromString(value);
 	} else if (key == "box_width") {
 		this->BoxWidth = std::stoi(value);
 	} else if (key == "box_height") {
@@ -861,6 +863,11 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		this->RandomMovementProbability = std::stoi(value);
 	} else if (key == "random_movement_distance") {
 		this->RandomMovementDistance = std::stoi(value);
+	} else if (key == "gives_resource") {
+		const CResource *resource = CResource::Get(value);
+		if (resource != nullptr) {
+			this->GivesResource = resource->GetIndex();
+		}
 	} else if (key == "can_cast_spell") {
 		value = FindAndReplaceString(value, "_", "-");
 		CSpell *spell = CSpell::GetSpell(value);
