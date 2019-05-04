@@ -65,18 +65,9 @@ public:
 	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const;
 	virtual std::string GetString(const std::string &prefix = "") const = 0; //get the dependency as a string
 	
-	bool ChecksAllPlayers() const
-	{
-		return this->CheckAllPlayers;
-	}
-	
-	bool ChecksNeutralPlayer() const
-	{
-		return this->CheckNeutralPlayer;
-	}
-	
 private:
-	bool CheckAllPlayers = false;
+	bool CheckAllPlayersAnd = false;	/// whether all players should be checked instead of the given player, with all of them having to qualify
+	bool CheckAllPlayersOr = false;		/// whether all players should be checked instead of the given player, with one of them having to qualify
 	bool CheckNeutralPlayer = false;	/// whether the neutral player should be checked instead of the given player
 };
 

@@ -117,8 +117,10 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 			continue;
 		}
 		
-		if (property.Key == "check_all_players") {
-			this->CheckAllPlayers = StringToBool(property.Value);
+		if (property.Key == "check_all_players_and") {
+			this->CheckAllPlayersAnd = StringToBool(property.Value);
+		} else if (property.Key == "check_all_players_or") {
+			this->CheckAllPlayersOr = StringToBool(property.Value);
 		} else if (property.Key == "check_neutral_player") {
 			this->CheckNeutralPlayer = StringToBool(property.Value);
 		} else {
@@ -143,7 +145,7 @@ void CDependency::ProcessConfigDataSection(const CConfigData *section)
 
 bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
 {
-	if (this->ChecksAllPlayers()) {
+	if (this->CheckAllPlayersAnd) {
 		for (const CPlayer *p : CPlayer::Players) {
 			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
 				continue;
@@ -153,7 +155,17 @@ bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
 				return false;
 			}
 		}
-	} else if (this->ChecksNeutralPlayer()) {
+	} else if (this->CheckAllPlayersOr) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
+				continue;
+			}
+			
+			if (this->CheckInternal(p, ignore_units)) {
+				return true;
+			}
+		}
+	} else if (this->CheckNeutralPlayer) {
 		if (!this->CheckInternal(CPlayer::Players[PlayerNumNeutral], ignore_units)) {
 			return false;
 		}
