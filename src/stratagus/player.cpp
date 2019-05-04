@@ -2559,7 +2559,7 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 
 bool CPlayer::CanAcceptQuest(CQuest *quest)
 {
-	if (quest->IsHidden() || quest->CurrentCompleted || quest->Unobtainable) {
+	if (quest->IsHidden() || quest->CurrentCompleted || quest->IsUnobtainable()) {
 		return false;
 	}
 	

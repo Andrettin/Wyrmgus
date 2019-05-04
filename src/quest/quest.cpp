@@ -244,7 +244,11 @@ void CQuest::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("set_repeatable", "repeatable"), [](CQuest *quest, const bool repeatable){ quest->Repeatable = repeatable; });
 	ClassDB::bind_method(D_METHOD("is_repeatable"), &CQuest::IsRepeatable);
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "repeatable"), "set_repeatable", "is_repeatable");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "repeatable"), "set_repeatable", "is_repeatable");
+	
+	ClassDB::bind_method(D_METHOD("set_unobtainable", "unobtainable"), [](CQuest *quest, const bool unobtainable){ quest->Unobtainable = unobtainable; });
+	ClassDB::bind_method(D_METHOD("is_unobtainable"), &CQuest::IsUnobtainable);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "unobtainable"), "set_unobtainable", "is_unobtainable");
 }
 
 /**

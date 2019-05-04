@@ -143,6 +143,11 @@ public:
 		return this->Completed;
 	}
 	
+	bool IsUnobtainable() const
+	{
+		return this->Unobtainable;
+	}
+	
 	bool IsRepeatable() const
 	{
 		return this->Repeatable;
@@ -191,7 +196,9 @@ private:
 public:
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others
+private:
 	bool Unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
+public:
 	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool Unfailable = false;			/// Whether the quest can fail normally
 private:
