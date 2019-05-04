@@ -58,6 +58,14 @@ public:
 	virtual bool Check(const CPlayer *player, const bool ignore_units = false) const = 0;
 	virtual bool Check(const CUnit *unit, const bool ignore_units = false) const;
 	virtual std::string GetString(const std::string &prefix = "") const = 0; //get the dependency as a string
+	
+	bool ChecksAllPlayers() const
+	{
+		return this->CheckAllPlayers;
+	}
+	
+private:
+	bool CheckAllPlayers = false;
 };
 
 /*----------------------------------------------------------------------------
@@ -82,11 +90,29 @@ extern bool CheckDependencies(const T *target, const CPlayer *player, const bool
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->Check(player, ignore_units);
-	} else {
-		return !target->Dependency || target->Dependency->Check(player, ignore_units);
+	const CDependency *dependency = is_predependency ? target->Predependency : target->Dependency;
+	
+	if (dependency == nullptr) {
+		return true;
 	}
+	
+	if (dependency->ChecksAllPlayers()) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody) {
+				continue;
+			}
+			
+			if (!dependency->Check(p, ignore_units)) {
+				return false;
+			}
+		}
+	} else {
+		if (!dependency->Check(player, ignore_units)) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 /// Check dependencies for unit

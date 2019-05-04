@@ -74,7 +74,11 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 			continue;
 		}
 		
-		this->ProcessConfigDataProperty(std::pair<std::string, std::string>(property.Key, property.Value));
+		if (property.Key == "check_all_players") {
+			this->CheckAllPlayers = StringToBool(property.Value);
+		} else {
+			this->ProcessConfigDataProperty(std::pair<std::string, std::string>(property.Key, property.Value));
+		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
@@ -149,11 +153,29 @@ bool CheckDependencies(const CUnitType *target, const CPlayer *player, const boo
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->Check(player, ignore_units);
-	} else {
-		return !target->Dependency || target->Dependency->Check(player, ignore_units);
+	const CDependency *dependency = is_predependency ? target->Predependency : target->Dependency;
+	
+	if (dependency == nullptr) {
+		return true;
 	}
+	
+	if (dependency->ChecksAllPlayers()) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody) {
+				continue;
+			}
+			
+			if (!dependency->Check(p, ignore_units)) {
+				return false;
+			}
+		}
+	} else {
+		if (!dependency->Check(player, ignore_units)) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_predependency, const bool is_neutral_use)
@@ -184,11 +206,29 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool
 		}
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->Check(player, ignore_units);
-	} else {
-		return !target->Dependency || target->Dependency->Check(player, ignore_units);
+	const CDependency *dependency = is_predependency ? target->Predependency : target->Dependency;
+	
+	if (dependency == nullptr) {
+		return true;
 	}
+	
+	if (dependency->ChecksAllPlayers()) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody) {
+				continue;
+			}
+			
+			if (!dependency->Check(p, ignore_units)) {
+				return false;
+			}
+		}
+	} else {
+		if (!dependency->Check(player, ignore_units)) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 bool CheckDependencies(const CUnitType *target, const CUnit *unit, const bool ignore_units, const bool is_predependency)
