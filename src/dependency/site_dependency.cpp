@@ -52,6 +52,8 @@ void CSiteDependency::ProcessConfigDataProperty(const std::pair<std::string, std
 		this->Site = CSite::Get(value);
 	} else if (key == "faction") {
 		this->Faction = CFaction::Get(value);
+	} else if (key == "enemy") {
+		this->Enemy = StringToBool(value);
 	} else {
 		fprintf(stderr, "Invalid site dependency property: \"%s\".\n", key.c_str());
 	}
@@ -66,7 +68,27 @@ bool CSiteDependency::CheckInternal(const CPlayer *player, const bool ignore_uni
 			return false;
 		}
 		
-		return faction_player->HasSettlement(this->Site);
+		if (!faction_player->HasSettlement(this->Site)) {
+			return false;
+		}
+		
+		if (this->Enemy && !player->IsEnemy(*faction_player)) {
+			return false;
+		}
+		
+		return true;
+	} else if (this->Enemy) {
+		for (const CPlayer *p : CPlayer::Players) {
+			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
+				continue;
+			}
+			
+			if (p->HasSettlement(this->Site) && player->IsEnemy(*p)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	return player->HasSettlement(this->Site);
@@ -74,8 +96,8 @@ bool CSiteDependency::CheckInternal(const CPlayer *player, const bool ignore_uni
 
 bool CSiteDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
-	if (this->Faction != nullptr) {
-		return this->CheckInternal(nullptr, ignore_units);
+	if (this->Faction != nullptr || this->Enemy) {
+		return this->CheckInternal(unit->Player, ignore_units);
 	}
 	
 	return unit->Settlement == this->Site;

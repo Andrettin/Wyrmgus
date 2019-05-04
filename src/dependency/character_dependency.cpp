@@ -68,7 +68,15 @@ bool CCharacterDependency::CheckInternal(const CPlayer *player, const bool ignor
 			return false;
 		}
 		
-		return faction_player->HasHero(this->Character);
+		if (!faction_player->HasHero(this->Character)) {
+			return false;
+		}
+		
+		if (this->Enemy && !player->IsEnemy(*faction_player)) {
+			return false;
+		}
+		
+		return true;
 	} else if (this->Enemy) {
 		for (const CPlayer *p : CPlayer::Players) {
 			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {

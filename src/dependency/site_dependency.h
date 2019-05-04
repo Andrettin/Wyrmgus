@@ -62,6 +62,7 @@ public:
 private:
 	const CSite *Site = nullptr;
 	const CFaction *Faction = nullptr;	/// the faction to check the ownership of the site for; if this isn't provided, the dependency will check instead if the triggering player owns the site, or if the unit is a part of the site
+	bool Enemy = false;	/// whether the player or unit should be checked to see if they are an enemy of the site
 };
 
 #endif
