@@ -45,6 +45,7 @@ class CCharacter;
 class CDialogueNode;
 class CDialogueOption;
 class CFaction;
+class CTriggerEffect;
 class CUnitType;
 class LuaCallback;
 
@@ -87,7 +88,8 @@ public:
 	std::string Text;
 	CDialogue *Dialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
-	LuaCallback *ImmediateEffects = nullptr;
+	LuaCallback *ImmediateEffectsLua = nullptr;
+	std::vector<const CTriggerEffect *> ImmediateEffects;
 	std::vector<CDialogueOption *> Options;
 };
 
@@ -102,6 +104,7 @@ public:
 	LuaCallback *EffectsLua;
 	std::string Tooltip;
 	CDialogue *Dialogue = nullptr;
+	std::vector<const CTriggerEffect *> Effects;
 	std::vector<const CDialogueNode *> Nodes;
 };
 

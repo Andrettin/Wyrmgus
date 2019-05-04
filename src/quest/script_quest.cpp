@@ -791,7 +791,7 @@ static int CclDefineDialogue(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "immediate-effects")) {
 						lua_rawgeti(l, -1, k + 1);
-						node->ImmediateEffects = new LuaCallback(l, -1);
+						node->ImmediateEffectsLua = new LuaCallback(l, -1);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "options")) {
 						lua_rawgeti(l, -1, k + 1);

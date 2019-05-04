@@ -93,12 +93,16 @@ CDialogueNode::~CDialogueNode()
 		delete Conditions;
 	}
 	
-	if (this->ImmediateEffects) {
-		delete ImmediateEffects;
+	if (this->ImmediateEffectsLua) {
+		delete ImmediateEffectsLua;
 	}
 	
 	for (const CDialogueOption *option : this->Options) {
 		delete option;
+	}
+	
+	for (const CTriggerEffect *effect : this->ImmediateEffects) {
+		delete effect;
 	}
 }
 
@@ -139,6 +143,12 @@ void CDialogueNode::ProcessConfigData(const CConfigData *config_data)
 			option->Dialogue = this->Dialogue;
 			this->Options.push_back(option);
 			option->ProcessConfigData(section);
+		} else if (section->Tag == "effects") {
+			for (const CConfigData *subsection : section->Sections) {
+				const CTriggerEffect *trigger_effect = CTriggerEffect::FromConfigData(subsection);
+				
+				this->ImmediateEffects.push_back(trigger_effect);
+			}
 		} else {
 			fprintf(stderr, "Invalid dialogue node section: \"%s\".\n", section->Tag.c_str());
 		}
@@ -158,9 +168,13 @@ void CDialogueNode::Call(const int player) const
 		}
 	}
 	
-	if (this->ImmediateEffects) {
-		this->ImmediateEffects->pushPreamble();
-		this->ImmediateEffects->run();
+	if (this->ImmediateEffectsLua) {
+		this->ImmediateEffectsLua->pushPreamble();
+		this->ImmediateEffectsLua->run();
+	}
+	
+	for (const CTriggerEffect *effect : this->ImmediateEffects) {
+		effect->Do(CPlayer::Players[player]);
 	}
 	
 	std::string lua_command = "Event(";
@@ -249,6 +263,11 @@ void CDialogueNode::OptionEffect(const int option, const int player) const
 		this->Options[option]->EffectsLua->pushPreamble();
 		this->Options[option]->EffectsLua->run();
 	}
+	
+	for (const CTriggerEffect *effect : this->Effects) {
+		effect->Do(CPlayer::Players[player]);
+	}
+	
 	if ((this->Index + 1) < (int) this->Dialogue->Nodes.size()) {
 		this->Dialogue->Nodes[this->Index + 1]->Call(player);
 	}
@@ -262,6 +281,10 @@ CDialogueOption::~CDialogueOption()
 	
 	for (const CDialogueNode *node : this->Nodes) {
 		delete node;
+	}
+	
+	for (const CTriggerEffect *effect : this->Effects) {
+		delete effect;
 	}
 }
 
@@ -293,6 +316,12 @@ void CDialogueOption::ProcessConfigData(const CConfigData *config_data)
 			node->Dialogue = this->Dialogue;
 			this->Nodes.push_back(node);
 			node->ProcessConfigData(section);
+		} else if (section->Tag == "effects") {
+			for (const CConfigData *subsection : section->Sections) {
+				const CTriggerEffect *trigger_effect = CTriggerEffect::FromConfigData(subsection);
+				
+				this->Effects.push_back(trigger_effect);
+			}
 		} else {
 			fprintf(stderr, "Invalid dialogue option section: \"%s\".\n", section->Tag.c_str());
 		}
