@@ -903,6 +903,11 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
 			CPlayer::Players[i]->Resources[WoodCost] = 2500;
 			CPlayer::Players[i]->Resources[StoneCost] = 2500;
+			
+			if (GameRunning) {
+				CPlayer::GetThisPlayer()->Notify(_("The %s faction has been founded!"), faction->GetName().utf8().get_data());
+			}
+			
 			return CPlayer::Players[i];
 		}
 	}
