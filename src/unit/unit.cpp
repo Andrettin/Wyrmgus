@@ -2919,16 +2919,19 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		this->UpdateSoldUnits();
 		
-		for (CPlayerQuestObjective *objective : player.QuestObjectives) {
-			if (
-				objective->ObjectiveType == BuildUnitsObjectiveType
-				&& (
-					std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end()
-					|| std::find(objective->UnitClasses.begin(), objective->UnitClasses.end(), type.GetClass()) != objective->UnitClasses.end()
-				)
-			) {
-				if (!objective->Settlement || objective->Settlement == this->Settlement) {
-					objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
+		if (!type.BoolFlag[BUILDING_INDEX].value) {
+			//for buildings this is already handled in the "built" action
+			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
+				if (
+					objective->ObjectiveType == BuildUnitsObjectiveType
+					&& (
+						std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end()
+						|| std::find(objective->UnitClasses.begin(), objective->UnitClasses.end(), type.GetClass()) != objective->UnitClasses.end()
+					)
+				) {
+					if (!objective->Settlement || objective->Settlement == this->Settlement) {
+						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
+					}
 				}
 			}
 		}
