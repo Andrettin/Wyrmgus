@@ -280,11 +280,11 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	/*
 	unit.Boarded = 0;
 	unit.Place(pos);
-	transporter.BoardCount -= unit.Type->BoardSize;
+	transporter.BoardCount -= unit.Type->GetBoardSize();
 	*/
 	if (unit.Boarded) {
 		unit.Boarded = 0;
-		transporter.BoardCount -= unit.Type->BoardSize;
+		transporter.BoardCount -= unit.Type->GetBoardSize();
 	}
 	unit.Place(pos, transporter.MapLayer->ID);
 

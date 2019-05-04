@@ -147,7 +147,7 @@ static std::vector<CUnitType *> getReparableUnits()
 	std::vector<CUnitType *> res;
 
 	for (CUnitType *unit_type : CUnitType::GetAll()) {
-		if (unit_type->RepairHP > 0) {
+		if (unit_type->GetRepairHP() > 0) {
 			res.push_back(unit_type);
 		}
 	}

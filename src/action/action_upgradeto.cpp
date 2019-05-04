@@ -230,7 +230,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		for (int i = unit.InsideCount; i && unit.BoardCount > newtype.MaxOnBoard; --i, uins = uins->NextContained) {
 			if (uins->Boarded) {
 				uins->Boarded = 0;
-				unit.BoardCount -= uins->Type->BoardSize;
+				unit.BoardCount -= uins->Type->GetBoardSize();
 				DropOutOnSide(*uins, LookingW, &unit);
 			}
 		}

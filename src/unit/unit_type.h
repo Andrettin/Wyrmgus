@@ -577,6 +577,16 @@ public:
 	
 	std::vector<String> GetStatStrings() const;
 	//Wyrmgus end
+	
+	int GetRepairHP() const
+	{
+		return this->RepairHP;
+	}
+
+	int GetBoardSize() const
+	{
+		return this->BoardSize;
+	}
 
 public:
 	CUnitType *Parent = nullptr;	/// Parent unit type
@@ -659,7 +669,9 @@ public:
 
 	CConstruction *Construction = nullptr;	/// What is shown in construction phase
 
+private:
 	int RepairHP = 0;				/// Amount of HP per repair
+public:
 	int RepairCosts[MaxCosts];		/// How much it costs to repair
 
 	Vec2i TileSize = Vec2i(0, 0);	/// Tile size
@@ -680,7 +692,9 @@ public:
 	int RandomMovementDistance = 1;	/// Quantity of tiles to move randomly.
 	int ClicksToExplode = 0;		/// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard = 0;				/// Number of Transporter slots.
+private:
 	int BoardSize = 1;				/// How many "cells" the unit occupies inside a transporter
+public:
 	CButtonLevel *ButtonLevelForTransporter = nullptr;	/// On which button level game will show units inside transporter
 	//Wyrmgus start
 	int ButtonPos = 0;				/// Position of this unit as a train/build button

@@ -628,7 +628,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		transport_capacity_needed += ai_unit.Type->BoardSize;
+		transport_capacity_needed += ai_unit.Type->GetBoardSize();
 	}
 	
 	int net_transport_capacity_needed = transport_capacity_needed - transport_capacity;
@@ -685,7 +685,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		for (size_t j = 0; j != transporters.size(); ++j) {
 			CUnit *ai_transporter = transporters[j];
 			
-			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit.Type->BoardSize) { //the unit's board size is too big to fit in the transporter
+			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit.Type->GetBoardSize()) { //the unit's board size is too big to fit in the transporter
 				continue;
 			}
 			

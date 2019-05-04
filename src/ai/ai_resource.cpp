@@ -1982,7 +1982,7 @@ static void AiCheckRepair()
 			
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
-		if (unit.Type->RepairHP
+		if (unit.Type->GetRepairHP()
 			//Wyrmgus start
 //			&& unit.CurrentAction() != UnitActionBuilt
 			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value)

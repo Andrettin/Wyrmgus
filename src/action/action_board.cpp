@@ -263,7 +263,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 	if (transporter->BoardCount < transporter->Type->MaxOnBoard) {
 		// Place the unit inside the transporter.
 		unit.Remove(transporter);
-		transporter->BoardCount += unit.Type->BoardSize;
+		transporter->BoardCount += unit.Type->GetBoardSize();
 		unit.Boarded = 1;
 		transporter->UpdateContainerAttackRange();
 		if (!unit.Player->AiEnabled) {

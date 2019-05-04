@@ -957,6 +957,25 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
 			}
 		}
+	} else if (section->Tag == "repair_costs") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
+			key = FindAndReplaceString(key, "_", "-");
+			
+			const int resource = GetResourceIdByName(key.c_str());
+			if (resource != -1) {
+				this->RepairCosts[resource] = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+			}
+		}
 	} else if (section->Tag == "image") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
@@ -2093,6 +2112,14 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_terrain_type"), [](const CUnitType *unit_type){ return unit_type->TerrainType; });
 	
 	ClassDB::bind_method(D_METHOD("get_stat_strings"), [](const CUnitType *unit_type){ return VectorToGodotArray(unit_type->GetStatStrings()); });
+	
+	ClassDB::bind_method(D_METHOD("set_repair_hp", "repair_hp"), [](CUnitType *unit_type, const int repair_hp){ unit_type->RepairHp = repair_hp; });
+	ClassDB::bind_method(D_METHOD("get_repair_hp"), &CUnitType::GetRepairHP);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "repair_hp"), "set_repair_hp", "get_repair_hp");
+	
+	ClassDB::bind_method(D_METHOD("set_board_size", "board_size"), [](CUnitType *unit_type, const int board_size){ unit_type->BoardSize = board_size; });
+	ClassDB::bind_method(D_METHOD("get_board_size"), &CUnitType::GetBoardSize);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "board_size"), "set_board_size", "get_board_size");
 	
 	ClassDB::bind_method(D_METHOD("get_copper_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[CopperCost]; });
 	ClassDB::bind_method(D_METHOD("get_lumber_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[WoodCost]; });

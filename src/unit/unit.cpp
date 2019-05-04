@@ -7857,7 +7857,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	//Wyrmgus end
 
-	if (transporter.BoardCount + unit.Type->BoardSize > transporter.Type->MaxOnBoard) { // too big unit
+	if (transporter.BoardCount + unit.Type->GetBoardSize() > transporter.Type->MaxOnBoard) { // too big unit
 		return 0;
 	}
 
