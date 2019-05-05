@@ -63,7 +63,7 @@ CDialogue::~CDialogue()
 */
 bool CDialogue::ProcessConfigDataSection(const CConfigData *section)
 {
-	if (section->Tag == "dialogue_node") {
+	if (section->Tag == "node") {
 		CDialogueNode *node = new CDialogueNode;
 		node->Index = this->Nodes.size();
 		node->Dialogue = this;
