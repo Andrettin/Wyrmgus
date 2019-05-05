@@ -159,10 +159,10 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 			this->LowerTemplate = lower_template;
 			lower_template->UpperTemplate = this;
 		}
-	} else if (key == "adjacent_template") {
+	} else if (key == "adjacent_to") {
 		CMapTemplate *adjacent_template = CMapTemplate::Get(value);
 		if (adjacent_template != nullptr) {
-			this->AdjacentTemplates.insert(adjacent_template);
+			this->AdjacentToTemplates.insert(adjacent_template);
 		}
 	} else if (key == "north_of") {
 		const CMapTemplate *north_of_template = CMapTemplate::Get(value);
@@ -277,14 +277,14 @@ void CMapTemplate::Initialize()
 			//give priority to the template if the other template's position depends on its own
 			} else if (
 				(
-					a->AdjacentTemplates.find(b) != a->AdjacentTemplates.end()
+					a->AdjacentToTemplates.find(b) != a->AdjacentToTemplates.end()
 					|| a->NorthOfTemplates.find(b) != a->NorthOfTemplates.end()
 					|| a->SouthOfTemplates.find(b) != a->SouthOfTemplates.end()
 					|| a->WestOfTemplates.find(b) != a->WestOfTemplates.end()
 					|| a->EastOfTemplates.find(b) != a->EastOfTemplates.end()
 				)
 				&& (
-					b->AdjacentTemplates.find(a) == b->AdjacentTemplates.end()
+					b->AdjacentToTemplates.find(a) == b->AdjacentToTemplates.end()
 					&& b->NorthOfTemplates.find(a) == b->NorthOfTemplates.end()
 					&& b->SouthOfTemplates.find(a) == b->SouthOfTemplates.end()
 					&& b->WestOfTemplates.find(a) == b->WestOfTemplates.end()
@@ -294,14 +294,14 @@ void CMapTemplate::Initialize()
 				return false;
 			} else if (
 				(
-					b->AdjacentTemplates.find(a) != b->AdjacentTemplates.end()
+					b->AdjacentToTemplates.find(a) != b->AdjacentToTemplates.end()
 					|| b->NorthOfTemplates.find(a) != b->NorthOfTemplates.end()
 					|| b->SouthOfTemplates.find(a) != b->SouthOfTemplates.end()
 					|| b->WestOfTemplates.find(a) != b->WestOfTemplates.end()
 					|| b->EastOfTemplates.find(a) != b->EastOfTemplates.end()
 				)
 				&& (
-					a->AdjacentTemplates.find(b) == a->AdjacentTemplates.end()
+					a->AdjacentToTemplates.find(b) == a->AdjacentToTemplates.end()
 					&& a->NorthOfTemplates.find(b) == a->NorthOfTemplates.end()
 					&& a->SouthOfTemplates.find(b) == a->SouthOfTemplates.end()
 					&& a->WestOfTemplates.find(b) == a->WestOfTemplates.end()
@@ -852,7 +852,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				}
 				
 				//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
-				for (const CMapTemplate *adjacent_template : subtemplate->AdjacentTemplates) {
+				for (const CMapTemplate *adjacent_template : subtemplate->AdjacentToTemplates) {
 					Vec2i adjacent_template_pos = CMap::Map.GetSubtemplatePos(adjacent_template);
 					
 					if (!CMap::Map.Info.IsPointOnMap(adjacent_template_pos, z)) {

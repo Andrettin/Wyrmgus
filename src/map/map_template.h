@@ -163,7 +163,7 @@ public:
 	CMapTemplate *MainTemplate = nullptr;					/// main template in which this one is located, if this is a subtemplate
 	CMapTemplate *UpperTemplate = nullptr;					/// map template corresponding to this one in the upper layer
 	CMapTemplate *LowerTemplate = nullptr;					/// map template corresponding to this one in the lower layer
-	std::set<const CMapTemplate *> AdjacentTemplates;		/// map templates adjacent to this one
+	std::set<const CMapTemplate *> AdjacentToTemplates;		/// map templates to which this one is adjacent
 	std::set<const CMapTemplate *> NorthOfTemplates;		/// map templates to which this one is to the north of
 	std::set<const CMapTemplate *> SouthOfTemplates;		/// map templates to which this one is to the north of
 	std::set<const CMapTemplate *> WestOfTemplates;			/// map templates to which this one is to the west of
