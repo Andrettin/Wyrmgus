@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_element.h"
+#include "time/date.h"
 
 #include <map>
 #include <vector>
@@ -108,16 +109,31 @@ public:
 		return this->RandomChance;
 	}
 	
+	const CDate &GetHistoricalDate() const
+	{
+		return this->HistoricalDate;
+	}
+	
+	const CFaction *GetHistoricalFaction() const
+	{
+		return this->HistoricalFaction;
+	}
+	
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
 	bool OnlyOnce = false;				/// whether the trigger should occur only once in a game
 	bool CampaignOnly = false;			/// whether the trigger should only occur in the campaign mode
+private:
 	int RandomChance = 100;				/// the chance that this trigger will be triggered every time it is checked
+public:
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 	std::vector<CTriggerEffect *> TriggerEffects;
+private:
+	CDate HistoricalDate;				/// the historical date for the trigger
+	const CFaction *HistoricalFaction = nullptr;	/// the faction for which the trigger was historically triggered
 
 protected:
 	static void _bind_methods();

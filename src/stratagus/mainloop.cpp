@@ -557,6 +557,7 @@ void GameMainLoop()
 		const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 		if (current_campaign != nullptr) {
 			const CDate start_date(current_campaign->GetStartDate());
+			
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->GetFaction() != nullptr) {
 					if (start_date.Year) {

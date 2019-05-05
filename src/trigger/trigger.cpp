@@ -38,6 +38,7 @@
 #include "config.h"
 #include "dependency/and_dependency.h"
 #include "dependency/dependency.h"
+#include "faction.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -730,9 +731,20 @@ void CTrigger::InitActiveTriggers()
 		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
 			continue;
 		}
-		if (trigger->CampaignOnly && CCampaign::GetCurrentCampaign() == nullptr) {
+		
+		const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+		
+		if (trigger->CampaignOnly && current_campaign == nullptr) {
 			continue;
 		}
+		
+		if (current_campaign != nullptr) {
+			if (trigger->GetHistoricalDate().Year != 0 && current_campaign->GetStartDate().ContainsDate(trigger->GetHistoricalDate())) {
+				CTrigger::DeactivatedTriggers.push_back(trigger->Ident);
+				continue;
+			}
+		}
+		
 		CTrigger::ActiveTriggers.push_back(trigger);
 	}
 }
@@ -802,6 +814,8 @@ bool CTrigger::ProcessConfigDataProperty(const std::string &key, std::string val
 		this->OnlyOnce = StringToBool(value);
 	} else if (key == "campaign_only") {
 		this->CampaignOnly = StringToBool(value);
+	} else if (key == "historical_date") {
+		this->HistoricalDate = CDate::FromString(value);
 	} else {
 		return false;
 	}
@@ -838,6 +852,10 @@ void CTrigger::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_random_chance", "random_chance"), [](CTrigger *trigger, const int random_chance){ trigger->RandomChance = random_chance; });
 	ClassDB::bind_method(D_METHOD("get_random_chance"), &CTrigger::GetRandomChance);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "random_chance"), "set_random_chance", "get_random_chance");
+	
+	ClassDB::bind_method(D_METHOD("set_historical_faction", "historical_faction"), [](CTrigger *trigger, const String &faction_ident){ trigger->HistoricalFaction = CFaction::Get(faction_ident); });
+	ClassDB::bind_method(D_METHOD("get_historical_faction"), [](const CTrigger *trigger){ return const_cast<CFaction *>(trigger->GetHistoricalFaction()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "historical_faction"), "set_historical_faction", "get_historical_faction");
 }
 
 /**
