@@ -82,6 +82,8 @@
 //Wyrmgus end
 #include "world/world.h"
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -1340,8 +1342,8 @@ void RestrictCursorToViewport()
 */
 void RestrictCursorToMinimap()
 {
-	clamp(&CursorScreenPos.x, UI.Minimap.X, UI.Minimap.X + UI.Minimap.W - 1);
-	clamp(&CursorScreenPos.y, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
+	CursorScreenPos.x = std::clamp(CursorScreenPos.x, UI.Minimap.X, UI.Minimap.X + UI.Minimap.W - 1);
+	CursorScreenPos.y = std::clamp(CursorScreenPos.y, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
 
 	UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
 	CursorOn = CursorOnMinimap;
@@ -1391,8 +1393,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	//  Make the piemenu "follow" the mouse
 	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
-		clamp(&CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
-		clamp(&CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
+		CursorStartScreenPos.x = std::clamp(CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
+		CursorStartScreenPos.y = std::clamp(CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
 		return;
 	}
 

@@ -87,6 +87,8 @@
 //Wyrmgus end
 #include "world/world.h"
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -3538,7 +3540,7 @@ void UpdateUnitVariables(CUnit &unit)
 //					   unit.Variable[i].Value, unit.Variable[i].Max);
 					   unit.Variable[i].Value, unit.GetModifiedVariable(i, VariableMax));
 					   //Wyrmgus end
-			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
+			unit.Variable[i].Value = std::clamp(unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}
 	}
 }

@@ -53,6 +53,8 @@
 #include "unit/unit.h"
 #include "video/video.h"
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -422,7 +424,7 @@ static char CalculateStereo(const CUnit &unit)
 	int stereo = ((unit.tilePos.x * CMap::Map.GetCurrentPixelTileSize().x + unit.Type->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 2 +
 				   unit.IX - UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
-	clamp(&stereo, -128, 127);
+	stereo = std::clamp(stereo, -128, 127);
 	return stereo;
 }
 
@@ -528,7 +530,7 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
 				   UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
-	clamp(&stereo, -128, 127);
+	stereo = std::clamp(stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
 	//Wyrmgus start

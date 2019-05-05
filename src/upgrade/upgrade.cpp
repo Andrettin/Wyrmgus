@@ -89,9 +89,10 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util.h"
 
+#include <algorithm>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -1640,9 +1641,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
 				//Wyrmgus start
-//				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+//				stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				if (stat.Variables[j].Max > 0) {
-					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+					stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				}
 				//Wyrmgus end
 			}
@@ -1707,7 +1708,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 						if (unit.Variable[j].Max > 0) {
-							clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+							unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 						}
 						//Wyrmgus start
 						if (j == ATTACKRANGE_INDEX && unit.Container) {
@@ -1931,9 +1932,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
 				//Wyrmgus start
-//				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+//				stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				if (stat.Variables[j].Max > 0) {
-					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+					stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				}
 				//Wyrmgus end
 			}
@@ -1999,9 +2000,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 
 						//Wyrmgus start
-//						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+//						unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 						if (unit.Variable[j].Max > 0) {
-							clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+							unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 						}
 						//Wyrmgus end
 						//Wyrmgus start
@@ -2126,7 +2127,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
-			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
 		//Wyrmgus start
 		if (j == ATTACKRANGE_INDEX && unit.Container && !SaveGameLoading) {
@@ -2225,7 +2226,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
-			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
 		//Wyrmgus start
 		if (j == ATTACKRANGE_INDEX && unit.Container) {

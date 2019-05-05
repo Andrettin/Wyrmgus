@@ -51,6 +51,8 @@
 
 #include <oamlGodotModule/oamlGodotModule.h>
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -240,7 +242,7 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 
 	while (mix < end) {
 		int s = (*mix++);
-		clamp(&s, SHRT_MIN, SHRT_MAX);
+		s = std::clamp(s, SHRT_MIN, SHRT_MAX);
 		*output++ = s;
 	}
 }
@@ -612,7 +614,7 @@ int PlaySoundFile(const std::string &name)
 */
 void SetEffectsVolume(int volume)
 {
-	clamp(&volume, 0, MaxVolume);
+	volume = std::clamp(volume, 0, MaxVolume);
 	EffectsVolume = volume;
 }
 
@@ -751,7 +753,7 @@ void StopMusic()
 */
 void SetMusicVolume(int volume)
 {
-	clamp(&volume, 0, MaxVolume);
+	volume = std::clamp(volume, 0, MaxVolume);
 	MusicVolume = volume;
 
 	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr) {

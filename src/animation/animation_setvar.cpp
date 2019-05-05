@@ -44,6 +44,7 @@
 #include "unit/unit_manager.h"
 #include "util.h"
 
+#include <algorithm>
 #include <stdio.h>
 
 
@@ -164,8 +165,8 @@
 		goal->Variable[index].Value = goal->Variable[index].Max * value / 100;
 	}
 	//Wyrmgus start
-//	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);
-	clamp(&goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableMax));
+//	goal->Variable[index].Value = std::clamp(goal->Variable[index].Value, 0, goal->Variable[index].Max);
+	goal->Variable[index].Value = std::clamp(goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableMax));
 	//Wyrmgus end
 	//Wyrmgus start
 	if (index == ATTACKRANGE_INDEX && goal->Container) {

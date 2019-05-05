@@ -88,9 +88,10 @@
 #include "video/font.h"
 #include "video/video.h"
 
+#include <algorithm>
 #include <ctype.h>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -923,13 +924,13 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 	}
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
-	clamp<int>(&x, 0, Video.Width - 1);
+	x = std::clamp<int>(x, 0, Video.Width - 1);
 	if (above) {
 		y = y - popupHeight - 10;
 	} else { //below
 		y = y + 10;
 	}
-	clamp<int>(&y, 0, Video.Height - 1);
+	y = std::clamp<int>(y, 0, Video.Height - 1);
 
 	// Background
 	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT);
@@ -1024,13 +1025,13 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	popupHeight = std::max(popupHeight, 0);
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
-	clamp<int>(&x, 0, Video.Width - 1);
+	x = std::clamp<int>(x, 0, Video.Width - 1);
 	if (above) {
 		y = y - popupHeight - 10;
 	} else { //below
 		y = y + 10;
 	}
-	clamp<int>(&y, 0, Video.Height - 1);
+	y = std::clamp<int>(y, 0, Video.Height - 1);
 
 	// Background
 	IntColor BackgroundColor = Video.MapRGBA(TheScreen->format, 28, 28, 28, 208);

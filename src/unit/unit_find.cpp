@@ -48,6 +48,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 
+#include <algorithm>
 #include <limits.h>
 
 /*----------------------------------------------------------------------------
@@ -1228,7 +1229,7 @@ public:
 
 				// Unit we won't kill are evaluated the same
 				// Unit we are sure to kill are all evaluated the same (except PRIORITY)
-				clamp(&effective_hp, -hp_damage_evaluate, 0);
+				effective_hp = std::clamp(effective_hp, -hp_damage_evaluate, 0);
 
 				// Here, effective_hp vary from -hp_damage_evaluate (unit will be killed) to 0 (unit can't be killed)
 				// => we prefer killing rather than only hitting...
@@ -1356,8 +1357,8 @@ private:
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileSize.x > 1)
-		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileSize.x - 1);
-		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileSize.y - 1);
+		x = std::clamp<int>(x, dest->tilePos.x, dest->tilePos.x + dtype.TileSize.x - 1);
+		y = std::clamp<int>(y, dest->tilePos.y, dest->tilePos.y + dtype.TileSize.y - 1);
 
 		int sbad = 0;
 		int sgood = 0;

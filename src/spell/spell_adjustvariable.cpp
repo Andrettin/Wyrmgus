@@ -28,6 +28,10 @@
 //      02111-1307, USA.
 //
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "stratagus.h"
 
 #include "spell/spell_adjustvariable.h"
@@ -39,6 +43,12 @@
 #include "config_operator.h"
 #include "script.h"
 #include "unit/unit.h"
+
+#include <algorithm>
+
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -246,8 +256,8 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 		unit->Variable[i].Value += this->Var[i].IncreaseTime * unit->Variable[i].Increase * modifier / 100;
 
 		//Wyrmgus start
-//		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);
-		clamp(&unit->Variable[i].Value, 0, unit->GetModifiedVariable(i, VariableMax));
+//		unit->Variable[i].Value = std::clamp(unit->Variable[i].Value, 0, unit->Variable[i].Max);
+		unit->Variable[i].Value = std::clamp(unit->Variable[i].Value, 0, unit->GetModifiedVariable(i, VariableMax));
 		//Wyrmgus end
 		
 		//Wyrmgus start

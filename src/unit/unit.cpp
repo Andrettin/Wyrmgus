@@ -103,6 +103,7 @@
 #include "world/plane.h"
 #include "wyrmgus.h"
 
+#include <algorithm>
 #include <math.h>
 
 /*----------------------------------------------------------------------------
@@ -4402,8 +4403,8 @@ void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 	const int y = unit.tilePos.y;
 
 	*dpos = pos;
-	clamp<short int>(&dpos->x, x, x + unit.Type->TileSize.x - 1);
-	clamp<short int>(&dpos->y, y, y + unit.Type->TileSize.y - 1);
+	dpos->x = std::clamp<short int>(dpos->x, x, x + unit.Type->TileSize.x - 1);
+	dpos->y = std::clamp<short int>(dpos->y, y, y + unit.Type->TileSize.y - 1);
 }
 
 /**
@@ -7249,7 +7250,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 						   : 0;
 		if (shieldDamage) {
 			target.Variable[SHIELD_INDEX].Value -= shieldDamage;
-			clamp(&target.Variable[SHIELD_INDEX].Value, 0, target.Variable[SHIELD_INDEX].Max);
+			target.Variable[SHIELD_INDEX].Value = std::clamp(target.Variable[SHIELD_INDEX].Value, 0, target.Variable[SHIELD_INDEX].Max);
 		}
 		target.Variable[HP_INDEX].Value -= damage - shieldDamage;
 	}
@@ -8122,8 +8123,8 @@ void CUnit::IncreaseVariable(const int index)
 {
 	this->Variable[index].Value += this->Variable[index].Increase;
 	//Wyrmgus start
-//	clamp(&this->Variable[index].Value, 0, this->Variable[index].Max);
-	clamp(&this->Variable[index].Value, 0, this->GetModifiedVariable(index, VariableMax));
+//	this->Variable[index].Value = std::clamp(this->Variable[index].Value, 0, this->Variable[index].Max);
+	this->Variable[index].Value = std::clamp(this->Variable[index].Value, 0, this->GetModifiedVariable(index, VariableMax));
 	//Wyrmgus end
 	
 	//Wyrmgus start
@@ -8131,7 +8132,7 @@ void CUnit::IncreaseVariable(const int index)
 		this->HealingItemAutoUse();
 	} else if (index == GIVERESOURCE_INDEX && !this->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
 		this->ChangeResourcesHeld(this->GetVariableIncrease(index));
-		clamp(&this->ResourcesHeld, 0, this->GetModifiedVariable(index, VariableMax));
+		this->ResourcesHeld = std::clamp(this->ResourcesHeld, 0, this->GetModifiedVariable(index, VariableMax));
 	}
 	//Wyrmgus end
 
@@ -8235,7 +8236,7 @@ void CUnit::HandleBuffsEachSecond()
 		//Wyrmgus start
 		if (i == HP_INDEX && this->GetVariableValue(REGENERATION_INDEX) > 0) {
 			this->Variable[i].Value += 1;
-			clamp(&this->Variable[i].Value, 0, this->GetModifiedVariable(i, VariableMax));
+			this->Variable[i].Value = std::clamp(this->Variable[i].Value, 0, this->GetModifiedVariable(i, VariableMax));
 		}
 		//Wyrmgus end
 		if (this->IsVariableEnabled(i) && this->GetVariableIncrease(i) != 0) {

@@ -28,12 +28,22 @@
 //      02111-1307, USA.
 //
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "stratagus.h"
 
 #include "spell/spell_adjustvital.h"
 
 #include "script.h"
 #include "unit/unit.h"
+
+#include <algorithm>
+
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
 /* virtual */ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
 {
@@ -144,11 +154,11 @@
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
 	//Wyrmgus start
-//	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
-	clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableMax));
+//	target->Variable[MANA_INDEX].Value = std::clamp(target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+	target->Variable[MANA_INDEX].Value = std::clamp(target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableMax));
 	//Wyrmgus end
 	target->Variable[SHIELD_INDEX].Value += castcount * shield;
-	clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
+	target->Variable[SHIELD_INDEX].Value = std::clamp(target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 
 	if (spell.RepeatCast) {
 		return 1;

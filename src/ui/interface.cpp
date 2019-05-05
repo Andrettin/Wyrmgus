@@ -59,6 +59,8 @@
 #include "video/font.h"
 #include "video/video.h"
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -1509,10 +1511,8 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 void HandleCursorMove(int *x, int *y)
 {
 	//  Reduce coordinates to window-size.
-	clamp(x, 0, Video.Width - 1);
-	clamp(y, 0, Video.Height - 1);
-	CursorScreenPos.x = *x;
-	CursorScreenPos.y = *y;
+	CursorScreenPos.x = std::clamp(*x, 0, Video.Width - 1);
+	CursorScreenPos.y = std::clamp(*y, 0, Video.Height - 1);
 }
 
 /**
