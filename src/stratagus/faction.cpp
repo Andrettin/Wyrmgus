@@ -37,6 +37,7 @@
 #include "ai/ai_building_template.h"
 #include "ai/force_template.h"
 #include "civilization.h"
+#include "economy/resource.h"
 #include "faction.h"
 #include "grand_strategy.h"
 #include "luacallback.h"
@@ -44,6 +45,7 @@
 #include "player_color.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
+#include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -121,6 +123,125 @@ bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string val
 		} else {
 			fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.c_str());
 		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CFaction::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "historical_resources") {
+		CDate date;
+		std::map<const CResource *, int> resource_quantities;
+			
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
+			if (key == "date") {
+				value = FindAndReplaceString(value, "_", "-");
+				date = CDate::FromString(value);
+			} else {
+				const CResource *resource = CResource::Get(key);
+				
+				if (resource != nullptr) {
+					resource_quantities[resource] = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid historical resources property: \"%s\".\n", key.c_str());
+				}
+			}
+		}
+		
+		for (const auto &element : resource_quantities) {
+			this->HistoricalResources[std::pair<CDate, int>(date, element.first->GetIndex())] = element.second;
+		}
+	} else if (section->Tag == "historical_diplomacy_state") {
+		CDate date;
+		const CFaction *other_faction = nullptr;
+		int diplomacy_state = -1;
+			
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
+			if (key == "date") {
+				value = FindAndReplaceString(value, "_", "-");
+				date = CDate::FromString(value);
+			} else if (key == "faction") {
+				other_faction = CFaction::Get(value);
+			} else if (key == "diplomacy_state") {
+				value = FindAndReplaceString(value, "_", "-");
+				diplomacy_state = GetDiplomacyStateIdByName(value);
+				if (diplomacy_state == -1) {
+					fprintf(stderr, "Invalid diplomacy state: \"%s\".\n", value.c_str());
+				}
+			} else {
+				fprintf(stderr, "Invalid historical resources property: \"%s\".\n", key.c_str());
+			}
+		}
+		
+		if (other_faction == nullptr) {
+			fprintf(stderr, "Historical diplomacy state has no faction.\n");
+			return true;
+		}
+		
+		if (diplomacy_state == -1) {
+			fprintf(stderr, "Historical diplomacy state has no diplomacy state.\n");
+			return true;
+		}
+		
+		this->HistoricalDiplomacyStates[std::pair<CDate, const CFaction *>(date, other_faction)] = diplomacy_state;
+	} else if (section->Tag == "historical_upgrade") {
+		CDate date;
+		const CUpgrade *upgrade = nullptr;
+		bool has_upgrade = true;
+			
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
+			if (key == "date") {
+				value = FindAndReplaceString(value, "_", "-");
+				date = CDate::FromString(value);
+			} else if (key == "upgrade") {
+				upgrade = CUpgrade::Get(value);
+			} else if (key == "has_upgrade") {
+				has_upgrade = StringToBool(value);
+			} else {
+				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.c_str());
+			}
+		}
+		
+		if (upgrade == nullptr) {
+			fprintf(stderr, "Historical upgrade has no upgrade.\n");
+			return true;
+		}
+		
+		this->HistoricalUpgrades[upgrade->Ident][date] = has_upgrade;
 	} else {
 		return false;
 	}

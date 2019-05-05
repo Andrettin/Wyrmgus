@@ -2164,7 +2164,7 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 				
 				std::string diplomacy_state_faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *diplomacy_state_faction = CFaction::Get(diplomacy_state_faction_ident);
+				const CFaction *diplomacy_state_faction = CFaction::Get(diplomacy_state_faction_ident);
 				if (diplomacy_state_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ diplomacy_state_faction_ident.c_str());
 				}
@@ -2175,7 +2175,7 @@ static int CclDefineFaction(lua_State *l)
 				if (diplomacy_state == -1) {
 					LuaError(l, "Diplomacy state \"%s\" doesn't exist." _C_ diplomacy_state_name.c_str());
 				}
-				faction->HistoricalDiplomacyStates[std::pair<CDate, CFaction *>(date, diplomacy_state_faction)] = diplomacy_state;
+				faction->HistoricalDiplomacyStates[std::pair<CDate, const CFaction *>(date, diplomacy_state_faction)] = diplomacy_state;
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {
 			if (!lua_istable(l, -1)) {

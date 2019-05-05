@@ -112,7 +112,8 @@ public:
 	static int GetFactionClassUpgrade(const CFaction *faction, const int class_id);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value);
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 	/**
 	**	@brief	Get the faction's primary color with highest priority
@@ -206,7 +207,7 @@ public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
-	std::map<std::pair<CDate, CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
+	std::map<std::pair<CDate, const CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
 	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
 	std::vector<CFiller> UIFillers;
