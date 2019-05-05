@@ -101,7 +101,7 @@ public:
 	void ProcessConfigData(const CConfigData *config_data);
 	
 	std::string Name;
-	LuaCallback *EffectsLua;
+	LuaCallback *EffectsLua = nullptr;
 	std::string Tooltip;
 	CDialogue *Dialogue = nullptr;
 	std::vector<const CTriggerEffect *> Effects;
