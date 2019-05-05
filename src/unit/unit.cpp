@@ -1344,6 +1344,8 @@ void CUnit::ChooseButtonIcon(const int button_action)
 			if (!item_slot->Boots) {
 				continue;
 			}
+		} else {
+			continue;
 		}
 			
 		for (const CUnit *equipment_unit : iterator->second) {
@@ -1441,6 +1443,8 @@ void CUnit::ChooseButtonIcon(const int button_action)
 			if (!item_slot->Boots) {
 				continue;
 			}
+		} else {
+			continue;
 		}
 		
 		if (button_action == ButtonStandGround) {
