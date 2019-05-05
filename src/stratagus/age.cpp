@@ -164,7 +164,7 @@ void CAge::SetCurrentAge(CAge *age)
 	if (GameCycle > 0 && !SaveGameLoading) {
 		if (CAge::CurrentAge && CAge::CurrentAge->YearBoost > 0) {
 			//boost the current date's year by a certain amount; this is done so that we can both have a slower passage of years in-game (for seasons and character lifetimes to be more sensible), while still not having overly old dates in later ages
-			for (CCalendar *calendar : CCalendar::Calendars) {
+			for (CCalendar *calendar : CCalendar::GetAll()) {
 				calendar->CurrentDate.AddHours(calendar, (long long) CAge::CurrentAge->YearBoost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
 			}
 		}

@@ -60,7 +60,7 @@ CDate CDate::FromString(const std::string &date_str)
 	size_t offset = 0;
 	
 	if (date_vector.size() >= 1 && !IsStringNumber(date_vector[0])) {
-		calendar = CCalendar::GetCalendar(date_vector[0]);
+		calendar = CCalendar::Get(date_vector[0]);
 		if (calendar) {
 			offset += 1;
 		} else if (!CTimeline::Get(date_vector[0])) { //is neither a calendar nor a timeline
@@ -354,7 +354,7 @@ int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
 */
 void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string)
 {
-	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
+	CCalendar *calendar = CCalendar::Get(calendar_ident);
 	
 	if (!calendar) {
 		return;
@@ -371,7 +371,7 @@ void SetCurrentDate(const std::string &calendar_ident, const std::string &date_s
 */
 void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week)
 {
-	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
+	CCalendar *calendar = CCalendar::Get(calendar_ident);
 	
 	if (!calendar || calendar->DaysOfTheWeek.empty() || !calendar->BaseDayOfTheWeek) {
 		return;

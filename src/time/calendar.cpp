@@ -42,8 +42,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CCalendar *> CCalendar::Calendars;
-std::map<std::string, CCalendar *> CCalendar::CalendarsByIdent;
 CCalendar * CCalendar::BaseCalendar = nullptr;
 
 /*----------------------------------------------------------------------------
@@ -108,67 +106,18 @@ CCalendar::~CCalendar()
 	for (size_t i = 0; i < DaysOfTheWeek.size(); ++i) {
 		delete DaysOfTheWeek[i];
 	}
-	DaysOfTheWeek.clear();
 	
 	for (size_t i = 0; i < Months.size(); ++i) {
 		delete Months[i];
 	}
-	Months.clear();
-}
-
-/**
-**	@brief	Get a calendar
-**
-**	@param	ident	The calendar's string identifier
-**	@param	should_find	Whether it is an error if the calendar couldn't be found
-**
-**	@return	A pointer to the calendar if found, null otherwise
-*/
-CCalendar *CCalendar::GetCalendar(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CCalendar *>::const_iterator find_iterator = CalendarsByIdent.find(ident);
-	
-	if (find_iterator != CalendarsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid calendar: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a calendar
-**
-**	@param	ident	The calendar's string identifier
-**
-**	@return	A pointer to the calendar if found, otherwise a new calendar is created and returned
-*/
-CCalendar *CCalendar::GetOrAddCalendar(const std::string &ident)
-{
-	CCalendar *calendar = GetCalendar(ident, false);
-	
-	if (!calendar) {
-		calendar = new CCalendar;
-		calendar->Ident = ident;
-		Calendars.push_back(calendar);
-		CalendarsByIdent[ident] = calendar;
-	}
-	
-	return calendar;
 }
 
 /**
 **	@brief	Remove the existing calendars
 */
-void CCalendar::ClearCalendars()
+void CCalendar::Clear()
 {
-	for (size_t i = 0; i < Calendars.size(); ++i) {
-		delete Calendars[i];
-	}
-	Calendars.clear();
+	DataType<CCalendar>::Clear();
 	
 	BaseCalendar = nullptr;
 }
@@ -240,7 +189,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "calendar") {
 					value = FindAndReplaceString(value, "_", "-");
-					calendar = CCalendar::GetCalendar(value);
+					calendar = CCalendar::Get(value);
 					if (!calendar) {
 						fprintf(stderr, "Calendar \"%s\" does not exist.\n", value.c_str());
 					}

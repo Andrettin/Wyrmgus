@@ -411,9 +411,7 @@ static void GameLogicLoop()
 			if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
 				CDate::CurrentTotalHours++;
 				
-				for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
-					CCalendar *calendar = CCalendar::Calendars[i];
-
+				for (CCalendar *calendar : CCalendar::GetAll()) {
 					calendar->CurrentDate.AddHours(calendar, 1, DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 					
 					if (calendar->CurrentDayOfTheWeek != -1 && CDate::CurrentTotalHours % calendar->HoursPerDay == 0) { //day passed in the calendar

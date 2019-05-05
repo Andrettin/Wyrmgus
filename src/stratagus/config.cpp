@@ -324,11 +324,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				button_level->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "calendar") {
-			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);
-			if (!define_only) {
-				calendar->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "missile_type") {
 			MissileType *missile_type = MissileTypeByIdent(ident);
 			if (!missile_type) {

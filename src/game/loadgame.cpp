@@ -96,7 +96,6 @@ void CleanModules()
 	CleanFonts();
 	CTrigger::ClearTriggers();
 	FreeAi();
-	CCalendar::ClearCalendars();
 	CleanConstructions();
 	CleanDecorations();
 	//Wyrmgus start

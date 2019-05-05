@@ -35,11 +35,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_element.h"
+#include "data_type.h"
 #include "time/date.h"
-
-#include <map>
-#include <string>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -67,22 +64,21 @@ public:
 	int Days = 0;
 };
 
-class CCalendar : public DataElement
+class CCalendar : public DataElement, public DataType<CCalendar>
 {
-	GDCLASS(CCalendar, DataElement)
+	DATA_TYPE(CCalendar, DataElement)
 	
 public:
 	~CCalendar();
 	
-	static CCalendar *GetCalendar(const std::string &ident, const bool should_find = true);
-	static CCalendar *GetOrAddCalendar(const std::string &ident);
-	static void ClearCalendars();
+	static constexpr const char *ClassIdentifier = "calendar";
+
+	static void Clear();
 	
-	static std::vector<CCalendar *> Calendars;
-	static std::map<std::string, CCalendar *> CalendarsByIdent;
 	static CCalendar *BaseCalendar;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	
 private:
 	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
 	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);

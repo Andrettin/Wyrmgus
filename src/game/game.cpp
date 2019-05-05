@@ -1648,9 +1648,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		CDate::CurrentTotalHours = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	}
 	
-	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
-		CCalendar *calendar = CCalendar::Calendars[i];
-		
+	for (CCalendar *calendar : CCalendar::GetAll()) {
 		calendar->CurrentDate = CCalendar::BaseCalendar->CurrentDate.ToCalendar(CCalendar::BaseCalendar, calendar);
 		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
 	}
