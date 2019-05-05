@@ -2103,7 +2103,20 @@ std::vector<String> CUnitType::GetStatStrings() const
 
 void CUnitType::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_unit_class", "unit_class"), [](CUnitType *unit_type, const String &unit_class_ident){
+		if (unit_type->Class != nullptr) {
+			unit_type->Class->UnitTypes.erase(std::remove(unit_type->Class->UnitTypes.begin(), unit_type->Class->UnitTypes.end(), unit_type), unit_type->Class->UnitTypes.end());
+		}
+		
+		unit_type->Class = UnitClass::Get(unit_class_ident);
+		
+		if (unit_type->Class != nullptr && std::find(unit_type->Class->UnitTypes.begin(), unit_type->Class->UnitTypes.end(), unit_type) == unit_type->Class->UnitTypes.end()) {
+			unit_type->Class->UnitTypes.push_back(unit_type);
+		}
+	});
 	ClassDB::bind_method(D_METHOD("get_unit_class"), [](const CUnitType *unit_type){ return unit_type->Class; });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unit_class"), "set_unit_class", "get_unit_class");
+	
 	ClassDB::bind_method(D_METHOD("get_item_class"), [](const CUnitType *unit_type){ return const_cast<ItemClass *>(unit_type->ItemClass); });
 	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CUnitType *unit_type){ return const_cast<CWord *>(unit_type->NameWord); });
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
