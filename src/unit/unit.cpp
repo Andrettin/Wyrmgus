@@ -507,7 +507,7 @@ void CUnit::Init()
 	Removed = 0;
 	Selected = 0;
 	TeamSelected = 0;
-	UnderConstruction = 0;
+	UnderConstruction = false;
 	Active = 0;
 	Boarded = 0;
 	RescuedFrom = nullptr;
@@ -2425,7 +2425,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->UnderConstruction == 1 || !CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->UnderConstruction == true || !CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	

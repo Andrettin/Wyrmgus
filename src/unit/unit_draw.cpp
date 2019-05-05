@@ -1089,7 +1089,7 @@ void CUnit::Draw(const CViewport &vp) const
 {
 	int frame;
 	int state;
-	int under_construction;
+	bool under_construction;
 	const CConstructionFrame *cframe;
 	const CUnitType *type;
 

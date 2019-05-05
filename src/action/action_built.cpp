@@ -198,7 +198,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	//Wyrmgus end
 	
-	unit.UnderConstruction = 0;
+	unit.UnderConstruction = false;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;
 	} else {

@@ -545,7 +545,7 @@ public:
 	unsigned Removed : 1;        /// unit is removed (not on map)
 	unsigned Selected : 1;       /// unit is selected
 
-	unsigned UnderConstruction : 1;    /// Unit is in construction
+	bool UnderConstruction = false;	/// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
 	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
@@ -566,7 +566,7 @@ public:
 		Vec2i tilePos = Vec2i(-1, -1);		/// Last unit->tilePos Seen
 		signed char IX;						/// Seen X image displacement to map position
 		signed char IY;						/// seen Y image displacement to map position
-		unsigned UnderConstruction : 1;		/// Unit seen construction
+		bool UnderConstruction = false;		/// Unit seen construction
 		unsigned State : 3;					/// Unit seen build/upgrade state
 		unsigned Destroyed : PlayerMax;		/// Unit seen destroyed or not
 		unsigned ByPlayer : PlayerMax;		/// Track unit seen by player

@@ -535,10 +535,10 @@ static int CclUnit(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "under-construction")) {
-			unit->UnderConstruction = 1;
+			unit->UnderConstruction = true;
 			--j;
 		} else if (!strcmp(value, "seen-under-construction")) {
-			unit->Seen.UnderConstruction = 1;
+			unit->Seen.UnderConstruction = true;
 			--j;
 		} else if (!strcmp(value, "seen-state")) {
 			unit->Seen.State = LuaToNumber(l, 2, j + 1);
