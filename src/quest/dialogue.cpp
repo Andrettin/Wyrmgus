@@ -38,7 +38,9 @@
 #include "character.h"
 #include "faction.h"
 #include "luacallback.h"
+#include "player.h"
 #include "script.h"
+#include "trigger/trigger_effect.h"
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
@@ -259,13 +261,15 @@ void CDialogueNode::Call(const int player) const
 
 void CDialogueNode::OptionEffect(const int option, const int player) const
 {
-	if ((int) this->Options.size() > option && this->Options[option]->EffectsLua) {
-		this->Options[option]->EffectsLua->pushPreamble();
-		this->Options[option]->EffectsLua->run();
-	}
-	
-	for (const CTriggerEffect *effect : this->Effects) {
-		effect->Do(CPlayer::Players[player]);
+	if ((int) this->Options.size() > option) {
+		if (this->Options[option]->EffectsLua) {
+			this->Options[option]->EffectsLua->pushPreamble();
+			this->Options[option]->EffectsLua->run();
+		}
+		
+		for (const CTriggerEffect *effect : this->Options[option]->Effects) {
+			effect->Do(CPlayer::Players[player]);
+		}
 	}
 	
 	if ((this->Index + 1) < (int) this->Dialogue->Nodes.size()) {
