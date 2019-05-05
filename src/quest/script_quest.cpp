@@ -501,6 +501,8 @@ static int CclDefineCampaign(lua_State *l)
 		}
 	}
 	
+	campaign->Initialize();
+	
 	return 0;
 }
 
