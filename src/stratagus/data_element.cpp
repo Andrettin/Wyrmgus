@@ -62,7 +62,7 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &config_property : config_data->Properties) {
 		try {
-			if (config_property.Process(*this)) {
+			if (config_property.ProcessForObject(*this)) {
 				continue;
 			}
 		} catch (std::exception &exception) {

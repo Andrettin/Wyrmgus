@@ -48,6 +48,8 @@
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/dialogue.h"
+#include "quest/dialogue_node.h"
+#include "quest/dialogue_option.h"
 #include "script.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
@@ -762,10 +764,16 @@ static int CclDefineDialogue(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CDialogueNode *node = new CDialogueNode;
+				
+				CDialogueNode *previous_node = nullptr;
+				if (!dialogue->Nodes.empty()) {
+					previous_node = dialogue->Nodes.back();
+				}
+				
+				CDialogueNode *node = new CDialogueNode(dialogue, previous_node);
 				node->Index = dialogue->Nodes.size();
 				dialogue->Nodes.push_back(node);
-				node->Dialogue = dialogue;
+				
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for dialogue nodes)");
 				}
@@ -801,6 +809,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= (int) node->Options.size()) {
 								CDialogueOption *option = new CDialogueOption;
+								option->ParentNode = node;
 								node->Options.push_back(option);
 							}
 							node->Options[n]->Name = LuaToString(l, -1, n + 1);
@@ -812,6 +821,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= (int) node->Options.size()) {
 								CDialogueOption *option = new CDialogueOption;
+								option->ParentNode = node;
 								node->Options.push_back(option);
 							}
 							lua_rawgeti(l, -1, n + 1);
@@ -825,6 +835,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= (int) node->Options.size()) {
 								CDialogueOption *option = new CDialogueOption;
+								option->ParentNode = node;
 								node->Options.push_back(option);
 							}
 							node->Options[n]->Tooltip = LuaToString(l, -1, n + 1);

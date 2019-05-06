@@ -133,4 +133,6 @@ void Wyrmgus::_bind_methods()
 	
 	// this signal occurs when a unit owned by the player has been hit
 	ADD_SIGNAL(MethodInfo("unit_hit"));
+	
+	ADD_SIGNAL(MethodInfo("dialogue_called"), PropertyInfo(Variant::OBJECT, "dialogue"));
 }

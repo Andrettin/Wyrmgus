@@ -75,11 +75,11 @@ public:
 	static inline std::map<std::string, std::function<void(const std::string &, const std::string &)>> DataTypeAddAliasFunctions;	/// functions for adding aliases for data type instances, mapped to the string identifier of their respective class
 	
 	template <typename T>
-	void Process(T &data_element) const
+	void ProcessPropertiesForObject(T &data_element) const
 	{
 		for (const CConfigProperty &config_property : this->Properties) {
 			try {
-				if (!config_property.Process(data_element)) {
+				if (!config_property.ProcessForObject(data_element)) {
 					fprintf(stderr, "Invalid %s property: \"%s\".\n", this->Tag.c_str(), config_property.Key.c_str());
 				}
 			} catch (std::exception &exception) {

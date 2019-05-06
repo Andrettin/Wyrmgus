@@ -1180,7 +1180,7 @@ void CButtonPanel::Draw()
 		const PixelPos pos(UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 
 		//Wyrmgus start
-		CIcon *button_icon = buttons[i].Icon.Icon;
+		const CIcon *button_icon = buttons[i].Icon.Icon;
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
 		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != nullptr) {

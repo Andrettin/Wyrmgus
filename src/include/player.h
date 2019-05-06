@@ -81,6 +81,7 @@ class CGender;
 class CGraphic;
 class CProvince;
 class CPlane;
+class CPlayerColor;
 class CPlayerQuestObjective;
 class CQuest;
 class CReligion;
@@ -134,6 +135,16 @@ public:
 	const CFaction *GetFaction() const
 	{
 		return this->Faction;
+	}
+
+	const CPlayerColor *GetPrimaryColor() const
+	{
+		return this->PrimaryColor;
+	}
+
+	const CPlayerColor *GetSecondaryColor() const
+	{
+		return this->SecondaryColor;
 	}
 
 	void SetDynasty(CDynasty *dynasty);
@@ -241,6 +252,11 @@ public:
 
 	CUnitColors UnitColors;		/// Unit colors for new units
 
+private:	
+	const CPlayerColor *PrimaryColor = nullptr;
+	const CPlayerColor *SecondaryColor = nullptr;
+
+public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
 	//Wyrmgus start
 	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
@@ -258,7 +274,7 @@ public:
 	void SetAge(CAge *age);
 	Currency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
-	bool IsPlayerColorUsed(int color);
+	bool IsPlayerColorAvailable(const CPlayerColor *player_color) const;
 	bool HasUpgradeClass(const int upgrade_class) const;
 	bool HasSettlement(const CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
@@ -434,6 +450,7 @@ public:
 	bool HasNeutralFactionType() const;
 	bool HasBuildingAccess(const CPlayer &player, int button_action = -1) const;
 	bool HasHero(const CCharacter *hero) const;
+	CUnit *GetHeroUnit(const CCharacter *hero) const;
 	//Wyrmgus end
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);

@@ -840,6 +840,19 @@ void CCharacter::UpdateAttributes()
 	}
 }
 
+CUnit *CCharacter::GetUnit() const
+{
+	for (const CPlayer *player : CPlayer::Players) {
+		CUnit *hero_unit = player->GetHeroUnit(this);
+		
+		if (hero_unit != nullptr) {
+			return hero_unit;
+		}
+	}
+	
+	return nullptr;
+}
+
 void CCharacter::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CCharacter *character){ return character->NameWord; });

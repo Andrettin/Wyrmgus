@@ -475,7 +475,7 @@ extern bool FindTerrainType(int movemask, int resource, int range,
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
 
 /// Find all units of this type of the player
-extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, bool ai_active = false);
+extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, const bool ai_active_only = false);
 /// Return any unit on that map tile
 //Wyrmgus start
 //extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);

@@ -38,6 +38,8 @@
 #include "unit/unit_type.h"
 #include "vec2i.h"
 
+#include <core/object.h>
+
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -122,8 +124,10 @@ constexpr int NextDirection = 32;	/// Next direction N->NE->E...
 #define UnitNotSeen 0x7fffffff		/// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure
-class CUnit
+class CUnit : public Object
 {
+	GDCLASS(CUnit, Object)
+	
 public:
 	CUnit() { Init(); }
 
@@ -191,6 +195,11 @@ public:
 
 	/// Release a unit
 	void Release(bool final = false);
+	
+	CPlayer *GetPlayer() const
+	{
+		return this->Player;
+	}
 	
 	//Wyrmgus start
 	void SetResourcesHeld(int quantity);
@@ -428,8 +437,8 @@ public:
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
-	CIcon *GetIcon() const;
-	CIcon *GetButtonIcon(int button_action) const;
+	const CIcon *GetIcon() const;
+	const CIcon *GetButtonIcon(int button_action) const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
 	std::string GetName() const;
@@ -518,7 +527,7 @@ public:
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	CUnit *ConnectingDestination = nullptr;	/// Which connector this unit connects to (if any)
-	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
+	std::map<int, const CIcon *> ButtonIcons;	/// icons for button actions
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
 
@@ -601,6 +610,9 @@ public:
 	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
+	
+protected:
+	static void _bind_methods();
 };
 
 constexpr CUnit *NoUnitP = (CUnit *) 0;		/// return value: for no unit found

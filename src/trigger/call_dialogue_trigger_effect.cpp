@@ -79,5 +79,5 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 */
 void CCallDialogueTriggerEffect::Do(CPlayer *player) const
 {
-	this->Dialogue->Call(player->Index);
+	this->Dialogue->Call(player);
 }

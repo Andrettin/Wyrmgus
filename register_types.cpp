@@ -62,6 +62,8 @@
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/dialogue.h"
+#include "quest/dialogue_node.h"
+#include "quest/dialogue_option.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -85,6 +87,7 @@
 #include "ui/button_level.h"
 #include "ui/icon.h"
 #include "unit/historical_unit.h"
+#include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
@@ -115,6 +118,8 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CDeity>();
 	ClassDB::register_class<CDeityDomain>();
 	ClassDB::register_class<CDialogue>();
+	ClassDB::register_class<CDialogueNode>();
+	ClassDB::register_class<CDialogueOption>();
 	ClassDB::register_class<CDynasty>();
 	ClassDB::register_class<CFaction>();
 	ClassDB::register_class<CGender>();
@@ -143,6 +148,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CTimeline>();
 	ClassDB::register_class<CTimeOfDay>();
 	ClassDB::register_class<CTrigger>();
+	ClassDB::register_class<CUnit>();
 	ClassDB::register_class<CUnitType>();
 	ClassDB::register_class<CUpgrade>();
 	ClassDB::register_class<CWord>();

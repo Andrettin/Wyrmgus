@@ -61,7 +61,7 @@ bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		CLiteraryTextPage *page = new CLiteraryTextPage(page_number, previous_page);
-		section->Process(*page);
+		section->ProcessPropertiesForObject(*page);
 		this->Pages.push_back(page);
 	} else {
 		return false;

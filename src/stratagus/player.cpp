@@ -1081,6 +1081,8 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	//Wyrmgus end
 
 	this->Color = PlayerColors[NumPlayers][0];
+	this->PrimaryColor = nullptr;
+	this->SecondaryColor = nullptr;
 
 	if (CPlayer::Players[NumPlayers]->Type == PlayerComputer || CPlayer::Players[NumPlayers]->Type == PlayerRescueActive) {
 		this->AiEnabled = true;
@@ -1235,28 +1237,36 @@ void CPlayer::SetFaction(const CFaction *faction)
 		this->SetName(this->Faction->GetName().utf8().get_data());
 	}
 	if (this->Faction != nullptr) {
-		int color = -1;
-		for (CPlayerColor *player_color : faction->GetPrimaryColors()) {
-			int primary_color = GetPlayerColorIndexByName(player_color->GetIdent().utf8().get_data());
-			if (!IsPlayerColorUsed(primary_color)) {
-				color = primary_color;
+		const CPlayerColor *chosen_player_color = nullptr;
+		for (const CPlayerColor *player_color : faction->GetPrimaryColors()) {
+			if (this->IsPlayerColorAvailable(player_color)) {
+				chosen_player_color = player_color;
 				break;
 			}
 		}
-		if (color == -1) { //if all of the faction's colors are used, get a unused player color
-			for (int i = 0; i < PlayerColorMax; ++i) {
-				if (!IsPlayerColorUsed(i)) {
-					color = i;
+		if (chosen_player_color == nullptr) { //if all of the faction's colors are used, get an unused player color
+			for (const CPlayerColor *player_color : CPlayerColor::GetAll()) {
+				if (this->IsPlayerColorAvailable(player_color)) {
+					chosen_player_color = player_color;
 					break;
 				}
 			}
 		}
 		
-		if (color != -1) {
-			if (this->Color != PlayerColors[color][0]) {
-				this->Color = PlayerColors[color][0];
-				this->UnitColors.Colors = PlayerColorsRGB[color];
-			}
+		if (chosen_player_color == nullptr) { //if the player color is still null, then just pick a random one
+			chosen_player_color = CPlayerColor::GetAll()[SyncRand(CPlayerColor::GetAll().size())];
+		}
+			
+		this->PrimaryColor = chosen_player_color;
+		if (this->Color != PlayerColors[chosen_player_color->GetIndex()][0]) {
+			this->Color = PlayerColors[chosen_player_color->GetIndex()][0];
+			this->UnitColors.Colors = PlayerColorsRGB[chosen_player_color->GetIndex()];
+		}
+		
+		if (faction->GetSecondaryColor() != nullptr) {
+			this->SecondaryColor = faction->GetSecondaryColor();
+		} else {
+			this->SecondaryColor = CPlayerColor::GetAll()[SyncRand(CPlayerColor::GetAll().size())]; //pick a random secondary color if the faction has none
 		}
 	
 		if (!this->Faction->FactionUpgrade.empty()) {
@@ -1494,15 +1504,14 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	}
 }
 
-bool CPlayer::IsPlayerColorUsed(int color)
+bool CPlayer::IsPlayerColorAvailable(const CPlayerColor *player_color) const
 {
-	bool color_used = false;
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->GetFaction() != nullptr && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Color == PlayerColors[color][0]) {
-			color_used = true;
+	for (const CPlayer *player : CPlayer::Players) {
+		if (player != this && player->GetFaction() != nullptr && player->Type != PlayerNobody && player->PrimaryColor == player_color) {
+			return false;
 		}		
 	}
-	return color_used;
+	return true;
 }
 
 bool CPlayer::HasUpgradeClass(const int upgrade_class) const
@@ -2140,6 +2149,8 @@ void CPlayer::Clear()
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
 	this->Color = 0;
+	this->PrimaryColor = nullptr;
+	this->SecondaryColor = nullptr;
 	this->UpgradeTimers.Clear();
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
@@ -4296,12 +4307,28 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 	return false;
 }
 
-void CPlayer::_bind_methods()
+CUnit *CPlayer::GetHeroUnit(const CCharacter *hero) const
 {
+	if (!hero) {
+		return nullptr;
+	}
 	
+	for (CUnit *hero_unit : this->Heroes) {
+		if (hero_unit->Character == hero) {
+			return hero_unit;
+		}
+	}
+	
+	return nullptr;
+}
+
+void CPlayer::_bind_methods()
+{	
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), [](const CPlayer *player){ return const_cast<CFaction *>(player->GetFaction()); });
 	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
+	ClassDB::bind_method(D_METHOD("get_primary_color"), [](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetPrimaryColor()); });
+	ClassDB::bind_method(D_METHOD("get_secondary_color"), [](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetSecondaryColor()); });
 	
 	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));

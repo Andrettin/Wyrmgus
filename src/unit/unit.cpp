@@ -6672,7 +6672,7 @@ CConstruction *CUnit::GetConstruction() const
 	}
 }
 
-CIcon *CUnit::GetIcon() const
+const CIcon *CUnit::GetIcon() const
 {
 	if (this->Character != nullptr && this->Character->GetLevel() >= 3 && this->Character->HeroicIcon.Icon) {
 		return this->Character->HeroicIcon.Icon;
@@ -6690,7 +6690,7 @@ CIcon *CUnit::GetIcon() const
 	}
 }
 
-CIcon *CUnit::GetButtonIcon(int button_action) const
+const CIcon *CUnit::GetButtonIcon(int button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
@@ -8399,6 +8399,13 @@ void CUnit::HandleUnitAction()
 		}
 	}
 	this->Orders[0]->Execute(*this);
+}
+
+void CUnit::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), [](const CUnit *unit){ return String(unit->GetName().c_str()); });
+	ClassDB::bind_method(D_METHOD("get_player"), &CUnit::GetPlayer);
+	ClassDB::bind_method(D_METHOD("get_icon"), [](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
 }
 
 /*----------------------------------------------------------------------------

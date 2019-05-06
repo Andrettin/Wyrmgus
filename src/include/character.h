@@ -207,6 +207,8 @@ public:
 	{
 		return this->HistoricalLocations;
 	}
+	
+	CUnit *GetUnit() const;
 
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name dialogue.h - The dialogue header file. */
+/**@name dialogue_node.h - The dialogue node header file. */
 //
 //      (c) Copyright 2015-2019 by Andrettin
 //
@@ -27,23 +27,30 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DIALOGUE_H__
-#define __DIALOGUE_H__
+#ifndef __DIALOGUE_NODE_H__
+#define __DIALOGUE_NODE_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
-#include "data_type.h"
+#include <core/object.h>
+#include <core/ustring.h>
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CDialogueNode;
+class CCharacter;
+class CConfigData;
+class CDialogue;
+class CDialogueOption;
+class CFaction;
 class CPlayer;
 class CTriggerEffect;
+class CUnitType;
 class LuaCallback;
 struct lua_State;
 
@@ -51,21 +58,45 @@ struct lua_State;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDialogue : public DataElement, public DataType<CDialogue>
+class CDialogueNode : public Object
 {
-	DATA_TYPE(CDialogue, DataElement)
+	GDCLASS(CDialogueNode, Object)
 	
 public:
-	~CDialogue();
+	CDialogueNode(CDialogue *dialogue = nullptr, CDialogueNode *previous_node = nullptr) : Dialogue(dialogue)
+	{
+		if (previous_node != nullptr) {
+			previous_node->NextNode = this;
+		}
+	}
+
+	~CDialogueNode();
 	
-	static constexpr const char *ClassIdentifier = "dialogue";
-	
-	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	void ProcessConfigData(const CConfigData *config_data);
 	
 	void Call(CPlayer *player) const;
+	void OptionEffect(const int option, CPlayer *player) const;
 	
-	std::vector<CDialogueNode *> Nodes;	/// the nodes of the dialogue
-	std::map<String, const CDialogueNode *> NodesByIdent;	/// the nodes of the dialogue which have an ident, mapped to it
+	const CDialogueNode *GetNextNode() const
+	{
+		return this->NextNode;
+	}
+	
+	String Ident;							/// identifier for the node, needed for links, but not necessary for all nodes
+	int Index = -1;
+	const CCharacter *Character = nullptr;	/// the speaker character
+	const CUnitType *UnitType = nullptr;	/// the speaker unit type (the speaker will be a random unit of this type)
+	const CFaction *Faction = nullptr;		/// the faction to which the speaker belongs
+	String SpeakerName;						/// speaker name, replaces the name of the character or unit
+	String Text;
+	CDialogue *Dialogue = nullptr;
+private:
+	const CDialogueNode *NextNode = nullptr;
+public:
+	LuaCallback *Conditions = nullptr;
+	LuaCallback *ImmediateEffectsLua = nullptr;
+	std::vector<const CTriggerEffect *> ImmediateEffects;
+	std::vector<CDialogueOption *> Options;
 	
 	friend int CclDefineDialogue(lua_State *l);
 	
@@ -77,6 +108,7 @@ protected:
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern void CallDialogue(const std::string &dialogue_ident, int player);
+extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
+extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);
 
 #endif

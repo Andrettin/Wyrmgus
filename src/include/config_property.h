@@ -60,7 +60,7 @@ public:
 	**	@return	True if the property was found, or false otherwise
 	*/
 	template <typename T>
-	bool Process(T &data_element) const
+	bool ProcessForObject(T &data_element) const
 	{
 		const PropertyInfo *property_info = nullptr;
 		

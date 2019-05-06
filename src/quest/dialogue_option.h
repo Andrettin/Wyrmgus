@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name dialogue.cpp - The dialogue source file. */
+/**@name dialogue_option.h - The dialogue option header file. */
 //
 //      (c) Copyright 2015-2019 by Andrettin
 //
@@ -27,80 +27,56 @@
 //      02111-1307, USA.
 //
 
+#ifndef __DIALOGUE_OPTION_H__
+#define __DIALOGUE_OPTION_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
+#include <core/object.h>
+#include <core/ustring.h>
 
-#include "quest/dialogue.h"
-
-#include "config.h"
-#include "player.h"
-#include "quest/dialogue_node.h"
-#include "wyrmgus.h"
+#include <vector>
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-CDialogue::~CDialogue()
-{
-	for (const CDialogueNode *node : this->Nodes) {
-		delete node;
-	}
-}
+class CConfigData;
+class CDialogue;
+class CDialogueNode;
+class CPlayer;
+class CTriggerEffect;
+class LuaCallback;
+struct lua_State;
 
-/**
-**	@brief	Process a section in the data provided by a configuration file
-**
-**	@param	section		The section
-**
-**	@return	True if the section can be processed, or false otherwise
-*/
-bool CDialogue::ProcessConfigDataSection(const CConfigData *section)
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CDialogueOption : public Object
 {
-	if (section->Tag == "node") {
-		CDialogueNode *previous_node = nullptr;
-		if (!this->Nodes.empty()) {
-			previous_node = this->Nodes.back();
-		}
-		
-		CDialogueNode *node = new CDialogueNode(this, previous_node);
-		node->Index = this->Nodes.size();
-		this->Nodes.push_back(node);
-		node->ProcessConfigData(section);
-	} else {
-		return false;
-	}
+	GDCLASS(CDialogueOption, Object)
+
+public:
+	~CDialogueOption();
 	
-	return true;
-}
-
-void CDialogue::Call(CPlayer *player) const
-{
-	if (this->Nodes.empty()) {
-		return;
-	}
+	void ProcessConfigData(const CConfigData *config_data);
+	void DoEffect(CPlayer *player) const;
 	
-	Wyrmgus::GetInstance()->emit_signal("dialogue_called", this);
+	String Name;
+	LuaCallback *EffectsLua = nullptr;
+	String Tooltip;
+	CDialogue *Dialogue = nullptr;
+	const CDialogueNode *ParentNode = nullptr;
+	std::vector<const CTriggerEffect *> Effects;
+	std::vector<CDialogueNode *> ChildNodes;
 	
-	this->Nodes.front()->Call(player);
-}
-
-void CDialogue::_bind_methods()
-{
-	//signals that the dialogue node has changed; if nullptr is provided as the dialogue node, then that indicates that the dialogue has ended
-	ADD_SIGNAL(MethodInfo("dialogue_node_changed", PropertyInfo(Variant::OBJECT, "dialogue_node"), PropertyInfo(Variant::OBJECT, "speaker_unit")));
-}
-
-void CallDialogue(const std::string &dialogue_ident, int player)
-{
-	CDialogue *dialogue = CDialogue::Get(dialogue_ident);
-	if (!dialogue) {
-		return;
-	}
+	friend int CclDefineDialogue(lua_State *l);
 	
-	dialogue->Call(CPlayer::Players[player]);
-}
+protected:
+	static void _bind_methods();
+};
 
+#endif

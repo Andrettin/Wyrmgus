@@ -801,17 +801,17 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 **  @param type    type of unit requested
 **  @param table   table in which we have to store the units
 */
-void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table, bool ai_active)
+void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table, const bool ai_active_only)
 {
 	std::vector<CUnit *> type_units;
 
-	if (ai_active) {
+	if (ai_active_only) {
 		if (player.AiActiveUnitsByType.find(&type) != player.AiActiveUnitsByType.end()) {
-			type_units = player.AiActiveUnitsByType.find(&type)->second;;
+			type_units = player.AiActiveUnitsByType.find(&type)->second;
 		}
 	} else {
 		if (player.UnitsByType.find(&type) != player.UnitsByType.end()) {
-			type_units = player.UnitsByType.find(&type)->second;;
+			type_units = player.UnitsByType.find(&type)->second;
 		}
 	}
 	

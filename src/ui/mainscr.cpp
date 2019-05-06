@@ -692,8 +692,8 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			continue;
 		}
 		//Wyrmgus start
-//		CIcon &icon = *uins->Type->GetIcon();
-		CIcon &icon = *uins->GetIcon();
+//		const CIcon &icon = *uins->Type->GetIcon();
+		const CIcon &icon = *uins->GetIcon();
 		//Wyrmgus end
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
@@ -739,7 +739,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
-		CIcon &icon = *uins->GetIcon();
+		const CIcon &icon = *uins->GetIcon();
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   IconActive : 0;
@@ -1072,7 +1072,8 @@ void DrawPopups()
 				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 					continue;
 				}
-				CIcon &icon = *uins->GetIcon();
+				
+				const CIcon &icon = *uins->GetIcon();
 				
 				int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 						   IconActive : 0;

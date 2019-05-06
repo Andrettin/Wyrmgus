@@ -643,7 +643,7 @@ void GameMainLoop()
 		}
 		
 		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
-			CurrentQuest->IntroductionDialogue->Call(CPlayer::GetThisPlayer()->Index);
+			CurrentQuest->IntroductionDialogue->Call(CPlayer::GetThisPlayer());
 		}
 	}
 	//Wyrmgus end
