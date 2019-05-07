@@ -21,6 +21,7 @@ $#include "player.h"
 //Wyrmgus start
 $#include "quest/achievement.h"
 $#include "quest/dialogue.h"
+$#include "quest/dialogue_node.h"
 $#include "quest/quest.h"
 $#include "script.h"
 //Wyrmgus end

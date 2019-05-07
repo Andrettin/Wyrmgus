@@ -110,7 +110,9 @@ void CDialogueOption::DoEffect(CPlayer *player) const
 		this->ParentNode->GetNextNode()->Call(player);
 	} else {
 		//no further dialogue node, end the dialogue
-		this->Dialogue->emit_signal("dialogue_node_changed", static_cast<CDialogueNode *>(nullptr), static_cast<CUnit *>(nullptr));
+		if (player == CPlayer::GetThisPlayer()) {
+			this->Dialogue->emit_signal("dialogue_node_changed", static_cast<CDialogueNode *>(nullptr), static_cast<CUnit *>(nullptr));
+		}
 	}
 }
 

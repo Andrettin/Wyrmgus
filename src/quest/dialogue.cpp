@@ -83,13 +83,22 @@ void CDialogue::Call(CPlayer *player) const
 		return;
 	}
 	
-	Wyrmgus::GetInstance()->emit_signal("dialogue_called", this);
-	
-	this->Nodes.front()->Call(player);
+	if (player == CPlayer::GetThisPlayer()) {
+		// for the "this" player, wait for the dialogue panel to give the go-ahead for calling the first node
+		Wyrmgus::GetInstance()->emit_signal("dialogue_called", this);
+	} else {
+		this->Nodes.front()->Call(player);
+	}
 }
 
 void CDialogue::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("call_first_node"), [](const CDialogue *dialogue){
+		if (!dialogue->Nodes.empty()) {
+			dialogue->Nodes.front()->Call(CPlayer::GetThisPlayer());
+		}
+	});
+	
 	//signals that the dialogue node has changed; if nullptr is provided as the dialogue node, then that indicates that the dialogue has ended
 	ADD_SIGNAL(MethodInfo("dialogue_node_changed", PropertyInfo(Variant::OBJECT, "dialogue_node"), PropertyInfo(Variant::OBJECT, "speaker_unit")));
 }

@@ -223,7 +223,9 @@ void CDialogueNode::Call(CPlayer *player) const
 	
 	CclCommand(lua_command);
 	
-	this->Dialogue->emit_signal("dialogue_node_changed", this, speaker_unit);
+	if (player == CPlayer::GetThisPlayer()) {
+		this->Dialogue->emit_signal("dialogue_node_changed", this, speaker_unit);
+	}
 }
 
 void CDialogueNode::OptionEffect(const int option, CPlayer *player) const
