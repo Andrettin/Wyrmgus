@@ -93,6 +93,16 @@ void CDialogueOption::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
+/**
+**	@brief	Initialize the dialogue option
+*/
+void CDialogueOption::Initialize()
+{
+	for (CDialogueNode *node : this->ChildNodes) {
+		node->Initialize();
+	}
+}
+
 void CDialogueOption::DoEffect(CPlayer *player) const
 {
 	if (this->EffectsLua) {

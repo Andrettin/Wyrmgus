@@ -61,6 +61,7 @@ public:
 	static constexpr const char *ClassIdentifier = "dialogue";
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 	void Call(CPlayer *player) const;
 	

@@ -73,6 +73,7 @@ public:
 	~CDialogueNode();
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	void Initialize();
 	
 	void Call(CPlayer *player) const;
 	void OptionEffect(const int option, CPlayer *player) const;

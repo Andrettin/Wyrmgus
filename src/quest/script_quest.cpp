@@ -847,6 +847,8 @@ static int CclDefineDialogue(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
+				
+				dialogue->Initialize();
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

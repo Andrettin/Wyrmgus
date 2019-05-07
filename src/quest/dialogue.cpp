@@ -77,6 +77,18 @@ bool CDialogue::ProcessConfigDataSection(const CConfigData *section)
 	return true;
 }
 
+/**
+**	@brief	Initialize the dialogue
+*/
+void CDialogue::Initialize()
+{
+	for (CDialogueNode *node : this->Nodes) {
+		node->Initialize();
+	}
+	
+	this->Initialized = true;
+}
+
 void CDialogue::Call(CPlayer *player) const
 {
 	if (this->Nodes.empty()) {

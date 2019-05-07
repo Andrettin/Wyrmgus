@@ -99,6 +99,23 @@ void CDialogueNode::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
+/**
+**	@brief	Initialize the dialogue option
+*/
+void CDialogueNode::Initialize()
+{
+	for (CDialogueOption *option : this->Options) {
+		option->Initialize();
+	}
+	
+	//if no options have been defined for the dialogue node, create one that will simply continue to the next node
+	if (this->Options.empty()) {
+		CDialogueOption *option = new CDialogueOption;
+		option->ParentNode = this;
+		this->Options.push_back(option);
+	}
+}
+
 void CDialogueNode::Call(CPlayer *player) const
 {
 	if (this->Conditions) {

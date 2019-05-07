@@ -63,6 +63,7 @@ public:
 	~CDialogueOption();
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	void Initialize();
 	void DoEffect(CPlayer *player) const;
 	
 	String Name;
