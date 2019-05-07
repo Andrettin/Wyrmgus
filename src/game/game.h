@@ -62,5 +62,14 @@ extern bool LoadingHistory;
 extern bool DefiningData;
 //Wyrmgus end
 
+/// Set the game paused or unpaused
+extern void SetGamePaused(const bool paused);
+/// Get the game paused or unpaused
+extern bool IsGamePaused();
+/// Set the game speed
+extern void SetGameSpeed(int speed);
+/// Get the game speed
+extern int GetGameSpeed();
+
 #endif
 

@@ -29,9 +29,8 @@ $void StopGame(GameResults result);
 void StopGame(GameResults result);
 
 extern bool GameRunning;
-extern void SetGamePaused(bool paused);
-extern bool GetGamePaused();
-extern tolua_property__s bool GamePaused;
+extern void SetGamePaused(const bool paused);
+extern bool IsGamePaused();
 extern void SetGameSpeed(int speed);
 extern int GetGameSpeed();
 extern tolua_property__s int GameSpeed;

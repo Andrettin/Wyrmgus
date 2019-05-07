@@ -1199,11 +1199,11 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 }
 
 /**
-**  Set the game paused or unpaused
+**	@brief	Set the game paused or unpaused
 **
-**  @param paused  True to pause game, false to unpause.
+**	@param	paused	True to pause game, false to unpause.
 */
-void SetGamePaused(bool paused)
+void SetGamePaused(const bool paused)
 {
 	//Wyrmgus start
 	KeyScrollState = MouseScrollState = ScrollNone;
@@ -1213,11 +1213,11 @@ void SetGamePaused(bool paused)
 }
 
 /**
-**  Get the game paused or unpaused
+**	@brief	Get whether the game is paused or unpaused
 **
-**  @return  True if the game is paused, false otherwise
+**	@return	True if the game is paused, false otherwise
 */
-bool GetGamePaused()
+bool IsGamePaused()
 {
 	return GamePaused;
 }

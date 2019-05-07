@@ -417,16 +417,4 @@ extern void SelectionChanged();
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
 
-//
-// in game.cpp
-//
-/// Set the game paused or unpaused
-extern void SetGamePaused(bool paused);
-/// Get the game paused or unpaused
-extern bool GetGamePaused();
-/// Set the game speed
-extern void SetGameSpeed(int speed);
-/// Get the game speed
-extern int GetGameSpeed();
-
 #endif
