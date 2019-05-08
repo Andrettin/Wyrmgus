@@ -111,6 +111,7 @@ void CDialogueNode::Initialize()
 	//if no options have been defined for the dialogue node, create one that will simply continue to the next node
 	if (this->Options.empty()) {
 		CDialogueOption *option = new CDialogueOption;
+		option->Dialogue = this->Dialogue;
 		option->ParentNode = this;
 		this->Options.push_back(option);
 	}
@@ -138,9 +139,7 @@ void CDialogueNode::Call(CPlayer *player) const
 		effect->Do(player);
 	}
 	
-	std::string lua_command = "Event(";
-	
-	CPlayer *faction_player = nullptr;
+	CPlayer *faction_player = player;
 	
 	if (this->Faction != nullptr) {
 		faction_player = GetFactionPlayer(this->Faction);
@@ -149,16 +148,12 @@ void CDialogueNode::Call(CPlayer *player) const
 	CUnit *speaker_unit = nullptr;
 	
 	if (this->Character != nullptr) {
-		lua_command += "FindHero(\"" + this->Character->Ident;
-		
 		if (faction_player != nullptr) {
 			speaker_unit = faction_player->GetHeroUnit(this->Character);
 		} else {
 			speaker_unit = this->Character->GetUnit();
 		}
 	} else if (this->UnitType != nullptr) {
-		lua_command += "FindUnit(\"" + this->UnitType->Ident;
-		
 		if (faction_player != nullptr) {
 			std::vector<CUnit *> unit_table;
 			FindPlayerUnitsByType(*faction_player, *this->UnitType, unit_table);
@@ -167,78 +162,7 @@ void CDialogueNode::Call(CPlayer *player) const
 				speaker_unit = unit_table[SyncRand(unit_table.size())];
 			}
 		}
-	} else {
-		lua_command += "\"" + std::string(this->SpeakerName.utf8().get_data()) + "\", ";
 	}
-	
-	if (this->Character != nullptr || this->UnitType != nullptr) {
-		lua_command += "\"";
-		if (this->Faction != nullptr) {
-			lua_command += ", GetFactionPlayer(\"" + this->Faction->Ident + "\")";
-		}
-		lua_command += "), ";
-	}
-	
-	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->Text.utf8().get_data(), "\"", "\\\""), "\n", "\\n") + "\", ";
-	lua_command += std::to_string((long long) player->Index) + ", ";
-	
-	lua_command += "{";
-	if (this->Options.size() > 0) {
-		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "\"" + std::string(this->Options[i]->Name.utf8().get_data()) + "\"";
-		}
-	} else {
-		lua_command += "\"~!Continue\"";
-	}
-	lua_command += "}, ";
-	
-	lua_command += "{";
-	if (this->Options.size() > 0) {
-		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->Index) + ", " + std::to_string((long long) i) + ", " + std::to_string((long long) player->Index) + ");";
-			lua_command += " end";
-		}
-	} else {
-		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->Index) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player->Index) + ");";
-		lua_command += " end";
-	}
-	lua_command += "}, ";
-
-	lua_command += "nil, nil, nil, ";
-	
-	lua_command += "{";
-	if (this->Options.size() > 0) {
-		lua_command += "OptionTooltips = {";
-		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "\"" + std::string(this->Options[i]->Tooltip.utf8().get_data()) + "\"";
-		}
-		lua_command += "}";
-	}
-	lua_command += "}";
-	
-	lua_command += ")";
-	
-	CclCommand(lua_command);
 	
 	if (player == CPlayer::GetThisPlayer()) {
 		this->Dialogue->emit_signal("dialogue_node_changed", this, speaker_unit);

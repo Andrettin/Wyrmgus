@@ -809,6 +809,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= (int) node->Options.size()) {
 								CDialogueOption *option = new CDialogueOption;
+								option->Dialogue = dialogue;
 								option->ParentNode = node;
 								node->Options.push_back(option);
 							}
@@ -821,6 +822,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= (int) node->Options.size()) {
 								CDialogueOption *option = new CDialogueOption;
+								option->Dialogue = dialogue;
 								option->ParentNode = node;
 								node->Options.push_back(option);
 							}
@@ -835,6 +837,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= (int) node->Options.size()) {
 								CDialogueOption *option = new CDialogueOption;
+								option->Dialogue = dialogue;
 								option->ParentNode = node;
 								node->Options.push_back(option);
 							}
