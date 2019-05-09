@@ -63,5 +63,5 @@ bool CConversibleColor::ProcessConfigDataSection(const CConfigData *section)
 
 void CConversibleColor::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_colors"), &CConversibleColor::GetColors);
+	ClassDB::bind_method(D_METHOD("get_colors"), [](const CConversibleColor *conversible_color){ return VectorToGodotArray(conversible_color->GetColors()); });
 }

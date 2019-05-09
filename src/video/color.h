@@ -30,9 +30,23 @@
 #ifndef __COLOR_H
 #define __COLOR_H
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include <core/color.h>
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
 class CConfigData;
 struct lua_State;
 struct SDL_Color;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 /// platform independent color
 class CColor
@@ -42,6 +56,7 @@ public:
 	CColor(unsigned char r, unsigned char g, unsigned char b,
 		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
 	CColor(const CColor &color) : R(color.R), G(color.G), B(color.B), A(color.A) {}
+	CColor(const Color &color) : R(static_cast<short>(color.r * 255.0)), G(static_cast<short>(color.g * 255.0)), B(static_cast<short>(color.b * 255.0)), A(static_cast<short>(color.a * 255.0)) {}
 	
 	static CColor FromString(const std::string &str);
 
@@ -132,7 +147,7 @@ public:
 	short R = 0;		/// Red
 	short G = 0;		/// Green
 	short B = 0;		/// Blue
-	short A = 0;		/// Alpha
+	short A = 255;		/// Alpha
 };
 
 

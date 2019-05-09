@@ -1258,9 +1258,10 @@ void CPlayer::SetFaction(const CFaction *faction)
 		}
 			
 		this->PrimaryColor = chosen_player_color;
-		if (this->Color != PlayerColors[chosen_player_color->GetIndex()][0]) {
-			this->Color = PlayerColors[chosen_player_color->GetIndex()][0];
-			this->UnitColors.Colors = PlayerColorsRGB[chosen_player_color->GetIndex()];
+		int player_color_index = GetPlayerColorIndexByName(chosen_player_color->Ident);
+		if (this->Color != PlayerColors[player_color_index][0]) {
+			this->Color = PlayerColors[player_color_index][0];
+			this->UnitColors.Colors = PlayerColorsRGB[player_color_index];
 		}
 		
 		if (faction->GetSecondaryColor() != nullptr) {

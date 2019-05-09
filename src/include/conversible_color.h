@@ -49,15 +49,9 @@ class CConversibleColor : public DataElement
 public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
-	Array GetColors() const
+	const std::vector<Color> &GetColors() const
 	{
-		Array colors;
-		
-		for (Color color : this->Colors) {
-			colors.push_back(color);
-		}
-		
-		return colors;
+		return this->Colors;
 	}
 
 private:
