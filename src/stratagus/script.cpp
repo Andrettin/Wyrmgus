@@ -1695,7 +1695,7 @@ std::string EvalString(const StringDesc *s)
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > CResource::GetAll()[res]->DefaultIncome) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->GetIndex()].ImproveIncomes[res] > CResource::GetAll()[res]->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1703,7 +1703,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += IdentToName(DefaultResourceNames[res]);
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - CResource::GetAll()[res]->DefaultIncome);
+						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->GetIndex()].ImproveIncomes[res] - CResource::GetAll()[res]->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}
@@ -1717,7 +1717,7 @@ std::string EvalString(const StringDesc *s)
 				std::string luxury_demand;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->GetIndex()].ResourceDemand[res]) {
 						if (!first) {
 							luxury_demand += "\n";
 						} else {
@@ -1725,7 +1725,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						luxury_demand += IdentToName(DefaultResourceNames[res]);
 						luxury_demand += " Demand: ";
-						luxury_demand += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]);
+						luxury_demand += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->GetIndex()].ResourceDemand[res]);
 					}
 				}
 				return luxury_demand;

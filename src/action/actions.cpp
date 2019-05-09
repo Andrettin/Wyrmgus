@@ -144,7 +144,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 			break;
 		default:
 			DebugPrint("FIXME: %i: %d(%s) killed, with order %d!\n" _C_
-					   unit.Player->Index _C_ UnitNumber(unit) _C_
+					   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_
 					   unit.Type->Ident.c_str() _C_ Action);
 			break;
 	}
@@ -335,7 +335,7 @@ static void DumpUnitInfo(CUnit &unit)
 		char buf[256];
 
 		//TODO should the filename be changed to reflect the new engine name?
-		snprintf(buf, sizeof(buf), "log_of_stratagus_%i.log", CPlayer::GetThisPlayer()->Index);
+		snprintf(buf, sizeof(buf), "log_of_stratagus_%i.log", CPlayer::GetThisPlayer()->GetIndex());
 		logf = fopen(buf, "wb");
 		if (!logf) {
 			return ;
@@ -350,7 +350,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fprintf(logf, "%d %s %d P%i Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
-			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
+			unit.Player ? unit.Player->GetIndex() : -1, unit.Refs, SyncRandSeed,
 			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);
@@ -411,7 +411,7 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		
 		for (size_t i = 0; i < unit.Type->SpawnUnits.size(); ++i) {
 			CUnitType *spawned_type = unit.Type->SpawnUnits[i];
-			int spawned_type_demand = spawned_type->Stats[unit.Player->Index].Variables[DEMAND_INDEX].Value;
+			int spawned_type_demand = spawned_type->Stats[unit.Player->GetIndex()].Variables[DEMAND_INDEX].Value;
 			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
 				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached
 					continue;

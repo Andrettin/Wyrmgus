@@ -862,7 +862,7 @@ static void DrawUnitIcons()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->Index);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -1453,8 +1453,8 @@ static void ShowUnitInfo(const CUnit &unit)
 	int n = sprintf(buf, _("#%d '%s' Player: #%d %s"), UnitNumber(unit),
 	//Wyrmgus end
 					//Wyrmgus start
-//					unit.Type->Name.c_str(), unit.Player->Index,
-					unit.GetTypeName().c_str(), (unit.Player->Index == PlayerNumNeutral) ? 16 : unit.Player->Index + 1,
+//					unit.Type->Name.c_str(), unit.Player->GetIndex(),
+					unit.GetTypeName().c_str(), (unit.Player->GetIndex() == PlayerNumNeutral) ? 16 : unit.Player->GetIndex() + 1,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
@@ -2461,10 +2461,10 @@ void CEditor::Init()
 		//
 		// Inititialize Map / Players.
 		//
-		InitPlayers();
+		CPlayer::InitPlayers();
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
-				CreatePlayer(PlayerNeutral);
+				CPlayer::Create(PlayerNeutral);
 				CMap::Map.Info.PlayerType[i] = PlayerNeutral;
 				//Wyrmgus start
 //				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race = 0;
@@ -2472,7 +2472,7 @@ void CEditor::Init()
 				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race;
 				//Wyrmgus end
 			} else {
-				CreatePlayer(PlayerNobody);
+				CPlayer::Create(PlayerNobody);
 				CMap::Map.Info.PlayerType[i] = PlayerNobody;
 			}
 		}

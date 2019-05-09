@@ -79,7 +79,7 @@ bool CSiteDependency::CheckInternal(const CPlayer *player, const bool ignore_uni
 		return true;
 	} else if (this->Enemy) {
 		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
+			if (p->Type == PlayerNobody || p->GetIndex() == PlayerNumNeutral) {
 				continue;
 			}
 			

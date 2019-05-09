@@ -370,8 +370,8 @@ bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction &)
 //		   && action != UnitActionUpgradeTo
 //		   && action != UnitActionResearch;
 	//don't stop showing the button for a quick moment if the time cost is 0
-	return (action != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
-		   && (action != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+	return (action != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0)
+		   && (action != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0)
 		   && (action != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0);
 	//Wyrmgus end
 }

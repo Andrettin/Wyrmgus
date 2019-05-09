@@ -169,8 +169,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	CPlayer &player = *unit.Player;
 
 	//Wyrmgus start
-//	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
+//	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.GetIndex() _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.GetIndex() _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
 	//Wyrmgus end
 
 	// HACK: the building is ready now
@@ -229,7 +229,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	
 	//give builders experience for the construction of the structure
-	int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 10;
+	int xp_gained = type.Stats[unit.Player->GetIndex()].Costs[TimeCost] / 10;
 	//Wyrmgus end
 
 	if (worker != nullptr) {
@@ -399,15 +399,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// Check if construction should be canceled...
 	if (this->IsCancelled || this->ProgressCounter < 0) {
 		//Wyrmgus start
-//		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.GetTypeName().c_str());
+//		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->GetIndex() _C_ unit.Type->Name.c_str());
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->GetIndex() _C_ unit.GetTypeName().c_str());
 		//Wyrmgus end
 
 		CancelBuilt(*this, unit);
 		return ;
 	}
 
-	const int maxProgress = type.Stats[unit.Player->Index].Costs[TimeCost] * 600;
+	const int maxProgress = type.Stats[unit.Player->GetIndex()].Costs[TimeCost] * 600;
 
 	// Check if building ready. Note we can both build and repair.
 	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
@@ -425,7 +425,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[BUILD_INDEX].Value = this->ProgressCounter;
-	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
+	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->GetIndex()].Costs[TimeCost] * 600;
 
 	// This should happen when building unit with several peons
 	// Maybe also with only one.
@@ -445,7 +445,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 void COrder_Built::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
 	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID), unit.Settlement);
@@ -474,7 +474,7 @@ static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cfr
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
-	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
+	const int percent = this->ProgressCounter / (type.Stats[unit.Player->GetIndex()].Costs[TimeCost] * 6);
 	//Wyrmgus start
 //	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
 	const CConstructionFrame *cframe = FindCFramePercent(*unit.GetConstruction()->Frames, percent);

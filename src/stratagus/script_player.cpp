@@ -635,7 +635,7 @@ static int CclGetThisPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	if (CPlayer::GetThisPlayer()) {
-		lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
+		lua_pushnumber(l, CPlayer::GetThisPlayer()->GetIndex());
 	} else {
 		lua_pushnumber(l, 0);
 	}
@@ -763,7 +763,7 @@ static int CclSetDiplomacy(lua_State *l)
 */
 static int CclDiplomacy(lua_State *l)
 {
-	lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
+	lua_pushnumber(l, CPlayer::GetThisPlayer()->GetIndex());
 	lua_insert(l, 1);
 	return CclSetDiplomacy(l);
 }
@@ -795,7 +795,7 @@ static int CclSetSharedVision(lua_State *l)
 */
 static int CclSharedVision(lua_State *l)
 {
-	lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
+	lua_pushnumber(l, CPlayer::GetThisPlayer()->GetIndex());
 	lua_insert(l, 1);
 	return CclSetSharedVision(l);
 }
@@ -2830,7 +2830,7 @@ static int CclGetPlayerData(lua_State *l)
 			}		
 		}
 		if (!found_color) {
-			LuaError(l, "Player %d has no color." _C_ p->Index);
+			LuaError(l, "Player %d has no color." _C_ p->GetIndex());
 		}
 		return 1;
 	//Wyrmgus end
@@ -3064,17 +3064,17 @@ static int CclGetPlayerData(lua_State *l)
 		const char *ident = LuaToString(l, 3);
 		if (!strncmp(ident, "unit-", 5)) {
 			int id = UnitTypeIdByIdent(ident);
-			if (UnitIdAllowed(*CPlayer::Players[p->Index], id) > 0) {
+			if (UnitIdAllowed(*p, id) > 0) {
 				lua_pushstring(l, "A");
-			} else if (UnitIdAllowed(*CPlayer::Players[p->Index], id) == 0) {
+			} else if (UnitIdAllowed(*p, id) == 0) {
 				lua_pushstring(l, "F");
 			}
 		} else if (!strncmp(ident, "upgrade-", 8)) {
-			if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'A') {
+			if (UpgradeIdentAllowed(*p, ident) == 'A') {
 				lua_pushstring(l, "A");
-			} else if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'R') {
+			} else if (UpgradeIdentAllowed(*p, ident) == 'R') {
 				lua_pushstring(l, "R");
-			} else if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'F') {
+			} else if (UpgradeIdentAllowed(*p, ident) == 'F') {
 				lua_pushstring(l, "F");
 			}
 		} else {

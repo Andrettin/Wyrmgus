@@ -319,8 +319,8 @@ public:
 			return IsAliveOnMap();
 		} else {
 			return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value
-				   && (Seen.ByPlayer & (1 << player.Index))
-				   && !(Seen.Destroyed & (1 << player.Index));
+				   && (Seen.ByPlayer & (1 << player.GetIndex()))
+				   && !(Seen.Destroyed & (1 << player.GetIndex()));
 		}
 	}
 

@@ -2292,10 +2292,10 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
 			}
 			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
-				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->Index != PlayerNumNeutral) {
-					new_owner = unit->Player->Index;
+				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->GetIndex() != PlayerNumNeutral) {
+					new_owner = unit->Player->GetIndex();
 					break;
-				} else if (unit->Player->Index == PlayerNumNeutral && (unit->Type == SettlementSiteUnitType || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
+				} else if (unit->Player->GetIndex() == PlayerNumNeutral && (unit->Type == SettlementSiteUnitType || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
 					must_have_no_owner = true;
 					break;
 				}
@@ -2321,7 +2321,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 					bool obstacle_subcheck = false;
 					for (int x = 0; x < unit->Type->TileSize.x; ++x) {
 						for (int y = 0; y < unit->Type->TileSize.y; ++y) {
-							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
+							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->Player->GetIndex())) { //the obstacle must be avoidable from at least one of the unit's tiles
 								obstacle_subcheck = true;
 								break;
 							}
@@ -2338,7 +2338,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				if (!obstacle_check) {
 					continue;
 				}
-				new_owner = unit->Player->Index;
+				new_owner = unit->Player->GetIndex();
 				break;
 			}
 		}

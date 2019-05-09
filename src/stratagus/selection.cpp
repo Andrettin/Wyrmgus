@@ -201,21 +201,21 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 {
 	// UnSelectAllTeam(player);
-	while (!TeamSelected[player.Index].empty()) {
-		CUnit *unit = TeamSelected[player.Index].back();
-		TeamSelected[player.Index].pop_back();
-		unit->TeamSelected &= ~(1 << player.Index);
+	while (!TeamSelected[player.GetIndex()].empty()) {
+		CUnit *unit = TeamSelected[player.GetIndex()].back();
+		TeamSelected[player.GetIndex()].pop_back();
+		unit->TeamSelected &= ~(1 << player.GetIndex());
 	}
 	// Add to selection
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit &unit = *units[i];
 		Assert(!unit.Removed);
 		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
-			TeamSelected[player.Index].push_back(&unit);
-			unit.TeamSelected |= 1 << player.Index;
+			TeamSelected[player.GetIndex()].push_back(&unit);
+			unit.TeamSelected |= 1 << player.GetIndex();
 		}
 	}
-	Assert(TeamSelected[player.Index].size() <= MaxSelectable);
+	Assert(TeamSelected[player.GetIndex()].size() <= MaxSelectable);
 }
 
 /**

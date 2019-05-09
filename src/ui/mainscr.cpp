@@ -450,17 +450,17 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 
 	switch (t) {
 		case 0: // Unit:
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];;
+			var = &type.Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[index];;
 			break;
 		case 1: // Type:
 			var = &type.MapDefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[index];
 			break;
 		default:
 			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[index];
 			break;
 	}
 	switch (e) {
@@ -481,7 +481,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent:
-			Assert(type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index].Max != 0);
+			Assert(type.Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
@@ -531,7 +531,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			//Wyrmgus start
-//			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+//			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
 			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer());
 			//Wyrmgus end
 		}
@@ -567,7 +567,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
-//					icon->DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+//					icon->DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
 					icon->DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer());
 					//Wyrmgus end
 					train_counter.push_back(1);
@@ -609,7 +609,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		 //Wyrmgus end
 
 		//Wyrmgus start
-//		type.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+//		type.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
 		unit.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 		//Wyrmgus end
 	}
@@ -621,7 +621,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 		case UnitActionTrain: { //  Building training units.
 			//Wyrmgus start
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
-			if (order.GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) { //don't show the training button for a quick moment if the time cost is 0
+			if (order.GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0) { //don't show the training button for a quick moment if the time cost is 0
 				return false;
 			}
 			//Wyrmgus end
@@ -633,7 +633,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 				
 				//Wyrmgus start
-				if (order.GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
+				if (order.GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
 					return false;
 				}
 				//Wyrmgus end
@@ -645,7 +645,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+//				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
 				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
@@ -668,7 +668,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+//				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
 				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
@@ -703,7 +703,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus end
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
-//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
+//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->GetIndex() : uins->Player->GetIndex());
 		uins->GetIcon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer());
 		//Wyrmgus end
 		//Wyrmgus start
@@ -751,7 +751,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index);
+		uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->GetIndex());
 		++j;
 	}
 }
@@ -1018,7 +1018,7 @@ void DrawPopups()
 					} else {
 						unit_name = UnitUnderCursor->GetTypeName();
 					}
-					if (UnitUnderCursor->Player->Index != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
+					if (UnitUnderCursor->Player->GetIndex() != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
@@ -1085,7 +1085,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index);
+				uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->GetIndex());
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					if (!Preference.NoStatusLineTooltips) {
@@ -1969,8 +1969,8 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	//draw icon panel frame, if any
 	if (
 		Preference.InfoPanelFrameG
-		&& (unit.CurrentAction() != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
-		&& (unit.CurrentAction() != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		&& (unit.CurrentAction() != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
+		&& (unit.CurrentAction() != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0)
 		&& (unit.CurrentAction() != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
 		&& unit.CurrentAction() != UnitActionBuilt
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
@@ -2020,7 +2020,7 @@ static void InfoPanel_draw_multiple_selection()
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  //Wyrmgus start
-//						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
+//						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->GetIndex() : Selected[i]->Player->GetIndex());
 						  pos, "", Selected[i]->GetDisplayPlayer());
 						  //Wyrmgus end
 

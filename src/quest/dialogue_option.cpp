@@ -40,6 +40,7 @@
 #include "player.h"
 #include "quest/dialogue.h"
 #include "quest/dialogue_node.h"
+#include "script.h"
 #include "trigger/trigger_effect.h"
 #include "unit/unit.h"
 
@@ -105,6 +106,8 @@ void CDialogueOption::Initialize()
 
 void CDialogueOption::DoEffect(CPlayer *player) const
 {
+	CclCommand("trigger_player = " + std::to_string((long long) player->GetIndex()) + ";");
+	
 	if (this->EffectsLua) {
 		this->EffectsLua->pushPreamble();
 		this->EffectsLua->run();

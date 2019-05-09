@@ -152,7 +152,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
-	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
+	if (Preference.PlayerColorCircle && unit.Player->GetIndex() != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
 		DrawSelectionCircleWithTrans(unit.Player->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
@@ -163,7 +163,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
-		if (unit.Player->Index == PlayerNumNeutral) {
+		if (unit.Player->GetIndex() == PlayerNumNeutral) {
 			color = ColorYellow;
 		} else if ((unit.Selected || (unit.Blink & 1))
 				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
@@ -869,9 +869,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 {
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
-	sprintf(buf, "%d%c%c%d", unit.VisCount[CPlayer::GetThisPlayer()->Index],
-			unit.Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index) ? 'Y' : 'N',
-			unit.Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index) ? 'Y' : 'N',
+	sprintf(buf, "%d%c%c%d", unit.VisCount[CPlayer::GetThisPlayer()->GetIndex()],
+			unit.Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->GetIndex()) ? 'Y' : 'N',
+			unit.Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->GetIndex()) ? 'Y' : 'N',
 			unit.Refs);
 	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
 #endif
@@ -1102,10 +1102,7 @@ void CUnit::Draw(const CViewport &vp) const
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
 	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
 
-	//Wyrmgus start
-//	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	int player = this->GetDisplayPlayer();
-	//Wyrmgus end
 	int action = this->CurrentAction();
 	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {

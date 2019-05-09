@@ -102,7 +102,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			tile_owner != -1
 			&& (
 				unit.IsEnemy(*CPlayer::Players[tile_owner])
-				|| (include_neutral && !unit.IsAllied(*CPlayer::Players[tile_owner]) && unit.Player->Index != tile_owner && !unit.Player->HasBuildingAccess(*CPlayer::Players[tile_owner]))
+				|| (include_neutral && !unit.IsAllied(*CPlayer::Players[tile_owner]) && unit.Player->GetIndex() != tile_owner && !unit.Player->HasBuildingAccess(*CPlayer::Players[tile_owner]))
 			)
 		) {
 			*result_enemy_wall_pos = pos;
@@ -137,7 +137,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			(
 				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index || unit.Player->HasBuildingAccess(*dest->Player))
+				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->GetIndex() == dest->Player->GetIndex() || unit.Player->HasBuildingAccess(*dest->Player))
 			)
 			|| !CanTarget(*unit.Type, dtype)
 		) {
@@ -280,7 +280,7 @@ public:
 	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && (unit->Player->Index == player->Index
+		return unit->IsVisibleAsGoal(*player) && (unit->Player->GetIndex() == player->GetIndex()
 												  || unit->IsAllied(*player));
 	}
 private:
@@ -861,7 +861,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			if (!AiPlayer->Player->IsEnemy(*enemy->Player) && enemy->Player->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
 				if (AiPlayer->Player->IsSharedVision(*enemy->Player)) {
-					CommandSharedVision(AiPlayer->Player->Index, false, enemy->Player->Index);
+					CommandSharedVision(AiPlayer->Player->GetIndex(), false, enemy->Player->GetIndex());
 				}
 			}
 			//Wyrmgus end
@@ -873,7 +873,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			if (!AiPlayer->Player->IsEnemy(*CPlayer::Players[enemy_wall_owner]) && CPlayer::Players[enemy_wall_owner]->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*CPlayer::Players[enemy_wall_owner]);
 				if (AiPlayer->Player->IsSharedVision(*CPlayer::Players[enemy_wall_owner])) {
-					CommandSharedVision(AiPlayer->Player->Index, false, CPlayer::Players[enemy_wall_owner]->Index);
+					CommandSharedVision(AiPlayer->Player->GetIndex(), false, CPlayer::Players[enemy_wall_owner]->GetIndex());
 				}
 			}
 		} else {
@@ -894,9 +894,9 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 	//Wyrmgus end
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
-		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
+		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->GetIndex());
 		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
-			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
+			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->GetIndex());
 			Attacking = false;
 		}
 		return;
@@ -1452,7 +1452,7 @@ void AiForce::Update()
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState_Waiting) {
 			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+					   _C_ AiPlayer->Player->GetIndex() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return;
@@ -1498,7 +1498,7 @@ void AiForce::Update()
 	if (Attacking == false) {
 		if (!Defending && State > AiForceAttackingState_Waiting) {
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+					   _C_ AiPlayer->Player->GetIndex() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return ;
@@ -1536,7 +1536,7 @@ void AiForce::Update()
 		if (transporters.empty()) {
 			// Our transporters have been destroyed
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-				_C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+				_C_ AiPlayer->Player->GetIndex() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		} else if (emptyTrans) {
 			// We have emptied our transporters, go go go
@@ -1636,7 +1636,7 @@ void AiForce::Update()
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
 					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+							   _C_ AiPlayer->Player->GetIndex() _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 					Attacking = false;
 					State = AiForceAttackingState_Waiting;
 					*/
@@ -1656,7 +1656,7 @@ void AiForce::Update()
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
-						CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+						CommandSharedVision(AiPlayer->Player->GetIndex(), false, unit->Player->GetIndex());
 					}
 				}
 			} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1666,7 +1666,7 @@ void AiForce::Update()
 				if (!AiPlayer->Player->IsEnemy(*CPlayer::Players[enemy_wall_owner]) && CPlayer::Players[enemy_wall_owner]->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*CPlayer::Players[enemy_wall_owner]);
 					if (AiPlayer->Player->IsSharedVision(*CPlayer::Players[enemy_wall_owner])) {
-						CommandSharedVision(AiPlayer->Player->Index, false, CPlayer::Players[enemy_wall_owner]->Index);
+						CommandSharedVision(AiPlayer->Player->GetIndex(), false, CPlayer::Players[enemy_wall_owner]->GetIndex());
 					}
 				}
 			}
@@ -1742,7 +1742,7 @@ void AiForce::Update()
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
 			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+					   _C_ AiPlayer->Player->GetIndex() _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 			Attacking = false;
 			State = AiForceAttackingState_Waiting;
 			*/
@@ -1766,7 +1766,7 @@ void AiForce::Update()
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
-						CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+						CommandSharedVision(AiPlayer->Player->GetIndex(), false, unit->Player->GetIndex());
 					}
 				}
 			} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1780,7 +1780,7 @@ void AiForce::Update()
 				if (!AiPlayer->Player->IsEnemy(*CPlayer::Players[enemy_wall_owner]) && CPlayer::Players[enemy_wall_owner]->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*CPlayer::Players[enemy_wall_owner]);
 					if (AiPlayer->Player->IsSharedVision(*CPlayer::Players[enemy_wall_owner])) {
-						CommandSharedVision(AiPlayer->Player->Index, false, CPlayer::Players[enemy_wall_owner]->Index);
+						CommandSharedVision(AiPlayer->Player->GetIndex(), false, CPlayer::Players[enemy_wall_owner]->GetIndex());
 					}
 				}
 			}

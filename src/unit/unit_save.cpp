@@ -133,7 +133,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"seen-type\", \"%s\", ", unit.Seen.Type->Ident.c_str());
 	}
 
-	file.printf("\"player\", %d,\n  ", unit.Player->Index);
+	file.printf("\"player\", %d,\n  ", unit.Player->GetIndex());
 
 	if (unit.MapLayer) {
 		file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
@@ -156,7 +156,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"stats\", \"S%08X\",\n  ", (int)unit.Stats);
 	}
 #else
-	file.printf("\"stats\", %d,\n  ", unit.Player->Index);
+	file.printf("\"stats\", %d,\n  ", unit.Player->GetIndex());
 #endif
 	file.printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
 	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
@@ -240,7 +240,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"mine-low\",");
 	}
 	if (unit.RescuedFrom) {
-		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
+		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->GetIndex());
 	}
 	
 	//Wyrmgus start
@@ -415,7 +415,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
-	for (std::map<const CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
+	for (std::map<const CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->GetIndex()].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->GetIndex()].UnitStock.end(); ++iterator) {
 		const CUnitType *unit_type = iterator->first;
 		
 		if (unit.GetUnitStock(unit_type) != 0) {

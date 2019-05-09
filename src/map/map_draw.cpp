@@ -389,7 +389,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 
 	if (unit && unit->IsAliveOnMap()) {
 		int backgroundColor;
-		if (unit->Player->Index == (*tplayer).Index) {
+		if (unit->Player->GetIndex() == (*tplayer).GetIndex()) {
 			backgroundColor = Video.MapRGB(TheScreen->format, 0, 0, 252);
 		} else if (unit->Player->IsAllied(*tplayer)) {
 			backgroundColor = Video.MapRGB(TheScreen->format, 0, 176, 0);
@@ -532,7 +532,7 @@ void CViewport::Draw() const
 			} else {
 				unit_name = UnitUnderCursor->GetTypeName();
 			}
-			if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+			if (UnitUnderCursor->Player->GetIndex() != PlayerNumNeutral) {
 				unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 			}
 			//hackish way to make the popup appear correctly for the unit under cursor

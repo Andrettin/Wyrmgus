@@ -142,7 +142,7 @@ void InitModules()
 	InitSyncRand();
 	InitVideoCursors();
 	InitUserInterface();
-	InitPlayers();
+	CPlayer::InitPlayers();
 	InitMissileTypes();
 	InitMissiles();
 	InitConstructions();
@@ -244,7 +244,7 @@ void LoadGame(const std::string &filename)
 	LoadFonts();
 	
 	//Wyrmgus start
-	InitPlayers();
+	CPlayer::InitPlayers();
 	//Wyrmgus end
 
 	LuaGarbageCollect();

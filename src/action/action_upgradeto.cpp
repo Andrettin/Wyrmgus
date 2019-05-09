@@ -144,22 +144,22 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (!unit.UnderConstruction) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
-		player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
-		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+		player.Demand += newtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value;
+		player.Supply += newtype.Stats[player.GetIndex()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[SUPPLY_INDEX].Value;
 
 		// Change resource limit
 		for (size_t i = 0; i < CResource::GetAll().size(); ++i) {
 			if (player.MaxResources[i] != -1) {
-				player.MaxResources[i] += newtype.Stats[player.Index].Storing[i] - oldtype.Stats[player.Index].Storing[i];
+				player.MaxResources[i] += newtype.Stats[player.GetIndex()].Storing[i] - oldtype.Stats[player.GetIndex()].Storing[i];
 				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 	}
 
 	//  adjust Variables with percent.
-	const CUnitStats &newstats = newtype.Stats[player.Index];
+	const CUnitStats &newstats = newtype.Stats[player.GetIndex()];
 	//Wyrmgus start
-	const CUnitStats &oldstats = oldtype.Stats[player.Index];
+	const CUnitStats &oldstats = oldtype.Stats[player.GetIndex()];
 	//Wyrmgus end
 	
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
@@ -245,7 +245,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus end
 	
 	unit.Type = const_cast<CUnitType *>(&newtype);
-	unit.Stats = &unit.Type->Stats[player.Index];
+	unit.Stats = &unit.Type->Stats[player.GetIndex()];
 	
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
@@ -509,7 +509,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	}
 	CPlayer &player = *unit.Player;
 	const CUnitType &newtype = *this->Type;
-	const CUnitStats &newstats = newtype.Stats[player.Index];
+	const CUnitStats &newstats = newtype.Stats[player.GetIndex()];
 
 	//Wyrmgus start
 //	this->Ticks += std::max(1, player.SpeedUpgrade / SPEEDUP_FACTOR);
@@ -568,15 +568,15 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
-	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
+	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->GetIndex()].Costs[TimeCost];
 }
 
 //Wyrmgus start
 void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 {
 	const CPlayer &player = *unit.Player;
-	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
-	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
+	const int oldCost = this->Type->Stats[player.GetIndex()].Costs[TimeCost];
+	const int newCost = newType.Stats[player.GetIndex()].Costs[TimeCost];
 
 	// Must Adjust Ticks to the fraction that was upgraded
 	this->Ticks = this->Ticks * newCost / oldCost;

@@ -145,7 +145,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 {
 	CUnit &unit = *Selected[0];
 
-	if (unit.Player->Index != PlayerNumNeutral || dest == nullptr
+	if (unit.Player->GetIndex() != PlayerNumNeutral || dest == nullptr
 		|| !(dest->Player == CPlayer::GetThisPlayer() || dest->IsTeamed(*CPlayer::GetThisPlayer()))) {
 		return;
 	}
@@ -301,7 +301,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	const CUnitType &type = *unit.Type;
 	//Wyrmgus start
 //	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
-//		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+//		&& (dest.Player == unit.Player || dest.Player->GetIndex() == PlayerNumNeutral)) {
 	if (unit.CanHarvest(&dest)) {
 	//Wyrmgus end
 			//Wyrmgus start
@@ -333,7 +333,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	//Wyrmgus start
 	// make unit build harvesting building on top if right-clicked
 	} else if (res && type.ResInfo[res] && !dest.Type->BoolFlag[CANHARVEST_INDEX].value
-		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+		&& (dest.Player == unit.Player || dest.Player->GetIndex() == PlayerNumNeutral)) {
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
@@ -502,7 +502,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
-	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->GetIndex() == PlayerNumNeutral || dest->Player == unit.Player)) {
 		for (CUnitType *unit_type : CUnitType::GetAll()) {
 			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
 				if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.Type) != AiHelpers.Build[unit_type->GetIndex()].end()) {
@@ -521,8 +521,8 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// Follow another unit
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit
 		//Wyrmgus start
-//		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->Index == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
+//		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->GetIndex() == PlayerNumNeutral)) {
+		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->GetIndex() == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -627,7 +627,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		return true;
 	}
 	//Wyrmgus end
-	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) && &dest != &unit) {
+	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->GetIndex() == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -732,7 +732,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 		return true;
 	}
 	//Wyrmgus end
-	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) {
+	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->GetIndex() == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -800,7 +800,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	// Go and harvest from a unit
 	//Wyrmgus start
 //	if (dest != nullptr && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
-//		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
+//		&& (dest->Player == unit.Player || dest->Player->GetIndex() == PlayerNumNeutral)) {
 	if (unit.CanHarvest(dest)) {
 		//Wyrmgus end
 		dest->Blink = 4;
@@ -1509,8 +1509,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf.playerInfo.IsTeamExplored(*CPlayer::Players[i])
 					//Wyrmgus start
-//					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()))) {
-					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->Revealed)) {
+//					&& (i == CPlayer::GetThisPlayer()->GetIndex() || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()))) {
+					&& (i == CPlayer::GetThisPlayer()->GetIndex() || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->Revealed)) {
 					//Wyrmgus end
 					show = true;
 					break;
@@ -1580,7 +1580,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 						//Wyrmgus end
 					}
 				//Wyrmgus start
-//				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+//				} else if (UnitUnderCursor->Player->GetIndex() != PlayerNumNeutral) {
 				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
@@ -1920,7 +1920,7 @@ static int SendResource(const Vec2i &pos, int flush)
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 				//Wyrmgus start
 //				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
-//				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
+//				&& (dest->Player == unit.Player || dest->Player->GetIndex() == PlayerMax - 1)) {
 				) {
 				//Wyrmgus end
 				dest->Blink = 4;
@@ -3198,7 +3198,7 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (Selected.size() == 1) {
-				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->Player->Index == CPlayer::GetThisPlayer()->Index) {
+				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->Player->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
@@ -3307,7 +3307,7 @@ void DrawPieMenu()
 			if (gray) {
 				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 			} else {
-				buttons[i].Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->Index);
+				buttons[i].Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->GetIndex());
 			}
 
 			// Tutorial show command key in icons

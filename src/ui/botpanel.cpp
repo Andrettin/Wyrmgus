@@ -466,7 +466,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncome != -1) {
-		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= CResource::GetAll()[condition->ImproveIncome]->DefaultIncome) {
+		if (!type || type->Stats[CPlayer::GetThisPlayer()->GetIndex()].ImproveIncomes[condition->ImproveIncome] <= CResource::GetAll()[condition->ImproveIncome]->DefaultIncome) {
 			return false;
 		}
 	}
@@ -494,7 +494,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				return false;
 			}
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > CResource::GetAll()[i]->DefaultIncome) {
+				if (type->Stats[CPlayer::GetThisPlayer()->GetIndex()].ImproveIncomes[i] > CResource::GetAll()[i]->DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}
@@ -611,7 +611,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus end
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[CPlayer::GetThisPlayer()->Index].Variables[i].Enable) {
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[i].Enable) {
 					return false;
 				}
 			}
@@ -893,13 +893,13 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 		case ButtonTrain:
 		case ButtonUpgradeTo:
 			//Wyrmgus start
-//			memcpy(Costs, CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index].Costs,
-//				   sizeof(CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index].Costs));
-//			Costs[FoodCost] = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
+//			memcpy(Costs, CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Costs,
+//				   sizeof(CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Costs));
+//			Costs[FoodCost] = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value;
 			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::Get(button.Value)) != 0);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(button.Value)) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
-			Costs[FoodCost] = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
+			Costs[FoodCost] = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value;
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
@@ -1220,13 +1220,12 @@ void CButtonPanel::Draw()
 		} else {
 			int player = -1;
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
-				//Wyrmgus start
-//				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
 				player = Selected[0]->GetDisplayPlayer();
 
+				//Wyrmgus start
 				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
 				if (CPlayer::GetThisPlayer()->HasBuildingAccess(*CPlayer::Players[player], buttons[i].Action)) {
-					player = CPlayer::GetThisPlayer()->Index;
+					player = CPlayer::GetThisPlayer()->GetIndex();
 				}
 				//Wyrmgus end
 			}
@@ -1237,12 +1236,12 @@ void CButtonPanel::Draw()
 												   pos, buf, player, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 												   
 				if (
-					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0)
+					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0)
 					|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
 				) {
 					std::string number_string;
-					if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string((long long) Selected[0]->GetUnitStock(CUnitType::Get(buttons[i].Value))) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::Get(buttons[i].Value)));
+					if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string((long long) Selected[0]->GetUnitStock(CUnitType::Get(buttons[i].Value))) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)));
 					} else if (buttons[i].Action == ButtonSellResource) {
 						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
 					} else if (buttons[i].Action == ButtonBuyResource) {
@@ -1332,11 +1331,11 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
 			//Wyrmgus start
-//			const CUnitStats &stats = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index];
+//			const CUnitStats &stats = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()];
 //			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::Get(button.Value)) != 0);
-			UI.StatusLine.SetCosts(0, CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value * (CUnitType::Get(button.Value)->TrainQuantity ? CUnitType::Get(button.Value)->TrainQuantity : 1), type_costs);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(button.Value)) != 0);
+			UI.StatusLine.SetCosts(0, CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value * (CUnitType::Get(button.Value)->TrainQuantity ? CUnitType::Get(button.Value)->TrainQuantity : 1), type_costs);
 			//Wyrmgus end
 			break;
 		}
@@ -1446,7 +1445,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 				break;
 			}
-			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(CUnitType::Get(buttonaction.Value))) {
+			if (unit.Player->GetIndex() == PlayerNumNeutral && !unit.CanHireMercenary(CUnitType::Get(buttonaction.Value))) {
 				break;
 			}
 		// FALL THROUGH
@@ -1489,14 +1488,14 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 //			res = unit.CurrentAction() == UnitActionUpgradeTo
 //				  || unit.CurrentAction() == UnitActionResearch;
 			//don't show the cancel button for a quick moment if the time cost is 0
-			res = (unit.CurrentAction() == UnitActionUpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0)
+			res = (unit.CurrentAction() == UnitActionUpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] > 0)
 				|| (unit.CurrentAction() == UnitActionResearch && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] > 0);
 			//Wyrmgus end
 			break;
 		case ButtonCancelTrain:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitActionTrain;
-			res = unit.CurrentAction() == UnitActionTrain && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
+			res = unit.CurrentAction() == UnitActionTrain && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
 			//Wyrmgus end
 			break;
 		case ButtonCancelBuild:
@@ -2114,7 +2113,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		//PlayerSubUnitType(player,type);
 		//Wyrmgus start
 //		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
-		SendCommandTrainUnit(*Selected[0], type, CPlayer::GetThisPlayer()->Index, !(KeyModifiers & ModifierShift));
+		SendCommandTrainUnit(*Selected[0], type, CPlayer::GetThisPlayer()->GetIndex(), !(KeyModifiers & ModifierShift));
 		//Wyrmgus end
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
@@ -2166,8 +2165,8 @@ void CButtonPanel::DoClicked_Train(int button)
 		if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].GetUnitStock(&type) != 0)) {
-			SendCommandTrainUnit(*Selected[best_training_place], type, CPlayer::GetThisPlayer()->Index, FlushCommands);
+		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->GetIndex()].GetUnitStock(&type) != 0)) {
+			SendCommandTrainUnit(*Selected[best_training_place], type, CPlayer::GetThisPlayer()->GetIndex(), FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
 		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) == -3) {
@@ -2247,7 +2246,7 @@ void CButtonPanel::DoClicked_Research(int button)
 		//PlayerSubCosts(player,Upgrades[i].Costs);
 		//Wyrmgus start
 //		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
-		SendCommandResearch(*Selected[0], *AllUpgrades[index], CPlayer::GetThisPlayer()->Index, !(KeyModifiers & ModifierShift));
+		SendCommandResearch(*Selected[0], *AllUpgrades[index], CPlayer::GetThisPlayer()->GetIndex(), !(KeyModifiers & ModifierShift));
 		//Wyrmgus end
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
@@ -2277,7 +2276,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[index]->GetIndex());
+	SendCommandSetFaction(CPlayer::GetThisPlayer()->GetIndex(), CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[index]->GetIndex());
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
@@ -2304,7 +2303,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 	memset(buy_costs, 0, sizeof(buy_costs));
 	buy_costs[CopperCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
-		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), CPlayer::GetThisPlayer()->Index);
+		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), CPlayer::GetThisPlayer()->GetIndex());
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
 		LastDrawnButtonPopup = nullptr;
@@ -2334,13 +2333,13 @@ void CButtonPanel::DoClicked_SellResource(int button)
 	const int resource = CurrentButtons[button].Value;
 	
 	if (toggle_autosell && Selected[0]->Player == CPlayer::GetThisPlayer()) {
-		SendCommandAutosellResource(CPlayer::GetThisPlayer()->Index, resource);
+		SendCommandAutosellResource(CPlayer::GetThisPlayer()->GetIndex(), resource);
 	} else {
 		int sell_resource_costs[MaxCosts];
 		memset(sell_resource_costs, 0, sizeof(sell_resource_costs));
 		sell_resource_costs[resource] = 100;
 		if (!CPlayer::GetThisPlayer()->CheckCosts(sell_resource_costs)) {
-			SendCommandSellResource(*Selected[0], resource, CPlayer::GetThisPlayer()->Index);
+			SendCommandSellResource(*Selected[0], resource, CPlayer::GetThisPlayer()->GetIndex());
 		}
 	}
 }
@@ -2352,7 +2351,7 @@ void CButtonPanel::DoClicked_BuyResource(int button)
 	memset(buy_resource_costs, 0, sizeof(buy_resource_costs));
 	buy_resource_costs[CopperCost] = Selected[0]->Player->GetEffectiveResourceBuyPrice(resource);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_resource_costs)) {
-		SendCommandBuyResource(*Selected[0], resource, CPlayer::GetThisPlayer()->Index);
+		SendCommandBuyResource(*Selected[0], resource, CPlayer::GetThisPlayer()->GetIndex());
 	}
 }
 

@@ -120,6 +120,12 @@ public:
 	static CPlayer *GetThisPlayer();
 	static CPlayer *GetPlayer(const int index);
 	
+	/// create a new player
+	static void Create(const int type);
+	
+	/// init players
+	static void InitPlayers();
+
 	static std::vector<CPlayer *> Players;	/// All players
 
 private:
@@ -127,6 +133,11 @@ private:
 	static std::shared_mutex PlayerMutex;	/// Mutex for players as a whole
 	
 public:
+	int GetIndex() const
+	{
+		return this->Index;
+	}
+
 	void SetCivilization(int civilization);
 	CCivilization *GetCivilization() const;
 	void SetFaction(const CFaction *faction);
@@ -150,7 +161,9 @@ public:
 	void SetDynasty(CDynasty *dynasty);
 	String GetInterface() const;
 	
+private:
 	int Index = 0;		/// player as number
+public:
 	std::string Name;   /// name of non computer
 
 	int Type = 0;		/// type of player (human,computer,...)
@@ -481,6 +494,7 @@ private:
 	mutable std::shared_mutex Mutex;	/// mutex for the player
 
 	friend void ApplyReplaySettings();
+	friend int CclPlayer(lua_State *l);
 	
 protected:
 	static void _bind_methods();
@@ -580,15 +594,10 @@ extern int PlayerColorIndexCount;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Init players
-extern void InitPlayers();
 /// Clean up players
 extern void CleanPlayers();
 /// Save players
 extern void SavePlayers(CFile &file);
-
-/// Create a new player
-extern void CreatePlayer(int type);
 
 //Wyrmgus start
 extern CPlayer *GetFactionPlayer(const CFaction *faction);

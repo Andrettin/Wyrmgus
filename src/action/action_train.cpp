@@ -72,7 +72,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].GetUnitStock(&type) != 0);
+	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->GetIndex()].GetUnitStock(&type) != 0);
 	//Wyrmgus end
 
 	return order;
@@ -131,7 +131,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CANCEL_TRAINING_COSTS_FACTOR);
+//	player.AddCostsFactor(this->Type->Stats[player.GetIndex()].Costs, CANCEL_TRAINING_COSTS_FACTOR);
 	int type_costs[MaxCosts];
 	player.GetUnitTypeCosts(this->Type, type_costs);
 	player.AddCostsFactor(type_costs, CANCEL_TRAINING_COSTS_FACTOR);
@@ -144,7 +144,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
 	//Wyrmgus start
-//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
+//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->GetIndex()].Costs[TimeCost];
 	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].Costs[TimeCost];
 	//Wyrmgus end
 }
@@ -155,8 +155,8 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 //	const CPlayer &player = *unit.Player;
 	const CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
-	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
+	const int oldCost = this->Type->Stats[player.GetIndex()].Costs[TimeCost];
+	const int newCost = newType.Stats[player.GetIndex()].Costs[TimeCost];
 
 	// Must Adjust Ticks to the fraction that was trained
 	this->Ticks = this->Ticks * newCost / oldCost;
@@ -245,7 +245,7 @@ static void AnimateActionTrain(CUnit &unit)
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const CUnitType &nType = *this->Type;
-	const int cost = nType.Stats[player.Index].Costs[TimeCost];
+	const int cost = nType.Stats[player.GetIndex()].Costs[TimeCost];
 	
 	//Wyrmgus start
 	// Check if enough supply available.
@@ -264,7 +264,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
 	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	
-	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
+	if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;
 	}
 	//Wyrmgus end
@@ -366,7 +366,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&nType) != 0) {
+		if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&nType) != 0) {
 			if (unit.GetUnitStock(&nType) > 0) {
 				unit.ChangeUnitStock(&nType, -1);
 			} else {
@@ -410,7 +410,7 @@ static void AnimateActionTrain(CUnit &unit)
 		DropOutOnSide(*newUnit, LookingW, &unit);
 
 		//Wyrmgus start
-		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
+		if (this->Player != unit.Player->GetIndex() && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
 			unit.Player->ChangeResource(CopperCost, newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
@@ -456,7 +456,7 @@ static void AnimateActionTrain(CUnit &unit)
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
-				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
+				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->GetIndex() == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
 						if (unit_type && unit_type->GivesResource == table[j]->Type->GivesResource && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *unit_type, table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
 							CommandBuildBuilding(*newUnit, table[j]->tilePos, *unit_type, FlushCommands, table[j]->MapLayer->ID);

@@ -703,10 +703,10 @@ static void AStarAddToClose(int node, int z)
 	}
 }
 
-//Wyrmgus start
-//#define GetIndex(x, y) (x) + (y) * AStarMapWidth
-#define GetIndex(x, y, z) (x) + (y) * AStarMapWidth[(z)]
-//Wyrmgus end
+static int GetIndex(const int x, const int y, const int z)
+{
+	return x + y * AStarMapWidth[z];
+}
 
 /* build-in costmoveto code */
 static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z)
@@ -786,7 +786,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus start
 			if (
 				(mf->Flags & MapFieldDesert)
-				&& mf->Owner != unit.Player->Index
+				&& mf->Owner != unit.Player->GetIndex()
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
 				&& unit.MapLayer->GetTimeOfDay()
 				&& unit.MapLayer->GetTimeOfDay()->Day

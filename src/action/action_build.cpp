@@ -217,7 +217,7 @@ enum {
 void COrder_Build::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_
+			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_
 			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
@@ -300,7 +300,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landm
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Not enough resources to build %s"), type.Name.c_str());
-					  _("Not enough resources to build %s"), type.GetDefaultName(CPlayer::Players[player.Index]).c_str());
+					  _("Not enough resources to build %s"), type.GetDefaultName(CPlayer::Players[player.GetIndex()]).c_str());
 					  //Wyrmgus end
 		isOk = false;
 	}
@@ -311,7 +311,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landm
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Can't build more units %s"), type.Name.c_str());
-					  _("Can't build more units %s"), type.GetDefaultName(CPlayer::Players[player.Index]).c_str());
+					  _("Can't build more units %s"), type.GetDefaultName(CPlayer::Players[player.GetIndex()]).c_str());
 					  //Wyrmgus end
 		isOk = false;
 	}
@@ -386,10 +386,10 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 	if (unit.CurrentOrder() == this) {
 		  DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 		  //Wyrmgus start
-//		  _C_ unit.Player->Index _C_ unit.Slot
+//		  _C_ unit.Player->GetIndex() _C_ unit.Slot
 //		  _C_ building->Type->Name.c_str()
 //		  _C_ building->Slot);
-		  _C_ unit.Player->Index _C_ UnitNumber(unit)
+		  _C_ unit.Player->GetIndex() _C_ UnitNumber(unit)
 		  _C_ building.Type->GetDefaultName(unit.Player).c_str()
 		  _C_ UnitNumber(building));
 		  //Wyrmgus end

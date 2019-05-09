@@ -1120,7 +1120,7 @@ static int InputKey(int key)
 				//Wyrmgus start
 				/*
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
-						 PlayerColorNames[CPlayer::GetThisPlayer()->Index].c_str(),
+						 PlayerColorNames[CPlayer::GetThisPlayer()->GetIndex()].c_str(),
 				*/
 				int player_color; // make the player color be correct for the faction
 				for (int j = 0; j < PlayerColorMax; ++j) {

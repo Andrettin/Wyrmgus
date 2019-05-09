@@ -781,7 +781,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 			}
 		}
 		
-		if (CPlayer::Players[i]->NumTownHalls > 0 || CPlayer::Players[i]->Index == CPlayer::GetThisPlayer()->Index) {
+		if (CPlayer::Players[i]->NumTownHalls > 0 || CPlayer::Players[i]->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
 				CMap::Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - Vec2i(8, 8), CPlayer::Players[i]->StartPos + Vec2i(8, 8), true, z);
 			}

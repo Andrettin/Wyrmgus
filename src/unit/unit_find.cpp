@@ -129,7 +129,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	}
 	
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != player.Index && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != player.GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !player.HasNeutralFactionType()) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -550,7 +550,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
 //		   && (resinfo.HarvestFromOutside
-//			   || mine.Player->Index == PlayerMax - 1
+//			   || mine.Player->GetIndex() == PlayerMax - 1
 //			   || mine.Player == worker.Player
 //			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
 		   && worker.CanHarvest(&mine, only_harvestable);
@@ -602,7 +602,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	CUnit *mine = CMap::Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
-	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->Index && !CPlayer::Players[worker.MapLayer->Field(pos)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
+	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->GetIndex() && !CPlayer::Players[worker.MapLayer->Field(pos)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -611,7 +611,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 	if (
 		mine && mine != *resultMine && MineIsUsable(*mine)
-		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->Owner == -1 || worker.MapLayer->Field(pos)->Owner == worker.Player->Index) //this is needed to prevent neutral factions from trying to build mines in others' territory
+		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->Owner == -1 || worker.MapLayer->Field(pos)->Owner == worker.Player->GetIndex()) //this is needed to prevent neutral factions from trying to build mines in others' territory
 	) {
 	//Wyrmgus end
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -999,7 +999,7 @@ private:
 		if (
 			(
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player->Index == dest->Player->Index)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
 			)
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
@@ -1186,7 +1186,7 @@ public:
 //			if (!player.IsEnemy(*dest)) { // a friend or neutral
 			if (
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player->Index == dest->Player->Index)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
 			) {
 			//Wyrmgus end
 				dest->CacheLock = 1;

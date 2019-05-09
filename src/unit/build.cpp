@@ -523,7 +523,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	if (unit) {
 		for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
 			for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->Owner != -1 && CMap::Map.Field(x, y, z)->Owner != unit->Player->Index) {
+				if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->Owner != -1 && CMap::Map.Field(x, y, z)->Owner != unit->Player->GetIndex()) {
 					return nullptr;
 				}
 			}

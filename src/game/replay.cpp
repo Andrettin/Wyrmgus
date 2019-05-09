@@ -209,7 +209,7 @@ static FullReplay *StartReplay()
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
 	}
 
-	replay->LocalPlayer = CPlayer::GetThisPlayer()->Index;
+	replay->LocalPlayer = CPlayer::GetThisPlayer()->GetIndex();
 
 	replay->Date = dateStr;
 	replay->Map = CMap::Map.Info.Description;
@@ -467,7 +467,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			makedir(path.c_str(), 0777);
 		}
 
-		snprintf(buf, sizeof(buf), "%d", CPlayer::GetThisPlayer()->Index);
+		snprintf(buf, sizeof(buf), "%d", CPlayer::GetThisPlayer()->GetIndex());
 
 		path += "/log_of_stratagus_";
 		path += buf;
@@ -1091,7 +1091,7 @@ int SaveReplay(const std::string &filename)
 
 	destination = Parameters::Instance.GetUserDirectory() + "/" + GameName + "/logs/" + filename;
 
-	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->Index << ".log";
+	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->GetIndex() << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");

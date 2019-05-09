@@ -894,7 +894,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					&& table[i]->CurrentOrder()->HasGoal()
 					&& table[i]->CurrentOrder()->GetGoal() == &unit
 				) {
-					if (unit.Player->Index == CPlayer::GetThisPlayer()->Index) {
+					if (unit.Player->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
@@ -1049,23 +1049,23 @@ void CommandTrainUnit(CUnit &unit, const CUnitType &type, const int player, cons
 //	if (unit.Player->CheckLimits(type) < 0
 //		|| unit.Player->CheckUnitType(type)) {
 	if (CPlayer::Players[player]->CheckLimits(type) < 0
-		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0)) {
+		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&type) != 0)) {
 	//Wyrmgus end
 		return;
 	}
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
-		if (player == CPlayer::GetThisPlayer()->Index) {
+	if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
+		if (player == CPlayer::GetThisPlayer()->GetIndex()) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
 		return;
 	}
 	
-	if (unit.Player->Index != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
+	if (unit.Player->GetIndex() != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
 		CPlayer::Players[player]->ShareUpgradeProgress(*unit.Player, unit);
 	}
 
-	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
+	if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
 			return;
 		}
@@ -1409,7 +1409,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
 			//Wyrmgus end
 				mfp.Visible[opponent] = 1;
-				if (opponent == CPlayer::GetThisPlayer()->Index) {
+				if (opponent == CPlayer::GetThisPlayer()->GetIndex()) {
 					CMap::Map.MarkSeenTile(mf);
 				}
 			}
@@ -1418,7 +1418,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
 			//Wyrmgus end
 				mfp.Visible[player] = 1;
-				if (player == CPlayer::GetThisPlayer()->Index) {
+				if (player == CPlayer::GetThisPlayer()->GetIndex()) {
 					CMap::Map.MarkSeenTile(mf);
 				}
 			}
@@ -1431,13 +1431,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 
 				if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
 					mfp.Visible[opponent] = 1;
-					if (opponent == CPlayer::GetThisPlayer()->Index) {
+					if (opponent == CPlayer::GetThisPlayer()->GetIndex()) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
 				if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
 					mfp.Visible[player] = 1;
-					if (player == CPlayer::GetThisPlayer()->Index) {
+					if (player == CPlayer::GetThisPlayer()->GetIndex()) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}

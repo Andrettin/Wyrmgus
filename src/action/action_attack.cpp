@@ -130,7 +130,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		target.Player->SetDiplomacyEnemyWith(*attacker.Player);
 		attacker.Player->SetDiplomacyEnemyWith(*target.Player);
 		if (target.Player->IsSharedVision(*attacker.Player)) {
-			CommandSharedVision(target.Player->Index, false, attacker.Player->Index);
+			CommandSharedVision(target.Player->GetIndex(), false, attacker.Player->GetIndex());
 		}
 	}
 	//Wyrmgus end

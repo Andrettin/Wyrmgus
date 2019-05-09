@@ -264,7 +264,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			CPlayer::GetThisPlayer()->FreeWorkers[0]->GetIcon()->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->Index);
+			CPlayer::GetThisPlayer()->FreeWorkers[0]->GetIcon()->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->GetIndex());
 		}
 		
 		//draw icon if there are units with available level up upgrades
@@ -272,7 +272,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
-			CPlayer::GetThisPlayer()->LevelUpUnits[0]->GetIcon()->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
+			CPlayer::GetThisPlayer()->LevelUpUnits[0]->GetIcon()->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->GetIndex());
 		}
 		
 		//draw icon if the player has a hero
@@ -280,7 +280,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
-			CPlayer::GetThisPlayer()->Heroes[i]->GetIcon()->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
+			CPlayer::GetThisPlayer()->Heroes[i]->GetIcon()->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->GetIndex());
 		}
 		
 		DrawPopups();
@@ -600,11 +600,11 @@ void GameMainLoop()
 							if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
 								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 								if (diplomacy_state_player != nullptr) {
-									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);
-									CommandDiplomacy(diplomacy_state_player->Index, iterator->second, i);
+									CommandDiplomacy(i, iterator->second, diplomacy_state_player->GetIndex());
+									CommandDiplomacy(diplomacy_state_player->GetIndex(), iterator->second, i);
 									if (iterator->second == DiplomacyAllied) {
-										CommandSharedVision(i, true, diplomacy_state_player->Index);
-										CommandSharedVision(diplomacy_state_player->Index, true, i);
+										CommandSharedVision(i, true, diplomacy_state_player->GetIndex());
+										CommandSharedVision(diplomacy_state_player->GetIndex(), true, i);
 									}
 								}
 							}

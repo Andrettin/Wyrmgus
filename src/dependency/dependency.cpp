@@ -147,7 +147,7 @@ bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
 {
 	if (this->CheckAllPlayersAnd) {
 		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
+			if (p->Type == PlayerNobody || p->GetIndex() == PlayerNumNeutral) {
 				continue;
 			}
 			
@@ -157,7 +157,7 @@ bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
 		}
 	} else if (this->CheckAllPlayersOr) {
 		for (const CPlayer *p : CPlayer::Players) {
-			if (p->Type == PlayerNobody || p->Index == PlayerNumNeutral) {
+			if (p->Type == PlayerNobody || p->GetIndex() == PlayerNumNeutral) {
 				continue;
 			}
 			

@@ -394,31 +394,6 @@ int PlayerColorIndexCount;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Init players.
-*/
-void InitPlayers()
-{
-	for (size_t p = 0; p < PlayerMax; ++p) {
-		CPlayer::Players[p]->Index = p;
-		if (!CPlayer::Players[p]->Type) {
-			CPlayer::Players[p]->Type = PlayerNobody;
-		}
-		//Wyrmgus start
-//		for (int x = 0; x < PlayerColorIndexCount; ++x) {
-//			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
-//		}
-		//Wyrmgus end
-	}
-	//Wyrmgus start
-	for (int p = 0; p < PlayerColorMax; ++p) {
-		for (int x = 0; x < PlayerColorIndexCount; ++x) {
-			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
-		}
-	}
-	//Wyrmgus end
-}
-
-/**
 **  Clean up players.
 */
 void CleanPlayers()
@@ -465,7 +440,7 @@ void SavePlayers(CFile &file)
 		CPlayer::Players[i]->Save(file);
 	}
 
-	file.printf("SetThisPlayer(%i)\n\n", CPlayer::GetThisPlayer()->Index);
+	file.printf("SetThisPlayer(%i)\n\n", CPlayer::GetThisPlayer()->GetIndex());
 }
 
 void CPlayer::SetThisPlayer(CPlayer *player)
@@ -515,6 +490,52 @@ CPlayer *CPlayer::GetPlayer(const int index)
 	}
 	
 	return CPlayer::Players[index];
+}
+
+/**
+**	@brief	Create a new player.
+**
+**	@param	type	Player type (computer, human, ...).
+*/
+void CPlayer::Create(const int type)
+{
+	if (NumPlayers == PlayerMax) { // already done for bigmaps!
+		return;
+	}
+	
+	CPlayer &player = *CPlayer::Players[NumPlayers];
+	player.Index = NumPlayers;
+	
+	if (type != PlayerNeutral && type != PlayerNobody && type != PlayerComputer && type != PlayerPerson && type != PlayerRescuePassive && type != PlayerRescueActive) {
+		fprintf(stderr, "Error in the CreatePlayer function: trying to assign invalid player type \"%d\" to player \"%d\".\n", type, player.GetIndex());
+	}
+
+	player.Init(type);
+}
+
+/**
+**	@brief	Init players.
+*/
+void CPlayer::InitPlayers()
+{
+	for (size_t p = 0; p < PlayerMax; ++p) {
+		CPlayer::Players[p]->Index = p;
+		if (!CPlayer::Players[p]->Type) {
+			CPlayer::Players[p]->Type = PlayerNobody;
+		}
+		//Wyrmgus start
+//		for (int x = 0; x < PlayerColorIndexCount; ++x) {
+//			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
+//		}
+		//Wyrmgus end
+	}
+	//Wyrmgus start
+	for (int p = 0; p < PlayerColorMax; ++p) {
+		for (int x = 0; x < PlayerColorIndexCount; ++x) {
+			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
+		}
+	}
+	//Wyrmgus end
 }
 
 void CPlayer::Save(CFile &file) const
@@ -844,27 +865,6 @@ void CPlayer::Save(CFile &file) const
 	file.printf(")\n\n");
 
 	DebugPrint("FIXME: must save unit-stats?\n");
-}
-
-/**
-**  Create a new player.
-**
-**  @param type  Player type (Computer,Human,...).
-*/
-void CreatePlayer(int type)
-{
-	if (NumPlayers == PlayerMax) { // already done for bigmaps!
-		return;
-	}
-	
-	CPlayer &player = *CPlayer::Players[NumPlayers];
-	player.Index = NumPlayers;
-	
-	if (type != PlayerNeutral && type != PlayerNobody && type != PlayerComputer && type != PlayerPerson && type != PlayerRescuePassive && type != PlayerRescueActive) {
-		fprintf(stderr, "Error in the CreatePlayer function: trying to assign invalid player type \"%d\" to player \"%d\".\n", type, player.Index);
-	}
-
-	player.Init(type);
 }
 
 //Wyrmgus start
@@ -1225,7 +1225,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 	
 	this->Faction = faction;
 
-	if (this->Index == CPlayer::GetThisPlayer()->Index) {
+	if (this->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		UI.Load();
 	}
 	
@@ -3980,11 +3980,11 @@ void CPlayer::Notify(const char *fmt, ...) const
 
 void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 {
-	this->Enemy &= ~(1 << player.Index);
-	this->Allied &= ~(1 << player.Index);
+	this->Enemy &= ~(1 << player.GetIndex());
+	this->Allied &= ~(1 << player.GetIndex());
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+	if (GameCycle > 0 && player.GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
@@ -3992,11 +3992,11 @@ void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 
 void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 {
-	this->Enemy &= ~(1 << player.Index);
-	this->Allied |= 1 << player.Index;
+	this->Enemy &= ~(1 << player.GetIndex());
+	this->Allied |= 1 << player.GetIndex();
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+	if (GameCycle > 0 && player.GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
@@ -4007,11 +4007,11 @@ void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 //Wyrmgus end
 {
-	this->Enemy |= 1 << player.Index;
-	this->Allied &= ~(1 << player.Index);
+	this->Enemy |= 1 << player.GetIndex();
+	this->Allied &= ~(1 << player.GetIndex());
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+	if (GameCycle > 0 && player.GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
 	}
 	
@@ -4026,11 +4026,11 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 
 void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 {
-	this->Enemy |= 1 << player.Index;
-	this->Allied |= 1 << player.Index;
+	this->Enemy |= 1 << player.GetIndex();
+	this->Allied |= 1 << player.GetIndex();
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+	if (GameCycle > 0 && player.GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
@@ -4038,10 +4038,10 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 
 void CPlayer::ShareVisionWith(const CPlayer &player)
 {
-	this->SharedVision |= (1 << player.Index);
+	this->SharedVision |= (1 << player.GetIndex());
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+	if (GameCycle > 0 && player.GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
@@ -4049,10 +4049,10 @@ void CPlayer::ShareVisionWith(const CPlayer &player)
 
 void CPlayer::UnshareVisionWith(const CPlayer &player)
 {
-	this->SharedVision &= ~(1 << player.Index);
+	this->SharedVision &= ~(1 << player.GetIndex());
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+	if (GameCycle > 0 && player.GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
@@ -4087,8 +4087,8 @@ void CPlayer::SetOverlord(CPlayer *player)
 bool CPlayer::IsEnemy(const CPlayer &player) const
 {
 	//Wyrmgus start
-//	return IsEnemy(player.Index);
-	return IsEnemy(player.Index) || player.IsEnemy(this->Index); // be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
+//	return IsEnemy(player.GetIndex());
+	return IsEnemy(player.GetIndex()) || player.IsEnemy(this->GetIndex()); // be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
 	//Wyrmgus end
 }
 
@@ -4117,7 +4117,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
-	if (unit.Player->Index != this->Index && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->HasNeutralFactionType()) {
+	if (unit.Player != this && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->HasNeutralFactionType()) {
 		return true;
 	}
 	//Wyrmgus end
@@ -4130,7 +4130,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 */
 bool CPlayer::IsAllied(const CPlayer &player) const
 {
-	return (Allied & (1 << player.Index)) != 0;
+	return (Allied & (1 << player.GetIndex())) != 0;
 }
 
 /**
@@ -4152,7 +4152,7 @@ bool CPlayer::IsVisionSharing() const
 */
 bool CPlayer::IsSharedVision(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0;
+	return (SharedVision & (1 << player.GetIndex())) != 0;
 }
 
 /**
@@ -4168,8 +4168,7 @@ bool CPlayer::IsSharedVision(const CUnit &unit) const
 */
 bool CPlayer::IsBothSharedVision(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0
-		   && (player.SharedVision & (1 << Index)) != 0;
+	return (SharedVision & (1 << player.GetIndex())) != 0 && (player.SharedVision & (1 << this->GetIndex())) != 0;
 }
 
 /**

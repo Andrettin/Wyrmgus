@@ -154,14 +154,14 @@ public:
 		//Wyrmgus end
 			return ;
 		}
-		const int p = player->Index;
+		const int p = player->GetIndex();
 		if (MARK) {
 			//  If the unit goes out of fog, this can happen for any player that
 			//  this player shares vision with, and can't YET see the unit.
 			//  It will be able to see the unit after the Unit->VisCount ++
 			if (!unit->VisCount[p]) {
 				for (int pi = 0; pi < PlayerMax; ++pi) {
-					if ((pi == p /*player->Index*/)
+					if ((pi == p /*player->GetIndex()*/)
 						|| player->IsBothSharedVision(*CPlayer::Players[pi]) || player->Revealed) {
 						if (!unit->IsVisible(*CPlayer::Players[pi])) {
 							UnitGoesOutOfFog(*unit, *CPlayer::Players[pi]);
@@ -169,7 +169,7 @@ public:
 					}
 				}
 			}
-			unit->VisCount[p/*player->Index*/]++;
+			unit->VisCount[p/*player->GetIndex()*/]++;
 		} else {
 			/*
 			 * HACK: UGLY !!!
@@ -188,7 +188,7 @@ public:
 			//  Now we have to check who can't see the unit anymore.
 			if (!unit->VisCount[p]) {
 				for (int pi = 0; pi < PlayerMax; ++pi) {
-					if (pi == p/*player->Index*/ ||
+					if (pi == p/*player->GetIndex()*/ ||
 						player->IsBothSharedVision(*CPlayer::Players[pi]) || player->Revealed) {
 						if (!unit->IsVisible(*CPlayer::Players[pi])) {
 							UnitGoesUnderFog(*unit, *CPlayer::Players[pi]);
@@ -254,7 +254,7 @@ static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloa
 void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 {
 	CMapField &mf = *CMap::Map.Field(index, z);
-	unsigned short *v = &(mf.playerInfo.Visible[player.Index]);
+	unsigned short *v = &(mf.playerInfo.Visible[player.GetIndex()]);
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!CMap::Map.NoFogOfWar || *v == 0) {
@@ -291,7 +291,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //Wyrmgus end
 {
 	CMapField &mf = *CMap::Map.Field(index, z);
-	unsigned short *v = &mf.playerInfo.Visible[player.Index];
+	unsigned short *v = &mf.playerInfo.Visible[player.GetIndex()];
 	switch (*v) {
 		case 0:  // Unexplored
 		case 1:
@@ -333,7 +333,7 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int
 //Wyrmgus end
 {
 	CMapField &mf = *CMap::Map.Field(index, z);
-	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
+	unsigned char *v = &mf.playerInfo.VisCloak[player.GetIndex()];
 	if (*v == 0) {
 		//Wyrmgus start
 //		UnitsOnTileMarkSeen(player, mf, 1);
@@ -367,7 +367,7 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 //Wyrmgus end
 {
 	CMapField &mf = *CMap::Map.Field(index, z);
-	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
+	unsigned char *v = &mf.playerInfo.VisCloak[player.GetIndex()];
 	Assert(*v != 0);
 	if (*v == 1) {
 		//Wyrmgus start
@@ -399,7 +399,7 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
 {
 	CMapField &mf = *CMap::Map.Field(index, z);
-	unsigned char *v = &mf.playerInfo.VisEthereal[player.Index];
+	unsigned char *v = &mf.playerInfo.VisEthereal[player.GetIndex()];
 	if (*v == 0) {
 		UnitsOnTileMarkSeen(player, mf, 0, 1);
 	}
@@ -421,7 +421,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
 {
 	CMapField &mf = *CMap::Map.Field(index, z);
-	unsigned char *v = &mf.playerInfo.VisEthereal[player.Index];
+	unsigned char *v = &mf.playerInfo.VisEthereal[player.GetIndex()];
 	Assert(*v != 0);
 	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, mf, 0, 1);

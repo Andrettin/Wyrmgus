@@ -279,7 +279,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		unitToDraw->GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
 		//Wyrmgus end
 			//Wyrmgus start
-//			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
+//			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->GetIndex() : unitToDraw->Player->GetIndex());
 			unitToDraw->GetDisplayPlayer());
 			//Wyrmgus end
 	}

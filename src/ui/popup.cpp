@@ -521,7 +521,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 		/*
 		CUnitType &type = *CUnitType::Get(button.Value);
 		int value = type.DefaultStat.Variables[this->Index].Value;
-		int diff = type.Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value - value;
+		int diff = type.Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[this->Index].Value - value;
 
 		if (!diff) {
 			label.Draw(x, y, value);
@@ -533,7 +533,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 		*/
 		int value;
 		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-			value = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
+			value = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
 			}

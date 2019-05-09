@@ -293,7 +293,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		fprintf(stderr, "recursive use of load map!\n");
 		ExitFatal(-1);
 	}
-	InitPlayers();
+	CPlayer::InitPlayers();
 	LcmPreventRecurse = 1;
 	if (LuaLoadFile(mapfull) == -1) {
 		fprintf(stderr, "Can't load lua file: %s\n", mapfull);
@@ -1006,7 +1006,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 					  unit.Type->Ident.c_str(),
-					  unit.Player->Index,
+					  unit.Player->GetIndex(),
 					  unit.tilePos.x, unit.tilePos.y);
 			if (unit.Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
@@ -1033,7 +1033,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				const CUnit &unit = **it;
 				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 						  unit.Type->Ident.c_str(),
-						  unit.Player->Index,
+						  unit.Player->GetIndex(),
 						  unit.tilePos.x, unit.tilePos.y);
 				if (unit.Type->GivesResource) {
 					f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
@@ -1627,7 +1627,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		return;
 	}
 
-	InitPlayers();
+	CPlayer::InitPlayers();
 	
 	//Wyrmgus start
 	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
@@ -1670,7 +1670,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
 			playertype = GameSettings.Presets[i].Type;
 		}
-		CreatePlayer(playertype);
+		CPlayer::Create(playertype);
 	}
 	
 	//Wyrmgus start

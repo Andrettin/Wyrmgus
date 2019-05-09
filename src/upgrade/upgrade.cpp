@@ -1426,7 +1426,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 
 		//Wyrmgus start
 		if (&unit == nullptr) {
-			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is null.\n", i, player.Index);
+			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is null.\n", i, player.GetIndex());
 			continue;
 		}
 		//Wyrmgus end
@@ -1496,7 +1496,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 {
 	Assert(um);
 
-	int pn = player.Index;
+	int pn = player.GetIndex();
 
 	//Wyrmgus start
 	if (um->SpeedResearch != 0) {
@@ -1569,7 +1569,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
 						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
@@ -1582,7 +1582,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
 						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
@@ -1673,7 +1673,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 
-					if (unit.Player->Index != player.Index) {
+					if (unit.Player->GetIndex() != player.GetIndex()) {
 						continue;
 					}
 					
@@ -1741,7 +1741,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (size_t j = 0; j != unitupgrade.size(); ++j) {
 				CUnit &unit = *unitupgrade[j];
 
-				if (unit.Player->Index != player.Index) {
+				if (unit.Player->GetIndex() != player.GetIndex()) {
 					continue;
 				}
 				
@@ -1808,7 +1808,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 {
 	Assert(um);
 
-	int pn = player.Index;
+	int pn = player.GetIndex();
 
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch -= um->SpeedResearch;
@@ -1858,7 +1858,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
 						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
@@ -1871,7 +1871,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
 						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
@@ -1888,9 +1888,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
 						//Wyrmgus start
-//						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+//						m = std::max(m, player.GetUnit(k).Type->Stats[player.GetIndex()].ImproveIncomes[j]);
 						if (player.GetUnit(k).Type != nullptr) {
-							m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+							m = std::max(m, player.GetUnit(k).Type->Stats[player.GetIndex()].ImproveIncomes[j]);
 						}
 						//Wyrmgus end
 					}
@@ -1944,7 +1944,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 				for (int k = 0; k < player.GetUnitCount(); ++k) {
 					if (player.GetUnit(k).Type != nullptr) {
-						m = std::min(m, player.GetUnit(k).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Value);
+						m = std::min(m, player.GetUnit(k).Type->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Value);
 					}
 				}
 				player.TradeCost = m;
@@ -1968,7 +1968,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 
-					if (unit.Player->Index != player.Index) {
+					if (unit.Player->GetIndex() != player.GetIndex()) {
 						continue;
 					}
 					
@@ -2036,7 +2036,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (size_t j = 0; j != unitupgrade.size(); ++j) {
 				CUnit &unit = *unitupgrade[j];
 
-				if (unit.Player->Index != player.Index) {
+				if (unit.Player->GetIndex() != player.GetIndex()) {
 					continue;
 				}
 				

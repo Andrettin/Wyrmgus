@@ -116,7 +116,7 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 static int ParseAnimPlayer(const CUnit &unit, char *parseint)
 {
 	if (!strcmp(parseint, "this")) {
-		return unit.Player->Index;
+		return unit.Player->GetIndex();
 	}
 	return ParseAnimInt(unit, parseint);
 }

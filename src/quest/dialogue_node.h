@@ -76,7 +76,6 @@ public:
 	void Initialize();
 	
 	void Call(CPlayer *player) const;
-	void OptionEffect(const int option, CPlayer *player) const;
 	
 	const CDialogueNode *GetNextNode() const
 	{
@@ -104,12 +103,5 @@ public:
 protected:
 	static void _bind_methods();
 };
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
-extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
-extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);
 
 #endif

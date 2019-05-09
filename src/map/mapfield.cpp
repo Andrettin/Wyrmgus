@@ -763,20 +763,20 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 
 bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
 {
-	return Visible[player.Index] != 0;
+	return Visible[player.GetIndex()] != 0;
 }
 
 //Wyrmgus start
 bool CMapFieldPlayerInfo::IsTeamExplored(const CPlayer &player) const
 {
-	return Visible[player.Index] != 0 || TeamVisibilityState(player) != 0;
+	return Visible[player.GetIndex()] != 0 || TeamVisibilityState(player) != 0;
 }
 //Wyrmgus end
 
 bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
 {
 	const bool fogOfWar = !CMap::Map.NoFogOfWar;
-	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
+	return Visible[player.GetIndex()] >= 2 || (!fogOfWar && IsExplored(player));
 }
 
 bool CMapFieldPlayerInfo::IsTeamVisible(const CPlayer &player) const

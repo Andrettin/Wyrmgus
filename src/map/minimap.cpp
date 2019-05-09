@@ -834,7 +834,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 
 	Uint32 color;
 	//Wyrmgus start
-//	if (unit.Player->Index == PlayerNumNeutral) {
+//	if (unit.Player->GetIndex() == PlayerNumNeutral) {
 	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
 	//Wyrmgus end
 		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);

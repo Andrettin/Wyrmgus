@@ -119,6 +119,8 @@ void CDialogueNode::Initialize()
 
 void CDialogueNode::Call(CPlayer *player) const
 {
+	CclCommand("trigger_player = " + std::to_string((long long) player->GetIndex()) + ";");
+	
 	if (this->Conditions) {
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
@@ -169,17 +171,6 @@ void CDialogueNode::Call(CPlayer *player) const
 	}
 }
 
-void CDialogueNode::OptionEffect(const int option, CPlayer *player) const
-{
-	if ((int) this->Options.size() > option) {
-		this->Options[option]->DoEffect(player);
-	} else {
-		if (this->GetNextNode() != nullptr) {
-			this->GetNextNode()->Call(player);
-		}
-	}
-}
-
 void CDialogueNode::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_ident", "ident"), [](CDialogueNode *node, const String &ident){
@@ -210,25 +201,4 @@ void CDialogueNode::_bind_methods()
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
 	ClassDB::bind_method(D_METHOD("get_options"), [](const CDialogueNode *node){ return VectorToGodotArray(node->Options); });
-}
-
-void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
-{
-	CDialogue *dialogue = CDialogue::Get(dialogue_ident);
-	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
-		return;
-	}
-	
-	dialogue->Nodes[node]->Call(CPlayer::Players[player]);
-}
-
-void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
-{
-	CDialogue *dialogue = CDialogue::Get(dialogue_ident);
-	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
-		return;
-	}
-	
-	CclCommand("trigger_player = " + std::to_string((long long) player) + ";");
-	dialogue->Nodes[node]->OptionEffect(option, CPlayer::Players[player]);
 }
