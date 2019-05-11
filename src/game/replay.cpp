@@ -59,6 +59,8 @@
 #include "unit/unit_type.h"
 #include "include/version.h"
 
+#include <core/math/random_number_generator.h>
+
 #include <sstream>
 #include <time.h>
 
@@ -85,7 +87,7 @@ public:
 	int DestUnitNumber = 0;
 	std::string Value;
 	int Num = 0;
-	unsigned SyncRandSeed = 0;
+	uint64_t SyncRandSeed = 0;
 	LogEntry *Next = nullptr;
 };
 
@@ -531,7 +533,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	log->Num = num;
 
-	log->SyncRandSeed = SyncRandSeed;
+	log->SyncRandSeed = RNG->get_seed();
 
 	// Append it to ReplayLog list
 	AppendLog(log, *LogFile);
@@ -855,14 +857,14 @@ static void DoNextReplay()
 
 	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
 
-	if (SyncRandSeed != ReplayStep->SyncRandSeed) {
+	if (RNG->get_seed() != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
 			CPlayer::GetThisPlayer()->Notify("%s", _("No sync info for this replay !"));
 		} else {
 			CPlayer::GetThisPlayer()->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
-			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
+			DebugPrint("OUT OF SYNC %u != %u\n" _C_ RNG->get_seed() _C_ ReplayStep->SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
 			Assert(0);
 			// ReplayStep = 0;

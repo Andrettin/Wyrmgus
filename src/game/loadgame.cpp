@@ -70,6 +70,8 @@
 #include "video/font.h"
 #include "video/video.h"
 
+#include <core/math/random_number_generator.h>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -259,15 +261,15 @@ void LoadGame(const std::string &filename)
 
 	const unsigned long game_cycle = GameCycle;
 	const unsigned long long current_total_hours = CDate::CurrentTotalHours;
-	const unsigned syncrand = SyncRandSeed;
-	const unsigned synchash = SyncHash;
+	const uint64_t syncrand = RNG->get_seed();
+	const uint64_t synchash = SyncHash;
 
 	InitModules();
 	LoadModules();
 
 	GameCycle = game_cycle;
 	CDate::CurrentTotalHours = current_total_hours;
-	SyncRandSeed = syncrand;
+	RNG->set_seed(syncrand);
 	SyncHash = synchash;
 	SelectionChanged();
 }

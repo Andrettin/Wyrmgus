@@ -80,12 +80,13 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 
+#include <core/math/random_number_generator.h>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-unsigned SyncHash; /// Hash calculated to find sync failures
-
+uint64_t SyncHash; /// Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -347,10 +348,10 @@ static void DumpUnitInfo(CUnit &unit)
 	}
 
 	fprintf(logf, "%lu: ", GameCycle);
-	fprintf(logf, "%d %s %d P%i Refs %d: %X %d,%d %d,%d\n",
+	fprintf(logf, "%d %s %d P%i Refs %d: %llX %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
-			unit.Player ? unit.Player->GetIndex() : -1, unit.Refs, SyncRandSeed,
+			unit.Player ? unit.Player->GetIndex() : -1, unit.Refs, RNG->get_seed(),
 			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);

@@ -574,10 +574,10 @@ static int CclGetCampaignData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "MapWidth")) {
-		lua_pushnumber(l, campaign->MapSizes[0].x);
+		lua_pushnumber(l, campaign->GetMapSize(0).x);
 		return 1;
 	} else if (!strcmp(data, "MapHeight")) {
-		lua_pushnumber(l, campaign->MapSizes[0].y);
+		lua_pushnumber(l, campaign->GetMapSize(0).y);
 		return 1;
 	} else if (!strcmp(data, "MapTemplateStartPosX")) {
 		lua_pushnumber(l, campaign->MapTemplateStartPos[0].x);

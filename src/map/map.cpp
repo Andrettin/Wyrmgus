@@ -366,7 +366,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 			continue;
 		}
 		
-		if (allowed_terrains.size() > 0 && std::find(allowed_terrains.begin(), allowed_terrains.end(), GetTileTopTerrain(random_pos, false, z)) == allowed_terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
+		if (allowed_terrains.size() > 0 && std::find(allowed_terrains.begin(), allowed_terrains.end(), this->GetTileTopTerrain(random_pos, false, z)) == allowed_terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
 			continue;
 		}
 		
@@ -3243,7 +3243,7 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {
-			unit_pos = GenerateUnitLocation(unit_type, nullptr, min_pos, max_pos, z);
+			unit_pos = this->GenerateUnitLocation(unit_type, nullptr, min_pos, max_pos, z);
 		}
 		if (!this->Info.IsPointOnMap(unit_pos, z)) {
 			continue;

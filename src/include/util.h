@@ -37,6 +37,7 @@
 #endif
 
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,11 +47,12 @@
 
 #include <cmath>
 
-extern unsigned SyncRandSeed;           /// Sync random seed value
+class RandomNumberGenerator;
 
-extern void InitSyncRand();             /// Initialize the syncron rand
-extern int SyncRand();                  /// Syncron rand
-extern int SyncRand(int max);           /// Syncron rand
+extern std::shared_ptr<RandomNumberGenerator> RNG;
+extern void InitSyncRand();				/// Initialize the syncron rand
+extern uint32_t SyncRand();					/// Syncron rand
+extern uint32_t SyncRand(const uint32_t max);		/// Syncron rand
 
 ///  rand only used on this computer.
 extern int MyRand();

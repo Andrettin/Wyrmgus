@@ -57,6 +57,8 @@
 #include "upgrade/upgrade.h"
 #include "include/version.h"
 
+#include <core/math/random_number_generator.h>
+
 #include <time.h>
 
 extern void StartMap(const std::string &filename, bool clean);
@@ -160,7 +162,7 @@ int SaveGame(const std::string &filename)
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
-	file.printf("  SyncRandSeed = %d, \n", SyncRandSeed);
+	file.printf("  SyncRandSeed = %d, \n", RNG->get_seed());
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);
 	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
 	file.printf("} )\n\n");

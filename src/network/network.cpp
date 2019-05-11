@@ -238,6 +238,8 @@
 #include "unit/unit_type.h"
 #include "video/video.h"
 
+#include <core/math/random_number_generator.h>
+
 #include <deque>
 #include <list>
 #include <stddef.h>
@@ -293,8 +295,8 @@ CUDPSocket NetworkFildes;                  /// Network file descriptor
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
 
-static int NetworkSyncSeeds[256];          /// Network sync seeds.
-static int NetworkSyncHashs[256];          /// Network sync hashs.
+static uint64_t NetworkSyncSeeds[256];		/// Network sync seeds.
+static uint64_t NetworkSyncHashs[256];		/// Network sync hashs.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
@@ -479,7 +481,7 @@ void NetworkOnStartGame()
 	}
 	CNetworkCommandSync nc;
 	//nc.syncHash = SyncHash;
-	//nc.syncSeed = SyncRandSeed;
+	//nc.syncSeed = RNG->get_seed();
 
 	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; i += CNetworkParameter::Instance.gameCyclesPerUpdate) {
 		for (int n = 0; n < HostsCount; ++n) {
@@ -902,16 +904,16 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 	CNetworkCommandSync nc;
 	nc.Deserialize(&ncq.Data[0]);
 	const unsigned long gameNetCycle = GameCycle;
-	const int syncSeed = nc.syncSeed;
-	const int syncHash = nc.syncHash;
+	const uint64_t syncSeed = nc.syncSeed;
+	const uint64_t syncHash = nc.syncHash;
 
 	if (syncSeed != NetworkSyncSeeds[gameNetCycle & 0xFF]
 		|| syncHash != NetworkSyncHashs[gameNetCycle & 0xFF]) {
 		SetMessage("%s", _("Network out of sync"));
 		//Wyrmgus start
-		fprintf(stderr, "Network out of sync %x!=%x! %d!=%d! Cycle %lu\n", syncSeed, NetworkSyncSeeds[gameNetCycle & 0xFF], syncHash, NetworkSyncHashs[gameNetCycle & 0xFF], GameCycle);
+		fprintf(stderr, "Network out of sync %llx!=%llx! %lld!=%lld! Cycle %lu\n", syncSeed, NetworkSyncSeeds[gameNetCycle & 0xFF], syncHash, NetworkSyncHashs[gameNetCycle & 0xFF], GameCycle);
 		//Wyrmgus end
-		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
+		DebugPrint("\nNetwork out of sync %llx!=%llx! %lld!=%lld! Cycle %lu\n\n" _C_
 				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
 				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
 	}
@@ -1010,7 +1012,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 		CNetworkCommandSync nc;
 		ncq[0].Type = MessageSync;
 		nc.syncHash = SyncHash;
-		nc.syncSeed = SyncRandSeed;
+		nc.syncSeed = RNG->get_seed();
 		ncq[0].Data.resize(nc.Size());
 		nc.Serialize(&ncq[0].Data[0]);
 		ncq[0].Time = gameNetCycle;
@@ -1046,7 +1048,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	if (numcommands != MaxNetworkCommands) {
 		ncq[numcommands].Type = MessageNone;
 	}
-	NetworkSyncSeeds[gameNetCycle & 0xFF] = SyncRandSeed;
+	NetworkSyncSeeds[gameNetCycle & 0xFF] = RNG->get_seed();
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
 	NetworkSendPacket(ncq);
 }

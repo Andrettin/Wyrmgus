@@ -205,7 +205,7 @@ typedef COrder *COrderPtr;
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned SyncHash;  /// Hash calculated to find sync failures
+extern uint64_t SyncHash;  /// Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
 --  Actions: in action_<name>.c

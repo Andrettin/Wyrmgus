@@ -39,6 +39,7 @@
 #ifdef _WIN32
 
 # define USE_WINSOCK
+# define INCL_EXTRA_HTON_FUNCTIONS
 
 # include <winsock2.h>
 

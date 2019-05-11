@@ -36,6 +36,8 @@
 //Wyrmgus end
 #include "species/gender.h"
 
+#include <core/math/random_number_generator.h>
+
 #include <boost/tokenizer.hpp>
 
 #include <ctype.h>
@@ -68,19 +70,21 @@
 --  Random
 ----------------------------------------------------------------------------*/
 
-unsigned SyncRandSeed;				/// sync random seed value.
+std::shared_ptr<RandomNumberGenerator> RNG;
 
 /**
 **  Inititalize sync rand seed.
 */
 void InitSyncRand()
 {
+	if (!RNG) {
+		RNG = std::make_shared<RandomNumberGenerator>();
+	}
+	
 	if (!IsNetworkGame()) { //if isn't a network game, make the seed vary according to the date and time
-		time_t time_curr;
-		time(&time_curr);
-		SyncRandSeed = static_cast<unsigned>(time_curr);
+		RNG->randomize();
 	} else {
-		SyncRandSeed = 0x87654321;
+		RNG->set_seed(RandomPCG::DEFAULT_SEED);
 	}
 }
 
@@ -90,15 +94,9 @@ void InitSyncRand()
 **  @note This random value must be same on all machines in network game.
 **  Very simple random generations, enough for us.
 */
-int SyncRand()
+uint32_t SyncRand()
 {
-	int val;
-
-	val = SyncRandSeed >> 16;
-
-	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
-
-	return val;
+	return RNG->randi();
 }
 
 /**
@@ -106,12 +104,10 @@ int SyncRand()
 **
 **  @param max  Max value of random number to return
 */
-int SyncRand(int max)
+uint32_t SyncRand(const uint32_t max)
 {
 	return SyncRand() % max;
 }
-
-
 
 int MyRand()
 {

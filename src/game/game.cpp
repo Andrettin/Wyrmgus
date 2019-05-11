@@ -106,6 +106,8 @@
 //Wyrmgus end
 #include "wyrmgus.h"
 
+#include <core/math/random_number_generator.h>
+
 #include <png.h>
 
 extern void CleanGame();
@@ -2355,7 +2357,7 @@ static int CclSavedGameInfo(lua_State *l)
 		} else if (!strcmp(value, "SyncHash")) {
 			SyncHash = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
-			SyncRandSeed = LuaToNumber(l, -1);
+			RNG->set_seed(LuaToNumber(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

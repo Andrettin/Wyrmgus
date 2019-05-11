@@ -406,8 +406,8 @@ public:
 	static size_t Size() { return 4 + 4; };
 
 public:
-	uint32_t syncSeed = 0;
-	uint32_t syncHash = 0;
+	uint64_t syncSeed = 0;
+	uint64_t syncHash = 0;
 };
 
 /**

@@ -40,6 +40,20 @@
 #include "network/network.h"
 #include "include/version.h"
 
+size_t serialize64(unsigned char *buf, uint64_t data)
+{
+	if (buf) {
+		*reinterpret_cast<uint64_t *>(buf) = htonl(data);
+	}
+	return sizeof(data);
+}
+size_t serialize64(unsigned char *buf, int64_t data)
+{
+	if (buf) {
+		*reinterpret_cast<int64_t *>(buf) = htonl(data);
+	}
+	return sizeof(data);
+}
 size_t serialize32(unsigned char *buf, uint32_t data)
 {
 	if (buf) {
@@ -128,6 +142,16 @@ size_t serialize(unsigned char *buf, const std::vector<unsigned char> &data)
 	//Wyrmgus end
 }
 
+size_t deserialize64(const unsigned char *buf, uint64_t *data)
+{
+	*data = ntohll(*reinterpret_cast<const uint64_t *>(buf));
+	return sizeof(*data);
+}
+size_t deserialize64(const unsigned char *buf, int64_t *data)
+{
+	*data = ntohll(*reinterpret_cast<const int64_t *>(buf));
+	return sizeof(*data);
+}
 size_t deserialize32(const unsigned char *buf, uint32_t *data)
 {
 	*data = ntohl(*reinterpret_cast<const uint32_t *>(buf));
@@ -669,16 +693,16 @@ size_t CNetworkChat::Size() const
 size_t CNetworkCommandSync::Serialize(unsigned char *buf) const
 {
 	unsigned char *p = buf;
-	p += serialize32(p, this->syncSeed);
-	p += serialize32(p, this->syncHash);
+	p += serialize64(p, this->syncSeed);
+	p += serialize64(p, this->syncHash);
 	return p - buf;
 }
 
 size_t CNetworkCommandSync::Deserialize(const unsigned char *buf)
 {
 	const unsigned char *p = buf;
-	p += deserialize32(p, &this->syncSeed);
-	p += deserialize32(p, &this->syncHash);
+	p += deserialize64(p, &this->syncSeed);
+	p += deserialize64(p, &this->syncHash);
 	return p - buf;
 }
 
