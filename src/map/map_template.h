@@ -104,6 +104,8 @@ private:
 
 public:	
 	static constexpr const char *ClassIdentifier = "map_template";
+	static constexpr int CMapTemplate::MinAdjacentTemplateDistance = 4;
+	static constexpr int CMapTemplate::MaxAdjacentTemplateDistance = 16;
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

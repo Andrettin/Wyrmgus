@@ -71,12 +71,6 @@
 #include <fstream>
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-const int MaxAdjacentTemplateDistance = 16;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -862,8 +856,8 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						continue;
 					}
 					
-					Vec2i min_adjacency_pos = adjacent_template_pos - MaxAdjacentTemplateDistance - Vec2i(subtemplate->Width, subtemplate->Height);
-					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->Width, adjacent_template->Height) + MaxAdjacentTemplateDistance;
+					Vec2i min_adjacency_pos = adjacent_template_pos - CMapTemplate::MaxAdjacentTemplateDistance - Vec2i(subtemplate->Width, subtemplate->Height);
+					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->Width, adjacent_template->Height) + CMapTemplate::MaxAdjacentTemplateDistance;
 					min_pos.x = std::max(min_pos.x, min_adjacency_pos.x);
 					min_pos.y = std::max(min_pos.y, min_adjacency_pos.y);
 					max_pos.x = std::min(max_pos.x, max_adjacency_pos.x);
@@ -918,8 +912,9 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					bool on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos, z) && CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->Width - 1, subtemplate_pos.y + subtemplate->Height - 1), z);
 
 					bool on_subtemplate_area = false;
-					for (int x = 0; x < subtemplate->Width; ++x) {
-						for (int y = 0; y < subtemplate->Height; ++y) {
+					
+					for (int x = CMapTemplate::MinAdjacentTemplateDistance * -1; x < (subtemplate->Width + CMapTemplate::MinAdjacentTemplateDistance); ++x) {
+						for (int y = CMapTemplate::MinAdjacentTemplateDistance * -1; y < (subtemplate->Height + CMapTemplate::MinAdjacentTemplateDistance); ++y) {
 							if (CMap::Map.IsPointInASubtemplateArea(subtemplate_pos + Vec2i(x, y), z)) {
 								on_subtemplate_area = true;
 								break;
