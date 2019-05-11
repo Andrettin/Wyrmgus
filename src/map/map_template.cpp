@@ -79,7 +79,7 @@
 */
 CMapTemplate::~CMapTemplate()
 {
-	for (CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
+	for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 		delete generated_terrain;
 	}
 }
@@ -318,6 +318,32 @@ void CMapTemplate::Initialize()
 			}
 		});
 	}
+	
+	if (CMapTemplate::AreAllInitialized()) {
+		//grow the size of map templates for subtemplates, if they are set to do that
+		for (CMapTemplate *map_template : CMapTemplate::GetAll()) {
+			if (map_template->GrowForSubtemplates) {
+				int total_area = map_template->Width * map_template->Height;
+				int total_subtemplate_area = 0;
+				for (const CMapTemplate *subtemplate : map_template->Subtemplates) {
+					total_subtemplate_area += subtemplate->Width * subtemplate->Height;
+				}
+				
+				//if subtemplates occupy more than 75% of the map template's area, double the area to accomodate the subtemplates
+				while ((total_subtemplate_area * 100 / total_area) > 75) {
+					map_template->Width = std::min(map_template->Width * 2, MaxMapWidth);
+					map_template->Height = std::min(map_template->Height * 2, MaxMapHeight);
+					
+					if (map_template->Width >= MaxMapWidth || map_template->Height >= MaxMapHeight) {
+						break;
+					}
+					
+					total_area = map_template->Width * map_template->Height;
+				}
+			}
+		}
+
+	}
 }
 
 void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
@@ -482,8 +508,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		int height = std::min(this->Height * this->Scale, CMap::Map.Info.MapHeight);
 		if (current_campaign) {
 			//applies the map size set for the campaign for this map layer; for the first map layer that is already CMap::Map.Info.Width/Height, so it isn't necessary here
-			width = current_campaign->MapSizes[z].x;
-			height = current_campaign->MapSizes[z].y;
+			width = current_campaign->GetMapSize(z).x;
+			height = current_campaign->GetMapSize(z).y;
 		}
 	
 		CMapLayer *map_layer = new CMapLayer(width, height);
@@ -1732,6 +1758,10 @@ void CMapTemplate::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_output_terrain_image", "output_terrain_image"), [](CMapTemplate *map_template, const bool output_terrain_image){ map_template->OutputTerrainImage = output_terrain_image; });
 	ClassDB::bind_method(D_METHOD("outputs_terrain_image"), [](const CMapTemplate *map_template){ return map_template->OutputTerrainImage; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "output_terrain_image"), "set_output_terrain_image", "outputs_terrain_image");
+	
+	ClassDB::bind_method(D_METHOD("set_grow_for_subtemplates", "grow_for_subtemplates"), [](CMapTemplate *map_template, const bool grow_for_subtemplates){ map_template->GrowForSubtemplates = grow_for_subtemplates; });
+	ClassDB::bind_method(D_METHOD("grows_for_subtemplates"), [](const CMapTemplate *map_template){ return map_template->GrowForSubtemplates; });
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "grow_for_subtemplates"), "set_grow_for_subtemplates", "grows_for_subtemplates");
 }
 
 /**

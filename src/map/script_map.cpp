@@ -1757,6 +1757,8 @@ static int CclDefineMapTemplate(lua_State *l)
 		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->GetHeight() - 1) / 2);
 	}
 	
+	map_template->Initialize();
+	
 	return 0;
 }
 

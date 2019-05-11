@@ -141,6 +141,7 @@ public:
 private:
 	int Priority = 0;	/// the priority of this map template, for the order of application of subtemplates
 	bool OutputTerrainImage = false;
+	bool GrowForSubtemplates = false;
 public:
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 	Vec2i MinPos = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
