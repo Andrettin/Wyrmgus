@@ -343,6 +343,13 @@ void CMapTemplate::Initialize()
 			}
 		}
 
+		//if a map template has an upper template, and no given size, make it have the same size as its upper template
+		for (CMapTemplate *map_template : CMapTemplate::GetAll()) {
+			if (map_template->Width == 0 && map_template->Height == 0 && map_template->UpperTemplate != nullptr) {
+				map_template->Width = map_template->UpperTemplate->Width;
+				map_template->Height = map_template->UpperTemplate->Height;
+			}
+		}
 	}
 }
 
