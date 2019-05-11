@@ -960,12 +960,23 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					subtemplate_pos = potential_positions[SyncRand(potential_positions.size())];
 					potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), subtemplate_pos), potential_positions.end());
 
-					bool on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos, z) && CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->Width - 1, subtemplate_pos.y + subtemplate->Height - 1), z);
+					//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
+					const int north_offset = subtemplate->GetDependentTemplatesNorthOffset();
+					const int south_offset = subtemplate->GetDependentTemplatesSouthOffset();
+					const int west_offset = subtemplate->GetDependentTemplatesWestOffset();
+					const int east_offset = subtemplate->GetDependentTemplatesEastOffset();
+					const bool top_left_on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos - Vec2i(west_offset, north_offset), z);
+					const bool bottom_right_on_map = CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->Width + east_offset - 1, subtemplate_pos.y + subtemplate->Height + south_offset - 1), z);
+					const bool on_map = top_left_on_map && bottom_right_on_map;
+					
+					if (!on_map) {
+						continue;
+					}
 
 					bool on_subtemplate_area = false;
 					
-					for (int x = CMapTemplate::MinAdjacentTemplateDistance * -1; x < (subtemplate->Width + CMapTemplate::MinAdjacentTemplateDistance); ++x) {
-						for (int y = CMapTemplate::MinAdjacentTemplateDistance * -1; y < (subtemplate->Height + CMapTemplate::MinAdjacentTemplateDistance); ++y) {
+					for (int x = (CMapTemplate::MinAdjacentTemplateDistance * -1) - west_offset; x < (subtemplate->Width + CMapTemplate::MinAdjacentTemplateDistance + east_offset); ++x) {
+						for (int y = (CMapTemplate::MinAdjacentTemplateDistance * -1) - north_offset; y < (subtemplate->Height + CMapTemplate::MinAdjacentTemplateDistance + south_offset); ++y) {
 							if (CMap::Map.IsPointInASubtemplateArea(subtemplate_pos + Vec2i(x, y), z)) {
 								on_subtemplate_area = true;
 								break;
@@ -976,7 +987,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						}
 					}
 
-					if (on_map && !on_subtemplate_area) {
+					if (!on_subtemplate_area) {
 						found_location = true;
 						break;
 					}

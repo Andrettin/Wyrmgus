@@ -117,6 +117,66 @@ public:
 		return this->Priority;
 	}
 	
+	int GetDependentTemplatesNorthOffset() const
+	{
+		int offset = 0;
+		
+		for (const CMapTemplate *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->NorthOfTemplates.begin(), map_template->NorthOfTemplates.end(), this) == map_template->NorthOfTemplates.end()) {
+				continue;
+			}
+			
+			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesNorthOffset();
+		}
+		
+		return offset;
+	}
+	
+	int GetDependentTemplatesSouthOffset() const
+	{
+		int offset = 0;
+		
+		for (const CMapTemplate *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->SouthOfTemplates.begin(), map_template->SouthOfTemplates.end(), this) == map_template->SouthOfTemplates.end()) {
+				continue;
+			}
+			
+			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesSouthOffset();
+		}
+		
+		return offset;
+	}
+	
+	int GetDependentTemplatesWestOffset() const
+	{
+		int offset = 0;
+		
+		for (const CMapTemplate *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->WestOfTemplates.begin(), map_template->WestOfTemplates.end(), this) == map_template->WestOfTemplates.end()) {
+				continue;
+			}
+			
+			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesWestOffset();
+		}
+		
+		return offset;
+	}
+	
+	int GetDependentTemplatesEastOffset() const
+	{
+		int offset = 0;
+		
+		for (const CMapTemplate *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->EastOfTemplates.begin(), map_template->EastOfTemplates.end(), this) == map_template->EastOfTemplates.end()) {
+				continue;
+			}
+			
+			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesEastOffset();
+		}
+		
+		return offset;
+	}
+	
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
