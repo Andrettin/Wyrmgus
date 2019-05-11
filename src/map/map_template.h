@@ -88,20 +88,6 @@ class CMapTemplate : public DataElement, public DataType<CMapTemplate>
 public:
 	~CMapTemplate();
 
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Overland);
-		REGISTER_PROPERTY(OutputTerrainImage);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
 public:	
 	static constexpr const char *ClassIdentifier = "map_template";
 	static constexpr int CMapTemplate::MinAdjacentTemplateDistance = 4;
@@ -154,9 +140,8 @@ public:
 	int SurfaceLayer = 0;							/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 private:
 	int Priority = 0;	/// the priority of this map template, for the order of application of subtemplates
+	bool OutputTerrainImage = false;
 public:
-	Property<bool> Overland = false;				/// Whether this is an overland map
-	ExposedProperty<bool> OutputTerrainImage = false;
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 	Vec2i MinPos = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)

@@ -154,7 +154,6 @@ public:
 	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-	bool Overland = false;						/// whether the map layer is an overland map
 	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer
 	CWorld *World = nullptr;					/// the world pointer (if any) for the map layer
 	int SurfaceLayer = 0;						/// the surface layer for the map layer

@@ -486,7 +486,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		map_layer->World = this->World;
 		map_layer->SurfaceLayer = this->SurfaceLayer;
 		map_layer->PixelTileSize = this->PixelTileSize;
-		map_layer->Overland = this->Overland;
 		CMap::Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
@@ -494,7 +493,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 			CMap::Map.MapLayers[z]->World = this->World;
 			CMap::Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
 			CMap::Map.MapLayers[z]->PixelTileSize = this->PixelTileSize;
-			CMap::Map.MapLayers[z]->Overland = this->Overland;
 		}
 	}
 
@@ -1710,6 +1708,10 @@ void CMapTemplate::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_priority", "priority"), [](CMapTemplate *map_template, const int priority){ map_template->Priority = priority; });
 	ClassDB::bind_method(D_METHOD("get_priority"), &CMapTemplate::GetPriority);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "priority"), "set_priority", "get_priority");
+	
+	ClassDB::bind_method(D_METHOD("set_output_terrain_image", "output_terrain_image"), [](CMapTemplate *map_template, const bool output_terrain_image){ map_template->OutputTerrainImage = output_terrain_image; });
+	ClassDB::bind_method(D_METHOD("outputs_terrain_image"), [](const CMapTemplate *map_template){ return map_template->OutputTerrainImage; });
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "output_terrain_image"), "set_output_terrain_image", "outputs_terrain_image");
 }
 
 /**
