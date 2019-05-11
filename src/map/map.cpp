@@ -453,6 +453,35 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 }
 
 /**
+**	@brief	Get whether a given tile borders a given terrain type
+**
+**	@param	pos					The tile's position
+**	@param	terrain_type		The terrain type to be checked for bordering
+**	@param	z					The tile's map layer
+**
+**	@return	True if the tile borders a given terrain type, or false otherwise
+*/
+bool CMap::TileBordersTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const
+{
+	bool overlay = terrain_type != nullptr ? terrain_type->Overlay : false;
+	
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+			
+			if (this->GetTileTopTerrain(adjacent_pos, overlay, z) == terrain_type) {
+				return true;
+			}
+		}
+	}
+		
+	return false;
+}
+
+/**
 **	@brief	Get whether a given tile borders only tiles with the same terrain as itself
 **
 **	@param	pos					The tile's position
@@ -461,7 +490,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 **
 **	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
 */
-bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain_type, const int z)
+bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain_type, const int z) const
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -591,7 +620,7 @@ bool CMap::TileBordersUnit(const Vec2i &pos, int z)
 **
 **	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
 */
-bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z)
+bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const
 {
 	if (!terrain_type || !terrain_type->Overlay) {
 		return false;
@@ -609,6 +638,10 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 			
 			CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
 			
+			if (adjacent_terrain == nullptr) {
+				continue;
+			}
+			
 			if (tile_terrain == adjacent_terrain) {
 				continue;
 			}
@@ -623,6 +656,59 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 			} else {
 				//if the terrain type is not an overlay one, the adjacent tile terrain is incompatible with it if it cannot border the terrain type
 				if (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), adjacent_terrain) == terrain_type->BorderTerrains.end()) {
+					return true;
+				}
+			}
+		}
+	}
+		
+	return false;
+}
+
+/**
+**	@brief	Get whether the given tile has any bordering terrains which are incompatible with a given terrain type
+**
+**	@param	pos						The tile's position
+**	@param	terrain_type			The terrain type to check
+**	@param	overlay_terrain_type	The overlay terrain type to check
+**	@param	z						The tile's map layer
+**
+**	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
+*/
+bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const
+{
+	if (!terrain_type) {
+		return false;
+	}
+	
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+			
+			CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
+			
+			if (adjacent_terrain == nullptr) {
+				continue;
+			}
+			
+			if (terrain_type == adjacent_terrain) {
+				continue;
+			}
+			
+			//the adjacent tile terrain is incompatible with the non-overlay terrain type if it cannot border the terrain type
+			if (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), adjacent_terrain) == terrain_type->BorderTerrains.end()) {
+				return true;
+			}
+			
+			if (overlay_terrain_type != nullptr) {
+				if ( //if the terrain type is an overlay one, the adjacent tile terrain is incompatible with it if it both cannot be a base terrain for the overlay terrain type, and it "expands into" the tile (that is, the tile has the adjacent terrain as an inner border terrain)
+					std::find(terrain_type->InnerBorderTerrains.begin(), terrain_type->InnerBorderTerrains.end(), adjacent_terrain) != terrain_type->InnerBorderTerrains.end()
+					&& std::find(overlay_terrain_type->BaseTerrainTypes.begin(), overlay_terrain_type->BaseTerrainTypes.end(), adjacent_terrain) == overlay_terrain_type->BaseTerrainTypes.end()
+				) {
 					return true;
 				}
 			}
@@ -2634,7 +2720,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 						continue;
 					}
 					
-					if (!IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
+					if (!this->IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
 						continue;
 					}
 					
@@ -2907,6 +2993,222 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 					tile_quantity++;
 				}
 			}
+		}
+	}
+}
+
+bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type) const
+{
+	if (tile->GetTopTerrain() == nullptr) {
+		return true;
+	}
+	
+	if (tile->Terrain == terrain_type && tile->OverlayTerrain == overlay_terrain_type) {
+		return true;
+	}
+	
+	return false;
+}
+
+/**
+**	@brief	Generate terrain for tiles with none
+**
+**	@param	generated_terrain	The terrain generation characteristics
+**	@param	min_pos				The minimum position in the map to generate the terrain on
+**	@param	max_pos				The maximum position in the map to generate the terrain on
+**	@param	preserve_coastline	Whether to avoid changing the coastline during terrain generation
+**	@param	z					The map layer to generate the terrain on
+*/
+void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z)
+{
+	if (SaveGameLoading) {
+		return;
+	}
+	
+	Vec2i random_pos(0, 0);
+	
+	std::vector<Vec2i> seeds;
+	
+	//use tiles that have a terrain as seeds for the terrain generation
+	bool has_tile_with_missing_terrain = false;
+	for (int x = min_pos.x; x <= max_pos.x; ++x) {
+		for (int y = min_pos.y; y <= max_pos.y; ++y) {
+			const Vec2i tile_pos(x, y);
+			
+			if (!this->IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
+				continue;
+			}
+			
+			const CMapField *tile = this->Field(x, y, z);
+
+			if (tile->GetTopTerrain() == nullptr) {
+				has_tile_with_missing_terrain = true;
+				continue;
+			}
+			
+			if (!this->TileBordersTerrain(tile_pos, nullptr, z)) {
+				continue; //the seed must border a tile with null terrain
+			}
+			
+			seeds.push_back(tile_pos);
+		}
+	}
+	
+	if (!has_tile_with_missing_terrain) {
+		return;
+	}
+	
+	// expand seeds
+	for (size_t i = 0; i < seeds.size(); ++i) {
+		Vec2i seed_pos = seeds[i];
+		
+		const int random_number = SyncRand(100);
+		if (random_number >= 50) { //50% chance for the seed to generate terrain
+			seeds.push_back(seed_pos); //try again later, as we want to ensure as much terrain is generated as possible
+			continue;
+		}
+		
+		CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
+		CTerrainType *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
+		
+		std::vector<Vec2i> adjacent_positions;
+		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
+			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
+				Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
+				Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
+				Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
+				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
+					continue;
+				}
+				
+				if ( //must either be able to generate on the tiles, or they must already have the generated terrain type
+					!this->CanTileBePartOfMissingTerrainGeneration(this->Field(diagonal_pos, z), terrain_type, overlay_terrain_type)
+					|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(vertical_pos, z), terrain_type, overlay_terrain_type)
+					|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(horizontal_pos, z), terrain_type, overlay_terrain_type)
+				) {
+					continue;
+				}
+		
+				CTerrainType *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+				CTerrainType *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+				CTerrainType *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+				
+				if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
+					continue;
+				}
+				if (vertical_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(vertical_pos, terrain_type, overlay_terrain_type, z)) {
+					continue;
+				}
+				if (horizontal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(horizontal_pos, terrain_type, overlay_terrain_type, z)) {
+					continue;
+				}
+				
+				if (diagonal_tile_top_terrain != nullptr && vertical_tile_top_terrain != nullptr && horizontal_tile_top_terrain != nullptr) { //at least one of the tiles being expanded to must have null terrain
+					continue;
+				}
+				
+				//tiles within a subtemplate area can only be used as seeds, they cannot be modified themselves
+				if (
+					(this->IsPointInASubtemplateArea(diagonal_pos, z) && diagonal_tile_top_terrain == nullptr)
+					|| (this->IsPointInASubtemplateArea(vertical_pos, z) && vertical_tile_top_terrain == nullptr)
+					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && horizontal_tile_top_terrain == nullptr)
+				) {
+					continue;
+				}
+				
+				adjacent_positions.push_back(diagonal_pos);
+			}
+		}
+		
+		if (adjacent_positions.size() > 0) {
+			if (adjacent_positions.size() > 1) {
+				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
+			}
+				
+			Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
+			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
+			
+			if (this->GetTileTopTerrain(adjacent_pos, false, z) == nullptr) {
+				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
+				this->Field(adjacent_pos, z)->SetTerrain(overlay_terrain_type);
+				seeds.push_back(adjacent_pos);
+			}
+			
+			if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) == nullptr) {
+				this->Field(adjacent_pos_horizontal, z)->SetTerrain(terrain_type);
+				this->Field(adjacent_pos_horizontal, z)->SetTerrain(overlay_terrain_type);
+				seeds.push_back(adjacent_pos_horizontal);
+			}
+			
+			if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) == nullptr) {
+				this->Field(adjacent_pos_vertical, z)->SetTerrain(terrain_type);
+				this->Field(adjacent_pos_vertical, z)->SetTerrain(overlay_terrain_type);
+				seeds.push_back(adjacent_pos_vertical);
+			}
+		}
+	}
+	
+	//set the terrain of the remaining tiles without any to their most-neighbored terrain/overlay terrain pair
+	for (int x = min_pos.x; x <= max_pos.x; ++x) {
+		for (int y = min_pos.y; y <= max_pos.y; ++y) {
+			const Vec2i tile_pos(x, y);
+			
+			if (this->IsPointInASubtemplateArea(tile_pos, z)) {
+				continue;
+			}
+			
+			CMapField *tile = this->Field(x, y, z);
+
+			if (tile->GetTopTerrain() != nullptr) {
+				continue;
+			}
+			
+			std::map<std::pair<CTerrainType *, CTerrainType*>, int> terrain_type_pair_neighbor_count;
+			
+			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+					if (x_offset == 0 && y_offset == 0) {
+						continue;
+					}
+					
+					Vec2i adjacent_pos(tile_pos.x + x_offset, tile_pos.y + y_offset);
+					
+					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+						continue;
+					}
+					
+					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
+					CTerrainType *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
+					CTerrainType *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
+					
+					if (adjacent_terrain_type == nullptr) {
+						continue;
+					}
+					
+					std::pair<CTerrainType *, CTerrainType*> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
+					
+					auto find_iterator = terrain_type_pair_neighbor_count.find(terrain_type_pair);
+					if (find_iterator == terrain_type_pair_neighbor_count.end()) {
+						terrain_type_pair_neighbor_count[terrain_type_pair] = 1;
+					} else {
+						find_iterator->second++;
+					}
+				}
+			}
+			
+			std::pair<CTerrainType *, CTerrainType*> best_terrain_type_pair(nullptr, nullptr);
+			int best_terrain_type_neighbor_count = 0;
+			for (const auto &element : terrain_type_pair_neighbor_count) {
+				if (element.second > best_terrain_type_neighbor_count) {
+					best_terrain_type_pair = element.first;
+					best_terrain_type_neighbor_count = element.second;
+				}
+			}
+			
+			//set the terrain and overlay terrain to the same as the most-neighbored one
+			tile->SetTerrain(best_terrain_type_pair.first);
+			tile->SetTerrain(best_terrain_type_pair.second);
 		}
 	}
 }

@@ -647,6 +647,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	this->ApplySubtemplates(template_start_pos, map_start_pos, z, false);
 	this->ApplySubtemplates(template_start_pos, map_start_pos, z, true);
 	
+	CMap::Map.GenerateMissingTerrain(map_start_pos, map_end - Vec2i(1, 1), z);
+	
 	if (!has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->GetName().utf8().get_data());
 		
