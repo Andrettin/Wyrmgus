@@ -130,6 +130,14 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 		this->MaxPos.x = std::stoi(value);
 	} else if (key == "max_y") {
 		this->MaxPos.y = std::stoi(value);
+	} else if (key == "min_x_percent") {
+		this->MinPosPercent.x = std::stoi(value);
+	} else if (key == "min_y_percent") {
+		this->MinPosPercent.y = std::stoi(value);
+	} else if (key == "max_x_percent") {
+		this->MaxPosPercent.x = std::stoi(value);
+	} else if (key == "max_y_percent") {
+		this->MaxPosPercent.y = std::stoi(value);
 	} else if (key == "main_template") {
 		CMapTemplate *main_template = CMapTemplate::Get(value);
 		this->MainTemplate = main_template;
@@ -830,18 +838,30 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				if (subtemplate->MinPos.x != -1) {
 					min_pos.x += subtemplate->MinPos.x;
 					min_pos.x -= template_start_pos.x;
+				} else if (subtemplate->MinPosPercent.x != -1) {
+					min_pos.x += subtemplate->MinPosPercent.x * this->Width / 100;
+					min_pos.x -= template_start_pos.x;
 				}
 				if (subtemplate->MinPos.y != -1) {
 					min_pos.y += subtemplate->MinPos.y;
+					min_pos.y -= template_start_pos.y;
+				} else if (subtemplate->MinPosPercent.y != -1) {
+					min_pos.y += subtemplate->MinPosPercent.y * this->Height / 100;
 					min_pos.y -= template_start_pos.y;
 				}
 				
 				if (subtemplate->MaxPos.x != -1) {
 					max_pos.x += subtemplate->MaxPos.x;
 					max_pos.x -= this->Width;
+				} else if (subtemplate->MaxPosPercent.x != -1) {
+					max_pos.x += subtemplate->MaxPosPercent.x * this->Width / 100;
+					max_pos.x -= this->Width;
 				}
 				if (subtemplate->MaxPos.y != -1) {
 					max_pos.y += subtemplate->MaxPos.y;
+					max_pos.y -= this->Height;
+				} else if (subtemplate->MaxPosPercent.y != -1) {
+					max_pos.y += subtemplate->MaxPosPercent.y * this->Height / 100;
 					max_pos.y -= this->Height;
 				}
 				

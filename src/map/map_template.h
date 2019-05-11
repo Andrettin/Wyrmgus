@@ -145,6 +145,8 @@ public:
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 	Vec2i MinPos = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)
+	Vec2i MinPosPercent = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage
+	Vec2i MaxPosPercent = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage
 	Vec2i CurrentStartPos = Vec2i(0, 0);
 	PixelSize PixelTileSize = Vec2i(32, 32);
 	CMapTemplate *MainTemplate = nullptr;					/// main template in which this one is located, if this is a subtemplate
