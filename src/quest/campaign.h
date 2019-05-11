@@ -105,6 +105,8 @@ public:
 		return this->Sandbox;
 	}
 	
+	Vec2i GetMapSize(const int z) const;
+	
 private:
 	String Description;		/// description of the campaign
 	CDate StartDate;		/// the starting date of the campaign
@@ -115,7 +117,9 @@ private:
 	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
 public:
 	std::vector<CMapTemplate *> MapTemplates;	/// Map templates used by the campaign
+private:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
+public:
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 	
 	friend int CclDefineCampaign(lua_State *l);

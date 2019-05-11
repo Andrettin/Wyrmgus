@@ -136,12 +136,6 @@ bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
 			
 			if (key == "map_template") {
 				map_template = CMapTemplate::Get(value);
-				if (map_size.x == 0) {
-					map_size.x = map_template->GetWidth();
-				}
-				if (map_size.y == 0) {
-					map_size.y = map_template->GetHeight();
-				}
 			} else if (key == "start_x") {
 				start_pos.x = std::stoi(value);
 			} else if (key == "start_y") {
@@ -215,6 +209,15 @@ bool CCampaign::IsAvailable() const
 	}
 	
 	return true;
+}
+
+Vec2i CCampaign::GetMapSize(const int z) const
+{
+	if (this->MapSizes[z].x != 0 && this->MapSizes[z].y != 0) {
+		return this->MapSizes[z];
+	}
+	
+	return Vec2i(this->MapTemplates[z]->GetWidth(), this->MapTemplates[z]->GetHeight());
 }
 
 void CCampaign::_bind_methods()

@@ -3003,7 +3003,7 @@ bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const 
 		return true;
 	}
 	
-	if (tile->Terrain == terrain_type && tile->OverlayTerrain == overlay_terrain_type) {
+	if (tile->Terrain == terrain_type && (tile->OverlayTerrain == overlay_terrain_type || overlay_terrain_type == nullptr)) {
 		return true;
 	}
 	
@@ -3071,6 +3071,16 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 		CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
 		CTerrainType *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
 		
+		if (overlay_terrain_type != nullptr) {
+			if (
+				(overlay_terrain_type->Flags & MapFieldWall)
+				|| (overlay_terrain_type->Flags & MapFieldRoad)
+				|| (overlay_terrain_type->Flags & MapFieldRailroad)
+			) {
+				overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a wall or pathway
+			}
+		}
+		
 		std::vector<Vec2i> adjacent_positions;
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
@@ -3114,6 +3124,16 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && horizontal_tile_top_terrain == nullptr)
 				) {
 					continue;
+				}
+				
+				//tiles with no terrain could nevertheless have units that were placed there already, e.g. due to units in a subtemplate being placed in a location where something is already present (e.g. units with a settlement set as their location, or resource units generated near the player's starting location); as such, we need to check if the terrain is compatible with those units
+				if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain_type, z)) {
+					continue;
+				}
+				if (overlay_terrain_type != nullptr) {
+					if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, overlay_terrain_type, z)) {
+						continue;
+					}
 				}
 				
 				adjacent_positions.push_back(diagonal_pos);
