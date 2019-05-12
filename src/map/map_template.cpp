@@ -497,7 +497,7 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	CGraphic::Free(terrain_image);
 }
 
-void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const
+void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z)
 {
 	if (SaveGameLoading) {
 		return;
@@ -507,6 +507,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), template_start_pos.x, template_start_pos.y);
 		return;
 	}
+	
+	this->CurrentStartPos = template_start_pos;
 	
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	

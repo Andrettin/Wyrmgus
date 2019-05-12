@@ -40,10 +40,15 @@
 #include "config_operator.h"
 #include "faction.h"
 #include "item/item.h"
+#include "map/map.h"
+#include "map/map_layer.h"
 #include "map/map_template.h"
+#include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "world/plane.h"
 #include "world/province.h" //for regions
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -210,14 +215,11 @@ void CSite::Initialize()
 }
 
 /**
-**	@brief	Get a site's cultural name
+**	@brief	Get the site's cultural name
 **
 **	@param	civilization	The civilization for which to get the cultural name
 **
 **	@return	The cultural name if present, or the default name otherwise
-*/
-/**
-**  
 */
 std::string CSite::GetCulturalName(const CCivilization *civilization) const
 {
@@ -229,4 +231,68 @@ std::string CSite::GetCulturalName(const CCivilization *civilization) const
 	}
 	
 	return this->GetName().utf8().get_data();
+}
+
+/**
+**	@brief	Get the position of the site on the current map
+**
+**	@return	The site's position on the current map (an invalid position is returned if the site isn't on the map)
+*/
+Vec2i CSite::GetMapPos() const
+{
+	if (this->SiteUnit != nullptr) {
+		return this->SiteUnit->tilePos;
+	}
+	
+	if (this->MapTemplate != nullptr && this->Position.x != -1 && this->Position.y != -1) {
+		Vec2i template_start_pos(-1, -1);
+		Vec2i template_end_pos(-1, -1);
+		
+		if (this->MapTemplate->IsSubtemplateArea()) {
+			template_start_pos = CMap::Map.GetSubtemplatePos(this->MapTemplate);
+			template_end_pos = CMap::Map.GetSubtemplateEndPos(this->MapTemplate);
+		} else {
+			const int z = ::GetMapLayer(this->MapTemplate->Plane->Ident, this->MapTemplate->World->Ident, this->MapTemplate->SurfaceLayer);
+			if (z != -1) {
+				template_start_pos = Vec2i(0, 0);
+				template_end_pos.x = CMap::Map.MapLayers[z]->GetWidth() - 1;
+				template_end_pos.y = CMap::Map.MapLayers[z]->GetHeight() - 1;
+			}
+		}
+		
+		if (template_start_pos.x != -1 && template_start_pos.y != -1) {
+			Vec2i site_map_pos = template_start_pos - this->MapTemplate->CurrentStartPos + this->Position;
+			
+			if (site_map_pos.x >= template_start_pos.x && site_map_pos.y >= template_start_pos.y && site_map_pos.x <= template_end_pos.x && site_map_pos.y <= template_end_pos.y) {
+				return site_map_pos;
+			}
+		}
+	}
+	
+	return Vec2i(-1, -1);
+}
+
+/**
+**	@brief	Get the site's map layer on the current map
+**
+**	@return	The site's map layer on the current map (null is returned if the site isn't on the map)
+*/
+CMapLayer *CSite::GetMapLayer() const
+{
+	if (this->SiteUnit != nullptr) {
+		return this->SiteUnit->MapLayer;
+	}
+	
+	if (this->MapTemplate != nullptr) {
+		if (this->MapTemplate->IsSubtemplateArea()) {
+			return CMap::Map.GetSubtemplateMapLayer(this->MapTemplate);
+		} else {
+			const int z = ::GetMapLayer(this->MapTemplate->Plane->Ident, this->MapTemplate->World->Ident, this->MapTemplate->SurfaceLayer);
+			if (z != -1) {
+				return CMap::Map.MapLayers[z];
+			}
+		}
+	}
+	
+	return nullptr;
 }

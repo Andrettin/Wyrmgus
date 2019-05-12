@@ -1048,7 +1048,6 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 	}
 	
 	for (size_t i = 0; i < campaign->MapTemplates.size(); ++i) {
-		campaign->MapTemplates[i]->CurrentStartPos = campaign->MapTemplateStartPos[i];
 		campaign->MapTemplates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
 	}
 }
@@ -2204,36 +2203,29 @@ static int CclGetSiteData(lua_State *l)
 		lua_pushnumber(l, site->Position.y);
 		return 1;
 	} else if (!strcmp(data, "MapPosX")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, site->SiteUnit->tilePos.x);
-		} else {
-			lua_pushnumber(l, -1);
-		}
+		lua_pushnumber(l, site->GetMapPos().x);
 		return 1;
 	} else if (!strcmp(data, "MapPosY")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, site->SiteUnit->tilePos.y);
-		} else {
-			lua_pushnumber(l, -1);
-		}
+		lua_pushnumber(l, site->GetMapPos().y);
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosX")) {
-		if (site->SiteUnit) {
+		if (site->SiteUnit != nullptr) {
 			lua_pushnumber(l, site->SiteUnit->GetTileCenterPos().x);
 		} else {
-			lua_pushnumber(l, -1);
+			lua_pushnumber(l, site->GetMapPos().x);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosY")) {
-		if (site->SiteUnit) {
+		if (site->SiteUnit != nullptr) {
 			lua_pushnumber(l, site->SiteUnit->GetTileCenterPos().y);
 		} else {
-			lua_pushnumber(l, -1);
+			lua_pushnumber(l, site->GetMapPos().y);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
-		if (site->SiteUnit && site->SiteUnit->MapLayer) {
-			lua_pushnumber(l, site->SiteUnit->MapLayer->ID);
+		const CMapLayer *map_layer = site->GetMapLayer();
+		if (map_layer != nullptr) {
+			lua_pushnumber(l, map_layer->ID);
 		} else {
 			lua_pushnumber(l, -1);
 		}

@@ -45,6 +45,7 @@
 
 class CCivilization;
 class CFaction;
+class CMapLayer;
 class CMapTemplate;
 class CRegion;
 class CUnit;
@@ -82,6 +83,9 @@ public:
 	virtual void Initialize() override;
 
 	std::string GetCulturalName(const CCivilization *civilization) const;
+	
+	Vec2i GetMapPos() const;
+	CMapLayer *GetMapLayer() const;
 
 	ExposedProperty<bool> Major = false;				/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	Vec2i Position = Vec2i(-1, -1);						/// Position of the site in its map template
