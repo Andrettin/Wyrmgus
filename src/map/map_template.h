@@ -102,9 +102,43 @@ public:
 		return this->Width;
 	}
 	
+	int GetAppliedWidth() const
+	{
+		int width = this->Width;
+		
+		if (this->EndPos.x != -1) {
+			width = std::min<int>(width, this->EndPos.x);
+		}
+		
+		if (this->StartPos.x != -1) {
+			width -= this->StartPos.x;
+		}
+		
+		width *= this->Scale;
+		
+		return width;
+	}
+	
 	int GetHeight() const
 	{
 		return this->Height;
+	}
+	
+	int GetAppliedHeight() const
+	{
+		int height = this->Height;
+		
+		if (this->EndPos.y != -1) {
+			height = std::min<int>(height, this->EndPos.y);
+		}
+		
+		if (this->StartPos.y != -1) {
+			height -= this->StartPos.y;
+		}
+		
+		height *= this->Scale;
+		
+		return height;
 	}
 	
 	int GetScale() const
@@ -180,10 +214,10 @@ public:
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void Apply(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z);
-	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
-	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
-	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false) const;
-	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
+	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
+	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
+	void ApplyConnectors(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
+	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
 	const CMapTemplate *GetTopMapTemplate() const;
 	Vec2i GetBestLocationMapPosition(const std::vector<const CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
@@ -204,6 +238,8 @@ private:
 	bool GrowForSubtemplates = false;
 public:
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
+	Vec2i StartPos = Vec2i(-1, -1);	/// the start position within the map template to be applied when it is used
+	Vec2i EndPos = Vec2i(-1, -1);	/// the end position within the map template to be applied when it is used
 	Vec2i MinPos = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MinPosPercent = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage

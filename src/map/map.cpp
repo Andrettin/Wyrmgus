@@ -3246,7 +3246,7 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 			unit_pos = this->GenerateUnitLocation(unit_type, nullptr, min_pos, max_pos, z);
 		}
 		if (!this->Info.IsPointOnMap(unit_pos, z)) {
-			continue;
+			return; //no point in trying to generate more units of this type; if we didn't get a valid unit location with these settings now, we won't be getting any further on either
 		}
 		if (unit_type->GivesResource) {
 			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
