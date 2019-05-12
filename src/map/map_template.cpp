@@ -387,16 +387,26 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 	while (std::getline(is_map, line_str))
 	{
 		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
-			y += 1;
+			y++;
 			continue;
 		}
+		
+		if (this->EndPos.y != -1 && y >= this->EndPos.y) {
+			break;
+		}
+		
 		int x = 0;
 		
 		for (unsigned int i = 0; i < line_str.length(); ++i) {
 			if (x < template_start_pos.x || x >= (template_start_pos.x + CMap::Map.Info.MapWidths[z])) {
-				x += 1;
+				x++;
 				continue;
 			}
+			
+			if (this->EndPos.x != -1 && x >= this->EndPos.x) {
+				break;
+			}
+
 			std::string terrain_character = line_str.substr(i, 1);
 			CTerrainType *terrain = nullptr;
 			if (CTerrainType::TerrainTypesByCharacter.find(terrain_character) != CTerrainType::TerrainTypesByCharacter.end()) {
@@ -406,10 +416,10 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
 				CMap::Map.Field(real_pos, z)->SetTerrain(terrain);
 			}
-			x += 1;
+			x++;
 		}
 		
-		y += 1;
+		y++;
 	}
 
 //	std::string filename = this->Ident;
