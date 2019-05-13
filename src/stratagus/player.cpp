@@ -76,6 +76,7 @@
 #include "parameters.h"
 #include "player_color.h"
 #include "quest/campaign.h"
+#include "quest/dialogue.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -2522,6 +2523,11 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	if (this == CPlayer::GetThisPlayer()) {
 		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
 		SaveQuestCompletion();
+		
+		if (CCampaign::GetCurrentCampaign() != nullptr && quest == CCampaign::GetCurrentCampaign()->GetCompletionQuest()) {
+			CDialogue::GetCampaignVictoryDialogue()->Call(CPlayer::GetThisPlayer());
+		}
+		
 		std::string rewards_string;
 		if (!quest->GetRewardsString().empty()) {
 			rewards_string = "Rewards: " + std::string(quest->GetRewardsString().utf8().get_data());
@@ -2554,6 +2560,10 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
+		if (CCampaign::GetCurrentCampaign() != nullptr && quest == CCampaign::GetCurrentCampaign()->GetCompletionQuest()) {
+			CDialogue::GetCampaignDefeatDialogue()->Call(CPlayer::GetThisPlayer());
+		}
+		
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + std::string(quest->GetName().utf8().get_data()) + " quest! " + fail_reason + "\", nil, \"" + quest->GetIcon()->Ident + "\", \"" + quest->GetPlayerColor()->Ident + "\") end;");
 	}
 }

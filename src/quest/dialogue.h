@@ -60,6 +60,15 @@ public:
 	
 	static constexpr const char *ClassIdentifier = "dialogue";
 	
+	static void Clear();
+	static const CDialogue *GetCampaignVictoryDialogue();
+	static const CDialogue *GetCampaignDefeatDialogue();
+	
+private:
+	static const CDialogue *CampaignVictoryDialogue;
+	static const CDialogue *CampaignDefeatDialogue;
+	
+public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	

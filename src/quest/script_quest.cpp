@@ -760,7 +760,15 @@ static int CclDefineDialogue(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Nodes")) {
+		if (!strcmp(value, "CampaignVictoryDialogue")) {
+			if (LuaToBoolean(l, -1)) {
+				CDialogue::CampaignVictoryDialogue = dialogue;
+			}
+		} else if (!strcmp(value, "CampaignDefeatDialogue")) {
+			if (LuaToBoolean(l, -1)) {
+				CDialogue::CampaignDefeatDialogue = dialogue;
+			}
+		} else if (!strcmp(value, "Nodes")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);

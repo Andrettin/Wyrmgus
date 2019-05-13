@@ -41,6 +41,13 @@
 #include "wyrmgus.h"
 
 /*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+
+const CDialogue *CDialogue::CampaignVictoryDialogue = nullptr;
+const CDialogue *CDialogue::CampaignDefeatDialogue = nullptr;
+
+/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -49,6 +56,37 @@ CDialogue::~CDialogue()
 	for (const CDialogueNode *node : this->Nodes) {
 		delete node;
 	}
+}
+
+/**
+**	@brief	Remove the existing dialogues
+*/
+void CDialogue::Clear()
+{
+	CDialogue::CampaignVictoryDialogue = nullptr;
+	CDialogue::CampaignDefeatDialogue = nullptr;
+	
+	DataType<CDialogue>::Clear();
+}
+
+/**
+**	@brief	Get the campaign victory dialogue
+**
+**	@return	The campaign victory dialogue
+*/
+const CDialogue *CDialogue::GetCampaignVictoryDialogue()
+{
+	return CDialogue::CampaignVictoryDialogue;
+}
+
+/**
+**	@brief	Get the campaign defeat dialogue
+**
+**	@return	The campaign defeat dialogue
+*/
+const CDialogue *CDialogue::GetCampaignDefeatDialogue()
+{
+	return CDialogue::CampaignDefeatDialogue;
 }
 
 /**
@@ -105,6 +143,22 @@ void CDialogue::Call(CPlayer *player) const
 
 void CDialogue::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_campaign_victory_dialogue", "campaign_victory_dialogue"), [](CDialogue *dialogue, const bool campaign_victory_dialogue){
+		CDialogue::CampaignVictoryDialogue = dialogue;
+	});
+	ClassDB::bind_method(D_METHOD("is_campaign_victory_dialogue"), [](const CDialogue *dialogue){
+		return CDialogue::GetCampaignVictoryDialogue() == dialogue;
+	});
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "campaign_victory_dialogue"), "set_campaign_victory_dialogue", "is_campaign_victory_dialogue");
+	
+	ClassDB::bind_method(D_METHOD("set_campaign_defeat_dialogue", "campaign_defeat_dialogue"), [](CDialogue *dialogue, const bool campaign_defeat_dialogue){
+		CDialogue::CampaignDefeatDialogue = dialogue;
+	});
+	ClassDB::bind_method(D_METHOD("is_campaign_defeat_dialogue"), [](const CDialogue *dialogue){
+		return CDialogue::GetCampaignDefeatDialogue() == dialogue;
+	});
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "campaign_defeat_dialogue"), "set_campaign_defeat_dialogue", "is_campaign_defeat_dialogue");
+	
 	ClassDB::bind_method(D_METHOD("call_first_node"), [](const CDialogue *dialogue){
 		if (!dialogue->Nodes.empty()) {
 			dialogue->Nodes.front()->Call(CPlayer::GetThisPlayer());

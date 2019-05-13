@@ -105,6 +105,11 @@ public:
 		return this->Sandbox;
 	}
 	
+	const CQuest *GetCompletionQuest() const
+	{
+		return this->CompletionQuest;
+	}
+	
 	Vec2i GetMapSize(const int z) const;
 	
 private:
@@ -113,14 +118,15 @@ private:
 	bool Hidden = false;	/// whether the campaign is hidden
 	bool Sandbox = false;	/// whether the campaign is a sandbox one
 private:
-	std::vector<CQuest *> RequiredQuests;	/// Quests required by the campaign
-	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
+	std::vector<CQuest *> RequiredQuests;	/// quests required for the campaign to be available
+	const CQuest *CompletionQuest = nullptr;	/// the quest on which the campaign depends for completion, or failure
+	CFaction *Faction = nullptr;	/// which faction the player plays as in the campaign
 public:
-	std::vector<CMapTemplate *> MapTemplates;	/// Map templates used by the campaign
+	std::vector<CMapTemplate *> MapTemplates;	/// map templates used by the campaign
 private:
-	std::vector<Vec2i> MapSizes;				/// Map sizes
+	std::vector<Vec2i> MapSizes;				/// map sizes
 public:
-	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
+	std::vector<Vec2i> MapTemplateStartPos;		/// map template position the map will start on
 	
 	friend int CclDefineCampaign(lua_State *l);
 	friend int CclGetCampaignData(lua_State *l);

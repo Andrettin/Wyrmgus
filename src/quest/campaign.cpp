@@ -234,6 +234,10 @@ void CCampaign::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_sandbox"), &CCampaign::IsSandbox);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "sandbox"), "set_sandbox", "is_sandbox");
 	
+	ClassDB::bind_method(D_METHOD("set_completion_quest", "completion_quest_ident"), [](CCampaign *campaign, const String &completion_quest_ident){ campaign->CompletionQuest = CQuest::Get(completion_quest_ident); });
+	ClassDB::bind_method(D_METHOD("get_completion_quest"), [](const CCampaign *campaign){ return const_cast<CQuest *>(campaign->GetCompletionQuest()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "completion_quest"), "set_completion_quest", "get_completion_quest");
+	
 	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);
 }
 
