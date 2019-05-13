@@ -160,7 +160,7 @@ public:
 				continue;
 			}
 			
-			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesNorthOffset();
+			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesNorthOffset());
 		}
 		
 		return offset;
@@ -175,7 +175,7 @@ public:
 				continue;
 			}
 			
-			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesSouthOffset();
+			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesSouthOffset());
 		}
 		
 		return offset;
@@ -190,7 +190,7 @@ public:
 				continue;
 			}
 			
-			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesWestOffset();
+			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesWestOffset());
 		}
 		
 		return offset;
@@ -205,7 +205,7 @@ public:
 				continue;
 			}
 			
-			offset += CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesEastOffset();
+			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesEastOffset());
 		}
 		
 		return offset;

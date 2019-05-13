@@ -328,7 +328,7 @@ void CMapTemplate::Initialize()
 	}
 	
 	if (CMapTemplate::AreAllInitialized()) {
-		//grow the size of map templates for subtemplates, if they are set to do that
+		//grow the size of map templates for their subtemplates, if those map templates are set to do that
 		for (CMapTemplate *map_template : CMapTemplate::GetAll()) {
 			if (map_template->GrowForSubtemplates) {
 				int total_area = map_template->GetAppliedWidth() * map_template->GetAppliedHeight();
@@ -337,8 +337,8 @@ void CMapTemplate::Initialize()
 					total_subtemplate_area += subtemplate->GetAppliedWidth() * subtemplate->GetAppliedHeight();
 				}
 				
-				//if subtemplates occupy more than 75% of the map template's area, double the area to accomodate the subtemplates
-				while ((total_subtemplate_area * 100 / total_area) > 75) {
+				//if subtemplates occupy more than the map template's area, double the area to accomodate the subtemplates
+				while (total_subtemplate_area > total_area) {
 					map_template->Width = std::min(map_template->Width * 2, MaxMapWidth);
 					map_template->Height = std::min(map_template->Height * 2, MaxMapHeight);
 					
