@@ -115,6 +115,11 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
+	CCivilization *GetCivilization() const
+	{
+		return this->Civilization;
+	}
+	
 	/**
 	**	@brief	Get the faction's primary color with highest priority
 	**
@@ -170,7 +175,9 @@ public:
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
-	CCivilization *Civilization = nullptr;								/// faction civilization
+private:
+	CCivilization *Civilization = nullptr;								/// the faction's civilization
+public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
@@ -214,7 +221,6 @@ public:
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 
-	friend DataType;
 	friend int CclDefineFaction(lua_State *l);
 	
 protected:

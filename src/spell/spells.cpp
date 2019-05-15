@@ -253,7 +253,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->Civilization || CFaction::GetFactionClassUnitType(condition->FactionEquivalent, caster.Type->GetClass()) == nullptr || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->GetCivilization() || CFaction::GetFactionClassUnitType(condition->FactionEquivalent, caster.Type->GetClass()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

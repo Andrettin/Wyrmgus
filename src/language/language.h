@@ -100,7 +100,6 @@ public:
 	
 public:
 	Property<CLanguageFamily *> Family = nullptr;	/// the family to which the language belongs
-	bool UsedByCivilizationOrFaction = false;
 	Property<CLanguage *> DialectOf {	/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 		Property<CLanguage *>::ValueType(nullptr),
 		Property<CLanguage *>::SetterType([this](CLanguage *language) {

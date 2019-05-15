@@ -3447,11 +3447,11 @@ std::vector<String> CUnit::GetPotentialNames() const
 		if (this->Player->GetFaction() != nullptr) {
 			faction = this->Player->GetFaction();
 			
-			if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
-				civilization = faction->Civilization;
+			if (civilization != nullptr && civilization != faction->GetCivilization() && civilization->GetSpecies() == faction->GetCivilization()->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+				civilization = faction->GetCivilization();
 			}
 		}
-		if (faction && faction->Civilization != civilization) {
+		if (faction && faction->GetCivilization() != civilization) {
 			faction = nullptr;
 		}
 		if (this->Type->GetFaction() != nullptr && !faction) {
@@ -3579,8 +3579,8 @@ void CUnit::UpdatePersonalName(const bool update_settlement_name)
 	if (this->Player->GetFaction() != nullptr) {
 		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
-			civilization = faction->Civilization;
+		if (civilization != nullptr && civilization != faction->GetCivilization() && civilization->GetSpecies() == faction->GetCivilization()->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+			civilization = faction->GetCivilization();
 		}
 	}
 	
@@ -6803,8 +6803,8 @@ const CLanguage *CUnit::GetLanguage() const
 	if (this->Player->GetFaction() != nullptr) {
 		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
-			civilization = faction->Civilization;
+		if (civilization != nullptr && civilization != faction->GetCivilization() && civilization->GetSpecies() == faction->GetCivilization()->GetSpecies() && this->Type == CFaction::GetFactionClassUnitType(faction, this->Type->GetClass())) {
+			civilization = faction->GetCivilization();
 		}
 	}
 	

@@ -189,8 +189,8 @@ void CCampaign::Initialize()
 
 CSpecies *CCampaign::GetSpecies() const
 {
-	if (this->Faction && this->Faction->Civilization) {
-		return this->Faction->Civilization->GetSpecies();
+	if (this->Faction && this->Faction->GetCivilization() != nullptr) {
+		return this->Faction->GetCivilization()->GetSpecies();
 	}
 	
 	return nullptr;

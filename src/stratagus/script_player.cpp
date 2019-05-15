@@ -850,7 +850,6 @@ static int CclDefineCivilization(lua_State *l)
 			CLanguage *language = CLanguage::Get(LuaToString(l, -1));
 			if (language) {
 				civilization->Language = language;
-				language->UsedByCivilizationOrFaction = true;
 			} else {
 				LuaError(l, "Language not found.");
 			}
@@ -1114,158 +1113,7 @@ static int CclDefineCivilization(lua_State *l)
 		}
 	}
 	
-	if (civilization->ParentCivilization) {
-		const CCivilization *parent_civilization = civilization->ParentCivilization;
-		int parent_civilization_id = parent_civilization->GetIndex();
-		
-		if (civilization->Interface.empty()) {
-			civilization->Interface = parent_civilization->Interface;
-		}
-
-		if (civilization->Upgrade.empty() && !parent_civilization->Upgrade.empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
-			civilization->Upgrade = parent_civilization->Upgrade;
-		}
-		
-		//inherit button icons from the parent civilization, for button actions which none are specified
-		for (std::map<int, IconConfig>::const_iterator iterator = parent_civilization->ButtonIcons.begin(); iterator != parent_civilization->ButtonIcons.end(); ++iterator) {
-			if (civilization->ButtonIcons.find(iterator->first) == civilization->ButtonIcons.end()) {
-				civilization->ButtonIcons[iterator->first] = iterator->second;
-			}
-		}
-		
-		//inherit historical upgrades from the parent civilization, if no historical data is given for that upgrade for this civilization
-		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = parent_civilization->HistoricalUpgrades.begin(); iterator != parent_civilization->HistoricalUpgrades.end(); ++iterator) {
-			if (civilization->HistoricalUpgrades.find(iterator->first) == civilization->HistoricalUpgrades.end()) {
-				civilization->HistoricalUpgrades[iterator->first] = iterator->second;
-			}
-		}
-		
-		//unit sounds
-		if (civilization->UnitSounds.Selected.Name.empty()) {
-			civilization->UnitSounds.Selected = parent_civilization->UnitSounds.Selected;
-		}
-		if (civilization->UnitSounds.Acknowledgement.Name.empty()) {
-			civilization->UnitSounds.Acknowledgement = parent_civilization->UnitSounds.Acknowledgement;
-		}
-		if (civilization->UnitSounds.Attack.Name.empty()) {
-			civilization->UnitSounds.Attack = parent_civilization->UnitSounds.Attack;
-		}
-		if (civilization->UnitSounds.Idle.Name.empty()) {
-			civilization->UnitSounds.Idle = parent_civilization->UnitSounds.Idle;
-		}
-		if (civilization->UnitSounds.Hit.Name.empty()) {
-			civilization->UnitSounds.Hit = parent_civilization->UnitSounds.Hit;
-		}
-		if (civilization->UnitSounds.Miss.Name.empty()) {
-			civilization->UnitSounds.Miss = parent_civilization->UnitSounds.Miss;
-		}
-		if (civilization->UnitSounds.FireMissile.Name.empty()) {
-			civilization->UnitSounds.FireMissile = parent_civilization->UnitSounds.FireMissile;
-		}
-		if (civilization->UnitSounds.Step.Name.empty()) {
-			civilization->UnitSounds.Step = parent_civilization->UnitSounds.Step;
-		}
-		if (civilization->UnitSounds.StepDirt.Name.empty()) {
-			civilization->UnitSounds.StepDirt = parent_civilization->UnitSounds.StepDirt;
-		}
-		if (civilization->UnitSounds.StepGrass.Name.empty()) {
-			civilization->UnitSounds.StepGrass = parent_civilization->UnitSounds.StepGrass;
-		}
-		if (civilization->UnitSounds.StepGravel.Name.empty()) {
-			civilization->UnitSounds.StepGravel = parent_civilization->UnitSounds.StepGravel;
-		}
-		if (civilization->UnitSounds.StepMud.Name.empty()) {
-			civilization->UnitSounds.StepMud = parent_civilization->UnitSounds.StepMud;
-		}
-		if (civilization->UnitSounds.StepStone.Name.empty()) {
-			civilization->UnitSounds.StepStone = parent_civilization->UnitSounds.StepStone;
-		}
-		if (civilization->UnitSounds.Used.Name.empty()) {
-			civilization->UnitSounds.Used = parent_civilization->UnitSounds.Used;
-		}
-		if (civilization->UnitSounds.Build.Name.empty()) {
-			civilization->UnitSounds.Build = parent_civilization->UnitSounds.Build;
-		}
-		if (civilization->UnitSounds.Ready.Name.empty()) {
-			civilization->UnitSounds.Ready = parent_civilization->UnitSounds.Ready;
-		}
-		if (civilization->UnitSounds.Repair.Name.empty()) {
-			civilization->UnitSounds.Repair = parent_civilization->UnitSounds.Repair;
-		}
-		for (unsigned int j = 0; j < MaxCosts; ++j) {
-			if (civilization->UnitSounds.Harvest[j].Name.empty()) {
-				civilization->UnitSounds.Harvest[j] = parent_civilization->UnitSounds.Harvest[j];
-			}
-		}
-		if (civilization->UnitSounds.Help.Name.empty()) {
-			civilization->UnitSounds.Help = parent_civilization->UnitSounds.Help;
-		}
-		if (civilization->UnitSounds.HelpTown.Name.empty()) {
-			civilization->UnitSounds.HelpTown = parent_civilization->UnitSounds.HelpTown;
-		}
-	}
-	
-	if (civilization->ButtonIcons.find(ButtonMove) != civilization->ButtonIcons.end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 1,\n";
-		button_definition += "\tAction = \"move\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"m\",\n";
-		button_definition += "\tHint = _(\"~!Move\"),\n";
-		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (civilization->ButtonIcons.find(ButtonStop) != civilization->ButtonIcons.end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 2,\n";
-		button_definition += "\tAction = \"stop\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"s\",\n";
-		button_definition += "\tHint = _(\"~!Stop\"),\n";
-		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (civilization->ButtonIcons.find(ButtonAttack) != civilization->ButtonIcons.end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 3,\n";
-		button_definition += "\tAction = \"attack\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"a\",\n";
-		button_definition += "\tHint = _(\"~!Attack\"),\n";
-		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (civilization->ButtonIcons.find(ButtonPatrol) != civilization->ButtonIcons.end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 4,\n";
-		button_definition += "\tAction = \"patrol\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"p\",\n";
-		button_definition += "\tHint = _(\"~!Patrol\"),\n";
-		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (civilization->ButtonIcons.find(ButtonStandGround) != civilization->ButtonIcons.end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 5,\n";
-		button_definition += "\tAction = \"stand-ground\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"t\",\n";
-		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
-		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	civilization->Initialized = true;
+	civilization->Initialize();
 	
 	return 0;
 }
@@ -1612,13 +1460,13 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, civilization->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, civilization->Description.c_str());
+		lua_pushstring(l, civilization->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, civilization->Quote.c_str());
+		lua_pushstring(l, civilization->GetQuote().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, civilization->Background.c_str());
+		lua_pushstring(l, civilization->GetBackground().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
 		if (!civilization->Adjective.empty()) {
@@ -1697,7 +1545,7 @@ static int CclGetCivilizationData(lua_State *l)
 		
 		std::vector<std::string> factions;
 		for (const CFaction *faction : CFaction::GetAll()) {
-			if (faction->Civilization != civilization) {
+			if (faction->GetCivilization() != civilization) {
 				continue;
 			}
 			
@@ -2568,7 +2416,7 @@ static int CclGetFactions(lua_State *l)
 		if (faction_type != -1 && faction->Type != faction_type) {
 			continue;
 		}
-		if (civilization == nullptr || faction->Civilization == civilization) {
+		if (civilization == nullptr || faction->GetCivilization() == civilization) {
 			factions.push_back(faction->GetIdent().utf8().get_data());
 		}
 	}
@@ -2647,8 +2495,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (faction->Civilization != nullptr) {
-			lua_pushstring(l, faction->Civilization->GetIdent().utf8().get_data());
+		if (faction->GetCivilization() != nullptr) {
+			lua_pushstring(l, faction->GetCivilization()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3384,16 +3232,9 @@ static int CclInitAi(lua_State *l)
 
 static int CclGetLanguages(lua_State *l)
 {
-	bool only_used = false;
-	if (lua_gettop(l) >= 1) {
-		only_used = LuaToBoolean(l, 1);
-	}
-	
 	std::vector<std::string> languages;
 	for (const CLanguage *language : CLanguage::GetAll()) {
-		if (!only_used || language->UsedByCivilizationOrFaction) {
-			languages.push_back(language->Ident);
-		}
+		languages.push_back(language->Ident);
 	}
 		
 	lua_createtable(l, languages.size(), 0);

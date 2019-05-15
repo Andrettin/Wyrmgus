@@ -876,7 +876,7 @@ CPlayer *GetFactionPlayer(const CFaction *faction)
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Race == faction->Civilization->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
+		if (CPlayer::Players[i]->Race == faction->GetCivilization()->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
 			return CPlayer::Players[i];
 		}
 	}
@@ -896,7 +896,7 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (CPlayer::Players[i]->Type == PlayerNobody) {
 			CPlayer::Players[i]->Type = PlayerComputer;
-			CPlayer::Players[i]->SetCivilization(faction->Civilization->GetIndex());
+			CPlayer::Players[i]->SetCivilization(faction->GetCivilization()->GetIndex());
 			CPlayer::Players[i]->SetFaction(faction);
 			CPlayer::Players[i]->AiEnabled = true;
 			CPlayer::Players[i]->AiName = faction->DefaultAI;
@@ -1188,8 +1188,8 @@ void CPlayer::SetFaction(const CFaction *faction)
 {
 	const CFaction *old_faction = this->Faction;
 	
-	if (faction && faction->Civilization->GetIndex() != this->Race) {
-		this->SetCivilization(faction->Civilization->GetIndex());
+	if (faction && faction->GetCivilization()->GetIndex() != this->Race) {
+		this->SetCivilization(faction->GetCivilization()->GetIndex());
 	}
 
 	if (this->Faction != nullptr) {
@@ -1301,7 +1301,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type == CFaction::GetFactionClassUnitType(faction, unit.Type->GetClass())) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->GetCivilization()->GetSpecies() && unit.Type == CFaction::GetFactionClassUnitType(faction, unit.Type->GetClass())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1320,7 +1320,7 @@ void CPlayer::SetRandomFaction()
 	std::vector<const CFaction *> local_factions;
 	
 	for (const CFaction *faction : CFaction::GetAll()) {
-		if (faction->Civilization->GetIndex() != this->Race) {
+		if (faction->GetCivilization()->GetIndex() != this->Race) {
 			continue;
 		}
 		if (!faction->Playable) {
@@ -1688,7 +1688,7 @@ bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->Civilization->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
+		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->GetCivilization()->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
 			// faction is already in use
 			return false;
 		}

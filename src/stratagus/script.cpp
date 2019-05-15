@@ -1768,7 +1768,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return (**faction).Civilization->GetName().utf8().get_data();
+				return (**faction).GetCivilization()->GetName().utf8().get_data();
 			} else {
 				return std::string();
 			}

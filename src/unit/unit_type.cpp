@@ -1174,7 +1174,7 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 **	@brief	Initialize the unit type
 */
 void CUnitType::Initialize()
-{	
+{
 	this->RemoveButtons(ButtonMove);
 	this->RemoveButtons(ButtonStop);
 	this->RemoveButtons(ButtonAttack);
@@ -1906,10 +1906,10 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 	
 	if (potential_names.empty() && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
-		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this == CFaction::GetFactionClassUnitType(faction, this->Class)) {
-			civilization = faction->Civilization;
+		if (faction && civilization != faction->GetCivilization() && civilization->GetSpecies() == faction->GetCivilization()->GetSpecies() && this == CFaction::GetFactionClassUnitType(faction, this->Class)) {
+			civilization = faction->GetCivilization();
 		}
-		if (faction && faction->Civilization != civilization) {
+		if (faction && faction->GetCivilization() != civilization) {
 			faction = nullptr;
 		}
 		if (this->Faction != nullptr && !faction) {

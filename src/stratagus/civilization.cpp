@@ -37,9 +37,12 @@
 
 #include "ai/ai_building_template.h"
 #include "ai/force_template.h"
+#include "language/language.h"
 #include "player.h"
 #include "player_color.h"
+#include "species/species.h"
 #include "time/calendar.h"
+#include "ui/button_action.h"
 #include "unit/unit_class.h"
 
 /*----------------------------------------------------------------------------
@@ -114,6 +117,206 @@ CCivilization::~CCivilization()
 }
 
 /**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CCivilization::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "historical_upgrade") {
+		CDate date;
+		const CUpgrade *upgrade = nullptr;
+		bool has_upgrade = true;
+			
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
+			if (key == "date") {
+				value = FindAndReplaceString(value, "_", "-");
+				date = CDate::FromString(value);
+			} else if (key == "upgrade") {
+				upgrade = CUpgrade::Get(value);
+			} else if (key == "has_upgrade") {
+				has_upgrade = StringToBool(value);
+			} else {
+				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.c_str());
+			}
+		}
+		
+		if (upgrade == nullptr) {
+			fprintf(stderr, "Historical upgrade has no upgrade.\n");
+			return true;
+		}
+		
+		this->HistoricalUpgrades[upgrade->Ident][date] = has_upgrade;
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Initialize the civilization
+*/
+void CCivilization::Initialize()
+{
+	if (this->ParentCivilization != nullptr) {
+		if (!this->ParentCivilization->IsInitialized()) {
+			fprintf(stderr, "Civilization \"%s\" is inheriting features from a non-initialized parent (\"%s\").\n", this->Ident.c_str(), this->ParentCivilization->Ident.c_str());
+		}
+		
+		//inherit button icons from the parent civilization, for button actions which none are specified
+		for (std::map<int, IconConfig>::const_iterator iterator = this->ParentCivilization->ButtonIcons.begin(); iterator != this->ParentCivilization->ButtonIcons.end(); ++iterator) {
+			if (this->ButtonIcons.find(iterator->first) == this->ButtonIcons.end()) {
+				this->ButtonIcons[iterator->first] = iterator->second;
+			}
+		}
+		
+		//inherit historical upgrades from the parent civilization, if no historical data is given for that upgrade for this civilization
+		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = this->ParentCivilization->HistoricalUpgrades.begin(); iterator != this->ParentCivilization->HistoricalUpgrades.end(); ++iterator) {
+			if (this->HistoricalUpgrades.find(iterator->first) == this->HistoricalUpgrades.end()) {
+				this->HistoricalUpgrades[iterator->first] = iterator->second;
+			}
+		}
+		
+		//unit sounds
+		if (this->UnitSounds.Selected.Name.empty()) {
+			this->UnitSounds.Selected = this->ParentCivilization->UnitSounds.Selected;
+		}
+		if (this->UnitSounds.Acknowledgement.Name.empty()) {
+			this->UnitSounds.Acknowledgement = this->ParentCivilization->UnitSounds.Acknowledgement;
+		}
+		if (this->UnitSounds.Attack.Name.empty()) {
+			this->UnitSounds.Attack = this->ParentCivilization->UnitSounds.Attack;
+		}
+		if (this->UnitSounds.Idle.Name.empty()) {
+			this->UnitSounds.Idle = this->ParentCivilization->UnitSounds.Idle;
+		}
+		if (this->UnitSounds.Hit.Name.empty()) {
+			this->UnitSounds.Hit = this->ParentCivilization->UnitSounds.Hit;
+		}
+		if (this->UnitSounds.Miss.Name.empty()) {
+			this->UnitSounds.Miss = this->ParentCivilization->UnitSounds.Miss;
+		}
+		if (this->UnitSounds.FireMissile.Name.empty()) {
+			this->UnitSounds.FireMissile = this->ParentCivilization->UnitSounds.FireMissile;
+		}
+		if (this->UnitSounds.Step.Name.empty()) {
+			this->UnitSounds.Step = this->ParentCivilization->UnitSounds.Step;
+		}
+		if (this->UnitSounds.StepDirt.Name.empty()) {
+			this->UnitSounds.StepDirt = this->ParentCivilization->UnitSounds.StepDirt;
+		}
+		if (this->UnitSounds.StepGrass.Name.empty()) {
+			this->UnitSounds.StepGrass = this->ParentCivilization->UnitSounds.StepGrass;
+		}
+		if (this->UnitSounds.StepGravel.Name.empty()) {
+			this->UnitSounds.StepGravel = this->ParentCivilization->UnitSounds.StepGravel;
+		}
+		if (this->UnitSounds.StepMud.Name.empty()) {
+			this->UnitSounds.StepMud = this->ParentCivilization->UnitSounds.StepMud;
+		}
+		if (this->UnitSounds.StepStone.Name.empty()) {
+			this->UnitSounds.StepStone = this->ParentCivilization->UnitSounds.StepStone;
+		}
+		if (this->UnitSounds.Used.Name.empty()) {
+			this->UnitSounds.Used = this->ParentCivilization->UnitSounds.Used;
+		}
+		if (this->UnitSounds.Build.Name.empty()) {
+			this->UnitSounds.Build = this->ParentCivilization->UnitSounds.Build;
+		}
+		if (this->UnitSounds.Ready.Name.empty()) {
+			this->UnitSounds.Ready = this->ParentCivilization->UnitSounds.Ready;
+		}
+		if (this->UnitSounds.Repair.Name.empty()) {
+			this->UnitSounds.Repair = this->ParentCivilization->UnitSounds.Repair;
+		}
+		for (unsigned int j = 0; j < MaxCosts; ++j) {
+			if (this->UnitSounds.Harvest[j].Name.empty()) {
+				this->UnitSounds.Harvest[j] = this->ParentCivilization->UnitSounds.Harvest[j];
+			}
+		}
+		if (this->UnitSounds.Help.Name.empty()) {
+			this->UnitSounds.Help = this->ParentCivilization->UnitSounds.Help;
+		}
+		if (this->UnitSounds.HelpTown.Name.empty()) {
+			this->UnitSounds.HelpTown = this->ParentCivilization->UnitSounds.HelpTown;
+		}
+	}
+	
+	if (this->ButtonIcons.find(ButtonMove) != this->ButtonIcons.end()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 1,\n";
+		button_definition += "\tAction = \"move\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"m\",\n";
+		button_definition += "\tHint = _(\"~!Move\"),\n";
+		button_definition += "\tForUnit = {\"" + std::string(this->GetIdent().utf8().get_data()) + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->ButtonIcons.find(ButtonStop) != this->ButtonIcons.end()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 2,\n";
+		button_definition += "\tAction = \"stop\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"s\",\n";
+		button_definition += "\tHint = _(\"~!Stop\"),\n";
+		button_definition += "\tForUnit = {\"" + std::string(this->GetIdent().utf8().get_data()) + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->ButtonIcons.find(ButtonAttack) != this->ButtonIcons.end()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 3,\n";
+		button_definition += "\tAction = \"attack\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"a\",\n";
+		button_definition += "\tHint = _(\"~!Attack\"),\n";
+		button_definition += "\tForUnit = {\"" + std::string(this->GetIdent().utf8().get_data()) + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->ButtonIcons.find(ButtonPatrol) != this->ButtonIcons.end()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 4,\n";
+		button_definition += "\tAction = \"patrol\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"p\",\n";
+		button_definition += "\tHint = _(\"~!Patrol\"),\n";
+		button_definition += "\tForUnit = {\"" + std::string(this->GetIdent().utf8().get_data()) + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->ButtonIcons.find(ButtonStandGround) != this->ButtonIcons.end()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 5,\n";
+		button_definition += "\tAction = \"stand-ground\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"t\",\n";
+		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
+		button_definition += "\tForUnit = {\"" + std::string(this->GetIdent().utf8().get_data()) + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	this->Initialized = true;
+}
+
+/**
 **	@brief	Get the civilization's upgrade
 **
 **	@return	The civilization's upgrade
@@ -122,9 +325,13 @@ const CUpgrade *CCivilization::GetUpgrade() const
 {
 	if (!this->Upgrade.empty()) {
 		return CUpgrade::Get(this->Upgrade);
-	} else {
-		return nullptr;
 	}
+	
+	if (this->ParentCivilization != nullptr) {
+		return this->ParentCivilization->GetUpgrade();
+	}
+	
+	return nullptr;
 }
 	
 int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
@@ -197,11 +404,66 @@ std::vector<CForceTemplate *> CCivilization::GetForceTemplates(const int force_t
 
 void CCivilization::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_ident"), &CCivilization::GetIdent);
-	ClassDB::bind_method(D_METHOD("get_name"), &CCivilization::GetName);
+	ClassDB::bind_method(D_METHOD("set_parent_civilization", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+		civilization->ParentCivilization = CCivilization::Get(civilization_ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_parent_civilization"), [](const CCivilization *civilization){ return civilization->ParentCivilization; });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "parent_civilization"), "set_parent_civilization", "get_parent_civilization");
+	
+	ClassDB::bind_method(D_METHOD("set_species", "species_ident"), [](CCivilization *civilization, const String &species_ident){
+		civilization->Species = CSpecies::Get(species_ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_species"), [](const CCivilization *civilization){ return civilization->GetSpecies(); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "species"), "set_species", "get_species");
+	
+	ClassDB::bind_method(D_METHOD("set_language", "language_ident"), [](CCivilization *civilization, const String &language_ident){
+		civilization->Language = CLanguage::Get(language_ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_language"), [](const CCivilization *civilization){ return civilization->GetLanguage(); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "language"), "set_language", "get_language");
+	
+	ClassDB::bind_method(D_METHOD("set_upgrade", "upgrade_ident"), [](CCivilization *civilization, const String &upgrade_ident){
+		civilization->Upgrade = upgrade_ident.utf8().get_data();
+	});
+	ClassDB::bind_method(D_METHOD("get_upgrade"), [](const CCivilization *civilization){ return const_cast<CUpgrade *>(civilization->GetUpgrade()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "upgrade"), "set_upgrade", "get_upgrade");
+	
 	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
-	ClassDB::bind_method(D_METHOD("is_hidden"), &CCivilization::IsHidden);
+	
+	ClassDB::bind_method(D_METHOD("set_default_player_color", "player_color_ident"), [](CCivilization *civilization, const String &player_color_ident){
+		civilization->DefaultPlayerColor = CPlayerColor::Get(player_color_ident);
+	});
 	ClassDB::bind_method(D_METHOD("get_default_player_color"), &CCivilization::GetDefaultPlayerColor);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "default_player_color"), "set_default_player_color", "get_default_player_color");
+	
 	ClassDB::bind_method(D_METHOD("get_victory_background_file"), &CCivilization::GetVictoryBackgroundFile);
 	ClassDB::bind_method(D_METHOD("get_defeat_background_file"), &CCivilization::GetDefeatBackgroundFile);
+	
+	ClassDB::bind_method(D_METHOD("set_playable", "playable"), [](CCivilization *civilization, const bool playable){ civilization->Playable = playable; });
+	ClassDB::bind_method(D_METHOD("is_playable"), &CCivilization::IsPlayable);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "playable"), "set_playable", "is_playable");
+	
+	ClassDB::bind_method(D_METHOD("add_to_develops_from", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+		CCivilization *develops_from = CCivilization::Get(civilization_ident);
+		civilization->DevelopsFrom.push_back(develops_from);
+		develops_from->DevelopsTo.push_back(civilization);
+	});
+	ClassDB::bind_method(D_METHOD("remove_from_develops_from", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+		CCivilization *develops_from = CCivilization::Get(civilization_ident);
+		civilization->DevelopsFrom.erase(std::remove(civilization->DevelopsFrom.begin(), civilization->DevelopsFrom.end(), develops_from), civilization->DevelopsFrom.end());
+		develops_from->DevelopsTo.erase(std::remove(develops_from->DevelopsTo.begin(), develops_from->DevelopsTo.end(), civilization), develops_from->DevelopsTo.end());
+	});
+	ClassDB::bind_method(D_METHOD("get_develops_from"), [](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsFrom); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_develops_to", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+		CCivilization *develops_to = CCivilization::Get(civilization_ident);
+		civilization->DevelopsTo.push_back(develops_to);
+		develops_to->DevelopsFrom.push_back(civilization);
+	});
+	ClassDB::bind_method(D_METHOD("remove_from_develops_to", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+		CCivilization *develops_to = CCivilization::Get(civilization_ident);
+		civilization->DevelopsTo.erase(std::remove(civilization->DevelopsTo.begin(), civilization->DevelopsTo.end(), develops_to), civilization->DevelopsTo.end());
+		develops_to->DevelopsFrom.erase(std::remove(develops_to->DevelopsFrom.begin(), develops_to->DevelopsFrom.end(), civilization), develops_to->DevelopsFrom.end());
+	});
+	ClassDB::bind_method(D_METHOD("get_develops_to"), [](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsTo); });
 }

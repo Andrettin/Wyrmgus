@@ -77,8 +77,8 @@ bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 			this->Cores.push_back(faction);
 			faction->Cores.push_back(this);
 			faction->Sites.push_back(this);
-			if (faction->Civilization) {
-				faction->Civilization->Sites.push_back(this);
+			if (faction->GetCivilization()) {
+				faction->GetCivilization()->Sites.push_back(this);
 			}
 		}
 	} else if (key == "region") {
@@ -323,7 +323,7 @@ CMapLayer *CSite::GetMapLayer() const
 
 void CSite::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_name_word", "name_word"), [](CSite *site, const String &name_word_ident){
+	ClassDB::bind_method(D_METHOD("set_name_word", "name_word_ident"), [](CSite *site, const String &name_word_ident){
 		CWord *name_word = CWord::Get(name_word_ident);
 		if (name_word != nullptr) {
 			site->NameWord = name_word;

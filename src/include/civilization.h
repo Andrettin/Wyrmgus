@@ -36,17 +36,11 @@
 
 #include "character.h" // because of "MaxCharacterTitles"
 #include "data_type.h"
+#include "detailed_data_element.h"
 #include "faction.h" //for certain enums
 #include "time/date.h"
 #include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
-
-#include <core/object.h>
-#include <core/variant.h>
-
-#include <map>
-#include <string>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -69,9 +63,9 @@ class UnitClass;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CCivilization : public Object, public DataType<CCivilization>
+class CCivilization : public DetailedDataElement, public DataType<CCivilization>
 {
-	GDCLASS(CCivilization, Object)
+	DATA_TYPE(CCivilization, DetailedDataElement)
 	
 public:
 	~CCivilization();
@@ -82,52 +76,28 @@ public:
 	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
 	static std::vector<CFiller> GetCivilizationUIFillers(const CCivilization *civilization);
 	
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
+	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const int force_type) const;
-	
-	/**
-	**	@brief	Get the civilization's string identifier
-	**
-	**	@return	The civilization's string identifier
-	*/
-	String GetIdent() const
-	{
-		return this->Ident.c_str();
-	}
-	
-	/**
-	**	@brief	Get the civilization's index
-	**
-	**	@return	The civilization's index
-	*/
-	int GetIndex() const
-	{
-		return this->Index;
-	}
-	
-	bool IsInitialized() const
-	{
-		return this->Initialized;
-	}
-
-	/**
-	**	@brief	Get the civilization's name
-	**
-	**	@return	The civilization's name
-	*/
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
 	
 	/**
 	**	@brief	Get the string identifier for the civilization's interface
 	**
 	**	@return	The string identifier for the civilization's interface
 	*/
-	String GetInterface() const
+	const String &GetInterface() const
 	{
-		return this->Interface.c_str();
+		if (!this->Interface.empty()) {
+			return this->Interface;
+		}
+		
+		if (this->ParentCivilization != nullptr) {
+			return this->ParentCivilization->GetInterface();
+		}
+		
+		return this->Interface;
 	}
 	
 	/**
@@ -137,7 +107,15 @@ public:
 	*/
 	CSpecies *GetSpecies() const
 	{
-		return this->Species;
+		if (this->Species != nullptr) {
+			return this->Species;
+		}
+		
+		if (this->ParentCivilization != nullptr) {
+			return this->ParentCivilization->GetSpecies();
+		}
+		
+		return nullptr;
 	}
 	
 	/**
@@ -151,7 +129,7 @@ public:
 			return this->Language;
 		}
 		
-		if (this->ParentCivilization) {
+		if (this->ParentCivilization != nullptr) {
 			return this->ParentCivilization->GetLanguage();
 		}
 		
@@ -176,7 +154,7 @@ public:
 			return this->Currency;
 		}
 		
-		if (this->ParentCivilization) {
+		if (this->ParentCivilization != nullptr) {
 			return this->ParentCivilization->GetCurrency();
 		}
 		
@@ -189,11 +167,6 @@ public:
 	**	@return	The civilization's upgrade
 	*/
 	const CUpgrade *GetUpgrade() const;
-	
-	bool IsHidden() const
-	{
-		return this->Hidden;
-	}
 	
 	bool IsPlayable() const
 	{
@@ -216,7 +189,7 @@ public:
 			return this->VictoryBackgroundFile;
 		}
 		
-		if (this->ParentCivilization) {
+		if (this->ParentCivilization != nullptr) {
 			return this->ParentCivilization->GetVictoryBackgroundFile();
 		}
 		
@@ -234,7 +207,7 @@ public:
 			return this->DefeatBackgroundFile;
 		}
 		
-		if (this->ParentCivilization) {
+		if (this->ParentCivilization != nullptr) {
 			return this->ParentCivilization->GetDefeatBackgroundFile();
 		}
 		
@@ -262,7 +235,7 @@ public:
 			return this->PersonalNames;
 		}
 		
-		if (this->ParentCivilization) {
+		if (this->ParentCivilization != nullptr) {
 			return this->ParentCivilization->GetPersonalNames();
 		}
 		
@@ -297,19 +270,11 @@ public:
 		return this->ShipNames;
 	}
 	
-private:
-	std::string Ident;				/// ident of the civilization
-	int Index = -1;
-	bool Initialized = false;
-	std::string Name;				/// name of the civilization
 public:
 	CCivilization *ParentCivilization = nullptr;
-	std::string Description;		/// civilization description
-	std::string Quote;				/// civilization quote
-	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
-	std::string Interface;			/// the string identifier for the civilization's interface
+	String Interface;				/// the string identifier for the civilization's interface
 public:
 	CUnitSound UnitSounds;			/// sounds for unit events
 private:
@@ -318,7 +283,6 @@ private:
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
 	Currency *Currency = nullptr;	/// the currency used by the civilization
 	std::string Upgrade;			/// the string identifier for the civilization's upgrade
-	bool Hidden = false;			/// whether the civilization is hidden
 	bool Playable = true;			/// whether the civilization is playable
 public:
 	CPlayerColor *DefaultPlayerColor = nullptr;	/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
@@ -347,7 +311,6 @@ public:
 	std::vector<CFiller> UIFillers;
 	std::map<int, IconConfig> ButtonIcons;		/// icons for button actions
 	
-	friend DataType;
 	friend int CclDefineCivilization(lua_State *l);
 
 protected:
