@@ -46,7 +46,6 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CRegion *> Regions;
-std::vector<CProvince *> Provinces;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
@@ -54,7 +53,7 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CleanProvinces()
+void CleanTerrainFeatures()
 {
 	for (size_t i = 0; i < TerrainFeatures.size(); ++i) {
 		delete TerrainFeatures[i];
@@ -65,10 +64,6 @@ void CleanProvinces()
 		delete WorldMapTerrainTypes[i];
 	}
 	WorldMapTerrainTypes.clear();
-	
-	for (size_t j = 0; j < Regions.size(); ++j) {
-		delete Regions[j];
-	}
 }
 
 CRegion *GetRegion(const std::string &region_ident)
@@ -76,16 +71,6 @@ CRegion *GetRegion(const std::string &region_ident)
 	for (size_t i = 0; i < Regions.size(); ++i) {
 		if (region_ident == Regions[i]->Ident) {
 			return Regions[i];
-		}
-	}
-	return nullptr;
-}
-
-CProvince *GetProvince(const std::string &province_name)
-{
-	for (size_t i = 0; i < Provinces.size(); ++i) {
-		if (province_name == Provinces[i]->Name) {
-			return Provinces[i];
 		}
 	}
 	return nullptr;
@@ -171,4 +156,11 @@ int GetEraIdByName(const std::string &era)
 	}
 
 	return -1;
+}
+
+void Province::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_water", "water"), [](Province *province, const bool water){ province->Water = water; });
+	ClassDB::bind_method(D_METHOD("is_water"), &Province::IsWater);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "water"), "set_water", "is_water");
 }

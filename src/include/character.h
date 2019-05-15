@@ -57,7 +57,6 @@ class CHistoricalLocation;
 class CMapTemplate;
 class CLanguage;
 class CPersistentItem;
-class CProvince;
 class CQuest;
 class CReligion;
 class CSite;
@@ -67,6 +66,7 @@ class CUpgrade;
 class CWord;
 class ItemSlot;
 class LuaCallback;
+class Province;
 struct lua_State;
 
 enum Attributes {
@@ -266,7 +266,7 @@ private:
 	std::vector<const CHistoricalLocation *> HistoricalLocations;	/// historical locations of the character
 public:
 	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
-	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
+	std::vector<std::tuple<int, int, Province *, int>> HistoricalProvinceTitles;
 	
 	friend int CclDefineCharacter(lua_State *l);
 	friend int CclDefineCustomHero(lua_State *l);

@@ -64,7 +64,7 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Water")) {
-		lua_pushboolean(l, province->Water);
+		lua_pushboolean(l, province->IsWater());
 		return 1;
 	} else if (!strcmp(data, "Coastal")) {
 		lua_pushboolean(l, province->Coastal);

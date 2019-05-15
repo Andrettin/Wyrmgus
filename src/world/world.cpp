@@ -68,12 +68,6 @@ CWorld *CWorld::Add(const std::string &ident)
 */
 void CWorld::Clear()
 {
-	for (CWorld *world : CWorld::GetAll()) {
-		for (CProvince *province : world->Provinces) {
-			delete province;
-		}
-	}
-	
 	UI.WorldButtons.clear();
 	
 	DataType<CWorld>::Clear();

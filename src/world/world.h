@@ -42,11 +42,11 @@
 ----------------------------------------------------------------------------*/
 
 class CPlane;
-class CProvince;
 class CSeasonSchedule;
 class CSpecies;
 class CTerrainFeature;
 class CTimeOfDaySchedule;
+class Province;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -78,7 +78,7 @@ public:
 	Property<CPlane *> Plane = nullptr;
 	Property<CTimeOfDaySchedule *> TimeOfDaySchedule = nullptr;			/// this world's time of day schedule
 	Property<CSeasonSchedule *> SeasonSchedule = nullptr;				/// this world's season schedule
-	std::vector<CProvince *> Provinces;									/// Provinces in this world
+	std::vector<Province *> Provinces;									/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world
 

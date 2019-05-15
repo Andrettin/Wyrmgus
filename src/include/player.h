@@ -79,7 +79,6 @@ class CFaction;
 class CFile;
 class CGender;
 class CGraphic;
-class CProvince;
 class CPlane;
 class CPlayerColor;
 class CPlayerQuestObjective;

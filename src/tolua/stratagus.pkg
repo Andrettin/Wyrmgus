@@ -155,8 +155,6 @@ extern void SaveHeroes();
 
 extern bool LoadingPersistentHeroes;
 
-extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
-
 extern void DeleteModFaction(std::string faction_name);
 extern void DeleteModUnitType(std::string unit_type_ident);
 extern void DisableMod(std::string mod_file);

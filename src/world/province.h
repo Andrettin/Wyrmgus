@@ -34,10 +34,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+#include "detailed_data_element.h"
 #include "vec2i.h"
 
-#include <vector>
-#include <map>
 #include <tuple>
 
 /*----------------------------------------------------------------------------
@@ -45,18 +45,13 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
-class CDeityDomain;
 class CFaction;
-class CGraphic;
-class CPlane;
-class CProvince;
 class CSite;
-class CSpecies;
-class CTerrainFeature;
-class CUnitType;
 class CUpgrade;
 class CWorld;
+class Province;
 class WorldMapTile;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Enumerations
@@ -105,30 +100,45 @@ public:
 	std::string Ident;
 	std::string Name;
 	int ID = -1;														/// ID of this region
-	std::vector<CProvince *> Provinces;									/// Provinces which belong to this region
+	std::vector<Province *> Provinces;									/// Provinces which belong to this region
 	std::vector<CSite *> Sites;											/// Sites which belong to this region
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 };
 
-class CProvince
+class Province : public DetailedDataElement, public DataType<Province>
 {
+	DATA_TYPE(Province, DetailedDataElement)
+
 public:
-	std::string Name;
-	CWorld *World = nullptr;
-	int ID = -1;														/// ID of this province
-	bool Water = false;													/// Whether the province is a water province or not
-	bool Coastal = false;												/// Whether the province is a coastal province or not
-	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
-	std::map<const CFaction *, std::string> FactionCulturalNames;		/// Names for the province for each different faction
-	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
-	std::vector<CRegion *> Regions;										/// Regions to which this province belongs
-	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
-	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
-	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
-	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
-	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
-	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers;		/// Historical province modifiers, mapped to the modifier's upgrade and year
-	std::map<std::tuple<int, int>, CCharacter *> HistoricalGovernors;	/// Historical governors of the province, mapped to the beginning and end of the term
+	static constexpr const char *ClassIdentifier = "province";
+	
+	bool IsWater() const
+	{
+		return this->Water;
+	}
+	
+public:
+	const CWorld *World = nullptr;										/// the world to which the province belongs
+private:
+	bool Water = false;													/// whether the province is a water province or not
+public:
+	bool Coastal = false;												/// whether the province is a coastal province or not
+	std::map<int, String> CulturalNames;								/// names for the province for each different culture/civilization
+	std::vector<CSite *> Sites;											/// sites which belong to this province
+	std::vector<CFaction *> FactionClaims;								/// factions which have a claim to this province
+	std::vector<CRegion *> Regions;										/// regions to which this province belongs
+	std::map<int, CFaction *> HistoricalOwners;							/// historical owners of the province, mapped to the year
+	std::map<int, CFaction *> HistoricalClaims;							/// historical claims over the province, mapped to the year
+	std::map<int, int> HistoricalCultures;								/// historical cultures which were predominant in the province, mapped to the year
+	std::map<int, int> HistoricalPopulation;							/// historical population, mapped to the year
+	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// historical settlement buildings, mapped to building unit type id and year
+	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers;		/// historical province modifiers, mapped to the modifier's upgrade and year
+	std::map<std::tuple<int, int>, CCharacter *> HistoricalGovernors;	/// historical governors of the province, mapped to the beginning and end of the term
+	
+	friend int CclDefineProvince(lua_State *l);
+
+protected:
+	static void _bind_methods();
 };
 
 class WorldMapTile
@@ -155,7 +165,6 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CRegion *> Regions;
-extern std::vector<CProvince *> Provinces;
 extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
@@ -163,9 +172,8 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern void CleanProvinces();
+extern void CleanTerrainFeatures();
 extern CRegion *GetRegion(const std::string &region_name);
-extern CProvince *GetProvince(const std::string &province_name);
 extern int GetWorldMapTerrainTypeId(const std::string &terrain_type_name);
 extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(const std::string &era);

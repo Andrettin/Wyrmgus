@@ -96,10 +96,10 @@ public:
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 };
 
-class CGrandStrategyProvince : public CProvince
+class CGrandStrategyProvince : public Province
 {
 public:
-	CGrandStrategyProvince() : CProvince()
+	CGrandStrategyProvince() : Province()
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(Units, 0, sizeof(Units));

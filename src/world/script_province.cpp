@@ -51,10 +51,6 @@
 #include "world/world.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -164,13 +160,7 @@ static int CclDefineProvince(lua_State *l)
 	}
 
 	std::string province_name = LuaToString(l, 1);
-	CProvince *province = GetProvince(province_name);
-	if (!province) {
-		province = new CProvince;
-		province->Name = province_name;
-		province->ID = Provinces.size();
-		Provinces.push_back(province);
-	}
+	Province *province = Province::GetOrAdd(province_name);
 	
 	std::string name_type = "province";
 	
@@ -204,26 +194,10 @@ static int CclDefineProvince(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->CulturalNames[civilization->GetIndex()] = TransliterateText(cultural_name);
+				province->CulturalNames[civilization->GetIndex()] = TransliterateText(cultural_name).c_str();
 			}
 		} else if (!strcmp(value, "FactionCulturalNames")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				++j;
-
-				const CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
-				if (faction == nullptr) {
-					LuaError(l, "Faction doesn't exist.");
-				}
-				++j;
-				
-				std::string cultural_name = LuaToString(l, -1, j + 1);
-				
-				province->FactionCulturalNames[faction] = TransliterateText(cultural_name);
-			}
+			continue;
 		} else if (!strcmp(value, "Claims")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -353,7 +327,7 @@ static int CclDefineProvince(lua_State *l)
 	}
 	
 	if (province->World == nullptr) {
-		LuaError(l, "Province \"%s\" is not assigned to any world." _C_ province->Name.c_str());
+		LuaError(l, "Province \"%s\" is not assigned to any world." _C_ province->GetName().utf8().get_data());
 	}
 	
 	return 0;
@@ -693,7 +667,7 @@ static int CclGetWorldData(lua_State *l)
 		lua_createtable(l, world->Provinces.size(), 0);
 		for (size_t i = 1; i <= world->Provinces.size(); ++i)
 		{
-			lua_pushstring(l, world->Provinces[i-1]->Name.c_str());
+			lua_pushstring(l, world->Provinces[i-1]->GetName().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -712,79 +686,6 @@ static int CclGetWorldData(lua_State *l)
 	return 0;
 }
 
-/**
-**  Get province data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetProvinceData(lua_State *l)
-{
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string province_name = LuaToString(l, 1);
-	CProvince *province = GetProvince(province_name);
-	if (!province) {
-		LuaError(l, "Province \"%s\" doesn't exist." _C_ province_name.c_str());
-	}
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, province->Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "World")) {
-		if (province->World != nullptr) {
-			lua_pushstring(l, province->World->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Water")) {
-		lua_pushboolean(l, province->Water);
-		return 1;
-	} else if (!strcmp(data, "Coastal")) {
-		lua_pushboolean(l, province->Coastal);
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
-static int CclGetPlanes(lua_State *l)
-{
-	lua_createtable(l, CPlane::GetAll().size(), 0);
-	for (size_t i = 1; i <= CPlane::GetAll().size(); ++i)
-	{
-		lua_pushstring(l, CPlane::Get(i-1)->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
-static int CclGetWorlds(lua_State *l)
-{
-	lua_createtable(l, CWorld::GetAll().size(), 0);
-	for (size_t i = 1; i <= CWorld::GetAll().size(); ++i)
-	{
-		lua_pushstring(l, CWorld::Get(i-1)->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
-static int CclGetProvinces(lua_State *l)
-{
-	lua_createtable(l, Provinces.size(), 0);
-	for (size_t i = 1; i <= Provinces.size(); ++i)
-	{
-		lua_pushstring(l, Provinces[i-1]->Name.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -798,8 +699,4 @@ void ProvinceCclRegister()
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);
 	lua_register(Lua, "GetPlaneData", CclGetPlaneData);
 	lua_register(Lua, "GetWorldData", CclGetWorldData);
-	lua_register(Lua, "GetProvinceData", CclGetProvinceData);
-	lua_register(Lua, "GetPlanes", CclGetPlanes);
-	lua_register(Lua, "GetWorlds", CclGetWorlds);
-	lua_register(Lua, "GetProvinces", CclGetProvinces);
 }

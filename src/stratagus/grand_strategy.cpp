@@ -258,7 +258,8 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		if (province->Owner != GrandStrategyGame.PlayerFaction) {
 			work_creation_message += "the foreign lands of ";
 		}
-		work_creation_message += province->Name + "!";
+		work_creation_message += province->GetName().utf8().get_data();
+		work_creation_message += "!";
 		if (work != nullptr && !work->Description.empty()) {
 			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->Description, "\"", "\\\""), "\n", "\\n");
 		}
@@ -292,20 +293,6 @@ CGrandStrategyHero *CGrandStrategyGame::GetHero(std::string hero_full_name)
 
 void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 {
-	//if new owner is the same as the current owner, return
-	if (
-		(this->Owner != nullptr && this->Owner->Civilization == civilization_id && this->Owner->Faction == faction_id)
-		|| (this->Owner == nullptr && civilization_id == -1 && faction_id == -1)
-	) {
-		return;
-	}
-	
-	CGrandStrategyFaction *old_owner = this->Owner;
-	
-	if (this->Owner != nullptr) { //if province has a previous owner, remove it from the owner's province list
-		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
-	}
-	
 	for (const CUnitType *unit_type : CUnitType::GetAll()) { //change the province's military score to be appropriate for the new faction's technologies
 		if (IsMilitaryUnit(*unit_type)) {
 			int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type->GetIndex()] : 0);
@@ -328,19 +315,12 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 			}
 		}
 	}
-
-	if (civilization_id != -1 && faction_id != -1) {
-		this->Owner = GrandStrategyGame.Factions[civilization_id][faction_id];
-		this->Owner->OwnedProvinces.push_back(this->ID);
-	} else {
-		this->Owner = nullptr;
-	}
 }
 
 void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
 {
 	if (building_id == -1) {
-		fprintf(stderr, "Tried to set invalid building type for the settlement of \"%s\".\n", this->Name.c_str());
+		fprintf(stderr, "Tried to set invalid building type for the settlement of \"%s\".\n", this->GetName().utf8().get_data());
 		return;
 	}
 	
@@ -546,7 +526,7 @@ bool CGrandStrategyProvince::HasSecondaryBorderThroughWaterWith(CGrandStrategyPr
 {
 	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
 		CGrandStrategyProvince *border_province = this->BorderProvinces[i];
-		if (border_province->Water) {
+		if (border_province->IsWater()) {
 			for (size_t j = 0; j < border_province->BorderProvinces.size(); ++j) {
 				if (border_province->BorderProvinces[j] == province) {
 					return true;
@@ -562,7 +542,7 @@ bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int factio
 	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
 		CGrandStrategyProvince *border_province = this->BorderProvinces[i];
 		if (border_province->Owner == nullptr) {
-			if (border_province->Water && check_through_water) {
+			if (border_province->IsWater() && check_through_water) {
 				for (size_t j = 0; j < border_province->BorderProvinces.size(); ++j) {
 					if (
 						border_province->BorderProvinces[j]->Owner != nullptr
@@ -1204,7 +1184,7 @@ int GetProvinceId(std::string province_name)
 {
 	if (!province_name.empty()) {
 		for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
-			if (GrandStrategyGame.Provinces[i]->Name == province_name) {
+			if (GrandStrategyGame.Provinces[i]->GetName() == province_name.c_str()) {
 				return i;
 			}
 		}
@@ -1215,54 +1195,22 @@ int GetProvinceId(std::string province_name)
 
 void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name)
 {
-	int province_id = GetProvinceId(province_name);
-	CCivilization *civilization = CCivilization::Get(civilization_name);
-	int faction_id = CFaction::GetFactionIndex(faction_name);
-	
-	if (!civilization || province_id == -1 || !GrandStrategyGame.Provinces[province_id]) {
-		return;
-	}
-	
-	GrandStrategyGame.Provinces[province_id]->SetOwner(civilization->GetIndex(), faction_id);
 }
 
 void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building)
 {
-	int province_id = GetProvinceId(province_name);
-	const CUnitType *settlement_building = CUnitType::Get(settlement_building_ident);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && settlement_building != nullptr) {
-		GrandStrategyGame.Provinces[province_id]->SetSettlementBuilding(settlement_building->GetIndex(), has_settlement_building);
-	}
 }
 
 void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
 {
-	int province_id = GetProvinceId(province_name);
-	const CUnitType *unit_type = CUnitType::Get(unit_type_ident);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != nullptr) {
-		GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(unit_type->GetIndex(), quantity);
-	}
 }
 
 void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
 {
-	int province_id = GetProvinceId(province_name);
-	const CUnitType *unit_type = CUnitType::Get(unit_type_ident);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != nullptr) {
-		GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(unit_type->GetIndex(), quantity);
-	}
 }
 
 void SetProvinceHero(std::string province_name, std::string hero_full_name, int value)
 {
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->SetHero(hero_full_name, value);
-	}
 }
 
 void SetProvinceFood(std::string province_name, int quantity)
@@ -1344,7 +1292,7 @@ void FinalizeGrandStrategyInitialization()
 	
 	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
-		CProvince *base_province = GetProvince(province->Name);
+		Province *base_province = Province::Get(province->Ident);
 		
 		// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
 		for (size_t j = 0; j < base_province->Regions.size(); ++j) {
@@ -1449,7 +1397,7 @@ int GetProvinceHero(std::string province_name, std::string hero_full_name)
 	
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (hero) {
-		if (hero->Province != nullptr && hero->Province->ID == province_id) {
+		if (hero->Province != nullptr && hero->Province->GetIndex() == province_id) {
 			return hero->State;
 		}
 	} else {
