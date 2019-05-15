@@ -1803,7 +1803,7 @@ static int CclDefineSite(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				site->CulturalNames[civilization] = cultural_name;
+				site->CulturalNames[civilization] = cultural_name.c_str();
 			}
 		} else if (!strcmp(value, "Cores")) {
 			if (!lua_istable(l, -1)) {

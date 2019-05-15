@@ -73,6 +73,13 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 
 public:
+	static void Clear();
+	static const CLanguage *GetEnglishLanguage();
+
+private:
+	static const CLanguage *EnglishLanguage;
+
+public:	
 	CWord *GetWord(const String &name, const CWordType *word_type, const std::vector<String> &word_meanings) const;
 	void RemoveWord(CWord *word);
 	
@@ -92,7 +99,7 @@ public:
 	String TranslateName(const String &name) const;
 	
 public:
-	Property<CLanguageFamily *> Family;				/// the family to which the language belongs
+	Property<CLanguageFamily *> Family = nullptr;	/// the family to which the language belongs
 	bool UsedByCivilizationOrFaction = false;
 	Property<CLanguage *> DialectOf {	/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 		Property<CLanguage *>::ValueType(nullptr),

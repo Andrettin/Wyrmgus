@@ -3143,7 +3143,7 @@ static int CclGetPlayerData(lua_State *l)
 		std::string site_ident = LuaToString(l, 3);
 		const CSite *site = CSite::Get(site_ident);
 		if (site) {
-			lua_pushstring(l, site->GetCulturalName(CCivilization::Get(p->Race)).c_str());
+			lua_pushstring(l, site->GetCulturalName(CCivilization::Get(p->Race)).utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

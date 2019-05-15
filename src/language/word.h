@@ -252,6 +252,15 @@ public:
 		return this->ShipNameWeight;
 	}
 	
+	void ChangeSettlementNameWeight(const int change)
+	{
+		if (this->SettlementNameWeight != 0) {
+			this->SettlementNameWeight += change;
+		} else {
+			fprintf(stderr, "Tried to increase settlement name weight for word \"%s\", but the word is not set to be a settlement name.\n", this->GetIdent().utf8().get_data());
+		}
+	}
+	
 	int GetSettlementNameWeight() const
 	{
 		return this->SettlementNameWeight;

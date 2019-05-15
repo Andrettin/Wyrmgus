@@ -42,8 +42,34 @@
 #include "species/gender.h"
 
 /*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+
+const CLanguage *CLanguage::EnglishLanguage = nullptr;
+
+/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	@brief	Remove the existing languages
+*/
+void CLanguage::Clear()
+{
+	CLanguage::EnglishLanguage = nullptr;
+	
+	DataType<CLanguage>::Clear();
+}
+
+/**
+**	@brief	Get the English language
+**
+**	@return	The English language
+*/
+const CLanguage *CLanguage::GetEnglishLanguage()
+{
+	return CLanguage::EnglishLanguage;
+}
 
 CWord *CLanguage::GetWord(const String &name, const CWordType *word_type, const std::vector<String> &word_meanings) const
 {
@@ -270,4 +296,12 @@ String CLanguage::TranslateName(const String &name) const
 void CLanguage::_bind_methods()
 {
 	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("set_english", "english"), [](CLanguage *language, const bool english){
+		CLanguage::EnglishLanguage = language;
+	});
+	ClassDB::bind_method(D_METHOD("is_english"), [](const CLanguage *language){
+		return CLanguage::GetEnglishLanguage() == language;
+	});
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "english"), "set_english", "is_english");
 }

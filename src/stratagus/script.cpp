@@ -1586,7 +1586,7 @@ std::string EvalString(const StringDesc *s)
 				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->GetClass()))) {
 					civilization = CCivilization::Get(site_player->Race);
 				}
-				return unit->Settlement->GetCulturalName(civilization);
+				return unit->Settlement->GetCulturalName(civilization).utf8().get_data();
 			} else {
 				return std::string();
 			}
@@ -1796,7 +1796,7 @@ std::string EvalString(const StringDesc *s)
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->GetCulturalName(CCivilization::Get(CPlayer::GetThisPlayer()->Race));
+					settlements_string += (**faction).Cores[i]->GetCulturalName(CCivilization::Get(CPlayer::GetThisPlayer()->Race)).utf8().get_data();
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}

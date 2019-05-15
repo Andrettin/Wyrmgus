@@ -40,6 +40,7 @@
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/word_type.h"
+#include "player.h"
 #include "species/gender.h"
 #include "species/species.h"
 #include "species/species_category.h"
@@ -280,6 +281,44 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "dependencies") {
 		this->Dependency = new CAndDependency;
 		this->Dependency->ProcessConfigData(section);
+	} else if (section->Tag == "number_case_inflection") {
+		int grammatical_number = GrammaticalNumberNoNumber;
+		int grammatical_case = GrammaticalCaseNoCase;
+		std::string inflection;
+
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			if (property.Key == "inflection") {
+				inflection = property.Value;
+			} else if (property.Key == "number") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
+				grammatical_number = GetGrammaticalNumberIdByName(value);
+				if (grammatical_number == -1) {
+					fprintf(stderr, "Grammatical number \"%s\" doesn't exist.\n", value.c_str());
+					return true;
+				}
+			} else if (property.Key == "case") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
+				grammatical_case = GetGrammaticalCaseIdByName(value);
+				if (grammatical_case == -1) {
+					fprintf(stderr, "Grammatical case \"%s\" doesn't exist.\n", value.c_str());
+					return true;
+				}
+			} else {
+				fprintf(stderr, "Invalid number case inflection property: \"%s\".\n", property.Key.c_str());
+			}
+		}
+		
+		if (inflection.empty()) {
+			fprintf(stderr, "Number case inflection has no inflection.\n");
+			return true;
+		}
+		
+		this->NumberCaseInflections[std::tuple<int, int>(grammatical_number, grammatical_case)] = inflection.c_str();
 	} else {
 		return false;
 	}

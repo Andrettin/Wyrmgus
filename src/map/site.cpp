@@ -40,6 +40,7 @@
 #include "config_operator.h"
 #include "faction.h"
 #include "item/item.h"
+#include "language/word.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -116,7 +117,26 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 			const CCivilization *civilization = CCivilization::Get(property.Key);
 			
 			if (civilization) {
-				this->CulturalNames[civilization] = property.Value;
+				this->CulturalNames[civilization] = property.Value.c_str();
+			}
+		}
+	} else if (section->Tag == "cultural_name_words") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			const CCivilization *civilization = CCivilization::Get(property.Key);
+			CWord *name_word = CWord::Get(property.Value);
+			
+			if (civilization != nullptr && name_word != nullptr) {
+				this->CulturalNameWords[civilization] = name_word;
+				name_word->ChangeSettlementNameWeight(1);
+				
+				if (this->CulturalNames.find(civilization) == this->CulturalNames.end()) {
+					this->CulturalNames[civilization] = name_word->GetAnglicizedName();
+				}
 			}
 		}
 	} else if (section->Tag == "historical_owner") {
@@ -164,7 +184,11 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 			} else if (property.Key == "unique") {
 				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				unique = GetUniqueItem(value);
-				if (!unique) {
+				if (unique != nullptr) {
+					if (building_class == nullptr) {
+						building_class = unique->Type->GetClass();
+					}
+				} else {
 					fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
 				}
 			} else if (property.Key == "faction") {
@@ -221,16 +245,16 @@ void CSite::Initialize()
 **
 **	@return	The cultural name if present, or the default name otherwise
 */
-std::string CSite::GetCulturalName(const CCivilization *civilization) const
+const String &CSite::GetCulturalName(const CCivilization *civilization) const
 {
 	if (civilization != nullptr) {
-		std::map<const CCivilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+		std::map<const CCivilization *, String>::const_iterator find_iterator = this->CulturalNames.find(civilization);
 		if (find_iterator != this->CulturalNames.end()) {
 			return find_iterator->second;
 		}
 	}
 	
-	return this->GetName().utf8().get_data();
+	return this->GetName();
 }
 
 /**
@@ -295,4 +319,24 @@ CMapLayer *CSite::GetMapLayer() const
 	}
 	
 	return nullptr;
+}
+
+void CSite::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_name_word", "name_word"), [](CSite *site, const String &name_word_ident){
+		CWord *name_word = CWord::Get(name_word_ident);
+		if (name_word != nullptr) {
+			site->NameWord = name_word;
+			name_word->ChangeSettlementNameWeight(1);
+			if (site->Name.empty()) {
+				site->Name = name_word->GetAnglicizedName();
+			}
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CSite *site){ return const_cast<CWord *>(site->NameWord); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "name_word"), "set_name_word", "get_name_word");
+
+	ClassDB::bind_method(D_METHOD("set_major", "major"), [](CSite *site, const bool major){ site->Major = major; });
+	ClassDB::bind_method(D_METHOD("is_major"), &CSite::IsMajor);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "major"), "set_major", "is_major");
 }

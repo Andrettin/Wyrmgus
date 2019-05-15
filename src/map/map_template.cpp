@@ -1096,7 +1096,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 
-		if (site->Major && SettlementSiteUnitType) { //add a settlement site for major sites
+		if (site->IsMajor() && SettlementSiteUnitType) { //add a settlement site for major sites
 			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileSize - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
 			}
@@ -1176,7 +1176,13 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
 				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
-				const CUnitType *unit_type = CFaction::GetFactionClassUnitType(site_owner, std::get<2>(site->HistoricalBuildings[j]));
+				const UnitClass *unit_class = std::get<2>(site->HistoricalBuildings[j]);
+				
+				if (unit_class == nullptr) {
+					continue;
+				}
+				
+				const CUnitType *unit_type = CFaction::GetFactionClassUnitType(site_owner, unit_class);
 				if (unit_type != nullptr && unit_type->TerrainType) {
 					if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
 						pathway_type = unit_type;
@@ -1193,10 +1199,14 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			) {
 				const CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 				const CUnitType *unit_type = nullptr;
-				if (building_owner) {
-					unit_type = CFaction::GetFactionClassUnitType(building_owner, std::get<2>(site->HistoricalBuildings[j]));
-				} else {
-					unit_type = CFaction::GetFactionClassUnitType(site_owner, std::get<2>(site->HistoricalBuildings[j]));
+				CUniqueItem *unique = std::get<3>(site->HistoricalBuildings[j]);
+				const UnitClass *unit_class = std::get<2>(site->HistoricalBuildings[j]);
+				if (unit_class != nullptr) {
+					if (building_owner) {
+						unit_type = CFaction::GetFactionClassUnitType(building_owner, unit_class);
+					} else {
+						unit_type = CFaction::GetFactionClassUnitType(site_owner, unit_class);
+					}
 				}
 				if (unit_type == nullptr) {
 					continue;
@@ -1204,7 +1214,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (unit_type->TerrainType) {
 					continue;
 				}
-				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->Major) {
+				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->IsMajor()) {
 					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
 					continue;
 				}
@@ -1227,12 +1237,12 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				} else {
 					unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true);
 				}
-				if (std::get<3>(site->HistoricalBuildings[j])) {
-					unit->SetUnique(std::get<3>(site->HistoricalBuildings[j]));
+				if (unique != nullptr) {
+					unit->SetUnique(unique);
 				}
 				if (first_building) {
 					if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
-						unit->Name = site->GetCulturalName(site_owner->Civilization);
+						unit->Name = site->GetCulturalName(site_owner->Civilization).utf8().get_data();
 					}
 					first_building = false;
 				}

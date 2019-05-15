@@ -51,6 +51,7 @@ class CRegion;
 class CUnit;
 class CUnitType;
 class CUniqueItem;
+class CWord;
 class UnitClass;
 struct lua_State;
 
@@ -62,19 +63,6 @@ class CSite : public DataElement, public DataType<CSite>
 {
 	DATA_TYPE(CSite, DataElement)
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Major);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
 public:	
 	static constexpr const char *ClassIdentifier = "site";
 	
@@ -82,28 +70,37 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 
-	std::string GetCulturalName(const CCivilization *civilization) const;
+	const String &GetCulturalName(const CCivilization *civilization) const;
+	
+	bool IsMajor() const
+	{
+		return this->Major;
+	}
 	
 	Vec2i GetMapPos() const;
 	CMapLayer *GetMapLayer() const;
 
-	ExposedProperty<bool> Major = false;				/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
-	Vec2i Position = Vec2i(-1, -1);						/// Position of the site in its map template
-	CMapTemplate *MapTemplate = nullptr;				/// Map template where this site is located
-	CUnit *SiteUnit = nullptr;							/// Unit which represents this site
-	std::vector<CRegion *> Regions;						/// Regions where this site is located
-	std::vector<CFaction *> Cores;						/// Factions which have this site as a core
-	std::map<const CCivilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
-	std::map<CDate, const CFaction *> HistoricalOwners;			/// Historical owners of the site
-	std::map<CDate, int> HistoricalPopulation;					/// Historical population
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, const CFaction *>> HistoricalBuildings;	/// Historical buildings, with start and end date
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources;	/// Historical resources, with start and end date; the integer at the end is the resource quantity
+private:
+	const CWord *NameWord = nullptr;
+	bool Major = false;						/// whether the site is a major one; major sites have settlement sites, and as such can have town halls
+public:
+	Vec2i Position = Vec2i(-1, -1);			/// position of the site in its map template
+	CMapTemplate *MapTemplate = nullptr;	/// map template where this site is located
+	CUnit *SiteUnit = nullptr;				/// unit which represents this site
+	std::vector<CRegion *> Regions;			/// regions where this site is located
+	std::vector<CFaction *> Cores;			/// factions which have this site as a core
+	std::map<const CCivilization *, String> CulturalNames;	/// names for the site for each different culture/civilization
+	std::map<const CCivilization *, const CWord *> CulturalNameWords;	/// name words for the site for each different culture/civilization
+	std::map<CDate, const CFaction *> HistoricalOwners;			/// historical owners of the site
+	std::map<CDate, int> HistoricalPopulation;					/// historical population
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// historical quantity of a particular unit type (number of people for units representing a person)
+	std::vector<std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, const CFaction *>> HistoricalBuildings;	/// historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources;	/// historical resources, with start and end date; the integer at the end is the resource quantity
 	
 	friend int CclDefineSite(lua_State *l);
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif
