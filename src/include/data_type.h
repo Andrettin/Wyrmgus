@@ -100,7 +100,6 @@ private: \
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCivilization;
 class DataElement;
 
 template <typename T, typename O>
@@ -335,12 +334,9 @@ private:
 	static inline bool InitializeDataTypeClass()
 	{
 		//initialize the class factory function
-		if constexpr(!std::is_same_v<T, CCivilization>) {
-			//FIXME: this conditional is only temporarily needed while the civilization classes doesn't inherit from DataElement
-			CConfigData::DataTypeGetFunctions[T::ClassIdentifier] = [](const std::string &ident) -> DataElement * { return T::Get(ident); };
-			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(T::GetOrAdd);
-			CConfigData::DataTypeAddAliasFunctions[T::ClassIdentifier] = std::function<void(const std::string &, const std::string &)>(T::AddAlias);
-		}
+		CConfigData::DataTypeGetFunctions[T::ClassIdentifier] = [](const std::string &ident) -> DataElement * { return T::Get(ident); };
+		CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(T::GetOrAdd);
+		CConfigData::DataTypeAddAliasFunctions[T::ClassIdentifier] = std::function<void(const std::string &, const std::string &)>(T::AddAlias);
 		
 		//register the clear function of the class
 		ClassClearFunctions.push_back(std::function<void()>(T::Clear));
