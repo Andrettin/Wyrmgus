@@ -202,7 +202,13 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 				std::string tag_name = token;
 				tag_name = FindAndReplaceString(tag_name, "[", "");
 				tag_name = FindAndReplaceString(tag_name, "]", "");
+				bool modification = false;
+				if (tag_name.front() == '+' || tag_name.back() == '+') {
+					tag_name = FindAndReplaceString(tag_name, "+", "");
+					modification = true;
+				}
 				CConfigData *new_config_data = new CConfigData(tag_name);
+				new_config_data->Modification = modification;
 				if ((*current_config_data) != nullptr) {
 					new_config_data->Parent = (*current_config_data);
 				}
@@ -283,8 +289,17 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			continue;
 		}
 		
+		bool can_add_new = !config_data->Modification;
+		if (LoadingHistory) {
+			can_add_new = false;
+		}
+		
+		if (!can_add_new && define_only) {
+			continue;
+		}
+		
 		//only load the history for characters that are already in the character database
-		const std::map<std::string, std::function<DataElement *(const std::string &)>> &function_map = LoadingHistory ? CConfigData::DataTypeGetFunctions : CConfigData::DataTypeGetOrAddFunctions;
+		const std::map<std::string, std::function<DataElement *(const std::string &)>> &function_map = can_add_new ? CConfigData::DataTypeGetOrAddFunctions : CConfigData::DataTypeGetFunctions;
 		
 		std::map<std::string, std::function<DataElement *(const std::string &)>>::const_iterator find_iterator = function_map.find(config_data->Tag);
 		

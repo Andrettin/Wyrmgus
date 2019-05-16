@@ -94,6 +94,7 @@ public:
 	std::string Ident;
 	std::vector<std::string> Aliases;	/// alias string identifiers for the data element
 	CConfigData *Parent = nullptr;
+	bool Modification = false;	/// whether this is a modification of a pre-existing tag
 	std::vector<CConfigProperty> Properties;
 	std::vector<CConfigData *> Sections;
 };
