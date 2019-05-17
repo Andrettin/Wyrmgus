@@ -163,6 +163,11 @@ public:
 			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesNorthOffset());
 		}
 		
+		if (this->LowerTemplate != nullptr) {
+			//use the offset for this template's lower template instead if it has dependent templates, so that when this template is applied it leaves enough space for the dependent templates of the lower template (which will be applied in this template's position)
+			offset = std::max(offset, this->LowerTemplate->GetDependentTemplatesNorthOffset());
+		}
+		
 		return offset;
 	}
 	
@@ -176,6 +181,10 @@ public:
 			}
 			
 			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Height + map_template->GetDependentTemplatesSouthOffset());
+		}
+		
+		if (this->LowerTemplate != nullptr) {
+			offset = std::max(offset, this->LowerTemplate->GetDependentTemplatesSouthOffset());
 		}
 		
 		return offset;
@@ -193,6 +202,10 @@ public:
 			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesWestOffset());
 		}
 		
+		if (this->LowerTemplate != nullptr) {
+			offset = std::max(offset, this->LowerTemplate->GetDependentTemplatesWestOffset());
+		}
+		
 		return offset;
 	}
 	
@@ -206,6 +219,10 @@ public:
 			}
 			
 			offset = std::max(offset, CMapTemplate::MinAdjacentTemplateDistance + map_template->Width + map_template->GetDependentTemplatesEastOffset());
+		}
+		
+		if (this->LowerTemplate != nullptr) {
+			offset = std::max(offset, this->LowerTemplate->GetDependentTemplatesEastOffset());
 		}
 		
 		return offset;
