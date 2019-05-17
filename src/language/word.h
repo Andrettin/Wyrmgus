@@ -139,7 +139,7 @@ class CWord : public DataElement, public DataType<CWord>
 	
 public:
 	static constexpr const char *ClassIdentifier = "word";
-	static constexpr int MinimumWordsForNameGeneration = 10;	/// the minimum quantity of words desired for name generation
+	static constexpr int MinimumWordsForNameGeneration = 5;	/// the minimum quantity of words desired for name generation
 	
 public:
 	static void Clear();
