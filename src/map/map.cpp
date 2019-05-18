@@ -769,16 +769,16 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTe
 }
 
 /**
-**	@brief	Get the applied map position of a given subtemplate
+**	@brief	Get the applied map rectangle of a given subtemplate
 **
 **	@param	subtemplate		The subtemplate
 **
-**	@return	The subtemplate's position if found, or (-1, -1) otherwise
+**	@return	The subtemplate's rectangle if found, or {(-1, -1), (-1, -1)} otherwise
 */
-Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
+std::pair<Vec2i, Vec2i> CMap::GetSubtemplateRect(const CMapTemplate *subtemplate) const
 {
 	if (!subtemplate) {
-		return Vec2i(-1, -1);
+		return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
 	}
 	
 	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
@@ -787,13 +787,44 @@ Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+					return std::make_pair(std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]), std::get<1>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]));
 				}
 			}
 		}
 	}
 	
-	return Vec2i(-1, -1);
+	return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
+}
+
+/**
+**	@brief	Get the applied map position of a given subtemplate
+**
+**	@param	subtemplate		The subtemplate
+**
+**	@return	The subtemplate's position if found, or (-1, -1) otherwise
+*/
+Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
+{
+	std::pair<Vec2i, Vec2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
+	
+	return subtemplate_rect.first;
+}
+
+/**
+**	@brief	Get the center of the applied map position of a given subtemplate
+**
+**	@param	subtemplate		The subtemplate
+**
+**	@return	The subtemplate's center position if found, or (-1, -1) otherwise
+*/
+Vec2i CMap::GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const
+{
+	std::pair<Vec2i, Vec2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
+	
+	const Vec2i &start_pos = subtemplate_rect.first;
+	const Vec2i &end_pos = subtemplate_rect.second;
+	
+	return start_pos + ((end_pos - start_pos) / 2);
 }
 
 /**
@@ -805,23 +836,9 @@ Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
 */
 Vec2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
 {
-	if (!subtemplate) {
-		return Vec2i(-1, -1);
-	}
+	std::pair<Vec2i, Vec2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
 	
-	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
-		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::get<1>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
-				}
-			}
-		}
-	}
-	
-	return Vec2i(-1, -1);
+	return subtemplate_rect.second;
 }
 
 /**

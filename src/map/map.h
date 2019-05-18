@@ -276,7 +276,9 @@ public:
 	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *overlay_terrain, const int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate = nullptr) const;
+	std::pair<Vec2i, Vec2i> GetSubtemplateRect(const CMapTemplate *subtemplate) const;
 	Vec2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
+	Vec2i GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const;
 	Vec2i GetSubtemplateEndPos(const CMapTemplate *subtemplate) const;
 	CMapLayer *GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const;
 	std::vector<CUnit *> GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const;
