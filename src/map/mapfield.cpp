@@ -59,7 +59,7 @@ CMapField::CMapField() :
 **
 **	@return	The terrain of the tile for the given overlay parameter
 */
-CTerrainType *CMapField::GetTerrain(const bool overlay) const
+const CTerrainType *CMapField::GetTerrain(const bool overlay) const
 {
 	if (overlay) {
 		return this->OverlayTerrain;
@@ -76,7 +76,7 @@ CTerrainType *CMapField::GetTerrain(const bool overlay) const
 **
 **	@return	The topmost terrain of the tile
 */
-CTerrainType *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+const CTerrainType *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
 		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
@@ -133,7 +133,7 @@ bool CMapField::IsDestroyedForestTile() const
 **
 **	@param	terrain_type	The new terrain type for the tile
 */
-void CMapField::SetTerrain(CTerrainType *terrain_type)
+void CMapField::SetTerrain(const CTerrainType *terrain_type)
 {
 	if (!terrain_type) {
 		return;

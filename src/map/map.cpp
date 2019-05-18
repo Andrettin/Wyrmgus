@@ -292,7 +292,7 @@ PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer
 }
 
 //Wyrmgus start
-CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
+const CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -303,7 +303,7 @@ CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const i
 	return mf.GetTerrain(overlay);
 }
 
-CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
+const CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -406,7 +406,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
-	CTerrainType *terrain = nullptr;
+	const CTerrainType *terrain = nullptr;
 	
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
@@ -431,7 +431,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
-					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
+					const CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
 						adjacent_terrain = nullptr;
 					}
@@ -501,8 +501,8 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_
 			if (this->IsPointInASubtemplateArea(pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
 				continue;
 			}
-			CTerrainType *top_terrain = GetTileTopTerrain(pos, false, z);
-			CTerrainType *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos, false, z);
+			const CTerrainType *top_terrain = GetTileTopTerrain(pos, false, z);
+			const CTerrainType *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos, false, z);
 			if (!new_terrain_type->Overlay) {
 				if (
 					adjacent_top_terrain
@@ -626,7 +626,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 		return false;
 	}
 	
-	CTerrainType *tile_terrain = this->GetTileTerrain(pos, false, z);
+	const CTerrainType *tile_terrain = this->GetTileTerrain(pos, false, z);
 	
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -636,7 +636,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 				continue;
 			}
 			
-			CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
+			const CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
 			
 			if (adjacent_terrain == nullptr) {
 				continue;
@@ -689,7 +689,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 				continue;
 			}
 			
-			CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
+			const CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
 			
 			if (adjacent_terrain == nullptr) {
 				continue;
@@ -1802,7 +1802,7 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
+void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
 {
 	if (!terrain) {
 		return;
@@ -1810,7 +1810,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	CTerrainType *old_terrain = this->GetTileTerrain(pos, terrain->Overlay, z);
+	const CTerrainType *old_terrain = this->GetTileTerrain(pos, terrain->Overlay, z);
 	
 	if (terrain->Overlay) {
 		if (mf.OverlayTerrain == terrain) {
@@ -1900,7 +1900,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 		return;
 	}
 	
-	CTerrainType *old_terrain = mf.OverlayTerrain;
+	const CTerrainType *old_terrain = mf.OverlayTerrain;
 	
 	mf.RemoveOverlayTerrain();
 	
@@ -2157,7 +2157,7 @@ static int GetTransitionType(std::vector<int> &adjacent_directions, bool allow_s
 void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
-	CTerrainType *terrain = nullptr;
+	const CTerrainType *terrain = nullptr;
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
 		mf.OverlayTransitionTiles.clear();
@@ -2179,7 +2179,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
+					const CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
 						adjacent_terrain = nullptr;
 					}
@@ -2187,8 +2187,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 						if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
 							adjacent_terrain_directions[adjacent_terrain->GetIndex()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 						} else if (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end()) { //if the two terrain types can't border, look for a third terrain type which can border both, and which treats both as outer border terrains, and then use for transitions between both tiles
-							for (size_t i = 0; i < terrain->BorderTerrains.size(); ++i) {
-								CTerrainType *border_terrain = terrain->BorderTerrains[i];
+							for (const CTerrainType *border_terrain : terrain->BorderTerrains) {
 								if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), border_terrain) != terrain->InnerBorderTerrains.end() && std::find(adjacent_terrain->InnerBorderTerrains.begin(), adjacent_terrain->InnerBorderTerrains.end(), border_terrain) != adjacent_terrain->InnerBorderTerrains.end()) {
 									adjacent_terrain_directions[border_terrain->GetIndex()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 									break;
@@ -2206,44 +2205,60 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	
 	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
 		int adjacent_terrain_id = iterator->first;
-		CTerrainType *adjacent_terrain = adjacent_terrain_id < (int) CTerrainType::GetAll().size() ? CTerrainType::Get(adjacent_terrain_id) : nullptr;
+		const CTerrainType *adjacent_terrain = adjacent_terrain_id < (int) CTerrainType::GetAll().size() ? CTerrainType::Get(adjacent_terrain_id) : nullptr;
 		int transition_type = GetTransitionType(iterator->second, terrain->AllowSingle);
 		
 		if (transition_type != -1) {
 			bool found_transition = false;
 			
 			if (!overlay) {
-				if (adjacent_terrain) {
-					if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+				if (adjacent_terrain != nullptr) {
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(adjacent_terrain_id, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.TransitionTiles.push_back(std::pair<const CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 						found_transition = true;
-					} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
-						found_transition = true;
-					} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
-						found_transition = true;
+					} else {
+						auto adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(terrain_id, transition_type));
+						if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+							mf.TransitionTiles.push_back(std::pair<const CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+							found_transition = true;
+						} else {
+							adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+							if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+								mf.TransitionTiles.push_back(std::pair<const CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+								found_transition = true;
+							}
+						}
 					}
 				} else {
-					if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.TransitionTiles.push_back(std::pair<const CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 					}
 				}
 			} else {
-				if (adjacent_terrain) {
-					if (adjacent_terrain && terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+				if (adjacent_terrain != nullptr) {
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(adjacent_terrain_id, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.OverlayTransitionTiles.push_back(std::pair<const CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 						found_transition = true;
-					} else if (adjacent_terrain && adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
-						found_transition = true;
-					} else if (adjacent_terrain && adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
-						found_transition = true;
+					} else {
+						auto adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(terrain_id, transition_type));
+						if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+							mf.OverlayTransitionTiles.push_back(std::pair<const CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+							found_transition = true;
+						} else {
+							adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+							if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+								mf.OverlayTransitionTiles.push_back(std::pair<const CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+								found_transition = true;
+							}
+						}
 					}
 				} else {
-					if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.OverlayTransitionTiles.push_back(std::pair<const CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 					}
 				}
 				
@@ -2269,7 +2284,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
 				bool change_order = false;
 				if (std::find(mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.begin(), mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.end(), mf.OverlayTransitionTiles[i].first) != mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.end()) {
-					std::pair<CTerrainType *, int> temp_transition = mf.OverlayTransitionTiles[i];
+					std::pair<const CTerrainType *, int> temp_transition = mf.OverlayTransitionTiles[i];
 					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
 					mf.OverlayTransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -2283,7 +2298,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
 				bool change_order = false;
 				if (std::find(mf.TransitionTiles[i + 1].first->InnerBorderTerrains.begin(), mf.TransitionTiles[i + 1].first->InnerBorderTerrains.end(), mf.TransitionTiles[i].first) != mf.TransitionTiles[i + 1].first->InnerBorderTerrains.end()) {
-					std::pair<CTerrainType *, int> temp_transition = mf.TransitionTiles[i];
+					std::pair<const CTerrainType *, int> temp_transition = mf.TransitionTiles[i];
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
 					mf.TransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -2532,11 +2547,11 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
 				CMapField &mf = *this->Field(x, y, z);
-				CTerrainType *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
+				const CTerrainType *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
 				if (!terrain || terrain->AllowSingle) {
 					continue;
 				}
-				std::vector<CTerrainType *> acceptable_adjacent_tile_types;
+				std::vector<const CTerrainType *> acceptable_adjacent_tile_types;
 				acceptable_adjacent_tile_types.push_back(terrain);
 				for (size_t i = 0; i < terrain->OuterBorderTerrains.size(); ++i) {
 					acceptable_adjacent_tile_types.push_back(terrain->OuterBorderTerrains[i]);
@@ -2593,29 +2608,36 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					if (overlay) {
 						mf.RemoveOverlayTerrain();
 					} else {
-						bool changed_terrain = false;
+						std::map<const CTerrainType *, int> best_terrain_scores;
+						
 						for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 							for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 								if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 									continue;
 								}
-								CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+								
+								const CTerrainType *tile_terrain = this->GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 								if (mf.Terrain != tile_terrain) {
-									if (std::find(mf.Terrain->InnerBorderTerrains.begin(), mf.Terrain->InnerBorderTerrains.end(), tile_terrain) != mf.Terrain->InnerBorderTerrains.end()) {
-										mf.SetTerrain(tile_terrain);
-										changed_terrain = true;
-										break;
+									if (best_terrain_scores.find(tile_terrain) == best_terrain_scores.end()) {
+										best_terrain_scores[tile_terrain] = 0;
 									}
+									best_terrain_scores[tile_terrain]++;
 								}
 							}
-							if (changed_terrain) {
-								break;
+						}
+						
+						const CTerrainType *best_terrain = nullptr;
+						int best_score = 0;
+						for (const auto &score_pair : best_terrain_scores) {
+							if (score_pair.second > best_score) {
+								best_score = score_pair.second;
+								best_terrain = score_pair.first;
 							}
 						}
-						if (!changed_terrain && terrain->InnerBorderTerrains.size() > 0) {
-							mf.SetTerrain(terrain->InnerBorderTerrains[0]);
-						}
+						
+						mf.SetTerrain(best_terrain);
 					}
+					
 					no_irregularities_found = false;
 				}
 			}
@@ -2634,8 +2656,8 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
-					CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
-					CTerrainType *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const CTerrainType *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					if (
 						mf.Terrain != tile_terrain
 						&& tile_top_terrain->Overlay
@@ -2659,10 +2681,9 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
-					CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					if (mf.Terrain != tile_terrain && std::find(mf.Terrain->BorderTerrains.begin(), mf.Terrain->BorderTerrains.end(), tile_terrain) == mf.Terrain->BorderTerrains.end()) {
-						for (size_t i = 0; i < mf.Terrain->BorderTerrains.size(); ++i) {
-							CTerrainType *border_terrain = mf.Terrain->BorderTerrains[i];
+						for (const CTerrainType *border_terrain : mf.Terrain->BorderTerrains) {
 							if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), mf.Terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), tile_terrain) != border_terrain->BorderTerrains.end()) {
 								mf.SetTerrain(border_terrain);
 								break;
@@ -2690,7 +2711,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		return;
 	}
 	
-	CTerrainType *terrain_type = generated_terrain->TerrainType;
+	const CTerrainType *terrain_type = generated_terrain->TerrainType;
 	const int seed_count = generated_terrain->SeedCount;
 	const int max_tile_quantity = (max_pos.x + 1 - min_pos.x) * (max_pos.y + 1 - min_pos.y) * generated_terrain->MaxPercent / 100;
 	int tile_quantity = 0;
@@ -2767,7 +2788,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			continue;
 		}
 		
-		CTerrainType *tile_terrain = this->GetTileTerrain(random_pos, false, z);
+		const CTerrainType *tile_terrain = this->GetTileTerrain(random_pos, false, z);
 		
 		if (!generated_terrain->CanGenerateOnTile(this->Field(random_pos, z))) {
 			continue;
@@ -2799,9 +2820,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 						continue;
 					}
 					
-					CTerrainType *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
-					CTerrainType *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
-					CTerrainType *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
+					const CTerrainType *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
+					const CTerrainType *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
+					const CTerrainType *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
 					
 					if (
 						!generated_terrain->CanGenerateOnTile(this->Field(diagonal_pos, z))
@@ -2891,12 +2912,12 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 					continue;
 				}
 		
-				CTerrainType *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
-				CTerrainType *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
-				CTerrainType *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
-				CTerrainType *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
-				CTerrainType *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
-				CTerrainType *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+				const CTerrainType *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
+				const CTerrainType *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
+				const CTerrainType *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
+				const CTerrainType *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+				const CTerrainType *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+				const CTerrainType *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
 				
 				if (!terrain_type->Overlay) {
 					if (diagonal_tile_terrain != terrain_type && (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), diagonal_tile_terrain) == terrain_type->BorderTerrains.end() || this->TileBordersTerrainIncompatibleWithTerrain(diagonal_pos, terrain_type, z))) {
@@ -3080,8 +3101,8 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
 		seeds.erase(std::remove(seeds.begin(), seeds.end(), seed_pos), seeds.end());
 		
-		CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
-		CTerrainType *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
+		const CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
+		const CTerrainType *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
 		
 		if (overlay_terrain_type != nullptr) {
 			if (
@@ -3111,9 +3132,9 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 					continue;
 				}
 		
-				CTerrainType *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
-				CTerrainType *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
-				CTerrainType *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+				const CTerrainType *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+				const CTerrainType *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+				const CTerrainType *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
 				
 				if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
 					continue;
@@ -3196,7 +3217,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 				continue;
 			}
 			
-			std::map<std::pair<CTerrainType *, CTerrainType*>, int> terrain_type_pair_neighbor_count;
+			std::map<std::pair<const CTerrainType *, const CTerrainType *>, int> terrain_type_pair_neighbor_count;
 			
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -3211,14 +3232,14 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 					}
 					
 					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
-					CTerrainType *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
-					CTerrainType *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
+					const CTerrainType *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
+					const CTerrainType *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
 					
 					if (adjacent_terrain_type == nullptr) {
 						continue;
 					}
 					
-					std::pair<CTerrainType *, CTerrainType*> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
+					std::pair<const CTerrainType *, const CTerrainType*> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
 					
 					auto find_iterator = terrain_type_pair_neighbor_count.find(terrain_type_pair);
 					if (find_iterator == terrain_type_pair_neighbor_count.end()) {
@@ -3229,7 +3250,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 				}
 			}
 			
-			std::pair<CTerrainType *, CTerrainType*> best_terrain_type_pair(nullptr, nullptr);
+			std::pair<const CTerrainType *, const CTerrainType *> best_terrain_type_pair(nullptr, nullptr);
 			int best_terrain_type_neighbor_count = 0;
 			for (const auto &element : terrain_type_pair_neighbor_count) {
 				if (element.second > best_terrain_type_neighbor_count) {

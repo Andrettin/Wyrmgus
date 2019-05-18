@@ -209,7 +209,7 @@ public:
 	void ClearMapLayers();
 	
 	//Wyrmgus start
-	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
+	void SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z);
 	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
@@ -237,8 +237,8 @@ public:
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const;
 	
 	//Wyrmgus start
-	CTerrainType *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
-	CTerrainType *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
+	const CTerrainType *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
+	const CTerrainType *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end

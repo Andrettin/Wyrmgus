@@ -983,7 +983,7 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	std::string RestrictTerrainTypeName;
-	CTerrainType *RestrictTerrainType = nullptr;
+	const CTerrainType *RestrictTerrainType = nullptr;
 };
 //Wyrmgus end
 
