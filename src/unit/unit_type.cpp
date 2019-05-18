@@ -66,6 +66,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unit_sound.h"
+#include "species/gender.h"
 #include "species/species.h"
 #include "spell/spells.h"
 #include "translate.h"
@@ -892,6 +893,19 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 				} else {
 					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
 				}
+			}
+		}
+	} else if (key == "gender") {
+		if (value.empty()) {
+			this->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
+			this->DefaultStat.Variables[GENDER_INDEX].Value = 0;
+			this->DefaultStat.Variables[GENDER_INDEX].Max = this->DefaultStat.Variables[GENDER_INDEX].Value;
+		} else {
+			const CGender *gender = CGender::Get(value);
+			if (gender != nullptr) {
+				this->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
+				this->DefaultStat.Variables[GENDER_INDEX].Value = gender->GetIndex() + 1;
+				this->DefaultStat.Variables[GENDER_INDEX].Max = this->DefaultStat.Variables[GENDER_INDEX].Value;
 			}
 		}
 	} else {

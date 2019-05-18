@@ -1777,11 +1777,19 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Quote")) {
 			type->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
-			const CGender *gender = CGender::Get(LuaToString(l, -1));
-			if (gender != nullptr) {
+			std::string gender_ident = LuaToString(l, -1);
+			
+			if (gender_ident.empty()) {
 				type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
-				type->DefaultStat.Variables[GENDER_INDEX].Value = gender->GetIndex() + 1;
+				type->DefaultStat.Variables[GENDER_INDEX].Value = 0;
 				type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
+			} else {
+				const CGender *gender = CGender::Get(gender_ident);
+				if (gender != nullptr) {
+					type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
+					type->DefaultStat.Variables[GENDER_INDEX].Value = gender->GetIndex() + 1;
+					type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
+				}
 			}
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
