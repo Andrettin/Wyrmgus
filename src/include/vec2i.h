@@ -60,6 +60,16 @@ public:
 		return Vector2(this->x, this->y);
 	}
 	
+	Vec2T ToRelativePoint(const Vec2T &origin_end_pos, const Vec2T &dest_end_pos) const
+	{
+		return *this * dest_end_pos / origin_end_pos;
+	}
+	
+	Vec2T ToRelativePoint(const std::pair<Vec2T, Vec2T> &origin_rect, const std::pair<Vec2T, Vec2T> &dest_rect) const
+	{
+		return this->ToRelativePoint(origin_rect.second - origin_rect.first, dest_rect.second - dest_rect.first);
+	}
+	
 public:
 	T x = 0;
 	T y = 0;
