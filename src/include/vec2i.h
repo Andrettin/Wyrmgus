@@ -146,6 +146,14 @@ inline const Vec2T<T> &operator *= (Vec2T<T> &lhs, int rhs)
 }
 
 template <typename T>
+inline const Vec2T<T> &operator /= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
+{
+	lhs.x /= rhs.x;
+	lhs.y /= rhs.y;
+	return lhs;
+}
+
+template <typename T>
 inline const Vec2T<T> &operator /= (Vec2T<T> &lhs, int rhs)
 {
 	lhs.x /= rhs;
@@ -217,11 +225,29 @@ inline Vec2T<T> operator * (int lhs, const Vec2T<T> &rhs)
 }
 
 template <typename T>
+inline Vec2T<T> operator / (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
+{
+	Vec2T<T> res(lhs);
+
+	res /= rhs;
+	return res;
+}
+
+template <typename T>
 inline Vec2T<T> operator / (const Vec2T<T> &lhs, int rhs)
 {
 	Vec2T<T> res(lhs);
 
 	res /= rhs;
+	return res;
+}
+
+template <typename T>
+inline Vec2T<T> operator / (int lhs, const Vec2T<T> &rhs)
+{
+	Vec2T<T> res(rhs);
+
+	res /= lhs;
 	return res;
 }
 
