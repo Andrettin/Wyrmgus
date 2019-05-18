@@ -4032,6 +4032,7 @@ startw:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& CMap::Map.GetTileTopTerrain(pos, false, z) != nullptr
 			) {
 			//Wyrmgus end
 				goto found;
@@ -4045,6 +4046,7 @@ starts:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& CMap::Map.GetTileTopTerrain(pos, false, z) != nullptr
 			) {
 			//Wyrmgus end
 				goto found;
@@ -4058,6 +4060,7 @@ starte:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& CMap::Map.GetTileTopTerrain(pos, false, z) != nullptr
 			) {
 			//Wyrmgus end
 				goto found;
@@ -4071,6 +4074,7 @@ startn:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& CMap::Map.GetTileTopTerrain(pos, false, z) != nullptr
 			) {
 			//Wyrmgus end
 				goto found;
