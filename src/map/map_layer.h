@@ -113,6 +113,11 @@ public:
 		return this->Height;
 	}
 	
+	Vec2i GetSize() const
+	{
+		return Vec2i(this->Width, this->Height);
+	}
+	
 	int GetIndex() const
 	{
 		return this->ID;

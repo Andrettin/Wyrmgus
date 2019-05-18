@@ -141,6 +141,11 @@ public:
 		return height;
 	}
 	
+	Vec2i GetAppliedSize() const
+	{
+		return Vec2i(this->GetAppliedWidth(), this->GetAppliedHeight());
+	}
+	
 	int GetScale() const
 	{
 		return this->Scale;
