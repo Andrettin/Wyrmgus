@@ -119,6 +119,14 @@ public:
 		return width;
 	}
 	
+	int GetAppliedWidthWithDependentTemplateOffsets() const
+	{
+		int width = this->GetAppliedWidth();
+		width += this->GetDependentTemplatesWestOffset();
+		width += this->GetDependentTemplatesEastOffset();
+		return width;
+	}
+	
 	int GetHeight() const
 	{
 		return this->Height;
@@ -141,9 +149,22 @@ public:
 		return height;
 	}
 	
+	int GetAppliedHeightWithDependentTemplateOffsets() const
+	{
+		int height = this->GetAppliedHeight();
+		height += this->GetDependentTemplatesNorthOffset();
+		height += this->GetDependentTemplatesSouthOffset();
+		return height;
+	}
+	
 	Vec2i GetAppliedSize() const
 	{
 		return Vec2i(this->GetAppliedWidth(), this->GetAppliedHeight());
+	}
+	
+	int GetAppliedAreaWithDependentTemplateOffsets() const
+	{
+		return this->GetAppliedWidthWithDependentTemplateOffsets() * this->GetAppliedHeightWithDependentTemplateOffsets();
 	}
 	
 	int GetScale() const

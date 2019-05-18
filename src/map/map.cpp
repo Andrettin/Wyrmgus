@@ -2539,11 +2539,14 @@ void CMap::AdjustMap()
 	}
 }
 
-void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z)
+void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z)
 {
 	bool no_irregularities_found = false;
-	while (!no_irregularities_found) {
+	int try_count = 0;
+	const int max_try_count = 100;
+	while (!no_irregularities_found && try_count < max_try_count) {
 		no_irregularities_found = true;
+		try_count++;
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
 				CMapField &mf = *this->Field(x, y, z);
@@ -2629,8 +2632,9 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 						const CTerrainType *best_terrain = nullptr;
 						int best_score = 0;
 						for (const auto &score_pair : best_terrain_scores) {
-							if (score_pair.second > best_score) {
-								best_score = score_pair.second;
+							int score = score_pair.second;
+							if (score > best_score) {
+								best_score = score;
 								best_terrain = score_pair.first;
 							}
 						}

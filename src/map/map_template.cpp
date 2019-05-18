@@ -280,53 +280,6 @@ void CMapTemplate::Initialize()
 {
 	this->Initialized = true;
 	
-	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
-		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](const CMapTemplate *a, const CMapTemplate *b) {
-			if (a->Priority != b->Priority) {
-				return a->Priority > b->Priority;
-			//give priority to the template if the other template's position depends on its own
-			} else if (
-				(
-					a->AdjacentToTemplates.find(b) != a->AdjacentToTemplates.end()
-					|| a->NorthOfTemplates.find(b) != a->NorthOfTemplates.end()
-					|| a->SouthOfTemplates.find(b) != a->SouthOfTemplates.end()
-					|| a->WestOfTemplates.find(b) != a->WestOfTemplates.end()
-					|| a->EastOfTemplates.find(b) != a->EastOfTemplates.end()
-				)
-				&& (
-					b->AdjacentToTemplates.find(a) == b->AdjacentToTemplates.end()
-					&& b->NorthOfTemplates.find(a) == b->NorthOfTemplates.end()
-					&& b->SouthOfTemplates.find(a) == b->SouthOfTemplates.end()
-					&& b->WestOfTemplates.find(a) == b->WestOfTemplates.end()
-					&& b->EastOfTemplates.find(a) == b->EastOfTemplates.end()
-				)
-			) {
-				return false;
-			} else if (
-				(
-					b->AdjacentToTemplates.find(a) != b->AdjacentToTemplates.end()
-					|| b->NorthOfTemplates.find(a) != b->NorthOfTemplates.end()
-					|| b->SouthOfTemplates.find(a) != b->SouthOfTemplates.end()
-					|| b->WestOfTemplates.find(a) != b->WestOfTemplates.end()
-					|| b->EastOfTemplates.find(a) != b->EastOfTemplates.end()
-				)
-				&& (
-					a->AdjacentToTemplates.find(b) == a->AdjacentToTemplates.end()
-					&& a->NorthOfTemplates.find(b) == a->NorthOfTemplates.end()
-					&& a->SouthOfTemplates.find(b) == a->SouthOfTemplates.end()
-					&& a->WestOfTemplates.find(b) == a->WestOfTemplates.end()
-					&& a->EastOfTemplates.find(b) == a->EastOfTemplates.end()
-				)
-			) {
-				return true;
-			} else if ((a->GetAppliedWidth() * a->GetAppliedHeight()) != (b->GetAppliedWidth() * b->GetAppliedHeight())) {
-				return (a->GetAppliedWidth() * a->GetAppliedHeight()) > (b->GetAppliedWidth() * b->GetAppliedHeight());
-			} else {
-				return a->Ident < b->Ident;
-			}
-		});
-	}
-	
 	if (CMapTemplate::AreAllInitialized()) {
 		//grow the size of map templates for their subtemplates, if those map templates are set to do that
 		for (CMapTemplate *map_template : CMapTemplate::GetAll()) {
@@ -357,6 +310,58 @@ void CMapTemplate::Initialize()
 				map_template->Width = map_template->UpperTemplate->Width;
 				map_template->Height = map_template->UpperTemplate->Height;
 			}
+		}
+		
+		//re-sort the subtemplates of the map templates that have them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
+		for (CMapTemplate *map_template : CMapTemplate::GetAll()) {
+			if (map_template->Subtemplates.empty()) {
+				continue;
+			}
+			
+			std::sort(map_template->Subtemplates.begin(), map_template->Subtemplates.end(), [](const CMapTemplate *a, const CMapTemplate *b) {
+				if (a->Priority != b->Priority) {
+					return a->Priority > b->Priority;
+				//give priority to the template if the other template's position depends on its own
+				} else if (
+					(
+						a->AdjacentToTemplates.find(b) != a->AdjacentToTemplates.end()
+						|| a->NorthOfTemplates.find(b) != a->NorthOfTemplates.end()
+						|| a->SouthOfTemplates.find(b) != a->SouthOfTemplates.end()
+						|| a->WestOfTemplates.find(b) != a->WestOfTemplates.end()
+						|| a->EastOfTemplates.find(b) != a->EastOfTemplates.end()
+					)
+					&& (
+						b->AdjacentToTemplates.find(a) == b->AdjacentToTemplates.end()
+						&& b->NorthOfTemplates.find(a) == b->NorthOfTemplates.end()
+						&& b->SouthOfTemplates.find(a) == b->SouthOfTemplates.end()
+						&& b->WestOfTemplates.find(a) == b->WestOfTemplates.end()
+						&& b->EastOfTemplates.find(a) == b->EastOfTemplates.end()
+					)
+				) {
+					return false;
+				} else if (
+					(
+						b->AdjacentToTemplates.find(a) != b->AdjacentToTemplates.end()
+						|| b->NorthOfTemplates.find(a) != b->NorthOfTemplates.end()
+						|| b->SouthOfTemplates.find(a) != b->SouthOfTemplates.end()
+						|| b->WestOfTemplates.find(a) != b->WestOfTemplates.end()
+						|| b->EastOfTemplates.find(a) != b->EastOfTemplates.end()
+					)
+					&& (
+						a->AdjacentToTemplates.find(b) == a->AdjacentToTemplates.end()
+						&& a->NorthOfTemplates.find(b) == a->NorthOfTemplates.end()
+						&& a->SouthOfTemplates.find(b) == a->SouthOfTemplates.end()
+						&& a->WestOfTemplates.find(b) == a->WestOfTemplates.end()
+						&& a->EastOfTemplates.find(b) == a->EastOfTemplates.end()
+					)
+				) {
+					return true;
+				} else if (a->GetAppliedAreaWithDependentTemplateOffsets() != b->GetAppliedAreaWithDependentTemplateOffsets()) {
+					return a->GetAppliedAreaWithDependentTemplateOffsets() > b->GetAppliedAreaWithDependentTemplateOffsets();
+				} else {
+					return a->Ident < b->Ident;
+				}
+			});
 		}
 	}
 }
