@@ -3076,14 +3076,9 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	}
 	
 	// expand seeds
-	for (size_t i = 0; i < seeds.size(); ++i) {
-		Vec2i seed_pos = seeds[i];
-		
-		const int random_number = SyncRand(100);
-		if (random_number >= 50) { //50% chance for the seed to generate terrain
-			seeds.push_back(seed_pos); //try again later, as we want to ensure as much terrain is generated as possible
-			continue;
-		}
+	while (!seeds.empty()) {
+		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
+		seeds.erase(std::remove(seeds.begin(), seeds.end(), seed_pos), seeds.end());
 		
 		CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
 		CTerrainType *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
