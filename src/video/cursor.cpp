@@ -78,7 +78,7 @@ PixelPos CursorStartMapPos;/// position of starting point of selection rectangle
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-CUnitType *CursorBuilding;           /// building cursor
+const CUnitType *CursorBuilding;           /// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/

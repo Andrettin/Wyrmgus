@@ -411,7 +411,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	unit.Player->SubUnitType(type);
 
-	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
+	CUnit *build = MakeUnit(type, unit.Player);
 	
 	//Wyrmgus start
 	build->Name.clear(); // under construction buildings should have no proper name

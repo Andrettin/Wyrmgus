@@ -244,7 +244,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 	
-	unit.Type = const_cast<CUnitType *>(&newtype);
+	unit.Type = &newtype;
 	unit.Stats = &unit.Type->Stats[player.GetIndex()];
 	
 	//Wyrmgus start

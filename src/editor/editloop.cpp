@@ -542,7 +542,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
+static void EditorPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
@@ -1269,12 +1269,12 @@ static void DrawMapCursor()
 				break;
 			case EditorEditUnit:
 				if (Editor.SelectedUnitIndex != -1) {
-					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
+					CursorBuilding = Editor.ShownUnitTypes[Editor.SelectedUnitIndex];
 				}
 				break;
 			case EditorSetStartLocation:
 				if (Editor.StartUnit) {
-					CursorBuilding = const_cast<CUnitType *>(Editor.StartUnit);
+					CursorBuilding = Editor.StartUnit;
 				}
 				break;
 		}
@@ -1708,7 +1708,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			/*
 			if (MouseButtons & LeftButton) {
 				Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+				CursorBuilding = Editor.ShownUnitTypes[Editor.CursorUnitIndex];
 				return;
 			} else if (MouseButtons & RightButton) {
 				char buf[256];
@@ -1721,7 +1721,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			if (Editor.CursorUnitIndex != (int) Editor.ShownUnitTypes.size()) {
 				if (MouseButtons & LeftButton) {
 					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+					CursorBuilding = Editor.ShownUnitTypes[Editor.CursorUnitIndex];
 					return;
 				} else if (MouseButtons & RightButton) {
 					char buf[256];

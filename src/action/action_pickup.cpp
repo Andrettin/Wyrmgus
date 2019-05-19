@@ -221,7 +221,7 @@ enum {
 				CPersistentItem *item = new CPersistentItem;
 				item->Owner = unit.Character;
 				unit.Character->Items.push_back(item);
-				item->Type = const_cast<CUnitType *>(goal->Type);
+				item->Type = goal->Type;
 				if (goal->Prefix != nullptr) {
 					item->Prefix = goal->Prefix;
 				}
