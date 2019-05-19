@@ -125,6 +125,9 @@ public:
 	/// init players
 	static void InitPlayers();
 
+	static CPlayer *GetFactionPlayer(const CFaction *faction);
+	static CPlayer *GetOrAddFactionPlayer(const CFaction *faction);
+
 	static std::vector<CPlayer *> Players;	/// All players
 
 private:
@@ -597,11 +600,6 @@ extern int PlayerColorIndexCount;
 extern void CleanPlayers();
 /// Save players
 extern void SavePlayers(CFile &file);
-
-//Wyrmgus start
-extern CPlayer *GetFactionPlayer(const CFaction *faction);
-extern CPlayer *GetOrAddFactionPlayer(const CFaction *faction);
-//Wyrmgus end
 
 /// Initialize the computer opponent AI
 extern void PlayersInitAi();

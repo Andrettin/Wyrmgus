@@ -62,7 +62,7 @@ void CSiteDependency::ProcessConfigDataProperty(const std::pair<std::string, std
 bool CSiteDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
 	if (this->Faction != nullptr) {
-		CPlayer *faction_player = GetFactionPlayer(this->Faction);
+		CPlayer *faction_player = CPlayer::GetFactionPlayer(this->Faction);
 		
 		if (faction_player == nullptr) { //no player belongs to that faction, so naturally the site can't be owned by it
 			return false;

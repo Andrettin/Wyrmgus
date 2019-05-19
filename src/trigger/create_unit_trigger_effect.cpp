@@ -113,7 +113,7 @@ void CCreateUnitTriggerEffect::Do(CPlayer *player) const
 	CPlayer *unit_player = player;
 	
 	if (this->Faction != nullptr) {
-		unit_player = GetFactionPlayer(this->Faction);
+		unit_player = CPlayer::GetFactionPlayer(this->Faction);
 		if (unit_player == nullptr) {
 			fprintf(stderr, "Unit faction \"%s\" has no player.\n", this->Faction->GetIdent().utf8().get_data());
 			return;

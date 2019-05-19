@@ -1155,7 +1155,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		CPlayer *player = GetOrAddFactionPlayer(site_owner);
+		CPlayer *player = CPlayer::GetOrAddFactionPlayer(site_owner);
 		
 		if (!player) {
 			continue;
@@ -1231,7 +1231,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				}
 				CUnit *unit = nullptr;
 				if (building_owner) {
-					CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
+					CPlayer *building_player = CPlayer::GetOrAddFactionPlayer(building_owner);
 					if (!building_player) {
 						continue;
 					}
@@ -1292,7 +1292,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 					CPlayer *unit_player = nullptr;
 					const CFaction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
 					if (unit_owner) {
-						unit_player = GetOrAddFactionPlayer(unit_owner);
+						unit_player = CPlayer::GetOrAddFactionPlayer(unit_owner);
 						if (!unit_player) {
 							continue;
 						}
@@ -1533,7 +1533,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 				if (!current_campaign) { //only apply neutral units for when applying map templates for non-campaign/scenario maps
 					continue;
 				}
-				player = GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
+				player = CPlayer::GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
 				if (!player) {
 					continue;
 				}
@@ -1578,7 +1578,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		if ((!current_campaign || std::get<3>(this->Heroes[i]).Year == 0 || start_date.ContainsDate(std::get<3>(this->Heroes[i]))) && (std::get<4>(this->Heroes[i]).Year == 0 || !start_date.ContainsDate(std::get<4>(this->Heroes[i])))) {
 			CPlayer *player = nullptr;
 			if (std::get<2>(this->Heroes[i])) {
-				player = GetOrAddFactionPlayer(std::get<2>(this->Heroes[i]));
+				player = CPlayer::GetOrAddFactionPlayer(std::get<2>(this->Heroes[i]));
 				if (!player) {
 					continue;
 				}
@@ -1618,7 +1618,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			unit_type = CFaction::GetFactionClassUnitType(unit_faction, historical_unit->GetUnitClass());
 		}
 		
-		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
+		CPlayer *unit_player = unit_faction ? CPlayer::GetFactionPlayer(unit_faction) : nullptr;
 		
 		bool in_another_map_template = false;
 		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->GetHistoricalLocations(), in_another_map_template, template_start_pos, map_start_pos, false);
@@ -1650,6 +1650,8 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		
 		if (unit_faction) {
 			unit_player = GetOrAddFactionPlayer(unit_faction);
+		if (unit_faction != nullptr) {
+			unit_player = CPlayer::GetOrAddFactionPlayer(unit_faction);
 			if (!unit_player) {
 				continue;
 			}
@@ -1692,7 +1694,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			}
 		}
 
-		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : nullptr;
+		CPlayer *hero_player = hero_faction ? CPlayer::GetFactionPlayer(hero_faction) : nullptr;
 		
 		bool in_another_map_template = false;
 		Vec2i hero_pos = this->GetBestLocationMapPosition(character->GetHistoricalLocations(), in_another_map_template, template_start_pos, map_start_pos, false);
@@ -1722,7 +1724,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 		
 		if (hero_faction) {
-			hero_player = GetOrAddFactionPlayer(hero_faction);
+			hero_player = CPlayer::GetOrAddFactionPlayer(hero_faction);
 			if (!hero_player) {
 				continue;
 			}

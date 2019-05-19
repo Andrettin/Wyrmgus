@@ -539,6 +539,71 @@ void CPlayer::InitPlayers()
 	//Wyrmgus end
 }
 
+/**
+**	@brief	Get the player belonging to a given faction
+**
+**	@param	faction	The faction
+**
+**	@return	The faction player if it exists
+*/
+CPlayer *CPlayer::GetFactionPlayer(const CFaction *faction)
+{
+	if (!faction) {
+		return nullptr;
+	}
+	
+	for (int i = 0; i < NumPlayers; ++i) {
+		if (CPlayer::Players[i]->Race == faction->GetCivilization()->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
+			return CPlayer::Players[i];
+		}
+	}
+	
+	return nullptr;
+}
+
+/**
+**	@brief	Get or add the player belonging to a given faction
+**
+**	@param	faction	The faction
+**
+**	@return	The faction player, newly-created or otherwise
+*/
+CPlayer *CPlayer::GetOrAddFactionPlayer(const CFaction *faction)
+{
+	CPlayer *faction_player = CPlayer::GetFactionPlayer(faction);
+	if (faction_player) {
+		return faction_player;
+	}
+	
+	// no player belonging to this faction, so let's make an unused player slot be created for it
+	
+	for (int i = 0; i < NumPlayers; ++i) {
+		if (CPlayer::Players[i]->Type == PlayerNobody) {
+			CPlayer::Players[i]->Type = PlayerComputer;
+			CPlayer::Players[i]->SetCivilization(faction->GetCivilization()->GetIndex());
+			CPlayer::Players[i]->SetFaction(faction);
+			CPlayer::Players[i]->AiEnabled = true;
+			CPlayer::Players[i]->AiName = faction->DefaultAI;
+			CPlayer::Players[i]->Team = 1;
+			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
+			CPlayer::Players[i]->Resources[WoodCost] = 2500;
+			CPlayer::Players[i]->Resources[StoneCost] = 2500;
+			
+			if (GameRunning) {
+				AiInit(*CPlayer::Players[i]);
+				
+				CPlayer::GetThisPlayer()->Notify(_("The %s faction has been founded!"), faction->GetName().utf8().get_data());
+			}
+			
+			return CPlayer::Players[i];
+		}
+	}
+	
+	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->GetIdent().utf8().get_data());
+	
+	return nullptr;
+}
+
 void CPlayer::Save(CFile &file) const
 {
 	file.printf("Player(%i,\n", this->Index);
@@ -867,59 +932,6 @@ void CPlayer::Save(CFile &file) const
 
 	DebugPrint("FIXME: must save unit-stats?\n");
 }
-
-//Wyrmgus start
-CPlayer *GetFactionPlayer(const CFaction *faction)
-{
-	if (!faction) {
-		return nullptr;
-	}
-	
-	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Race == faction->GetCivilization()->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
-			return CPlayer::Players[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
-{
-	CPlayer *faction_player = GetFactionPlayer(faction);
-	if (faction_player) {
-		return faction_player;
-	}
-	
-	// no player belonging to this faction, so let's make an unused player slot be created for it
-	
-	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Type == PlayerNobody) {
-			CPlayer::Players[i]->Type = PlayerComputer;
-			CPlayer::Players[i]->SetCivilization(faction->GetCivilization()->GetIndex());
-			CPlayer::Players[i]->SetFaction(faction);
-			CPlayer::Players[i]->AiEnabled = true;
-			CPlayer::Players[i]->AiName = faction->DefaultAI;
-			CPlayer::Players[i]->Team = 1;
-			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
-			CPlayer::Players[i]->Resources[WoodCost] = 2500;
-			CPlayer::Players[i]->Resources[StoneCost] = 2500;
-			
-			if (GameRunning) {
-				AiInit(*CPlayer::Players[i]);
-				
-				CPlayer::GetThisPlayer()->Notify(_("The %s faction has been founded!"), faction->GetName().utf8().get_data());
-			}
-			
-			return CPlayer::Players[i];
-		}
-	}
-	
-	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->GetIdent().utf8().get_data());
-	
-	return nullptr;
-}
-//Wyrmgus end
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
@@ -2671,7 +2683,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			recruit_heroes_quantity++;
 		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
 			if (objective->Faction) {
-				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+				CPlayer *faction_player = CPlayer::GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return false;
 				}
@@ -2691,7 +2703,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				}
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
-			CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+			CPlayer *faction_player = CPlayer::GetFactionPlayer(objective->Faction);
 			if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 				return false;
 			}
@@ -2842,7 +2854,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			}
 		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
 			if (objective->Faction && objective->Counter < objective->Quantity) {
-				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+				CPlayer *faction_player = CPlayer::GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return "The target no longer exists.";
 				}
@@ -2863,7 +2875,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
 			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
-				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+				CPlayer *faction_player = CPlayer::GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return "The target no longer exists.";
 				}

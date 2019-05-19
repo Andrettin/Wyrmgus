@@ -7221,7 +7221,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
-			const CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+			const CPlayer *faction_player = CPlayer::GetFactionPlayer(objective->Faction);
 			
 			if (faction_player) {
 				int dying_faction_units = faction_player == target.Player ? 1 : 0;

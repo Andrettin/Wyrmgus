@@ -144,7 +144,7 @@ void CDialogueNode::Call(CPlayer *player) const
 	CPlayer *faction_player = player;
 	
 	if (this->Faction != nullptr) {
-		faction_player = GetFactionPlayer(this->Faction);
+		faction_player = CPlayer::GetFactionPlayer(this->Faction);
 	}
 	
 	CUnit *speaker_unit = nullptr;

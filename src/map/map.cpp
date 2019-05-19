@@ -331,7 +331,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		return Vec2i(-1, -1);
 	}
 	
-	CPlayer *player = GetFactionPlayer(faction);
+	CPlayer *player = CPlayer::GetFactionPlayer(faction);
 	
 	Vec2i random_pos(-1, -1);
 	

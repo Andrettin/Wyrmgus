@@ -87,7 +87,7 @@ void CCreatePlayerTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 */
 void CCreatePlayerTriggerEffect::Do(CPlayer *player) const
 {
-	CPlayer *new_player = GetOrAddFactionPlayer(this->Faction);
+	CPlayer *new_player = CPlayer::GetOrAddFactionPlayer(this->Faction);
 	
 	if (new_player == nullptr) {
 		fprintf(stderr, "Failed to create player for faction \"%s\".\n", this->Faction->GetIdent().utf8().get_data());
