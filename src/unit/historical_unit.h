@@ -44,6 +44,7 @@
 
 class CFaction;
 class CHistoricalLocation;
+class CUniqueItem;
 class CUnitType;
 class UnitClass;
 
@@ -80,6 +81,11 @@ public:
 		return this->Faction;
 	}
 	
+	CUniqueItem *GetUnique() const
+	{
+		return this->Unique;
+	}
+	
 	int GetQuantity() const
 	{
 		return this->Quantity;
@@ -100,6 +106,11 @@ public:
 		return this->ResourcesHeld;
 	}
 	
+	int GetConnectionSurfaceLayer() const
+	{
+		return this->ConnectionSurfaceLayer;
+	}
+	
 	const std::vector<const CHistoricalLocation *> &GetHistoricalLocations() const
 	{
 		return this->HistoricalLocations;
@@ -114,10 +125,12 @@ private:
 	std::vector<const UnitClass *> UnitClasses;	/// the unit's potential classes
 	std::vector<const CUnitType *> UnitTypes;	/// the unit's potential unit types
 	const CFaction *Faction = nullptr;		/// the unit's faction
+	CUniqueItem *Unique = nullptr;	/// the unique for this unit, if any
 	int Quantity = 1;	/// how many in-game units does this historical unit result in when applied
 	CDate StartDate;	/// when the unit starts being active
 	CDate EndDate;		/// when the unit ceases being active (e.g. when it is disbanded)
 	int ResourcesHeld = 0;	/// how much of the unit's resource, if any, does the unit contain
+	int ConnectionSurfaceLayer = -1;	/// to which surface layer does this unit connect, if it is a surface layer connector
 	std::vector<const CHistoricalLocation *> HistoricalLocations;	/// historical locations for the unit
 	std::map<CDate, const CFaction *> HistoricalOwners;				/// historical owners for the unit
 

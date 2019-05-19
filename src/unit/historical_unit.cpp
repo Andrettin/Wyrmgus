@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "faction.h"
+#include "item/item.h"
 #include "map/historical_location.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -175,9 +176,17 @@ void CHistoricalUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction"), [](const CHistoricalUnit *historical_unit){ return const_cast<CFaction *>(historical_unit->GetFaction()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
+	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), [](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = GetUniqueItem(unique_ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_unique"), &CHistoricalUnit::GetUnique);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unique"), "set_unique", "get_unique");
+	
 	ClassDB::bind_method(D_METHOD("set_quantity", "quantity"), [](CHistoricalUnit *historical_unit, const int quantity){ historical_unit->Quantity = quantity; });
 	ClassDB::bind_method(D_METHOD("get_quantity"), &CHistoricalUnit::GetQuantity);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "quantity"), "set_quantity", "get_quantity");
+	
+	ClassDB::bind_method(D_METHOD("set_connection_surface_layer", "connection_surface_layer"), [](CHistoricalUnit *historical_unit, const int connection_surface_layer){ historical_unit->ConnectionSurfaceLayer = connection_surface_layer; });
+	ClassDB::bind_method(D_METHOD("get_connection_surface_layer"), &CHistoricalUnit::GetConnectionSurfaceLayer);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "connection_surface_layer"), "set_connection_surface_layer", "get_connection_surface_layer");
 	
 	ClassDB::bind_method(D_METHOD("set_resources_held", "resources_held"), [](CHistoricalUnit *historical_unit, const int resources_held){ historical_unit->ResourcesHeld = resources_held; });
 	ClassDB::bind_method(D_METHOD("get_resources_held"), &CHistoricalUnit::GetResourcesHeld);

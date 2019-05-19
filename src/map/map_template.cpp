@@ -1417,11 +1417,11 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		const CMapTemplate *other_template = nullptr;
 		if (surface_layer == (this->SurfaceLayer + 1)) {
 			other_template = this->LowerTemplate;
-		}
-		else if (surface_layer == (this->SurfaceLayer - 1)) {
+		} else if (surface_layer == (this->SurfaceLayer - 1)) {
 			other_template = this->UpperTemplate;
 		}
-		if (!other_template) {
+		
+		if (other_template == nullptr) {
 			continue; //surface layer connectors must lead to an adjacent surface layer
 		}
 
@@ -1475,9 +1475,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
 		CUnit *best_layer_connector = nullptr;
 		int best_distance = -1;
-		for (size_t j = 0; j < other_layer_connectors.size(); ++j) {
-			CUnit *potential_connector = other_layer_connectors[j];
-			
+		for (CUnit *potential_connector : other_layer_connectors) {
 			if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
 				int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
 				if (best_distance == -1 || distance < best_distance) {
@@ -1631,6 +1629,13 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			}
 		}
 		
+		if (unit_type == nullptr) {
+			fprintf(stderr, "Could not get a valid unit type for historical unit \"%s\".\n", historical_unit->Ident.c_str());
+			continue;
+		}
+		
+		CUniqueItem *unique = historical_unit->GetUnique();
+		
 		CPlayer *unit_player = unit_faction ? CPlayer::GetFactionPlayer(unit_faction) : nullptr;
 		
 		bool in_another_map_template = false;
@@ -1638,6 +1643,22 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		
 		if (in_another_map_template) {
 			continue;
+		}
+		
+		//add the connecting destination, if this is a connector
+		const CMapTemplate *other_template = nullptr;
+		if (historical_unit->GetConnectionSurfaceLayer() != -1) {
+			const int surface_layer = historical_unit->GetConnectionSurfaceLayer();
+			
+			if (surface_layer == (this->SurfaceLayer + 1)) {
+				other_template = this->LowerTemplate;
+			} else if (surface_layer == (this->SurfaceLayer - 1)) {
+				other_template = this->UpperTemplate;
+			}
+			
+			if (other_template == nullptr) {
+				continue; //surface layer connectors must lead to an adjacent surface layer
+			}
 		}
 		
 		if (unit_pos.x == -1 || unit_pos.y == -1) {
@@ -1676,9 +1697,41 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		for (int i = 0; i < historical_unit->GetQuantity(); ++i) {
 			//item units only use factions to generate special properties for them
 			CUnit *unit = CreateUnit(unit_pos - unit_type->GetTileCenterPosOffset(), *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
-			if (unit_type->BoolFlag[ITEM_INDEX].value) {
-				unit->GenerateSpecialProperties(nullptr, unit_player, false);
+
+			if (unique != nullptr) {
+				unit->SetUnique(unique);
+			} else {
+				if (unit_type->BoolFlag[ITEM_INDEX].value) {
+					unit->GenerateSpecialProperties(nullptr, unit_player, false);
+				}
 			}
+			
+			if (historical_unit->GetConnectionSurfaceLayer() != -1) {
+				CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
+				
+				//get the nearest compatible connector in the target map layer / template
+				std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
+				CUnit *best_layer_connector = nullptr;
+				int best_distance = -1;
+				for (CUnit *potential_connector : other_layer_connectors) {
+					if (potential_connector->Type == unit_type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
+						int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
+						if (best_distance == -1 || distance < best_distance) {
+							best_layer_connector = potential_connector;
+							best_distance = distance;
+							if (distance == 0) {
+								break;
+							}
+						}
+					}
+				}
+				
+				if (best_layer_connector != nullptr) {
+					best_layer_connector->ConnectingDestination = unit;
+					unit->ConnectingDestination = best_layer_connector;
+				}
+			}
+			
 			if (historical_unit->GetResourcesHeld() != 0) {
 				unit->SetResourcesHeld(historical_unit->GetResourcesHeld());
 				unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->GetResourcesHeld();
