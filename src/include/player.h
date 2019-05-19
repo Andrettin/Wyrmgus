@@ -486,6 +486,10 @@ public:
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
+	
+	void ApplyHistoricalResources();
+	void ApplyHistoricalUpgrades();
+	void ApplyHistoricalDiplomacyStates();
 
 private:
 	std::vector<CUnit *> Units;		/// units belonging to this player
