@@ -593,6 +593,11 @@ CPlayer *CPlayer::GetOrAddFactionPlayer(const CFaction *faction)
 				AiInit(*CPlayer::Players[i]);
 				
 				CPlayer::GetThisPlayer()->Notify(_("The %s faction has been founded!"), faction->GetName().utf8().get_data());
+			} else {
+				if (CCampaign::GetCurrentCampaign() != nullptr) {
+					CPlayer::Players[i]->ApplyHistoricalResources();
+					CPlayer::Players[i]->ApplyHistoricalUpgrades();
+				}
 			}
 			
 			return CPlayer::Players[i];
@@ -4342,6 +4347,90 @@ CUnit *CPlayer::GetHeroUnit(const CCharacter *hero) const
 	}
 	
 	return nullptr;
+}
+
+/**
+**	@brief	Apply historical resource quantities for the player
+*/
+void CPlayer::ApplyHistoricalResources()
+{
+	const CFaction *faction = this->GetFaction();
+	const CDate &start_date(CCampaign::GetCurrentCampaign()->GetStartDate());
+	
+	for (std::map<std::pair<CDate, int>, int>::const_iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
+		if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
+			this->SetResource(iterator->first.second, iterator->second);
+		}
+	}
+}
+
+/**
+**	@brief	Apply historical upgrades for the player
+*/
+void CPlayer::ApplyHistoricalUpgrades()
+{
+	const CCivilization *civilization = CCivilization::Get(this->Race);
+	const CFaction *faction = this->GetFaction();
+	const CDate &start_date(CCampaign::GetCurrentCampaign()->GetStartDate());
+	
+	for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
+		const CUpgrade *upgrade = CUpgrade::Get(iterator->first);
+		if (upgrade == nullptr) {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+			continue;
+		}
+		
+		for (std::map<CDate, bool>::const_reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+			if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
+				if (second_iterator->second && UpgradeIdentAllowed(*this, iterator->first.c_str()) != 'R') {
+					UpgradeAcquire(*this, upgrade);
+				} else if (!second_iterator->second) {
+					break;
+				}
+			}
+		}
+	}
+	
+	for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = faction->HistoricalUpgrades.begin(); iterator != faction->HistoricalUpgrades.end(); ++iterator) {
+		const CUpgrade *upgrade = CUpgrade::Get(iterator->first);
+		if (upgrade == nullptr) {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+			continue;
+		}
+		
+		for (std::map<CDate, bool>::const_reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+			if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
+				if (second_iterator->second && UpgradeIdentAllowed(*this, iterator->first.c_str()) != 'R') {
+					UpgradeAcquire(*this, upgrade);
+				} else if (!second_iterator->second) {
+					break;
+				}
+			}
+		}
+	}
+}
+
+/**
+**	@brief	Apply historical diplomacy states for the player
+*/
+void CPlayer::ApplyHistoricalDiplomacyStates()
+{
+	const CFaction *faction = this->GetFaction();
+	const CDate &start_date(CCampaign::GetCurrentCampaign()->GetStartDate());
+	
+	for (std::map<std::pair<CDate, const CFaction *>, int>::const_iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
+		if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
+			CPlayer *diplomacy_state_player = CPlayer::GetFactionPlayer(iterator->first.second);
+			if (diplomacy_state_player != nullptr) {
+				CommandDiplomacy(this->GetIndex(), iterator->second, diplomacy_state_player->GetIndex());
+				CommandDiplomacy(diplomacy_state_player->GetIndex(), iterator->second, this->GetIndex());
+				if (iterator->second == DiplomacyAllied) {
+					CommandSharedVision(this->GetIndex(), true, diplomacy_state_player->GetIndex());
+					CommandSharedVision(diplomacy_state_player->GetIndex(), true, this->GetIndex());
+				}
+			}
+		}
+	}
 }
 
 void CPlayer::_bind_methods()
