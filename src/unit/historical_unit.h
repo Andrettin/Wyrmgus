@@ -65,14 +65,14 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	const UnitClass *GetUnitClass() const
+	const std::vector<const UnitClass *> &GetUnitClasses() const
 	{
-		return this->UnitClass;
+		return this->UnitClasses;
 	}
 	
-	const CUnitType *GetUnitType() const
+	const std::vector<const CUnitType *> &GetUnitTypes() const
 	{
-		return this->UnitType;
+		return this->UnitTypes;
 	}
 	
 	const CFaction *GetFaction() const
@@ -111,8 +111,8 @@ public:
 	}
 	
 private:
-	const ::UnitClass *UnitClass = nullptr;	/// the unit's class
-	const CUnitType *UnitType = nullptr;	/// the unit's unit type
+	std::vector<const UnitClass *> UnitClasses;	/// the unit's potential classes
+	std::vector<const CUnitType *> UnitTypes;	/// the unit's potential unit types
 	const CFaction *Faction = nullptr;		/// the unit's faction
 	int Quantity = 1;	/// how many in-game units does this historical unit result in when applied
 	CDate StartDate;	/// when the unit starts being active

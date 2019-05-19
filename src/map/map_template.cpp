@@ -1613,9 +1613,22 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			}
 		}
 		
-		const CUnitType *unit_type = historical_unit->GetUnitType();
-		if (unit_type == nullptr) {
-			unit_type = CFaction::GetFactionClassUnitType(unit_faction, historical_unit->GetUnitClass());
+		const CUnitType *unit_type = nullptr;
+		if (!historical_unit->GetUnitTypes().empty()) {
+			unit_type = historical_unit->GetUnitTypes()[SyncRand(historical_unit->GetUnitTypes().size())];
+		} else if (!historical_unit->GetUnitClasses().empty()) {
+			std::vector<const CUnitType *> potential_unit_types;
+			
+			for (const UnitClass *unit_class : historical_unit->GetUnitClasses()) {
+				const CUnitType *unit_class_type = CFaction::GetFactionClassUnitType(unit_faction, unit_class);
+				if (unit_class_type != nullptr) {
+					potential_unit_types.push_back(unit_class_type);
+				}
+			}
+			
+			if (!potential_unit_types.empty()) {
+				unit_type = potential_unit_types[SyncRand(potential_unit_types.size())];
+			}
 		}
 		
 		CPlayer *unit_player = unit_faction ? CPlayer::GetFactionPlayer(unit_faction) : nullptr;
