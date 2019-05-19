@@ -224,23 +224,23 @@ public:
 	void ConsumeElixir(const CUpgrade *elixir, const bool affect_character = true);
 	void ApplyAura(int aura_index);
 	void ApplyAuraEffect(int aura_index);
-	void SetPrefix(CUpgrade *prefix);
-	void SetSuffix(CUpgrade *suffix);
-	void SetSpell(CSpell *spell);
-	void SetWork(CUpgrade *work);
-	void SetElixir(CUpgrade *elixir);
+	void SetPrefix(const CUpgrade *prefix);
+	void SetSuffix(const CUpgrade *suffix);
+	void SetSpell(const CSpell *spell);
+	void SetWork(const CUpgrade *work);
+	void SetElixir(const CUpgrade *elixir);
 	void SetUnique(CUniqueItem *unique);
 	void Identify();
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
-	void GenerateSpecialProperties(CUnit *dropper = nullptr, CPlayer *dropper_player = nullptr, bool allow_unique = true, bool sold_item = false, bool always_magic = false);
-	void GeneratePrefix(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateSuffix(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateSpell(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateWork(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateUnique(CUnit *dropper, CPlayer *dropper_player);
+	void GenerateSpecialProperties(const CUnit *dropper = nullptr, const CPlayer *dropper_player = nullptr, const bool allow_unique = true, const bool sold_item = false, const bool always_magic = false);
+	void GeneratePrefix(const CUnit *dropper, const CPlayer *dropper_player);
+	void GenerateSuffix(const CUnit *dropper, const CPlayer *dropper_player);
+	void GenerateSpell(const CUnit *dropper, const CPlayer *dropper_player);
+	void GenerateWork(const CUnit *dropper, const CPlayer *dropper_player);
+	void GenerateUnique(const CUnit *dropper, const CPlayer *dropper_player);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
 	bool CanRecruitHero(const CCharacter *character) const;
@@ -518,11 +518,11 @@ public:
 	CUpgrade *Trait = nullptr;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
-	CUpgrade *Prefix = nullptr;	/// Item unit's prefix
-	CUpgrade *Suffix = nullptr;	/// Item unit's suffix
-	CSpell *Spell = nullptr;	/// Item unit's spell
-	CUpgrade *Work = nullptr;	/// Item unit's literary work
-	CUpgrade *Elixir = nullptr;	/// Item unit's elixir
+	const CUpgrade *Prefix = nullptr;	/// Item unit's prefix
+	const CUpgrade *Suffix = nullptr;	/// Item unit's suffix
+	const CSpell *Spell = nullptr;	/// Item unit's spell
+	const CUpgrade *Work = nullptr;	/// Item unit's literary work
+	const CUpgrade *Elixir = nullptr;	/// Item unit's elixir
 	CUniqueItem *Unique = nullptr;	/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified

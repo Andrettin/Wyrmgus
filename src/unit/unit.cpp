@@ -1920,9 +1920,9 @@ void CUnit::ApplyAuraEffect(int aura_index)
 	this->Variable[effect_index].Value = std::max(CYCLES_PER_SECOND + 1, this->Variable[effect_index].Value);
 }
 
-void CUnit::SetPrefix(CUpgrade *prefix)
+void CUnit::SetPrefix(const CUpgrade *prefix)
 {
-	if (Prefix != nullptr) {
+	if (this->Prefix != nullptr) {
 		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
 			RemoveIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
@@ -1933,8 +1933,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		Container->Character->GetItem(this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
-	Prefix = prefix;
-	if (Prefix != nullptr) {
+	this->Prefix = prefix;
+	if (this->Prefix != nullptr) {
 		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
 			ApplyIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
@@ -1945,9 +1945,9 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSuffix(CUpgrade *suffix)
+void CUnit::SetSuffix(const CUpgrade *suffix)
 {
-	if (Suffix != nullptr) {
+	if (this->Suffix != nullptr) {
 		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
 			RemoveIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
@@ -1958,7 +1958,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		Container->Character->GetItem(this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
-	Suffix = suffix;
+	this->Suffix = suffix;
 	if (Suffix != nullptr) {
 		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
 			ApplyIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
@@ -1970,18 +1970,18 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSpell(CSpell *spell)
+void CUnit::SetSpell(const CSpell *spell)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Spell = spell;
 		SaveHero(Container->Character);
 	}
-	Spell = spell;
+	this->Spell = spell;
 	
 	this->UpdateItemName();
 }
 
-void CUnit::SetWork(CUpgrade *work)
+void CUnit::SetWork(const CUpgrade *work)
 {
 	if (this->Work != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->MagicLevel;
@@ -1993,7 +1993,7 @@ void CUnit::SetWork(CUpgrade *work)
 		SaveHero(Container->Character);
 	}
 	
-	Work = work;
+	this->Work = work;
 	
 	if (this->Work != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->MagicLevel;
@@ -2003,7 +2003,7 @@ void CUnit::SetWork(CUpgrade *work)
 	this->UpdateItemName();
 }
 
-void CUnit::SetElixir(CUpgrade *elixir)
+void CUnit::SetElixir(const CUpgrade *elixir)
 {
 	if (this->Elixir != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->MagicLevel;
@@ -2015,7 +2015,7 @@ void CUnit::SetElixir(CUpgrade *elixir)
 		SaveHero(Container->Character);
 	}
 	
-	Elixir = elixir;
+	this->Elixir = elixir;
 	
 	if (this->Elixir != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->MagicLevel;
@@ -2033,11 +2033,11 @@ void CUnit::SetUnique(CUniqueItem *unique)
 	}
 		
 	if (unique != nullptr) {
-		SetPrefix(unique->Prefix);
-		SetSuffix(unique->Suffix);
-		SetSpell(unique->Spell);
-		SetWork(unique->Work);
-		SetElixir(unique->Elixir);
+		this->SetPrefix(unique->Prefix);
+		this->SetSuffix(unique->Suffix);
+		this->SetSpell(unique->Spell);
+		this->SetWork(unique->Work);
+		this->SetElixir(unique->Elixir);
 		if (unique->ResourcesHeld != 0) {
 			this->SetResourcesHeld(unique->ResourcesHeld);
 			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
@@ -2049,15 +2049,15 @@ void CUnit::SetUnique(CUniqueItem *unique)
 			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->MagicLevel;
 		}
 		Name = unique->Name;
-		Unique = unique;
+		this->Unique = unique;
 	} else {
 		Name.clear();
-		Unique = nullptr;
-		SetPrefix(nullptr);
-		SetSuffix(nullptr);
-		SetSpell(nullptr);
-		SetWork(nullptr);
-		SetElixir(nullptr);
+		this->Unique = nullptr;
+		this->SetPrefix(nullptr);
+		this->SetSuffix(nullptr);
+		this->SetSpell(nullptr);
+		this->SetWork(nullptr);
+		this->SetElixir(nullptr);
 	}
 }
 
@@ -2233,7 +2233,7 @@ void CUnit::GenerateDrop()
 	}
 }
 
-void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, bool allow_unique, bool sold_item, bool always_magic)
+void CUnit::GenerateSpecialProperties(const CUnit *dropper, const CPlayer *dropper_player, const bool allow_unique, const bool sold_item, const bool always_magic)
 {
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
@@ -2291,57 +2291,85 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	}
 }
 			
-void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::GeneratePrefix(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUpgrade *> potential_prefixes;
-	for (CUpgrade *affix : this->Type->Affixes) {
+	std::vector<const CUpgrade *> potential_prefixes;
+	
+	for (const CUpgrade *affix : this->Type->Affixes) {
 		if ((this->Type->ItemClass == nullptr && affix->MagicPrefix) || (this->Type->ItemClass != nullptr && affix->ItemPrefix.find(this->Type->ItemClass) != affix->ItemPrefix.end())) {
 			potential_prefixes.push_back(affix);
 		}
 	}
+	
 	if (dropper_player != nullptr) {
-		for (CUpgrade *upgrade : AllUpgrades) {
-			if (this->Type->ItemClass != nullptr && upgrade->ItemPrefix.find(this->Type->ItemClass) != upgrade->ItemPrefix.end() && CheckDependencies(upgrade, dropper)) {
-				potential_prefixes.push_back(upgrade);
+		for (const CUpgrade *upgrade : AllUpgrades) {
+			if (this->Type->ItemClass == nullptr || upgrade->ItemPrefix.find(this->Type->ItemClass) == upgrade->ItemPrefix.end()) {
+				continue;
 			}
+			if (dropper != nullptr) {
+				if (!CheckDependencies(upgrade, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(upgrade, dropper_player)) {
+					continue;
+				}
+			}
+			
+			potential_prefixes.push_back(upgrade);
 		}
 	}
 	
 	if (potential_prefixes.size() > 0) {
-		SetPrefix(potential_prefixes[SyncRand(potential_prefixes.size())]);
+		this->SetPrefix(potential_prefixes[SyncRand(potential_prefixes.size())]);
 	}
 }
 
-void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::GenerateSuffix(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUpgrade *> potential_suffixes;
-	for (CUpgrade *affix : this->Type->Affixes) {
+	std::vector<const CUpgrade *> potential_suffixes;
+	
+	for (const CUpgrade *affix : this->Type->Affixes) {
 		if ((this->Type->ItemClass == nullptr && affix->MagicSuffix) || (this->Type->ItemClass != nullptr && affix->ItemSuffix.find(this->Type->ItemClass) != affix->ItemSuffix.end())) {
 			if (this->Prefix == nullptr || !affix->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 				potential_suffixes.push_back(affix);
 			}
 		}
 	}
+	
 	if (dropper_player != nullptr) {
-		for (CUpgrade *upgrade : AllUpgrades) {
-			if (this->Type->ItemClass != nullptr && upgrade->ItemSuffix.find(this->Type->ItemClass) != upgrade->ItemSuffix.end() && CheckDependencies(upgrade, dropper)) {
-				if (this->Prefix == nullptr || !upgrade->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-					potential_suffixes.push_back(upgrade);
+		for (const CUpgrade *upgrade : AllUpgrades) {
+			if (this->Type->ItemClass == nullptr || upgrade->ItemSuffix.find(this->Type->ItemClass) == upgrade->ItemSuffix.end()) {
+				continue;
+			}
+			if (dropper != nullptr) {
+				if (!CheckDependencies(upgrade, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(upgrade, dropper_player)) {
+					continue;
 				}
 			}
+			
+			if (this->Prefix != nullptr && upgrade->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				continue;
+			}
+			
+			potential_suffixes.push_back(upgrade);
 		}
 	}
 	
 	if (potential_suffixes.size() > 0) {
-		SetSuffix(potential_suffixes[SyncRand(potential_suffixes.size())]);
+		this->SetSuffix(potential_suffixes[SyncRand(potential_suffixes.size())]);
 	}
 }
 
-void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::GenerateSpell(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CSpell *> potential_spells;
+	std::vector<const CSpell *> potential_spells;
 	if (dropper != nullptr) {
-		for (CSpell *spell : dropper->Type->DropSpells) {
+		for (const CSpell *spell : dropper->Type->DropSpells) {
 			if (this->Type->ItemClass != nullptr && spell->ItemSpell.find(this->Type->ItemClass) != spell->ItemSpell.end()) {
 				potential_spells.push_back(spell);
 			}
@@ -2349,74 +2377,167 @@ void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 	}
 	
 	if (potential_spells.size() > 0) {
-		SetSpell(potential_spells[SyncRand(potential_spells.size())]);
+		this->SetSpell(potential_spells[SyncRand(potential_spells.size())]);
 	}
 }
 
-void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::GenerateWork(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUpgrade *> potential_works;
-	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if (this->Type->ItemClass != nullptr && this->Type->Affixes[i]->Work == this->Type->ItemClass && !this->Type->Affixes[i]->UniqueOnly) {
-			potential_works.push_back(this->Type->Affixes[i]);
+	std::vector<const CUpgrade *> potential_works;
+	
+	for (const CUpgrade *affix : this->Type->Affixes) {
+		if (this->Type->ItemClass != nullptr && affix->Work == this->Type->ItemClass && !affix->UniqueOnly) {
+			potential_works.push_back(affix);
 		}
 	}
+	
 	if (dropper_player != nullptr) {
-		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != nullptr && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependencies(AllUpgrades[i], dropper) && !AllUpgrades[i]->UniqueOnly) {
-				potential_works.push_back(AllUpgrades[i]);
+		for (const CUpgrade *upgrade : AllUpgrades) {
+			if (this->Type->ItemClass == nullptr || upgrade->Work != this->Type->ItemClass || upgrade->UniqueOnly) {
+				continue;
 			}
+			
+			if (dropper != nullptr) {
+				if (!CheckDependencies(upgrade, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(upgrade, dropper_player)) {
+					continue;
+				}
+			}
+			
+			potential_works.push_back(upgrade);
 		}
 	}
 	
 	if (potential_works.size() > 0) {
-		SetWork(potential_works[SyncRand(potential_works.size())]);
+		this->SetWork(potential_works[SyncRand(potential_works.size())]);
 	}
 }
 
-void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::GenerateUnique(const CUnit *dropper, const CPlayer *dropper_player)
 {
 	std::vector<CUniqueItem *> potential_uniques;
-	for (size_t i = 0; i < UniqueItems.size(); ++i) {
-		if (
-			Type == UniqueItems[i]->Type
-			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Prefix == nullptr
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Prefix, dropper))
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Suffix == nullptr
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Suffix, dropper))
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
-				UniqueItems[i]->Set == nullptr
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Set, dropper))
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
-				UniqueItems[i]->Spell == nullptr
-				|| (dropper != nullptr && std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), UniqueItems[i]->Spell) != dropper->Type->DropSpells.end())
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Work == nullptr
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Work, dropper))
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Elixir == nullptr
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Elixir, dropper))
-			)
-			&& UniqueItems[i]->CanDrop()
-		) {
-			potential_uniques.push_back(UniqueItems[i]);
+	for (CUniqueItem *unique : UniqueItems) {
+		if (this->Type != unique->Type) {
+			continue;
 		}
+		
+		if (unique->Prefix != nullptr) {
+			//the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Prefix) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+				
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Prefix, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Prefix, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+		
+		if (unique->Suffix != nullptr) {
+			//the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Suffix) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+				
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Suffix, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Suffix, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+		
+		if (unique->Set != nullptr) {
+			//the dropper unit must be capable of generating this unique item's set to drop the item
+			if (dropper_player == nullptr) {
+				continue;
+			}
+			
+			if (dropper != nullptr) {
+				if (!CheckDependencies(unique->Set, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(unique->Set, dropper_player)) {
+					continue;
+				}
+			}
+		}
+		
+		if (unique->Spell != nullptr) {
+			//the dropper unit must be capable of generating this unique item's spell to drop the item
+			if (dropper == nullptr) {
+				continue;
+			}
+			
+			if (std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), unique->Spell) == dropper->Type->DropSpells.end()) {
+				continue;
+			}
+		}
+		
+		if (unique->Work != nullptr) {
+			//the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Work) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+				
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Work, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Work, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+		
+		if (unique->Elixir != nullptr) {
+			//the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Elixir) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+				
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Elixir, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Elixir, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+		
+		if (!unique->CanDrop()) {
+			continue;
+		}
+		
+		potential_uniques.push_back(unique);
 	}
 	
 	if (potential_uniques.size() > 0) {
 		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
-		SetUnique(chosen_unique);
+		this->SetUnique(chosen_unique);
 	}
 }
 

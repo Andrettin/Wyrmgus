@@ -1648,14 +1648,12 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		if (unit_faction) {
-			unit_player = GetOrAddFactionPlayer(unit_faction);
 		if (unit_faction != nullptr) {
 			unit_player = CPlayer::GetOrAddFactionPlayer(unit_faction);
 			if (!unit_player) {
 				continue;
 			}
-			if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
+			if (!unit_type->BoolFlag[ITEM_INDEX].value && unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
 				unit_player->SetStartView(unit_pos, z);
 			}
 		} else {
@@ -1663,7 +1661,11 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 		
 		for (int i = 0; i < historical_unit->GetQuantity(); ++i) {
-			CUnit *unit = CreateUnit(unit_pos - unit_type->GetTileCenterPosOffset(), *unit_type, unit_player, z);
+			//item units only use factions to generate special properties for them
+			CUnit *unit = CreateUnit(unit_pos - unit_type->GetTileCenterPosOffset(), *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+			if (unit_type->BoolFlag[ITEM_INDEX].value) {
+				unit->GenerateSpecialProperties(nullptr, unit_player, false);
+			}
 			if (historical_unit->GetResourcesHeld() != 0) {
 				unit->SetResourcesHeld(historical_unit->GetResourcesHeld());
 				unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->GetResourcesHeld();

@@ -79,12 +79,12 @@ public:
 	std::string Name;
 	bool Bound = false;			/// Whether the item is bound to its owner and can't be dropped
 	bool Identified = true;		/// Whether the item has been identified
-	CUnitType *Type = nullptr;	/// Item type of the item
-	CUpgrade *Prefix = nullptr;
-	CUpgrade *Suffix = nullptr;
-	CSpell *Spell = nullptr;
-	CUpgrade *Work = nullptr;
-	CUpgrade *Elixir = nullptr;
+	const CUnitType *Type = nullptr;	/// Item type of the item
+	const CUpgrade *Prefix = nullptr;
+	const CUpgrade *Suffix = nullptr;
+	const CSpell *Spell = nullptr;
+	const CUpgrade *Work = nullptr;
+	const CUpgrade *Elixir = nullptr;
 	CUniqueItem *Unique = nullptr;
 	CCharacter *Owner = nullptr;
 };

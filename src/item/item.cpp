@@ -110,23 +110,23 @@ int CUniqueItem::GetMagicLevel() const
 {
 	int magic_level = 0;
 	
-	if (this->Prefix) {
+	if (this->Prefix != nullptr) {
 		magic_level += this->Prefix->MagicLevel;
 	}
 	
-	if (this->Suffix) {
+	if (this->Suffix != nullptr) {
 		magic_level += this->Suffix->MagicLevel;
 	}
 	
-	if (this->Set) {
+	if (this->Set != nullptr) {
 		magic_level += this->Set->MagicLevel;
 	}
 	
-	if (this->Work) {
+	if (this->Work != nullptr) {
 		magic_level += this->Work->MagicLevel;
 	}
 	
-	if (this->Elixir) {
+	if (this->Elixir != nullptr) {
 		magic_level += this->Elixir->MagicLevel;
 	}
 	
@@ -177,13 +177,13 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "type") {
-			CUnitType *unit_type = CUnitType::Get(value);
+			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->Type = unit_type;
 			}
 		} else if (key == "prefix") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->Prefix = upgrade;
 			} else {
@@ -191,7 +191,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "suffix") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->Suffix = upgrade;
 			} else {
@@ -199,7 +199,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "spell") {
 			value = FindAndReplaceString(value, "_", "-");
-			CSpell *spell = CSpell::GetSpell(value);
+			const CSpell *spell = CSpell::GetSpell(value);
 			if (spell) {
 				this->Spell = spell;
 			} else {
@@ -207,7 +207,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "work") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->Work = upgrade;
 			} else {
@@ -215,7 +215,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "elixir") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->Elixir = upgrade;
 			} else {
