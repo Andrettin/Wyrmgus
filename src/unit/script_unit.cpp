@@ -405,7 +405,7 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "connecting-destination")) {
 			unit->ConnectingDestination = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
-			unit->MapLayer->LayerConnectors.push_back(unit);
+			unit->MapLayer->AddLayerConnector(unit);
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);

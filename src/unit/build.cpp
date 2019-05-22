@@ -615,7 +615,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		return nullptr;
 	}
 	
-	if (unit && z != unit->Player->StartMapLayer && (CMap::Map.MapLayers[z]->Plane != CMap::Map.MapLayers[unit->Player->StartMapLayer]->Plane || CMap::Map.MapLayers[z]->World != CMap::Map.MapLayers[unit->Player->StartMapLayer]->World)) {
+	if (unit && z != unit->Player->StartMapLayer && (CMap::Map.MapLayers[z]->GetPlane() != CMap::Map.MapLayers[unit->Player->StartMapLayer]->GetPlane() || CMap::Map.MapLayers[z]->GetWorld() != CMap::Map.MapLayers[unit->Player->StartMapLayer]->GetWorld())) {
 		return nullptr;
 	}
 

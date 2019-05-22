@@ -167,6 +167,21 @@ public:
 		return this->GetAppliedWidthWithDependentTemplateOffsets() * this->GetAppliedHeightWithDependentTemplateOffsets();
 	}
 	
+	CPlane *GetPlane() const
+	{
+		return this->Plane;
+	}
+	
+	CWorld *GetWorld() const
+	{
+		return this->World;
+	}
+	
+	int GetSurfaceLayer() const
+	{
+		return this->SurfaceLayer;
+	}
+	
 	int GetScale() const
 	{
 		return this->Scale;
@@ -273,9 +288,7 @@ private:
 	int Width = 0;
 	int Height = 0;
 	int Scale = 1;		/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
-public:
 	int SurfaceLayer = 0;							/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
-private:
 	int Priority = 0;	/// the priority of this map template, for the order of application of subtemplates
 	bool OutputTerrainImage = false;
 	bool GrowForSubtemplates = false;
@@ -297,8 +310,10 @@ public:
 	std::set<const CMapTemplate *> SouthOfTemplates;		/// map templates to which this one is to the north of
 	std::set<const CMapTemplate *> WestOfTemplates;			/// map templates to which this one is to the west of
 	std::set<const CMapTemplate *> EastOfTemplates;			/// map templates to which this one is to the east of
+private:
 	CPlane *Plane = nullptr;
 	CWorld *World = nullptr;
+public:
 	CTerrainType *BaseTerrainType = nullptr;
 	CTerrainType *BaseOverlayTerrainType = nullptr;
 	CTerrainType *BorderTerrainType = nullptr;

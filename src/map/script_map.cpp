@@ -2133,8 +2133,8 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushstring(l, map_template->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (map_template->World != nullptr) {
-			lua_pushstring(l, map_template->World->Ident.c_str());
+		if (map_template->GetWorld() != nullptr) {
+			lua_pushstring(l, map_template->GetWorld()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

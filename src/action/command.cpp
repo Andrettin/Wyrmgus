@@ -179,8 +179,7 @@ static void StopRaft(CUnit &unit)
 
 static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int new_z, std::vector<CUnit *> &checked_connectors)
 {
-	for (size_t i = 0; i != CMap::Map.MapLayers[old_z]->LayerConnectors.size(); ++i) {
-		CUnit *connector = CMap::Map.MapLayers[old_z]->LayerConnectors[i];
+	for (CUnit *connector : CMap::Map.MapLayers[old_z]->GetLayerConnectors()) {
 		CUnit *connector_destination = connector->ConnectingDestination;
 		std::vector<CUnit *> connector_path;
 		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.Player)) {

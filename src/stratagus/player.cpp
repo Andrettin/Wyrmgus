@@ -3844,19 +3844,19 @@ void GraphicPlayerPixels(int player, const CGraphic &sprite)
 	int time_of_day_blue = 0;
 	
 	if (sprite.TimeOfDay) {
-		if (sprite.TimeOfDay->Dawn) {
+		if (sprite.TimeOfDay->IsDawn()) {
 			time_of_day_red = -20;
 			time_of_day_green = -20;
 			time_of_day_blue = 0;
-		} else if (sprite.TimeOfDay->Day) {
+		} else if (sprite.TimeOfDay->IsDay()) {
 			time_of_day_red = 0;
 			time_of_day_green = 0;
 			time_of_day_blue = 0;
-		} else if (sprite.TimeOfDay->Dusk) {
+		} else if (sprite.TimeOfDay->IsDusk()) {
 			time_of_day_red = 0;
 			time_of_day_green = -20;
 			time_of_day_blue = -20;
-		} else if (sprite.TimeOfDay->Night) {
+		} else if (sprite.TimeOfDay->IsNight()) {
 			time_of_day_red = -45;
 			time_of_day_green = -35;
 			time_of_day_blue = -10;
@@ -4275,7 +4275,7 @@ bool CPlayer::IsVassalOf(const CPlayer &player, bool include_indirect) const
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
-	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->World == CMap::Map.MapLayers[this->StartMapLayer]->World && CMap::Map.MapLayers[player.StartMapLayer]->Plane == CMap::Map.MapLayers[this->StartMapLayer]->Plane);
+	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->GetWorld() == CMap::Map.MapLayers[this->StartMapLayer]->GetWorld() && CMap::Map.MapLayers[player.StartMapLayer]->GetPlane() == CMap::Map.MapLayers[this->StartMapLayer]->GetPlane());
 }
 
 /**

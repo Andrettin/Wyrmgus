@@ -473,11 +473,11 @@ void CleanUserInterfaceFillers()
 
 void UpdateSurfaceLayerButtons()
 {
-	unsigned int last_surface_layer = 0;
-	if (UI.CurrentMapLayer) {
+	int last_surface_layer = 0;
+	if (UI.CurrentMapLayer != nullptr) {
 		for (const CMapLayer *map_layer : CMap::Map.MapLayers) {
-			if (UI.CurrentMapLayer->Plane == map_layer->Plane && UI.CurrentMapLayer->World == map_layer->World && map_layer->SurfaceLayer > (int) last_surface_layer) {
-				last_surface_layer = map_layer->SurfaceLayer;
+			if (UI.CurrentMapLayer->GetPlane() == map_layer->GetPlane() && UI.CurrentMapLayer->GetWorld() == map_layer->GetWorld() && map_layer->GetSurfaceLayer() > last_surface_layer) {
+				last_surface_layer = map_layer->GetSurfaceLayer();
 			}
 		}
 	}

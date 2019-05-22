@@ -59,6 +59,7 @@
 //Wyrmgus end
 #include "species/species.h"
 #include "spell/spells.h"
+#include "time/time_of_day.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -81,7 +82,6 @@ enum {
 {
 	return new COrder_Still(false);
 }
-
 
 /* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
 {
@@ -208,6 +208,43 @@ static bool MoveRandomly(CUnit &unit)
 
 	// move if possible
 	if (pos != unit.tilePos) {
+		// if the tile the unit is moving to happens to have a layer connector, use it, if appropriate for the unit
+		bool found_connector = false;
+		CUnitCache &unitcache = CMap::Map.Field(pos, unit.MapLayer->ID)->UnitCache;
+		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
+			CUnit *connector = *it;
+
+			if (connector->ConnectingDestination == nullptr || !unit.CanUseItem(connector)) {
+				continue;
+			}
+			
+			const CMapLayer *destination_map_layer = connector->ConnectingDestination->MapLayer;
+			
+			if (unit.IsDiurnal() && destination_map_layer->IsUnderground()) {
+				continue;
+			}
+			
+			if (unit.IsNocturnal() && !destination_map_layer->IsUnderground()) {
+				if (destination_map_layer->GetTimeOfDay() == nullptr || !destination_map_layer->GetTimeOfDay()->IsNight()) {
+					continue;
+				}
+			}
+			
+			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
+			if (unit.Type->GetSpecies() != nullptr && unit.Type->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
+				if (!unit.Type->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(connector->ConnectingDestination->GetTileCenterPos(), false, connector->ConnectingDestination->MapLayer->ID))) {
+					continue;
+				}
+			}
+			
+			if (!UnitReachable(unit, *connector, 1, unit.GetReactionRange() * 8)) {
+				continue;
+			}
+			
+			CommandUse(unit, *connector, FlushCommands);
+			return true;
+		}
+		
 		UnmarkUnitFieldFlags(unit);
 		if (UnitCanBeAt(unit, pos, unit.MapLayer->ID)) {
 			MarkUnitFieldFlags(unit);
@@ -294,9 +331,9 @@ static bool LeaveShelter(CUnit &unit)
 }
 
 /**
-**  PickUpItem
+**	@brief	Pick up an item, if any is near the unit
 **
-**  @return  true if the unit picks up an item, false otherwise
+**	@return	True if the unit picks up an item, or false otherwise
 */
 static bool PickUpItem(CUnit &unit)
 {
@@ -327,6 +364,53 @@ static bool PickUpItem(CUnit &unit)
 			}
 		}
 	}
+	return false;
+}
+
+/**
+**	@brief	Move underground, if the unit is a nocturnal animal and it is no longer night
+**
+**	@return	True if the unit moves underground (or to another map layer which it can reach and where it is night), or false otherwise
+*/
+static bool MoveUnderground(CUnit &unit)
+{
+	if (!unit.Type->BoolFlag[FAUNA_INDEX].value || !unit.IsNocturnal()) {
+		return false; //must be a nocturnal animal
+	}
+	
+	if (unit.MapLayer->IsUnderground()) {
+		return false; //already underground
+	}
+	
+	if (unit.MapLayer->GetTimeOfDay() != nullptr && unit.MapLayer->GetTimeOfDay()->IsNight()) {
+		return false; //should only move underground if it is not night in the map layer where the unit currently is
+	}
+	
+	// look for a nearby connector to an underground layer
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, unit.GetReactionRange(), table);
+
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (table[i]->ConnectingDestination == nullptr || !unit.CanUseItem(table[i])) {
+			continue;
+		}
+		
+		const CMapLayer *destination_map_layer = table[i]->ConnectingDestination->MapLayer;
+		
+		if (!destination_map_layer->IsUnderground()) {
+			if (destination_map_layer->GetTimeOfDay() == nullptr || !destination_map_layer->GetTimeOfDay()->IsNight()) {
+				continue; //the destination map layer must either be underground, or be in a night time of day
+			}
+		}
+		
+		if (!UnitReachable(unit, *table[i], 1, unit.GetReactionRange() * 8)) {
+			continue;
+		}
+		
+		CommandUse(unit, *table[i], FlushCommands);
+		return true;
+	}
+	
 	return false;
 }
 //Wyrmgus end
@@ -564,7 +648,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| MoveRandomly(unit) || PickUpItem(unit)) {
+			|| MoveRandomly(unit) || PickUpItem(unit) || MoveUnderground(unit)) {
 			//Wyrmgus end
 		}
 	}

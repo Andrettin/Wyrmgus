@@ -56,7 +56,8 @@
 /**
 **	@brief	Constructor
 */
-CMapLayer::CMapLayer(const int width, const int height) : Width(width), Height(height)
+CMapLayer::CMapLayer(const int width, const int height, CPlane *plane, CWorld *world, const int surface_layer)
+	: Width(width), Height(height), Plane(plane), World(world), SurfaceLayer(surface_layer)
 {
 	const int max_tile_index = this->Width * this->Height;
 
@@ -326,8 +327,8 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", old_time_of_day ? old_time_of_day->TimeOfDay : nullptr, this->TimeOfDay ? this->TimeOfDay->TimeOfDay : nullptr);
 	}
 
-	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);
-	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Night) != (old_time_of_day && old_time_of_day->TimeOfDay->Night);
+	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->IsDay()) != (old_time_of_day && old_time_of_day->TimeOfDay->IsDay());
+	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->IsNight()) != (old_time_of_day && old_time_of_day->TimeOfDay->IsNight());
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {

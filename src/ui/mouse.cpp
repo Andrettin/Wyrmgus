@@ -2393,7 +2393,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->Plane || UI.CurrentMapLayer->World != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->World)) {
+				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->GetPlane() != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->GetPlane() || UI.CurrentMapLayer->GetWorld() != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->GetWorld())) {
 					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
 				}
 				PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);

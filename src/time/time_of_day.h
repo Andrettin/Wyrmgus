@@ -52,22 +52,6 @@ class CTimeOfDay : public DataElement, public DataType<CTimeOfDay>
 {
 	DATA_TYPE(CTimeOfDay, DataElement)
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Dawn);
-		REGISTER_PROPERTY(Day);
-		REGISTER_PROPERTY(Dusk);
-		REGISTER_PROPERTY(Night);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	static constexpr const char *ClassIdentifier = "time_of_day";
 	
@@ -76,6 +60,26 @@ public:
 	CGraphic *GetGraphic() const
 	{
 		return this->G;
+	}
+	
+	bool IsDawn() const
+	{
+		return this->Dawn;
+	}
+	
+	bool IsDay() const
+	{
+		return this->Day;
+	}
+	
+	bool IsDusk() const
+	{
+		return this->Dusk;
+	}
+	
+	bool IsNight() const
+	{
+		return this->Night;
 	}
 	
 	/**
@@ -93,14 +97,12 @@ public:
 		return this->ColorModification;
 	}
 	
-public:
-	Property<bool> Dawn = false;		/// Whether this is a dawn time of day
-	Property<bool> Day = false;			/// Whether this is a day time of day
-	Property<bool> Dusk = false;		/// Whether this is a dusk time of day
-	Property<bool> Night = false;		/// Whether this is a night time of day
-	
 private:
-	CColor ColorModification;			/// The color modification applied to graphics when the time of day is active
+	bool Dawn = false;		/// whether this is a dawn time of day
+	bool Day = false;		/// whether this is a day time of day
+	bool Dusk = false;		/// whether this is a dusk time of day
+	bool Night = false;		/// whether this is a night time of day
+	CColor ColorModification;	/// the color modification applied to graphics when the time of day is active
 	CGraphic *G = nullptr;
 
 protected:

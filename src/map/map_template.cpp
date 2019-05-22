@@ -552,13 +552,10 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 			height = current_campaign->GetMapSize(z).y;
 		}
 	
-		CMapLayer *map_layer = new CMapLayer(width, height);
+		CMapLayer *map_layer = new CMapLayer(width, height, this->Plane, this->World, this->SurfaceLayer);
 		map_layer->ID = CMap::Map.MapLayers.size();
 		CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
 		CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
-		map_layer->Plane = this->Plane;
-		map_layer->World = this->World;
-		map_layer->SurfaceLayer = this->SurfaceLayer;
 		map_layer->PixelTileSize = this->PixelTileSize;
 		CMap::Map.MapLayers.push_back(map_layer);
 	} else {
@@ -1346,7 +1343,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (CMap::Map.MapLayers[second_z]->Plane == std::get<2>(this->PlaneConnectors[i])) {
+			if (CMap::Map.MapLayers[second_z]->GetPlane() == std::get<2>(this->PlaneConnectors[i])) {
 				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
 					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
 						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
@@ -1389,7 +1386,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (CMap::Map.MapLayers[second_z]->World == std::get<2>(this->WorldConnectors[i])) {
+			if (CMap::Map.MapLayers[second_z]->GetWorld() == std::get<2>(this->WorldConnectors[i])) {
 				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
 					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
 						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
@@ -1433,7 +1430,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
 			std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
 			for (const CUnit *connector : other_layer_connectors) {
-				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->Plane == this->Plane && connector->ConnectingDestination->MapLayer->World == this->World && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
+				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->GetPlane() == this->Plane && connector->ConnectingDestination->MapLayer->GetWorld() == this->World && connector->ConnectingDestination->MapLayer->GetSurfaceLayer() == this->SurfaceLayer) {
 					already_implemented = true;
 					break;
 				}
@@ -1646,18 +1643,19 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 		
 		//add the connecting destination, if this is a connector
-		const CMapTemplate *other_template = nullptr;
+		const CMapLayer *other_map_layer = nullptr;
 		if (historical_unit->GetConnectionSurfaceLayer() != -1) {
-			const int surface_layer = historical_unit->GetConnectionSurfaceLayer();
+			other_map_layer = CMap::Map.GetMapLayer(this->Plane, this->World, historical_unit->GetConnectionSurfaceLayer());
 			
-			if (surface_layer == (this->SurfaceLayer + 1)) {
-				other_template = this->LowerTemplate;
-			} else if (surface_layer == (this->SurfaceLayer - 1)) {
-				other_template = this->UpperTemplate;
+			if (other_map_layer == nullptr) { //the layer doesn't exist (at least yet)
+				if (CCampaign::GetCurrentCampaign() != nullptr && !CCampaign::GetCurrentCampaign()->HasMapTemplateForLayer(this->Plane, this->World, historical_unit->GetConnectionSurfaceLayer())) { //the current scenario has no map template for the desired layer either
+					fprintf(stderr, "Surface layer connector \"%s\" should lead to surface layer %i, but no such layer exists.\n", historical_unit->Ident.c_str(), historical_unit->GetConnectionSurfaceLayer());
+					continue; //surface layer connectors must lead to a surface layer
+				}
 			}
-			
-			if (other_template == nullptr) {
-				continue; //surface layer connectors must lead to an adjacent surface layer
+
+			if (std::abs(this->GetSurfaceLayer() - historical_unit->GetConnectionSurfaceLayer()) != 1) {
+				fprintf(stderr, "Non-adjacent surface layer (%i) for surface layer connector in layer %i.\n", historical_unit->GetConnectionSurfaceLayer(), this->SurfaceLayer);
 			}
 		}
 		
@@ -1709,26 +1707,28 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			if (historical_unit->GetConnectionSurfaceLayer() != -1) {
 				CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 				
-				//get the nearest compatible connector in the target map layer / template
-				std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
-				CUnit *best_layer_connector = nullptr;
-				int best_distance = -1;
-				for (CUnit *potential_connector : other_layer_connectors) {
-					if (potential_connector->Type == unit_type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-						int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
-						if (best_distance == -1 || distance < best_distance) {
-							best_layer_connector = potential_connector;
-							best_distance = distance;
-							if (distance == 0) {
-								break;
+				if (other_map_layer != nullptr) {
+					//get the nearest compatible connector in the target map layer / template
+					const std::vector<CUnit *> &other_layer_connectors = other_map_layer->GetLayerConnectors();
+					CUnit *best_layer_connector = nullptr;
+					int best_distance = -1;
+					for (CUnit *potential_connector : other_layer_connectors) {
+						if (potential_connector->Type == unit_type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
+							int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
+							if (best_distance == -1 || distance < best_distance) {
+								best_layer_connector = potential_connector;
+								best_distance = distance;
+								if (distance == 0) {
+									break;
+								}
 							}
 						}
 					}
-				}
-				
-				if (best_layer_connector != nullptr) {
-					best_layer_connector->ConnectingDestination = unit;
-					unit->ConnectingDestination = best_layer_connector;
+					
+					if (best_layer_connector != nullptr) {
+						best_layer_connector->ConnectingDestination = unit;
+						unit->ConnectingDestination = best_layer_connector;
+					}
 				}
 			}
 			

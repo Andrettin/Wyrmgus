@@ -100,7 +100,7 @@ bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string va
 		this->StartDate = CDate::FromString(value);
 	} else if (key == "required_quest") {
 		value = FindAndReplaceString(value, "_", "-");
-		CQuest *quest = CQuest::Get(value);
+		const CQuest *quest = CQuest::Get(value);
 		if (quest != nullptr) {
 			this->RequiredQuests.push_back(quest);
 		}
@@ -202,7 +202,7 @@ bool CCampaign::IsAvailable() const
 		return false;
 	}
 	
-	for (CQuest *quest : this->RequiredQuests) {
+	for (const CQuest *quest : this->RequiredQuests) {
 		if (!quest->IsCompleted()) {
 			return false;
 		}
@@ -218,6 +218,17 @@ Vec2i CCampaign::GetMapSize(const int z) const
 	}
 	
 	return Vec2i(this->MapTemplates[z]->GetWidth(), this->MapTemplates[z]->GetHeight());
+}
+
+bool CCampaign::HasMapTemplateForLayer(const CPlane *plane, const CWorld *world, const int surface_layer) const
+{
+	for (const CMapTemplate *map_template : this->MapTemplates) {
+		if (map_template->GetPlane() == plane && map_template->GetWorld() == world && map_template->GetSurfaceLayer() == surface_layer) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 void CCampaign::_bind_methods()

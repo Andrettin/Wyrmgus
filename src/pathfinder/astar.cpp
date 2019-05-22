@@ -788,8 +788,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				(mf->Flags & MapFieldDesert)
 				&& mf->Owner != unit.Player->GetIndex()
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
-				&& unit.MapLayer->GetTimeOfDay()
-				&& unit.MapLayer->GetTimeOfDay()->Day
+				&& unit.MapLayer->GetTimeOfDay() != nullptr
+				&& unit.MapLayer->GetTimeOfDay()->IsDay()
 				&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 			) {
 				cost += 32; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that

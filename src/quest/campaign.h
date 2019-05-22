@@ -49,8 +49,10 @@
 
 class CFaction;
 class CMapTemplate;
+class CPlane;
 class CQuest;
 class CSpecies;
+class CWorld;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -112,13 +114,15 @@ public:
 	
 	Vec2i GetMapSize(const int z) const;
 	
+	bool HasMapTemplateForLayer(const CPlane *plane, const CWorld *world, const int surface_layer) const;
+	
 private:
 	String Description;		/// description of the campaign
 	CDate StartDate;		/// the starting date of the campaign
 	bool Hidden = false;	/// whether the campaign is hidden
 	bool Sandbox = false;	/// whether the campaign is a sandbox one
 private:
-	std::vector<CQuest *> RequiredQuests;	/// quests required for the campaign to be available
+	std::vector<const CQuest *> RequiredQuests;	/// quests required for the campaign to be available
 	const CQuest *CompletionQuest = nullptr;	/// the quest on which the campaign depends for completion, or failure
 	CFaction *Faction = nullptr;	/// which faction the player plays as in the campaign
 public:

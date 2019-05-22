@@ -54,11 +54,12 @@ class CTimeOfDay;
 class CTimeOfDaySchedule;
 class CUnit;
 class CWorld;
+struct lua_State;
 
 class CMapLayer
 {
 public:
-	CMapLayer(const int width, const int height);
+	CMapLayer(const int width, const int height, CPlane *plane = nullptr, CWorld *world = nullptr, const int surface_layer = 0);
 	~CMapLayer();
 	
 	/**
@@ -123,6 +124,21 @@ public:
 		return this->ID;
 	}
 	
+	CPlane *GetPlane() const
+	{
+		return this->Plane;
+	}
+	
+	CWorld *GetWorld() const
+	{
+		return this->World;
+	}
+	
+	int GetSurfaceLayer() const
+	{
+		return this->SurfaceLayer;
+	}
+	
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
 	void RegenerateForest();
@@ -147,6 +163,21 @@ public:
 	void SetSeason(CScheduledSeason *season);
 	CSeason *GetSeason() const;
 	
+	bool IsUnderground() const
+	{
+		return this->SurfaceLayer > 0;
+	}
+	
+	void AddLayerConnector(CUnit *connector)
+	{
+		this->LayerConnectors.push_back(connector);
+	}
+	
+	const std::vector<CUnit *> &GetLayerConnectors() const
+	{
+		return this->LayerConnectors;
+	}
+	
 	int ID = -1;
 private:
 	CMapField *Fields = nullptr;				/// fields on the map layer
@@ -159,13 +190,18 @@ public:
 	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
+private:
 	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer
 	CWorld *World = nullptr;					/// the world pointer (if any) for the map layer
 	int SurfaceLayer = 0;						/// the surface layer for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
+public:
 	PixelSize PixelTileSize = PixelSize(32, 32);	/// the pixel tile size for the map layer
 	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
+	
+	friend int CclStratagusMap(lua_State *l);
+	friend CMapTemplate;
 };
 
 #endif

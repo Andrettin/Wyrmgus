@@ -285,14 +285,16 @@ public:
 	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
 	
-	void SetCurrentPlane(CPlane *plane);
-	void SetCurrentWorld(CWorld *world);
-	void SetCurrentSurfaceLayer(int surface_layer);
+	void SetCurrentPlane(const CPlane *plane);
+	void SetCurrentWorld(const CWorld *world);
+	void SetCurrentSurfaceLayer(const int surface_layer);
 	CPlane *GetCurrentPlane() const;
 	CWorld *GetCurrentWorld() const;
 	int GetCurrentSurfaceLayer() const;
 	PixelSize GetCurrentPixelTileSize() const;
 	PixelSize GetMapLayerPixelTileSize(int map_layer) const;
+	
+	CMapLayer *GetMapLayer(const CPlane *plane, const CWorld *world = nullptr, const int surface_layer = 0) const;
 	//Wyrmgus end
 
 	//UnitCache

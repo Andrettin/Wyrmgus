@@ -454,19 +454,19 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 	}
 #endif
 	SDL_Surface *surface = nullptr;
-	if (time_of_day && time_of_day->Dawn) {
+	if (time_of_day && time_of_day->IsDawn()) {
 		if (flipped) {
 			surface = PlayerColorSurfacesDawnFlip[player_color];
 		} else {
 			surface = PlayerColorSurfacesDawn[player_color];
 		}
-	} else if (time_of_day && time_of_day->Dusk) {
+	} else if (time_of_day && time_of_day->IsDusk()) {
 		if (flipped) {
 			surface = PlayerColorSurfacesDuskFlip[player_color];
 		} else {
 			surface = PlayerColorSurfacesDusk[player_color];
 		}
-	} else if (time_of_day && time_of_day->Night) {
+	} else if (time_of_day && time_of_day->IsNight()) {
 		if (flipped) {
 			surface = PlayerColorSurfacesNightFlip[player_color];
 		} else {
@@ -486,19 +486,19 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 	
 	SDL_Surface *base_surface = flipped ? SurfaceFlip : Surface;
 	
-	if (time_of_day && time_of_day->Dawn) {
+	if (time_of_day && time_of_day->IsDawn()) {
 		if (flipped) {
 			surface = PlayerColorSurfacesDawnFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		} else {
 			surface = PlayerColorSurfacesDawn[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		}
-	} else if (time_of_day && time_of_day->Dusk) {
+	} else if (time_of_day && time_of_day->IsDusk()) {
 		if (flipped) {
 			surface = PlayerColorSurfacesDuskFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		} else {
 			surface = PlayerColorSurfacesDusk[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		}
-	} else if (time_of_day && time_of_day->Night) {
+	} else if (time_of_day && time_of_day->IsNight()) {
 		if (flipped) {
 			surface = PlayerColorSurfacesNightFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		} else {
@@ -526,15 +526,15 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 	int time_of_day_blue = 0;
 	
 	if (!this->Grayscale) { // don't alter the colors of grayscale graphics
-		if (time_of_day && time_of_day->Dawn) { // dawn
+		if (time_of_day && time_of_day->IsDawn()) { // dawn
 			time_of_day_red = -20;
 			time_of_day_green = -20;
 			time_of_day_blue = 0;
-		} else if (time_of_day && time_of_day->Dusk) { // dusk
+		} else if (time_of_day && time_of_day->IsDusk()) { // dusk
 			time_of_day_red = 0;
 			time_of_day_green = -20;
 			time_of_day_blue = -20;
-		} else if (time_of_day && time_of_day->Night) { // night
+		} else if (time_of_day && time_of_day->IsNight()) { // night
 			time_of_day_red = -45;
 			time_of_day_green = -35;
 			time_of_day_blue = -10;
@@ -644,22 +644,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 //		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
 			if (!PlayerColorSurfaces[player]) {
 				MakePlayerColorSurface(player, false, nullptr);
 			}
 			surface = PlayerColorSurfaces[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
 			if (!PlayerColorSurfacesDawn[player]) {
 				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDawn[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
 			if (!PlayerColorSurfacesDusk[player]) {
 				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDusk[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
 			if (!PlayerColorSurfacesNight[player]) {
 				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
 			}
@@ -718,22 +718,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 //		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
 			if (!PlayerColorSurfaces[player]) {
 				MakePlayerColorSurface(player, false, nullptr);
 			}
 			surface = PlayerColorSurfaces[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
 			if (!PlayerColorSurfacesDawn[player]) {
 				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDawn[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
 			if (!PlayerColorSurfacesDusk[player]) {
 				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDusk[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
 			if (!PlayerColorSurfacesNight[player]) {
 				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
 			}
@@ -796,22 +796,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 //		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
 			if (!PlayerColorSurfacesFlip[player]) {
 				MakePlayerColorSurface(player, true, nullptr);
 			}
 			surface = PlayerColorSurfacesFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
 			if (!PlayerColorSurfacesDawnFlip[player]) {
 				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDawnFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
 			if (!PlayerColorSurfacesDuskFlip[player]) {
 				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDuskFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
 			if (!PlayerColorSurfacesNightFlip[player]) {
 				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
 			}
@@ -1053,22 +1053,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 //		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
 			if (!PlayerColorSurfacesFlip[player]) {
 				MakePlayerColorSurface(player, true, nullptr);
 			}
 			surface = PlayerColorSurfacesFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
 			if (!PlayerColorSurfacesDawnFlip[player]) {
 				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDawnFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
 			if (!PlayerColorSurfacesDuskFlip[player]) {
 				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 			surface = PlayerColorSurfacesDuskFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
+		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
 			if (!PlayerColorSurfacesNightFlip[player]) {
 				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
 			}
@@ -2421,7 +2421,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 		} else {
 			return Surface;
 		}
-	} else if (time_of_day->Dawn) {
+	} else if (time_of_day->IsDawn()) {
 		if (flipped) {
 			if (DawnSurfaceFlip) {
 				return DawnSurfaceFlip;
@@ -2431,7 +2431,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 				return DawnSurface;
 			}
 		}
-	} else if (time_of_day->Dusk) {
+	} else if (time_of_day->IsDusk()) {
 		if (flipped) {
 			if (DuskSurfaceFlip) {
 				return DuskSurfaceFlip;
@@ -2441,7 +2441,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 				return DuskSurface;
 			}
 		}
-	} else if (time_of_day->Night) {
+	} else if (time_of_day->IsNight()) {
 		if (flipped) {
 			if (NightSurfaceFlip) {
 				return NightSurfaceFlip;
@@ -2465,7 +2465,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
 
-	if (time_of_day->Dawn) {
+	if (time_of_day->IsDawn()) {
 		if (flipped) {
 			surface = DawnSurfaceFlip = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		} else {
@@ -2474,7 +2474,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 		time_of_day_red = -20;
 		time_of_day_green = -20;
 		time_of_day_blue = 0;
-	} else if (time_of_day->Dusk) {
+	} else if (time_of_day->IsDusk()) {
 		if (flipped) {
 			surface = DuskSurfaceFlip = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		} else {
@@ -2483,7 +2483,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 		time_of_day_red = 0;
 		time_of_day_green = -20;
 		time_of_day_blue = -20;
-	} else if (time_of_day->Night) {
+	} else if (time_of_day->IsNight()) {
 		if (flipped) {
 			surface = NightSurfaceFlip = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
 		} else {

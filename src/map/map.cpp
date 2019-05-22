@@ -782,12 +782,12 @@ std::pair<Vec2i, Vec2i> CMap::GetSubtemplateRect(const CMapTemplate *subtemplate
 	}
 	
 	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
-		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::make_pair(std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]), std::get<1>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]));
+	if (main_template && subtemplate != main_template && main_template->GetPlane() && main_template->GetWorld()) {
+		const CMapLayer *map_layer = this->GetMapLayer(main_template->GetPlane(), main_template->GetWorld(), main_template->GetSurfaceLayer());
+		if (map_layer != nullptr) {
+			for (size_t i = 0; i < map_layer->SubtemplateAreas.size(); ++i) {
+				if (subtemplate == std::get<2>(map_layer->SubtemplateAreas[i])) {
+					return std::make_pair(std::get<0>(map_layer->SubtemplateAreas[i]), std::get<1>(map_layer->SubtemplateAreas[i]));
 				}
 			}
 		}
@@ -855,12 +855,12 @@ CMapLayer *CMap::GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const
 	}
 	
 	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
-		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return this->MapLayers[z];
+	if (main_template && subtemplate != main_template && main_template->GetPlane() && main_template->GetWorld()) {
+		CMapLayer *map_layer = this->GetMapLayer(main_template->GetPlane(), main_template->GetWorld(), main_template->GetSurfaceLayer());
+		if (map_layer != nullptr) {
+			for (size_t i = 0; i < map_layer->SubtemplateAreas.size(); ++i) {
+				if (subtemplate == std::get<2>(map_layer->SubtemplateAreas[i])) {
+					return map_layer;
 				}
 			}
 		}
@@ -885,17 +885,16 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 	}
 	
 	const CMapTemplate *main_template = map_template->GetTopMapTemplate();
-	if (main_template && main_template->Plane && main_template->World) {
+	if (main_template && main_template->GetPlane() && main_template->GetWorld()) {
 		const bool is_main_template = main_template == map_template;
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
-		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
-				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
+		const CMapLayer *map_layer = this->GetMapLayer(main_template->GetPlane(), main_template->GetWorld(), main_template->GetSurfaceLayer());
+		if (map_layer != nullptr) {
+			for (CUnit *connector_unit : map_layer->GetLayerConnectors()) {
 				const Vec2i unit_pos = connector_unit->GetTileCenterPos();
 				
-				if (is_main_template && this->IsPointInASubtemplateArea(unit_pos, z)) {
+				if (is_main_template && this->IsPointInASubtemplateArea(unit_pos, map_layer->GetIndex())) {
 					continue;
-				} else if (!is_main_template && !this->IsPointInASubtemplateArea(unit_pos, z, map_template)) {
+				} else if (!is_main_template && !this->IsPointInASubtemplateArea(unit_pos, map_layer->GetIndex(), map_template)) {
 					continue;
 				}
 
@@ -940,95 +939,91 @@ bool CMap::IsLayerUnderground(int z) const
 		return true;
 	}
 	
-	if (this->MapLayers[z]->SurfaceLayer > 0) {
-		return true;
-	}
-
-	return false;
+	return this->MapLayers[z]->IsUnderground();
 }
 
-void CMap::SetCurrentPlane(CPlane *plane)
+void CMap::SetCurrentPlane(const CPlane *plane)
 {
-	if (UI.CurrentMapLayer->Plane == plane) {
+	if (UI.CurrentMapLayer->GetPlane() == plane) {
 		return;
 	}
 	
-	int map_layer = -1;
+	CMapLayer *chosen_map_layer = nullptr;
 	
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
-			map_layer = z;
+	for (CMapLayer *map_layer : this->MapLayers) {
+		if (map_layer->GetPlane() == plane && map_layer->GetSurfaceLayer() == this->GetCurrentSurfaceLayer()) {
+			chosen_map_layer = map_layer;
 			break;
 		}
 	}
 	
-	if (map_layer == -1) {
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			if (CMap::Map.MapLayers[z]->Plane == plane) {
-				map_layer = z;
+	if (chosen_map_layer == nullptr) {
+		for (CMapLayer *map_layer : this->MapLayers) {
+			if (map_layer->GetPlane() == plane) {
+				chosen_map_layer = map_layer;
 				break;
 			}
 		}
 	}
 	
-	if (map_layer != -1) {
-		ChangeCurrentMapLayer(map_layer);
+	if (chosen_map_layer != nullptr) {
+		ChangeCurrentMapLayer(chosen_map_layer->GetIndex());
 	}
 }
 
-void CMap::SetCurrentWorld(CWorld *world)
+void CMap::SetCurrentWorld(const CWorld *world)
 {
-	if (UI.CurrentMapLayer->World == world) {
+	if (UI.CurrentMapLayer->GetWorld() == world) {
 		return;
 	}
 	
-	int map_layer = -1;
+	CMapLayer *chosen_map_layer = nullptr;
 	
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->World == world && CMap::Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
-			map_layer = z;
+	for (CMapLayer *map_layer : this->MapLayers) {
+		if (map_layer->GetWorld() == world && map_layer->GetSurfaceLayer() == this->GetCurrentSurfaceLayer()) {
+			chosen_map_layer = map_layer;
 			break;
 		}
 	}
 	
-	if (map_layer == -1) {
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			if (CMap::Map.MapLayers[z]->World == world) {
-				map_layer = z;
+	if (chosen_map_layer == nullptr) {
+		for (CMapLayer *map_layer : this->MapLayers) {
+			if (map_layer->GetWorld() == world) {
+				chosen_map_layer = map_layer;
 				break;
 			}
 		}
 	}
 	
-	if (map_layer != -1) {
-		ChangeCurrentMapLayer(map_layer);
+	if (chosen_map_layer != nullptr) {
+		ChangeCurrentMapLayer(chosen_map_layer->GetIndex());
 	}
 }
 
-void CMap::SetCurrentSurfaceLayer(int surface_layer)
+void CMap::SetCurrentSurfaceLayer(const int surface_layer)
 {
-	if (UI.CurrentMapLayer->SurfaceLayer == surface_layer) {
+	if (UI.CurrentMapLayer->GetSurfaceLayer() == surface_layer) {
 		return;
 	}
 	
-	int map_layer = -1;
+	CMapLayer *chosen_map_layer = nullptr;
 	
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->Plane == this->GetCurrentPlane() && CMap::Map.MapLayers[z]->World == this->GetCurrentWorld() && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
-			map_layer = z;
+	for (CMapLayer *map_layer : this->MapLayers) {
+		if (map_layer->GetPlane() == this->GetCurrentPlane() && map_layer->GetWorld() == this->GetCurrentWorld() && map_layer->GetSurfaceLayer() == surface_layer) {
+			chosen_map_layer = map_layer;
 			break;
 		}
 	}
 	
-	if (map_layer != -1) {
-		ChangeCurrentMapLayer(map_layer);
+	if (chosen_map_layer != nullptr) {
+		ChangeCurrentMapLayer(chosen_map_layer->GetIndex());
 	}
 }
 
 CPlane *CMap::GetCurrentPlane() const
 {
 	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->Plane;
+		return UI.CurrentMapLayer->GetPlane();
 	} else {
 		return nullptr;
 	}
@@ -1037,7 +1032,7 @@ CPlane *CMap::GetCurrentPlane() const
 CWorld *CMap::GetCurrentWorld() const
 {
 	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->World;
+		return UI.CurrentMapLayer->GetWorld();
 	} else {
 		return nullptr;
 	}
@@ -1046,7 +1041,7 @@ CWorld *CMap::GetCurrentWorld() const
 int CMap::GetCurrentSurfaceLayer() const
 {
 	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->SurfaceLayer;
+		return UI.CurrentMapLayer->GetSurfaceLayer();
 	} else {
 		return 0;
 	}
@@ -1068,6 +1063,17 @@ PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
 	} else {
 		return PixelSize(32, 32);
 	}
+}
+
+CMapLayer *CMap::GetMapLayer(const CPlane *plane, const CWorld *world, const int surface_layer) const
+{
+	for (CMapLayer *map_layer : this->MapLayers) {
+		if (map_layer->GetPlane() == plane && map_layer->GetWorld() == world && map_layer->GetSurfaceLayer() == surface_layer) {
+			return map_layer;
+		}
+	}
+	
+	return nullptr;
 }
 //Wyrmgus end
 
@@ -1197,10 +1203,10 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, 
 	CPlane *plane = CPlane::Get(plane_ident, false);
 	CWorld *world = CWorld::Get(world_ident, false);
 
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->World == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
-			return z;
-		}
+	const CMapLayer *map_layer = CMap::Map.GetMapLayer(plane, world, surface_layer);
+	
+	if (map_layer != nullptr) {
+		return map_layer->GetIndex();
 	}
 	
 	return -1;
@@ -1602,23 +1608,23 @@ void CMap::Save(CFile &file) const
 	}
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->TimeOfDaySchedule ? this->MapLayers[z]->TimeOfDaySchedule->Ident.c_str() : "", this->MapLayers[z]->TimeOfDay ? this->MapLayers[z]->TimeOfDay->ID : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
+	for (CMapLayer *map_layer : this->MapLayers) {
+		file.printf("  {\"%s\", %d, %d},\n", map_layer->TimeOfDaySchedule ? map_layer->TimeOfDaySchedule->Ident.c_str() : "", map_layer->TimeOfDay ? map_layer->TimeOfDay->ID : 0, map_layer->RemainingTimeOfDayHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"season\", {\n");
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->SeasonSchedule ? this->MapLayers[z]->SeasonSchedule->Ident.c_str() : "", this->MapLayers[z]->Season ? this->MapLayers[z]->Season->ID : 0, this->MapLayers[z]->RemainingSeasonHours);
+	for (CMapLayer *map_layer : this->MapLayers) {
+		file.printf("  {\"%s\", %d, %d},\n", map_layer->SeasonSchedule ? map_layer->SeasonSchedule->Ident.c_str() : "", map_layer->Season ? map_layer->Season->ID : 0, map_layer->RemainingSeasonHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"pixel-tile-size\", {\n");
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {%d, %d},\n", this->MapLayers[z]->PixelTileSize.x, this->MapLayers[z]->PixelTileSize.y);
+	for (CMapLayer *map_layer : this->MapLayers) {
+		file.printf("  {%d, %d},\n", map_layer->PixelTileSize.x, map_layer->PixelTileSize.y);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\", %d},\n", this->MapLayers[z]->Plane ? this->MapLayers[z]->Plane->Ident.c_str() : "", this->MapLayers[z]->World ? this->MapLayers[z]->World->Ident.c_str() : "", this->MapLayers[z]->SurfaceLayer);
+	for (CMapLayer *map_layer : this->MapLayers) {
+		file.printf("  {\"%s\", \"%s\", %d},\n", map_layer->GetPlane() ? map_layer->GetPlane()->Ident.c_str() : "", map_layer->GetWorld() ? map_layer->GetWorld()->Ident.c_str() : "", map_layer->GetSurfaceLayer());
 	}
 	file.printf("  },\n");
 	file.printf("  \"landmasses\", {\n");

@@ -445,6 +445,9 @@ public:
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	const CLanguage *GetLanguage() const;
+	
+	bool IsDiurnal() const;
+	bool IsNocturnal() const;
 	//Wyrmgus end
 	
 	void IncreaseVariable(const int index);

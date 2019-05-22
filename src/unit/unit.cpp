@@ -2760,21 +2760,16 @@ void CUnit::Scout()
 	// move if possible
 	if (target_pos != this->tilePos) {
 		// if the tile the scout is moving to happens to have a layer connector, use it
-		bool found_connector = false;
 		CUnitCache &unitcache = CMap::Map.Field(target_pos, this->MapLayer->ID)->UnitCache;
 		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 			CUnit *connector = *it;
 
 			if (connector->ConnectingDestination != nullptr && this->CanUseItem(connector)) {
 				CommandUse(*this, *connector, FlushCommands);
-				found_connector = true;
-				break;
+				return;
 			}
 		}
-		if (found_connector) {
-			return;
-		}
-				
+		
 		UnmarkUnitFieldFlags(*this);
 		if (UnitCanBeAt(*this, target_pos, this->MapLayer->ID)) {
 			MarkUnitFieldFlags(*this);
@@ -3321,10 +3316,9 @@ void UpdateUnitSightRange(CUnit &unit)
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
 	if (unit.MapLayer) {
-		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Day) {
+		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->IsDay()) {
 			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-		}
-		else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Night) {
+		} else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->IsNight()) {
 			unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 		}
 	}
@@ -6690,7 +6684,7 @@ bool CUnit::LevelCheck(const int level) const
 
 bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 {
-	const CPlane *plane = this->MapLayer->Plane;
+	const CPlane *plane = this->MapLayer->GetPlane();
 	if (plane) {
 		if (!plane->EmpoweredDeityDomains.empty()) {
 			for (const CDeityDomain *deity_domain : ability->DeityDomains) {
@@ -6940,6 +6934,16 @@ const CLanguage *CUnit::GetLanguage() const
 	return nullptr;
 }
 //Wyrmgus end
+
+bool CUnit::IsDiurnal() const
+{
+	return this->Variable[DAYSIGHTRANGEBONUS_INDEX].Value > 0 && this->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value < 0;
+}
+
+bool CUnit::IsNocturnal() const
+{
+	return this->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value > 0 && this->Variable[DAYSIGHTRANGEBONUS_INDEX].Value < 0;
+}
 
 /**
 **  Let an unit die.
@@ -8412,8 +8416,8 @@ void CUnit::HandleBuffsEachSecond()
 			&& CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)
 			&& (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldDesert)
 			&& this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Owner != this->Player->GetIndex()
-			&& this->MapLayer->GetTimeOfDay()
-			&& this->MapLayer->GetTimeOfDay()->Day
+			&& this->MapLayer->GetTimeOfDay() != nullptr
+			&& this->MapLayer->GetTimeOfDay()->IsDay()
 			&& this->GetVariableValue(HYDRATING_INDEX) <= 0
 			&& this->GetVariableValue(DEHYDRATIONIMMUNITY_INDEX) <= 0
 		) {

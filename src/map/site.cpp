@@ -276,11 +276,11 @@ Vec2i CSite::GetMapPos() const
 			template_start_pos = CMap::Map.GetSubtemplatePos(this->MapTemplate);
 			template_end_pos = CMap::Map.GetSubtemplateEndPos(this->MapTemplate);
 		} else {
-			const int z = ::GetMapLayer(this->MapTemplate->Plane->Ident, this->MapTemplate->World->Ident, this->MapTemplate->SurfaceLayer);
-			if (z != -1) {
+			const CMapLayer *map_layer = CMap::Map.GetMapLayer(this->MapTemplate->GetPlane(), this->MapTemplate->GetWorld(), this->MapTemplate->GetSurfaceLayer());
+			if (map_layer != nullptr) {
 				template_start_pos = Vec2i(0, 0);
-				template_end_pos.x = CMap::Map.MapLayers[z]->GetWidth() - 1;
-				template_end_pos.y = CMap::Map.MapLayers[z]->GetHeight() - 1;
+				template_end_pos.x = map_layer->GetWidth() - 1;
+				template_end_pos.y = map_layer->GetHeight() - 1;
 			}
 		}
 		
@@ -311,10 +311,8 @@ CMapLayer *CSite::GetMapLayer() const
 		if (this->MapTemplate->IsSubtemplateArea()) {
 			return CMap::Map.GetSubtemplateMapLayer(this->MapTemplate);
 		} else {
-			const int z = ::GetMapLayer(this->MapTemplate->Plane->Ident, this->MapTemplate->World->Ident, this->MapTemplate->SurfaceLayer);
-			if (z != -1) {
-				return CMap::Map.MapLayers[z];
-			}
+			CMapLayer *map_layer = CMap::Map.GetMapLayer(this->MapTemplate->GetPlane(), this->MapTemplate->GetWorld(), this->MapTemplate->GetSurfaceLayer());
+			return map_layer;
 		}
 	}
 	
