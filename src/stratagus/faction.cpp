@@ -40,6 +40,7 @@
 #include "ai/force_template.h"
 #include "civilization.h"
 #include "economy/resource.h"
+#include "faction_type.h"
 #include "grand_strategy.h"
 #include "luacallback.h"
 #include "player.h"
@@ -81,14 +82,6 @@ bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string val
 {
 	if (key == "civilization") {
 		this->Civilization = CCivilization::Get(value);
-	} else if (key == "type") {
-		value = FindAndReplaceString(value, "_", "-");
-		const int faction_type = GetFactionTypeIdByName(value);
-		if (faction_type != -1) {
-			this->Type = faction_type;
-		} else {
-			fprintf(stderr, "Faction type \"%s\" doesn't exist.", value.c_str());
-		}
 	} else if (key == "primary_color") {
 		CPlayerColor *player_color = CPlayerColor::Get(value);
 		if (player_color != nullptr) {
@@ -429,6 +422,10 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 
 void CFaction::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), [](CFaction *faction, const String &type_ident){ faction->Type = FactionType::Get(type_ident); });
+	ClassDB::bind_method(D_METHOD("get_type"), [](const CFaction *faction){ return const_cast<FactionType *>(faction->GetType()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "type"), "set_type", "get_type");
+
 	ClassDB::bind_method(D_METHOD("get_primary_color"), &CFaction::GetPrimaryColor);
 	ClassDB::bind_method(D_METHOD("get_secondary_color"), &CFaction::GetSecondaryColor);
 }

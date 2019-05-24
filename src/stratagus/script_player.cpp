@@ -49,6 +49,7 @@
 #include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
+#include "faction_type.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -1707,8 +1708,8 @@ static int CclDefineFaction(lua_State *l)
 			faction->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string faction_type_name = LuaToString(l, -1);
-			int faction_type = GetFactionTypeIdByName(faction_type_name);
-			if (faction_type != -1) {
+			const FactionType *faction_type = FactionType::Get(faction_type_name);
+			if (faction_type != nullptr) {
 				faction->Type = faction_type;
 			} else {
 				LuaError(l, "Faction type \"%s\" doesn't exist." _C_ faction_type_name.c_str());
@@ -2069,7 +2070,7 @@ static int CclDefineFaction(lua_State *l)
 		}
 	}
 	
-	if (faction->Type == FactionTypeTribe) {
+	if (faction->GetType()->IsTribal()) {
 		faction->DefiniteArticle = true;
 	}
 	
@@ -2406,14 +2407,14 @@ static int CclGetFactions(lua_State *l)
 		civilization = CCivilization::Get(LuaToString(l, 1));
 	}
 	
-	int faction_type = -1;
+	const FactionType *faction_type = nullptr;
 	if (lua_gettop(l) >= 2) {
-		faction_type = GetFactionTypeIdByName(LuaToString(l, 2));
+		faction_type = FactionType::Get(LuaToString(l, 2));
 	}
 	
 	std::vector<std::string> factions;
 	for (const CFaction *faction : CFaction::GetAll()) {
-		if (faction_type != -1 && faction->Type != faction_type) {
+		if (faction_type != nullptr && faction->GetType() != faction_type) {
 			continue;
 		}
 		if (civilization == nullptr || faction->GetCivilization() == civilization) {
@@ -2492,7 +2493,11 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());
+		if (faction->GetType() != nullptr) {
+			lua_pushstring(l, faction->GetType()->GetIdent().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (faction->GetCivilization() != nullptr) {

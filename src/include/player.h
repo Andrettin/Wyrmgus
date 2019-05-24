@@ -638,8 +638,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == CP
 //Wyrmgus start
 extern void NetworkSetFaction(int player, const std::string &faction_name);
 extern int GetPlayerColorIndexByName(const std::string &player_color_name);
-extern std::string GetFactionTypeNameById(int faction_type);
-extern int GetFactionTypeIdByName(const std::string &faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(const std::string &government_type);
 extern std::string GetForceTypeNameById(int force_type);

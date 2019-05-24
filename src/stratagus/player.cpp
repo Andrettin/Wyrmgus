@@ -53,6 +53,7 @@
 //Wyrmgus start
 #include "editor/editor.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "game/game.h"
 //Wyrmgus end
 //Wyrmgus start
@@ -1214,9 +1215,9 @@ void CPlayer::SetFaction(const CFaction *faction)
 			UpgradeLost(*this, CUpgrade::Get(this->Faction->FactionUpgrade)->ID);
 		}
 
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->Faction->Type));
-		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
-			UpgradeLost(*this, faction_type_upgrade_id);
+		const CUpgrade *faction_type_upgrade = this->Faction->GetType()->GetUpgrade();
+		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] == 'R') {
+			UpgradeLost(*this, faction_type_upgrade->ID);
 		}
 	}
 
@@ -1299,12 +1300,12 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 		
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->Faction->Type));
-		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
+		const CUpgrade *faction_type_upgrade = this->Faction->GetType()->GetUpgrade();
+		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] != 'R') {
 			if (GameEstablishing) {
-				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
+				AllowUpgradeId(*this, faction_type_upgrade->ID, 'R');
 			} else {
-				UpgradeAcquire(*this, AllUpgrades[faction_type_upgrade_id]);
+				UpgradeAcquire(*this, faction_type_upgrade);
 			}
 		}
 	} else {
@@ -1340,19 +1341,16 @@ void CPlayer::SetRandomFaction()
 		if (faction->GetCivilization()->GetIndex() != this->Race) {
 			continue;
 		}
+		
 		if (!faction->Playable) {
 			continue;
 		}
-		if (!this->CanFoundFaction(faction)) {
+		
+		if (faction->GetType()->IsNeutral()) {
 			continue;
 		}
-
-		int faction_type = faction->Type;
-		bool has_writing = this->HasUpgradeClass(GetUpgradeClassIndexByName("writing"));
-		if (
-			!(faction_type == FactionTypeTribe && !has_writing)
-			&& !(faction_type == FactionTypePolity && has_writing)
-		) {
+		
+		if (!this->CanFoundFaction(faction)) {
 			continue;
 		}
 
@@ -1692,6 +1690,11 @@ bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 		return false;
 	}
 	
+	const FactionType *faction_type = faction->GetType();
+	if (faction_type->GetUpgrade() != nullptr && !CheckDependencies(faction_type->GetUpgrade(), this)) {
+		return false;
+	}
+	
 	if (!faction->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::Get(faction->FactionUpgrade);
 		
@@ -1831,7 +1834,7 @@ std::string CPlayer::GetFactionTitleName() const
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
 	
-	if (faction->Type == FactionTypePolity) {
+	if (!faction->GetType()->IsTribal()) {
 		if (!faction->Titles[government_type][faction_tier].empty()) {
 			return faction->Titles[government_type][faction_tier];
 		} else {
@@ -1871,7 +1874,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, const CGender *gender
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
 	
-	if (faction->Type == FactionTypePolity) {
+	if (!faction->GetType()->IsTribal()) {
 		auto title_type_find_iterator = faction->MinisterTitles.find(title_type);
 		if (title_type_find_iterator != faction->MinisterTitles.end()) {
 			auto gender_find_iterator = title_type_find_iterator->second.find(gender);
@@ -1920,13 +1923,13 @@ std::string CPlayer::GetCharacterTitleName(int title_type, const CGender *gender
 	}
 
 	if (title_type == CharacterTitleHeadOfState) {
-		if (faction->Type == FactionTypeTribe) {
+		if (faction->GetType()->IsTribal()) {
 			if (gender == nullptr || gender->GetIdent() != "female") {
 				return "Chieftain";
 			} else {
 				return "Chieftess";
 			}
-		} else if (faction->Type == FactionTypePolity) {
+		} else {
 			std::string faction_title = this->GetFactionTitleName();
 			
 			if (faction_title == "Barony") {
@@ -4286,9 +4289,8 @@ bool CPlayer::HasNeutralFactionType() const
 	if (
 		this->Race != -1
 		&& this->Faction != nullptr
-		&& (this->Faction->Type == FactionTypeMercenaryCompany || this->Faction->Type == FactionTypeHolyOrder || this->Faction->Type == FactionTypeTradingCompany)
 	) {
-		return true;
+		return this->Faction->GetType()->IsNeutral();
 	}
 
 	return false;
@@ -4311,7 +4313,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 		player.HasNeutralFactionType()
 		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
-		if (player.GetFaction()->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), player.GetFaction()->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (!player.GetFaction()->GetType()->IsReligious() || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), player.GetFaction()->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
@@ -4462,44 +4464,6 @@ int GetPlayerColorIndexByName(const std::string &player_color_name)
 			return c;
 		}
 	}
-	return -1;
-}
-
-std::string GetFactionTypeNameById(int faction_type)
-{
-	if (faction_type == FactionTypeNoFactionType) {
-		return "no-faction-type";
-	} else if (faction_type == FactionTypeTribe) {
-		return "tribe";
-	} else if (faction_type == FactionTypePolity) {
-		return "polity";
-	} else if (faction_type == FactionTypeMercenaryCompany) {
-		return "mercenary-company";
-	} else if (faction_type == FactionTypeHolyOrder) {
-		return "holy-order";
-	} else if (faction_type == FactionTypeTradingCompany) {
-		return "trading-company";
-	}
-
-	return "";
-}
-
-int GetFactionTypeIdByName(const std::string &faction_type)
-{
-	if (faction_type == "no-faction-type") {
-		return FactionTypeNoFactionType;
-	} else if (faction_type == "tribe") {
-		return FactionTypeTribe;
-	} else if (faction_type == "polity") {
-		return FactionTypePolity;
-	} else if (faction_type == "mercenary-company") {
-		return FactionTypeMercenaryCompany;
-	} else if (faction_type == "holy-order") {
-		return FactionTypeHolyOrder;
-	} else if (faction_type == "trading-company") {
-		return FactionTypeTradingCompany;
-	}
-
 	return -1;
 }
 

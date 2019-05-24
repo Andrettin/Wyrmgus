@@ -55,6 +55,7 @@ class CIcon;
 class CPlayerColor;
 class CUpgrade;
 class CSite;
+class FactionType;
 class LuaCallback;
 class UnitClass;
 
@@ -69,17 +70,6 @@ enum GovernmentTypes {
 	GovernmentTypeTheocracy,
 	
 	MaxGovernmentTypes
-};
-
-enum FactionTypes {
-	FactionTypeNoFactionType,
-	FactionTypeTribe,
-	FactionTypePolity,
-	FactionTypeMercenaryCompany,
-	FactionTypeHolyOrder,
-	FactionTypeTradingCompany,
-	
-	MaxFactionTypes
 };
 
 enum FactionTiers {
@@ -118,6 +108,11 @@ public:
 	CCivilization *GetCivilization() const
 	{
 		return this->Civilization;
+	}
+	
+	const FactionType *GetType() const
+	{
+		return this->Type;
 	}
 	
 	/**
@@ -177,8 +172,8 @@ public:
 	std::string DefaultAI = "land-attack";
 private:
 	CCivilization *Civilization = nullptr;								/// the faction's civilization
+	const FactionType *Type = nullptr;									/// faction type (e.g. tribe or polity)
 public:
-	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
 	const CFaction *ParentFaction = nullptr;							/// the parent faction of this faction

@@ -44,6 +44,7 @@
 #include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
+#include "faction_type.h"
 #include "game/game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -1776,7 +1777,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return IdentToName(GetFactionTypeNameById((**faction).Type));
+				return (**faction).GetType()->GetName().utf8().get_data();
 			} else {
 				return std::string();
 			}

@@ -38,6 +38,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "game/game.h"	// for loading screen elements
 #include "iolib.h"
 #include "luacallback.h"
@@ -772,7 +773,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 {
 	if (
 		this->Ministers[title] != nullptr
-		&& (CFaction::Get(this->Faction)->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
+		&& ((CFaction::Get(this->Faction)->GetType() != nullptr && CFaction::Get(this->Faction)->GetType()->IsTribal()) || this->GovernmentType == GovernmentTypeMonarchy)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
@@ -858,7 +859,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 
 bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || CFaction::Get(this->Faction)->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || (CFaction::Get(this->Faction)->GetType() != nullptr && CFaction::Get(this->Faction)->GetType()->IsTribal()) || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -867,7 +868,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && CFaction::Get(this->Faction)->Type == FactionTypeTribe) {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && (CFaction::Get(this->Faction)->GetType() != nullptr && CFaction::Get(this->Faction)->GetType()->IsTribal())) {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -911,9 +912,10 @@ int CGrandStrategyFaction::GetDiplomacyStateProposal(CGrandStrategyFaction *fact
 
 std::string CGrandStrategyFaction::GetFullName()
 {
-	if (CFaction::Get(this->Faction)->Type == FactionTypeTribe) {
+	if ((CFaction::Get(this->Faction)->GetType() != nullptr && CFaction::Get(this->Faction)->GetType()->IsTribal())) {
 		return CFaction::Get(this->Faction)->GetName().utf8().get_data();
-	} else if (CFaction::Get(this->Faction)->Type == FactionTypePolity) {
+//	} else if (CFaction::Get(this->Faction)->Type == FactionTypePolity) {
+	} else {
 //		return this->GetTitle() + " of " + CFaction::Get(this->Faction)->Name;
 	}
 	

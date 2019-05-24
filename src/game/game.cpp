@@ -50,6 +50,7 @@
 #include "economy/resource.h"
 #include "editor/editor.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "game/replay.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -586,8 +587,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("DefineFaction(\"%s\", {\n", faction->GetIdent().utf8().get_data());
 			f->printf("\tName = \"%s\",\n", faction->GetName().utf8().get_data());
 			f->printf("\tCivilization = \"%s\",\n", faction->GetCivilization()->GetIdent().utf8().get_data());
-			if (faction->Type != FactionTypeNoFactionType) {
-				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
+			if (faction->GetType() != nullptr) {
+				f->printf("\tType = \"%s\",\n", faction->GetType()->Ident.c_str());
 			}
 			if (faction->ParentFaction != nullptr) {
 				f->printf("\tParentFaction = \"%s\",\n", faction->ParentFaction->GetIdent().utf8().get_data());

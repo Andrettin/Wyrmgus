@@ -49,6 +49,7 @@
 #include "dependency/unit_type_dependency.h"
 #include "dependency/upgrade_dependency.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"
@@ -254,8 +255,8 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool
 		return false;
 	}
 
-	if (player->GetFaction() != nullptr && player->GetFaction()->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
-		if (player->GetFaction()->HolyOrderDeity) {
+	if (player->GetFaction() != nullptr && player->GetFaction()->GetType()->IsReligious()) { // if the player's faction type is a religious one (e.g. holy order), and the upgrade is incompatible with its deity, don't allow it
+		if (player->GetFaction()->HolyOrderDeity != nullptr) {
 			CUpgrade *deity_upgrade = player->GetFaction()->HolyOrderDeity->DeityUpgrade;
 			if (deity_upgrade) {
 				for (CUpgradeModifier *upgrade_modifier : target->UpgradeModifiers) {
