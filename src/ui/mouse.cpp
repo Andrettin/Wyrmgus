@@ -247,9 +247,8 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return false;
 	}
 	
-	if (unit.AutoCastSpell) {
-		for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
-			CSpell *spell = unit.Type->Spells[i];
+	if (!unit.AutoCastSpells.empty()) {
+		for (CSpell *spell : unit.Type->Spells) {
 			if (unit.CanAutoCastSpell(spell)) {
 				const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
 				

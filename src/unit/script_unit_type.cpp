@@ -1614,14 +1614,9 @@ static int CclDefineUnitType(lua_State *l)
 			// Warning: AutoCastActive should only be used AFTER all spells
 			// have been defined.
 			//
-			if (!type->AutoCastActive) {
-				type->AutoCastActive = new char[CSpell::Spells.size()];
-				memset(type->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
-			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->AutoCastActive;
-				type->AutoCastActive = nullptr;
+				type->AutoCastActiveSpells.clear();
 
 			}
 			for (int k = 0; k < subargs; ++k) {
@@ -1630,7 +1625,7 @@ static int CclDefineUnitType(lua_State *l)
 				if (spell == nullptr) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
-				type->AutoCastActive[spell->Slot] = 1;
+				type->AutoCastActiveSpells.insert(spell);
 			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
 			//

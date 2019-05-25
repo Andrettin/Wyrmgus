@@ -596,7 +596,7 @@ CUnitType::~CUnitType()
 	}
 	this->AiBuildingRules.clear();
 
-	delete[] this->AutoCastActive;
+	this->AutoCastActiveSpells.clear();
 
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->ResInfo[res]) {
@@ -876,20 +876,14 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 			this->Spells.push_back(spell);
 		}
 	} else if (key == "autocast_active") {
-		if (!this->AutoCastActive) {
-			this->AutoCastActive = new char[CSpell::Spells.size()];
-			memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
-		}
-		
 		if (value == "false") {
-			delete[] this->AutoCastActive;
-			this->AutoCastActive = nullptr;
+			this->AutoCastActiveSpells.clear();
 		} else {
 			value = FindAndReplaceString(value, "_", "-");
 			const CSpell *spell = CSpell::GetSpell(value);
 			if (spell != nullptr) {
 				if (spell->AutoCast) {
-					this->AutoCastActive[spell->Slot] = 1;
+					this->AutoCastActiveSpells.insert(spell);
 				} else {
 					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
 				}
@@ -1495,16 +1489,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->BuildingRulesString = parent_type->BuildingRulesString;
 	this->Elixir = parent_type->Elixir;
 	this->Icon = parent_type->Icon;
-	for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
-		this->Spells.push_back(parent_type->Spells[i]);
-	}
-	if (parent_type->AutoCastActive) {
-		this->AutoCastActive = new char[CSpell::Spells.size()];
-		memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
-		for (unsigned int i = 0; i < CSpell::Spells.size(); ++i) {
-			this->AutoCastActive[i] = parent_type->AutoCastActive[i];
-		}
-	}
+	this->Spells = parent_type->Spells;
+	this->AutoCastActiveSpells = parent_type->AutoCastActiveSpells;
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 		this->RepairCosts[i] = parent_type->RepairCosts[i];

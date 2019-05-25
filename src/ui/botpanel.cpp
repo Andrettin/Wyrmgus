@@ -374,8 +374,9 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 			// Autocast
 			for (i = 0; i < Selected.size(); ++i) {
-				Assert(Selected[i]->AutoCastSpell);
-				if (Selected[i]->AutoCastSpell[button.Value] != 1) {
+				Assert(!Selected[i]->AutoCastSpells.empty());
+				
+				if (Selected[i]->AutoCastSpells.find(CSpell::Spells[button.Value]) == Selected[i]->AutoCastSpells.end()) {
 					break;
 				}
 			}
@@ -1136,11 +1137,13 @@ void CButtonPanel::Draw()
 			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 				gray = true;
 				break;
-			} else if (buttons[i].Action == ButtonSpellCast
-					   && (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[buttons[i].Value]->Slot]) {
+			} else if (
+				buttons[i].Action == ButtonSpellCast
+				&& (*Selected[j]).SpellCoolDownTimers.find(CSpell::Spells[buttons[i].Value]) != (*Selected[j]).SpellCoolDownTimers.end()
+			) {
 				Assert(CSpell::Spells[buttons[i].Value]->CoolDown > 0);
 				cooldownSpell = true;
-				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[buttons[i].Value]->Slot]);
+				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers.find(CSpell::Spells[buttons[i].Value])->second);
 			}
 		}
 		//
@@ -1949,7 +1952,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 {
 	const int spellId = CurrentButtons[button].Value;
 	if (KeyModifiers & ModifierControl) {
-		int autocast = 0;
+		bool autocast = false;
 
 		if (!CSpell::Spells[spellId]->AutoCast) {
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
@@ -1960,13 +1963,24 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoCastSpell[spellId] == 0) {
-				autocast = 1;
+			if (Selected[i]->AutoCastSpells.find(CSpell::Spells[spellId]) == Selected[i]->AutoCastSpells.end()) {
+				autocast = true;
 				break;
 			}
 		}
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoCastSpell[spellId] != autocast) {
+			bool should_toggle_autocast = false;
+			if (autocast) {
+				if (Selected[i]->AutoCastSpells.find(CSpell::Spells[spellId]) == Selected[i]->AutoCastSpells.end()) {
+					should_toggle_autocast = true;
+				}
+			} else {
+				if (Selected[i]->AutoCastSpells.find(CSpell::Spells[spellId]) != Selected[i]->AutoCastSpells.end()) {
+					should_toggle_autocast = true;
+				}
+			}
+			
+			if (should_toggle_autocast) {
 				SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
 			}
 		}

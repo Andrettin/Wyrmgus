@@ -50,6 +50,7 @@
 #include <algorithm>
 #include <climits>
 #include <cstring>
+#include <set>
 
 #ifdef __MORPHOS__
 #undef Enable
@@ -69,6 +70,7 @@ class CGender;
 class CGraphic;
 class CPlayer;
 class CPlayerColorGraphic;
+class CSpell;
 class CUnitTypeVariation;
 class CWord;
 class MissileType;
@@ -77,7 +79,6 @@ class CButtonLevel;
 class CFaction;
 class CPlane;
 class CSpecies;
-class CSpell;
 class CTerrainType;
 class CUniqueItem;
 class CVariable;
@@ -686,7 +687,7 @@ public:
 	int RepairRange = 0;			/// Units repair range.
 #define InfiniteRepairRange INT_MAX
 	std::vector<CSpell *> Spells;	/// Spells the unit is able to cast.
-	char *AutoCastActive = nullptr;	/// Default value for autocast.
+	std::set<const CSpell *> AutoCastActiveSpells;	/// Default spells for autocast.
 	int AutoBuildRate = 0;			/// The rate at which the building builds itself
 	int RandomMovementProbability = 0;	/// Probability to move randomly.
 	int RandomMovementDistance = 1;	/// Quantity of tiles to move randomly.

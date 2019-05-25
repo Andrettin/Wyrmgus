@@ -675,25 +675,19 @@ static int CclUnit(lua_State *l)
 			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "auto-cast")) {
 			const char *s = LuaToString(l, 2, j + 1);
-			Assert(CSpell::GetSpell(s));
-			if (!unit->AutoCastSpell) {
-				unit->AutoCastSpell = new char[CSpell::Spells.size()];
-				memset(unit->AutoCastSpell, 0, CSpell::Spells.size());
+			const CSpell *spell = CSpell::GetSpell(s);
+			Assert(spell != nullptr);
+			if (spell != nullptr) {
+				unit->AutoCastSpells.insert(spell);
 			}
-			unit->AutoCastSpell[CSpell::GetSpell(s)->Slot] = 1;
 		} else if (!strcmp(value, "spell-cooldown")) {
-			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != CSpell::Spells.size()) {
-				LuaError(l, "incorrect argument");
+			const CSpell *spell = CSpell::GetSpell(LuaToString(l, 2, j + 1));
+			++j;
+			const int cooldown = LuaToNumber(l, 2, j + 1);
+			
+			if (spell != nullptr && cooldown > 0) {
+				unit->SpellCoolDownTimers[spell] = cooldown;
 			}
-			if (!unit->SpellCoolDownTimers) {
-				unit->SpellCoolDownTimers = new int[CSpell::Spells.size()];
-				memset(unit->SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
-			}
-			for (size_t k = 0; k < CSpell::Spells.size(); ++k) {
-				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
-			}
-			lua_pop(l, 1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "variation")) {
 			unit->Variation = LuaToNumber(l, 2, j + 1);

@@ -718,16 +718,16 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 ** Send command: Unit auto spell cast.
 **
 ** @param unit      pointer to unit.
-** @param spellid   Spell type id.
-** @param on        1 for auto cast on, 0 for off.
+** @param spell_id   Spell type id.
+** @param on        true for auto cast on, false for off.
 */
-void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
+void SendCommandAutoSpellCast(CUnit &unit, const int spell_id, const bool on)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, nullptr, spellid);
-		CommandAutoSpellCast(unit, spellid, on);
+		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, nullptr, spell_id);
+		CommandAutoSpellCast(unit, CSpell::Spells[spell_id], on);
 	} else {
-		NetworkSendCommand(MessageCommandSpellCast + spellid,
+		NetworkSendCommand(MessageCommandSpellCast + spell_id,
 						   unit, on, -1, NoUnitP, nullptr, FlushCommands);
 	}
 }
@@ -1133,7 +1133,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CommandSpellCast(unit, pos, dest, *CSpell::Spells[id], status);
 			} else {
 				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, nullptr, id);
-				CommandAutoSpellCast(unit, id, arg1);
+				CommandAutoSpellCast(unit, CSpell::Spells[id], arg1 != 0);
 			}
 			break;
 		}

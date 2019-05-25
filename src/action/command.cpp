@@ -1327,12 +1327,21 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &
 **  @param spellid  Spell id.
 **  @param on       1 for auto cast on, 0 for off.
 */
-void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
+void CommandAutoSpellCast(CUnit &unit, const CSpell *spell, const bool on)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	unit.AutoCastSpell[spellid] = on;
+	
+	if (on) {
+		if (unit.AutoCastSpells.find(spell) == unit.AutoCastSpells.end()) {
+			unit.AutoCastSpells.insert(spell);
+		}
+	} else {
+		if (unit.AutoCastSpells.find(spell) != unit.AutoCastSpells.end()) {
+			unit.AutoCastSpells.erase(spell);
+		}
+	}
 }
 
 /**

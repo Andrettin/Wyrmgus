@@ -115,7 +115,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		return false;
 	}
 	// check countdown timer
-	if (caster.SpellCoolDownTimers[spell.Slot]) { // Check caster mana.
+	if (caster.SpellCoolDownTimers.find(&spell) != caster.SpellCoolDownTimers.end()) { // Check caster mana.
 		return false;
 	}
 	// Check caster's resources
@@ -352,15 +352,6 @@ CSpell *CSpell::GetOrAddSpell(const std::string &ident)
 	
 	if (!spell) {
 		spell = new CSpell(Spells.size(), ident);
-		for (CUnitType *unit_type : CUnitType::GetAll()) { // adjust array for casters that have already been defined
-			if (unit_type->AutoCastActive) {
-				char *newc = new char[(Spells.size() + 1) * sizeof(char)];
-				memcpy(newc, unit_type->AutoCastActive, Spells.size() * sizeof(char));
-				delete[] unit_type->AutoCastActive;
-				unit_type->AutoCastActive = newc;
-				unit_type->AutoCastActive[Spells.size()] = 0;
-			}
-		}
 		Spells.push_back(spell);
 		SpellsByIdent[ident] = spell;
 	}
@@ -924,7 +915,9 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 		}
 		caster.Player->SubCosts(spell.Costs);
-		caster.SpellCoolDownTimers[spell.Slot] = spell.CoolDown;
+		if (spell.CoolDown > 0) {
+			caster.SpellCoolDownTimers[&spell] = spell.CoolDown;
+		}
 		//
 		// Spells like blizzard are casted again.
 		// This is sort of confusing, we do the test again, to

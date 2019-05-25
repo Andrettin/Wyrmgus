@@ -40,6 +40,7 @@
 
 #include <core/object.h>
 
+#include <set>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -609,8 +610,8 @@ public:
 	COrder *NewOrder = nullptr;		/// order for new trained units
 	COrder *CriticalOrder = nullptr;	/// order to do as possible in breakable animation.
 
-	char *AutoCastSpell;        /// spells to auto cast
-	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
+	std::set<const CSpell *> AutoCastSpells;			/// spells to auto cast
+	std::map<const CSpell *, int> SpellCoolDownTimers;	/// how much time the unit needs to wait before a spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 	

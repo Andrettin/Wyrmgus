@@ -223,7 +223,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			fprintf(stderr, "Invalid spell: '%s'\n", cur);
 			ExitFatal(1);
 		}
-		if (unit.AutoCastSpell[spell->Slot]) {
+		if (unit.AutoCastSpells.find(spell) != unit.AutoCastSpells.end()) {
 			return 1;
 		}
 		return 0;

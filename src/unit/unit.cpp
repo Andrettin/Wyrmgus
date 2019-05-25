@@ -540,8 +540,8 @@ void CUnit::Init()
 	NewOrder = nullptr;
 	delete CriticalOrder;
 	CriticalOrder = nullptr;
-	AutoCastSpell = nullptr;
-	SpellCoolDownTimers = nullptr;
+	this->AutoCastSpells.clear();
+	this->SpellCoolDownTimers.clear();
 	AutoRepair = 0;
 	Goal = nullptr;
 	IndividualUpgrades.clear();
@@ -622,8 +622,8 @@ void CUnit::Release(bool final)
 	//Wyrmgus end
 
 	delete pathFinderData;
-	delete[] AutoCastSpell;
-	delete[] SpellCoolDownTimers;
+	this->AutoCastSpells.clear();
+	this->SpellCoolDownTimers.clear();
 	delete[] Variable;
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		delete *order;
@@ -2855,22 +2855,8 @@ void CUnit::Init(const CUnitType &type)
 		UnitUpdateHeading(*this);
 	}
 
-	// Create AutoCastSpell and SpellCoolDownTimers arrays for casters
-	//Wyrmgus start
-//	if (type.CanCastSpell) {
-	//to avoid crashes with spell items for units who cannot ordinarily cast spells
-	//Wyrmgus end
-		AutoCastSpell = new char[CSpell::Spells.size()];
-		SpellCoolDownTimers = new int[CSpell::Spells.size()];
-		memset(SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
-		if (Type->AutoCastActive) {
-			memcpy(AutoCastSpell, Type->AutoCastActive, CSpell::Spells.size());
-		} else {
-			memset(AutoCastSpell, 0, CSpell::Spells.size());
-		}
-	//Wyrmgus start
-//	}
-	//Wyrmgus end
+	this->AutoCastSpells = this->Type->AutoCastActiveSpells;
+
 	Active = 1;
 	Removed = 1;
 	
@@ -6257,7 +6243,7 @@ bool CUnit::CanCastSpell(const CSpell *spell, const bool ignore_mana_and_cooldow
 				return false;
 			}
 			
-			if (this->SpellCoolDownTimers[spell->Slot]) {
+			if (this->SpellCoolDownTimers.find(spell) != this->SpellCoolDownTimers.end()) {
 				return false;
 			}
 		}
@@ -6293,7 +6279,7 @@ bool CUnit::CanCastAnySpell() const
 */
 bool CUnit::CanAutoCastSpell(const CSpell *spell) const
 {
-	if (!this->AutoCastSpell || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
+	if (this->AutoCastSpells.empty() || !spell || this->AutoCastSpells.find(spell) == this->AutoCastSpells.end() || !spell->AutoCast) {
 		return false;
 	}
 	
@@ -8305,10 +8291,15 @@ void CUnit::HandleBuffsEachCycle()
 	}
 
 	// decrease spell countdown timers
-	for (size_t i = 0; i < this->Type->Spells.size(); ++i) {
-		int spell_id = this->Type->Spells[i]->Slot;
-		if (this->SpellCoolDownTimers[spell_id] > 0) {
-			--this->SpellCoolDownTimers[spell_id];
+	if (!this->SpellCoolDownTimers.empty()) {
+		for (const CSpell *spell : this->Type->Spells) {
+			if (this->SpellCoolDownTimers.find(spell) != this->SpellCoolDownTimers.end()) {
+				--this->SpellCoolDownTimers[spell];
+				
+				if (this->SpellCoolDownTimers[spell] <= 0) {
+					this->SpellCoolDownTimers.erase(spell);
+				}
+			}
 		}
 	}
 

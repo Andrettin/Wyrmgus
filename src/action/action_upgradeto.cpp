@@ -308,16 +308,6 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
-	if (!unit.AutoCastSpell) { //to avoid crashes with spell items for units who cannot ordinarily cast spells
-	//Wyrmgus end
-		unit.AutoCastSpell = new char[CSpell::Spells.size()];
-		unit.SpellCoolDownTimers = new int[CSpell::Spells.size()];
-		memset(unit.AutoCastSpell, 0, CSpell::Spells.size() * sizeof(char));
-		memset(unit.SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
-	}
-
 	if (!unit.UnderConstruction) {
 		UpdateForNewUnit(unit, 1);
 		player.IncreaseCountsForUnit(&unit, true);

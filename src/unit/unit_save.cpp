@@ -391,22 +391,12 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Goal) {
 		file.printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
 	}
-	if (unit.AutoCastSpell) {
-		for (size_t i = 0; i < CSpell::Spells.size(); ++i) {
-			if (unit.AutoCastSpell[i]) {
-				file.printf(",\n  \"auto-cast\", \"%s\"", CSpell::Spells[i]->Ident.c_str());
-			}
-		}
+	for (const CSpell *autocast_spell : unit.AutoCastSpells) {
+		file.printf(",\n  \"auto-cast\", \"%s\"", autocast_spell->Ident.c_str());
 	}
-	if (unit.SpellCoolDownTimers) {
-		file.printf(",\n  \"spell-cooldown\", {");
-		for (size_t i = 0; i < CSpell::Spells.size(); ++i) {
-			if (i) {
-				file.printf(" ,");
-			}
-			file.printf("%d", unit.SpellCoolDownTimers[i]);
-		}
-		file.printf("}");
+	for (const auto &element : unit.SpellCoolDownTimers) {
+		const CSpell *spell = element.first;
+		file.printf(",\n  \"spell-cooldown\", \"%s\", %d", spell->Ident.c_str(), element.second);
 	}
 	//Wyrmgus start
 	file.printf(",\n  \"variation\", %d", unit.Variation);
