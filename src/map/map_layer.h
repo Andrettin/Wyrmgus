@@ -139,7 +139,6 @@ public:
 		return this->SurfaceLayer;
 	}
 	
-	void DoPerCycleLoop();
 	void DoPerHourLoop();
 	void RegenerateForest();
 	//regenerate a forest tile	

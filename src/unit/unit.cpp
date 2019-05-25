@@ -2210,6 +2210,9 @@ void CUnit::GenerateDrop()
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->MapLayer->Field(drop_pos)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
+			if (!CMap::Map.Info.IsPointOnMap(resPos, this->MapLayer->ID)) {
+				return;
+			}
 			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		} else {
 			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
@@ -4042,13 +4045,16 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 */
 CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building)
 {
+	Vec2i res_pos;
+	const int heading = SyncRand() % 256;
+	FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
+	if (!CMap::Map.Info.IsPointOnMap(res_pos, z)) {
+		return nullptr;
+	}
+	
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != nullptr) {
-		Vec2i res_pos;
-		const int heading = SyncRand() % 256;
-		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
-		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
 			CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
 			if (b && b->ReplaceOnBuild) {
@@ -4113,6 +4119,7 @@ void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos,
 	int addx = 0;
 	int addy = 0;
 	Vec2i pos = goalPos;
+	int directions_outside_the_map = 0;
 
 	if (heading < LookingNE || heading > LookingNW) {
 		goto starts;
@@ -4124,8 +4131,8 @@ void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos,
 		goto starte;
 	}
 
-	// FIXME: don't search outside of the map
 	for (;;) {
+		directions_outside_the_map = 0;
 startw:
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
@@ -4138,6 +4145,9 @@ startw:
 			//Wyrmgus end
 				goto found;
 			}
+		}
+		if (pos.y >= CMap::Map.MapLayers[z]->GetHeight()) {
+			directions_outside_the_map++;
 		}
 		++addx;
 starts:
@@ -4153,6 +4163,9 @@ starts:
 				goto found;
 			}
 		}
+		if (pos.x >= CMap::Map.MapLayers[z]->GetWidth()) {
+			directions_outside_the_map++;
+		}
 		++addy;
 starte:
 		for (int i = addy; i--; --pos.y) {
@@ -4166,6 +4179,9 @@ starte:
 			//Wyrmgus end
 				goto found;
 			}
+		}
+		if (pos.y < 0) {
+			directions_outside_the_map++;
 		}
 		++addx;
 startn:
@@ -4181,7 +4197,16 @@ startn:
 				goto found;
 			}
 		}
+		if (pos.x < 0) {
+			directions_outside_the_map++;
+		}
 		++addy;
+		
+		if (directions_outside_the_map == 4) {
+			fprintf(stderr, "Could not find valid position on the map for unit type \"%s\".\n", type.Ident.c_str());
+			resPos = Vec2i(-1, -1);
+			return;
+		}
 	}
 
 found:

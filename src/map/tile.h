@@ -202,6 +202,18 @@ class CMapField
 public:
 	CMapField();
 
+	static constexpr unsigned char CyclesPerFrame = CYCLES_PER_SECOND / 4; //same speed as color-cycling
+
+	/**
+	**	@brief	Get the current game frame for tile animations
+	**
+	**	@return	The current game frame for tile animations
+	*/
+	static unsigned int GetGameTileAnimationFrame()
+	{
+		return GameCycle / CMapField::CyclesPerFrame;
+	}
+	
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
@@ -258,6 +270,19 @@ public:
 	unsigned char getCost() const { return cost; }
 	unsigned long getFlag() const { return Flags; }
 	
+	/**
+	**	@brief	Get the current base frame of the tile's animation
+	**
+	**	@return	The current base frame of the tile's animation
+	*/
+	unsigned char GetAnimationBaseFrame() const
+	{
+		return CMapField::GetGameTileAnimationFrame() + this->RandomNumber;
+	}
+	
+	unsigned char GetAnimationFrame() const;
+	unsigned char GetOverlayAnimationFrame() const;
+	
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
@@ -265,8 +290,6 @@ public:
 	//Wyrmgus start
 //	unsigned short Flags = 0;	/// field flags
 	unsigned long Flags = 0;	/// field flags
-	unsigned char AnimationFrame = 0;	/// current frame of the tile's animation
-	unsigned char OverlayAnimationFrame = 0;	/// current frame of the overlay tile's animation
 	const CTerrainType *Terrain = nullptr;
 	const CTerrainType *OverlayTerrain = nullptr;
 	const CTerrainFeature *TerrainFeature = nullptr;
@@ -291,6 +314,9 @@ public:
 	CUnitCache UnitCache;	/// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
+	
+private:
+	unsigned char RandomNumber = 0;	/// a random number used to e.g. give the tile a seemingly-random animation frame compared to its neighbors
 };
 
 #endif

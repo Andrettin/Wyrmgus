@@ -47,9 +47,9 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 
-CMapField::CMapField() :
-	UnitCache()
+CMapField::CMapField() : UnitCache()
 {
+	this->RandomNumber = SyncRand(UCHAR_MAX + 1);
 }
 
 /**
@@ -191,20 +191,6 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = nullptr;
 			this->OverlayTransitionTiles.clear();
-		}
-	}
-	
-	if (Editor.Running == EditorNotRunning && terrain_type->SolidAnimationFrames > 0) {
-		if (terrain_type->Overlay) {
-			this->OverlayAnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
-		} else {
-			this->AnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
-		}
-	} else {
-		if (terrain_type->Overlay) {
-			this->OverlayAnimationFrame = 0;
-		} else {
-			this->AnimationFrame = 0;
 		}
 	}
 	
@@ -724,6 +710,34 @@ bool CMapField::RockOnMap() const
 bool CMapField::isAWall() const
 {
 	return CheckMask(MapFieldWall);
+}
+
+/**
+**	@brief	Get the current frame of the tile's animation
+**
+**	@return	The current frame of the tile's animation
+*/
+unsigned char CMapField::GetAnimationFrame() const
+{
+	if (this->Terrain != nullptr && this->Terrain->SolidAnimationFrames > 0) {
+		return this->GetAnimationBaseFrame() % this->Terrain->SolidAnimationFrames;
+	}
+	
+	return 0;
+}
+
+/**
+**	@brief	Get the current frame of the tile's overlay animation
+**
+**	@return	The current frame of the tile's overlay animation
+*/
+unsigned char CMapField::GetOverlayAnimationFrame() const
+{
+	if (this->OverlayTerrain != nullptr && this->OverlayTerrain->SolidAnimationFrames > 0) {
+		return CMapField::GetAnimationBaseFrame() % this->OverlayTerrain->SolidAnimationFrames;
+	}
+	
+	return 0;
 }
 
 //

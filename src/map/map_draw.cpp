@@ -253,6 +253,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				continue;
 			}
 			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
+			
 			//Wyrmgus start
 			/*
 			unsigned short int tile;
@@ -268,7 +269,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			if (ReplayRevealMap) {
 				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) == mf.OverlayTerrain->DestroyedTiles.end();
 				if (mf.Terrain && mf.Terrain->GetGraphics(season)) {
-					mf.Terrain->GetGraphics(season)->DrawFrameClip(mf.SolidTile + (mf.Terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
+					mf.Terrain->GetGraphics(season)->DrawFrameClip(mf.SolidTile + mf.GetAnimationFrame(), dx, dy, false);
 				}
 				for (size_t i = 0; i != mf.TransitionTiles.size(); ++i) {
 					if (mf.TransitionTiles[i].first->GetGraphics(season)) {
@@ -285,10 +286,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 				if (mf.OverlayTerrain && mf.OverlayTransitionTiles.size() == 0) {
 					if (mf.OverlayTerrain->GetGraphics(season)) {
-						mf.OverlayTerrain->GetGraphics(season)->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
+						mf.OverlayTerrain->GetGraphics(season)->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.GetOverlayAnimationFrame() : 0), dx, dy, false);
 					}
 					if (mf.OverlayTerrain->PlayerColorGraphics) {
-						mf.OverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
+						mf.OverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.GetOverlayAnimationFrame() : 0), dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
@@ -315,7 +316,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			} else {
 				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) == mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end();
 				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(season)) {
-					mf.playerInfo.SeenTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
+					mf.playerInfo.SeenTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.GetAnimationFrame() : 0), dx, dy, false);
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenTransitionTiles.size(); ++i) {
 					if (mf.playerInfo.SeenTransitionTiles[i].first->GetGraphics(season)) {
@@ -332,10 +333,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
 					if (mf.playerInfo.SeenOverlayTerrain->GetGraphics(season)) {
-						mf.playerInfo.SeenOverlayTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
+						mf.playerInfo.SeenOverlayTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.GetOverlayAnimationFrame() : 0), dx, dy, false);
 					}
 					if (mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics) {
-						mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
+						mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.GetOverlayAnimationFrame() : 0), dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {

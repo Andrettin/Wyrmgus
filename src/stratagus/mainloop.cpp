@@ -333,10 +333,6 @@ static void GameLogicLoop()
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
 
-		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
-			map_layer->DoPerCycleLoop();
-		}
-		
 		//
 		// Work todo each second.
 		// Split into different frames, to reduce cpu time.
@@ -575,8 +571,10 @@ void GameMainLoop()
 		if (!IsNetworkGame() && CPlayer::GetThisPlayer() && CurrentCustomHero != nullptr) {
 			Vec2i resPos;
 			FindNearestDrop(*CurrentCustomHero->UnitType, CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
-			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->UnitType, CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
-			custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
+			if (CMap::Map.Info.IsPointOnMap(resPos, CPlayer::GetThisPlayer()->StartMapLayer)) {
+				CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->UnitType, CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
+				custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
+			}
 		}
 		
 		//update the sold units of all units before starting, to make sure they fit the current conditions
