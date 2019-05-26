@@ -43,6 +43,7 @@
 #include "economy/currency.h"
 #include "economy/resource.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "hair_color.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
@@ -154,6 +155,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CWord>();
 	ClassDB::register_class<CWordType>();
 	ClassDB::register_class<CWorld>();
+	ClassDB::register_class<FactionType>();
 	ClassDB::register_class<ItemClass>();
 	ClassDB::register_class<ItemSlot>();
 	ClassDB::register_class<MissileType>();
