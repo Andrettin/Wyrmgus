@@ -105,24 +105,6 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 }
 
 /**
-**  Parse player number in animation frame
-**
-**  @param unit      Unit of the animation.
-**  @param parseint  Integer to parse.
-**
-**  @return  The parsed value.
-*/
-
-static int ParseAnimPlayer(const CUnit &unit, char *parseint)
-{
-	if (!strcmp(parseint, "this")) {
-		return unit.Player->GetIndex();
-	}
-	return ParseAnimInt(unit, parseint);
-}
-
-
-/**
 **  Parse integer in animation frame.
 **
 **  @param unit      Unit of the animation.

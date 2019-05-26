@@ -40,7 +40,7 @@
 /* virtual */ void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
 {
 	Assert(unit.Anim.Anim == this);
-	unit.Anim.Wait = ParseAnimInt(unit, this->wait.c_str()) << scale >> 8;
+	unit.Anim.Wait = this->Wait << scale >> 8;
 	if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
 		unit.Anim.Wait <<= 1;
 	}
@@ -54,5 +54,5 @@
 
 /* virtual */ void CAnimation_Wait::Init(const char *s, lua_State *)
 {
-	this->wait = s;
+	this->Wait = std::stoi(s);
 }

@@ -41,8 +41,8 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int arg1 = ParseAnimInt(unit, this->minWait.c_str());
-	const int arg2 = ParseAnimInt(unit, this->maxWait.c_str());
+	const int arg1 = this->MinWait;
+	const int arg2 = this->MaxWait;
 
 	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
 }
@@ -52,14 +52,19 @@
 */
 /* virtual */ void CAnimation_RandomWait::Init(const char *s, lua_State *)
 {
+	
 	const std::string str(s);
 	const size_t len = str.size();
 
+	std::string min_wait_str;
 	size_t begin = 0;
 	size_t end = str.find(' ', begin);
-	this->minWait.assign(str, begin, end - begin);
+	min_wait_str.assign(str, begin, end - begin);
+	this->MinWait = std::stoi(min_wait_str);
 
+	std::string max_wait_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->maxWait.assign(str, begin, end - begin);
+	max_wait_str.assign(str, begin, end - begin);
+	this->MaxWait = std::stoi(max_wait_str);
 }

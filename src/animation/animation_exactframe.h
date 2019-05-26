@@ -41,11 +41,14 @@ public:
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
-
-	int ParseAnimInt(const CUnit *unit) const;
+	
+	int GetFrame() const
+	{
+		return this->Frame;
+	}
 
 private:
-	std::string frame;
+	int Frame = 0;
 };
 
 #endif

@@ -43,8 +43,8 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	std::string minWait;
-	std::string maxWait;
+	int MinWait = 0;
+	int MaxWait = 0;
 };
 
 #endif

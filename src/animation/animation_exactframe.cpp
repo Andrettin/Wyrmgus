@@ -40,19 +40,10 @@
 /* virtual */ void CAnimation_ExactFrame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	unit.Frame = ParseAnimInt(&unit);
+	unit.Frame = this->Frame;
 }
 
 /* virtual */ void CAnimation_ExactFrame::Init(const char *s, lua_State *)
 {
-	this->frame = s;
-}
-
-int CAnimation_ExactFrame::ParseAnimInt(const CUnit *unit) const
-{
-	if (unit == nullptr) {
-		return atoi(this->frame.c_str());
-	} else {
-		return ::ParseAnimInt(*unit, this->frame.c_str());
-	}
+	this->Frame = std::stoi(s);
 }

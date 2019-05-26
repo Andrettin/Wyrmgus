@@ -43,7 +43,7 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	std::string rotateStr;
+	int Rotate = 0;
 };
 
 #endif

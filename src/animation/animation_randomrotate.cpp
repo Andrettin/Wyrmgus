@@ -43,13 +43,13 @@
 	Assert(unit.Anim.Anim == this);
 
 	if ((SyncRand() >> 8) & 1) {
-		UnitRotate(unit, -ParseAnimInt(unit, this->rotateStr.c_str()));
+		UnitRotate(unit, this->Rotate * -1);
 	} else {
-		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));
+		UnitRotate(unit, this->Rotate);
 	}
 }
 
 /* virtual */ void CAnimation_RandomRotate::Init(const char *s, lua_State *)
 {
-	this->rotateStr = s;
+	this->Rotate = std::stoi(s);
 }

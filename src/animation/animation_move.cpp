@@ -42,10 +42,10 @@
 	Assert(unit.Anim.Anim == this);
 	Assert(!move);
 
-	move = ParseAnimInt(unit, this->moveStr.c_str());
+	move = this->Move;
 }
 
 /* virtual */ void CAnimation_Move::Init(const char *s, lua_State *)
 {
-	this->moveStr = s;
+	this->Move = std::stoi(s);
 }
