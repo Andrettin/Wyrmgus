@@ -43,7 +43,7 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	std::string randomStr;
+	int Random = 0;
 	CAnimation *gotoLabel = nullptr;
 };
 

@@ -41,7 +41,7 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (SyncRand() % 100 < ParseAnimInt(unit, this->randomStr.c_str())) {
+	if (SyncRand() % 100 < this->Random) {
 		unit.Anim.Anim = this->gotoLabel;
 	}
 }
@@ -54,9 +54,11 @@
 	const std::string str(s);
 	const size_t len = str.size();
 
+	std::string random_str;
 	size_t begin = 0;
 	size_t end = str.find(' ', begin);
-	this->randomStr.assign(str, begin, end - begin);
+	random_str.assign(str, begin, end - begin);
+	this->Random = std::stoi(random_str);
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
