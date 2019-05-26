@@ -117,29 +117,29 @@ class CAnimations : public DataElement
 public:
 	CAnimations()
 	{
-		memset(Death, 0, sizeof(Death));
-		memset(Harvest, 0, sizeof(Harvest));
+		memset(this->Death, 0, sizeof(this->Death));
+		memset(this->Harvest, 0, sizeof(this->Harvest));
 	}
 
 	~CAnimations()
 	{
-		delete Attack;
-		delete RangedAttack;
-		delete Build;
+		delete this->Attack;
+		delete this->RangedAttack;
+		delete this->Build;
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
-			delete Death[i];
+			delete this->Death[i];
 		}
 		for (int i = 0; i < MaxCosts; ++i) {
-			delete Harvest[i];
+			delete this->Harvest[i];
 		}
-		delete Move;
-		delete Repair;
-		delete Research;
-		delete SpellCast;
-		delete Start;
-		delete Still;
-		delete Train;
-		delete Upgrade;
+		delete this->Move;
+		delete this->Repair;
+		delete this->Research;
+		delete this->SpellCast;
+		delete this->Start;
+		delete this->Still;
+		delete this->Train;
+		delete this->Upgrade;
 	}
 
 	static void AddAnimationToArray(CAnimation *anim);

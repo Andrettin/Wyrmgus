@@ -291,7 +291,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
 		unit.Anim.Wait = 0;
 	}
-
+	
 	// Currently waiting
 	if (unit.Anim.Wait) {
 		--unit.Anim.Wait;
@@ -309,7 +309,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 			unit.Anim.Anim = unit.Anim.Anim->Next;
 		}
 	}
-
+	
 	--unit.Anim.Wait;
 	if (!unit.Anim.Wait) {
 		// Advance to next frame

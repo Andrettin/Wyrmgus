@@ -200,12 +200,12 @@ int DoActionMove(CUnit &unit)
 		}
 	}
 	//Wyrmgus end
-		
+	
 	Vec2i posd; // movement in tile.
 	int d;
-
+	
 	Assert(unit.CanMove());
-
+	
 	//Wyrmgus start
 //	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 	if (!unit.Moving && (unit.GetAnimations()->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
@@ -308,13 +308,13 @@ int DoActionMove(CUnit &unit)
 		posd.y = Heading2Y[unit.Direction / NextDirection];
 		d = unit.pathFinderData->output.Length + 1;
 	}
-
+	
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
 //	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, CMap::Map.Field(unit.Offset)->getCost());
 	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
 	//Wyrmgus end
-
+	
 	unit.IX += posd.x * move;
 	unit.IY += posd.y * move;
 	
@@ -351,14 +351,14 @@ int DoActionMove(CUnit &unit)
 		}
 	}
 	//Wyrmgus end
-
+	
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
 	// FIXME: this is broken for subtile movement
 	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
 		unit.Moving = 0;
 	}
-
+	
 	return d;
 }
 

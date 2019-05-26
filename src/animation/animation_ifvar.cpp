@@ -38,7 +38,7 @@
 #include "unit/unit.h"
 
 //IfVar compare types
-enum EIfVarBinOp {
+enum IfVarBinOp {
 	IF_GREATER_EQUAL = 1,
 	IF_GREATER,
 	IF_LESS_EQUAL,
@@ -113,7 +113,7 @@ static bool returnFalse(int, int) { return false; }
 	} else if (op == "!") {
 		this->binOpFunc = binOpNot;
 	} else {
-		EIfVarBinOp type = static_cast<EIfVarBinOp>(atoi(op.c_str()));
+		IfVarBinOp type = static_cast<IfVarBinOp>(atoi(op.c_str()));
 
 		switch (type) {
 			case IF_GREATER_EQUAL: this->binOpFunc = binOpGreaterEqual; break;
