@@ -60,6 +60,7 @@
 #include "item/item.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "item/unique_item.h"
 #include "language/language.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -2025,7 +2026,7 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 	this->UpdateItemName();
 }
 
-void CUnit::SetUnique(CUniqueItem *unique)
+void CUnit::SetUnique(UniqueItem *unique)
 {
 	if (this->Unique && this->Unique->Set) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->MagicLevel;
@@ -2421,8 +2422,8 @@ void CUnit::GenerateWork(const CUnit *dropper, const CPlayer *dropper_player)
 
 void CUnit::GenerateUnique(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUniqueItem *> potential_uniques;
-	for (CUniqueItem *unique : UniqueItems) {
+	std::vector<UniqueItem *> potential_uniques;
+	for (UniqueItem *unique : UniqueItem::GetAll()) {
 		if (this->Type != unique->Type) {
 			continue;
 		}
@@ -2539,7 +2540,7 @@ void CUnit::GenerateUnique(const CUnit *dropper, const CPlayer *dropper_player)
 	}
 	
 	if (potential_uniques.size() > 0) {
-		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
+		UniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
 		this->SetUnique(chosen_unique);
 	}
 }
@@ -6391,7 +6392,7 @@ bool CUnit::IsItemTypeEquipped(const CUnitType *item_type) const
 	return false;
 }
 
-bool CUnit::IsUniqueItemEquipped(const CUniqueItem *unique) const
+bool CUnit::IsUniqueItemEquipped(const UniqueItem *unique) const
 {
 	if (unique->Type->ItemClass == nullptr) {
 		return false;
@@ -6525,7 +6526,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 
 bool CUnit::IsItemSetComplete(const CUnit *item) const
 {
-	for (const CUniqueItem *set_item : item->Unique->Set->UniqueItems) {
+	for (const UniqueItem *set_item : item->Unique->Set->UniqueItems) {
 		if (!this->IsUniqueItemEquipped(set_item)) {
 			return false;
 		}
@@ -6536,7 +6537,7 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
-	for (const CUniqueItem *set_item : item->Unique->Set->UniqueItems) {
+	for (const UniqueItem *set_item : item->Unique->Set->UniqueItems) {
 		const ItemSlot *item_slot = set_item->Type->ItemClass->Slot;
 		
 		if (item_slot == nullptr) {

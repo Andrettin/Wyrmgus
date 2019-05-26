@@ -47,6 +47,7 @@
 #include "hair_color.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "item/unique_item.h"
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/language_family.h"
@@ -159,6 +160,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<ItemClass>();
 	ClassDB::register_class<ItemSlot>();
 	ClassDB::register_class<MissileType>();
+	ClassDB::register_class<UniqueItem>();
 	ClassDB::register_class<UnitClass>();
 	
 	ClassDB::register_virtual_class<CConversibleColor>();

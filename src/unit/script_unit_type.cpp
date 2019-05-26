@@ -47,6 +47,7 @@
 #include "item/item.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "item/unique_item.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -2925,11 +2926,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Uniques")) {
-		std::vector<CUniqueItem *> uniques;
-		for (size_t i = 0; i < UniqueItems.size(); ++i)
+		std::vector<UniqueItem *> uniques;
+		for (UniqueItem *unique_item : UniqueItem::GetAll())
 		{
-			if (UniqueItems[i]->Type == type) {
-				uniques.push_back(UniqueItems[i]);
+			if (unique_item->Type == type) {
+				uniques.push_back(unique_item);
 			}
 		}
 		

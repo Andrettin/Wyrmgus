@@ -80,7 +80,6 @@ class CFaction;
 class CPlane;
 class CSpecies;
 class CTerrainType;
-class CUniqueItem;
 class CVariable;
 class CWorld;
 //Wyrmgus end

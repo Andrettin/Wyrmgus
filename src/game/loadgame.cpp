@@ -106,7 +106,6 @@ void CleanModules()
 	CleanMissiles();
 	//Wyrmgus start
 	CleanTerrainFeatures();
-	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();
 	CleanPlayers();

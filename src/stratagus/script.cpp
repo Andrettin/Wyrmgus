@@ -55,6 +55,7 @@
 #include "item/item.h"
 //Wyrmgus end
 #include "item/item_class.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "parameters.h"

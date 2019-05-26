@@ -47,6 +47,7 @@
 //Wyrmgus end
 #include "item/item.h"
 #include "item/item_class.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -365,7 +366,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "elixir")) {
 			unit->Elixir = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
-			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
+			UniqueItem *unique_item = UniqueItem::Get(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
 			if (unit->Unique && unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
 				if (unique_item == nullptr) {
@@ -2039,8 +2040,8 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string unique_name = LuaToString(l, 3);
 		if (unique_name.empty()) {
 			unit->SetUnique(nullptr);
-		} else if (GetUniqueItem(unique_name) != nullptr) {
-			unit->SetUnique(GetUniqueItem(unique_name));
+		} else if (UniqueItem::Get(unique_name) != nullptr) {
+			unit->SetUnique(UniqueItem::Get(unique_name));
 		} else {
 			LuaError(l, "Unique \"%s\" doesn't exist." _C_ unique_name.c_str());
 		}

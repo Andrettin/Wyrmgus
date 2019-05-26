@@ -61,6 +61,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "item/item.h"
+#include "item/unique_item.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

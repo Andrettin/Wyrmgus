@@ -45,6 +45,7 @@
 #include "iolib.h"
 #include "item/item.h"
 #include "item/item_class.h"
+#include "item/unique_item.h"
 #include "language/word.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"

@@ -62,12 +62,12 @@ class CDeityDomain;
 class CDependency;
 class CIcon;
 class CSchoolOfMagic;
-class CUniqueItem;
 class CUnitType;
 class CUpgradeModifier;
 class CVariable;
 class ItemClass;
 class ItemSlot;
+class UniqueItem;
 struct lua_State;
 
 /**
@@ -156,7 +156,7 @@ public:
 	int Year = 0;						/// Year of publication, if is a literary work
 	CCharacter *Author = nullptr;		/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
-	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
+	std::vector<UniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs

@@ -736,7 +736,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->GetName().utf8().get_data());
 
-	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
+	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, UniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
 		Vec2i unit_pos(map_start_pos.x + unit_raw_pos.x - template_start_pos.x, map_start_pos.y + unit_raw_pos.y - template_start_pos.y);
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z)) {
@@ -1201,7 +1201,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			) {
 				const CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 				const CUnitType *unit_type = nullptr;
-				CUniqueItem *unique = std::get<3>(site->HistoricalBuildings[j]);
+				UniqueItem *unique = std::get<3>(site->HistoricalBuildings[j]);
 				const UnitClass *unit_class = std::get<2>(site->HistoricalBuildings[j]);
 				if (unit_class != nullptr) {
 					if (building_owner) {
@@ -1405,7 +1405,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 	for (size_t i = 0; i < this->SurfaceLayerConnectors.size(); ++i) {
 		const CUnitType *type = std::get<1>(this->SurfaceLayerConnectors[i]);
 		const int surface_layer = std::get<2>(this->SurfaceLayerConnectors[i]);
-		CUniqueItem *unique = std::get<3>(this->SurfaceLayerConnectors[i]);
+		UniqueItem *unique = std::get<3>(this->SurfaceLayerConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->SurfaceLayerConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		Vec2i unit_offset((type->TileSize - 1) / 2);
@@ -1631,7 +1631,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		CUniqueItem *unique = historical_unit->GetUnique();
+		UniqueItem *unique = historical_unit->GetUnique();
 		
 		CPlayer *unit_player = unit_faction ? CPlayer::GetFactionPlayer(unit_faction) : nullptr;
 		

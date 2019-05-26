@@ -44,8 +44,8 @@
 
 class CFaction;
 class CHistoricalLocation;
-class CUniqueItem;
 class CUnitType;
+class UniqueItem;
 class UnitClass;
 
 /*----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public:
 		return this->Faction;
 	}
 	
-	CUniqueItem *GetUnique() const
+	UniqueItem *GetUnique() const
 	{
 		return this->Unique;
 	}
@@ -125,7 +125,7 @@ private:
 	std::vector<const UnitClass *> UnitClasses;	/// the unit's potential classes
 	std::vector<const CUnitType *> UnitTypes;	/// the unit's potential unit types
 	const CFaction *Faction = nullptr;		/// the unit's faction
-	CUniqueItem *Unique = nullptr;	/// the unique for this unit, if any
+	UniqueItem *Unique = nullptr;	/// the unique for this unit, if any
 	int Quantity = 1;	/// how many in-game units does this historical unit result in when applied
 	CDate StartDate;	/// when the unit starts being active
 	CDate EndDate;		/// when the unit ceases being active (e.g. when it is disbanded)

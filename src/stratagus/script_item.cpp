@@ -35,6 +35,7 @@
 
 #include "item/item.h"
 
+#include "item/unique_item.h"
 #include "script.h"
 #include "spell/spells.h"
 #include "ui/icon.h"
@@ -62,12 +63,7 @@ static int CclDefineUniqueItem(lua_State *l)
 	}
 
 	std::string item_ident = LuaToString(l, 1);
-	CUniqueItem *item = GetUniqueItem(item_ident);
-	if (!item) {
-		item = new CUniqueItem;
-		UniqueItems.push_back(item);
-		item->Ident = item_ident;
-	}
+	UniqueItem *item = UniqueItem::GetOrAdd(item_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -171,10 +167,10 @@ static int CclGetItems(lua_State *l)
 
 static int CclGetUniqueItems(lua_State *l)
 {
-	lua_createtable(l, UniqueItems.size(), 0);
-	for (size_t i = 1; i <= UniqueItems.size(); ++i)
+	lua_createtable(l, UniqueItem::GetAll().size(), 0);
+	for (size_t i = 1; i <= UniqueItem::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, UniqueItems[i-1]->Ident.c_str());
+		lua_pushstring(l, UniqueItem::Get(i-1)->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -191,7 +187,7 @@ static int CclGetUniqueItemData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string item_ident = LuaToString(l, 1);
-	const CUniqueItem *item = GetUniqueItem(item_ident);
+	const UniqueItem *item = UniqueItem::Get(item_ident);
 	if (!item) {
 		LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item_ident.c_str());
 	}

@@ -58,9 +58,6 @@ class CMapLayer;
 class COrder;
 class CPlayer;
 class CSpell;
-//Wyrmgus start
-class CUniqueItem;
-//Wyrmgus end
 class CUnit;
 class CUnitColors;
 class CUnitPtr;
@@ -75,6 +72,7 @@ class ItemClass;
 class ItemSlot;
 class Missile;
 class PathFinderData;
+class UniqueItem;
 struct lua_State;
 
 typedef COrder *COrderPtr;
@@ -230,7 +228,7 @@ public:
 	void SetSpell(const CSpell *spell);
 	void SetWork(const CUpgrade *work);
 	void SetElixir(const CUpgrade *elixir);
-	void SetUnique(CUniqueItem *unique);
+	void SetUnique(UniqueItem *unique);
 	void Identify();
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
@@ -420,7 +418,7 @@ public:
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(const ItemClass *item_class) const;
 	bool IsItemTypeEquipped(const CUnitType *item_type) const;
-	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
+	bool IsUniqueItemEquipped(const UniqueItem *unique) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(const ItemClass *item_class) const;
 	bool CanUseItem(CUnit *item) const;
@@ -527,7 +525,7 @@ public:
 	const CSpell *Spell = nullptr;	/// Item unit's spell
 	const CUpgrade *Work = nullptr;	/// Item unit's literary work
 	const CUpgrade *Elixir = nullptr;	/// Item unit's elixir
-	CUniqueItem *Unique = nullptr;	/// Whether the item is unique
+	UniqueItem *Unique = nullptr;	/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	CUnit *ConnectingDestination = nullptr;	/// Which connector this unit connects to (if any)

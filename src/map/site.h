@@ -50,8 +50,8 @@ class CMapTemplate;
 class CRegion;
 class CUnit;
 class CUnitType;
-class CUniqueItem;
 class CWord;
+class UniqueItem;
 class UnitClass;
 struct lua_State;
 
@@ -94,8 +94,8 @@ public:
 	std::map<CDate, const CFaction *> HistoricalOwners;			/// historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, const CFaction *>> HistoricalBuildings;	/// historical buildings, with start and end date
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources;	/// historical resources, with start and end date; the integer at the end is the resource quantity
+	std::vector<std::tuple<CDate, CDate, const UnitClass *, UniqueItem *, const CFaction *>> HistoricalBuildings;	/// historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, UniqueItem *, int>> HistoricalResources;	/// historical resources, with start and end date; the integer at the end is the resource quantity
 	
 	friend int CclDefineSite(lua_State *l);
 

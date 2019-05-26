@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name item.h - The item header file. */
+/**@name unique_item.h - The unique item header file. */
 //
 //      (c) Copyright 2015-2019 by Andrettin
 //
@@ -27,55 +27,63 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ITEM_H__
-#define __ITEM_H__
+#ifndef __UNIQUE_ITEM_H__
+#define __UNIQUE_ITEM_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
+#include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCharacter;
-class CConfigData;
 class CIcon;
 class CUnitType;
 class CUpgrade;
 class CSpell;
-class CVariable;
-class UniqueItem;
 
 /*----------------------------------------------------------------------------
---  Definitions
+--  Definition
 ----------------------------------------------------------------------------*/
 
-class CPersistentItem
+class UniqueItem : public DetailedDataElement, public DataType<UniqueItem>
 {
+	DATA_TYPE(UniqueItem, DetailedDataElement)
+
 public:
-	void ProcessConfigData(const CConfigData *config_data);
+	static constexpr const char *ClassIdentifier = "unique_item";
 	
+	bool CanDrop() const;				/// Check whether this unique item can drop
+	int GetMagicLevel() const;			/// Get this unique item's magic level
+	CIcon *GetIcon() const;
+
+	int ResourcesHeld = 0;
+	std::string Ident;
 	std::string Name;
-	bool Bound = false;			/// Whether the item is bound to its owner and can't be dropped
-	bool Identified = true;		/// Whether the item has been identified
-	const CUnitType *Type = nullptr;	/// Item type of the item
-	const CUpgrade *Prefix = nullptr;
-	const CUpgrade *Suffix = nullptr;
-	const CSpell *Spell = nullptr;
-	const CUpgrade *Work = nullptr;
-	const CUpgrade *Elixir = nullptr;
-	UniqueItem *Unique = nullptr;
-	CCharacter *Owner = nullptr;
+	std::string Description;
+	std::string Background;
+	std::string Quote;
+	CIcon *Icon = nullptr;		/// Unique item's icon (if it differs from that of its type)
+	CUnitType *Type = nullptr;	/// Item type of the item
+	CUpgrade *Prefix = nullptr;
+	CUpgrade *Suffix = nullptr;
+	CUpgrade *Set = nullptr;
+	CSpell *Spell = nullptr;
+	CUpgrade *Work = nullptr;
+	CUpgrade *Elixir = nullptr;
+	
+protected:
+	static inline void _bind_methods() {}
 };
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern std::string GetItemEffectsString(const std::string &item_ident);
-extern void ItemCclRegister();
+extern std::string GetUniqueItemEffectsString(const std::string &item_ident);
 
 #endif

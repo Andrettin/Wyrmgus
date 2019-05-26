@@ -42,6 +42,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/item.h"
+#include "item/unique_item.h"
 #include "luacallback.h"
 #include "map/site.h"
 #include "parameters.h"
@@ -319,7 +320,7 @@ void CQuestObjective::ProcessConfigData(const CConfigData *config_data)
 				this->Character = character;
 			}
 		} else if (property.Key == "unique") {
-			const CUniqueItem *unique = GetUniqueItem(property.Value);
+			const UniqueItem *unique = UniqueItem::Get(property.Value);
 			if (unique != nullptr) {
 				this->Unique = unique;
 			}

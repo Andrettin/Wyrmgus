@@ -10,9 +10,8 @@ $#include "game/game.h"
 $#include "grand_strategy.h"
 //Wyrmgus end
 $#include "iolib.h"
-//Wyrmgus start
 $#include "item/item.h"
-//Wyrmgus end
+$#include "item/unique_item.h"
 $#include "map/map.h"
 $#include "map/minimap.h"
 $#include "module.h"

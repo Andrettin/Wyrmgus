@@ -40,6 +40,7 @@
 #include "config_operator.h"
 #include "faction.h"
 #include "item/item.h"
+#include "item/unique_item.h"
 #include "language/word.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -164,7 +165,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 		CDate start_date;
 		CDate end_date;
 		const UnitClass *building_class = nullptr;
-		CUniqueItem *unique = nullptr;
+		UniqueItem *unique = nullptr;
 		CFaction *building_owner_faction = nullptr;
 			
 		for (const CConfigProperty &property : section->Properties) {
@@ -183,7 +184,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 				building_class = UnitClass::Get(property.Value);
 			} else if (property.Key == "unique") {
 				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				unique = GetUniqueItem(value);
+				unique = UniqueItem::Get(value);
 				if (unique != nullptr) {
 					if (building_class == nullptr) {
 						building_class = unique->Type->GetClass();
@@ -203,7 +204,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 			return true;
 		}
 		
-		this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
+		this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const UnitClass *, UniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
 	} else {
 		return false;
 	}

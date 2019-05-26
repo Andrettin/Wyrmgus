@@ -103,10 +103,10 @@ class CPlane;
 class CRegion;
 class CSite;
 class CTileset;
-class CUniqueItem;
 class CUnit;
 class CUnitType;
 class CWorld;
+class UniqueItem;
 
 /*----------------------------------------------------------------------------
 --  Map

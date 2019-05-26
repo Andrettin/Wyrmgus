@@ -53,9 +53,8 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-//Wyrmgus start
 #include "item/item.h"
-//Wyrmgus end
+#include "item/unique_item.h"
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/language_family.h"
@@ -521,7 +520,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Character = character;
 					} else if (!strcmp(value, "unique")) {
-						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, n + 1));
+						UniqueItem *unique = UniqueItem::Get(LuaToString(l, -1, n + 1));
 						if (!unique) {
 							LuaError(l, "Unique doesn't exist.");
 						}

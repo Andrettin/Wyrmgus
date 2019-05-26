@@ -40,6 +40,7 @@
 #include "faction.h"
 #include "luacallback.h"
 #include "item/item.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
@@ -235,7 +236,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Character = character;
 					} else if (!strcmp(value, "unique")) {
-						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, k + 1));
+						UniqueItem *unique = UniqueItem::Get(LuaToString(l, -1, k + 1));
 						if (!unique) {
 							LuaError(l, "Unique doesn't exist.");
 						}

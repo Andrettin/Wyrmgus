@@ -54,10 +54,10 @@ class CPlayerColor;
 class CQuest;
 class CSite;
 class CTriggerEffect;
-class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
+class UniqueItem;
 class UnitClass;
 struct lua_State;
 
@@ -100,7 +100,7 @@ public:
 	std::vector<const CUnitType *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 	const CCharacter *Character = nullptr;
-	const CUniqueItem *Unique = nullptr;
+	const UniqueItem *Unique = nullptr;
 	const CSite *Settlement = nullptr;
 	const CFaction *Faction = nullptr;
 };

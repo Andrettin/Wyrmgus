@@ -41,6 +41,7 @@
 #include "grand_strategy.h"
 #include "item/item.h"
 #include "item/item_class.h"
+#include "item/unique_item.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
@@ -398,7 +399,7 @@ static int CclDefineCharacter(lua_State *l)
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
-						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
+						UniqueItem *unique_item = UniqueItem::Get(unique_ident);
 						item->Unique = unique_item;
 						if (unique_item != nullptr) {
 							item->Name = unique_item->Name;
@@ -753,7 +754,7 @@ static int CclDefineCustomHero(lua_State *l)
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
-						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
+						UniqueItem *unique_item = UniqueItem::Get(unique_ident);
 						item->Unique = unique_item;
 						if (unique_item != nullptr) {
 							item->Name = unique_item->Name;

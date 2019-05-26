@@ -227,7 +227,7 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 		//Wyrmgus end
-
+		
 		UnmarkUnitFieldFlags(unit);
 		d = NextPathElement(unit, &posd.x, &posd.y);
 		MarkUnitFieldFlags(unit);

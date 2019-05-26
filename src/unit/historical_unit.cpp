@@ -38,6 +38,7 @@
 #include "config.h"
 #include "faction.h"
 #include "item/item.h"
+#include "item/unique_item.h"
 #include "map/historical_location.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -176,7 +177,7 @@ void CHistoricalUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction"), [](const CHistoricalUnit *historical_unit){ return const_cast<CFaction *>(historical_unit->GetFaction()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
-	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), [](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = GetUniqueItem(unique_ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), [](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = UniqueItem::Get(unique_ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_unique"), &CHistoricalUnit::GetUnique);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unique"), "set_unique", "get_unique");
 	

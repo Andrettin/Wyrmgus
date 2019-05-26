@@ -57,6 +57,7 @@
 #include "item/item.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
