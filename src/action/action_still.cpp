@@ -288,10 +288,16 @@ static bool MoveRandomly(CUnit &unit)
 					}
 				}
 			}
+			
+			if (!PlaceReachable(unit, pos, 1, 1, 0, 1, unit.GetReactionRange() * 8, unit.MapLayer->GetIndex())) {
+				return false;
+			}
+			
 			CommandMove(unit, pos, FlushCommands, unit.MapLayer->ID);
 			return true;
+		} else {
+			MarkUnitFieldFlags(unit);
 		}
-		MarkUnitFieldFlags(unit);
 	}
 	return false;
 }

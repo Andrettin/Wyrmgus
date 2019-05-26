@@ -2768,15 +2768,26 @@ void CUnit::Scout()
 		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 			CUnit *connector = *it;
 
-			if (connector->ConnectingDestination != nullptr && this->CanUseItem(connector)) {
-				CommandUse(*this, *connector, FlushCommands);
-				return;
+			if (connector->ConnectingDestination == nullptr || !this->CanUseItem(connector)) {
+				continue;
 			}
+			
+			if (!UnitReachable(*this, *connector, 1, this->GetReactionRange() * 8)) {
+				continue;
+			}
+			
+			CommandUse(*this, *connector, FlushCommands);
+			return;
 		}
 		
 		UnmarkUnitFieldFlags(*this);
 		if (UnitCanBeAt(*this, target_pos, this->MapLayer->ID)) {
 			MarkUnitFieldFlags(*this);
+			
+			if (!PlaceReachable(*this, target_pos, 1, 1, 0, 1, this->GetReactionRange() * 8, this->MapLayer->GetIndex())) {
+				return;
+			}
+			
 			CommandMove(*this, target_pos, FlushCommands, this->MapLayer->ID);
 			return;
 		}
