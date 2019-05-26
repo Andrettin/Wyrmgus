@@ -2736,11 +2736,11 @@ static int GetStillFrame(const CUnitType &type)
 		if (anim->Type == AnimationFrame) {
 			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.ParseAnimInt(nullptr) + type.NumDirections / 2;
+			return a_frame.GetFrame() + type.NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
 			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
-			return a_frame.ParseAnimInt(nullptr);
+			return a_frame.GetFrame();
 		}
 		anim = anim->Next;
 	}

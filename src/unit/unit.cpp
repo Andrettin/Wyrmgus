@@ -8351,11 +8351,14 @@ void CUnit::HandleBuffsEachCycle()
 	
 	const bool last_status_is_hidden = this->GetVariableValue(INVISIBLE_INDEX) > 0;
 	
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, INFUSION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
 	//  decrease spells effects time.
-	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
-		this->Variable[SpellEffects[i]].Increase = -1;
-		this->IncreaseVariable(SpellEffects[i]);
+	for (unsigned int i = 0; i < sizeof(CUnitTypeVar::SpellEffects) / sizeof(int); ++i) {
+		if (this->Variable[CUnitTypeVar::SpellEffects[i]].Value == 0) {
+			continue;
+		}
+		
+		this->Variable[CUnitTypeVar::SpellEffects[i]].Increase = -1;
+		this->IncreaseVariable(CUnitTypeVar::SpellEffects[i]);
 	}
 	
 	if (last_status_is_hidden && this->GetVariableValue(INVISIBLE_INDEX) == 0) {
