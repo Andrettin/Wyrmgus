@@ -205,6 +205,17 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const UnitClass *, UniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
+	} else if (section->Tag == "historical_population") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = FindAndReplaceString(property.Key, "_", "-");
+			const CDate date = CDate::FromString(key);
+			this->HistoricalPopulation[date] = std::stoi(property.Value);
+		}
 	} else {
 		return false;
 	}
