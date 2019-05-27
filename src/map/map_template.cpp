@@ -266,6 +266,42 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		this->GeneratedTerrains.push_back(generated_terrain);
+	} else if (section->Tag == "historical_terrain") {
+		Vec2i pos(-1, -1);
+		CDate date;
+		const CTerrainType *terrain_type = nullptr;
+			
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			if (property.Key == "x") {
+				pos.x = std::stoi(property.Value);
+			} else if (property.Key == "y") {
+				pos.y = std::stoi(property.Value);
+			} else if (property.Key == "date") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
+				date = CDate::FromString(value);
+			} else if (property.Key == "terrain_type") {
+				terrain_type = CTerrainType::Get(property.Value);
+			} else {
+				fprintf(stderr, "Invalid historical terrain property: \"%s\".\n", property.Key.c_str());
+			}
+		}
+		
+		if (terrain_type == nullptr) {
+			fprintf(stderr, "Historical terrain has no terrain type.\n");
+			return true;
+		}
+		
+		if (pos.x == -1 || pos.y == -1) {
+			fprintf(stderr, "Historical terrain has no valid position.\n");
+			return true;
+		}
+		
+		this->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(pos, terrain_type, date));
 	} else {
 		return false;
 	}
@@ -652,7 +688,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 				continue;
 			}
 			if (current_campaign->GetStartDate().ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).Year == 0) {
-				CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
+				const CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
 				
 				for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
 					for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {

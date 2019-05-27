@@ -698,7 +698,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 		CclGetDate(l, &date, 4);
 	}
 	
-	map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(pos, terrain, date));
+	map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(pos, terrain, date));
 
 	if (nargs >= 5) {
 		map_template->TileLabels[std::pair<int, int>(pos.x, pos.y)] = LuaToString(l, 5);
@@ -786,7 +786,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 				if (pathway_length.x % pathway_length.y != 0 && current_length.x % (pathway_length.x / (pathway_length.x % pathway_length.y)) == 0) {
 					offset += 1;
 				} else if ((current_length.x - offset) % (std::max(1, pathway_length.x / pathway_length.y)) == 0) {
-					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(Vec2i(pos), terrain, date));
 					pos.y += pathway_change.y;
 				}
 			}
@@ -796,7 +796,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 				if (pathway_length.y % pathway_length.x != 0 && current_length.y % (pathway_length.y / (pathway_length.y % pathway_length.x)) == 0) {
 					offset += 1;
 				} else if ((current_length.y - offset) % (std::max(1, pathway_length.y / pathway_length.x)) == 0) {
-					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(Vec2i(pos), terrain, date));
 					pos.x += pathway_change.x;
 				}
 			}
@@ -811,7 +811,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			break;
 		}
 
-		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(Vec2i(pos), terrain, date));
 	}
 
 	return 1;
@@ -1923,7 +1923,7 @@ static int CclDefineSite(lua_State *l)
 				
 				UniqueItem *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && UniqueItem::Get(LuaToString(l, -1)) != nullptr) {
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && UniqueItem::Get(LuaToString(l, -1), false) != nullptr) {
 					unique = UniqueItem::Get(LuaToString(l, -1));
 				} else {
 					--j;

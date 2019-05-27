@@ -612,11 +612,11 @@ void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, cons
 			y += 1;
 		}
 	} else {
-		std::map<int, std::map<int, CTerrainType *>> terrain_map;
+		std::map<int, std::map<int, const CTerrainType *>> terrain_map;
 		for (size_t i = 0; i < map_template->HistoricalTerrains.size(); ++i) {
 			if (std::get<2>(map_template->HistoricalTerrains[i]).Year == 0) {
 				Vec2i terrain_pos = std::get<0>(map_template->HistoricalTerrains[i]);
-				CTerrainType *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
+				const CTerrainType *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
 				if (terrain_type->Overlay == overlay) {
 					terrain_map[terrain_pos.y][terrain_pos.x] = terrain_type;
 				}
@@ -630,9 +630,9 @@ void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, cons
 				row[x * 3 + 2] = 0;
 			}
 			
-			for (std::map<int, CTerrainType *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
+			for (std::map<int, const CTerrainType *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
 				int x = iterator->first;
-				CTerrainType *terrain_type = iterator->second;
+				const CTerrainType *terrain_type = iterator->second;
 				
 				Uint8 red = 0;
 				Uint8 green = 0;
