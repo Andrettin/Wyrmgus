@@ -291,11 +291,6 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 			}
 		}
 		
-		if (terrain_type == nullptr) {
-			fprintf(stderr, "Historical terrain has no terrain type.\n");
-			return true;
-		}
-		
 		if (pos.x == -1 || pos.y == -1) {
 			fprintf(stderr, "Historical terrain has no valid position.\n");
 			return true;
