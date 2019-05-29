@@ -52,41 +52,39 @@ class CPlayerColorGraphic;
 class CUnitType;
 //Wyrmgus end
 
-enum MapFieldFlag : unsigned long long {
-	MapFieldSpeedMask = 1 << 0,		/// Move faster on this tile
+enum MapFieldFlag : unsigned long {
+	MapFieldLandAllowed = 1 << 0,	/// Land units allowed
+	MapFieldCoastAllowed = 1 << 1,	/// Coast (e.g. transporter) units allowed
+	MapFieldWaterAllowed = 1 << 2,	/// Water units allowed
+	MapFieldNoBuilding = 1 << 3,	/// No buildings allowed
 	
-	MapFieldLandAllowed = 1 << 1,	/// Land units allowed
-	MapFieldCoastAllowed = 1 << 2,	/// Coast (e.g. transporter) units allowed
-	MapFieldWaterAllowed = 1 << 3,	/// Water units allowed
-	MapFieldNoBuilding = 1 << 4,	/// No buildings allowed
+	MapFieldUnpassable = 1 << 4,	/// Field is movement blocked
+	MapFieldAirUnpassable = 1 << 5,	/// Field is movement blocked for air units and missiles
+	MapFieldWall = 1 << 6,			/// Field contains wall
+	MapFieldRocks = 1 << 7,			/// Field contains rocks
+	MapFieldForest = 1 << 8,		/// Field contains forest
 	
-	MapFieldUnpassable = 1 << 5,	/// Field is movement blocked
-	MapFieldAirUnpassable = 1 << 6,	/// Field is movement blocked for air units and missiles
-	MapFieldWall = 1 << 7,			/// Field contains wall
-	MapFieldRocks = 1 << 8,			/// Field contains rocks
-	MapFieldForest = 1 << 9,		/// Field contains forest
+	MapFieldLandUnit = 1 << 9,		/// Land unit on field
+	MapFieldSeaUnit = 1 << 10,		/// Water unit on field
+	MapFieldAirUnit = 1 << 11,		/// Air unit on field
+	MapFieldBuilding = 1 << 12,		/// Building on field
+	MapFieldItem = 1 << 13,			/// Item on field
 	
-	MapFieldLandUnit = 1 << 10,		/// Land unit on field
-	MapFieldSeaUnit = 1 << 11,		/// Water unit on field
-	MapFieldAirUnit = 1 << 12,		/// Air unit on field
-	MapFieldBuilding = 1 << 13,		/// Building on field
-	MapFieldItem = 1 << 14,			/// Item on field
+	MapFieldRoad = 1 << 14,			/// Road (moves faster)
+	MapFieldRailroad = 1 << 15,		/// Railroad (moves faster)
+	MapFieldNoRail = 1 << 16,		/// Marker that there's no railroad, used for rail movemasks
+	MapFieldBridge = 1 << 17,		/// Bridge or raft
 	
-	MapFieldRoad = 1 << 15,			/// Road (moves faster)
-	MapFieldRailroad = 1 << 16,		/// Railroad (moves faster)
-	MapFieldNoRail = 1 << 17,		/// Marker that there's no railroad, used for rail movemasks
-	MapFieldBridge = 1 << 18,		/// Bridge or raft
+	MapFieldGrass = 1 << 18,		/// Used for playing grass step sounds
+	MapFieldMud = 1 << 19,			/// Used for playing mud step sounds
+	MapFieldStoneFloor = 1 << 20,	/// Used for playing stone step sounds
+	MapFieldDirt = 1 << 21,			/// Used for playing dirt step sounds
+	MapFieldDesert = 1 << 22,		/// Used for identifying desert tiles for desertstalk and dehydration
+	MapFieldSnow = 1 << 23,			/// Used for playing snow step sounds
+	MapFieldIce = 1 << 24,			/// Used for playing ice step sounds
 	
-	MapFieldGrass = 1 << 19,		/// Used for playing grass step sounds
-	MapFieldMud = 1 << 20,			/// Used for playing mud step sounds
-	MapFieldStoneFloor = 1 << 21,	/// Used for playing stone step sounds
-	MapFieldDirt = 1 << 22,			/// Used for playing dirt step sounds
-	MapFieldDesert = 1 << 23,		/// Used for identifying desert tiles for desertstalk and dehydration
-	MapFieldSnow = 1 << 24,			/// Used for playing snow step sounds
-	MapFieldIce = 1 << 25,			/// Used for playing ice step sounds
-	
-	MapFieldGravel = 1 << 26,		/// Used for playing gravel step sounds
-	MapFieldStumps = 1 << 27,		/// Used for playing stumps step sounds and identifying removed forests
+	MapFieldGravel = 1 << 25,		/// Used for playing gravel step sounds
+	MapFieldStumps = 1 << 26,		/// Used for playing stumps step sounds and identifying removed forests
 };
 
 /**

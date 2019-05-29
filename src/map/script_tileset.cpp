@@ -98,7 +98,7 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 
 	for (unsigned int i = 0; i != sizeof(speeds) / sizeof(*speeds); ++i) {
 		if (!strcmp(flagName, speeds[i].name)) {
-			*flag = (*flag & ~MapFieldSpeedMask) | speeds[i].speed;
+			*flag |= speeds[i].speed;
 			return true;
 		}
 	}

@@ -341,7 +341,6 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
 #endif
-	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
 #ifdef DEBUG
 	this->tilesetTile = tileIndex;
 #endif
