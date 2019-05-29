@@ -508,9 +508,10 @@ void CWord::_bind_methods()
 		if (word->DerivesFrom != nullptr) {
 			word->DerivesFrom->DerivesTo.erase(std::remove(word->DerivesFrom->DerivesTo.begin(), word->DerivesFrom->DerivesTo.end(), word), word->DerivesFrom->DerivesTo.end());
 		}
-		word->DerivesFrom = word;
-		if (word != nullptr) {
-			word->DerivesTo.push_back(word);
+		CWord *derives_from = CWord::Get(derives_from_ident);
+		word->DerivesFrom = derives_from;
+		if (derives_from != nullptr) {
+			derives_from->DerivesTo.push_back(word);
 		}
 	});
 	ClassDB::bind_method(D_METHOD("get_derives_from"), &CWord::GetDerivesFrom);
