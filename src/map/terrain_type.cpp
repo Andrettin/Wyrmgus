@@ -366,19 +366,19 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 
 void CTerrainType::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_tree", "tree"), [](CTerrainType *terrain_type, const bool tree){ terrain_type->Tree = tree; });
+	ClassDB::bind_method(D_METHOD("set_tree", "tree"), +[](CTerrainType *terrain_type, const bool tree){ terrain_type->Tree = tree; });
 	ClassDB::bind_method(D_METHOD("is_tree"), &CTerrainType::IsTree);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "tree"), "set_tree", "is_tree");
 	
-	ClassDB::bind_method(D_METHOD("set_rock", "rock"), [](CTerrainType *terrain_type, const bool rock){ terrain_type->Rock = rock; });
+	ClassDB::bind_method(D_METHOD("set_rock", "rock"), +[](CTerrainType *terrain_type, const bool rock){ terrain_type->Rock = rock; });
 	ClassDB::bind_method(D_METHOD("is_rock"), &CTerrainType::IsRock);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "rock"), "set_rock", "is_rock");
 	
-	ClassDB::bind_method(D_METHOD("set_desert", "desert"), [](CTerrainType *terrain_type, const bool desert){ terrain_type->Desert = desert; });
+	ClassDB::bind_method(D_METHOD("set_desert", "desert"), +[](CTerrainType *terrain_type, const bool desert){ terrain_type->Desert = desert; });
 	ClassDB::bind_method(D_METHOD("is_desert"), &CTerrainType::IsDesert);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "desert"), "set_desert", "is_desert");
 	
-	ClassDB::bind_method(D_METHOD("set_swamp", "swamp"), [](CTerrainType *terrain_type, const bool swamp){ terrain_type->Swamp = swamp; });
+	ClassDB::bind_method(D_METHOD("set_swamp", "swamp"), +[](CTerrainType *terrain_type, const bool swamp){ terrain_type->Swamp = swamp; });
 	ClassDB::bind_method(D_METHOD("is_swamp"), &CTerrainType::IsSwamp);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "swamp"), "set_swamp", "is_swamp");
 }

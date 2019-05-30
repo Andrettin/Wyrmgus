@@ -41,5 +41,23 @@
 
 void ItemSlot::_bind_methods()
 {
-	BIND_PROPERTIES();
+	ClassDB::bind_method(D_METHOD("set_quantity", "quantity"), +[](ItemSlot *slot, const int quantity){ slot->Quantity = quantity; });
+	ClassDB::bind_method(D_METHOD("get_quantity"), &ItemSlot::GetQuantity);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "quantity"), "set_quantity", "get_quantity");
+	
+	ClassDB::bind_method(D_METHOD("set_weapon", "weapon"), +[](ItemSlot *slot, const bool weapon){ slot->Weapon = weapon; });
+	ClassDB::bind_method(D_METHOD("is_weapon"), &ItemSlot::IsWeapon);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "weapon"), "set_weapon", "is_weapon");
+	
+	ClassDB::bind_method(D_METHOD("set_shield", "shield"), +[](ItemSlot *slot, const bool shield){ slot->Shield = shield; });
+	ClassDB::bind_method(D_METHOD("is_shield"), &ItemSlot::IsShield);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "shield"), "set_shield", "is_shield");
+
+	ClassDB::bind_method(D_METHOD("set_boots", "boots"), +[](ItemSlot *slot, const bool boots){ slot->Boots = boots; });
+	ClassDB::bind_method(D_METHOD("is_boots"), &ItemSlot::IsBoots);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "boots"), "set_boots", "is_boots");
+
+	ClassDB::bind_method(D_METHOD("set_arrows", "arrows"), +[](ItemSlot *slot, const bool arrows){ slot->Arrows = arrows; });
+	ClassDB::bind_method(D_METHOD("is_arrows"), &ItemSlot::IsArrows);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "arrows"), "set_arrows", "is_arrows");
 }

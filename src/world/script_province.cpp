@@ -657,8 +657,8 @@ static int CclGetWorldData(lua_State *l)
 		lua_pushstring(l, world->GetQuote().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Plane")) {
-		if (world->Plane) {
-			lua_pushstring(l, world->Plane->Ident.c_str());
+		if (world->GetPlane()) {
+			lua_pushstring(l, world->GetPlane()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

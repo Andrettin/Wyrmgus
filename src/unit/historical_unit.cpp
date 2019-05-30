@@ -139,11 +139,11 @@ void CHistoricalUnit::Initialize()
 
 void CHistoricalUnit::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_unit_class", "unit_class_ident"), [](CHistoricalUnit *historical_unit, const String &unit_class_ident){
+	ClassDB::bind_method(D_METHOD("set_unit_class", "unit_class_ident"), +[](CHistoricalUnit *historical_unit, const String &unit_class_ident){
 		historical_unit->UnitClasses.clear();
 		historical_unit->UnitClasses.push_back(UnitClass::Get(unit_class_ident));
 	});
-	ClassDB::bind_method(D_METHOD("get_unit_class"), [](const CHistoricalUnit *historical_unit){
+	ClassDB::bind_method(D_METHOD("get_unit_class"), +[](const CHistoricalUnit *historical_unit){
 		if (!historical_unit->GetUnitClasses().empty()) {
 			return const_cast<UnitClass *>(historical_unit->GetUnitClasses().front());
 		}
@@ -152,15 +152,15 @@ void CHistoricalUnit::_bind_methods()
 	});
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unit_class"), "set_unit_class", "get_unit_class");
 	
-	ClassDB::bind_method(D_METHOD("add_to_unit_classes", "unit_class"), [](CHistoricalUnit *historical_unit, const String &unit_class_ident){ historical_unit->UnitClasses.push_back(UnitClass::Get(unit_class_ident)); });
-	ClassDB::bind_method(D_METHOD("remove_from_unit_classes", "unit_class_ident"), [](CHistoricalUnit *historical_unit, const String &unit_class_ident){ historical_unit->UnitClasses.erase(std::remove(historical_unit->UnitClasses.begin(), historical_unit->UnitClasses.end(), UnitClass::Get(unit_class_ident)), historical_unit->UnitClasses.end()); });
-	ClassDB::bind_method(D_METHOD("get_unit_classes"), [](const CHistoricalUnit *historical_unit){ return VectorToGodotArray(historical_unit->UnitClasses); });
+	ClassDB::bind_method(D_METHOD("add_to_unit_classes", "unit_class"), +[](CHistoricalUnit *historical_unit, const String &unit_class_ident){ historical_unit->UnitClasses.push_back(UnitClass::Get(unit_class_ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_unit_classes", "unit_class_ident"), +[](CHistoricalUnit *historical_unit, const String &unit_class_ident){ historical_unit->UnitClasses.erase(std::remove(historical_unit->UnitClasses.begin(), historical_unit->UnitClasses.end(), UnitClass::Get(unit_class_ident)), historical_unit->UnitClasses.end()); });
+	ClassDB::bind_method(D_METHOD("get_unit_classes"), +[](const CHistoricalUnit *historical_unit){ return VectorToGodotArray(historical_unit->UnitClasses); });
 	
-	ClassDB::bind_method(D_METHOD("set_unit_type", "unit_type_ident"), [](CHistoricalUnit *historical_unit, const String &unit_type_ident){
+	ClassDB::bind_method(D_METHOD("set_unit_type", "unit_type_ident"), +[](CHistoricalUnit *historical_unit, const String &unit_type_ident){
 		historical_unit->UnitTypes.clear();
 		historical_unit->UnitTypes.push_back(CUnitType::Get(unit_type_ident));
 	});
-	ClassDB::bind_method(D_METHOD("get_unit_type"), [](const CHistoricalUnit *historical_unit){
+	ClassDB::bind_method(D_METHOD("get_unit_type"), +[](const CHistoricalUnit *historical_unit){
 		if (!historical_unit->GetUnitTypes().empty()) {
 			return const_cast<CUnitType *>(historical_unit->GetUnitTypes().front());
 		}
@@ -169,27 +169,27 @@ void CHistoricalUnit::_bind_methods()
 	});
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unit_type"), "set_unit_type", "get_unit_type");
 	
-	ClassDB::bind_method(D_METHOD("add_to_unit_types", "unit_type"), [](CHistoricalUnit *historical_unit, const String &unit_type_ident){ historical_unit->UnitTypes.push_back(CUnitType::Get(unit_type_ident)); });
-	ClassDB::bind_method(D_METHOD("remove_from_unit_types", "unit_type_ident"), [](CHistoricalUnit *historical_unit, const String &unit_type_ident){ historical_unit->UnitTypes.erase(std::remove(historical_unit->UnitTypes.begin(), historical_unit->UnitTypes.end(), CUnitType::Get(unit_type_ident)), historical_unit->UnitTypes.end()); });
-	ClassDB::bind_method(D_METHOD("get_unit_types"), [](const CHistoricalUnit *historical_unit){ return VectorToGodotArray(historical_unit->UnitTypes); });
+	ClassDB::bind_method(D_METHOD("add_to_unit_types", "unit_type"), +[](CHistoricalUnit *historical_unit, const String &unit_type_ident){ historical_unit->UnitTypes.push_back(CUnitType::Get(unit_type_ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_unit_types", "unit_type_ident"), +[](CHistoricalUnit *historical_unit, const String &unit_type_ident){ historical_unit->UnitTypes.erase(std::remove(historical_unit->UnitTypes.begin(), historical_unit->UnitTypes.end(), CUnitType::Get(unit_type_ident)), historical_unit->UnitTypes.end()); });
+	ClassDB::bind_method(D_METHOD("get_unit_types"), +[](const CHistoricalUnit *historical_unit){ return VectorToGodotArray(historical_unit->UnitTypes); });
 	
-	ClassDB::bind_method(D_METHOD("set_faction", "faction_ident"), [](CHistoricalUnit *historical_unit, const String &faction_ident){ historical_unit->Faction = CFaction::Get(faction_ident); });
-	ClassDB::bind_method(D_METHOD("get_faction"), [](const CHistoricalUnit *historical_unit){ return const_cast<CFaction *>(historical_unit->GetFaction()); });
+	ClassDB::bind_method(D_METHOD("set_faction", "faction_ident"), +[](CHistoricalUnit *historical_unit, const String &faction_ident){ historical_unit->Faction = CFaction::Get(faction_ident); });
+	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CHistoricalUnit *historical_unit){ return const_cast<CFaction *>(historical_unit->GetFaction()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
-	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), [](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = UniqueItem::Get(unique_ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), +[](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = UniqueItem::Get(unique_ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_unique"), &CHistoricalUnit::GetUnique);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unique"), "set_unique", "get_unique");
 	
-	ClassDB::bind_method(D_METHOD("set_quantity", "quantity"), [](CHistoricalUnit *historical_unit, const int quantity){ historical_unit->Quantity = quantity; });
+	ClassDB::bind_method(D_METHOD("set_quantity", "quantity"), +[](CHistoricalUnit *historical_unit, const int quantity){ historical_unit->Quantity = quantity; });
 	ClassDB::bind_method(D_METHOD("get_quantity"), &CHistoricalUnit::GetQuantity);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "quantity"), "set_quantity", "get_quantity");
 	
-	ClassDB::bind_method(D_METHOD("set_connection_surface_layer", "connection_surface_layer"), [](CHistoricalUnit *historical_unit, const int connection_surface_layer){ historical_unit->ConnectionSurfaceLayer = connection_surface_layer; });
+	ClassDB::bind_method(D_METHOD("set_connection_surface_layer", "connection_surface_layer"), +[](CHistoricalUnit *historical_unit, const int connection_surface_layer){ historical_unit->ConnectionSurfaceLayer = connection_surface_layer; });
 	ClassDB::bind_method(D_METHOD("get_connection_surface_layer"), &CHistoricalUnit::GetConnectionSurfaceLayer);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "connection_surface_layer"), "set_connection_surface_layer", "get_connection_surface_layer");
 	
-	ClassDB::bind_method(D_METHOD("set_resources_held", "resources_held"), [](CHistoricalUnit *historical_unit, const int resources_held){ historical_unit->ResourcesHeld = resources_held; });
+	ClassDB::bind_method(D_METHOD("set_resources_held", "resources_held"), +[](CHistoricalUnit *historical_unit, const int resources_held){ historical_unit->ResourcesHeld = resources_held; });
 	ClassDB::bind_method(D_METHOD("get_resources_held"), &CHistoricalUnit::GetResourcesHeld);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "resources_held"), "set_resources_held", "get_resources_held");
 }

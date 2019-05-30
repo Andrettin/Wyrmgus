@@ -422,8 +422,8 @@ static int CclDefineCharacter(lua_State *l)
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
-						if (is_equipped && item->Type->ItemClass->Slot != nullptr) {
-							character->EquippedItems[item->Type->ItemClass->Slot].push_back(item);
+						if (is_equipped && item->Type->ItemClass->GetSlot() != nullptr) {
+							character->EquippedItems[item->Type->ItemClass->GetSlot()].push_back(item);
 						}
 					} else {
 						printf("\n%s\n", character->Ident.c_str());
@@ -777,8 +777,8 @@ static int CclDefineCustomHero(lua_State *l)
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
-						if (is_equipped && item->Type->ItemClass->Slot != nullptr) {
-							hero->EquippedItems[item->Type->ItemClass->Slot].push_back(item);
+						if (is_equipped && item->Type->ItemClass->GetSlot() != nullptr) {
+							hero->EquippedItems[item->Type->ItemClass->GetSlot()].push_back(item);
 						}
 					} else {
 						printf("\n%s\n", hero->Ident.c_str());

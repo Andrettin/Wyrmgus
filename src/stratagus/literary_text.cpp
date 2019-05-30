@@ -138,51 +138,59 @@ void CLiteraryText::UpdateSectionPageNumbers() const
 
 void CLiteraryText::_bind_methods()
 {
-	BIND_PROPERTIES();
-	
-	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), [](CLiteraryText *text, const bool hidden){ text->Hidden = hidden; });
-	ClassDB::bind_method(D_METHOD("is_hidden"), [](CLiteraryText *text){ return text->Hidden; });
+	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), +[](CLiteraryText *text, const bool hidden){ text->Hidden = hidden; });
+	ClassDB::bind_method(D_METHOD("is_hidden"), +[](CLiteraryText *text){ return text->Hidden; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hidden"), "set_hidden", "is_hidden");
 	
-	ClassDB::bind_method(D_METHOD("set_author", "author"), [](CLiteraryText *text, const String &author){ text->Author = author; });
-	ClassDB::bind_method(D_METHOD("get_author"), [](CLiteraryText *text){ return text->Author; });
+	ClassDB::bind_method(D_METHOD("set_author", "author"), +[](CLiteraryText *text, const String &author){ text->Author = author; });
+	ClassDB::bind_method(D_METHOD("get_author"), +[](CLiteraryText *text){ return text->Author; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "author"), "set_author", "get_author");
 	
-	ClassDB::bind_method(D_METHOD("set_translator", "translator"), [](CLiteraryText *text, const String &translator){ text->Translator = translator; });
-	ClassDB::bind_method(D_METHOD("get_translator"), [](CLiteraryText *text){ return text->Translator; });
+	ClassDB::bind_method(D_METHOD("set_translator", "translator"), +[](CLiteraryText *text, const String &translator){ text->Translator = translator; });
+	ClassDB::bind_method(D_METHOD("get_translator"), +[](CLiteraryText *text){ return text->Translator; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "translator"), "set_translator", "get_translator");
 	
-	ClassDB::bind_method(D_METHOD("set_publisher", "publisher"), [](CLiteraryText *text, const String &publisher){ text->Publisher = publisher; });
-	ClassDB::bind_method(D_METHOD("get_publisher"), [](CLiteraryText *text){ return text->Publisher; });
+	ClassDB::bind_method(D_METHOD("set_publisher", "publisher"), +[](CLiteraryText *text, const String &publisher){ text->Publisher = publisher; });
+	ClassDB::bind_method(D_METHOD("get_publisher"), +[](CLiteraryText *text){ return text->Publisher; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "publisher"), "set_publisher", "get_publisher");
 	
-	ClassDB::bind_method(D_METHOD("set_license", "license"), [](CLiteraryText *text, const String &license){ text->License = license; });
-	ClassDB::bind_method(D_METHOD("get_license"), [](CLiteraryText *text){ return text->License; });
+	ClassDB::bind_method(D_METHOD("set_license", "license"), +[](CLiteraryText *text, const String &license){ text->License = license; });
+	ClassDB::bind_method(D_METHOD("get_license"), +[](CLiteraryText *text){ return text->License; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "license"), "set_license", "get_license");
 	
-	ClassDB::bind_method(D_METHOD("set_notes", "notes"), [](CLiteraryText *text, const String &notes){ text->Notes = notes; });
-	ClassDB::bind_method(D_METHOD("get_notes"), [](CLiteraryText *text){ return text->Notes; });
+	ClassDB::bind_method(D_METHOD("set_notes", "notes"), +[](CLiteraryText *text, const String &notes){ text->Notes = notes; });
+	ClassDB::bind_method(D_METHOD("get_notes"), +[](CLiteraryText *text){ return text->Notes; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "notes"), "set_notes", "get_notes");
 	
-	ClassDB::bind_method(D_METHOD("set_publication_year", "publication_year"), [](CLiteraryText *text, const int publication_year){ text->PublicationYear = publication_year; });
-	ClassDB::bind_method(D_METHOD("get_publication_year"), [](CLiteraryText *text){ return text->PublicationYear; });
+	ClassDB::bind_method(D_METHOD("set_publication_year", "publication_year"), +[](CLiteraryText *text, const int publication_year){ text->PublicationYear = publication_year; });
+	ClassDB::bind_method(D_METHOD("get_publication_year"), +[](CLiteraryText *text){ return text->PublicationYear; });
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "publication_year"), "set_publication_year", "get_publication_year");
 	
-	ClassDB::bind_method(D_METHOD("set_initial_page_number", "initial_page_number"), [](CLiteraryText *text, const int initial_page_number){ text->InitialPageNumber = initial_page_number; });
-	ClassDB::bind_method(D_METHOD("get_initial_page_number"), [](CLiteraryText *text){ return text->InitialPageNumber; });
+	ClassDB::bind_method(D_METHOD("set_initial_page_number", "initial_page_number"), +[](CLiteraryText *text, const int initial_page_number){ text->InitialPageNumber = initial_page_number; });
+	ClassDB::bind_method(D_METHOD("get_initial_page_number"), +[](CLiteraryText *text){ return text->InitialPageNumber; });
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "initial_page_number"), "set_initial_page_number", "get_initial_page_number");
 	
-	ClassDB::bind_method(D_METHOD("set_page_numbering_enabled", "page_numbering_enabled"), [](CLiteraryText *text, const bool page_numbering_enabled){ text->PageNumberingEnabled = page_numbering_enabled; });
-	ClassDB::bind_method(D_METHOD("is_page_numbering_enabled"), [](CLiteraryText *text){ return text->PageNumberingEnabled; });
+	ClassDB::bind_method(D_METHOD("set_page_numbering_enabled", "page_numbering_enabled"), +[](CLiteraryText *text, const bool page_numbering_enabled){ text->PageNumberingEnabled = page_numbering_enabled; });
+	ClassDB::bind_method(D_METHOD("is_page_numbering_enabled"), +[](CLiteraryText *text){ return text->PageNumberingEnabled; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "page_numbering_enabled"), "set_page_numbering_enabled", "is_page_numbering_enabled");
 	
-	ClassDB::bind_method(D_METHOD("set_lowercase_roman_numeral_page_numbering", "lowercase_roman_numeral_page_numbering"), [](CLiteraryText *text, const bool lowercase_roman_numeral_page_numbering){ text->LowercaseRomanNumeralPageNumbering = lowercase_roman_numeral_page_numbering; });
-	ClassDB::bind_method(D_METHOD("has_lowercase_roman_numeral_page_numbering"), [](CLiteraryText *text){ return text->LowercaseRomanNumeralPageNumbering; });
+	ClassDB::bind_method(D_METHOD("set_lowercase_roman_numeral_page_numbering", "lowercase_roman_numeral_page_numbering"), +[](CLiteraryText *text, const bool lowercase_roman_numeral_page_numbering){ text->LowercaseRomanNumeralPageNumbering = lowercase_roman_numeral_page_numbering; });
+	ClassDB::bind_method(D_METHOD("has_lowercase_roman_numeral_page_numbering"), +[](CLiteraryText *text){ return text->LowercaseRomanNumeralPageNumbering; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "lowercase_roman_numeral_page_numbering"), "set_lowercase_roman_numeral_page_numbering", "has_lowercase_roman_numeral_page_numbering");
+	
+	ClassDB::bind_method(D_METHOD("set_icon", "icon"), +[](CLiteraryText *text, const String &ident){
+		text->Icon = CIcon::Get(ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "icon"), "set_icon", "get_icon");
 	
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
 	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);
 	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);
 	ClassDB::bind_method(D_METHOD("get_first_page"), &CLiteraryText::GetFirstPage);
 	ClassDB::bind_method(D_METHOD("get_last_page"), &CLiteraryText::GetLastPage);
+	
+	ClassDB::bind_method(D_METHOD("add_to_sections", "section"), +[](CLiteraryText *text, const String &ident){ text->Sections.push_back(CLiteraryText::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_sections", "section"), +[](CLiteraryText *text, const String &ident){ text->Sections.erase(std::remove(text->Sections.begin(), text->Sections.end(), CLiteraryText::Get(ident)), text->Sections.end()); });
+	ClassDB::bind_method(D_METHOD("get_sections"), +[](const CLiteraryText *text){ return VectorToGodotArray(text->Sections); });
 }

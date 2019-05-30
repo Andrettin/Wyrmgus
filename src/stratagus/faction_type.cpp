@@ -43,19 +43,19 @@
 
 void FactionType::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_neutral", "neutral"), [](FactionType *faction_type, const bool neutral){ faction_type->Neutral = neutral; });
+	ClassDB::bind_method(D_METHOD("set_neutral", "neutral"), +[](FactionType *faction_type, const bool neutral){ faction_type->Neutral = neutral; });
 	ClassDB::bind_method(D_METHOD("is_neutral"), &FactionType::IsNeutral);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "neutral"), "set_neutral", "is_neutral");
 
-	ClassDB::bind_method(D_METHOD("set_religious", "religious"), [](FactionType *faction_type, const bool religious){ faction_type->Religious = religious; });
+	ClassDB::bind_method(D_METHOD("set_religious", "religious"), +[](FactionType *faction_type, const bool religious){ faction_type->Religious = religious; });
 	ClassDB::bind_method(D_METHOD("is_religious"), &FactionType::IsReligious);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "religious"), "set_religious", "is_religious");
 	
-	ClassDB::bind_method(D_METHOD("set_tribal", "tribal"), [](FactionType *faction_type, const bool tribal){ faction_type->Tribal = tribal; });
+	ClassDB::bind_method(D_METHOD("set_tribal", "tribal"), +[](FactionType *faction_type, const bool tribal){ faction_type->Tribal = tribal; });
 	ClassDB::bind_method(D_METHOD("is_tribal"), &FactionType::IsTribal);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "tribal"), "set_tribal", "is_tribal");
 	
-	ClassDB::bind_method(D_METHOD("set_upgrade", "upgrade_ident"), [](FactionType *faction_type, const String &upgrade_ident){ faction_type->Upgrade = CUpgrade::Get(upgrade_ident.utf8().get_data()); });
-	ClassDB::bind_method(D_METHOD("get_upgrade"), [](const FactionType *faction_type){ return const_cast<CUpgrade *>(faction_type->GetUpgrade()); });
+	ClassDB::bind_method(D_METHOD("set_upgrade", "upgrade_ident"), +[](FactionType *faction_type, const String &upgrade_ident){ faction_type->Upgrade = CUpgrade::Get(upgrade_ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_upgrade"), +[](const FactionType *faction_type){ return const_cast<CUpgrade *>(faction_type->GetUpgrade()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "upgrade"), "set_upgrade", "get_upgrade");
 }

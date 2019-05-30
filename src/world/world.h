@@ -59,28 +59,23 @@ class CWorld : public DetailedDataElement, public DataType<CWorld>
 public:
 	static constexpr const char *ClassIdentifier = "world";
 
-private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Plane);
-		REGISTER_PROPERTY(SeasonSchedule);
-		REGISTER_PROPERTY(TimeOfDaySchedule);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
-public:
 	static CWorld *Add(const std::string &ident);
 	static void Clear();
 	
-	Property<CPlane *> Plane = nullptr;
-	Property<CTimeOfDaySchedule *> TimeOfDaySchedule = nullptr;			/// this world's time of day schedule
-	Property<CSeasonSchedule *> SeasonSchedule = nullptr;				/// this world's season schedule
-	std::vector<Province *> Provinces;									/// Provinces in this world
-	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
-	std::vector<CSpecies *> Species;									/// Species in this world
+	CPlane *GetPlane() const { return this->Plane; }
+	
+	CTimeOfDaySchedule *GetTimeOfDaySchedule() const { return this->TimeOfDaySchedule; }
+	
+	CSeasonSchedule *GetSeasonSchedule() const { return this->SeasonSchedule; }
+	
+private:
+	CPlane *Plane = nullptr;
+public:
+	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// this world's time of day schedule
+	CSeasonSchedule *SeasonSchedule = nullptr;			/// this world's season schedule
+	std::vector<Province *> Provinces;					/// Provinces in this world
+	std::vector<CTerrainFeature *> TerrainFeatures;		/// Terrain features in this world
+	std::vector<CSpecies *> Species;					/// Species in this world
 
 protected:
 	static void _bind_methods();

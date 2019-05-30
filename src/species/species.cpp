@@ -213,30 +213,28 @@ const std::vector<CWord *> &CSpecies::GetSpecimenNameWords(const CGender *gender
 
 void CSpecies::_bind_methods()
 {
-	BIND_PROPERTIES();
-	
-	ClassDB::bind_method(D_METHOD("set_scientific_name", "scientific_name"), [](CSpecies *species, const String &scientific_name){ species->ScientificName = scientific_name; });
-	ClassDB::bind_method(D_METHOD("get_scientific_name"), [](const CSpecies *species){ return species->ScientificName; });
+	ClassDB::bind_method(D_METHOD("set_scientific_name", "scientific_name"), +[](CSpecies *species, const String &scientific_name){ species->ScientificName = scientific_name; });
+	ClassDB::bind_method(D_METHOD("get_scientific_name"), +[](const CSpecies *species){ return species->ScientificName; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "scientific_name"), "set_scientific_name", "get_scientific_name");
 	
-	ClassDB::bind_method(D_METHOD("set_name_plural", "name_plural"), [](CSpecies *species, const String &name_plural){ species->ScientificName = name_plural; });
-	ClassDB::bind_method(D_METHOD("get_name_plural"), [](const CSpecies *species){ return species->NamePlural; });
+	ClassDB::bind_method(D_METHOD("set_name_plural", "name_plural"), +[](CSpecies *species, const String &name_plural){ species->ScientificName = name_plural; });
+	ClassDB::bind_method(D_METHOD("get_name_plural"), +[](const CSpecies *species){ return species->NamePlural; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "name_plural"), "set_name_plural", "get_name_plural");
 	
-	ClassDB::bind_method(D_METHOD("set_category", "category_ident"), [](CSpecies *species, const String &category_ident){ species->Category = CSpeciesCategory::Get(category_ident); });
-	ClassDB::bind_method(D_METHOD("get_category"), [](const CSpecies *species){ return const_cast<CSpeciesCategory *>(species->GetCategory()); });
+	ClassDB::bind_method(D_METHOD("set_category", "category_ident"), +[](CSpecies *species, const String &category_ident){ species->Category = CSpeciesCategory::Get(category_ident); });
+	ClassDB::bind_method(D_METHOD("get_category"), +[](const CSpecies *species){ return const_cast<CSpeciesCategory *>(species->GetCategory()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "category"), "set_category", "get_category");
-	ClassDB::bind_method(D_METHOD("get_all_categories"), [](const CSpecies *species){ return VectorToGodotArray(species->GetAllCategories()); });
+	ClassDB::bind_method(D_METHOD("get_all_categories"), +[](const CSpecies *species){ return VectorToGodotArray(species->GetAllCategories()); });
 	
-	ClassDB::bind_method(D_METHOD("set_sapient", "sapient"), [](CSpecies *species, const bool sapient){ species->Sapient = sapient; });
+	ClassDB::bind_method(D_METHOD("set_sapient", "sapient"), +[](CSpecies *species, const bool sapient){ species->Sapient = sapient; });
 	ClassDB::bind_method(D_METHOD("is_sapient"), &CSpecies::IsSapient);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "sapient"), "set_sapient", "is_sapient");
 	
-	ClassDB::bind_method(D_METHOD("set_prehistoric", "prehistoric"), [](CSpecies *species, const bool prehistoric){ species->Prehistoric = prehistoric; });
+	ClassDB::bind_method(D_METHOD("set_prehistoric", "prehistoric"), +[](CSpecies *species, const bool prehistoric){ species->Prehistoric = prehistoric; });
 	ClassDB::bind_method(D_METHOD("is_prehistoric"), &CSpecies::IsPrehistoric);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "prehistoric"), "set_prehistoric", "is_prehistoric");
 	
-	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), [](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
-	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), [](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
-	ClassDB::bind_method(D_METHOD("get_genders"), [](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
+	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), +[](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
+	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), +[](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
+	ClassDB::bind_method(D_METHOD("get_genders"), +[](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
 }

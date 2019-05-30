@@ -394,33 +394,33 @@ std::vector<CForceTemplate *> CCivilization::GetForceTemplates(const int force_t
 
 void CCivilization::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_parent_civilization", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+	ClassDB::bind_method(D_METHOD("set_parent_civilization", "civilization_ident"), +[](CCivilization *civilization, const String &civilization_ident){
 		civilization->ParentCivilization = CCivilization::Get(civilization_ident);
 	});
-	ClassDB::bind_method(D_METHOD("get_parent_civilization"), [](const CCivilization *civilization){ return civilization->ParentCivilization; });
+	ClassDB::bind_method(D_METHOD("get_parent_civilization"), +[](const CCivilization *civilization){ return civilization->ParentCivilization; });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "parent_civilization"), "set_parent_civilization", "get_parent_civilization");
 	
-	ClassDB::bind_method(D_METHOD("set_species", "species_ident"), [](CCivilization *civilization, const String &species_ident){
+	ClassDB::bind_method(D_METHOD("set_species", "species_ident"), +[](CCivilization *civilization, const String &species_ident){
 		civilization->Species = CSpecies::Get(species_ident);
 	});
-	ClassDB::bind_method(D_METHOD("get_species"), [](const CCivilization *civilization){ return civilization->GetSpecies(); });
+	ClassDB::bind_method(D_METHOD("get_species"), +[](const CCivilization *civilization){ return civilization->GetSpecies(); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "species"), "set_species", "get_species");
 	
-	ClassDB::bind_method(D_METHOD("set_language", "language_ident"), [](CCivilization *civilization, const String &language_ident){
+	ClassDB::bind_method(D_METHOD("set_language", "language_ident"), +[](CCivilization *civilization, const String &language_ident){
 		civilization->Language = CLanguage::Get(language_ident);
 	});
-	ClassDB::bind_method(D_METHOD("get_language"), [](const CCivilization *civilization){ return civilization->GetLanguage(); });
+	ClassDB::bind_method(D_METHOD("get_language"), +[](const CCivilization *civilization){ return civilization->GetLanguage(); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "language"), "set_language", "get_language");
 	
-	ClassDB::bind_method(D_METHOD("set_upgrade", "upgrade_ident"), [](CCivilization *civilization, const String &upgrade_ident){
+	ClassDB::bind_method(D_METHOD("set_upgrade", "upgrade_ident"), +[](CCivilization *civilization, const String &upgrade_ident){
 		civilization->Upgrade = upgrade_ident.utf8().get_data();
 	});
-	ClassDB::bind_method(D_METHOD("get_upgrade"), [](const CCivilization *civilization){ return const_cast<CUpgrade *>(civilization->GetUpgrade()); });
+	ClassDB::bind_method(D_METHOD("get_upgrade"), +[](const CCivilization *civilization){ return const_cast<CUpgrade *>(civilization->GetUpgrade()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "upgrade"), "set_upgrade", "get_upgrade");
 	
 	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
 	
-	ClassDB::bind_method(D_METHOD("set_default_player_color", "player_color_ident"), [](CCivilization *civilization, const String &player_color_ident){
+	ClassDB::bind_method(D_METHOD("set_default_player_color", "player_color_ident"), +[](CCivilization *civilization, const String &player_color_ident){
 		civilization->DefaultPlayerColor = CPlayerColor::Get(player_color_ident);
 	});
 	ClassDB::bind_method(D_METHOD("get_default_player_color"), &CCivilization::GetDefaultPlayerColor);
@@ -429,31 +429,31 @@ void CCivilization::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_victory_background_file"), &CCivilization::GetVictoryBackgroundFile);
 	ClassDB::bind_method(D_METHOD("get_defeat_background_file"), &CCivilization::GetDefeatBackgroundFile);
 	
-	ClassDB::bind_method(D_METHOD("set_playable", "playable"), [](CCivilization *civilization, const bool playable){ civilization->Playable = playable; });
+	ClassDB::bind_method(D_METHOD("set_playable", "playable"), +[](CCivilization *civilization, const bool playable){ civilization->Playable = playable; });
 	ClassDB::bind_method(D_METHOD("is_playable"), &CCivilization::IsPlayable);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "playable"), "set_playable", "is_playable");
 	
-	ClassDB::bind_method(D_METHOD("add_to_develops_from", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+	ClassDB::bind_method(D_METHOD("add_to_develops_from", "civilization_ident"), +[](CCivilization *civilization, const String &civilization_ident){
 		CCivilization *develops_from = CCivilization::Get(civilization_ident);
 		civilization->DevelopsFrom.push_back(develops_from);
 		develops_from->DevelopsTo.push_back(civilization);
 	});
-	ClassDB::bind_method(D_METHOD("remove_from_develops_from", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+	ClassDB::bind_method(D_METHOD("remove_from_develops_from", "civilization_ident"), +[](CCivilization *civilization, const String &civilization_ident){
 		CCivilization *develops_from = CCivilization::Get(civilization_ident);
 		civilization->DevelopsFrom.erase(std::remove(civilization->DevelopsFrom.begin(), civilization->DevelopsFrom.end(), develops_from), civilization->DevelopsFrom.end());
 		develops_from->DevelopsTo.erase(std::remove(develops_from->DevelopsTo.begin(), develops_from->DevelopsTo.end(), civilization), develops_from->DevelopsTo.end());
 	});
-	ClassDB::bind_method(D_METHOD("get_develops_from"), [](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsFrom); });
+	ClassDB::bind_method(D_METHOD("get_develops_from"), +[](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsFrom); });
 	
-	ClassDB::bind_method(D_METHOD("add_to_develops_to", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+	ClassDB::bind_method(D_METHOD("add_to_develops_to", "civilization_ident"), +[](CCivilization *civilization, const String &civilization_ident){
 		CCivilization *develops_to = CCivilization::Get(civilization_ident);
 		civilization->DevelopsTo.push_back(develops_to);
 		develops_to->DevelopsFrom.push_back(civilization);
 	});
-	ClassDB::bind_method(D_METHOD("remove_from_develops_to", "civilization_ident"), [](CCivilization *civilization, const String &civilization_ident){
+	ClassDB::bind_method(D_METHOD("remove_from_develops_to", "civilization_ident"), +[](CCivilization *civilization, const String &civilization_ident){
 		CCivilization *develops_to = CCivilization::Get(civilization_ident);
 		civilization->DevelopsTo.erase(std::remove(civilization->DevelopsTo.begin(), civilization->DevelopsTo.end(), develops_to), civilization->DevelopsTo.end());
 		develops_to->DevelopsFrom.erase(std::remove(develops_to->DevelopsFrom.begin(), develops_to->DevelopsFrom.end(), civilization), develops_to->DevelopsFrom.end());
 	});
-	ClassDB::bind_method(D_METHOD("get_develops_to"), [](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsTo); });
+	ClassDB::bind_method(D_METHOD("get_develops_to"), +[](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsTo); });
 }

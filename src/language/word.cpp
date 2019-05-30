@@ -472,11 +472,11 @@ String CWord::GetParticiple(const int grammatical_tense)
 
 void CWord::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_anglicized_name", "anglicized_name"), [](CWord *word, const String &anglicized_name){ word->AnglicizedName = anglicized_name; });
+	ClassDB::bind_method(D_METHOD("set_anglicized_name", "anglicized_name"), +[](CWord *word, const String &anglicized_name){ word->AnglicizedName = anglicized_name; });
 	ClassDB::bind_method(D_METHOD("get_anglicized_name"), &CWord::GetAnglicizedName);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "anglicized_name"), "set_anglicized_name", "get_anglicized_name");
 	
-	ClassDB::bind_method(D_METHOD("set_language", "language_ident"), [](CWord *word, const String &language_ident){
+	ClassDB::bind_method(D_METHOD("set_language", "language_ident"), +[](CWord *word, const String &language_ident){
 		if (word->Language != nullptr) {
 			word->Language->Words.erase(std::remove(word->Language->Words.begin(), word->Language->Words.end(), word), word->Language->Words.end());
 			for (CLanguage *dialect : word->Language->Dialects) {
@@ -493,18 +493,18 @@ void CWord::_bind_methods()
 			}
 		}
 	});
-	ClassDB::bind_method(D_METHOD("get_language"), [](const CWord *word){ return const_cast<CLanguage *>(word->GetLanguage()); });
+	ClassDB::bind_method(D_METHOD("get_language"), +[](const CWord *word){ return const_cast<CLanguage *>(word->GetLanguage()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "language"), "set_language", "get_language");
 	
-	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), [](CWord *word, const String &type_ident){ word->Type = CWordType::Get(type_ident); });
-	ClassDB::bind_method(D_METHOD("get_type"), [](const CWord *word){ return const_cast<CWordType *>(word->GetType()); });
+	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), +[](CWord *word, const String &type_ident){ word->Type = CWordType::Get(type_ident); });
+	ClassDB::bind_method(D_METHOD("get_type"), +[](const CWord *word){ return const_cast<CWordType *>(word->GetType()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "type"), "set_type", "get_type");
 	
-	ClassDB::bind_method(D_METHOD("set_gender", "gender_ident"), [](CWord *word, const String &gender_ident){ word->Gender = CGrammaticalGender::Get(gender_ident); });
-	ClassDB::bind_method(D_METHOD("get_gender"), [](const CWord *word){ return const_cast<CGrammaticalGender *>(word->GetGender()); });
+	ClassDB::bind_method(D_METHOD("set_gender", "gender_ident"), +[](CWord *word, const String &gender_ident){ word->Gender = CGrammaticalGender::Get(gender_ident); });
+	ClassDB::bind_method(D_METHOD("get_gender"), +[](const CWord *word){ return const_cast<CGrammaticalGender *>(word->GetGender()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "gender"), "set_gender", "get_gender");
 	
-	ClassDB::bind_method(D_METHOD("set_derives_from", "derives_from_ident"), [](CWord *word, const String &derives_from_ident){
+	ClassDB::bind_method(D_METHOD("set_derives_from", "derives_from_ident"), +[](CWord *word, const String &derives_from_ident){
 		if (word->DerivesFrom != nullptr) {
 			word->DerivesFrom->DerivesTo.erase(std::remove(word->DerivesFrom->DerivesTo.begin(), word->DerivesFrom->DerivesTo.end(), word), word->DerivesFrom->DerivesTo.end());
 		}
@@ -517,32 +517,32 @@ void CWord::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_derives_from"), &CWord::GetDerivesFrom);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "derives_from"), "set_derives_from", "get_derives_from");
 	
-	ClassDB::bind_method(D_METHOD("get_derives_to"), [](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
+	ClassDB::bind_method(D_METHOD("get_derives_to"), +[](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
 	
-	ClassDB::bind_method(D_METHOD("add_to_meanings", "meaning"), [](CWord *word, const String &meaning){ word->Meanings.push_back(meaning); });
-	ClassDB::bind_method(D_METHOD("remove_from_meanings", "meaning"), [](CWord *word, const String &meaning){ word->Meanings.erase(std::remove(word->Meanings.begin(), word->Meanings.end(), meaning), word->Meanings.end()); });
-	ClassDB::bind_method(D_METHOD("get_meanings"), [](const CWord *word){ return VectorToGodotArray(word->Meanings); });
+	ClassDB::bind_method(D_METHOD("add_to_meanings", "meaning"), +[](CWord *word, const String &meaning){ word->Meanings.push_back(meaning); });
+	ClassDB::bind_method(D_METHOD("remove_from_meanings", "meaning"), +[](CWord *word, const String &meaning){ word->Meanings.erase(std::remove(word->Meanings.begin(), word->Meanings.end(), meaning), word->Meanings.end()); });
+	ClassDB::bind_method(D_METHOD("get_meanings"), +[](const CWord *word){ return VectorToGodotArray(word->Meanings); });
 	
-	ClassDB::bind_method(D_METHOD("add_to_compound_elements", "compound_element"), [](CWord *word, const String &compound_element){ word->CompoundElements.push_back(CWord::Get(compound_element)); });
-	ClassDB::bind_method(D_METHOD("remove_from_compound_elements", "compound_element"), [](CWord *word, const String &compound_element){ word->CompoundElements.erase(std::remove(word->CompoundElements.begin(), word->CompoundElements.end(), CWord::Get(compound_element)), word->CompoundElements.end()); });
-	ClassDB::bind_method(D_METHOD("get_compound_elements"), [](const CWord *word){ return VectorToGodotArray(word->CompoundElements); });
+	ClassDB::bind_method(D_METHOD("add_to_compound_elements", "compound_element"), +[](CWord *word, const String &compound_element){ word->CompoundElements.push_back(CWord::Get(compound_element)); });
+	ClassDB::bind_method(D_METHOD("remove_from_compound_elements", "compound_element"), +[](CWord *word, const String &compound_element){ word->CompoundElements.erase(std::remove(word->CompoundElements.begin(), word->CompoundElements.end(), CWord::Get(compound_element)), word->CompoundElements.end()); });
+	ClassDB::bind_method(D_METHOD("get_compound_elements"), +[](const CWord *word){ return VectorToGodotArray(word->CompoundElements); });
 	
-	ClassDB::bind_method(D_METHOD("get_personal_name_genders"), [](const CWord *word){
+	ClassDB::bind_method(D_METHOD("get_personal_name_genders"), +[](const CWord *word){
 		Array genders;
 		for (const auto &element : word->PersonalNameWeights) {
 			genders.push_back(const_cast<CGender *>(element.first));
 		}
 		return genders;
 	});
-	ClassDB::bind_method(D_METHOD("is_family_name"), [](const CWord *word){ return word->FamilyNameWeight != 0; });
-	ClassDB::bind_method(D_METHOD("get_specimen_name_species"), [](const CWord *word){
+	ClassDB::bind_method(D_METHOD("is_family_name"), +[](const CWord *word){ return word->FamilyNameWeight != 0; });
+	ClassDB::bind_method(D_METHOD("get_specimen_name_species"), +[](const CWord *word){
 		Array species;
 		for (const auto &element : word->SpecimenNameWeights) {
 			species.push_back(const_cast<CSpecies *>(element.first));
 		}
 		return species;
 	});
-	ClassDB::bind_method(D_METHOD("get_specimen_name_genders", "species"), [](const CWord *word, Object *species){
+	ClassDB::bind_method(D_METHOD("get_specimen_name_genders", "species"), +[](const CWord *word, Object *species){
 		Array genders;
 		auto find_iterator = word->SpecimenNameWeights.find(static_cast<CSpecies *>(species));
 		if (find_iterator != word->SpecimenNameWeights.end()) {
@@ -552,6 +552,6 @@ void CWord::_bind_methods()
 		}
 		return genders;
 	});
-	ClassDB::bind_method(D_METHOD("is_ship_name"), [](const CWord *word){ return word->ShipNameWeight != 0; });
-	ClassDB::bind_method(D_METHOD("is_settlement_name"), [](const CWord *word){ return word->SettlementNameWeight != 0; });
+	ClassDB::bind_method(D_METHOD("is_ship_name"), +[](const CWord *word){ return word->ShipNameWeight != 0; });
+	ClassDB::bind_method(D_METHOD("is_settlement_name"), +[](const CWord *word){ return word->SettlementNameWeight != 0; });
 }

@@ -397,7 +397,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "equipped")) {
 			bool is_equipped = LuaToBoolean(l, 2, j + 1);
 			if (is_equipped && unit->Container != nullptr) {
-				unit->Container->EquippedItems[unit->Type->ItemClass->Slot].push_back(unit);
+				unit->Container->EquippedItems[unit->Type->ItemClass->GetSlot()].push_back(unit);
 			}
 		} else if (!strcmp(value, "sold-unit")) {
 			bool is_sold = LuaToBoolean(l, 2, j + 1);

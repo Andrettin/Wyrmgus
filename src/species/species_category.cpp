@@ -99,12 +99,22 @@ const std::vector<CWord *> &CSpeciesCategory::GetSpecimenNameWords(const CGender
 
 void CSpeciesCategory::_bind_methods()
 {
-	BIND_PROPERTIES();
+	ClassDB::bind_method(D_METHOD("set_common_name", "common_name"), +[](CSpeciesCategory *category, const String &common_name){ category->CommonName = common_name; });
+	ClassDB::bind_method(D_METHOD("get_common_name"), &CSpeciesCategory::GetCommonName);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "common_name"), "set_common_name", "get_common_name");
 	
-	ClassDB::bind_method(D_METHOD("get_upper_category"), [](const CSpeciesCategory *category){ return category->UpperCategory; });
-	ClassDB::bind_method(D_METHOD("get_all_upper_categories"), [](const CSpeciesCategory *category){ return VectorToGodotArray(category->GetAllUpperCategories()); });
+	ClassDB::bind_method(D_METHOD("set_common_name_plural", "common_name_plural"), +[](CSpeciesCategory *category, const String &common_name_plural){ category->CommonNamePlural = common_name_plural; });
+	ClassDB::bind_method(D_METHOD("get_common_name_plural"), &CSpeciesCategory::GetCommonNamePlural);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "common_name_plural"), "set_common_name_plural", "get_common_name_plural");
 	
-	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), [](CSpeciesCategory *category, const String &gender){ category->Genders.push_back(CGender::Get(gender)); });
-	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), [](CSpeciesCategory *category, const String &gender){ category->Genders.erase(std::remove(category->Genders.begin(), category->Genders.end(), CGender::Get(gender)), category->Genders.end()); });
-	ClassDB::bind_method(D_METHOD("get_genders"), [](const CSpeciesCategory *category){ return VectorToGodotArray(category->Genders); });
+	ClassDB::bind_method(D_METHOD("set_rank", "rank"), +[](CSpeciesCategory *category, const String &ident){ category->Rank = CSpeciesCategoryRank::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_rank"), &CSpeciesCategory::GetRank);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "rank"), "set_rank", "get_rank");
+	
+	ClassDB::bind_method(D_METHOD("get_upper_category"), +[](const CSpeciesCategory *category){ return category->UpperCategory; });
+	ClassDB::bind_method(D_METHOD("get_all_upper_categories"), +[](const CSpeciesCategory *category){ return VectorToGodotArray(category->GetAllUpperCategories()); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), +[](CSpeciesCategory *category, const String &gender){ category->Genders.push_back(CGender::Get(gender)); });
+	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), +[](CSpeciesCategory *category, const String &gender){ category->Genders.erase(std::remove(category->Genders.begin(), category->Genders.end(), CGender::Get(gender)), category->Genders.end()); });
+	ClassDB::bind_method(D_METHOD("get_genders"), +[](const CSpeciesCategory *category){ return VectorToGodotArray(category->Genders); });
 }

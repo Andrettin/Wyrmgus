@@ -231,23 +231,23 @@ bool CQuest::ProcessConfigDataSection(const CConfigData *section)
 
 void CQuest::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_player_color", "player_color_ident"), [](CQuest *quest, const String &player_color_ident){ quest->PlayerColor = CPlayerColor::Get(player_color_ident); });
-	ClassDB::bind_method(D_METHOD("get_player_color"), [](const CQuest *quest){ return const_cast<CPlayerColor *>(quest->GetPlayerColor()); });
+	ClassDB::bind_method(D_METHOD("set_player_color", "player_color_ident"), +[](CQuest *quest, const String &player_color_ident){ quest->PlayerColor = CPlayerColor::Get(player_color_ident); });
+	ClassDB::bind_method(D_METHOD("get_player_color"), +[](const CQuest *quest){ return const_cast<CPlayerColor *>(quest->GetPlayerColor()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "player_color"), "set_player_color", "get_player_color");
 	
-	ClassDB::bind_method(D_METHOD("set_hint", "hint"), [](CQuest *quest, const String &hint){ quest->Hint = hint; });
+	ClassDB::bind_method(D_METHOD("set_hint", "hint"), +[](CQuest *quest, const String &hint){ quest->Hint = hint; });
 	ClassDB::bind_method(D_METHOD("get_hint"), &CQuest::GetHint);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "hint"), "set_hint", "get_hint");
 	
-	ClassDB::bind_method(D_METHOD("set_rewards_string", "rewards_string"), [](CQuest *quest, const String &rewards_string){ quest->RewardsString = rewards_string; });
+	ClassDB::bind_method(D_METHOD("set_rewards_string", "rewards_string"), +[](CQuest *quest, const String &rewards_string){ quest->RewardsString = rewards_string; });
 	ClassDB::bind_method(D_METHOD("get_rewards_string"), &CQuest::GetRewardsString);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "rewards_string"), "set_rewards_string", "get_rewards_string");
 	
-	ClassDB::bind_method(D_METHOD("set_repeatable", "repeatable"), [](CQuest *quest, const bool repeatable){ quest->Repeatable = repeatable; });
+	ClassDB::bind_method(D_METHOD("set_repeatable", "repeatable"), +[](CQuest *quest, const bool repeatable){ quest->Repeatable = repeatable; });
 	ClassDB::bind_method(D_METHOD("is_repeatable"), &CQuest::IsRepeatable);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "repeatable"), "set_repeatable", "is_repeatable");
 	
-	ClassDB::bind_method(D_METHOD("set_unobtainable", "unobtainable"), [](CQuest *quest, const bool unobtainable){ quest->Unobtainable = unobtainable; });
+	ClassDB::bind_method(D_METHOD("set_unobtainable", "unobtainable"), +[](CQuest *quest, const bool unobtainable){ quest->Unobtainable = unobtainable; });
 	ClassDB::bind_method(D_METHOD("is_unobtainable"), &CQuest::IsUnobtainable);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "unobtainable"), "set_unobtainable", "is_unobtainable");
 }

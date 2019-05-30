@@ -2526,15 +2526,15 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlot")) {
-		if (type->ItemClass != nullptr && type->ItemClass->Slot != nullptr) {
-			lua_pushstring(l, type->ItemClass->Slot->Ident.c_str());
+		if (type->ItemClass != nullptr && type->ItemClass->GetSlot() != nullptr) {
+			lua_pushstring(l, type->ItemClass->GetSlot()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlotId")) {
-		if (type->ItemClass != nullptr && type->ItemClass->Slot != nullptr) {
-			lua_pushnumber(l, type->ItemClass->Slot->GetIndex());
+		if (type->ItemClass != nullptr && type->ItemClass->GetSlot() != nullptr) {
+			lua_pushnumber(l, type->ItemClass->GetSlot()->GetIndex());
 		} else {
 			lua_pushnumber(l, -1);
 		}
@@ -3684,43 +3684,6 @@ static int CclGetSpeciesData(lua_State *l)
 
 	return 0;
 }
-
-/**
-**  Get species category data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetSpeciesCategoryData(lua_State *l)
-{
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string category_ident = LuaToString(l, 1);
-	const CSpeciesCategory *category = CSpeciesCategory::Get(category_ident);
-	if (!category) {
-		LuaError(l, "Species category \"%s\" doesn't exist." _C_ category_ident.c_str());
-	}
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, category->GetName().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "CommonName")) {
-		lua_pushstring(l, category->CommonName.utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "UpperCategory")) {
-		if (category->GetUpperCategory()) {
-			lua_pushstring(l, category->GetUpperCategory()->GetIdent().utf8().get_data());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
 //Wyrmgus end
 
 //Wyrmgus start
@@ -4092,7 +4055,6 @@ void UnitTypeCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineSpecies", CclDefineSpecies);
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
-	lua_register(Lua, "GetSpeciesCategoryData", CclGetSpeciesCategoryData);
 	lua_register(Lua, "SetSettlementSiteUnit", CclSetSettlementSiteUnit);
 	lua_register(Lua, "SetModTrains", CclSetModTrains);
 	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);

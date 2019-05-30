@@ -891,7 +891,7 @@ void CUnit::HealingItemAutoUse()
 			continue;
 		}
 		
-		if (uins->Type->ItemClass->Consumable == false) {
+		if (uins->Type->ItemClass->IsConsumable() == false) {
 			continue;
 		}
 		
@@ -1193,12 +1193,12 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		bool requires_shield = false;
 		bool found_shield = false;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
-			if (required_upgrade->ItemSlot != nullptr && required_upgrade->ItemSlot->Weapon) {
+			if (required_upgrade->ItemSlot != nullptr && required_upgrade->ItemSlot->IsWeapon()) {
 				requires_weapon = true;
 				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
 					found_weapon = true;
 				}
-			} else if (required_upgrade->ItemSlot != nullptr && required_upgrade->ItemSlot->Shield) {
+			} else if (required_upgrade->ItemSlot != nullptr && required_upgrade->ItemSlot->IsShield()) {
 				requires_shield = true;
 				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
 					found_shield = true;
@@ -1234,12 +1234,12 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			continue;
 		}
 		for (const ItemClass *item_class : variation->ItemClassesEquipped) {
-			if (item_class->Slot->Weapon) {
+			if (item_class->GetSlot()->IsWeapon()) {
 				requires_weapon = true;
 				if (this->IsItemClassEquipped(item_class)) {
 					found_weapon = true;
 				}
-			} else if (item_class->Slot->Shield) {
+			} else if (item_class->GetSlot()->IsShield()) {
 				requires_shield = true;
 				if (this->IsItemClassEquipped(item_class)) {
 					found_shield = true;
@@ -1247,12 +1247,12 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			}
 		}
 		for (size_t j = 0; j < variation->ItemsEquipped.size(); ++j) {
-			if (variation->ItemsEquipped[j]->ItemClass->Slot->Weapon) {
+			if (variation->ItemsEquipped[j]->ItemClass->GetSlot()->IsWeapon()) {
 				requires_weapon = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_weapon = true;
 				}
-			} else if (variation->ItemsEquipped[j]->ItemClass->Slot->Shield) {
+			} else if (variation->ItemsEquipped[j]->ItemClass->GetSlot()->IsShield()) {
 				requires_shield = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_shield = true;
@@ -1336,15 +1336,15 @@ void CUnit::ChooseButtonIcon(const int button_action)
 		const ItemSlot *item_slot = iterator->first;
 		
 		if (button_action == ButtonAttack || button_action == ButtonStandGround) {
-			if (!item_slot->Arrows && !item_slot->Weapon) {
+			if (!item_slot->IsArrows() && !item_slot->IsWeapon()) {
 				continue;
 			}
 		} else if (button_action == ButtonStop) {
-			if (!item_slot->Shield) {
+			if (!item_slot->IsShield()) {
 				continue;
 			}
 		} else if (button_action == ButtonMove) {
-			if (!item_slot->Boots) {
+			if (!item_slot->IsBoots()) {
 				continue;
 			}
 		} else {
@@ -1353,11 +1353,11 @@ void CUnit::ChooseButtonIcon(const int button_action)
 			
 		for (const CUnit *equipment_unit : iterator->second) {
 			if (button_action == ButtonAttack || button_action == ButtonStandGround) {
-				if (item_slot->Weapon && equipment_unit->Type->ItemClass->AllowArrows) { //use the arrow icon for attack/stand ground buttons instead if the weapon allows arrows
+				if (item_slot->IsWeapon() && equipment_unit->Type->ItemClass->AllowsArrows()) { //use the arrow icon for attack/stand ground buttons instead if the weapon allows arrows
 					continue;
 				}
 			} else if (button_action == ButtonStop) {
-				if (!equipment_unit->Type->ItemClass->Shield) {
+				if (!equipment_unit->Type->ItemClass->IsShield()) {
 					continue;
 				}
 			}
@@ -1410,15 +1410,15 @@ void CUnit::ChooseButtonIcon(const int button_action)
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X' && upgrade->ItemSlot != nullptr) {
 			if (
 				(
-					(button_action == ButtonAttack && ((upgrade->ItemSlot->Weapon && upgrade->Item->ItemClass->AllowArrows == false) || upgrade->ItemSlot->Arrows))
-					|| (button_action == ButtonStop && upgrade->ItemSlot->Shield)
-					|| (button_action == ButtonMove && upgrade->ItemSlot->Boots)
+					(button_action == ButtonAttack && ((upgrade->ItemSlot->IsWeapon() && upgrade->Item->ItemClass->AllowsArrows() == false) || upgrade->ItemSlot->IsArrows()))
+					|| (button_action == ButtonStop && upgrade->ItemSlot->IsShield())
+					|| (button_action == ButtonMove && upgrade->ItemSlot->IsBoots())
 				)
 				&& upgrade->Item->GetIcon() != nullptr
 			) {
 				this->ButtonIcons[button_action] = upgrade->Item->GetIcon();
 				return;
-			} else if (button_action == ButtonStandGround && (upgrade->ItemSlot->Weapon || upgrade->ItemSlot->Arrows) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
+			} else if (button_action == ButtonStandGround && (upgrade->ItemSlot->IsWeapon() || upgrade->ItemSlot->IsArrows()) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
 				this->ButtonIcons[button_action] = upgrade->Item->ButtonIcons.find(button_action)->second.Icon;
 				return;
 			}
@@ -1432,18 +1432,18 @@ void CUnit::ChooseButtonIcon(const int button_action)
 		const CUnitType *equipment_unit_type = iterator->second;
 		
 		if (button_action == ButtonAttack || button_action == ButtonStandGround) {
-			if (!item_slot->Arrows && !item_slot->Weapon) {
+			if (!item_slot->IsArrows() && !item_slot->IsWeapon()) {
 				continue;
 			}
-			if (item_slot->Weapon && equipment_unit_type->ItemClass->AllowArrows) { //use the arrow icon for attack/stand ground buttons instead if the weapon allows arrows
+			if (item_slot->IsWeapon() && equipment_unit_type->ItemClass->AllowsArrows()) { //use the arrow icon for attack/stand ground buttons instead if the weapon allows arrows
 				continue;
 			}
 		} else if (button_action == ButtonStop) {
-			if (!item_slot->Shield || !equipment_unit_type->ItemClass->Shield) {
+			if (!item_slot->IsShield() || !equipment_unit_type->ItemClass->IsShield()) {
 				continue;
 			}
 		} else if (button_action == ButtonMove) {
-			if (!item_slot->Boots) {
+			if (!item_slot->IsBoots()) {
 				continue;
 			}
 		} else {
@@ -1503,7 +1503,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 void CUnit::EquipItem(CUnit *item, const bool affect_character)
 {
 	const ItemClass *item_class = item->Type->ItemClass;
-	const ItemSlot *item_slot = item_class->Slot;
+	const ItemSlot *item_slot = item_class->GetSlot();
 	
 	if (item_slot == nullptr) {
 		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item->GetTypeName().c_str());
@@ -1515,12 +1515,12 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 	}
 	
 	if (this->EquippedItems[item_slot].size() == 0) {
-		if (item_slot->Weapon) {
+		if (item_slot->IsWeapon()) {
 			// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 				if (
-					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Weapon && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X')
+					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsWeapon() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X')
 					|| (
 						modifier_upgrade->Ability
 						&& this->GetIndividualUpgrade(modifier_upgrade)
@@ -1548,27 +1548,27 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 					}
 				}
 			}
-		} else if (item_slot->Shield) {
+		} else if (item_slot->IsShield()) {
 			// remove the upgrade modifiers from shield technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsShield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
-		} else if (item_slot->Boots) {
+		} else if (item_slot->IsBoots()) {
 			// remove the upgrade modifiers from boots technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsBoots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
-		} else if (item_slot->Arrows) {
+		} else if (item_slot->IsArrows()) {
 			// remove the upgrade modifiers from arrows technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsArrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1619,12 +1619,12 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 		}
 	}
 	
-	if (item_slot->Weapon || item_slot->Arrows) {
+	if (item_slot->IsWeapon() || item_slot->IsArrows()) {
 		this->ChooseButtonIcon(ButtonAttack);
 		this->ChooseButtonIcon(ButtonStandGround);
-	} else if (item_slot->Shield) {
+	} else if (item_slot->IsShield()) {
 		this->ChooseButtonIcon(ButtonStop);
-	} else if (item_slot->Boots) {
+	} else if (item_slot->IsBoots()) {
 		this->ChooseButtonIcon(ButtonMove);
 	}
 	this->ChooseButtonIcon(ButtonPatrol);
@@ -1703,7 +1703,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 	}
 
 	const ItemClass *item_class = item->Type->ItemClass;
-	const ItemSlot *item_slot = item_class->Slot;
+	const ItemSlot *item_slot = item_class->GetSlot();
 	
 	if (item_slot == nullptr) {
 		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item->GetTypeName().c_str());
@@ -1733,12 +1733,12 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 	if (this->EquippedItems[item_slot].empty()) {
 		this->EquippedItems.erase(item_slot);
 		
-		if (item_slot->Weapon) {
+		if (item_slot->IsWeapon()) {
 			// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 				if (
-					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Weapon && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X')
+					(modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsWeapon() && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X')
 					|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
@@ -1760,27 +1760,27 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 					}
 				}
 			}
-		} else if (item_slot->Shield) {
+		} else if (item_slot->IsShield()) {
 			// restore the upgrade modifiers from shield technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsShield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
-		} else if (item_slot->Boots) {
+		} else if (item_slot->IsBoots()) {
 			// restore the upgrade modifiers from boots technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsBoots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
-		} else if (item_slot->Arrows) {
+		} else if (item_slot->IsArrows()) {
 			// restore the upgrade modifiers from arrows technologies
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
-				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
+				if (modifier_upgrade->ItemSlot != nullptr && modifier_upgrade->ItemSlot->IsArrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X') {
 					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
@@ -1812,12 +1812,12 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 		}
 	}
 	
-	if (item_slot->Weapon || item_slot->Arrows) {
+	if (item_slot->IsWeapon() || item_slot->IsArrows()) {
 		this->ChooseButtonIcon(ButtonAttack);
 		this->ChooseButtonIcon(ButtonStandGround);
-	} else if (item_slot->Shield) {
+	} else if (item_slot->IsShield()) {
 		this->ChooseButtonIcon(ButtonStop);
-	} else if (item_slot->Boots) {
+	} else if (item_slot->IsBoots()) {
 		this->ChooseButtonIcon(ButtonMove);
 	}
 	this->ChooseButtonIcon(ButtonPatrol);
@@ -2290,7 +2290,7 @@ void CUnit::GenerateSpecialProperties(const CUnit *dropper, const CPlayer *dropp
 	
 	if (
 		this->Prefix == nullptr && this->Suffix == nullptr && this->Spell == nullptr && this->Work == nullptr && this->Elixir == nullptr
-		&& ((this->Type->ItemClass != nullptr && this->Type->ItemClass->SpecialPropertyRequired) || always_magic)
+		&& ((this->Type->ItemClass != nullptr && this->Type->ItemClass->IsSpecialPropertyRequired()) || always_magic)
 	) { //scrolls, books, jewelry and horns must always have a property
 		this->GenerateSpecialProperties(dropper, dropper_player, allow_unique, sold_item, always_magic);
 	}
@@ -5819,13 +5819,13 @@ int CUnit::GetItemSlotQuantity(const ItemSlot *item_slot) const
 	}
 	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
-		item_slot->Arrows
-		&& this->Type->WeaponClasses[0]->AllowArrows == false
+		item_slot->IsArrows()
+		&& this->Type->WeaponClasses[0]->AllowsArrows() == false
 	) {
 		return 0;
 	}
 	
-	return item_slot->Quantity;
+	return item_slot->GetQuantity();
 }
 
 const ItemClass *CUnit::GetCurrentWeaponClass() const
@@ -5833,7 +5833,7 @@ const ItemClass *CUnit::GetCurrentWeaponClass() const
 	if (this->HasInventory()) {
 		for (std::map<const ItemSlot *, std::vector<CUnit *>>::const_iterator iterator = this->EquippedItems.begin(); iterator != this->EquippedItems.end(); ++iterator) {
 			const ItemSlot *item_slot = iterator->first;
-			if (item_slot->Weapon && iterator->second.size() > 0) {
+			if (item_slot->IsWeapon() && iterator->second.size() > 0) {
 				return iterator->second.front()->Type->ItemClass;
 			}
 		}
@@ -5848,7 +5848,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		return 0;
 	}
 	
-	const ItemSlot *item_slot = item->Type->ItemClass->Slot;
+	const ItemSlot *item_slot = item->Type->ItemClass->GetSlot();
 	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == nullptr || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
 		return 0;
 	}
@@ -5935,7 +5935,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		} else if (
 			item_slot != nullptr
 			&& (this->EquippedItems.find(item_slot) == this->EquippedItems.end() || this->EquippedItems.find(item_slot)->second.empty())
-			&& (item_slot->Weapon || item_slot->Shield || item_slot->Boots || item_slot->Arrows)
+			&& (item_slot->IsWeapon() || item_slot->IsShield() || item_slot->IsBoots() || item_slot->IsArrows())
 		) {
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
@@ -5944,7 +5944,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 						modifier_upgrade->ItemSlot == item_slot
 						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->GetIndex()] == 'X'
 					)
-					|| (item_slot->Weapon && modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->GetCurrentWeaponClass()) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item->Type->ItemClass) == modifier_upgrade->WeaponClasses.end())
+					|| (item_slot->IsWeapon() && modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->GetCurrentWeaponClass()) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item->Type->ItemClass) == modifier_upgrade->WeaponClasses.end())
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
 						for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
@@ -6334,7 +6334,7 @@ bool CUnit::IsItemEquipped(const CUnit *item) const
 		return false;
 	}
 	
-	const ItemSlot *item_slot = item->Type->ItemClass->Slot;
+	const ItemSlot *item_slot = item->Type->ItemClass->GetSlot();
 	
 	if (item_slot == nullptr) {
 		return false;
@@ -6358,7 +6358,7 @@ bool CUnit::IsItemClassEquipped(const ItemClass *item_class) const
 		return false;
 	}
 	
-	const ItemSlot *item_slot = item_class->Slot;
+	const ItemSlot *item_slot = item_class->GetSlot();
 	
 	if (item_slot == nullptr) {
 		return false;
@@ -6384,7 +6384,7 @@ bool CUnit::IsItemTypeEquipped(const CUnitType *item_type) const
 		return false;
 	}
 	
-	const ItemSlot *item_slot = item_type->ItemClass->Slot;
+	const ItemSlot *item_slot = item_type->ItemClass->GetSlot();
 	
 	if (item_slot == nullptr) {
 		return false;
@@ -6410,7 +6410,7 @@ bool CUnit::IsUniqueItemEquipped(const UniqueItem *unique) const
 		return false;
 	}
 	
-	const ItemSlot *item_slot = unique->Type->ItemClass->Slot;
+	const ItemSlot *item_slot = unique->Type->ItemClass->GetSlot();
 		
 	if (item_slot == nullptr) {
 		return false;
@@ -6453,34 +6453,34 @@ bool CUnit::CanEquipItemClass(const ItemClass *item_class) const
 		return false;
 	}
 	
-	if (item_class->Slot == nullptr) { //can't equip items that don't correspond to an equippable slot
+	if (item_class->GetSlot() == nullptr) { //can't equip items that don't correspond to an equippable slot
 		return false;
 	}
 	
-	if (item_class->Slot->Weapon && std::find(this->Type->WeaponClasses.begin(), this->Type->WeaponClasses.end(), item_class) == this->Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+	if (item_class->GetSlot()->IsWeapon() && std::find(this->Type->WeaponClasses.begin(), this->Type->WeaponClasses.end(), item_class) == this->Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
-		item_class->Slot->Shield
+		item_class->GetSlot()->IsShield()
 		&& this->Type->WeaponClasses.size() > 0
-		&& this->Type->WeaponClasses[0]->TwoHanded
+		&& this->Type->WeaponClasses[0]->IsTwoHanded()
 	) {
 		return false;
 	}
 	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		item_class->Shield
+		item_class->IsShield()
 		&& (
 			Type->WeaponClasses.size() == 0
-			|| Type->WeaponClasses[0]->ShieldCompatible == false
+			|| Type->WeaponClasses[0]->IsShieldCompatible() == false
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {
 		return false;
 	}
 	
-	if (this->GetItemSlotQuantity(item_class->Slot) == 0) {
+	if (this->GetItemSlotQuantity(item_class->GetSlot()) == 0) {
 		return false;
 	}
 	
@@ -6507,7 +6507,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass->Consumable == false) {
+	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass->IsConsumable() == false) {
 		return false;
 	}
 	
@@ -6550,7 +6550,7 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
 	for (const UniqueItem *set_item : item->Unique->Set->UniqueItems) {
-		const ItemSlot *item_slot = set_item->Type->ItemClass->Slot;
+		const ItemSlot *item_slot = set_item->Type->ItemClass->GetSlot();
 		
 		if (item_slot == nullptr) {
 			return false;
@@ -6584,7 +6584,7 @@ bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
 		return false;
 	}
 	
-	const ItemSlot *item_slot = item->Type->ItemClass->Slot;
+	const ItemSlot *item_slot = item->Type->ItemClass->GetSlot();
 		
 	if (item_slot == nullptr) {
 		return false;
@@ -8055,7 +8055,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && unit.Type->ItemClass->Consumable == false) { //only consumable items can be picked up as if they were power-ups for units with no inventory
+	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && unit.Type->ItemClass->IsConsumable() == false) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction
@@ -8565,9 +8565,9 @@ void CUnit::HandleUnitAction()
 
 void CUnit::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), [](const CUnit *unit){ return String(unit->GetName().c_str()); });
+	ClassDB::bind_method(D_METHOD("get_name"), +[](const CUnit *unit){ return String(unit->GetName().c_str()); });
 	ClassDB::bind_method(D_METHOD("get_player"), &CUnit::GetPlayer);
-	ClassDB::bind_method(D_METHOD("get_icon"), [](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
+	ClassDB::bind_method(D_METHOD("get_icon"), +[](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
 }
 
 /*----------------------------------------------------------------------------

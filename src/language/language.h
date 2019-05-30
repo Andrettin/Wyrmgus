@@ -61,18 +61,6 @@ class CLanguage : public DataElement, public DataType<CLanguage>
 public:
 	static constexpr const char *ClassIdentifier = "language";
 	
-private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(DialectOf);
-		REGISTER_PROPERTY(Family);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
-public:
 	static void Clear();
 	static const CLanguage *GetEnglishLanguage();
 
@@ -82,6 +70,9 @@ private:
 public:	
 	CWord *GetWord(const String &name, const CWordType *word_type, const std::vector<String> &word_meanings) const;
 	void RemoveWord(CWord *word);
+	
+	CLanguageFamily *GetFamily() const { return this->Family; }
+	CLanguage *GetDialectOf() const { return this->DialectOf; }
 	
 	void AddPersonalNameWord(CWord *word, const CGender *gender);
 	const std::vector<CWord *> &GetPersonalNameWords(const CGender *gender) const;
@@ -98,22 +89,13 @@ public:
 	
 	String TranslateName(const String &name) const;
 	
+private:
+	CLanguageFamily *Family = nullptr;	/// the family to which the language belongs
+	CLanguage *DialectOf = nullptr;		/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 public:
-	Property<CLanguageFamily *> Family = nullptr;	/// the family to which the language belongs
-	Property<CLanguage *> DialectOf {	/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
-		Property<CLanguage *>::ValueType(nullptr),
-		Property<CLanguage *>::SetterType([this](CLanguage *language) {
-			if (this->DialectOf.Value != nullptr) {
-				this->DialectOf->Dialects.erase(std::remove(this->DialectOf->Dialects.begin(), this->DialectOf->Dialects.end(), this), this->DialectOf->Dialects.end());
-			}
-			this->DialectOf.Value = language;
-			this->DialectOf->Dialects.push_back(this);
-		})
-	};
 	std::vector<CLanguage *> Dialects;				/// dialects of this language
 	std::vector<CWord *> Words;						/// words of the language
 	std::map<String, std::vector<String>> NameTranslations;	/// name translations; possible translations mapped to the name to be translated
-	
 private:
 	std::map<const CGender *, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
 	std::vector<CWord *> FamilyNameWords;

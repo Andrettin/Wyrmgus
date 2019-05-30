@@ -97,10 +97,7 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	int GetWidth() const
-	{
-		return this->Width;
-	}
+	int GetWidth() const { return this->Width; }
 	
 	int GetAppliedWidth() const
 	{
@@ -127,10 +124,7 @@ public:
 		return width;
 	}
 	
-	int GetHeight() const
-	{
-		return this->Height;
-	}
+	int GetHeight() const { return this->Height; }
 	
 	int GetAppliedHeight() const
 	{
@@ -167,30 +161,15 @@ public:
 		return this->GetAppliedWidthWithDependentTemplateOffsets() * this->GetAppliedHeightWithDependentTemplateOffsets();
 	}
 	
-	CPlane *GetPlane() const
-	{
-		return this->Plane;
-	}
+	CPlane *GetPlane() const { return this->Plane; }
 	
-	CWorld *GetWorld() const
-	{
-		return this->World;
-	}
+	CWorld *GetWorld() const { return this->World; }
 	
-	int GetSurfaceLayer() const
-	{
-		return this->SurfaceLayer;
-	}
+	int GetSurfaceLayer() const { return this->SurfaceLayer; }
 	
-	int GetScale() const
-	{
-		return this->Scale;
-	}
+	int GetScale() const { return this->Scale; }
 	
-	int GetPriority() const
-	{
-		return this->Priority;
-	}
+	int GetPriority() const { return this->Priority; }
 	
 	int GetDependentTemplatesNorthOffset() const
 	{

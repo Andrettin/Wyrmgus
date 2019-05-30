@@ -160,7 +160,7 @@ int GetEraIdByName(const std::string &era)
 
 void Province::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_water", "water"), [](Province *province, const bool water){ province->Water = water; });
+	ClassDB::bind_method(D_METHOD("set_water", "water"), +[](Province *province, const bool water){ province->Water = water; });
 	ClassDB::bind_method(D_METHOD("is_water"), &Province::IsWater);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "water"), "set_water", "is_water");
 }

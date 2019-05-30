@@ -233,20 +233,20 @@ bool CCampaign::HasMapTemplateForLayer(const CPlane *plane, const CWorld *world,
 
 void CCampaign::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_description", "description"), [](CCampaign *campaign, const String &description){ campaign->Description = description; });
+	ClassDB::bind_method(D_METHOD("set_description", "description"), +[](CCampaign *campaign, const String &description){ campaign->Description = description; });
 	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "description"), "set_description", "get_description");
 	
-	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), [](CCampaign *campaign, const bool hidden){ campaign->Hidden = hidden; });
+	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), +[](CCampaign *campaign, const bool hidden){ campaign->Hidden = hidden; });
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CCampaign::IsHidden);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hidden"), "set_hidden", "is_hidden");
 	
-	ClassDB::bind_method(D_METHOD("set_sandbox", "sandbox"), [](CCampaign *campaign, const bool sandbox){ campaign->Sandbox = sandbox; });
+	ClassDB::bind_method(D_METHOD("set_sandbox", "sandbox"), +[](CCampaign *campaign, const bool sandbox){ campaign->Sandbox = sandbox; });
 	ClassDB::bind_method(D_METHOD("is_sandbox"), &CCampaign::IsSandbox);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "sandbox"), "set_sandbox", "is_sandbox");
 	
-	ClassDB::bind_method(D_METHOD("set_completion_quest", "completion_quest_ident"), [](CCampaign *campaign, const String &completion_quest_ident){ campaign->CompletionQuest = CQuest::Get(completion_quest_ident); });
-	ClassDB::bind_method(D_METHOD("get_completion_quest"), [](const CCampaign *campaign){ return const_cast<CQuest *>(campaign->GetCompletionQuest()); });
+	ClassDB::bind_method(D_METHOD("set_completion_quest", "completion_quest_ident"), +[](CCampaign *campaign, const String &completion_quest_ident){ campaign->CompletionQuest = CQuest::Get(completion_quest_ident); });
+	ClassDB::bind_method(D_METHOD("get_completion_quest"), +[](const CCampaign *campaign){ return const_cast<CQuest *>(campaign->GetCompletionQuest()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "completion_quest"), "set_completion_quest", "get_completion_quest");
 	
 	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);

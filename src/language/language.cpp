@@ -295,13 +295,23 @@ String CLanguage::TranslateName(const String &name) const
 
 void CLanguage::_bind_methods()
 {
-	BIND_PROPERTIES();
+	ClassDB::bind_method(D_METHOD("set_family", "family"), +[](CLanguage *language, const String &ident){ language->Family = CLanguageFamily::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_family"), &CLanguage::GetFamily);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "family"), "set_family", "get_family");
 	
-	ClassDB::bind_method(D_METHOD("set_english", "english"), [](CLanguage *language, const bool english){
-		CLanguage::EnglishLanguage = language;
+	ClassDB::bind_method(D_METHOD("set_dialect_of", "dialect_of"), +[](CLanguage *language, const String &ident){
+		if (language->DialectOf != nullptr) {
+			language->DialectOf->Dialects.erase(std::remove(language->DialectOf->Dialects.begin(), language->DialectOf->Dialects.end(), language), language->DialectOf->Dialects.end());
+		}
+		language->DialectOf = CLanguage::Get(ident);
+		if (language->DialectOf != nullptr) {
+			language->DialectOf->Dialects.push_back(language);
+		}
 	});
-	ClassDB::bind_method(D_METHOD("is_english"), [](const CLanguage *language){
-		return CLanguage::GetEnglishLanguage() == language;
-	});
+	ClassDB::bind_method(D_METHOD("get_dialect_of"), &CLanguage::GetDialectOf);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "dialect_of"), "set_dialect_of", "get_dialect_of");
+	
+	ClassDB::bind_method(D_METHOD("set_english", "english"), +[](CLanguage *language, const bool english){ CLanguage::EnglishLanguage = language; });
+	ClassDB::bind_method(D_METHOD("is_english"), +[](const CLanguage *language){ return CLanguage::GetEnglishLanguage() == language; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "english"), "set_english", "is_english");
 }

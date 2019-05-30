@@ -849,12 +849,12 @@ bool CTrigger::ProcessConfigDataSection(const CConfigData *section)
 
 void CTrigger::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_random_chance", "random_chance"), [](CTrigger *trigger, const int random_chance){ trigger->RandomChance = random_chance; });
+	ClassDB::bind_method(D_METHOD("set_random_chance", "random_chance"), +[](CTrigger *trigger, const int random_chance){ trigger->RandomChance = random_chance; });
 	ClassDB::bind_method(D_METHOD("get_random_chance"), &CTrigger::GetRandomChance);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "random_chance"), "set_random_chance", "get_random_chance");
 	
-	ClassDB::bind_method(D_METHOD("set_historical_faction", "historical_faction"), [](CTrigger *trigger, const String &faction_ident){ trigger->HistoricalFaction = CFaction::Get(faction_ident); });
-	ClassDB::bind_method(D_METHOD("get_historical_faction"), [](const CTrigger *trigger){ return const_cast<CFaction *>(trigger->GetHistoricalFaction()); });
+	ClassDB::bind_method(D_METHOD("set_historical_faction", "historical_faction"), +[](CTrigger *trigger, const String &faction_ident){ trigger->HistoricalFaction = CFaction::Get(faction_ident); });
+	ClassDB::bind_method(D_METHOD("get_historical_faction"), +[](const CTrigger *trigger){ return const_cast<CFaction *>(trigger->GetHistoricalFaction()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "historical_faction"), "set_historical_faction", "get_historical_faction");
 }
 

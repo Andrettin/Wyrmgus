@@ -76,25 +76,6 @@ private: \
 	
 #define REGISTER_PROPERTY(property_variable) \
 	ThisClass::Properties.insert({PascalCaseToSnakeCase(#property_variable), std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
-	
-#define BIND_PROPERTIES() \
-	for (std::map<std::string, std::function<PropertyCommonBase *(ThisClass *)>>::iterator iterator = ThisClass::Properties.begin(); iterator != ThisClass::Properties.end(); ++iterator) { \
-		const std::string &property_key = iterator->first; \
-		std::function<PropertyCommonBase *(ThisClass *)> property_function = iterator->second; \
-		/* temporary instance used to check the contained value in the property */ \
-		ThisClass temp_instance; \
-		PropertyCommonBase *property = property_function(&temp_instance); \
-		String method_name; \
-		\
-		if (dynamic_cast<PropertyBase<bool> *>(property)) { \
-			method_name += "is_"; \
-		} else { \
-			method_name += "get_"; \
-		} \
-		\
-		method_name += property_key.c_str(); \
-		ClassDB::bind_method(MethodDefinition(method_name), [property_function](ThisClass *instance){ return property_function(instance)->ToVariant(); }); \
-	}
 
 /*----------------------------------------------------------------------------
 --  Declarations

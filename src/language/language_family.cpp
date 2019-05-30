@@ -181,5 +181,7 @@ const std::vector<CWord *> &CLanguageFamily::GetSettlementNameWords() const
 
 void CLanguageFamily::_bind_methods()
 {
-	BIND_PROPERTIES();
+	ClassDB::bind_method(D_METHOD("set_family", "family"), +[](CLanguageFamily *family, const String &ident){ family->Family = CLanguageFamily::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_family"), &CLanguageFamily::GetFamily);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "family"), "set_family", "get_family");
 }

@@ -131,13 +131,13 @@ void CDialogueOption::DoEffect(CPlayer *player) const
 
 void CDialogueOption::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_name", "name"), [](CDialogueOption *option, const String &name){ option->Name = name; });
-	ClassDB::bind_method(D_METHOD("get_name"), [](const CDialogueOption *option){ return option->Name; });
+	ClassDB::bind_method(D_METHOD("set_name", "name"), +[](CDialogueOption *option, const String &name){ option->Name = name; });
+	ClassDB::bind_method(D_METHOD("get_name"), +[](const CDialogueOption *option){ return option->Name; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "name"), "set_name", "get_name");
 
-	ClassDB::bind_method(D_METHOD("set_tooltip", "tooltip"), [](CDialogueOption *option, const String &tooltip){ option->Tooltip = tooltip; });
-	ClassDB::bind_method(D_METHOD("get_tooltip"), [](const CDialogueOption *option){ return option->Tooltip; });
+	ClassDB::bind_method(D_METHOD("set_tooltip", "tooltip"), +[](CDialogueOption *option, const String &tooltip){ option->Tooltip = tooltip; });
+	ClassDB::bind_method(D_METHOD("get_tooltip"), +[](const CDialogueOption *option){ return option->Tooltip; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "tooltip"), "set_tooltip", "get_tooltip");
 	
-	ClassDB::bind_method(D_METHOD("do_effect"), [](const CDialogueOption *option){ return option->DoEffect(CPlayer::GetThisPlayer()); });
+	ClassDB::bind_method(D_METHOD("do_effect"), +[](const CDialogueOption *option){ return option->DoEffect(CPlayer::GetThisPlayer()); });
 }

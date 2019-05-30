@@ -74,15 +74,6 @@ public:
 public:
 	static constexpr const char *ClassIdentifier = "terrain_type";
 	
-private:
-	static inline bool InitializeClass()
-	{
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
-public:
 	static void LoadTerrainTypeGraphics();
 	static void Clear();
 	static uint16_t GetTerrainFlagByName(const std::string &flag_name);

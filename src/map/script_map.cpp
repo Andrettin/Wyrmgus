@@ -1619,7 +1619,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				LuaError(l, "World doesn't exist.");
 			}
 			map_template->World = world;
-			map_template->Plane = world->Plane;
+			map_template->Plane = world->GetPlane();
 		} else if (!strcmp(value, "SurfaceLayer")) {
 			map_template->SurfaceLayer = LuaToNumber(l, -1);
 			if (map_template->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
@@ -2036,7 +2036,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			if (world != nullptr) {
 				terrain_feature->World = world;
 				world->TerrainFeatures.push_back(terrain_feature);
-				terrain_feature->Plane = world->Plane;
+				terrain_feature->Plane = world->GetPlane();
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}

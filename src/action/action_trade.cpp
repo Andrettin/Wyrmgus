@@ -276,7 +276,7 @@ enum {
 				return;
 			}
 			PlayUnitSound(*goal, VoiceUsed);
-			if (goal->Type->BoolFlag[POWERUP_INDEX].value || (goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->Consumable)) { //only destroy item if it is consumable
+			if (goal->Type->BoolFlag[POWERUP_INDEX].value || (goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->IsConsumable())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);

@@ -103,7 +103,7 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 		CWorld *world = CWorld::Get(value);
 		if (world) {
 			this->World = world;
-			this->Plane = this->World->Plane;
+			this->Plane = this->World->GetPlane();
 		}
 	} else if (key == "surface_layer") {
 		this->SurfaceLayer = std::stoi(value);
@@ -604,9 +604,9 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 	
 	if (!this->IsSubtemplateArea()) {
 		if (Editor.Running == EditorNotRunning) {
-			if (this->World && this->World->SeasonSchedule) {
-				CMap::Map.MapLayers[z]->SeasonSchedule = this->World->SeasonSchedule;
-			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule) {
+			if (this->World && this->World->GetSeasonSchedule() != nullptr) {
+				CMap::Map.MapLayers[z]->SeasonSchedule = this->World->GetSeasonSchedule();
+			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule != nullptr) {
 				CMap::Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
 			} else {
 				CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
@@ -622,9 +622,9 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 				&& !GameSettings.Inside
 				&& !GameSettings.NoTimeOfDay
 			) {
-				if (this->World && this->World->TimeOfDaySchedule) {
-					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->World->TimeOfDaySchedule;
-				} else if (!this->World && this->Plane && this->Plane->TimeOfDaySchedule) {
+				if (this->World && this->World->GetTimeOfDaySchedule() != nullptr) {
+					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->World->GetTimeOfDaySchedule();
+				} else if (this->World == nullptr && this->Plane != nullptr && this->Plane->TimeOfDaySchedule != nullptr) {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->Plane->TimeOfDaySchedule;
 				} else {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
@@ -1905,28 +1905,28 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<const CHistoric
 
 void CMapTemplate::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_width", "width"), [](CMapTemplate *map_template, const int width){ map_template->Width = width; });
+	ClassDB::bind_method(D_METHOD("set_width", "width"), +[](CMapTemplate *map_template, const int width){ map_template->Width = width; });
 	ClassDB::bind_method(D_METHOD("get_width"), &CMapTemplate::GetWidth);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "width"), "set_width", "get_width");
 	
-	ClassDB::bind_method(D_METHOD("set_height", "height"), [](CMapTemplate *map_template, const int height){ map_template->Height = height; });
+	ClassDB::bind_method(D_METHOD("set_height", "height"), +[](CMapTemplate *map_template, const int height){ map_template->Height = height; });
 	ClassDB::bind_method(D_METHOD("get_height"), &CMapTemplate::GetHeight);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "height"), "set_height", "get_height");
 	
-	ClassDB::bind_method(D_METHOD("set_scale", "scale"), [](CMapTemplate *map_template, const int scale){ map_template->Scale = scale; });
+	ClassDB::bind_method(D_METHOD("set_scale", "scale"), +[](CMapTemplate *map_template, const int scale){ map_template->Scale = scale; });
 	ClassDB::bind_method(D_METHOD("get_scale"), &CMapTemplate::GetScale);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "scale"), "set_scale", "get_scale");
 	
-	ClassDB::bind_method(D_METHOD("set_priority", "priority"), [](CMapTemplate *map_template, const int priority){ map_template->Priority = priority; });
+	ClassDB::bind_method(D_METHOD("set_priority", "priority"), +[](CMapTemplate *map_template, const int priority){ map_template->Priority = priority; });
 	ClassDB::bind_method(D_METHOD("get_priority"), &CMapTemplate::GetPriority);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "priority"), "set_priority", "get_priority");
 	
-	ClassDB::bind_method(D_METHOD("set_output_terrain_image", "output_terrain_image"), [](CMapTemplate *map_template, const bool output_terrain_image){ map_template->OutputTerrainImage = output_terrain_image; });
-	ClassDB::bind_method(D_METHOD("outputs_terrain_image"), [](const CMapTemplate *map_template){ return map_template->OutputTerrainImage; });
+	ClassDB::bind_method(D_METHOD("set_output_terrain_image", "output_terrain_image"), +[](CMapTemplate *map_template, const bool output_terrain_image){ map_template->OutputTerrainImage = output_terrain_image; });
+	ClassDB::bind_method(D_METHOD("outputs_terrain_image"), +[](const CMapTemplate *map_template){ return map_template->OutputTerrainImage; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "output_terrain_image"), "set_output_terrain_image", "outputs_terrain_image");
 	
-	ClassDB::bind_method(D_METHOD("set_grow_for_subtemplates", "grow_for_subtemplates"), [](CMapTemplate *map_template, const bool grow_for_subtemplates){ map_template->GrowForSubtemplates = grow_for_subtemplates; });
-	ClassDB::bind_method(D_METHOD("grows_for_subtemplates"), [](const CMapTemplate *map_template){ return map_template->GrowForSubtemplates; });
+	ClassDB::bind_method(D_METHOD("set_grow_for_subtemplates", "grow_for_subtemplates"), +[](CMapTemplate *map_template, const bool grow_for_subtemplates){ map_template->GrowForSubtemplates = grow_for_subtemplates; });
+	ClassDB::bind_method(D_METHOD("grows_for_subtemplates"), +[](const CMapTemplate *map_template){ return map_template->GrowForSubtemplates; });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "grow_for_subtemplates"), "set_grow_for_subtemplates", "grows_for_subtemplates");
 }
 

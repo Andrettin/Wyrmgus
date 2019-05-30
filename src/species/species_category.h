@@ -59,35 +59,19 @@ public:
 	{
 	}
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(CommonName);
-		REGISTER_PROPERTY(CommonNamePlural);
-		REGISTER_PROPERTY(Rank);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
-public:
 	static constexpr const char *ClassIdentifier = "species_category";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	const std::vector<CSpeciesCategory *> &GetLowerCategory() const
-	{
-		return this->LowerCategories;
-	}
+	const String &GetCommonName() const { return this->CommonName; }
 	
-	CSpeciesCategory *GetUpperCategory() const
-	{
-		return this->UpperCategory;
-	}
+	const String &GetCommonNamePlural() const { return this->CommonNamePlural; }
+	
+	CSpeciesCategoryRank *GetRank() const { return this->Rank; }
+	
+	const std::vector<CSpeciesCategory *> &GetLowerCategory() const { return this->LowerCategories; }
+	
+	CSpeciesCategory *GetUpperCategory() const { return this->UpperCategory; }
 	
 	std::vector<const CSpeciesCategory *> GetAllUpperCategories() const
 	{
@@ -113,11 +97,10 @@ public:
 	void AddSpecimenNameWord(CWord *word, const CGender *gender);
 	const std::vector<CWord *> &GetSpecimenNameWords(const CGender *gender);
 	
-	Property<String> CommonName;	/// the common name of members of the species category
-	Property<String> CommonNamePlural;	/// the plural of the common name of members of the species category
-	Property<CSpeciesCategoryRank *> Rank = nullptr;	/// the rank of the species category
-	
 private:
+	String CommonName;	/// the common name of members of the species category
+	String CommonNamePlural;	/// the plural of the common name of members of the species category
+	CSpeciesCategoryRank *Rank = nullptr;	/// the rank of the species category
 	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories directly below this one
 	CSpeciesCategory *UpperCategory = nullptr;	/// the category directly above this one
 	std::vector<const CGender *> Genders;

@@ -422,8 +422,8 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 
 void CFaction::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), [](CFaction *faction, const String &type_ident){ faction->Type = FactionType::Get(type_ident); });
-	ClassDB::bind_method(D_METHOD("get_type"), [](const CFaction *faction){ return const_cast<FactionType *>(faction->GetType()); });
+	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), +[](CFaction *faction, const String &type_ident){ faction->Type = FactionType::Get(type_ident); });
+	ClassDB::bind_method(D_METHOD("get_type"), +[](const CFaction *faction){ return const_cast<FactionType *>(faction->GetType()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "type"), "set_type", "get_type");
 
 	ClassDB::bind_method(D_METHOD("get_primary_color"), &CFaction::GetPrimaryColor);

@@ -106,19 +106,19 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 
 void CTimeOfDay::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_dawn", "dawn"), [](CTimeOfDay *time_of_day, const bool dawn){ time_of_day->Dawn = dawn; });
+	ClassDB::bind_method(D_METHOD("set_dawn", "dawn"), +[](CTimeOfDay *time_of_day, const bool dawn){ time_of_day->Dawn = dawn; });
 	ClassDB::bind_method(D_METHOD("is_dawn"), &CTimeOfDay::IsDawn);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "dawn"), "set_dawn", "is_dawn");
 	
-	ClassDB::bind_method(D_METHOD("set_day", "day"), [](CTimeOfDay *time_of_day, const bool day){ time_of_day->Day = day; });
+	ClassDB::bind_method(D_METHOD("set_day", "day"), +[](CTimeOfDay *time_of_day, const bool day){ time_of_day->Day = day; });
 	ClassDB::bind_method(D_METHOD("is_day"), &CTimeOfDay::IsDay);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "day"), "set_day", "is_day");
 	
-	ClassDB::bind_method(D_METHOD("set_dusk", "dusk"), [](CTimeOfDay *time_of_day, const bool dusk){ time_of_day->Dusk = dusk; });
+	ClassDB::bind_method(D_METHOD("set_dusk", "dusk"), +[](CTimeOfDay *time_of_day, const bool dusk){ time_of_day->Dusk = dusk; });
 	ClassDB::bind_method(D_METHOD("is_dusk"), &CTimeOfDay::IsDusk);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "dusk"), "set_dusk", "is_dusk");
 	
-	ClassDB::bind_method(D_METHOD("set_night", "night"), [](CTimeOfDay *time_of_day, const bool night){ time_of_day->Night = night; });
+	ClassDB::bind_method(D_METHOD("set_night", "night"), +[](CTimeOfDay *time_of_day, const bool night){ time_of_day->Night = night; });
 	ClassDB::bind_method(D_METHOD("is_night"), &CTimeOfDay::IsNight);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "night"), "set_night", "is_night");
 }

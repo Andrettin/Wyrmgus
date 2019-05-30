@@ -333,7 +333,7 @@ CMapLayer *CSite::GetMapLayer() const
 
 void CSite::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_name_word", "name_word_ident"), [](CSite *site, const String &name_word_ident){
+	ClassDB::bind_method(D_METHOD("set_name_word", "name_word_ident"), +[](CSite *site, const String &name_word_ident){
 		CWord *name_word = CWord::Get(name_word_ident);
 		if (name_word != nullptr) {
 			site->NameWord = name_word;
@@ -343,10 +343,10 @@ void CSite::_bind_methods()
 			}
 		}
 	});
-	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CSite *site){ return const_cast<CWord *>(site->NameWord); });
+	ClassDB::bind_method(D_METHOD("get_name_word"), +[](const CSite *site){ return const_cast<CWord *>(site->NameWord); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "name_word"), "set_name_word", "get_name_word");
 
-	ClassDB::bind_method(D_METHOD("set_major", "major"), [](CSite *site, const bool major){ site->Major = major; });
+	ClassDB::bind_method(D_METHOD("set_major", "major"), +[](CSite *site, const bool major){ site->Major = major; });
 	ClassDB::bind_method(D_METHOD("is_major"), &CSite::IsMajor);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "major"), "set_major", "is_major");
 }

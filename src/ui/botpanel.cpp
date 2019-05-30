@@ -683,7 +683,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Consumable != CONDITION_TRUE) {
-				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Type->ItemClass->Consumable)) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Type->ItemClass->IsConsumable())) {
 					return false;
 				}
 			}
@@ -728,22 +728,22 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Weapon != CONDITION_TRUE) {
-				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Weapon)) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsWeapon())) {
 					return false;
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Shield)) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsShield())) {
 					return false;
 				}
 			}
 			if (condition->Boots != CONDITION_TRUE) {
-				if ((condition->Boots == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Boots)) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsBoots())) {
 					return false;
 				}
 			}
 			if (condition->Arrows != CONDITION_TRUE) {
-				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Arrows)) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsArrows())) {
 					return false;
 				}
 			}

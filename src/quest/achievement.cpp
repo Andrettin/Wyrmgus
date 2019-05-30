@@ -230,16 +230,16 @@ int CAchievement::GetProgressMax() const
 
 void CAchievement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_description", "description"), [](CAchievement *achievement, const String &description){ achievement->Description = description; });
+	ClassDB::bind_method(D_METHOD("set_description", "description"), +[](CAchievement *achievement, const String &description){ achievement->Description = description; });
 	ClassDB::bind_method(D_METHOD("get_description"), &CAchievement::GetDescription);
-	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), [](CAchievement *achievement, const bool hidden){ achievement->Hidden = hidden; });
+	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), +[](CAchievement *achievement, const bool hidden){ achievement->Hidden = hidden; });
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CAchievement::IsHidden);
 	ClassDB::bind_method(D_METHOD("is_obtained"), &CAchievement::IsObtained);
-	ClassDB::bind_method(D_METHOD("set_unobtainable", "unobtainable"), [](CAchievement *achievement, const bool unobtainable){ achievement->Unobtainable = unobtainable; });
+	ClassDB::bind_method(D_METHOD("set_unobtainable", "unobtainable"), +[](CAchievement *achievement, const bool unobtainable){ achievement->Unobtainable = unobtainable; });
 	ClassDB::bind_method(D_METHOD("is_unobtainable"), &CAchievement::IsUnobtainable);
-	ClassDB::bind_method(D_METHOD("set_character_level", "character_level"), [](CAchievement *achievement, const int character_level){ achievement->CharacterLevel = character_level; });
+	ClassDB::bind_method(D_METHOD("set_character_level", "character_level"), +[](CAchievement *achievement, const int character_level){ achievement->CharacterLevel = character_level; });
 	ClassDB::bind_method(D_METHOD("get_character_level"), &CAchievement::GetCharacterLevel);
-	ClassDB::bind_method(D_METHOD("set_difficulty", "difficulty"), [](CAchievement *achievement, const int difficulty){ achievement->Difficulty = difficulty; });
+	ClassDB::bind_method(D_METHOD("set_difficulty", "difficulty"), +[](CAchievement *achievement, const int difficulty){ achievement->Difficulty = difficulty; });
 	ClassDB::bind_method(D_METHOD("get_difficulty"), &CAchievement::GetDifficulty);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
 	ClassDB::bind_method(D_METHOD("get_player_color"), &CAchievement::GetPlayerColor);

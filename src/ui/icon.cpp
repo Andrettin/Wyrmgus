@@ -341,13 +341,13 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 
 void CIcon::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_frame", "frame"), [](CIcon *icon, const int frame){ icon->Frame = frame; });
+	ClassDB::bind_method(D_METHOD("set_frame", "frame"), +[](CIcon *icon, const int frame){ icon->Frame = frame; });
 	ClassDB::bind_method(D_METHOD("get_frame"), &CIcon::GetFrame);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "frame"), "set_frame", "get_frame");
 	
 	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
 	
-	ClassDB::bind_method(D_METHOD("get_size"), [](const CIcon *icon){ return Vector2(icon->Size); });
+	ClassDB::bind_method(D_METHOD("get_size"), +[](const CIcon *icon){ return Vector2(icon->Size); });
 }
 
 /**

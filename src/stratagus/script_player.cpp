@@ -3271,8 +3271,8 @@ static int CclGetLanguageData(lua_State *l)
 		lua_pushstring(l, language->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		if (language->Family != nullptr) {
-			lua_pushstring(l, language->Family->GetName().utf8().get_data());
+		if (language->GetFamily() != nullptr) {
+			lua_pushstring(l, language->GetFamily()->GetName().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

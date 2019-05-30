@@ -53,50 +53,34 @@ class CLiteraryText : public DataElement, public DataType<CLiteraryText>
 	DATA_TYPE(CLiteraryText, DataElement)
 	
 public:
-	CLiteraryText()
-	{
-	}
+	CLiteraryText() {}
 
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Icon);
-		REGISTER_PROPERTY(Sections);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
-public:
 	static constexpr const char *ClassIdentifier = "literary_text";
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
 public:
-	CLiteraryText *GetMainText() const
+	CIcon *GetIcon() const
 	{
-		return this->MainText;
+		if (this->Icon != nullptr) {
+			return this->Icon;
+		} else if (this->GetMainText() != nullptr) {
+			return this->GetMainText()->GetIcon();
+		} else {
+			return nullptr;
+		}
 	}
 	
-	CLiteraryText *GetPreviousSection() const
-	{
-		return this->PreviousSection;
-	}
+	CLiteraryText *GetMainText() const { return this->MainText; }
 	
-	CLiteraryText *GetNextSection() const
-	{
-		return this->NextSection;
-	}
+	const std::vector<CLiteraryText *> &GetSections() const { return this->Sections; }
 	
-	const std::vector<CLiteraryTextPage *> &GetPages() const
-	{
-		return this->Pages;
-	}
+	CLiteraryText *GetPreviousSection() const { return this->PreviousSection; }
+	
+	CLiteraryText *GetNextSection() const { return this->NextSection; }
+	
+	const std::vector<CLiteraryTextPage *> &GetPages() const { return this->Pages; }
 	
 	CLiteraryTextPage *GetFirstPage() const
 	{
@@ -152,21 +136,9 @@ public:
 	int InitialPageNumber = 0;	/// page number in which the literary text begins
 	bool PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
 	bool LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
-	Property<CIcon *> Icon {		/// the literary text's icon
-		Property<CIcon *>::ValueType(nullptr),
-		Property<CIcon *>::GetterType([this]() -> Property<CIcon *>::ReturnType {
-			if (this->Icon.Value != nullptr) {
-				return this->Icon.Value;
-			} else if (this->GetMainText() != nullptr) {
-				return this->GetMainText()->Icon;		
-			} else {
-				return nullptr;
-			}
-		})
-	};
-	Property<std::vector<CLiteraryText *>> Sections;
-	
 private:
+	CIcon *Icon = nullptr;	/// the literary text's icon
+	std::vector<CLiteraryText *> Sections;
 	CLiteraryText *MainText = nullptr;	/// the main literary text to which this one belongs, if it is a section
 	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section
 	CLiteraryText *NextSection = nullptr;	/// the next section to this one, if this is a section

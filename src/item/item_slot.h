@@ -48,26 +48,22 @@ class ItemSlot : public DataElement, public DataType<ItemSlot>
 public:
 	static constexpr const char *ClassIdentifier = "item_slot";
 	
+	int GetQuantity() const { return this->Quantity; }
+	
+	bool IsWeapon() const { return this->Weapon; }
+	
+	bool IsShield() const { return this->Shield; }
+	
+	bool IsBoots() const { return this->Boots; }
+	
+	bool IsArrows() const { return this->Arrows; }
+	
 private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Quantity);
-		REGISTER_PROPERTY(Weapon);
-		REGISTER_PROPERTY(Shield);
-		REGISTER_PROPERTY(Boots);
-		REGISTER_PROPERTY(Arrows);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
-public:
-	Property<int> Quantity = 1;			/// the quantity of slots provided for this item slot per unit/character
-	Property<bool> Weapon = false;		/// whether the item slot is the weapon item slot
-	Property<bool> Shield = false;		/// whether the item slot is the shield item slot
-	Property<bool> Boots = false;		/// whether the item slot is the boots item slot
-	Property<bool> Arrows = false;		/// whether the item slot is the arrows item slot
+	int Quantity = 1;		/// the quantity of slots provided for this item slot per unit/character
+	bool Weapon = false;	/// whether the item slot is the weapon item slot
+	bool Shield = false;	/// whether the item slot is the shield item slot
+	bool Boots = false;		/// whether the item slot is the boots item slot
+	bool Arrows = false;	/// whether the item slot is the arrows item slot
 	
 protected:
 	static void _bind_methods();

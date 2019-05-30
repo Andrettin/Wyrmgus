@@ -149,8 +149,8 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	if (is_equipped && this->Owner && this->Type->ItemClass->Slot != nullptr) {
-		this->Owner->EquippedItems[this->Type->ItemClass->Slot].push_back(this);
+	if (is_equipped && this->Owner && this->Type->ItemClass->GetSlot() != nullptr) {
+		this->Owner->EquippedItems[this->Type->ItemClass->GetSlot()].push_back(this);
 	}
 }
 

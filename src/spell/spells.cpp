@@ -238,7 +238,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 	}
 	//Wyrmgus start
 	if (condition->ThrustingWeapon != CONDITION_TRUE) {
-		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ (caster.GetCurrentWeaponClass() != nullptr && caster.GetCurrentWeaponClass()->ThrustingWeapon)) {
+		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ (caster.GetCurrentWeaponClass() != nullptr && caster.GetCurrentWeaponClass()->IsThrustingWeapon())) {
 			return false;
 		}
 	}

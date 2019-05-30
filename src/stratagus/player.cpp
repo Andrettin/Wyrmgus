@@ -4439,10 +4439,10 @@ void CPlayer::ApplyHistoricalDiplomacyStates()
 void CPlayer::_bind_methods()
 {	
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
-	ClassDB::bind_method(D_METHOD("get_faction"), [](const CPlayer *player){ return const_cast<CFaction *>(player->GetFaction()); });
+	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CPlayer *player){ return const_cast<CFaction *>(player->GetFaction()); });
 	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
-	ClassDB::bind_method(D_METHOD("get_primary_color"), [](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetPrimaryColor()); });
-	ClassDB::bind_method(D_METHOD("get_secondary_color"), [](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetSecondaryColor()); });
+	ClassDB::bind_method(D_METHOD("get_primary_color"), +[](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetPrimaryColor()); });
+	ClassDB::bind_method(D_METHOD("get_secondary_color"), +[](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetSecondaryColor()); });
 	
 	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));

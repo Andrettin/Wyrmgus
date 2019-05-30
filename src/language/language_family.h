@@ -57,17 +57,8 @@ class CLanguageFamily : public DataElement, public DataType<CLanguageFamily>
 public:
 	static constexpr const char *ClassIdentifier = "language_family";
 	
-private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Family);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
+	CLanguageFamily *GetFamily() const { return this->Family; }
 
-public:
 	void AddPersonalNameWord(CWord *word, const CGender *gender);
 	const std::vector<CWord *> &GetPersonalNameWords(const CGender *gender) const;
 	void AddFamilyNameWord(CWord *word);
@@ -81,9 +72,8 @@ public:
 	void AddSettlementNameWord(CWord *word);
 	const std::vector<CWord *> &GetSettlementNameWords() const;
 	
-	Property<CLanguageFamily *> Family;			/// the family to which this language family belongs
-	
 private:
+	CLanguageFamily *Family = nullptr;	/// the family to which this language family belongs
 	std::map<const CGender *, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
 	std::vector<CWord *> FamilyNameWords;
 	std::map<const CSpecies *, std::map<const CGender *, std::vector<CWord *>>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the species and gender for which they can be used

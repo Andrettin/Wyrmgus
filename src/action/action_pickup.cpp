@@ -257,7 +257,7 @@ enum {
 			goal
 			&& (
 				goal->Type->BoolFlag[POWERUP_INDEX].value
-				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->Consumable)
+				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->IsConsumable())
 			)
 		) {
 			if (!unit.CriticalOrder) {

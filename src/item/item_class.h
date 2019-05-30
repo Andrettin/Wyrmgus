@@ -54,32 +54,31 @@ class ItemClass : public DataElement, public DataType<ItemClass>
 public:
 	static constexpr const char *ClassIdentifier = "item_class";
 	
+	const ItemSlot *GetSlot() const { return this->Slot; }
+	
+	bool IsConsumable() const { return this->Consumable; }
+	
+	bool IsTwoHanded() const { return this->TwoHanded; }
+	
+	bool IsThrustingWeapon() const { return this->ThrustingWeapon; }
+	
+	bool AllowsArrows() const { return this->AllowArrows; }
+	
+	bool IsShield() const { return this->Shield; }
+	
+	bool IsSpecialPropertyRequired() const { return this->SpecialPropertyRequired; }
+	
+	bool IsShieldCompatible() const { return this->ShieldCompatible; }
+	
 private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Slot);
-		REGISTER_PROPERTY(Consumable);
-		REGISTER_PROPERTY(TwoHanded);
-		REGISTER_PROPERTY(ThrustingWeapon);
-		REGISTER_PROPERTY(AllowArrows);
-		REGISTER_PROPERTY(Shield);
-		REGISTER_PROPERTY(SpecialPropertyRequired);
-		REGISTER_PROPERTY(ShieldCompatible);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
-public:
-	Property<const ItemSlot *> Slot = nullptr;	/// the item slot of the item class
-	Property<bool> Consumable = false;		/// whether the item class is consumable
-	Property<bool> TwoHanded = false;		/// whether the item class is a two-handed weapon
-	Property<bool> ThrustingWeapon = false;	/// whether the item class is a thrusting weapon
-	Property<bool> AllowArrows = false;		/// whether the item class allows arrows to be equipped
-	Property<bool> Shield = false;			/// whether the item class is a shield
-	Property<bool> SpecialPropertyRequired = false;	/// whether items of the item class must always have a special property (e.g. a magic affix)
-	Property<bool> ShieldCompatible = false;	/// whether the item class is compatible with shields
+	const ItemSlot *Slot = nullptr;	/// the item slot of the item class
+	bool Consumable = false;		/// whether the item class is consumable
+	bool TwoHanded = false;			/// whether the item class is a two-handed weapon
+	bool ThrustingWeapon = false;	/// whether the item class is a thrusting weapon
+	bool AllowArrows = false;		/// whether the item class allows arrows to be equipped
+	bool Shield = false;			/// whether the item class is a shield
+	bool SpecialPropertyRequired = false;	/// whether items of the item class must always have a special property (e.g. a magic affix)
+	bool ShieldCompatible = false;	/// whether the item class is compatible with shields
 	
 protected:
 	static void _bind_methods();

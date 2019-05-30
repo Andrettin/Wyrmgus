@@ -41,7 +41,7 @@
 
 void CGender::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_father", "father"), [](CGender *gender, const bool father){ gender->Father = father; });
+	ClassDB::bind_method(D_METHOD("set_father", "father"), +[](CGender *gender, const bool father){ gender->Father = father; });
 	ClassDB::bind_method(D_METHOD("is_father"), &CGender::IsFather);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "father"), "set_father", "is_father");
 }

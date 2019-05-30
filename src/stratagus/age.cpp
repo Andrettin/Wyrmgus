@@ -191,11 +191,11 @@ void CAge::CheckCurrentAge()
 
 void CAge::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_priority", "priority"), [](CAge *age, const int priority){ age->Priority = priority; });
+	ClassDB::bind_method(D_METHOD("set_priority", "priority"), +[](CAge *age, const int priority){ age->Priority = priority; });
 	ClassDB::bind_method(D_METHOD("get_priority"), &CAge::GetPriority);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "priority"), "set_priority", "get_priority");
 	
-	ClassDB::bind_method(D_METHOD("set_year_boost", "year_boost"), [](CAge *age, const int year_boost){ age->YearBoost = year_boost; });
+	ClassDB::bind_method(D_METHOD("set_year_boost", "year_boost"), +[](CAge *age, const int year_boost){ age->YearBoost = year_boost; });
 	ClassDB::bind_method(D_METHOD("get_year_boost"), &CAge::GetYearBoost);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "year_boost"), "set_year_boost", "get_year_boost");
 }

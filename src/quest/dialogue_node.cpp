@@ -173,32 +173,32 @@ void CDialogueNode::Call(CPlayer *player) const
 
 void CDialogueNode::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_ident", "ident"), [](CDialogueNode *node, const String &ident){
+	ClassDB::bind_method(D_METHOD("set_ident", "ident"), +[](CDialogueNode *node, const String &ident){
 		node->Ident = ident;
 		node->Dialogue->NodesByIdent[node->Ident] = node;
 	});
-	ClassDB::bind_method(D_METHOD("get_ident"), [](const CDialogueNode *node){ return node->Ident; });
+	ClassDB::bind_method(D_METHOD("get_ident"), +[](const CDialogueNode *node){ return node->Ident; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "ident"), "set_ident", "get_ident");
 	
-	ClassDB::bind_method(D_METHOD("set_speaker_name", "speaker_name"), [](CDialogueNode *node, const String &speaker_name){ node->SpeakerName = speaker_name; });
-	ClassDB::bind_method(D_METHOD("get_speaker_name"), [](const CDialogueNode *node){ return node->SpeakerName; });
+	ClassDB::bind_method(D_METHOD("set_speaker_name", "speaker_name"), +[](CDialogueNode *node, const String &speaker_name){ node->SpeakerName = speaker_name; });
+	ClassDB::bind_method(D_METHOD("get_speaker_name"), +[](const CDialogueNode *node){ return node->SpeakerName; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "speaker_name"), "set_speaker_name", "get_speaker_name");
 
-	ClassDB::bind_method(D_METHOD("set_text", "text"), [](CDialogueNode *node, const String &text){ node->Text = text; });
-	ClassDB::bind_method(D_METHOD("get_text"), [](const CDialogueNode *node){ return node->Text; });
+	ClassDB::bind_method(D_METHOD("set_text", "text"), +[](CDialogueNode *node, const String &text){ node->Text = text; });
+	ClassDB::bind_method(D_METHOD("get_text"), +[](const CDialogueNode *node){ return node->Text; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "text"), "set_text", "get_text");
 
-	ClassDB::bind_method(D_METHOD("set_character", "character"), [](CDialogueNode *node, const String &character_ident){ node->Character = CCharacter::Get(character_ident); });
-	ClassDB::bind_method(D_METHOD("get_character"), [](const CDialogueNode *node){ return const_cast<CCharacter *>(node->Character); });
+	ClassDB::bind_method(D_METHOD("set_character", "character"), +[](CDialogueNode *node, const String &character_ident){ node->Character = CCharacter::Get(character_ident); });
+	ClassDB::bind_method(D_METHOD("get_character"), +[](const CDialogueNode *node){ return const_cast<CCharacter *>(node->Character); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "character"), "set_character", "get_character");
 
-	ClassDB::bind_method(D_METHOD("set_unit_type", "unit_type"), [](CDialogueNode *node, const String &unit_type_ident){ node->UnitType = CUnitType::Get(unit_type_ident); });
-	ClassDB::bind_method(D_METHOD("get_unit_type"), [](const CDialogueNode *node){ return const_cast<CUnitType *>(node->UnitType); });
+	ClassDB::bind_method(D_METHOD("set_unit_type", "unit_type"), +[](CDialogueNode *node, const String &unit_type_ident){ node->UnitType = CUnitType::Get(unit_type_ident); });
+	ClassDB::bind_method(D_METHOD("get_unit_type"), +[](const CDialogueNode *node){ return const_cast<CUnitType *>(node->UnitType); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unit_type"), "set_unit_type", "get_unit_type");
 
-	ClassDB::bind_method(D_METHOD("set_faction", "faction"), [](CDialogueNode *node, const String &faction_ident){ node->Faction = CFaction::Get(faction_ident); });
-	ClassDB::bind_method(D_METHOD("get_faction"), [](const CDialogueNode *node){ return const_cast<CFaction *>(node->Faction); });
+	ClassDB::bind_method(D_METHOD("set_faction", "faction"), +[](CDialogueNode *node, const String &faction_ident){ node->Faction = CFaction::Get(faction_ident); });
+	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CDialogueNode *node){ return const_cast<CFaction *>(node->Faction); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
-	ClassDB::bind_method(D_METHOD("get_options"), [](const CDialogueNode *node){ return VectorToGodotArray(node->Options); });
+	ClassDB::bind_method(D_METHOD("get_options"), +[](const CDialogueNode *node){ return VectorToGodotArray(node->Options); });
 }
