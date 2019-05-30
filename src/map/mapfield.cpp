@@ -124,7 +124,7 @@ int CMapField::GetResource() const
 
 bool CMapField::IsDestroyedForestTile() const
 {
-	return this->OverlayTerrain && this->OverlayTerrainDestroyed && (this->getFlag() & MapFieldStumps);
+	return this->OverlayTerrain != nullptr && this->OverlayTerrainDestroyed && this->OverlayTerrain->IsTree();
 }
 
 //Wyrmgus start
