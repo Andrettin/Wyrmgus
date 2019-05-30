@@ -66,6 +66,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile/burning_building_frame.h"
 #include "missile/missile.h"
@@ -8426,9 +8427,9 @@ void CUnit::HandleBuffsEachSecond()
 		if ((this->GetVariableValue(DESERTSTALK_INDEX) > 0 || this->GetVariableValue(FORESTSTALK_INDEX) > 0 || this->GetVariableValue(SWAMPSTALK_INDEX) > 0) && CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)) {
 			if (
 				(
-					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetFlags() & MapFieldDesert))
+					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetTerrain(false)->IsDesert())
 					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && this->MapLayer->TileBlockHasTree(this->tilePos - 1, this->Type->TileSize + 2))
-					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetFlags() & MapFieldMud))
+					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetTerrain(false)->IsSwamp())
 				)
 				&& (this->GetVariableValue(INVISIBLE_INDEX) > 0 || !this->IsInCombat())
 			) {				
@@ -8443,9 +8444,9 @@ void CUnit::HandleBuffsEachSecond()
 		}
 		
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
-			this->Type->BoolFlag[ORGANIC_INDEX].value
+			this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetTerrain(false)->IsDesert()
+			&& this->Type->BoolFlag[ORGANIC_INDEX].value
 			&& CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)
-			&& (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetFlags() & MapFieldDesert)
 			&& this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Owner != this->Player->GetIndex()
 			&& this->MapLayer->GetTimeOfDay() != nullptr
 			&& this->MapLayer->GetTimeOfDay()->IsDay()

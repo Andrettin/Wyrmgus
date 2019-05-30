@@ -1276,9 +1276,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		return 1;
 	}
 	
-//	unsigned short flag = 0;
-	unsigned long flag = 0;
 	//Wyrmgus end
+	uint16_t flag = 0;
 	const char *flag_name = LuaToString(l, 3);
 	if (!strcmp(flag_name, "water")) {
 		flag = MapFieldWaterAllowed;
@@ -1293,10 +1292,6 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(flag_name, "air-unpassable")) {
 		flag = MapFieldAirUnpassable;
-	} else if (!strcmp(flag_name, "desert")) {
-		flag = MapFieldDesert;
-	} else if (!strcmp(flag_name, "mud")) {
-		flag = MapFieldMud;
 	} else if (!strcmp(flag_name, "railroad")) {
 		flag = MapFieldRailroad;
 	} else if (!strcmp(flag_name, "road")) {
@@ -1460,10 +1455,6 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldWall;
 				} else if (tile_flag == "air-unpassable") {
 					terrain->Flags |= MapFieldAirUnpassable;
-				} else if (tile_flag == "desert") {
-					terrain->Flags |= MapFieldDesert;
-				} else if (tile_flag == "mud") {
-					terrain->Flags |= MapFieldMud;
 				} else if (tile_flag == "railroad") {
 					terrain->Flags |= MapFieldRailroad;
 				} else if (tile_flag == "road") {

@@ -52,7 +52,7 @@ class CPlayerColorGraphic;
 class CUnitType;
 //Wyrmgus end
 
-enum MapFieldFlag : unsigned long {
+enum MapFieldFlag : uint16_t {
 	MapFieldLandAllowed = 1 << 0,	/// Land units allowed
 	MapFieldCoastAllowed = 1 << 1,	/// Coast (e.g. transporter) units allowed
 	MapFieldWaterAllowed = 1 << 2,	/// Water units allowed
@@ -72,9 +72,6 @@ enum MapFieldFlag : unsigned long {
 	MapFieldRailroad = 1 << 13,		/// Railroad (moves faster)
 	MapFieldNoRail = 1 << 14,		/// Marker that there's no railroad, used for rail movemasks
 	MapFieldBridge = 1 << 15,		/// Bridge or raft
-	
-	MapFieldMud = 1 << 16,			/// Used for identifying mud tiles for swampstalk
-	MapFieldDesert = 1 << 17		/// Used for identifying desert tiles for desertstalk and dehydration
 };
 
 //Wyrmgus start
@@ -165,10 +162,7 @@ class CTile
 {
 public:
 	unsigned short tile = 0;	/// graphical pos
-	//Wyrmgus start
-//	unsigned short flag = 0;	/// Flag
-	unsigned long flag = 0;		/// Flag
-	//Wyrmgus end
+	uint16_t flag = 0;			/// Flag
 	CTileInfo tileinfo;			/// Tile descriptions
 };
 

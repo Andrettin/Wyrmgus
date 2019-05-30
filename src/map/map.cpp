@@ -2272,7 +2272,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 	}
 
 	if (new_owner == -1 && !must_have_no_owner) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
-		std::vector<unsigned long> obstacle_flags;
+		std::vector<uint16_t> obstacle_flags;
 		obstacle_flags.push_back(MapFieldCoastAllowed);
 		obstacle_flags.push_back(MapFieldUnpassable);
 

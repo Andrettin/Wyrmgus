@@ -1448,8 +1448,8 @@ struct CompareUnitDistance {
 **  @return         true, if an obstacle was found, false otherwise
 */
 //Wyrmgus start
-//bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
-bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference, int *distance, int player)
+//bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, uint16_t flags, int *distance)
+bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, uint16_t flags, int z, int max_difference, int *distance, int player)
 //Wyrmgus end
 {
 	const Vec2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));

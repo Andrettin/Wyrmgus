@@ -96,7 +96,7 @@ void CTerrainType::Clear()
 **
 **	@return	The terrain flag if it exists, or 0 otherwise
 */
-unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
+uint16_t CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 {
 	if (flag_name == "land") {
 		return MapFieldLandAllowed;
@@ -112,10 +112,6 @@ unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldWall;
 	} else if (flag_name == "air-unpassable") {
 		return MapFieldAirUnpassable;
-	} else if (flag_name == "desert") {
-		return MapFieldDesert;
-	} else if (flag_name == "mud") {
-		return MapFieldMud;
 	} else if (flag_name == "railroad") {
 		return MapFieldRailroad;
 	} else if (flag_name == "road") {
@@ -200,7 +196,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->Resource = GetResourceIdByName(value.c_str());
 		} else if (property.Key == "flag") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			unsigned long flag = CTerrainType::GetTerrainFlagByName(value);
+			uint16_t flag = CTerrainType::GetTerrainFlagByName(value);
 			if (flag) {
 				this->Flags |= flag;
 			}
@@ -377,4 +373,12 @@ void CTerrainType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_rock", "rock"), [](CTerrainType *terrain_type, const bool rock){ terrain_type->Rock = rock; });
 	ClassDB::bind_method(D_METHOD("is_rock"), &CTerrainType::IsRock);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "rock"), "set_rock", "is_rock");
+	
+	ClassDB::bind_method(D_METHOD("set_desert", "desert"), [](CTerrainType *terrain_type, const bool desert){ terrain_type->Desert = desert; });
+	ClassDB::bind_method(D_METHOD("is_desert"), &CTerrainType::IsDesert);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "desert"), "set_desert", "is_desert");
+	
+	ClassDB::bind_method(D_METHOD("set_swamp", "swamp"), [](CTerrainType *terrain_type, const bool swamp){ terrain_type->Swamp = swamp; });
+	ClassDB::bind_method(D_METHOD("is_swamp"), &CTerrainType::IsSwamp);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "swamp"), "set_swamp", "is_swamp");
 }

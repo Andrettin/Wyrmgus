@@ -267,7 +267,7 @@ public:
 	
 	unsigned char getCost() const { return this->cost; }
 	
-	unsigned long GetFlags() const { return this->Flags; }
+	uint16_t GetFlags() const { return this->Flags; }
 	
 	/**
 	**	@brief	Get the current base frame of the tile's animation
@@ -286,9 +286,8 @@ public:
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
 public:
+	uint16_t Flags = 0;	/// field flags
 	//Wyrmgus start
-//	unsigned short Flags = 0;	/// field flags
-	unsigned long Flags = 0;	/// field flags
 	const CTerrainType *Terrain = nullptr;
 	const CTerrainType *OverlayTerrain = nullptr;
 	const CTerrainFeature *TerrainFeature = nullptr;

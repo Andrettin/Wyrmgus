@@ -771,12 +771,8 @@ public:
 
 	// --- FILLED UP ---
 
-	//Wyrmgus start
-//	unsigned FieldFlags = 0;		/// Unit map field flags
-//	unsigned MovementMask = 0;		/// Unit check this map flags for move
-	unsigned long FieldFlags = 0;	/// Unit map field flags
-	unsigned long MovementMask = 0;	/// Unit check this map flags for move
-	//Wyrmgus end
+	uint16_t FieldFlags = 0;		/// Unit map field flags
+	uint16_t MovementMask = 0;		/// Unit check this map flags for move
 
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];	/// Unit status for each player

@@ -456,7 +456,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	}
 	
 	//Wyrmgus start
-	std::vector<unsigned long> obstacle_flags;
+	std::vector<uint16_t> obstacle_flags;
 	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
 	
 	if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {

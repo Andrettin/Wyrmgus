@@ -34,15 +34,16 @@
 
 #include "stratagus.h"
 
+#include "pathfinder/pathfinder.h"
+
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "settings.h"
 #include "time/time_of_day.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-
-#include "pathfinder/pathfinder.h"
 
 #include <stdio.h>
 
@@ -720,7 +721,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	}
 #endif
 	int cost = 0;
-	const int mask = unit.Type->MovementMask;
+	const uint16_t mask = unit.Type->MovementMask;
 	const CUnitTypeFinder unit_finder((UnitTypeType)unit.Type->UnitType);
 
 	// verify each tile of the unit.
@@ -731,13 +732,13 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 		int i = w;
 		do {
 			//Wyrmgus start
-//			const int flag = mf->GetFlags() & mask;
+//			const uint16_t flag = mf->GetFlags() & mask;
 			//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
-			unsigned long check_flags = mf->GetFlags();
+			uint16_t check_flags = mf->GetFlags();
 			if (check_flags & MapFieldBridge) {
 				check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 			}
-			const unsigned long flag = check_flags & mask;
+			const uint16_t flag = check_flags & mask;
 			//Wyrmgus end
 			
 			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsTeamExplored(*unit.Player))) {
@@ -785,7 +786,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			
 			//Wyrmgus start
 			if (
-				(mf->GetFlags() & MapFieldDesert)
+				(mf->GetTerrain(false)->IsDesert())
 				&& mf->Owner != unit.Player->GetIndex()
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
 				&& unit.MapLayer->GetTimeOfDay() != nullptr

@@ -418,12 +418,6 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldAirUnpassable) {
 		file.printf(", \"air-unpassable\"");
 	}
-	if (Flags & MapFieldDesert) {
-		file.printf(", \"desert\"");
-	}
-	if (Flags & MapFieldMud) {
-		file.printf(", \"mud\"");
-	}
 	if (Flags & MapFieldRailroad) {
 		file.printf(", \"railroad\"");
 	}
@@ -594,10 +588,6 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldBridge;
 		} else if (!strcmp(value, "air-unpassable")) {
 			this->Flags |= MapFieldAirUnpassable;
-		} else if (!strcmp(value, "desert")) {
-			this->Flags |= MapFieldDesert;
-		} else if (!strcmp(value, "mud")) {
-			this->Flags |= MapFieldMud;
 		} else if (!strcmp(value, "railroad")) {
 			this->Flags |= MapFieldRailroad;
 		} else if (!strcmp(value, "road")) {
@@ -616,7 +606,7 @@ bool CMapField::CheckMask(int mask) const
 {
 	//Wyrmgus start
 	//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
-	unsigned long check_flags = this->GetFlags();
+	uint16_t check_flags = this->GetFlags();
 	if (check_flags & MapFieldBridge) {
 		check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 	}

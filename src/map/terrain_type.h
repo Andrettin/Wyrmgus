@@ -85,14 +85,14 @@ private:
 public:
 	static void LoadTerrainTypeGraphics();
 	static void Clear();
-	static unsigned long GetTerrainFlagByName(const std::string &flag_name);
+	static uint16_t GetTerrainFlagByName(const std::string &flag_name);
 	
 	static std::map<std::string, CTerrainType *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	unsigned long GetFlags() const
+	uint16_t GetFlags() const
 	{
 		return this->Flags;
 	}
@@ -109,13 +109,23 @@ public:
 		return this->Rock;
 	}
 
+	bool IsDesert() const
+	{
+		return this->Desert;
+	}
+
+	bool IsSwamp() const
+	{
+		return this->Swamp;
+	}
+
 	std::string Name;
 	std::string Character;
 	CColor Color;
 	int SolidAnimationFrames = 0;
 	int Resource = -1;
 private:
-	unsigned long Flags = 0;
+	uint16_t Flags = 0;
 public:
 	bool Overlay = false;										/// Whether this terrain type belongs to the overlay layer
 	bool Buildable = false;										/// Whether structures can be built upon this terrain type
@@ -123,6 +133,8 @@ public:
 	bool Hidden = false;
 	bool Tree = false;
 	bool Rock = false;
+	bool Desert = false;
+	bool Swamp = false;
 	PixelSize PixelTileSize = PixelSize(32, 32);
 	CUnitType *UnitType = nullptr;
 private:
