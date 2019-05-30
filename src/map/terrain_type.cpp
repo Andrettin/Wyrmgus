@@ -118,14 +118,6 @@ unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldAirUnpassable;
 	} else if (flag_name == "desert") {
 		return MapFieldDesert;
-	} else if (flag_name == "dirt") {
-		return MapFieldDirt;
-	} else if (flag_name == "grass") {
-		return MapFieldGrass;
-	} else if (flag_name == "gravel") {
-		return MapFieldGravel;
-	} else if (flag_name == "ice") {
-		return MapFieldIce;
 	} else if (flag_name == "mud") {
 		return MapFieldMud;
 	} else if (flag_name == "railroad") {
@@ -134,10 +126,6 @@ unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldRoad;
 	} else if (flag_name == "no-rail") {
 		return MapFieldNoRail;
-	} else if (flag_name == "snow") {
-		return MapFieldSnow;
-	} else if (flag_name == "stone-floor") {
-		return MapFieldStoneFloor;
 	} else if (flag_name == "stumps") {
 		return MapFieldStumps;
 	} else {

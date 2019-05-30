@@ -1975,13 +1975,11 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 			map_layer->DestroyedForestTiles.push_back(pos);
 		} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
 			mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-			mf.Flags |= MapFieldGravel;
 		} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
 			mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
 			if (GameSettings.Inside) {
 				mf.Flags &= ~(MapFieldAirUnpassable);
 			}
-			mf.Flags |= MapFieldGravel;
 		}
 		mf.Value = 0;
 	} else {

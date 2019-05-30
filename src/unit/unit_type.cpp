@@ -1073,16 +1073,12 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 				this->Sound.FireMissile.Name = value;
 			} else if (key == "step") {
 				this->Sound.Step.Name = value;
-			} else if (key == "step_dirt") {
-				this->Sound.StepDirt.Name = value;
-			} else if (key == "step_grass") {
-				this->Sound.StepGrass.Name = value;
-			} else if (key == "step_gravel") {
-				this->Sound.StepGravel.Name = value;
-			} else if (key == "step_mud") {
-				this->Sound.StepMud.Name = value;
-			} else if (key == "step_stone") {
-				this->Sound.StepStone.Name = value;
+			} else if (key.find("step_") != std::string::npos) {
+				std::string terrain_type_ident = FindAndReplaceString(key, "step_", "");
+				const CTerrainType *terrain_type = CTerrainType::Get(terrain_type_ident);
+				if (terrain_type != nullptr) {
+					this->Sound.TerrainTypeStep[terrain_type].Name = value;
+				}
 			} else if (key == "used") {
 				this->Sound.Used.Name = value;
 			} else if (key == "build") {
@@ -2225,20 +2221,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			if (!iterator->second.Step.Name.empty()) {
 				type.MapSound.Step = iterator->second.Step;
 			}
-			if (!iterator->second.StepDirt.Name.empty()) {
-				type.MapSound.StepDirt = iterator->second.StepDirt;
-			}
-			if (!iterator->second.StepGrass.Name.empty()) {
-				type.MapSound.StepGrass = iterator->second.StepGrass;
-			}
-			if (!iterator->second.StepGravel.Name.empty()) {
-				type.MapSound.StepGravel = iterator->second.StepGravel;
-			}
-			if (!iterator->second.StepMud.Name.empty()) {
-				type.MapSound.StepMud = iterator->second.StepMud;
-			}
-			if (!iterator->second.StepStone.Name.empty()) {
-				type.MapSound.StepStone = iterator->second.StepStone;
+			for (const auto &element : iterator->second.TerrainTypeStep) {
+				if (type.MapSound.TerrainTypeStep.find(element.first) == type.MapSound.TerrainTypeStep.end()) {
+					type.MapSound.TerrainTypeStep[element.first] = element.second;
+				}
 			}
 			if (!iterator->second.Used.Name.empty()) {
 				type.MapSound.Used = iterator->second.Used;
@@ -2483,9 +2469,6 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
 					type.FieldFlags |= MapFieldUnpassable;
 					type.FieldFlags |= MapFieldAirUnpassable;
-				}
-				if (type.BoolFlag[GRAVEL_INDEX].value) {
-					type.FieldFlags |= MapFieldGravel;
 				}
 				//Wyrmgus end
 				break;

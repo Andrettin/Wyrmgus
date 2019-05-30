@@ -168,9 +168,10 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 */
 static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
-	//Wyrmgus start
 	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	//Wyrmgus end
+	
+	std::map<const CTerrainType *, SoundConfig>::const_iterator find_iterator;
+
 	switch (voice) {
 		case VoiceAcknowledging:
 			//Wyrmgus start
@@ -222,16 +223,9 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceFireMissile:
 			return unit.Type->MapSound.FireMissile.Sound;
 		case VoiceStep:
-			if (unit.Type->MapSound.StepMud.Sound && ((mf.getFlag() & MapFieldMud) || (mf.getFlag() & MapFieldSnow))) {
-				return unit.Type->MapSound.StepMud.Sound;
-			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.getFlag() & MapFieldDirt) || (mf.getFlag() & MapFieldIce))) {
-				return unit.Type->MapSound.StepDirt.Sound;
-			} else if (unit.Type->MapSound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
-				return unit.Type->MapSound.StepGravel.Sound;
-			} else if (unit.Type->MapSound.StepGrass.Sound && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldStumps))) {
-				return unit.Type->MapSound.StepGrass.Sound;
-			} else if (unit.Type->MapSound.StepStone.Sound && mf.getFlag() & MapFieldStoneFloor) {
-				return unit.Type->MapSound.StepStone.Sound;
+			find_iterator = unit.Type->MapSound.TerrainTypeStep.find(mf.GetTopTerrain(false, true));
+			if (find_iterator != unit.Type->MapSound.TerrainTypeStep.end() && find_iterator->second.Sound) {
+				return find_iterator->second.Sound;
 			} else {
 				return unit.Type->MapSound.Step.Sound;
 			}

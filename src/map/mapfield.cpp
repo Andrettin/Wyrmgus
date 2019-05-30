@@ -151,12 +151,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 				if (this->OverlayTerrain->Flags & MapFieldForest) {
 					this->Flags &= ~(MapFieldStumps);
 				}
-				
-				if (((this->OverlayTerrain->Flags & MapFieldRocks) || (this->OverlayTerrain->Flags & MapFieldWall)) && !(this->Terrain->Flags & MapFieldGravel)) {
-					this->Flags &= ~(MapFieldGravel);
-				}
 			}
-			this->Flags &= ~(MapFieldGravel);
 		}
 	} else {
 		if (this->Terrain == terrain_type) {
@@ -336,8 +331,8 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 //Wyrmgus start
 //					 MapFieldWall | MapFieldRocks | MapFieldForest);
 					 MapFieldWall | MapFieldRocks | MapFieldForest |
-					 MapFieldAirUnpassable | MapFieldDirt | MapFieldGrass |
-					 MapFieldGravel | MapFieldMud | MapFieldStoneFloor | MapFieldStumps);
+					 MapFieldAirUnpassable |
+					 MapFieldStumps);
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
 #endif
@@ -439,18 +434,6 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldDesert) {
 		file.printf(", \"desert\"");
 	}
-	if (Flags & MapFieldDirt) {
-		file.printf(", \"dirt\"");
-	}
-	if (Flags & MapFieldIce) {
-		file.printf(", \"ice\"");
-	}
-	if (Flags & MapFieldGrass) {
-		file.printf(", \"grass\"");
-	}
-	if (Flags & MapFieldGravel) {
-		file.printf(", \"gravel\"");
-	}
 	if (Flags & MapFieldMud) {
 		file.printf(", \"mud\"");
 	}
@@ -462,12 +445,6 @@ void CMapField::Save(CFile &file) const
 	}
 	if (Flags & MapFieldNoRail) {
 		file.printf(", \"no-rail\"");
-	}
-	if (Flags & MapFieldSnow) {
-		file.printf(", \"snow\"");
-	}
-	if (Flags & MapFieldStoneFloor) {
-		file.printf(", \"stone-floor\"");
 	}
 	if (Flags & MapFieldStumps) {
 		file.printf(", \"stumps\"");
@@ -639,14 +616,6 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldAirUnpassable;
 		} else if (!strcmp(value, "desert")) {
 			this->Flags |= MapFieldDesert;
-		} else if (!strcmp(value, "dirt")) {
-			this->Flags |= MapFieldDirt;
-		} else if (!strcmp(value, "grass")) {
-			this->Flags |= MapFieldGrass;
-		} else if (!strcmp(value, "gravel")) {
-			this->Flags |= MapFieldGravel;
-		} else if (!strcmp(value, "ice")) {
-			this->Flags |= MapFieldIce;
 		} else if (!strcmp(value, "mud")) {
 			this->Flags |= MapFieldMud;
 		} else if (!strcmp(value, "railroad")) {
@@ -655,10 +624,6 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldRoad;
 		} else if (!strcmp(value, "no-rail")) {
 			this->Flags |= MapFieldNoRail;
-		} else if (!strcmp(value, "snow")) {
-			this->Flags |= MapFieldSnow;
-		} else if (!strcmp(value, "stone-floor")) {
-			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {
 			this->Flags |= MapFieldStumps;
 		//Wyrmgus end

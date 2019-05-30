@@ -10,7 +10,7 @@
 //
 /**@name unitsound.cpp - The unit sounds. */
 //
-//      (c) Copyright 1999-2015 by Fabrice Rossi, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2019 by Fabrice Rossi, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -45,14 +45,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "video/video.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -204,11 +196,9 @@ void MapUnitSounds()
 		unit_type->MapSound.Miss.MapSound();
 		unit_type->MapSound.FireMissile.MapSound();
 		unit_type->MapSound.Step.MapSound();
-		unit_type->MapSound.StepDirt.MapSound();
-		unit_type->MapSound.StepGrass.MapSound();
-		unit_type->MapSound.StepGravel.MapSound();
-		unit_type->MapSound.StepMud.MapSound();
-		unit_type->MapSound.StepStone.MapSound();
+		for (auto &element : unit_type->MapSound.TerrainTypeStep) {
+			element.second.MapSound();
+		}
 		unit_type->MapSound.Used.MapSound();
 		//Wyrmgus end
 		unit_type->MapSound.Build.MapSound();

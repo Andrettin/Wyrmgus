@@ -1386,7 +1386,7 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const unsigned flag = mf.getFlag();
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.Value, flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldAirUnpassable   ? 'A' : '-',
@@ -1403,7 +1403,6 @@ static void DrawEditorInfo()
 			flag & MapFieldBuilding     ? 'b' : '-',
 			flag & MapFieldItem         ? 'i' : '-',
 			flag & MapFieldStumps       ? 't' : '-',
-			flag & MapFieldGravel       ? 'g' : '-',
 			flag & MapFieldBridge       ? 'B' : '-');
 
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);

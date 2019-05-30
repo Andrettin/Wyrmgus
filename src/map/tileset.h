@@ -75,16 +75,10 @@ enum MapFieldFlag : unsigned long {
 	MapFieldNoRail = 1 << 16,		/// Marker that there's no railroad, used for rail movemasks
 	MapFieldBridge = 1 << 17,		/// Bridge or raft
 	
-	MapFieldGrass = 1 << 18,		/// Used for playing grass step sounds
-	MapFieldMud = 1 << 19,			/// Used for playing mud step sounds
-	MapFieldStoneFloor = 1 << 20,	/// Used for playing stone step sounds
-	MapFieldDirt = 1 << 21,			/// Used for playing dirt step sounds
-	MapFieldDesert = 1 << 22,		/// Used for identifying desert tiles for desertstalk and dehydration
-	MapFieldSnow = 1 << 23,			/// Used for playing snow step sounds
-	MapFieldIce = 1 << 24,			/// Used for playing ice step sounds
+	MapFieldMud = 1 << 18,			/// Used for identifying mud tiles for swampstalk
+	MapFieldDesert = 1 << 19,		/// Used for identifying desert tiles for desertstalk and dehydration
 	
-	MapFieldGravel = 1 << 25,		/// Used for playing gravel step sounds
-	MapFieldStumps = 1 << 26,		/// Used for playing stumps step sounds and identifying removed forests
+	MapFieldStumps = 1 << 20,		/// Used for playing stumps step sounds and identifying removed forests
 };
 
 /**

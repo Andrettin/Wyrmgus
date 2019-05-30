@@ -44,6 +44,11 @@
 #define ANIMATIONS_DEATHTYPES 40
 
 class CSound;
+class CTerrainType;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 /**
 **  Sound definition
@@ -79,11 +84,7 @@ public:
 	SoundConfig Miss;				/// attacked another unit, but missed
 	SoundConfig FireMissile;		/// fire a missile at another unit
 	SoundConfig Step;				/// stepped
-	SoundConfig StepDirt;			/// stepped on dirt
-	SoundConfig StepGrass;			/// stepped on grass
-	SoundConfig StepGravel;			/// stepped on gravel
-	SoundConfig StepMud;			/// stepped on mud
-	SoundConfig StepStone;			/// stepped on stone
+	std::map<const CTerrainType *, SoundConfig> TerrainTypeStep;	/// stepped on a particular terrain type
 	SoundConfig Used;				/// used (for items)
 	//Wyrmgus end
 	SoundConfig Build;              /// build confirm command

@@ -213,20 +213,10 @@ void CCivilization::Initialize()
 		if (this->UnitSounds.Step.Name.empty()) {
 			this->UnitSounds.Step = this->ParentCivilization->UnitSounds.Step;
 		}
-		if (this->UnitSounds.StepDirt.Name.empty()) {
-			this->UnitSounds.StepDirt = this->ParentCivilization->UnitSounds.StepDirt;
-		}
-		if (this->UnitSounds.StepGrass.Name.empty()) {
-			this->UnitSounds.StepGrass = this->ParentCivilization->UnitSounds.StepGrass;
-		}
-		if (this->UnitSounds.StepGravel.Name.empty()) {
-			this->UnitSounds.StepGravel = this->ParentCivilization->UnitSounds.StepGravel;
-		}
-		if (this->UnitSounds.StepMud.Name.empty()) {
-			this->UnitSounds.StepMud = this->ParentCivilization->UnitSounds.StepMud;
-		}
-		if (this->UnitSounds.StepStone.Name.empty()) {
-			this->UnitSounds.StepStone = this->ParentCivilization->UnitSounds.StepStone;
+		for (const auto &element : this->ParentCivilization->UnitSounds.TerrainTypeStep) {
+			if (this->UnitSounds.TerrainTypeStep.find(element.first) == this->UnitSounds.TerrainTypeStep.end()) {
+				this->UnitSounds.TerrainTypeStep[element.first] = element.second;
+			}
 		}
 		if (this->UnitSounds.Used.Name.empty()) {
 			this->UnitSounds.Used = this->ParentCivilization->UnitSounds.Used;

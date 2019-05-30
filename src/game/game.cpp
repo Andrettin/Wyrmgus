@@ -715,21 +715,6 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!unit_type->Sound.Step.Name.empty() && (!unit_type->Parent || unit_type->Sound.Step.Name != unit_type->Parent->Sound.Step.Name)) {
 				f->printf("\t\t\"step\", \"%s\",\n", unit_type->Sound.Step.Name.c_str());
 			}
-			if (!unit_type->Sound.StepDirt.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepDirt.Name != unit_type->Parent->Sound.StepDirt.Name)) {
-				f->printf("\t\t\"step-dirt\", \"%s\",\n", unit_type->Sound.StepDirt.Name.c_str());
-			}
-			if (!unit_type->Sound.StepGrass.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepGrass.Name != unit_type->Parent->Sound.StepGrass.Name)) {
-				f->printf("\t\t\"step-grass\", \"%s\",\n", unit_type->Sound.StepGrass.Name.c_str());
-			}
-			if (!unit_type->Sound.StepGravel.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepGravel.Name != unit_type->Parent->Sound.StepGravel.Name)) {
-				f->printf("\t\t\"step-gravel\", \"%s\",\n", unit_type->Sound.StepGravel.Name.c_str());
-			}
-			if (!unit_type->Sound.StepMud.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepMud.Name != unit_type->Parent->Sound.StepMud.Name)) {
-				f->printf("\t\t\"step-mud\", \"%s\",\n", unit_type->Sound.StepMud.Name.c_str());
-			}
-			if (!unit_type->Sound.StepStone.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepStone.Name != unit_type->Parent->Sound.StepStone.Name)) {
-				f->printf("\t\t\"step-stone\", \"%s\",\n", unit_type->Sound.StepStone.Name.c_str());
-			}
 			if (!unit_type->Sound.Used.Name.empty() && (!unit_type->Parent || unit_type->Sound.Used.Name != unit_type->Parent->Sound.Used.Name)) {
 				f->printf("\t\t\"used\", \"%s\",\n", unit_type->Sound.Used.Name.c_str());
 			}
@@ -952,21 +937,6 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Step.Name.empty()) {
 				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Step.Name.c_str());
-			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepDirt.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-dirt\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepDirt.Name.c_str());
-			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepGrass.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-grass\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepGrass.Name.c_str());
-			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepGravel.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-gravel\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepGravel.Name.c_str());
-			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepMud.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-mud\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepMud.Name.c_str());
-			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepStone.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-stone\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepStone.Name.c_str());
 			}
 			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Used.Name.empty()) {
 				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"used\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Used.Name.c_str());

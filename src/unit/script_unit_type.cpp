@@ -168,7 +168,6 @@ static const char HARVESTFROMOUTSIDE_KEY[] = "HarvestFromOutside";
 static const char OBSTACLE_KEY[] = "Obstacle";
 static const char AIRUNPASSABLE_KEY[] = "AirUnpassable";
 static const char SLOWS_KEY[] = "Slows";
-static const char GRAVEL_KEY[] = "Gravel";
 static const char HACKDAMAGE_KEY[] = "HackDamage";
 static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
 static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
@@ -344,7 +343,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, RAIL_KEY, DIMINUTIVE_KEY, GIANT_KEY, DRAGON_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
-							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
+							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY,
 							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY,
 							   ETHEREAL_KEY, HIDDENOWNERSHIP_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
 							   //Wyrmgus end
@@ -1700,16 +1699,13 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.FireMissile.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step")) {
 					type->Sound.Step.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-dirt")) {
-					type->Sound.StepDirt.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-grass")) {
-					type->Sound.StepGrass.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-gravel")) {
-					type->Sound.StepGravel.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-mud")) {
-					type->Sound.StepMud.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-stone")) {
-					type->Sound.StepStone.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "terrain-type-step")) {
+					const std::string terrain_type_ident = LuaToString(l, -1, k + 1);
+					++k;
+					const CTerrainType *terrain_type = CTerrainType::Get(terrain_type_ident);
+					if (terrain_type != nullptr) {
+						type->Sound.TerrainTypeStep[terrain_type].Name = LuaToString(l, -1, k + 1);
+					}
 				} else if (!strcmp(value, "used")) {
 					type->Sound.Used.Name = LuaToString(l, -1, k + 1);
 				//Wyrmgus end
@@ -2679,36 +2675,6 @@ static int CclGetUnitTypeData(lua_State *l)
 				lua_pushstring(l, type->Sound.Step.Name.c_str());
 			} else {
 				lua_pushstring(l, type->MapSound.Step.Name.c_str());
-			}
-		} else if (sound_type == "step-dirt") {
-			if (!GameRunning && Editor.Running != EditorEditing) {
-				lua_pushstring(l, type->Sound.StepDirt.Name.c_str());
-			} else {
-				lua_pushstring(l, type->MapSound.StepDirt.Name.c_str());
-			}
-		} else if (sound_type == "step-grass") {
-			if (!GameRunning && Editor.Running != EditorEditing) {
-				lua_pushstring(l, type->Sound.StepGrass.Name.c_str());
-			} else {
-				lua_pushstring(l, type->MapSound.StepGrass.Name.c_str());
-			}
-		} else if (sound_type == "step-gravel") {
-			if (!GameRunning && Editor.Running != EditorEditing) {
-				lua_pushstring(l, type->Sound.StepGravel.Name.c_str());
-			} else {
-				lua_pushstring(l, type->MapSound.StepGravel.Name.c_str());
-			}
-		} else if (sound_type == "step-mud") {
-			if (!GameRunning && Editor.Running != EditorEditing) {
-				lua_pushstring(l, type->Sound.StepMud.Name.c_str());
-			} else {
-				lua_pushstring(l, type->MapSound.StepMud.Name.c_str());
-			}
-		} else if (sound_type == "step-stone") {
-			if (!GameRunning && Editor.Running != EditorEditing) {
-				lua_pushstring(l, type->Sound.StepStone.Name.c_str());
-			} else {
-				lua_pushstring(l, type->MapSound.StepStone.Name.c_str());
 			}
 		} else if (sound_type == "used") {
 			if (!GameRunning && Editor.Running != EditorEditing) {
@@ -3928,16 +3894,6 @@ void SetModSound(const std::string &mod_file, const std::string &ident, const st
 		type->ModSounds[mod_file].FireMissile.Name = sound;
 	} else if (sound_type == "step") {
 		type->ModSounds[mod_file].Step.Name = sound;
-	} else if (sound_type == "step-dirt") {
-		type->ModSounds[mod_file].StepDirt.Name = sound;
-	} else if (sound_type == "step-grass") {
-		type->ModSounds[mod_file].StepGrass.Name = sound;
-	} else if (sound_type == "step-gravel") {
-		type->ModSounds[mod_file].StepGravel.Name = sound;
-	} else if (sound_type == "step-mud") {
-		type->ModSounds[mod_file].StepMud.Name = sound;
-	} else if (sound_type == "step-stone") {
-		type->ModSounds[mod_file].StepStone.Name = sound;
 	} else if (sound_type == "used") {
 		type->ModSounds[mod_file].Used.Name = sound;
 	//Wyrmgus end
@@ -3985,16 +3941,6 @@ void SetModSound(const std::string &mod_file, const std::string &ident, const st
 			type->MapSound.FireMissile.Name = sound;
 		} else if (sound_type == "step") {
 			type->MapSound.Step.Name = sound;
-		} else if (sound_type == "step-dirt") {
-			type->MapSound.StepDirt.Name = sound;
-		} else if (sound_type == "step-grass") {
-			type->MapSound.StepGrass.Name = sound;
-		} else if (sound_type == "step-gravel") {
-			type->MapSound.StepGravel.Name = sound;
-		} else if (sound_type == "step-mud") {
-			type->MapSound.StepMud.Name = sound;
-		} else if (sound_type == "step-stone") {
-			type->MapSound.StepStone.Name = sound;
 		} else if (sound_type == "used") {
 			type->MapSound.Used.Name = sound;
 		//Wyrmgus end
