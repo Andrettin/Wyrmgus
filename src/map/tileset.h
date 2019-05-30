@@ -61,40 +61,20 @@ enum MapFieldFlag : unsigned long {
 	MapFieldUnpassable = 1 << 4,	/// Field is movement blocked
 	MapFieldAirUnpassable = 1 << 5,	/// Field is movement blocked for air units and missiles
 	MapFieldWall = 1 << 6,			/// Field contains wall
-	MapFieldRocks = 1 << 7,			/// Field contains rocks
-	MapFieldForest = 1 << 8,		/// Field contains forest
 	
-	MapFieldLandUnit = 1 << 9,		/// Land unit on field
-	MapFieldSeaUnit = 1 << 10,		/// Water unit on field
-	MapFieldAirUnit = 1 << 11,		/// Air unit on field
-	MapFieldBuilding = 1 << 12,		/// Building on field
-	MapFieldItem = 1 << 13,			/// Item on field
+	MapFieldLandUnit = 1 << 7,		/// Land unit on field
+	MapFieldSeaUnit = 1 << 8,		/// Water unit on field
+	MapFieldAirUnit = 1 << 9,		/// Air unit on field
+	MapFieldBuilding = 1 << 10,		/// Building on field
+	MapFieldItem = 1 << 11,			/// Item on field
 	
-	MapFieldRoad = 1 << 14,			/// Road (moves faster)
-	MapFieldRailroad = 1 << 15,		/// Railroad (moves faster)
-	MapFieldNoRail = 1 << 16,		/// Marker that there's no railroad, used for rail movemasks
-	MapFieldBridge = 1 << 17,		/// Bridge or raft
+	MapFieldRoad = 1 << 12,			/// Road (moves faster)
+	MapFieldRailroad = 1 << 13,		/// Railroad (moves faster)
+	MapFieldNoRail = 1 << 14,		/// Marker that there's no railroad, used for rail movemasks
+	MapFieldBridge = 1 << 15,		/// Bridge or raft
 	
-	MapFieldMud = 1 << 18,			/// Used for identifying mud tiles for swampstalk
-	MapFieldDesert = 1 << 19,		/// Used for identifying desert tiles for desertstalk and dehydration
-	
-	MapFieldStumps = 1 << 20,		/// Used for playing stumps step sounds and identifying removed forests
-};
-
-/**
-**  These are used for lookup tiles types
-**  mainly used for the FOW implementation of the seen woods/rocks
-**
-**  @todo I think this can be removed, we can use the flags?
-**  I'm not sure, if we have seen and real time to considere.
-*/
-enum TileType {
-	TileTypeUnknown,	/// Unknown tile type
-	TileTypeWood,		/// Any wood tile
-	TileTypeRock,		/// Any rock tile
-	TileTypeCoast,		/// Any coast tile
-	TileTypeWall,		/// Any wall tile
-	TileTypeWater		/// Any water tile
+	MapFieldMud = 1 << 16,			/// Used for identifying mud tiles for swampstalk
+	MapFieldDesert = 1 << 17		/// Used for identifying desert tiles for desertstalk and dehydration
 };
 
 //Wyrmgus start
@@ -201,34 +181,8 @@ public:
 	unsigned int getTileCount() const { return tiles.size(); }
 
 	unsigned int getDefaultTileIndex() const;
-	//Wyrmgus start
-	unsigned int getDefaultWoodTileIndex() const;
-	//Wyrmgus end
-
-	bool isAWallTile(unsigned tile) const;
-	bool isAWoodTile(unsigned tile) const;
-	bool isARockTile(unsigned tile) const;
 
 	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
-
-	//Wyrmgus start
-//	unsigned getRemovedRockTile() const { return removedRockTile; }
-//	unsigned getRemovedTreeTile() const { return removedTreeTile; }
-	unsigned getRemovedRockTile() const { return removedRockTiles.size() > 0 ? removedRockTiles[SyncRand(removedRockTiles.size())] : -1; }
-	unsigned getRemovedTreeTile() const { return removedTreeTiles.size() > 0 ? removedTreeTiles[SyncRand(removedTreeTiles.size())] : -1; }
-	//Wyrmgus end
-	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
-	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
-	unsigned getMidOneTreeTile() const { return midOneTreeTile; }
-	
-	unsigned getWallDirection(int tileIndex, bool human) const;
-
-	unsigned getHumanWallTileIndex(int dirFlag) const;
-	unsigned getOrcWallTileIndex(int dirFlag) const;
-	unsigned getHumanWallTileIndex_broken(int dirFlag) const;
-	unsigned getOrcWallTileIndex_broken(int dirFlag) const;
-	unsigned getHumanWallTileIndex_destroyed(int dirFlag) const;
-	unsigned getOrcWallTileIndex_destroyed(int dirFlag) const;
 
 	unsigned int getSolidTerrainCount() const;
 
@@ -243,18 +197,7 @@ public:
 	unsigned getQuadFromTile(unsigned int tileIndex) const;
 	//Wyrmgus end
 	//Wyrmgus start
-	int getFromMixedLookupTable(int base_terrain, int tile) const;
-//	int getTileBySurrounding(unsigned short type
-	int getTileBySurrounding(unsigned short type,
-							 int tile_index,
-	//Wyrmgus end
-							 int up, int right,
-							 int bottom, int left) const;
 	int tileFromQuad(unsigned fixed, unsigned quad) const;
-	//Wyrmgus start
-//	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
-	bool isEquivalentTile(unsigned int tile1, unsigned int tile2, int tile_index) const;
-	//Wyrmgus end
 
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
@@ -263,7 +206,6 @@ private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
 	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
 	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
-	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
 	void parseSpecial(lua_State *l);
 	void parseSolid(lua_State *l);
@@ -279,42 +221,14 @@ public:
 public:
 	std::vector<CTile> tiles;
 
-	// TODO: currently hardcoded
-	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 	//Wyrmgus start
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
-	int TreeUnderlayTerrain;
-	int RockUnderlayTerrain;
-	std::vector<unsigned> removedTreeTiles;  /// Tiles placed where trees are gone
-	std::vector<unsigned> removedRockTiles;  /// Tiles placed where trees are gone
 	//Wyrmgus end
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
 	//Wyrmgus start
 //	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 	//Wyrmgus end
-#if 1
-	//Wyrmgus start
-//	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
-	std::map<std::pair<int,int>, int> mixedLookupTable;  /// Lookup for what part of tile used; mapped to a pair, which has its first element as the tile type and the second element as the graphic tile
-	//Wyrmgus end
-	unsigned topOneTreeTile;   /// Tile for one tree top
-	unsigned midOneTreeTile;   /// Tile for one tree middle
-	unsigned botOneTreeTile;   /// Tile for one tree bottom
-	//Wyrmgus start
-//	unsigned removedTreeTile;  /// Tile placed where trees are gone
-	//Wyrmgus end
-	int woodTable[20];     /// Table for tree removable
-	unsigned topOneRockTile;   /// Tile for one rock top
-	unsigned midOneRockTile;   /// Tile for one rock middle
-	unsigned botOneRockTile;   /// Tile for one rock bottom
-	//Wyrmgus start
-//	unsigned removedRockTile;  /// Tile placed where rocks are gone
-	//Wyrmgus end
-	int rockTable[20];     /// Removed rock placement table
-	unsigned humanWallTable[16];  /// Human wall placement table
-	unsigned orcWallTable[16];    /// Orc wall placement table
-#endif
 };
 
 /*----------------------------------------------------------------------------

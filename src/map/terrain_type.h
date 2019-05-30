@@ -50,6 +50,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 class CSeason;
 class CUnitType;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -90,21 +91,41 @@ public:
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	
+	unsigned long GetFlags() const
+	{
+		return this->Flags;
+	}
+	
 	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
+	
+	bool IsTree() const
+	{
+		return this->Tree;
+	}
+
+	bool IsRock() const
+	{
+		return this->Rock;
+	}
 
 	std::string Name;
 	std::string Character;
 	CColor Color;
 	int SolidAnimationFrames = 0;
 	int Resource = -1;
+private:
 	unsigned long Flags = 0;
+public:
 	bool Overlay = false;										/// Whether this terrain type belongs to the overlay layer
 	bool Buildable = false;										/// Whether structures can be built upon this terrain type
 	bool AllowSingle = false;									/// Whether this terrain type has transitions for single tiles
 	bool Hidden = false;
+	bool Tree = false;
+	bool Rock = false;
 	PixelSize PixelTileSize = PixelSize(32, 32);
 	CUnitType *UnitType = nullptr;
-//private:
+private:
 	CGraphic *Graphics = nullptr;
 	std::map<const CSeason *, CGraphic *> SeasonGraphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 public:
@@ -119,6 +140,8 @@ public:
 	std::vector<int> DestroyedTiles;
 	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	
+	friend int CclDefineTerrainType(lua_State *l);
 
 protected:
 	static void _bind_methods();

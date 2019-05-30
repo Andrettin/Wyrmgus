@@ -54,7 +54,7 @@
 
 //Wyrmgus start
 //static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
-static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
+static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, const int z)
 //Wyrmgus end
 {
 	if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
@@ -65,12 +65,12 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
 	}
-	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding);
-	if (mf.Flags & blockedFlag) {
+	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldBuilding);
+	if (mf.GetFlags() & blockedFlag) {
 		return false;
 	}
 	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed);
-	return ((mf.Flags & passableFlag) != 0);
+	return ((mf.GetFlags() & passableFlag) != 0);
 }
 
 /**

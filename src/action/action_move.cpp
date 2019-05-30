@@ -141,21 +141,6 @@
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 
 	int distance = this->Range;
-	//Wyrmgus start
-	// why alter the distance by checking for obstacles to missiles moving in a straight line when a unit is moving?
-	/*
-	if (GameSettings.Inside) {
-		//Wyrmgus start
-//		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
-		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest | MapFieldAirUnpassable, this->MapLayer, &distance);
-		//Wyrmgus end
-	//Wyrmgus start
-	} else {
-		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer, &distance);
-	//Wyrmgus end
-	}
-	*/
-	//Wyrmgus end
 	input.SetMaxRange(distance);
 	input.SetMinRange(0);
 }
@@ -185,7 +170,7 @@ int DoActionMove(CUnit &unit)
 				}
 			}
 		}
-	} else if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft, don't move if the raft is still moving
+	} else if ((mf.GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft, don't move if the raft is still moving
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -393,7 +378,7 @@ int DoActionMove(CUnit &unit)
 		case PF_REACHED:
 			//Wyrmgus start
 			if (this->Range >= 1) {
-				if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
+				if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {

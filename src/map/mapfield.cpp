@@ -145,20 +145,14 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 			return;
 		}
 		if (this->OverlayTerrain) {
-			this->Flags &= ~(this->OverlayTerrain->Flags);
-			
-			if (this->OverlayTerrainDestroyed) {
-				if (this->OverlayTerrain->Flags & MapFieldForest) {
-					this->Flags &= ~(MapFieldStumps);
-				}
-			}
+			this->Flags &= ~(this->OverlayTerrain->GetFlags());
 		}
 	} else {
 		if (this->Terrain == terrain_type) {
 			return;
 		}
 		if (this->Terrain) {
-			this->Flags &= ~(this->Terrain->Flags);
+			this->Flags &= ~(this->Terrain->GetFlags());
 		}
 	}
 	
@@ -166,8 +160,8 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 		if (!this->Terrain || std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), this->Terrain) == terrain_type->BaseTerrainTypes.end()) {
 			this->SetTerrain(terrain_type->BaseTerrainTypes[0]);
 		}
-		if (terrain_type->Flags & MapFieldWaterAllowed) {
-			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water, remove all flags from the base terrain
+		if (terrain_type->GetFlags() & MapFieldWaterAllowed) {
+			this->Flags &= ~(this->Terrain->GetFlags()); // if the overlay is water, remove all flags from the base terrain
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 		this->OverlayTerrain = terrain_type;
@@ -182,7 +176,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 			this->SolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
 		}
 		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrainTypes.begin(), this->OverlayTerrain->BaseTerrainTypes.end(), terrain_type) == this->OverlayTerrain->BaseTerrainTypes.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
-			this->Flags &= ~(this->OverlayTerrain->Flags);
+			this->Flags &= ~(this->OverlayTerrain->GetFlags());
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = nullptr;
 			this->OverlayTransitionTiles.clear();
@@ -190,7 +184,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 	}
 	
 	//apply the flags from the new terrain type
-	this->Flags |= terrain_type->Flags;
+	this->Flags |= terrain_type->GetFlags();
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
@@ -206,15 +200,15 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 		}
 	}
 
-	if (this->Flags & MapFieldRailroad) {
+	if (this->GetFlags() & MapFieldRailroad) {
 		this->cost = DefaultTileMovementCost - 1;
-	} else if (this->Flags & MapFieldRoad) {
+	} else if (this->GetFlags() & MapFieldRoad) {
 		this->cost = DefaultTileMovementCost - 1;
 	} else {
 		this->cost = DefaultTileMovementCost; // default speed
 	}
 	
-	if (this->Flags & MapFieldRailroad) {
+	if (this->GetFlags() & MapFieldRailroad) {
 		this->Flags &= ~(MapFieldNoRail);
 	} else {
 		this->Flags |= MapFieldNoRail;
@@ -223,7 +217,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain_type->Overlay && terrain_type->Resource != -1) {
 		this->Value = CResource::GetAll()[terrain_type->Resource]->DefaultAmount;
-	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
+	} else if ((terrain_type->GetFlags() & MapFieldWall) && terrain_type->UnitType) {
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
 	
@@ -239,13 +233,13 @@ void CMapField::RemoveOverlayTerrain()
 	}
 	
 	this->Value = 0;
-	this->Flags &= ~(this->OverlayTerrain->Flags);
+	this->Flags &= ~(this->OverlayTerrain->GetFlags());
 	
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 	this->OverlayTerrain = nullptr;
 	this->OverlayTransitionTiles.clear();
 	
-	this->Flags |= this->Terrain->Flags;
+	this->Flags |= this->Terrain->GetFlags();
 	// restore MapFieldAirUnpassable related to units (i.e. doors)
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
@@ -256,15 +250,15 @@ void CMapField::RemoveOverlayTerrain()
 		}
 	}
 	
-	if (this->Flags & MapFieldRailroad) {
+	if (this->GetFlags() & MapFieldRailroad) {
 		this->cost = DefaultTileMovementCost - 1;
-	} else if (this->Flags & MapFieldRoad) {
+	} else if (this->GetFlags() & MapFieldRoad) {
 		this->cost = DefaultTileMovementCost - 1;
 	} else {
 		this->cost = DefaultTileMovementCost; // default speed
 	}
 	
-	if (this->Flags & MapFieldRailroad) {
+	if (this->GetFlags() & MapFieldRailroad) {
 		this->Flags &= ~(MapFieldNoRail);
 	} else {
 		this->Flags |= MapFieldNoRail;
@@ -329,10 +323,9 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	this->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 //Wyrmgus start
-//					 MapFieldWall | MapFieldRocks | MapFieldForest);
-					 MapFieldWall | MapFieldRocks | MapFieldForest |
-					 MapFieldAirUnpassable |
-					 MapFieldStumps);
+//					 MapFieldWall);
+					 MapFieldWall |
+					 MapFieldAirUnpassable);
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
 #endif
@@ -349,9 +342,9 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 		return;
 	}
 	if (terrain->Overlay) {
-		if (terrain->Flags & MapFieldForest) {
+		if (terrain->IsTree()) {
 			this->SetTerrain(CTerrainType::Get(tileset.solidTerrainTypes[3].TerrainName));
-		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
+		} else if (terrain->IsRock() || terrain->GetFlags() & MapFieldWaterAllowed) {
 			this->SetTerrain(CTerrainType::Get(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
@@ -421,12 +414,6 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldWall) {
 		file.printf(", \"wall\"");
 	}
-	if (Flags & MapFieldRocks) {
-		file.printf(", \"rock\"");
-	}
-	if (Flags & MapFieldForest) {
-		file.printf(", \"wood\"");
-	}
 	//Wyrmgus start
 	if (Flags & MapFieldAirUnpassable) {
 		file.printf(", \"air-unpassable\"");
@@ -445,9 +432,6 @@ void CMapField::Save(CFile &file) const
 	}
 	if (Flags & MapFieldNoRail) {
 		file.printf(", \"no-rail\"");
-	}
-	if (Flags & MapFieldStumps) {
-		file.printf(", \"stumps\"");
 	}
 	//Wyrmgus end
 #if 1
@@ -595,10 +579,6 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldUnpassable;
 		} else if (!strcmp(value, "wall")) {
 			this->Flags |= MapFieldWall;
-		} else if (!strcmp(value, "rock")) {
-			this->Flags |= MapFieldRocks;
-		} else if (!strcmp(value, "wood")) {
-			this->Flags |= MapFieldForest;
 		} else if (!strcmp(value, "ground")) {
 			this->Flags |= MapFieldLandUnit;
 		} else if (!strcmp(value, "air")) {
@@ -624,8 +604,6 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldRoad;
 		} else if (!strcmp(value, "no-rail")) {
 			this->Flags |= MapFieldNoRail;
-		} else if (!strcmp(value, "stumps")) {
-			this->Flags |= MapFieldStumps;
 		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -638,7 +616,7 @@ bool CMapField::CheckMask(int mask) const
 {
 	//Wyrmgus start
 	//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
-	int check_flags = this->Flags;
+	unsigned long check_flags = this->GetFlags();
 	if (check_flags & MapFieldBridge) {
 		check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 	}
@@ -662,13 +640,13 @@ bool CMapField::CoastOnMap() const
 /// Returns true, if water on the map tile field
 bool CMapField::ForestOnMap() const
 {
-	return CheckMask(MapFieldForest);
+	return this->GetTopTerrain(false, true)->IsTree();
 }
 
 /// Returns true, if coast on the map tile field
 bool CMapField::RockOnMap() const
 {
-	return CheckMask(MapFieldRocks);
+	return this->GetTopTerrain(false, true)->IsRock();
 }
 
 bool CMapField::isAWall() const

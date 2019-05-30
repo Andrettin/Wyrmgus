@@ -111,25 +111,6 @@
 	//
 	// Terrain effect of the explosion
 	//
-	//Wyrmgus start
-	/*
-	Vec2i ipos;
-	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
-		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-			const CMapField &mf = *CMap::Map.Field(ipos);
-			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
-				// Not in circle range
-				continue;
-			} else if (mf.isAWall()) {
-				CMap::Map.RemoveWall(ipos);
-			} else if (mf.RockOnMap()) {
-				CMap::Map.ClearRockTile(ipos);
-			} else if (mf.ForestOnMap()) {
-				CMap::Map.ClearWoodTile(ipos);
-			}
-		}
-	}
-	*/
 
 	if (this->DamageTerrain) {
 		Vec2i ipos;
@@ -148,7 +129,6 @@
 			}
 		}
 	}
-	//Wyrmgus end
 
 	//
 	//  Effect of the explosion on units. Don't bother if damage is 0

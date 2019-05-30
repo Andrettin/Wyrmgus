@@ -2078,7 +2078,7 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 		
-		if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
+		if ((unit_type->TerrainType->GetFlags() & MapFieldRoad) || (unit_type->TerrainType->GetFlags() & MapFieldRailroad)) {
 			pathway_types.push_back(unit_type);
 		}
 	}
@@ -2164,6 +2164,7 @@ static void AiCheckPathwayConstruction()
 						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
 						Vec2i worker_path_pos(test_worker->tilePos);
 						std::vector<Vec2i> first_path_tiles;
+						std::vector<CMapField *> unpassable_marked_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
@@ -2178,8 +2179,10 @@ static void AiCheckPathwayConstruction()
 						
 						// mark the tiles of the first path (that aren't the first and last tile) as unpassable, so that the second path has to follow a different way
 						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							if (!(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldForest) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldRocks) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldWall)) {
-								unit.MapLayer->Field(first_path_tiles[z])->Flags |= MapFieldUnpassable;
+							CMapField *path_tile = unit.MapLayer->Field(first_path_tiles[z]);
+							if (!(path_tile->GetFlags() & MapFieldUnpassable)) {
+								path_tile->Flags |= MapFieldUnpassable;
+								unpassable_marked_tiles.push_back(path_tile);
 							}
 						}
 						
@@ -2196,10 +2199,8 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//unmark the tiles of the first path
-						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							if (!(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldForest) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldRocks) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldWall)) {
-								unit.MapLayer->Field(first_path_tiles[z])->Flags &= ~(MapFieldUnpassable);
-							}
+						for (CMapField *path_tile : unpassable_marked_tiles) {
+							path_tile->Flags &= ~(MapFieldUnpassable);
 						}
 						
 						MarkUnitFieldFlags(unit);
@@ -2217,7 +2218,7 @@ static void AiCheckPathwayConstruction()
 					continue;
 				}
 				CMapField &mf = *unit.MapLayer->Field(pathway_pos);
-				if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+				if (mf.GetFlags() & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 					continue;
 				}
 					
@@ -2229,19 +2230,19 @@ static void AiCheckPathwayConstruction()
 				bool built_pathway = false;
 					
 				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !CResource::GetAll()[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
+					if ((pathway_types[p]->TerrainType->GetFlags() & MapFieldRailroad) && (unit.GivesResource == -1 || !CResource::GetAll()[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
 						continue;
 					}
 						
 					if (
 						(
-							!(mf.Flags & MapFieldRailroad)
-							&& (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)
+							!(mf.GetFlags() & MapFieldRailroad)
+							&& (pathway_types[p]->TerrainType->GetFlags() & MapFieldRailroad)
 						)
 						|| (
-							!(mf.Flags & MapFieldRoad)
-							&& !(mf.Flags & MapFieldRailroad)
-							&& (pathway_types[p]->TerrainType->Flags & MapFieldRoad)
+							!(mf.GetFlags() & MapFieldRoad)
+							&& !(mf.GetFlags() & MapFieldRailroad)
+							&& (pathway_types[p]->TerrainType->GetFlags() & MapFieldRoad)
 						)
 					) {
 						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer->ID) || !CanBuildHere(nullptr, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {

@@ -63,38 +63,6 @@
 
 //Wyrmgus start
 /*
-static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value, unsigned int oldTile = 0)
-{
-	unsigned int tileIndex, newTile;
-	if (humanWall) {
-		if (value == 0) {
-			tileIndex = tileset.getHumanWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
-			tileIndex = tileset.getHumanWallTileIndex_broken(dirFlag);
-		} else {
-			tileIndex = tileset.getHumanWallTileIndex(dirFlag);
-		}
-	} else { // orcWall
-		if (value == 0) {
-			tileIndex = tileset.getOrcWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
-			tileIndex = tileset.getOrcWallTileIndex_broken(dirFlag);
-		} else {
-			tileIndex = tileset.getOrcWallTileIndex(dirFlag);
-		}
-	}
-	newTile = tileset.tiles[tileIndex].tile;
-	if (!newTile && oldTile) {
-		unsigned int oldTileIndex = tileset.findTileIndexByTile(oldTile);
-		return getWallTile(tileset, humanWall, tileset.getWallDirection(oldTileIndex, humanWall), value);
-	} else {
-		return newTile;
-	}
-}
-
-
-
-
 //  Calculate the correct tile. Depends on the surrounding.
 static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 {
@@ -116,94 +84,6 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 		}
 	}
 	return dirFlag;
-}
-*/
-//Wyrmgus end
-
-/**
-** Correct the seen wall field, depending on the surrounding.
-**
-** @param pos Map tile-position.
-*/
-//Wyrmgus start
-/*
-void MapFixSeenWallTile(const Vec2i &pos)
-{
-	//  Outside of map or no wall.
-	if (!CMap::Map.Info.IsPointOnMap(pos)) {
-		return;
-	}
-	CMapField &mf = *CMap::Map.Field(pos);
-	const CTileset &tileset = *CMap::Map.Tileset;
-	const unsigned tile = mf.playerInfo.SeenTile;
-	if (!tileset.isAWallTile(tile)) {
-		return;
-	}
-	const bool human = tileset.isARaceWallTile(tile, true);
-	const int dirFlag = GetDirectionFromSurrounding(pos, human, true);
-	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
-
-	if (mf.playerInfo.SeenTile != wallTile) { // Already there!
-		mf.playerInfo.SeenTile = wallTile;
-		// FIXME: can this only happen if seen?
-		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			UI.Minimap.UpdateSeenXY(pos);
-		}
-	}
-}
-*/
-//Wyrmgus end
-
-/**
-** Correct the surrounding seen wall fields.
-**
-** @param pos Map tile-position.
-*/
-//Wyrmgus start
-/*
-void MapFixSeenWallNeighbors(const Vec2i &pos)
-{
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
-
-	for (unsigned int i = 0; i < 4; ++i) {
-		MapFixSeenWallTile(pos + offset[i]);
-	}
-}
-*/
-//Wyrmgus end
-
-/**
-** Correct the real wall field, depending on the surrounding.
-**
-** @param pos Map tile-position.
-*/
-//Wyrmgus start
-/*
-void MapFixWallTile(const Vec2i &pos)
-{
-	//  Outside of map or no wall.
-	if (!CMap::Map.Info.IsPointOnMap(pos)) {
-		return;
-	}
-	CMapField &mf = *CMap::Map.Field(pos);
-	const CTileset &tileset = *CMap::Map.Tileset;
-	const int tile = mf.getGraphicTile();
-	if (!tileset.isAWallTile(tile)) {
-		return;
-	}
-	const bool human = tileset.isARaceWallTile(tile, true);
-	const int dirFlag = GetDirectionFromSurrounding(pos, human, false);
-	const unsigned int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
-
-	if (mf.getGraphicTile() != wallTile) {
-		mf.setGraphicTile(wallTile);
-		UI.Minimap.UpdateXY(pos);
-
-		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			UI.Minimap.UpdateSeenXY(pos);
-			CMap::Map.MarkSeenTile(mf);
-		}
-	}
 }
 */
 //Wyrmgus end
@@ -246,40 +126,6 @@ void CMap::RemoveWall(const Vec2i &pos)
 	MapFixWallNeighbors(pos);
 
 	UI.Minimap.UpdateXY(pos);
-
-	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		UI.Minimap.UpdateSeenXY(pos);
-		this->MarkSeenTile(mf);
-	}
-}
-*/
-//Wyrmgus end
-
-/**
-** Set wall onto the map.
-**
-** @param pos  Map position.
-** @param humanwall Flag, if true set a human wall.
-**
-** @todo FIXME: support for more races.
-*/
-//Wyrmgus start
-/*
-void CMap::SetWall(const Vec2i &pos, bool humanwall)
-{
-	CMapField &mf = *Field(pos);
-
-	if (humanwall) {
-		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
-	} else {
-		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
-	}
-
-	UI.Minimap.UpdateXY(pos);
-	MapFixWallTile(pos);
-	MapFixWallNeighbors(pos);
 
 	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		UI.Minimap.UpdateSeenXY(pos);

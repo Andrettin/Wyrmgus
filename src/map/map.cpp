@@ -163,51 +163,8 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 	const Vec2i pos = {x, y}
 #endif
 
-	//Wyrmgus start
-	/*
-	if (this->Tileset->TileTypeTable.empty() == false) {
-#ifndef MINIMAP_UPDATE
-		//rb - GRRRRRRRRRRRR
-		const unsigned int index = &mf - CMap::Map.Fields;
-		const int y = index / Info.MapWidth;
-		const int x = index - (y * Info.MapWidth);
-		const Vec2i pos(x, y);
-#endif
-
-		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (tile == this->Tileset->getRemovedTreeTile()) {
-			FixNeighbors(MapFieldForest, 1, pos);
-		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
-			FixTile(MapFieldForest, 1, pos);
-		} else if (mf.ForestOnMap()) {
-			FixTile(MapFieldForest, 1, pos);
-			FixNeighbors(MapFieldForest, 1, pos);
-
-			// Handle rock changes.
-		} else if (tile == Tileset->getRemovedRockTile()) {
-			FixNeighbors(MapFieldRocks, 1, pos);
-		} else if (seentile == Tileset->getRemovedRockTile()) {
-			FixTile(MapFieldRocks, 1, pos);
-		} else if (mf.RockOnMap()) {
-			FixTile(MapFieldRocks, 1, pos);
-			FixNeighbors(MapFieldRocks, 1, pos);
-
-			//  Handle Walls changes.
-		} else if (this->Tileset->isAWallTile(tile)
-				   || this->Tileset->isAWallTile(seentile)) {
-		//Wyrmgus end
-			MapFixSeenWallTile(pos);
-			MapFixSeenWallNeighbors(pos);
-		}
-	}
-	*/
-	//Wyrmgus end
-
 #ifdef MINIMAP_UPDATE
-	//Wyrmgus start
-//	UI.Minimap.UpdateXY(pos);
 	UI.Minimap.UpdateXY(pos, z);
-	//Wyrmgus end
 #endif
 }
 
@@ -734,7 +691,7 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainT
 	const CUnitCache &cache = mf.UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		const CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && (terrain_type->Flags & unit.Type->MovementMask) != 0) {
+		if (unit.IsAliveOnMap() && (terrain_type->GetFlags() & unit.Type->MovementMask) != 0) {
 			return true;
 		}
 	}
@@ -1180,20 +1137,6 @@ void PreprocessMap()
 			}
 		}
 	}
-	//Wyrmgus end
-	//Wyrmgus start
-	/*
-	// it is required for fixing the wood that all tiles are marked as seen!
-	if (CMap::Map.Tileset->TileTypeTable.empty() == false) {
-		Vec2i pos;
-		for (pos.x = 0; pos.x < CMap::Map.Info.MapWidth; ++pos.x) {
-			for (pos.y = 0; pos.y < CMap::Map.Info.MapHeight; ++pos.y) {
-				MapFixWallTile(pos);
-				MapFixSeenWallTile(pos);
-			}
-		}
-	}
-	*/
 	//Wyrmgus end
 }
 
@@ -1681,111 +1624,6 @@ void CMap::Save(CFile &file) const
 ----------------------------------------------------------------------------*/
 
 /**
-**  Correct the seen wood field, depending on the surrounding.
-**
-**  @param type  type of tile to update
-**  @param seen  1 if updating seen value, 0 for real
-**  @param pos   Map tile-position.
-*/
-//Wyrmgus start
-/*
-void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
-{
-	Assert(type == MapFieldForest || type == MapFieldRocks);
-
-	//  Outside of map or no wood.
-	if (!Info.IsPointOnMap(pos)) {
-		return;
-	}
-	unsigned int index = getIndex(pos);
-	CMapField &mf = *this->Field(index);
-
-	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile))
-		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
-		if (seen) {
-			return;
-		}
-	}
-
-	if (!seen && !(mf.getFlag() & type)) {
-		return;
-	}
-
-	// Select Table to lookup
-	int removedtile;
-	int flags;
-	if (type == MapFieldForest) {
-		removedtile = this->Tileset->getRemovedTreeTile();
-		flags = (MapFieldForest | MapFieldUnpassable);
-	} else { // (type == MapFieldRocks)
-		removedtile = this->Tileset->getRemovedRockTile();
-		flags = (MapFieldRocks | MapFieldUnpassable);
-	}
-	//  Find out what each tile has with respect to wood, or grass.
-	int ttup;
-	int ttdown;
-	int ttleft;
-	int ttright;
-
-	if (pos.y - 1 < 0) {
-		ttup = -1; //Assign trees in all directions
-	} else {
-		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
-		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
-	}
-	if (pos.x + 1 >= this->Info.MapWidth) {
-		ttright = -1; //Assign trees in all directions
-	} else {
-		const CMapField &new_mf = *(&mf + 1);
-		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
-	}
-	if (pos.y + 1 >= this->Info.MapHeight) {
-		ttdown = -1; //Assign trees in all directions
-	} else {
-		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
-		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
-	}
-	if (pos.x - 1 < 0) {
-		ttleft = -1; //Assign trees in all directions
-	} else {
-		const CMapField &new_mf = *(&mf - 1);
-		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
-	}
-	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
-
-	//Update seen tile.
-	if (tile == -1) { // No valid wood remove it.
-		if (seen) {
-			mf.playerInfo.SeenTile = removedtile;
-			this->FixNeighbors(type, seen, pos);
-		} else {
-			mf.setGraphicTile(removedtile);
-			mf.Flags &= ~flags;
-			mf.Value = 0;
-			UI.Minimap.UpdateXY(pos);
-		}
-	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
-		return;
-	} else {
-		if (seen) {
-			mf.playerInfo.SeenTile = tile;
-		} else {
-			mf.setGraphicTile(tile);
-		}
-	}
-
-	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*CPlayer::GetThisPlayer())) {
-		UI.Minimap.UpdateSeenXY(pos);
-		if (!seen) {
-			MarkSeenTile(mf);
-		}
-	}
-}
-*/
-//Wyrmgus end
-
-/**
 **  Correct the surrounding fields.
 **
 **  @param type  Tiletype of tile to adjust
@@ -1878,7 +1716,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
 	}
 	
 	if (terrain->Overlay) {
-		if ((terrain->Flags & MapFieldUnpassable) || (old_terrain && (old_terrain->Flags & MapFieldUnpassable))) {
+		if ((terrain->GetFlags() & MapFieldUnpassable) || (old_terrain && (old_terrain->GetFlags() & MapFieldUnpassable))) {
 			CMap::Map.CalculateTileOwnership(pos, z);
 			
 			for (int x_offset = -16; x_offset <= 16; ++x_offset) {
@@ -1936,7 +1774,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 		}
 	}
 	
-	if (old_terrain->Flags & MapFieldUnpassable) {
+	if (old_terrain->GetFlags() & MapFieldUnpassable) {
 		CMap::Map.CalculateTileOwnership(pos, z);
 			
 		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
@@ -1962,31 +1800,39 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	CMapField &mf = *map_layer->Field(pos);
 	
-	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == destroyed) {
+	if (mf.OverlayTerrain == nullptr || mf.OverlayTerrainDestroyed == destroyed) {
 		return;
 	}
 	
 	mf.SetOverlayTerrainDestroyed(destroyed);
 	
 	if (destroyed) {
-		if (mf.OverlayTerrain->Flags & MapFieldForest) {
-			mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
-			mf.Flags |= MapFieldStumps;
+		if (mf.OverlayTerrain->GetFlags() & MapFieldUnpassable) {
+			mf.Flags &= ~(MapFieldUnpassable);
+		}
+		
+		if (mf.OverlayTerrain->GetFlags() & MapFieldAirUnpassable) {
+			mf.Flags &= ~(MapFieldAirUnpassable);
+		}
+		
+		if (mf.OverlayTerrain->IsTree()) {
 			map_layer->DestroyedForestTiles.push_back(pos);
-		} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
-			mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-		} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
-			mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
+		}
+		
+		if (mf.OverlayTerrain->GetFlags() & MapFieldWall) {
+			mf.Flags &= ~(MapFieldWall);
 			if (GameSettings.Inside) {
 				mf.Flags &= ~(MapFieldAirUnpassable);
 			}
 		}
 		mf.Value = 0;
 	} else {
-		if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
-			mf.Flags &= ~(MapFieldStumps);
-			mf.Flags |= MapFieldForest | MapFieldUnpassable;
-			mf.Value = CResource::GetAll()[WoodCost]->DefaultAmount;
+		if (mf.OverlayTerrain->IsTree()) { //if is a cleared tree tile regrowing trees
+			mf.Flags |= MapFieldUnpassable;
+			
+			if (mf.OverlayTerrain->Resource != -1) {
+				mf.Value = CResource::GetAll()[mf.OverlayTerrain->Resource]->DefaultAmount;
+			}
 		}
 	}
 	
@@ -2019,7 +1865,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		}
 	}
 	
-	if (mf.OverlayTerrain->Flags & MapFieldUnpassable) {
+	if (mf.OverlayTerrain->GetFlags() & MapFieldUnpassable) {
 		CMap::Map.CalculateTileOwnership(pos, z);
 			
 		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
@@ -2266,7 +2112,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 					}
 				}
 				
-				if ((mf.Flags & MapFieldWaterAllowed) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldWaterAllowed))) { //if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
+				if ((mf.GetFlags() & MapFieldWaterAllowed) && (!adjacent_terrain || !(adjacent_terrain->GetFlags() & MapFieldWaterAllowed))) { //if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
 					mf.Flags &= ~(MapFieldWaterAllowed);
 					mf.Flags |= MapFieldCoastAllowed;
 				}
@@ -2328,7 +2174,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 		return; //already calculated
 	}
 	
-	bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
+	const bool is_water = (mf.GetFlags() & MapFieldWaterAllowed) || (mf.GetFlags() & MapFieldCoastAllowed);
 
 	//doesn't have a landmass ID, and hasn't inherited one from another tile yet, so add a new one
 	mf.Landmass = this->Landmasses + 1;
@@ -2345,7 +2191,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 					Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
 					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
+						const bool adjacent_is_water = (adjacent_mf.GetFlags() & MapFieldWaterAllowed) || (adjacent_mf.GetFlags() & MapFieldCoastAllowed);
 									
 						if (adjacent_is_water == is_water && adjacent_mf.Landmass == 0) {
 							adjacent_mf.Landmass = mf.Landmass;
@@ -2406,7 +2252,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 	int new_owner = -1;
 	bool must_have_no_owner = false;
 	
-	if (mf.Flags & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
+	if (mf.GetFlags() & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
 		const CUnitCache &cache = mf.UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			CUnit *unit = cache[i];
@@ -2814,9 +2660,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 					&& (!GetTileTopTerrain(random_pos, false, z)->Overlay || GetTileTopTerrain(random_pos, false, z) == terrain_type)
 				)
 			)
-			&& (!preserve_coastline || (terrain_type->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed))
+			&& (!preserve_coastline || (terrain_type->GetFlags() & MapFieldWaterAllowed) == (tile_terrain->GetFlags() & MapFieldWaterAllowed))
 			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain_type, z)
-			&& (!(terrain_type->Flags & MapFieldUnpassable) || !this->TileBordersUnit(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to units
+			&& (!(terrain_type->GetFlags() & MapFieldUnpassable) || !this->TileBordersUnit(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to units
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -2856,9 +2702,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 								&& (!GetTileTopTerrain(diagonal_pos, false, z)->Overlay || GetTileTopTerrain(diagonal_pos, false, z) == terrain_type) && (!GetTileTopTerrain(vertical_pos, false, z)->Overlay || GetTileTopTerrain(vertical_pos, false, z) == terrain_type) && (!GetTileTopTerrain(horizontal_pos, false, z)->Overlay || GetTileTopTerrain(horizontal_pos, false, z) == terrain_type)
 							)
 						)
-						&& (!preserve_coastline || ((terrain_type->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
+						&& (!preserve_coastline || ((terrain_type->GetFlags() & MapFieldWaterAllowed) == (diagonal_tile_terrain->GetFlags() & MapFieldWaterAllowed) && (terrain_type->GetFlags() & MapFieldWaterAllowed) == (vertical_tile_terrain->GetFlags() & MapFieldWaterAllowed) && (terrain_type->GetFlags() & MapFieldWaterAllowed) == (horizontal_tile_terrain->GetFlags() & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain_type, z)
-						&& (!(terrain_type->Flags & MapFieldUnpassable) || (!this->TileBordersUnit(diagonal_pos, z) && !this->TileBordersUnit(vertical_pos, z) && !this->TileBordersUnit(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
+						&& (!(terrain_type->GetFlags() & MapFieldUnpassable) || (!this->TileBordersUnit(diagonal_pos, z) && !this->TileBordersUnit(vertical_pos, z) && !this->TileBordersUnit(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 						&& !this->IsPointInASubtemplateArea(diagonal_pos, z) && !this->IsPointInASubtemplateArea(vertical_pos, z) && !this->IsPointInASubtemplateArea(horizontal_pos, z)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
@@ -2965,9 +2811,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				if (
 					preserve_coastline
 					&& (
-						(terrain_type->Flags & MapFieldWaterAllowed) != (diagonal_tile_terrain->Flags & MapFieldWaterAllowed)
-						|| (terrain_type->Flags & MapFieldWaterAllowed) != (vertical_tile_terrain->Flags & MapFieldWaterAllowed)
-						|| (terrain_type->Flags & MapFieldWaterAllowed) != (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)
+						(terrain_type->GetFlags() & MapFieldWaterAllowed) != (diagonal_tile_terrain->GetFlags() & MapFieldWaterAllowed)
+						|| (terrain_type->GetFlags() & MapFieldWaterAllowed) != (vertical_tile_terrain->GetFlags() & MapFieldWaterAllowed)
+						|| (terrain_type->GetFlags() & MapFieldWaterAllowed) != (horizontal_tile_terrain->GetFlags() & MapFieldWaterAllowed)
 					)
 				) {
 					continue;
@@ -2978,7 +2824,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 				
 				if ( // if the terrain is unpassable, don't expand to spots adjacent to buildings
-					(terrain_type->Flags & MapFieldUnpassable) && (this->TileBordersUnit(diagonal_pos, z) || this->TileBordersUnit(vertical_pos, z) || this->TileBordersUnit(horizontal_pos, z))
+					(terrain_type->GetFlags() & MapFieldUnpassable) && (this->TileBordersUnit(diagonal_pos, z) || this->TileBordersUnit(vertical_pos, z) || this->TileBordersUnit(horizontal_pos, z))
 				) {
 					continue;
 				}
@@ -3114,9 +2960,9 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 		
 		if (overlay_terrain_type != nullptr) {
 			if (
-				(overlay_terrain_type->Flags & MapFieldWall)
-				|| (overlay_terrain_type->Flags & MapFieldRoad)
-				|| (overlay_terrain_type->Flags & MapFieldRailroad)
+				(overlay_terrain_type->GetFlags() & MapFieldWall)
+				|| (overlay_terrain_type->GetFlags() & MapFieldRoad)
+				|| (overlay_terrain_type->GetFlags() & MapFieldRailroad)
 			) {
 				overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a wall or pathway
 			}
@@ -3340,48 +3186,6 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 		}
 	}
 }
-//Wyrmgus end
-
-//Wyrmgus start
-/*
-/// Remove wood from the map.
-void CMap::ClearWoodTile(const Vec2i &pos)
-{
-	CMapField &mf = *this->Field(pos);
-
-	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
-	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
-	mf.Value = 0;
-
-	UI.Minimap.UpdateXY(pos);
-	FixNeighbors(MapFieldForest, 0, pos);
-
-	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*CPlayer::GetThisPlayer())) {
-		UI.Minimap.UpdateSeenXY(pos);
-		MarkSeenTile(mf);
-	}
-}
-
-/// Remove rock from the map.
-void CMap::ClearRockTile(const Vec2i &pos)
-{
-	CMapField &mf = *this->Field(pos);
-
-	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
-	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-	mf.Value = 0;
-	
-	UI.Minimap.UpdateXY(pos);
-	FixNeighbors(MapFieldRocks, 0, pos);
-
-	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*CPlayer::GetThisPlayer())) {
-		UI.Minimap.UpdateSeenXY(pos);
-		MarkSeenTile(mf);
-	}
-}
-*/
 //Wyrmgus end
 
 /**

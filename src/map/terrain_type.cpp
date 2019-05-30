@@ -110,10 +110,6 @@ unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldUnpassable;
 	} else if (flag_name == "wall") {
 		return MapFieldWall;
-	} else if (flag_name == "rock") {
-		return MapFieldRocks;
-	} else if (flag_name == "forest") {
-		return MapFieldForest;
 	} else if (flag_name == "air-unpassable") {
 		return MapFieldAirUnpassable;
 	} else if (flag_name == "desert") {
@@ -126,8 +122,6 @@ unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldRoad;
 	} else if (flag_name == "no-rail") {
 		return MapFieldNoRail;
-	} else if (flag_name == "stumps") {
-		return MapFieldStumps;
 	} else {
 		fprintf(stderr, "Flag \"%s\" doesn't exist.\n", flag_name.c_str());
 		return 0;
@@ -376,5 +370,11 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 
 void CTerrainType::_bind_methods()
 {
-	BIND_PROPERTIES();
+	ClassDB::bind_method(D_METHOD("set_tree", "tree"), [](CTerrainType *terrain_type, const bool tree){ terrain_type->Tree = tree; });
+	ClassDB::bind_method(D_METHOD("is_tree"), &CTerrainType::IsTree);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "tree"), "set_tree", "is_tree");
+	
+	ClassDB::bind_method(D_METHOD("set_rock", "rock"), [](CTerrainType *terrain_type, const bool rock){ terrain_type->Rock = rock; });
+	ClassDB::bind_method(D_METHOD("is_rock"), &CTerrainType::IsRock);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "rock"), "set_rock", "is_rock");
 }

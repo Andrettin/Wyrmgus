@@ -267,7 +267,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			//Wyrmgus start
 //			CMap::Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 			if (ReplayRevealMap) {
-				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) == mf.OverlayTerrain->DestroyedTiles.end();
+				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->GetFlags() & MapFieldUnpassable) && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) == mf.OverlayTerrain->DestroyedTiles.end();
 				if (mf.Terrain && mf.Terrain->GetGraphics(season)) {
 					mf.Terrain->GetGraphics(season)->DrawFrameClip(mf.SolidTile + mf.GetAnimationFrame(), dx, dy, false);
 				}
@@ -314,7 +314,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 				}
 			} else {
-				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) == mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end();
+				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->GetFlags() & MapFieldUnpassable) && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) == mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end();
 				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(season)) {
 					mf.playerInfo.SeenTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.GetAnimationFrame() : 0), dx, dy, false);
 				}

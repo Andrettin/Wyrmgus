@@ -1472,9 +1472,9 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 		if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
-//		} else if (CMap::Map.Field(pos)->Flags & flags) {
+//		} else if (CMap::Map.Field(pos)->GetFlags() & flags) {
 		} else if (
-			((CMap::Map.Field(pos, z)->Flags & flags) || (player != -1 && CMap::Map.Field(pos, z)->Owner != player && CMap::Map.Field(pos, z)->Owner != -1))
+			((CMap::Map.Field(pos, z)->GetFlags() & flags) || (player != -1 && CMap::Map.Field(pos, z)->Owner != player && CMap::Map.Field(pos, z)->Owner != -1))
 			&& pos != goalPos
 			&& (abs(pos.x - goalPos.x) > max_difference || abs(pos.y - goalPos.y) > max_difference)
 		) { // the goal's tile itself shouldn't be checked for an obstacle

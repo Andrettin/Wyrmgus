@@ -141,11 +141,13 @@ public:
 	
 	void DoPerHourLoop();
 	void RegenerateForest();
-	//regenerate a forest tile	
+	/// regenerate a forest tile	
 	void RegenerateForestTile(const Vec2i &pos);
 	
 	/// Returns true if there is a wall on the map tile field
 	bool WallOnMap(const Vec2i &pos) const;
+	
+	bool TileBlockHasTree(const Vec2i &min_pos, const Vec2i &max_pos) const;
 	
 private:
 	void DecrementRemainingTimeOfDayHours();

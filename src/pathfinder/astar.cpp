@@ -731,9 +731,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 		int i = w;
 		do {
 			//Wyrmgus start
-//			const int flag = mf->Flags & mask;
+//			const int flag = mf->GetFlags() & mask;
 			//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
-			unsigned long check_flags = mf->Flags;
+			unsigned long check_flags = mf->GetFlags();
 			if (check_flags & MapFieldBridge) {
 				check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 			}
@@ -785,7 +785,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			
 			//Wyrmgus start
 			if (
-				(mf->Flags & MapFieldDesert)
+				(mf->GetFlags() & MapFieldDesert)
 				&& mf->Owner != unit.Player->GetIndex()
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
 				&& unit.MapLayer->GetTimeOfDay() != nullptr

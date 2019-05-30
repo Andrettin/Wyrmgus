@@ -133,12 +133,12 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 	const unsigned long permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
 	const unsigned long occupied_flag = (permanent_occupied_flag | MapFieldLandUnit | MapFieldItem);
 	
-	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
+	if ((mf.GetFlags() & permanent_occupied_flag)) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
 		mf.Value = 0;
 		return;
 	}
 
-	if (mf.Flags & occupied_flag) { // if the tree tile is temporarily occupied (e.g. by an item or unit), don't continue the regrowing process while the occupation occurs, but don't reset it either
+	if (mf.GetFlags() & occupied_flag) { // if the tree tile is temporarily occupied (e.g. by an item or unit), don't continue the regrowing process while the occupation occurs, but don't reset it either
 		return;
 	}
 	
@@ -165,9 +165,9 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
-				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
-				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
-				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
+				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.GetFlags() & occupied_flag)) || verticalMf.ForestOnMap())
+				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.GetFlags() & occupied_flag)) || diagonalMf.ForestOnMap())
+				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.GetFlags() & occupied_flag)) || horizontalMf.ForestOnMap())
 			) {
 				DebugPrint("Real place wood\n");
 				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
@@ -179,40 +179,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 			}
 		}
 	}
-
-	/*
-	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
-		&& topMf.Value >= ForestRegeneration
-		&& !(topMf.Flags & occupied_flag)) {
-		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*CMap::Map.Tileset, CMap::Map.Tileset->getTopOneTreeTile(), 0);
-		topMf.setGraphicTile(CMap::Map.Tileset->getTopOneTreeTile());
-		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		topMf.Value = 0;
-		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
-		
-		mf.setTileIndex(*CMap::Map.Tileset, CMap::Map.Tileset->getBottomOneTreeTile(), 0);
-		mf.setGraphicTile(CMap::Map.Tileset->getBottomOneTreeTile());
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
-		mf.Flags |= MapFieldForest | MapFieldUnpassable;
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
-		
-		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			MarkSeenTile(mf);
-		}
-		if (CMap::Map.Field(pos + offset)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			MarkSeenTile(topMf);
-		}
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
-	}
-	*/
 }
-
 
 /**
 **	@brief	Get whether a map tile is a wall.
@@ -225,6 +192,36 @@ bool CMapLayer::WallOnMap(const Vec2i &pos) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
 	return this->Field(pos)->isAWall();
+}
+
+/**
+**	@brief	Get whether a tile block has a tree tile
+**
+**	@param	pos		The tile block's top-left position
+**	@param	size	The tile block's size
+**
+**	@return	True if the tile block borders has a tree tile, or false otherwise
+*/
+bool CMapLayer::TileBlockHasTree(const Vec2i &pos, const Vec2i &size) const
+{
+	Vec2i max_pos = pos + size - 1;
+	for (int x = pos.x; x <= max_pos.x; ++x) {
+		for (int y = pos.y; y <= max_pos.y; ++y) {
+			const Vec2i tile_pos(x, y);
+			
+			if (!CMap::Map.Info.IsPointOnMap(tile_pos, this->ID)) {
+				continue;
+			}
+			
+			const CMapField &mf = *this->Field(tile_pos);
+			
+			if (mf.ForestOnMap()) {
+				return true;
+			}
+		}
+	}
+		
+	return false;
 }
 
 /**

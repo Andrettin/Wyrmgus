@@ -175,16 +175,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	COrder_Resource *order = new COrder_Resource(harvester);
 	Vec2i ressourceLoc;
 
-	//Wyrmgus start
-	/*
-	//  Find the closest piece of wood next to a tile where the unit can move
-	if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, MapFieldForest, 20, *harvester.Player, pos, &ressourceLoc)) {
-		DebugPrint("FIXME: Give up???\n");
-		ressourceLoc = pos;
-	}
-	order->goalPos = ressourceLoc;
-	order->CurrentResource = WoodCost; // Hard-coded resource.
-	*/
 	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->GetResource() != -1) {
 		order->CurrentResource = CMap::Map.Field(pos, z)->GetResource();
 		//  Find the closest resource tile next to a tile where the unit can move
@@ -195,7 +185,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	}
 	order->goalPos = ressourceLoc;
 	order->MapLayer = z;
-	//Wyrmgus end
 		
 	return order;
 }
@@ -482,10 +471,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	// Wood gone, look somewhere else.
 	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->IsTerrainResourceOnMap(CurrentResource) == false)
 		&& (!unit.IX) && (!unit.IY)) {
-		//Wyrmgus start
-//		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
 		if (!FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
-		//Wyrmgus end
 			// no wood in range
 			return -1;
 		} else {
@@ -496,7 +482,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -518,10 +504,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 					AiCanNotMove(unit);
 				}
 			}
-			//Wyrmgus start
-//			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
 			if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 9999, *unit.Player, unit.tilePos, &pos, z)) {
-			//Wyrmgus end
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
 				// FIXME: can't this overflow? It really shouldn't, since
@@ -559,7 +542,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -1269,7 +1252,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -1428,10 +1411,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		Vec2i pos = this->Resource.Pos;
 		int z = this->Resource.MapLayer = unit.MapLayer->ID;
 
-		//Wyrmgus start
-//		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
 		if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 10, *unit.Player, pos, &pos, z)) {
-		//Wyrmgus end
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
 			}
@@ -1592,10 +1572,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				}
 			} else {
 				Vec2i resPos;
-				//Wyrmgus start
-//				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
 				if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
-				//Wyrmgus end
 					this->goalPos = resPos;
 					this->MapLayer = unit.MapLayer->ID;
 					this->State = SUB_MOVE_TO_RESOURCE;

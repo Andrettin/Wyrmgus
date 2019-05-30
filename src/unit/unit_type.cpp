@@ -2419,10 +2419,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		//Wyrmgus start
 		type.MovementMask |= MapFieldItem;
 		if (type.TerrainType) {
-			if ((type.TerrainType->Flags & MapFieldRailroad) || (type.TerrainType->Flags & MapFieldRoad)) {
+			if ((type.TerrainType->GetFlags() & MapFieldRailroad) || (type.TerrainType->GetFlags() & MapFieldRoad)) {
 				type.MovementMask |= MapFieldRailroad;
 			}
-			if (type.TerrainType->Flags & MapFieldRoad) {
+			if (type.TerrainType->GetFlags() & MapFieldRoad) {
 				type.MovementMask |= MapFieldRoad;
 			}
 		}

@@ -95,8 +95,6 @@
 **    ::MapFieldNoBuilding no buildings allowed.
 **    ::MapFieldUnpassable field is movement blocked.
 **    ::MapFieldWall field contains wall.
-**    ::MapFieldRocks field contains rocks.
-**    ::MapFieldForest field contains forest.
 **    ::MapFieldLandUnit land unit on field.
 **    ::MapFieldAirUnit air unit on field.
 **    ::MapFieldSeaUnit water unit on field.
@@ -267,8 +265,9 @@ public:
 
 	bool IsDestroyedForestTile() const;
 	
-	unsigned char getCost() const { return cost; }
-	unsigned long getFlag() const { return Flags; }
+	unsigned char getCost() const { return this->cost; }
+	
+	unsigned long GetFlags() const { return this->Flags; }
 	
 	/**
 	**	@brief	Get the current base frame of the tile's animation

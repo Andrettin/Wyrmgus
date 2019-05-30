@@ -1133,7 +1133,7 @@ static int CclDefineTileset(lua_State *l)
 	return 0;
 }
 /**
-** Build tileset tables like humanWallTable or mixedLookupTable
+** Build tileset tables
 **
 ** Called after DefineTileset and only for tilesets that have wall,
 ** trees and rocks. This function will be deleted when removing
@@ -1303,20 +1303,14 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldRoad;
 	} else if (!strcmp(flag_name, "no-rail")) {
 		flag = MapFieldNoRail;
-	} else if (!strcmp(flag_name, "stumps")) {
-		flag = MapFieldStumps;
 	//Wyrmgus end
 	} else if (!strcmp(flag_name, "wall")) {
 		flag = MapFieldWall;
-	} else if (!strcmp(flag_name, "rock")) {
-		flag = MapFieldRocks;
-	} else if (!strcmp(flag_name, "forest")) {
-		flag = MapFieldForest;
 	}
 
 	const CMapField &mf = *CMap::Map.Field(pos, z);
 
-	if (mf.getFlag() & flag) {
+	if (mf.GetFlags() & flag) {
 		lua_pushboolean(l, 1);
 	} else {
 		lua_pushboolean(l, 0);
@@ -1464,10 +1458,6 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldUnpassable;
 				} else if (tile_flag == "wall") {
 					terrain->Flags |= MapFieldWall;
-				} else if (tile_flag == "rock") {
-					terrain->Flags |= MapFieldRocks;
-				} else if (tile_flag == "forest") {
-					terrain->Flags |= MapFieldForest;
 				} else if (tile_flag == "air-unpassable") {
 					terrain->Flags |= MapFieldAirUnpassable;
 				} else if (tile_flag == "desert") {
@@ -1480,8 +1470,6 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldRoad;
 				} else if (tile_flag == "no-rail") {
 					terrain->Flags |= MapFieldNoRail;
-				} else if (tile_flag == "stumps") {
-					terrain->Flags |= MapFieldStumps;
 				} else {
 					LuaError(l, "Flag \"%s\" doesn't exist." _C_ tile_flag.c_str());
 				}

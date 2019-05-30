@@ -2208,7 +2208,7 @@ void CUnit::GenerateDrop()
 		
 	if (chosen_drop != nullptr) {
 		CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
-		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->MapLayer->Field(drop_pos)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
+		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->MapLayer->Field(drop_pos)->GetFlags() & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
 			if (!CMap::Map.Info.IsPointOnMap(resPos, this->MapLayer->ID)) {
@@ -3993,7 +3993,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 					}
 					Vec2i building_tile_pos(x, y);
 					CMapField &mf = *this->MapLayer->Field(building_tile_pos);
-					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad) || (mf.Flags & MapFieldWall)) {
+					if ((mf.GetFlags() & MapFieldRoad) || (mf.GetFlags() & MapFieldRailroad) || (mf.GetFlags() & MapFieldWall)) {
 						CMap::Map.RemoveTileOverlayTerrain(building_tile_pos, this->MapLayer->ID);
 					}
 					//remove decorations if a building has been built here
@@ -8426,9 +8426,9 @@ void CUnit::HandleBuffsEachSecond()
 		if ((this->GetVariableValue(DESERTSTALK_INDEX) > 0 || this->GetVariableValue(FORESTSTALK_INDEX) > 0 || this->GetVariableValue(SWAMPSTALK_INDEX) > 0) && CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)) {
 			if (
 				(
-					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldDesert))
-					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && CMap::Map.TileBordersFlag(this->tilePos, this->MapLayer->ID, MapFieldForest))
-					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldMud))
+					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetFlags() & MapFieldDesert))
+					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && this->MapLayer->TileBlockHasTree(this->tilePos - 1, this->Type->TileSize + 2))
+					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetFlags() & MapFieldMud))
 				)
 				&& (this->GetVariableValue(INVISIBLE_INDEX) > 0 || !this->IsInCombat())
 			) {				
@@ -8445,7 +8445,7 @@ void CUnit::HandleBuffsEachSecond()
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			this->Type->BoolFlag[ORGANIC_INDEX].value
 			&& CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)
-			&& (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldDesert)
+			&& (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetFlags() & MapFieldDesert)
 			&& this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Owner != this->Player->GetIndex()
 			&& this->MapLayer->GetTimeOfDay() != nullptr
 			&& this->MapLayer->GetTimeOfDay()->IsDay()

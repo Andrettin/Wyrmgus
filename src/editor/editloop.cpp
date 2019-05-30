@@ -206,7 +206,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	
 	//Wyrmgus start
 	int value = 0;
-	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
+	if (terrain->Resource != -1) {
 		value = CResource::GetAll()[terrain->Resource]->DefaultAmount;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
@@ -1385,15 +1385,13 @@ static void DrawEditorInfo()
 	//
 	// Flags info
 	//
-	const unsigned flag = mf.getFlag();
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	const unsigned flag = mf.GetFlags();
+	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.Value, flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldAirUnpassable   ? 'A' : '-',
 			flag & MapFieldNoBuilding   ? 'n' : '-',
 			flag & MapFieldWall         ? 'w' : '-',
-			flag & MapFieldRocks        ? 'r' : '-',
-			flag & MapFieldForest       ? 'f' : '-',
 			flag & MapFieldLandAllowed  ? 'L' : '-',
 			flag & MapFieldCoastAllowed ? 'C' : '-',
 			flag & MapFieldWaterAllowed ? 'W' : '-',
@@ -1402,7 +1400,6 @@ static void DrawEditorInfo()
 			flag & MapFieldSeaUnit      ? 's' : '-',
 			flag & MapFieldBuilding     ? 'b' : '-',
 			flag & MapFieldItem         ? 'i' : '-',
-			flag & MapFieldStumps       ? 't' : '-',
 			flag & MapFieldBridge       ? 'B' : '-');
 
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);

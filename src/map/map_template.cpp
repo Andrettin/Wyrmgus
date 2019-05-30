@@ -694,7 +694,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 						}
 						
 						if (historical_terrain) {
-							if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+							if (historical_terrain->Overlay && ((historical_terrain->GetFlags() & MapFieldRoad) || (historical_terrain->GetFlags() & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->GetFlags() & MapFieldLandAllowed)) {
 								continue;
 							}
 							CMap::Map.Field(real_pos, z)->SetTerrain(historical_terrain);
@@ -1217,7 +1217,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				
 				const CUnitType *unit_type = CFaction::GetFactionClassUnitType(site_owner, unit_class);
 				if (unit_type != nullptr && unit_type->TerrainType) {
-					if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
+					if ((unit_type->TerrainType->GetFlags() & MapFieldRoad) || (unit_type->TerrainType->GetFlags() & MapFieldRailroad)) {
 						pathway_type = unit_type;
 					}
 				}
@@ -1289,7 +1289,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 								continue;
 							}
 							CMapField &mf = *unit->MapLayer->Field(x, y);
-							if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+							if (mf.GetFlags() & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 								continue;
 							}
 							Vec2i pathway_pos(x, y);

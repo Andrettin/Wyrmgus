@@ -1106,7 +1106,7 @@ bool PointToPointMissile(Missile &missile)
 				return false;
 			}
 			const CMapField &mf = *CMap::Map.Field(tilePos, missile.MapLayer);
-			if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
+			if (missile.Type->MissileStopFlags & mf.GetFlags()) { // incompatible terrain
 				missile.position = position;
 				missile.MissileHit();
 				missile.TTL = 0;
