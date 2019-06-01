@@ -306,27 +306,13 @@ void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2)
 
 	//Wyrmgus start
 //	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS, CORNER_PIXELS);
-	} else
-#endif
-	{
-		Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-	}
+	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS, CORNER_PIXELS);
 	//Wyrmgus end
 	Video.DrawHLineClip(color, x1, y2, CORNER_PIXELS - 1);
 
 	//Wyrmgus start
 //	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS, CORNER_PIXELS);
-	} else
-#endif
-	{
-		Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-	}
+	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS, CORNER_PIXELS);
 	//Wyrmgus end
 	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
 }

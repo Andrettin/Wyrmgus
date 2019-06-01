@@ -117,7 +117,6 @@ bool CAge::ProcessConfigDataSection(const CConfigData *section)
 		
 		this->G = CGraphic::New(file, size.x, size.y);
 		this->G->Load();
-		this->G->UseDisplayFormat();
 	} else if (section->Tag == "predependencies") {
 		this->Predependency = new CAndDependency;
 		this->Predependency->ProcessConfigData(section);

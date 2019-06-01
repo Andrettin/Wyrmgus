@@ -100,69 +100,7 @@ void CGraphic::DrawClip(int x, int y) const
 void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface) const
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		DrawTexture(this, Textures, gx, gy, gx + w, gy + h, x, y, 0);
-	} else
-#endif
-	{
-		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		//Wyrmgus start
-//		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
-		SDL_BlitSurface(surface ? surface : Surface, &srect, TheScreen, &drect);
-		//Wyrmgus end
-		//Wyrmgus start
-		//code for drawing a scaled image under xBRZ - use later for implementing zoom mode
-		/*
-		SDL_Rect srect = {Sint16(gx * 2), Sint16(gy * 2), Uint16(w * 2), Uint16(h * 2)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		SDL_LockSurface(Surface);
-		
-		SDL_Surface *neutral_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,1,1,32,0xFF0000,0xFF00,0xFF,0xFF000000);
-		SDL_PixelFormat format = *neutral_surface->format;
-		
-		int Rmask = format.Rmask;
-		int Gmask = format.Gmask;
-		int Bmask = format.Bmask;
-		int Amask = format.Amask;
-		int bpp = format.BitsPerPixel;
-		
-		SDL_Surface *src = SDL_ConvertSurface(Surface,&format,SDL_SWSURFACE);
-							 
-		SDL_Surface *dst = SDL_CreateRGBSurface(SDL_SWSURFACE, Width * 2, Height * 2,
-							 bpp, Rmask, Gmask, Bmask, Amask);
-		SDL_LockSurface(src);
-		SDL_LockSurface(dst);
-		const Uint32* old_pixels = reinterpret_cast<const Uint32*>(src->pixels);
-		Uint32* new_pixels = reinterpret_cast<Uint32*>(dst->pixels);
-		xbrz::scale(2, old_pixels, new_pixels, Width, Height);
-		SDL_SetAlpha(SDL_DisplayFormatAlpha(dst),SDL_SRCALPHA|SDL_RLEACCEL,SDL_ALPHA_OPAQUE);
-		SDL_UnlockSurface(Surface);
-		SDL_UnlockSurface(src);
-		SDL_UnlockSurface(dst);
-		SDL_BlitSurface(dst, &srect, TheScreen, &drect);
-
-		unsigned char *src_pixels = nullptr;
-
-		if (src->flags & SDL_PREALLOC) {
-			src_pixels = (unsigned char *)src->pixels;
-		}
-		SDL_FreeSurface(src);
-		delete[] src_pixels;
-		src = nullptr;
-
-		unsigned char *dst_pixels = nullptr;
-
-		if (dst->flags & SDL_PREALLOC) {
-			dst_pixels = (unsigned char *)dst->pixels;
-		}
-		SDL_FreeSurface(dst);
-		delete[] dst_pixels;
-		dst = nullptr;
-		*/
-		//Wyrmgus end
-	}
+	DrawTexture(this, Textures, gx, gy, gx + w, gy + h, x, y, 0);
 }
 
 //Wyrmgus start
@@ -179,28 +117,10 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 */
 void CPlayerColorGraphic::DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player, nullptr);
-		}
-		DrawTexture(this, PlayerColorTextures[player], gx, gy, gx + w, gy + h, x, y, 0);
-	} else
-#endif
-	{
-		//Wyrmgus start
-//		GraphicPlayerPixels(player, *this);
-		//Wyrmgus end
-		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		//Wyrmgus start
-//		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
-		if (!PlayerColorSurfaces[player]) {
-			MakePlayerColorSurface(player, true, nullptr);
-		}
-		SDL_BlitSurface(PlayerColorSurfaces[player], &srect, TheScreen, &drect);
-		//Wyrmgus end
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player, nullptr);
 	}
+	DrawTexture(this, PlayerColorTextures[player], gx, gy, gx + w, gy + h, x, y, 0);
 }
 //Wyrmgus end
 
@@ -265,32 +185,10 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 							unsigned char alpha, SDL_Surface *surface) const
 							//Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		DrawSub(gx, gy, w, h, x, y);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		//Wyrmgus start
-		/*
-		int oldalpha = Surface->format->alpha;
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
-		DrawSub(gx, gy, w, h, x, y);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
-		*/
-		if (!surface) {
-			surface = Surface;
-		}
-		
-		int oldalpha = surface->format->alpha;
-		SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
-		DrawSub(gx, gy, w, h, x, y, surface);
-		SDL_SetAlpha(surface, SDL_SRCALPHA, oldalpha);
-		//Wyrmgus end
-	}
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawSub(gx, gy, w, h, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 /**
@@ -328,19 +226,10 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 */
 void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
-					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
-	} else
-#endif
-	{
-		DrawSub(frame_map[frame].x, frame_map[frame].y,
-				Width, Height, x, y);
-	}
+	DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
+				frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 void CGraphic::DoDrawFrameClip(GLuint *textures,
 							   unsigned frame, int x, int y, int show_percent) const
 {
@@ -356,7 +245,6 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 				frame_map[frame].x + ox + (w),
 				frame_map[frame].y + oy + (h * show_percent / 100), x, y, 0);
 }
-#endif
 
 /**
 **  Draw graphic object clipped.
@@ -370,49 +258,25 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day, SDL_Surface *surface, int show_percent)
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		//Wyrmgus start
-//		DoDrawFrameClip(Textures, frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			DoDrawFrameClip(Textures, frame, x, y, show_percent);
-		} else {
-			if (TextureColorModifications.find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == TextureColorModifications.end()) {
-				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClip(TextureColorModifications[UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y, show_percent);
+	//Wyrmgus start
+//	DoDrawFrameClip(Textures, frame, x, y);
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		DoDrawFrameClip(Textures, frame, x, y, show_percent);
+	} else {
+		if (TextureColorModifications.find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == TextureColorModifications.end()) {
+			MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
 		}
-		//Wyrmgus end
-	} else
-#endif
-	{
-		//Wyrmgus start
-		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(UI.CurrentMapLayer->GetTimeOfDay(), false);
-		}
-		//Wyrmgus end
-		DrawSubClip(frame_map[frame].x, frame_map[frame].y,
-					//Wyrmgus start
-//					Width, Height, x, y);
-					Width, Height * show_percent / 100, x, y, surface);
-					//Wyrmgus end
+		DoDrawFrameClip(TextureColorModifications[UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y, show_percent);
 	}
+	//Wyrmgus end
 }
 
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		DrawFrame(frame, x, y);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
-					 Width, Height, x, y, alpha);
-	}
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrame(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 //Wyrmgus start
@@ -420,178 +284,14 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, SDL_Surface *surface, int show_percent)
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		//Wyrmgus start
-//		DrawFrameClip(frame, x, y);
-		DrawFrameClip(frame, x, y, ignore_time_of_day, surface, show_percent);
-		//Wyrmgus end
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		//Wyrmgus start
-		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(UI.CurrentMapLayer->GetTimeOfDay(), false);
-		}
-		//Wyrmgus end
-		DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
-						 //Wyrmgus start
-//						 Width, Height, x, y, alpha);
-						 Width, Height * show_percent / 100, x, y, alpha, surface);
-						 //Wyrmgus end
-	}
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	//Wyrmgus start
+//	DrawFrameClip(frame, x, y);
+	DrawFrameClip(frame, x, y, ignore_time_of_day, surface, show_percent);
+	//Wyrmgus end
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
-
-//Wyrmgus start
-void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped, CTimeOfDay *time_of_day)
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		return;
-	}
-#endif
-	SDL_Surface *surface = nullptr;
-	if (time_of_day && time_of_day->IsDawn()) {
-		if (flipped) {
-			surface = PlayerColorSurfacesDawnFlip[player_color];
-		} else {
-			surface = PlayerColorSurfacesDawn[player_color];
-		}
-	} else if (time_of_day && time_of_day->IsDusk()) {
-		if (flipped) {
-			surface = PlayerColorSurfacesDuskFlip[player_color];
-		} else {
-			surface = PlayerColorSurfacesDusk[player_color];
-		}
-	} else if (time_of_day && time_of_day->IsNight()) {
-		if (flipped) {
-			surface = PlayerColorSurfacesNightFlip[player_color];
-		} else {
-			surface = PlayerColorSurfacesNight[player_color];
-		}
-	} else {
-		if (flipped) {
-			surface = PlayerColorSurfacesFlip[player_color];
-		} else {
-			surface = PlayerColorSurfaces[player_color];
-		}
-	}
-
-	if (surface) {
-		return;
-	}
-	
-	SDL_Surface *base_surface = flipped ? SurfaceFlip : Surface;
-	
-	if (time_of_day && time_of_day->IsDawn()) {
-		if (flipped) {
-			surface = PlayerColorSurfacesDawnFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		} else {
-			surface = PlayerColorSurfacesDawn[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		}
-	} else if (time_of_day && time_of_day->IsDusk()) {
-		if (flipped) {
-			surface = PlayerColorSurfacesDuskFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		} else {
-			surface = PlayerColorSurfacesDusk[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		}
-	} else if (time_of_day && time_of_day->IsNight()) {
-		if (flipped) {
-			surface = PlayerColorSurfacesNightFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		} else {
-			surface = PlayerColorSurfacesNight[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		}
-	} else {
-		if (flipped) {
-			surface = PlayerColorSurfacesFlip[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		} else {
-			surface = PlayerColorSurfaces[player_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
-		}
-	}
-
-	if (base_surface->flags & SDL_SRCCOLORKEY) {
-		SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, base_surface->format->colorkey);
-	}
-	if (surface->format->BytesPerPixel == 1) {
-		VideoPaletteListAdd(surface);
-	}
-	
-	int found_player_color = -1;
-	
-	int time_of_day_red = 0;
-	int time_of_day_green = 0;
-	int time_of_day_blue = 0;
-	
-	if (!this->Grayscale) { // don't alter the colors of grayscale graphics
-		if (time_of_day && time_of_day->IsDawn()) { // dawn
-			time_of_day_red = -20;
-			time_of_day_green = -20;
-			time_of_day_blue = 0;
-		} else if (time_of_day && time_of_day->IsDusk()) { // dusk
-			time_of_day_red = 0;
-			time_of_day_green = -20;
-			time_of_day_blue = -20;
-		} else if (time_of_day && time_of_day->IsNight()) { // night
-			time_of_day_red = -45;
-			time_of_day_green = -35;
-			time_of_day_blue = -10;
-		}
-	}
-	
-	SDL_LockSurface(surface);
-	
-	switch (surface->format->BytesPerPixel) {
-		case 1: {
-			SDL_Color colors[256];
-			SDL_Palette &pal = *surface->format->palette;
-			for (int i = 0; i < 256; ++i) {
-				int red = pal.colors[i].r;
-				int green = pal.colors[i].g;
-				int blue = pal.colors[i].b;
-				
-				if (player_color != -1 && !this->Grayscale) {
-					for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
-						if (PlayerColorNames[k].empty()) {
-							break;
-						}
-						if (ConversiblePlayerColors[k] == player_color) {
-							continue;
-						}
-							
-						for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
-							if (pal.colors[i].r == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && pal.colors[i].g == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && pal.colors[i].b == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
-								red = PlayerColorsRGB[player_color][z].R;
-								green = PlayerColorsRGB[player_color][z].G;
-								blue = PlayerColorsRGB[player_color][z].B;
-								
-								if (found_player_color == -1) {
-									found_player_color = ConversiblePlayerColors[k];
-								} else if (found_player_color != ConversiblePlayerColors[k]) {
-									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", this->File.c_str(), PlayerColorNames[ConversiblePlayerColors[k]].c_str(), PlayerColorNames[found_player_color].c_str());
-								}
-							}
-						}
-					}
-				}
-				
-				colors[i].r = std::max<int>(0,std::min<int>(255,int(red) + time_of_day_red));
-				colors[i].g = std::max<int>(0,std::min<int>(255,int(green) + time_of_day_green));
-				colors[i].b = std::max<int>(0,std::min<int>(255,int(blue) + time_of_day_blue));;
-			}
-			SDL_SetColors(surface, &colors[0], 0, 256);
-			break;
-		}
-		case 4: {
-			break;
-		}
-	}
-	
-	SDL_UnlockSurface(surface);
-}
-//Wyrmgus end
 
 /**
 **  Draw graphic object clipped and with player colors.
@@ -614,62 +314,27 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 			break;
 		}
 	}
-	
 	//Wyrmgus end
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		//Wyrmgus start
-		/*
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player);
-		}
-		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			if (!PlayerColorTextures[player]) {
-				MakePlayerColorTexture(this, player, nullptr);
-			}
-			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
-		} else {
-			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClip(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y, show_percent);
-		}
-		//Wyrmgus end
-	} else
-#endif
-	{
-		//Wyrmgus start
-//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
-
-		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
-			if (!PlayerColorSurfaces[player]) {
-				MakePlayerColorSurface(player, false, nullptr);
-			}
-			surface = PlayerColorSurfaces[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
-			if (!PlayerColorSurfacesDawn[player]) {
-				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDawn[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
-			if (!PlayerColorSurfacesDusk[player]) {
-				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDusk[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
-			if (!PlayerColorSurfacesNight[player]) {
-				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesNight[player];
-		}
-		
-//		DrawFrameClip(frame, x, y);
-		DrawFrameClip(frame, x, y, true, surface);
-		//Wyrmgus end
+	
+	//Wyrmgus start
+	/*
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player);
 	}
+	DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
+	*/
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		if (!PlayerColorTextures[player]) {
+			MakePlayerColorTexture(this, player, nullptr);
+		}
+		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
+	} else {
+		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
+			MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
+		}
+		DoDrawFrameClip(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y, show_percent);
+	}
+	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -681,69 +346,35 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 			break;
 		}		
 	}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		//Wyrmgus start
-		/*
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player);
-		}
-		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			if (!PlayerColorTextures[player]) {
-				MakePlayerColorTexture(this, player, nullptr);
-			}
-		} else {
-			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-		}
-		//Wyrmgus end
-		
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		//Wyrmgus start
-//		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
-		} else {
-			DoDrawFrameClip(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y, show_percent);
-		}
-		//Wyrmgus end
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		//Wyrmgus start
-//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
-		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
-			if (!PlayerColorSurfaces[player]) {
-				MakePlayerColorSurface(player, false, nullptr);
-			}
-			surface = PlayerColorSurfaces[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
-			if (!PlayerColorSurfacesDawn[player]) {
-				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDawn[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
-			if (!PlayerColorSurfacesDusk[player]) {
-				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDusk[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
-			if (!PlayerColorSurfacesNight[player]) {
-				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesNight[player];
-		}
-		
-//		DrawFrameClipTrans(frame, x, y, alpha);
-		DrawFrameClipTrans(frame, x, y, alpha, true, surface);
-		//Wyrmgus end
+	//Wyrmgus start
+	/*
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player);
 	}
+	*/
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		if (!PlayerColorTextures[player]) {
+			MakePlayerColorTexture(this, player, nullptr);
+		}
+	} else {
+		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
+			MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
+		}
+	}
+	//Wyrmgus end
+	
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	//Wyrmgus start
+//	DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
+	} else {
+		DoDrawFrameClip(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y, show_percent);
+	}
+	//Wyrmgus end
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 //Wyrmgus start
@@ -759,69 +390,35 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 		}		
 	}
 	//Wyrmgus end
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		//Wyrmgus start
-		/*
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player);
-		}
-		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			if (!PlayerColorTextures[player]) {
-				MakePlayerColorTexture(this, player, nullptr);
-			}
-		} else {
-			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-		}
-		//Wyrmgus end
-		
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		//Wyrmgus start
-//		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else {
-			DoDrawFrameClipX(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y);
-		}
-		//Wyrmgus end
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		//Wyrmgus start
-//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
-		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
-			if (!PlayerColorSurfacesFlip[player]) {
-				MakePlayerColorSurface(player, true, nullptr);
-			}
-			surface = PlayerColorSurfacesFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
-			if (!PlayerColorSurfacesDawnFlip[player]) {
-				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDawnFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
-			if (!PlayerColorSurfacesDuskFlip[player]) {
-				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDuskFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
-			if (!PlayerColorSurfacesNightFlip[player]) {
-				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesNightFlip[player];
-		}
-		
-//		DrawFrameClipTransX(frame, x, y, alpha);
-		DrawFrameClipTransX(frame, x, y, alpha, true, surface);
-		//Wyrmgus end
+	//Wyrmgus start
+	/*
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player);
 	}
+	*/
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		if (!PlayerColorTextures[player]) {
+			MakePlayerColorTexture(this, player, nullptr);
+		}
+	} else {
+		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
+			MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
+		}
+	}
+	//Wyrmgus end
+	
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	//Wyrmgus start
+//	DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+	} else {
+		DoDrawFrameClipX(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y);
+	}
+	//Wyrmgus end
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 //Wyrmgus end
 
@@ -834,21 +431,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 */
 void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
-					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
-	} else
-#endif
-	{
-		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-
-		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	}
+	DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
+				frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 								int x, int y) const
 {
@@ -872,7 +458,6 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 				frame_map[frame].x + ox + w,
 				frame_map[frame].y + oy + h, x, y, 1);
 }
-#endif
 
 /**
 **  Draw graphic object clipped and flipped in X direction.
@@ -886,68 +471,25 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		//Wyrmgus start
-		//DoDrawFrameClipX(Textures, frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			DoDrawFrameClipX(Textures, frame, x, y);
-		} else {
-			if (TextureColorModifications.find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == TextureColorModifications.end()) {
-				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClipX(TextureColorModifications[UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y);
+	//Wyrmgus start
+	//DoDrawFrameClipX(Textures, frame, x, y);
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
+		DoDrawFrameClipX(Textures, frame, x, y);
+	} else {
+		if (TextureColorModifications.find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == TextureColorModifications.end()) {
+			MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
 		}
-		//Wyrmgus end
-	} else
-#endif
-	{
-		//Wyrmgus start
-		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(UI.CurrentMapLayer->GetTimeOfDay(), true);
-		}
-		//Wyrmgus end
-		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-
-		const int oldx = x;
-		const int oldy = y;
-		CLIP_RECTANGLE(x, y, srect.w, srect.h);
-		srect.x += x - oldx;
-		srect.y += y - oldy;
-
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-
-		//Wyrmgus start
-//		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		
-		if (!surface) {
-			surface = SurfaceFlip;
-		}
-
-		SDL_BlitSurface(surface, &srect, TheScreen, &drect);
-		//Wyrmgus end
+		DoDrawFrameClipX(TextureColorModifications[UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y);
 	}
+	//Wyrmgus end
 }
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		DrawFrameX(frame, x, y);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		const int oldalpha = Surface->format->alpha;
-
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
-		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
-	}
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrameX(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 //Wyrmgus start
@@ -955,52 +497,13 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		//Wyrmgus start
-//		DrawFrameClipX(frame, x, y);
-		DrawFrameClipX(frame, x, y, ignore_time_of_day);
-		//Wyrmgus end
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		//Wyrmgus start
-		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(UI.CurrentMapLayer->GetTimeOfDay(), true);
-		}
-		//Wyrmgus end
-		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-
-		const int oldx = x;
-		const int oldy = y;
-		CLIP_RECTANGLE(x, y, srect.w, srect.h);
-		srect.x += x - oldx;
-		srect.y += y - oldy;
-
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		//Wyrmgus start
-		/*
-		const int oldalpha = SurfaceFlip->format->alpha;
-
-		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
-		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
-		*/
-		
-		if (!surface) {
-			surface = SurfaceFlip;
-		}
-		
-		const int oldalpha = surface->format->alpha;
-
-		SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
-		SDL_BlitSurface(surface, &srect, TheScreen, &drect);
-		SDL_SetAlpha(surface, SDL_SRCALPHA, oldalpha);
-		//Wyrmgus end
-	}
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	//Wyrmgus start
+//	DrawFrameClipX(frame, x, y);
+	DrawFrameClipX(frame, x, y, ignore_time_of_day);
+	//Wyrmgus end
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 /**
@@ -1025,60 +528,26 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 		}		
 	}
 	//Wyrmgus end
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		//Wyrmgus start
-		/*
+
+	//Wyrmgus start
+	/*
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player);
+	}
+	DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+	*/
+	if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player);
+			MakePlayerColorTexture(this, player, nullptr);
 		}
 		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
-			if (!PlayerColorTextures[player]) {
-				MakePlayerColorTexture(this, player, nullptr);
-			}
-			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else {
-			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClipX(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y);
+	} else {
+		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()) == PlayerColorTextureColorModifications[player].end()) {
+			MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
 		}
-		//Wyrmgus end
-	} else
-#endif
-	{
-		//Wyrmgus start
-//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
-
-		SDL_Surface *surface = nullptr;
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->IsDay()) {
-			if (!PlayerColorSurfacesFlip[player]) {
-				MakePlayerColorSurface(player, true, nullptr);
-			}
-			surface = PlayerColorSurfacesFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDawn()) {
-			if (!PlayerColorSurfacesDawnFlip[player]) {
-				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDawnFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsDusk()) {
-			if (!PlayerColorSurfacesDuskFlip[player]) {
-				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesDuskFlip[player];
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->IsNight()) {
-			if (!PlayerColorSurfacesNightFlip[player]) {
-				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			surface = PlayerColorSurfacesNightFlip[player];
-		}
-		
-//		DrawFrameClipX(frame, x, y);
-		DrawFrameClipX(frame, x, y, true, surface);
-		//Wyrmgus end
+		DoDrawFrameClipX(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->GetColorModification()], frame, x, y);
 	}
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -1274,14 +743,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 void CGraphic::GenFramesMap()
 {
 	Assert(NumFrames != 0);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		Assert(GraphicWidth != 0);
-	} else
-#endif
-	{
-		Assert(Surface != nullptr);
-	}
+	Assert(GraphicWidth != 0);
 	Assert(Width != 0);
 	Assert(Height != 0);
 
@@ -1290,16 +752,8 @@ void CGraphic::GenFramesMap()
 	frame_map = new frame_pos_t[NumFrames];
 
 	for (int frame = 0; frame < NumFrames; ++frame) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			frame_map[frame].x = (frame % (GraphicWidth / Width)) * Width;
-			frame_map[frame].y = (frame / (GraphicWidth / Width)) * Height;
-		} else
-#endif
-		{
-			frame_map[frame].x = (frame % (Surface->w / Width)) * Width;
-			frame_map[frame].y = (frame / (Surface->w / Width)) * Height;
-		}
+		frame_map[frame].x = (frame % (GraphicWidth / Width)) * Width;
+		frame_map[frame].y = (frame / (GraphicWidth / Width)) * Height;
 	}
 }
 
@@ -1507,12 +961,9 @@ void CGraphic::Load(bool grayscale)
 	}
 	*/
 	
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		MakeTexture(this);
-		Graphics.push_back(this);
-	}
-#endif
+	MakeTexture(this);
+	Graphics.push_back(this);
+
 	GenFramesMap();
 }
 
@@ -1554,105 +1005,41 @@ void CGraphic::Free(CGraphic *g)
 
 	--g->Refs;
 	if (!g->Refs) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		// No more uses of this graphic
-		if (UseOpenGL) {
-			if (g->Textures) {
-				glDeleteTextures(g->NumTextures, g->Textures);
-				delete[] g->Textures;
-			}
-			
-			for (std::map<CColor, GLuint *>::iterator iterator = g->TextureColorModifications.begin(); iterator != g->TextureColorModifications.end(); ++iterator) {
-				glDeleteTextures(g->NumTextures, iterator->second);
-				delete[] iterator->second;
-			}
-			g->TextureColorModifications.clear();
-
-			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-			if (cg) {
-				for (int i = 0; i < PlayerColorMax; ++i) {
-					if (cg->PlayerColorTextures[i]) {
-						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
-						delete[] cg->PlayerColorTextures[i];
-					}
-				}
-					
-				for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
-					for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
-						glDeleteTextures(cg->NumTextures, sub_iterator->second);
-						delete[] sub_iterator->second;
-					}
-					iterator->second.clear();
-				}
-				cg->PlayerColorTextureColorModifications.clear();
-			}
-			Graphics.remove(g);
+		if (g->Textures) {
+			glDeleteTextures(g->NumTextures, g->Textures);
+			delete[] g->Textures;
 		}
-#endif
+		
+		for (std::map<CColor, GLuint *>::iterator iterator = g->TextureColorModifications.begin(); iterator != g->TextureColorModifications.end(); ++iterator) {
+			glDeleteTextures(g->NumTextures, iterator->second);
+			delete[] iterator->second;
+		}
+		g->TextureColorModifications.clear();
+
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+		if (cg) {
+			for (int i = 0; i < PlayerColorMax; ++i) {
+				if (cg->PlayerColorTextures[i]) {
+					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
+					delete[] cg->PlayerColorTextures[i];
+				}
+			}
+				
+			for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
+				for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
+					glDeleteTextures(cg->NumTextures, sub_iterator->second);
+					delete[] sub_iterator->second;
+				}
+				iterator->second.clear();
+			}
+			cg->PlayerColorTextureColorModifications.clear();
+		}
+		Graphics.remove(g);
 
 		FreeSurface(&g->Surface);
 		delete[] g->frame_map;
 		g->frame_map = nullptr;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (!UseOpenGL)
-#endif
-		{
-			FreeSurface(&g->SurfaceFlip);
-			delete[] g->frameFlip_map;
-			g->frameFlip_map = nullptr;
-			
-			//Wyrmgus start
-			if (g->DawnSurface) {
-				FreeSurface(&g->DawnSurface);
-			}
-			if (g->DawnSurfaceFlip) {
-				FreeSurface(&g->DawnSurfaceFlip);
-			}
-			if (g->DuskSurface) {
-				FreeSurface(&g->DuskSurface);
-			}
-			if (g->DuskSurfaceFlip) {
-				FreeSurface(&g->DuskSurfaceFlip);
-			}
-			if (g->NightSurface) {
-				FreeSurface(&g->NightSurface);
-			}
-			if (g->NightSurfaceFlip) {
-				FreeSurface(&g->NightSurfaceFlip);
-			}
-
-			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-			if (cg) {
-				for (int i = 0; i < PlayerColorMax; ++i) {
-					if (cg->PlayerColorSurfaces[i]) {
-						FreeSurface(&cg->PlayerColorSurfaces[i]);
-					}
-					if (cg->PlayerColorSurfacesFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesFlip[i]);
-					}
-					if (cg->PlayerColorSurfacesDawn[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDawn[i]);
-					}
-					if (cg->PlayerColorSurfacesDawnFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDawnFlip[i]);
-					}
-					if (cg->PlayerColorSurfacesDusk[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDusk[i]);
-					}
-					if (cg->PlayerColorSurfacesDuskFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDuskFlip[i]);
-					}
-					if (cg->PlayerColorSurfacesNight[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesNight[i]);
-					}
-					if (cg->PlayerColorSurfacesNightFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesNightFlip[i]);
-					}
-				}
-			}
-			//Wyrmgus end
-		}
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
@@ -1660,8 +1047,6 @@ void CGraphic::Free(CGraphic *g)
 		delete g;
 	}
 }
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
 
 /**
 **  Free OpenGL graphics
@@ -1739,163 +1124,6 @@ void ReloadGraphics()
 		}
 	}
 }
-
-#endif
-
-/**
-**  Flip graphic and store in graphic->SurfaceFlip
-*/
-void CGraphic::Flip()
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		return;
-	}
-#endif
-	if (SurfaceFlip) {
-		return;
-	}
-
-	SDL_Surface *s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
-	if (Surface->flags & SDL_SRCCOLORKEY) {
-		SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL, Surface->format->colorkey);
-	}
-	if (SurfaceFlip->format->BytesPerPixel == 1) {
-		VideoPaletteListAdd(SurfaceFlip);
-	}
-	SDL_LockSurface(Surface);
-	SDL_LockSurface(s);
-	switch (s->format->BytesPerPixel) {
-		case 1:
-			for (int i = 0; i < s->h; ++i) {
-				for (int j = 0; j < s->w; ++j) {
-					((char *)s->pixels)[j + i * s->pitch] =
-						((char *)Surface->pixels)[s->w - j - 1 + i * Surface->pitch];
-				}
-			}
-			break;
-		case 3:
-			for (int i = 0; i < s->h; ++i) {
-				for (int j = 0; j < s->w; ++j) {
-					memcpy(&((char *)s->pixels)[j + i * s->pitch],
-						   &((char *)Surface->pixels)[(s->w - j - 1) * 3 + i * Surface->pitch], 3);
-				}
-			}
-			break;
-		//Wyrmgus start
-//		case 4: {
-		case 4:
-		//Wyrmgus end
-			//Wyrmgus start
-			for (int i = 0; i < s->h; ++i) {
-				for (int j = 0; j < s->w; ++j) {
-					*(Uint32 *)&((Uint8 *)s->pixels)[((s->w - j - 1) + i * s->w) * 4] = *(Uint32 *)&((Uint8 *)Surface->pixels)[j * 4 + i * Surface->pitch];
-				}
-			}
-			break;
-			/*
-			unsigned int p0 = s->pitch;
-			unsigned int p1 = Surface->pitch;
-			const int width = s->w;
-			int j = 0;
-			for (int i = 0; i < s->h; ++i) {
-#ifdef _MSC_VER
-				for (j = 0; j < width; ++j) {
-					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-						*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-				}
-#else
-				int n = (width + 7) / 8;
-				switch (width & 7) {
-					case 0: do {
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 7:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 6:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 5:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 4:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 3:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 2:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 1:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						} while (--n > 0);
-				}
-#endif
-				p0 += s->pitch;
-				p1 += Surface->pitch;
-			}
-		}
-		break;
-		*/
-		//Wyrmgus end
-	}
-	SDL_UnlockSurface(Surface);
-	SDL_UnlockSurface(s);
-
-	delete[] frameFlip_map;
-
-	frameFlip_map = new frame_pos_t[NumFrames];
-
-	for (int frame = 0; frame < NumFrames; ++frame) {
-		frameFlip_map[frame].x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
-															 Width)) * Width) - Width;
-		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
-	}
-}
-
-/**
-**  Convert the SDL surface to the display format
-*/
-void CGraphic::UseDisplayFormat()
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) { return; }
-#endif
-
-	SDL_Surface *s = Surface;
-
-	if (s->format->Amask != 0) {
-		Surface = SDL_DisplayFormatAlpha(s);
-	} else {
-		Surface = SDL_DisplayFormat(s);
-	}
-	VideoPaletteListRemove(s);
-	SDL_FreeSurface(s);
-
-	if (SurfaceFlip) {
-		s = SurfaceFlip;
-		if (s->format->Amask != 0) {
-			SurfaceFlip = SDL_DisplayFormatAlpha(s);
-		} else {
-			SurfaceFlip = SDL_DisplayFormat(s);
-		}
-		VideoPaletteListRemove(s);
-		SDL_FreeSurface(s);
-	}
-}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
 
 /**
 **  Find the next power of 2 >= x
@@ -2223,8 +1451,6 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, int player, CTimeOfDay *time
 	//Wyrmgus end
 }
 
-#endif
-
 /**
 **  Resize a graphic
 **
@@ -2348,14 +1574,13 @@ void CGraphic::Resize(int w, int h)
 	Width = GraphicWidth = w;
 	Height = GraphicHeight = h;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && Textures) {
+	if (Textures) {
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
 		Textures = nullptr;
 		MakeTexture(this);
 	}
-#endif
+
 	GenFramesMap();
 }
 
@@ -2378,25 +1603,12 @@ void CGraphic::SetOriginalSize()
 	}
 	delete[] frame_map;
 	frame_map = nullptr;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (SurfaceFlip) {
-			FreeSurface(&SurfaceFlip);
-			SurfaceFlip = nullptr;
-		}
-		delete[] frameFlip_map;
-		frameFlip_map = nullptr;
-	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && Textures) {
+	if (Textures) {
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
 		Textures = nullptr;
 	}
-#endif
 
 	this->Width = this->Height = 0;
 	this->Surface = nullptr;
@@ -2584,25 +1796,12 @@ void CGraphic::MakeShadow()
 	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 192);
 	//Wyrmgus end
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		if (Textures) {
-			glDeleteTextures(NumTextures, Textures);
-			delete[] Textures;
-			Textures = nullptr;
-		}
-		MakeTexture(this);
-	} else
-#endif
-	{
-		if (SurfaceFlip) {
-			SDL_SetPalette(SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-			//Wyrmgus start
-//			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 192);
-			//Wyrmgus end
-		}
+	if (Textures) {
+		glDeleteTextures(NumTextures, Textures);
+		delete[] Textures;
+		Textures = nullptr;
 	}
+	MakeTexture(this);
 }
 
 void FreeGraphics()
@@ -2721,7 +1920,6 @@ void CFiller::Load()
 	if (G) {
 		G->Load();
 		map.Init(G);
-		G->UseDisplayFormat();
 	}
 	//Wyrmgus start
 	if (this->X < 0) {

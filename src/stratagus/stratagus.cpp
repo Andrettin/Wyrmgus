@@ -293,7 +293,6 @@ static int MenuLoop()
 	InterfaceState = IfaceStateMenu;
 	//  Clear screen
 	Video.ClearScreen();
-	Invalidate();
 
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
@@ -457,10 +456,6 @@ static void Usage()
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-N name\t\tName of the player\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
-		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
-#endif
 		"\t-p\t\tEnables debug messages printing in console\n"
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
@@ -468,13 +463,11 @@ static void Usage()
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		"\t-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
 		"\t  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
 		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
 		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
-		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
-#endif
+		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style).\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -567,21 +560,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'N':
 				parameters.LocalPlayerName = optarg;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'o':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 0;
-				if (ZoomNoResize) {
-					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
-					Usage();
-					ExitFatal(-1);
-				}
-				continue;
-			case 'O':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				continue;
-#endif
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
 				continue;
@@ -612,21 +590,20 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					ExitFatal(-1);
 				}
-#if defined(USE_OPENGL) || defined(USE_GLES)
+
 				if (ZoomNoResize) {
 					Video.ViewportHeight = Video.Height;
 					Video.ViewportWidth = Video.Width;
 					Video.Height = 0;
 					Video.Width = 0;
 				}
-#endif
+
 				continue;
 			}
 			case 'W':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 			case 'x':
 				ShaderIndex = atoi(optarg) % MAX_SHADERS;
 				if (atoi(optarg) == -1) {
@@ -638,15 +615,12 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				}
 				continue;
 			case 'Z':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
 				ZoomNoResize = 1;
 				Video.ViewportHeight = Video.Height;
 				Video.ViewportWidth = Video.Width;
 				Video.Height = 0;
 				Video.Width = 0;
 				continue;
-#endif
 			case -1:
 				break;
 			case '?':

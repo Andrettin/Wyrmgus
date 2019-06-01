@@ -57,10 +57,10 @@ public:
 	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
 	void Create();
-#if defined(USE_OPENGL) || defined(USE_GLES)
+
 	void FreeOpenGL();
 	void Reload();
-#endif
+
 	void Destroy();
 	void Draw() const;
 	void DrawViewportArea(const CViewport &viewport) const;
@@ -90,7 +90,6 @@ public:
 	bool UpdateCache = false;
 };
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 // Minimap surface with units (for OpenGL)
 //Wyrmgus start
 //extern unsigned char *MinimapSurfaceGL;
@@ -101,7 +100,6 @@ extern std::vector<unsigned char *> MinimapSurfaceGL;
 //extern unsigned char *MinimapTerrainSurfaceGL;
 extern std::vector<unsigned char *> MinimapTerrainSurfaceGL;
 //Wyrmgus end
-#endif
 
 // Minimap surface with units (for software)
 //Wyrmgus start

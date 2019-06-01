@@ -218,7 +218,6 @@ void StartMap(const std::string &filename, bool clean)
 
 	//  Clear screen
 	Video.ClearScreen();
-	Invalidate();
 
 	CleanGame();
 	InterfaceState = IfaceStateMenu;
@@ -356,115 +355,54 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	png_write_info(png_ptr, info_ptr);
 
 	const int rectSize = 5; // size of rectange used for player start spots
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
-		if (!pixels) {
-			fprintf(stderr, "Out of memory\n");
-			exit(1);
-		}
-		// Copy GL map surface to pixel array
-		for (int i = 0; i < UI.Minimap.H; ++i) {
-			for (int j = 0; j < UI.Minimap.W; ++j) {
-				Uint32 c = ((Uint32 *)MinimapSurfaceGL[UI.CurrentMapLayer->ID])[j + i * UI.Minimap.W];
+	unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
+	if (!pixels) {
+		fprintf(stderr, "Out of memory\n");
+		exit(1);
+	}
+	// Copy GL map surface to pixel array
+	for (int i = 0; i < UI.Minimap.H; ++i) {
+		for (int j = 0; j < UI.Minimap.W; ++j) {
+			Uint32 c = ((Uint32 *)MinimapSurfaceGL[UI.CurrentMapLayer->ID])[j + i * UI.Minimap.W];
 
-				const int offset = (i * UI.Minimap.W + j) * 3;
-				pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
-				pixels[offset + 1] = ((c & GMASK) >> GSHIFT);
-				pixels[offset + 2] = ((c & BMASK) >> BSHIFT);
-			}
+			const int offset = (i * UI.Minimap.W + j) * 3;
+			pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
+			pixels[offset + 1] = ((c & GMASK) >> GSHIFT);
+			pixels[offset + 2] = ((c & BMASK) >> BSHIFT);
 		}
-		// Add player start spots
-		for (int i = 0; i < PlayerMax - 1; ++i) {
-			//Wyrmgus start
-//			if (CPlayer::Players[i]->Type != PlayerNobody) {
-			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
-			//Wyrmgus end
-				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
-					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
-						const int miniMapX = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth();
-						const int miniMapY = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight();
-						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
-							continue;
-						}
-						if (miniMapY + k < 0 || miniMapY + k >= UI.Minimap.H) {
-							continue;
-						}
-						const int offset = ((miniMapY + k) * UI.Minimap.H + miniMapX + j) * 3;
-						pixels[offset + 0] = ((CPlayer::Players[i]->Color & RMASK) >> RSHIFT);
-						pixels[offset + 1] = ((CPlayer::Players[i]->Color & GMASK) >> GSHIFT);
-						pixels[offset + 2] = ((CPlayer::Players[i]->Color & BMASK) >> BSHIFT);
+	}
+	// Add player start spots
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		//Wyrmgus start
+//		if (CPlayer::Players[i]->Type != PlayerNobody) {
+		if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
+		//Wyrmgus end
+			for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
+				for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
+					const int miniMapX = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth();
+					const int miniMapY = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight();
+					if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
+						continue;
 					}
+					if (miniMapY + k < 0 || miniMapY + k >= UI.Minimap.H) {
+						continue;
+					}
+					const int offset = ((miniMapY + k) * UI.Minimap.H + miniMapX + j) * 3;
+					pixels[offset + 0] = ((CPlayer::Players[i]->Color & RMASK) >> RSHIFT);
+					pixels[offset + 1] = ((CPlayer::Players[i]->Color & GMASK) >> GSHIFT);
+					pixels[offset + 2] = ((CPlayer::Players[i]->Color & BMASK) >> BSHIFT);
 				}
 			}
 		}
-		// Write everything in PNG
-		for (int i = 0; i < UI.Minimap.H; ++i) {
-			unsigned char *row = new unsigned char[UI.Minimap.W * 3];
-			memcpy(row, pixels + i * UI.Minimap.W * 3, UI.Minimap.W * 3);
-			png_write_row(png_ptr, row);
-			delete[] row;
-		}
-		delete[] pixels;
-	} else
-#endif
-	{
-		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
-		//Wyrmgus start
-//		const SDL_PixelFormat *fmt = MinimapSurface->format;
-		const SDL_PixelFormat *fmt = MinimapSurface[UI.CurrentMapLayer->ID]->format;
-		//Wyrmgus end
-		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
-													UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
-		//Wyrmgus start
-//		SDL_BlitSurface(MinimapSurface, nullptr, preview, nullptr);
-		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], nullptr, preview, nullptr);
-		//Wyrmgus end
-
-		SDL_LockSurface(preview);
-
-		SDL_Rect rect;
-		for (int i = 0; i < PlayerMax - 1; ++i) {
-			//Wyrmgus start
-//			if (CPlayer::Players[i]->Type != PlayerNobody) {
-			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
-			//Wyrmgus end
-				rect.x = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth() - rectSize / 2;
-				rect.y = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight() - rectSize / 2;
-				rect.w = rect.h = rectSize;
-				SDL_FillRect(preview, &rect, CPlayer::Players[i]->Color);
-			}
-		}
-
-		for (int i = 0; i < UI.Minimap.H; ++i) {
-			switch (preview->format->BytesPerPixel) {
-				case 1:
-					for (int j = 0; j < UI.Minimap.W; ++j) {
-						Uint8 c = ((Uint8 *)preview->pixels)[j + i * UI.Minimap.W];
-						row[j * 3 + 0] = fmt->palette->colors[c].r;
-						row[j * 3 + 1] = fmt->palette->colors[c].g;
-						row[j * 3 + 2] = fmt->palette->colors[c].b;
-					}
-					break;
-				case 3:
-					memcpy(row, (char *)preview->pixels + i * UI.Minimap.W, UI.Minimap.W * 3);
-					break;
-				case 4:
-					for (int j = 0; j < UI.Minimap.W; ++j) {
-						Uint32 c = ((Uint32 *)preview->pixels)[j + i * UI.Minimap.W];
-						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
-						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
-						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
-					}
-					break;
-			}
-			png_write_row(png_ptr, row);
-		}
-		delete[] row;
-
-		SDL_UnlockSurface(preview);
-		SDL_FreeSurface(preview);
 	}
+	// Write everything in PNG
+	for (int i = 0; i < UI.Minimap.H; ++i) {
+		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
+		memcpy(row, pixels + i * UI.Minimap.W * 3, UI.Minimap.W * 3);
+		png_write_row(png_ptr, row);
+		delete[] row;
+	}
+	delete[] pixels;
 
 	png_write_end(png_ptr, info_ptr);
 

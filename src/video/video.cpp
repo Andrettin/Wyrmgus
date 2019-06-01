@@ -147,9 +147,6 @@ private:
 
 extern void InitVideoSdl();         /// Init SDL video hardware driver
 
-extern void SdlLockScreen();        /// Do SDL hardware lock
-extern void SdlUnlockScreen();      /// Do SDL hardware unlock
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -157,16 +154,12 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 CVideo Video;
 /*static*/ CColorCycling *CColorCycling::s_instance = nullptr;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-char ForceUseOpenGL;
-bool UseOpenGL;                      /// Use OpenGL
 //Wyrmgus start
 //bool ZoomNoResize;
 bool ZoomNoResize = false;
 //bool GLShaderPipelineSupported = true;
 bool GLShaderPipelineSupported = false;
 //Wyrmgus end
-#endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
@@ -249,22 +242,6 @@ void PopClipping()
 ----------------------------------------------------------------------------*/
 
 /**
-**  Lock the screen for write access.
-*/
-void CVideo::LockScreen()
-{
-	SdlLockScreen();
-}
-
-/**
-**  Unlock the screen for write access.
-*/
-void CVideo::UnlockScreen()
-{
-	SdlUnlockScreen();
-}
-
-/**
 **  Clear the video screen.
 */
 void CVideo::ClearScreen()
@@ -280,15 +257,12 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			FreeOpenGLGraphics();
-			FreeOpenGLFonts();
-			UI.Minimap.FreeOpenGL();
-		}
-#endif
+		FreeOpenGLGraphics();
+		FreeOpenGLFonts();
+		UI.Minimap.FreeOpenGL();
+
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
-#if defined(USE_OPENGL) || defined(USE_GLES)
+
 		ViewportWidth = w;
 		ViewportHeight = h;
 		if (ZoomNoResize) {
@@ -297,15 +271,8 @@ bool CVideo::ResizeScreen(int w, int h)
 			Width = w;
 			Height = h;
 			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-			if (UseOpenGL) {
-				ReloadOpenGL();
-			}
+			ReloadOpenGL();
 		}
-#else
-		Width = w;
-		Height = h;
-		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-#endif
 
 		//Wyrmgus start
 		if (GameRunning) {

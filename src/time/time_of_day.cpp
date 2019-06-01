@@ -96,7 +96,6 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 		
 		this->G = CGraphic::New(file, size.x, size.y);
 		this->G->Load();
-		this->G->UseDisplayFormat();
 	} else {
 		return false;
 	}

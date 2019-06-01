@@ -54,12 +54,8 @@ class CFont;
 class CMapTemplate;
 class CTimeOfDay;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-extern char ForceUseOpenGL;
-extern bool UseOpenGL;
 extern bool ZoomNoResize;
 extern bool GLShaderPipelineSupported;
-#endif
 
 class CGraphic : public gcn::Image
 {
@@ -94,9 +90,7 @@ public:
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
-#endif
 	//Wyrmgus start
 //	void DrawFrameClip(unsigned frame, int x, int y) const;
 	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr, int show_percent = 100);
@@ -109,9 +103,7 @@ public:
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClipX(GLuint *textures, unsigned frame, int x, int y) const;
-#endif
 	//Wyrmgus start
 //	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr);
@@ -129,8 +121,6 @@ public:
 	static void Free(CGraphic *g);
 
 	void Load(bool grayscale = false);
-	void Flip();
-	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
 	SDL_Surface *SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped = false);
@@ -179,13 +169,11 @@ public:
 	bool Grayscale = false;
 	//Wyrmgus end
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat TextureWidth = 0.f;		/// Width of the texture
 	GLfloat TextureHeight = 0.f;	/// Height of the texture
 	GLuint *Textures = nullptr;		/// Texture names
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;			/// Number of textures
-#endif
 
 	friend class CFont;
 };
@@ -208,20 +196,15 @@ protected:
 		}
 		//Wyrmgus end
 		
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
 //		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
 		for (int i = 0; i < PlayerColorMax; ++i) {
 			PlayerColorTextures[i] = nullptr;
 		}
 		//Wyrmgus end
-#endif
 	}
 
 public:
-	//Wyrmgus start
-	void MakePlayerColorSurface(int player_color, bool flipped = false, CTimeOfDay *time_of_day = nullptr);
-	//Wyrmgus end
 	//Wyrmgus start
 	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y);
@@ -245,9 +228,6 @@ public:
 			return Surface;
 		}
 		
-		if (!PlayerColorSurfaces[player_color]) {
-			MakePlayerColorSurface(player_color, false, nullptr);
-		}
 		return PlayerColorSurfaces[player_color];
 	}
 	//Wyrmgus end
@@ -263,10 +243,8 @@ public:
 	SDL_Surface *PlayerColorSurfacesNightFlip[PlayerColorMax];	/// Flipped surface
 	//Wyrmgus end
 	
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	GLuint *PlayerColorTextures[PlayerColorMax];				/// Textures with player colors
 	std::map<int, std::map<CColor, GLuint *>> PlayerColorTextureColorModifications;	/// Player color textures with a color modification applied to them
-#endif
 };
 
 /**
@@ -322,9 +300,6 @@ struct EventCallback {
 class CVideo
 {
 public:
-	void LockScreen();
-	void UnlockScreen();
-
 	void ClearScreen();
 	bool ResizeScreen(int width, int height);
 
@@ -368,68 +343,43 @@ public:
 
 	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			return MapRGBA(f, r, g, b, 0xFF);
-		} else
-#endif
-		{
-			return SDL_MapRGB(f, r, g, b);
-		}
+		return MapRGBA(f, r, g, b, 0xFF);
 	}
+	
 	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
 	{
 		return MapRGB(f, color.R, color.G, color.B);
 	}
+	
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
-		} else
-#endif
-		{
-			return SDL_MapRGBA(f, r, g, b, a);
-		}
+		return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 	}
+	
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
 	{
 		return MapRGBA(f, color.R, color.G, color.B, color.A);
 	}
+	
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			*r = (c >> RSHIFT) & 0xff;
-			*g = (c >> GSHIFT) & 0xff;
-			*b = (c >> BSHIFT) & 0xff;
-		} else
-#endif
-		{
-			SDL_GetRGB(c, f, r, g, b);
-		}
+		*r = (c >> RSHIFT) & 0xff;
+		*g = (c >> GSHIFT) & 0xff;
+		*b = (c >> BSHIFT) & 0xff;
 	}
+	
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			*r = (c >> RSHIFT) & 0xff;
-			*g = (c >> GSHIFT) & 0xff;
-			*b = (c >> BSHIFT) & 0xff;
-			*a = (c >> ASHIFT) & 0xff;
-		} else
-#endif
-		{
-			SDL_GetRGBA(c, f, r, g, b, a);
-		}
+		*r = (c >> RSHIFT) & 0xff;
+		*g = (c >> GSHIFT) & 0xff;
+		*b = (c >> BSHIFT) & 0xff;
+		*a = (c >> ASHIFT) & 0xff;
 	}
 
 	int Width = 0;
 	int Height = 0;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
-#endif
 //Wyrmgus start
 //#if defined(USE_TOUCHSCREEN) && defined(_WIN32)
 //Wyrmgus end
@@ -473,7 +423,6 @@ extern void SetPlayersPalette();
 /// The SDL screen
 extern SDL_Surface *TheScreen;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 /// Max texture size supported on the video card
 extern GLint GLMaxTextureSize;
 /// User-specified limit for ::GLMaxTextureSize
@@ -482,7 +431,6 @@ extern GLint GLMaxTextureSizeOverride;
 extern bool GLTextureCompressionSupported;
 /// Use OpenGL texture compression
 extern bool UseGLTextureCompression;
-#endif
 
 /// register lua function
 extern void VideoCclRegister();
@@ -498,8 +446,6 @@ extern int VideoValidResolution(int w, int h);
 
 /// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g);
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
 
 /// Make an OpenGL texture
 //Wyrmgus start
@@ -525,20 +471,11 @@ extern void ReloadGraphics();
 /// Reload OpenGL
 extern void ReloadOpenGL();
 
-#endif
-
 /// Initializes video synchronization.
 extern void SetVideoSync();
 
 /// Init line draw
 extern void InitLineDraw();
-
-/// Simply invalidates whole window or screen.
-extern void Invalidate();
-
-/// Invalidates selected area on window or screen. Use for accurate
-/// redrawing. in so
-extern void InvalidateArea(int x, int y, int w, int h);
 
 /// Set clipping for nearly all vector primitives. Functions which support
 /// clipping will be marked Clip. Set the system-wide clipping rectangle.
@@ -605,10 +542,8 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
-#endif
 
 extern void FreeGraphics();
 

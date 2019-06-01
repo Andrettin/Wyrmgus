@@ -2794,9 +2794,6 @@ void LoadUnitTypeSprite(CUnitType &type)
 	if (!type.ShadowFile.empty()) {
 		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
 		type.ShadowSprite->Load();
-		if (type.Flip) {
-			type.ShadowSprite->Flip();
-		}
 		if (type.ShadowSprite->Surface->format->BytesPerPixel == 1) {
 			//Wyrmgus start
 //			type.ShadowSprite->MakeShadow();
@@ -2814,17 +2811,11 @@ void LoadUnitTypeSprite(CUnitType &type)
 				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
 																	 type.Width, type.Height);
 				resinfo->SpriteWhenLoaded->Load();
-				if (type.Flip) {
-					resinfo->SpriteWhenLoaded->Flip();
-				}
 			}
 			if (!resinfo->FileWhenEmpty.empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
 																	type.Width, type.Height);
 				resinfo->SpriteWhenEmpty->Load();
-				if (type.Flip) {
-					resinfo->SpriteWhenEmpty->Flip();
-				}
 			}
 		}
 	}
@@ -2832,26 +2823,17 @@ void LoadUnitTypeSprite(CUnitType &type)
 	if (!type.File.empty()) {
 		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
 		type.Sprite->Load();
-		if (type.Flip) {
-			type.Sprite->Flip();
-		}
 	}
 
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {
 		type.LightSprite = CGraphic::New(type.LightFile, type.Width, type.Height);
 		type.LightSprite->Load();
-		if (type.Flip) {
-			type.LightSprite->Flip();
-		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (!type.LayerFiles[i].empty()) {
 			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.Width, type.Height);
 			type.LayerSprites[i]->Load();
-			if (type.Flip) {
-				type.LayerSprites[i]->Flip();
-			}
 		}
 	}
 	//Wyrmgus end
@@ -2867,16 +2849,10 @@ void LoadUnitTypeSprite(CUnitType &type)
 		if (!variation->File.empty()) {
 			variation->Sprite = CPlayerColorGraphic::New(variation->File, frame_width, frame_height);
 			variation->Sprite->Load();
-			if (type.Flip) {
-				variation->Sprite->Flip();
-			}
 		}
 		if (!variation->ShadowFile.empty()) {
 			variation->ShadowSprite = CGraphic::New(variation->ShadowFile, type.ShadowWidth, type.ShadowHeight);
 			variation->ShadowSprite->Load();
-			if (type.Flip) {
-				variation->ShadowSprite->Flip();
-			}
 			if (variation->ShadowSprite->Surface->format->BytesPerPixel == 1) {
 //				variation->ShadowSprite->MakeShadow();
 			}
@@ -2884,17 +2860,11 @@ void LoadUnitTypeSprite(CUnitType &type)
 		if (!variation->LightFile.empty()) {
 			variation->LightSprite = CGraphic::New(variation->LightFile, frame_width, frame_height);
 			variation->LightSprite->Load();
-			if (type.Flip) {
-				variation->LightSprite->Flip();
-			}
 		}
 		for (int j = 0; j < MaxImageLayers; ++j) {
 			if (!variation->LayerFiles[j].empty()) {
 				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], frame_width, frame_height);
 				variation->LayerSprites[j]->Load();
-				if (type.Flip) {
-					variation->LayerSprites[j]->Flip();
-				}
 			}
 		}
 	
@@ -2902,16 +2872,10 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (!variation->FileWhenLoaded[j].empty()) {
 				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], frame_width, frame_height);
 				variation->SpriteWhenLoaded[j]->Load();
-				if (type.Flip) {
-					variation->SpriteWhenLoaded[j]->Flip();
-				}
 			}
 			if (!variation->FileWhenEmpty[j].empty()) {
 				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], frame_width, frame_height);
 				variation->SpriteWhenEmpty[j]->Load();
-				if (type.Flip) {
-					variation->SpriteWhenEmpty[j]->Flip();
-				}
 			}
 		}
 	}
@@ -2921,9 +2885,6 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (!layer_variation->File.empty()) {
 				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.Width, type.Height);
 				layer_variation->Sprite->Load();
-				if (type.Flip) {
-					layer_variation->Sprite->Flip();
-				}
 			}
 		}
 	}

@@ -124,21 +124,7 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 */
 void initGuichan()
 {
-	gcn::Graphics *graphics;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		graphics = new MyOpenGLGraphics();
-	} else
-#endif
-	{
-		graphics = new gcn::SDLGraphics();
-
-		// Set the target for the graphics object to be the screen.
-		// In other words, we will draw to the screen.
-		// Note, any surface will do, it doesn't have to be the screen.
-		((gcn::SDLGraphics *)graphics)->setTarget(TheScreen);
-	}
+	gcn::Graphics *graphics = new MyOpenGLGraphics();
 
 	Input = new gcn::SDLInput();
 
@@ -147,11 +133,7 @@ void initGuichan()
 	Gui->setInput(Input);
 	Gui->setTop(nullptr);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	Gui->setUseDirtyDrawing(!UseOpenGL);
-#else
-	Gui->setUseDirtyDrawing(1);
-#endif
+	Gui->setUseDirtyDrawing(false);
 
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
@@ -203,11 +185,7 @@ void handleInput(const SDL_Event *event)
 void DrawGuichanWidgets()
 {
 	if (Gui) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
-#else
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-#endif
+		Gui->setUseDirtyDrawing(false);
 		Gui->draw();
 	}
 }
@@ -249,8 +227,6 @@ void LuaActionListener::action(const std::string &eventId)
 LuaActionListener::~LuaActionListener()
 {
 }
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
 
 /*----------------------------------------------------------------------------
 --  MyOpenGLGraphics
@@ -365,8 +341,6 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 							 x1, y1, x2 - x1, y2 - y1, c.a);
 }
 
-#endif
-
 //Wyrmgus start
 /*----------------------------------------------------------------------------
 --  PlayerColorImageWidget
@@ -451,18 +425,6 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	}
 	
 	//Wyrmgus start
-	if (img) {
-		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-			} else
-		#endif
-			{
-				WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CGraphic *)img));
-			}
-		}
-	}
-
 //	graphics->drawImage(img, 0, 0, 0, 0,
 //						img->getWidth(), img->getHeight());
 
@@ -473,21 +435,13 @@ void ImageButton::draw(gcn::Graphics *graphics)
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1);
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
@@ -495,40 +449,24 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			}
 		} else {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight());
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 		}
 	} else {
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight());
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
 	}
 	//Wyrmgus end
@@ -602,17 +540,6 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		}
 		//Wyrmgus end
 	}
-	
-	//Wyrmgus start
-	//restore old alpha
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-	} else
-#endif
-	{
-		WidgetGraphicTransparency(255, *((CGraphic *)img));
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -716,21 +643,13 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName, Transparency);
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
@@ -738,40 +657,24 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			}
 		} else {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, Transparency);
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 		}
 	} else {
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, Transparency);
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
 	}
 

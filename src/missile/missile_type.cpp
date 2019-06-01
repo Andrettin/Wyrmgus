@@ -269,9 +269,6 @@ void MissileType::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
 		this->G->Load();
-		if (this->Flip) {
-			this->G->Flip();
-		}
 
 		// Correct the number of frames in graphic
 		Assert(this->G->NumFrames >= this->SpriteFrames);

@@ -114,14 +114,6 @@ void ShowLoadProgress(const char *fmt, ...)
 		}
 		//Wyrmgus end
 		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
-		//Wyrmgus start
-//		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
-		if (loadingBackground == nullptr) {
-			InvalidateArea(0, Video.Height - 18, Video.Width, 18);
-		} else {
-			InvalidateArea(0, 0, Video.Width, Video.Height);
-		}
-		//Wyrmgus end
 
 		RealizeVideoMemory();
 	} else {
@@ -284,47 +276,37 @@ void CUserInterface::Load()
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
-			Resources[i].G->UseDisplayFormat();
 		}
 	}
 
 	if (InfoPanel.G) {
 		InfoPanel.G->Load();
-		InfoPanel.G->UseDisplayFormat();
 	}
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load();
-		ButtonPanel.G->UseDisplayFormat();
 	}
 	if (PieMenu.G) {
 		PieMenu.G->Load();
-		PieMenu.G->UseDisplayFormat();
 	}
 
 	//Wyrmgus start
 	if (Preference.IconFrameG) {
 		Preference.IconFrameG->Load();
-		Preference.IconFrameG->UseDisplayFormat();
 	}
 	if (Preference.PressedIconFrameG) {
 		Preference.PressedIconFrameG->Load();
-		Preference.PressedIconFrameG->UseDisplayFormat();
 	}
 	if (Preference.CommandButtonFrameG) {
 		Preference.CommandButtonFrameG->Load();
-		Preference.CommandButtonFrameG->UseDisplayFormat();
 	}
 	if (Preference.BarFrameG) {
 		Preference.BarFrameG->Load();
-		Preference.BarFrameG->UseDisplayFormat();
 	}
 	if (Preference.InfoPanelFrameG) {
 		Preference.InfoPanelFrameG->Load();
-		Preference.InfoPanelFrameG->UseDisplayFormat();
 	}
 	if (Preference.ProgressBarG) {
 		Preference.ProgressBarG->Load();
-		Preference.ProgressBarG->UseDisplayFormat();
 	}
 	//Wyrmgus end
 	

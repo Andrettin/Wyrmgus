@@ -1538,7 +1538,6 @@ void EditorUpdateDisplay()
 	DrawCursor();
 
 	// refresh entire screen, so no further invalidate needed
-	Invalidate();
 	RealizeVideoMemory();
 }
 
@@ -2750,7 +2749,6 @@ void EditorMainLoop()
 		GameCursor = UI.Point.Cursor;
 
 		Video.ClearScreen();
-		Invalidate();
 	}
 
 	CommandLogDisabled = OldCommandLogDisabled;
@@ -2806,7 +2804,6 @@ void StartEditor(const char *filename, bool is_mod)
 
 	// Clear screen
 	Video.ClearScreen();
-	Invalidate();
 
 	Editor.TerrainEditable = true;
 

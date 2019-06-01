@@ -137,7 +137,6 @@ void LoadCursors(const std::string civilization_name)
 		if (cursor.G && !cursor.G->IsLoaded()) {
 			UpdateLoadProgress();
 			cursor.G->Load();
-			cursor.G->UseDisplayFormat();
 
 			IncItemsLoaded();
 		}
@@ -384,56 +383,11 @@ void DrawCursor()
 	}
 	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL &&
-#else
-	if (
-#endif
-		!GameRunning && !Editor.Running) {
-		if (!HiddenSurface
-			|| HiddenSurface->w != GameCursor->G->getWidth()
-			|| HiddenSurface->h != GameCursor->G->getHeight()) {
-			if (HiddenSurface) {
-				VideoPaletteListRemove(HiddenSurface);
-				SDL_FreeSurface(HiddenSurface);
-			}
-
-			HiddenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-												 GameCursor->G->getWidth(),
-												 GameCursor->G->getHeight(),
-												 TheScreen->format->BitsPerPixel,
-												 TheScreen->format->Rmask,
-												 TheScreen->format->Gmask,
-												 TheScreen->format->Bmask,
-												 TheScreen->format->Amask);
-		}
-
-		SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
-		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, nullptr);
-	}
-
 	//  Last, Normal cursor.
 	if (!GameCursor->G->IsLoaded()) {
 		GameCursor->G->Load();
 	}
 	GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame, pos.x, pos.y);
-}
-
-/**
-**  Hide the cursor
-*/
-void HideCursor()
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL &&
-#else
-	if (
-#endif
-		!GameRunning && !Editor.Running && GameCursor) {
-		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
-		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
-		SDL_BlitSurface(HiddenSurface, nullptr, TheScreen, &dstRect);
-	}
 }
 
 /**
