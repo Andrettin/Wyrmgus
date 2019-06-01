@@ -120,6 +120,10 @@ public:
 	*/
 	static inline T *Get(const std::string &ident, const bool should_find = true)
 	{
+		if (ident.empty()) {
+			return nullptr;
+		}
+		
 		std::string processed_ident = FindAndReplaceString(ident, "_", "-"); //remove this when data elements are no longer used in Lua
 		
 		std::map<std::string, T *>::const_iterator find_iterator = DataType<T>::InstancesByIdent.find(processed_ident);
