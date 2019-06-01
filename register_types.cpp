@@ -92,6 +92,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "world/plane.h"
 #include "world/world.h"
@@ -162,6 +163,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<MissileType>();
 	ClassDB::register_class<UniqueItem>();
 	ClassDB::register_class<UnitClass>();
+	ClassDB::register_class<UpgradeClass>();
 	
 	ClassDB::register_virtual_class<CConversibleColor>();
 	ClassDB::register_class<CHairColor>();
