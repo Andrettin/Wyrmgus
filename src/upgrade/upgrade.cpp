@@ -86,6 +86,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util.h"
 
@@ -258,14 +259,15 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 		value = FindAndReplaceString(value, "_", "-");
 		const std::string &class_name = value;
 		
-		int class_id = GetUpgradeClassIndexByName(class_name);
-		if (class_id == -1) {
-			SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
-			class_id = UpgradeClasses.size();
-			UpgradeClasses.push_back(class_name);
+		if (!class_name.empty()) {
+			UpgradeClass *upgrade_class = UpgradeClass::Get(class_name);
+			if (upgrade_class != nullptr) {
+				this->Class = upgrade_class;
+				upgrade_class->Upgrades.insert(this);
+			}
+		} else {
+			this->Class = nullptr;
 		}
-		
-		this->Class = class_id;
 	} else if (key == "civilization") {
 		const CCivilization *civilization = CCivilization::Get(value);
 		if (civilization) {
@@ -362,16 +364,16 @@ bool CUpgrade::ProcessConfigDataSection(const CConfigData *section)
 void CUpgrade::Initialize()
 {
 	//set the upgrade's civilization and class here
-	if (this->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = this->Class;
+	if (this->Class != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		const UpgradeClass *upgrade_class = this->Class;
 		if (this->Civilization != -1) {
 			CCivilization *civilization = CCivilization::Get(this->Civilization);
 			
 			if (this->Faction != -1) {
 				CFaction *faction = CFaction::Get(this->Faction);
-				faction->ClassUpgrades[class_id] = this->ID;
+				faction->ClassUpgrades[upgrade_class] = this;
 			} else {
-				civilization->ClassUpgrades[class_id] = this->ID;
+				civilization->ClassUpgrades[upgrade_class] = this;
 			}
 		}
 	}
@@ -563,14 +565,15 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Class")) {
 			std::string class_name = LuaToString(l, -1);
 			
-			int class_id = GetUpgradeClassIndexByName(class_name);
-			if (class_id == -1) {
-				SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
-				class_id = UpgradeClasses.size();
-				UpgradeClasses.push_back(class_name);
+			if (!class_name.empty()) {
+				UpgradeClass *upgrade_class = UpgradeClass::Get(class_name);
+				if (upgrade_class != nullptr) {
+					upgrade->Class = upgrade_class;
+					upgrade_class->Upgrades.insert(upgrade);
+				}
+			} else {
+				upgrade->Class = nullptr;
 			}
-			
-			upgrade->Class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			CCivilization *civilization = CCivilization::Get(civilization_name);
@@ -782,16 +785,16 @@ static int CclDefineUpgrade(lua_State *l)
 	}
 	
 	//set the upgrade's civilization and class here
-	if (upgrade->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = upgrade->Class;
+	if (upgrade->Class != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		const UpgradeClass *upgrade_class = upgrade->Class;
 		if (upgrade->Civilization != -1) {
 			CCivilization *civilization = CCivilization::Get(upgrade->Civilization);
 			
 			if (upgrade->Faction != -1) {
 				CFaction *faction = CFaction::Get(upgrade->Faction);
-				faction->ClassUpgrades[class_id] = upgrade->ID;
+				faction->ClassUpgrades[upgrade_class] = upgrade;
 			} else {
-				civilization->ClassUpgrades[class_id] = upgrade->ID;
+				civilization->ClassUpgrades[upgrade_class] = upgrade;
 			}
 		}
 	}
@@ -1196,8 +1199,8 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		if (upgrade->Class != -1) {
-			lua_pushstring(l, UpgradeClasses[upgrade->Class].c_str());
+		if (upgrade->Class != nullptr) {
+			lua_pushstring(l, upgrade->Class->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1538,7 +1541,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	//Wyrmgus start
 	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
 		if (player.Allow.Upgrades[um->RemoveUpgrades[i]->ID] == 'R') {
-			UpgradeLost(player, um->RemoveUpgrades[i]->ID);
+			UpgradeLost(player, um->RemoveUpgrades[i]);
 		}
 	}
 	//Wyrmgus end
@@ -2340,34 +2343,33 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 **  @param id       Upgrade to be lost.
 **  
 */
-void UpgradeLost(CPlayer &player, int id)
+void UpgradeLost(CPlayer &player, const CUpgrade *upgrade)
 {
 	//Wyrmgus start
 	if (!GameRunning && !GameEstablishing) {
 		return;
 	}
 	//Wyrmgus end
-	player.UpgradeTimers.Upgrades[id] = 0;
+	player.UpgradeTimers.Upgrades[upgrade->ID] = 0;
 	//Wyrmgus start
-	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
+	AllowUpgradeId(player, upgrade->ID, 'A'); // research is lost i.e. available
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CUpgrade *upgrade = AllUpgrades[id];
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		CDeity *upgrade_deity = CDeity::GetByUpgrade(upgrade);
 		if (upgrade_deity) {
 			for (CDeityDomain *deity_domain : upgrade_deity->GetDomains()) {
 				CUpgrade *domain_upgrade = deity_domain->Upgrade;
 				if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
-					UpgradeLost(player, domain_upgrade->ID);
+					UpgradeLost(player, domain_upgrade);
 				}
 			}
 			player.Deities.erase(std::remove(player.Deities.begin(), player.Deities.end(), upgrade_deity), player.Deities.end());
 		}
 	}
 
-	for (const CUpgradeModifier *modifier : AllUpgrades[id]->UpgradeModifiers) {
+	for (const CUpgradeModifier *modifier : upgrade->UpgradeModifiers) {
 		RemoveUpgradeModifier(player, modifier);
 	}
 	//Wyrmgus end

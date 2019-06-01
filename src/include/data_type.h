@@ -222,6 +222,10 @@ public:
 	{
 		std::string processed_ident = FindAndReplaceString(ident, "_", "-"); //remove this when data elements are no longer used in Lua
 		
+		if (ident.empty()) {
+			throw std::runtime_error("Tried to add a \"" + std::string(T::ClassIdentifier) + "\" instance with an empty string identifier.");
+		}
+		
 		T *instance = new T;
 		instance->Ident = processed_ident;
 		instance->Index = DataType<T>::Instances.size();

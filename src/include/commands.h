@@ -157,8 +157,8 @@ extern void CommandTransformIntoType(CUnit &unit, const CUnitType &type);
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
 //Wyrmgus start
-//extern void CommandResearch(CUnit &unit, CUpgrade &what, int flush);
-extern void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush);
+//extern void CommandResearch(CUnit &unit, const CUpgrade &what, int flush);
+extern void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush);
 //Wyrmgus end
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
@@ -283,8 +283,8 @@ extern void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush);
 //Wyrmgus end
 /// Send research command
 //Wyrmgus start
-//extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush);
-extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int player, int flush);
+//extern void SendCommandResearch(CUnit &unit, const CUpgrade &what, int flush);
+extern void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush);
 //Wyrmgus end
 /// Send cancel research command
 extern void SendCommandCancelResearch(CUnit &unit);

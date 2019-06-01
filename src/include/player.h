@@ -88,6 +88,7 @@ class CSite;
 class CUnit;
 class CUnitType;
 class PlayerAi;
+class UpgradeClass;
 //Wyrmgus start
 class CFiller;
 class LuaCallback;
@@ -290,7 +291,7 @@ public:
 	Currency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorAvailable(const CPlayerColor *player_color) const;
-	bool HasUpgradeClass(const int upgrade_class) const;
+	bool HasUpgradeClass(const UpgradeClass *upgrade_class) const;
 	bool HasSettlement(const CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
@@ -303,7 +304,7 @@ public:
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, const CGender *gender) const;
 	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
-	std::vector<CUpgrade *> GetResearchableUpgrades();
+	std::vector<const CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end
 
 	/// Clear turn related player data

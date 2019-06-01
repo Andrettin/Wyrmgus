@@ -1117,7 +1117,6 @@ public:
 extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
-extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 extern CUnitType *SettlementSiteUnitType;
 //Wyrmgus end
 
@@ -1130,10 +1129,8 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
-//Wyrmgus start
-extern int GetUpgradeClassIndexByName(const std::string &class_name);
-extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
 
+//Wyrmgus start
 extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 //Wyrmgus end
 

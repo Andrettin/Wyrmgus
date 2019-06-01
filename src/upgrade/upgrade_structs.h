@@ -68,6 +68,7 @@ class CVariable;
 class ItemClass;
 class ItemSlot;
 class UniqueItem;
+class UpgradeClass;
 struct lua_State;
 
 /**
@@ -124,7 +125,7 @@ public:
 	void SetIcon(CIcon *icon);
 
 	//Wyrmgus start
-	int Class = -1;					/// upgrade class (i.e. siege weapon projectile I)
+	UpgradeClass *Class = nullptr;	/// upgrade class (i.e. siege weapon projectile I)
 	int Civilization = -1;			/// which civilization this upgrade belongs to, if any
 	int Faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string Description;		/// Description of the upgrade

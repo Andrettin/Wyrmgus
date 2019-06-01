@@ -58,6 +58,7 @@ class CQuest;
 class CSpecies;
 class CUpgrade;
 class UnitClass;
+class UpgradeClass;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -73,7 +74,7 @@ public:
 	static constexpr const char *ClassIdentifier = "civilization";
 	
 	static const CUnitType *GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class);
-	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
+	static const CUpgrade *GetCivilizationClassUpgrade(const CCivilization *civilization, const UpgradeClass *upgrade_class);
 	static std::vector<CFiller> GetCivilizationUIFillers(const CCivilization *civilization);
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
@@ -303,7 +304,7 @@ public:
 	std::map<int, std::map<const CGender *, std::map<int, std::map<int, std::string>>>> MinisterTitles; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<const UnitClass *, const CUnitType *> ClassUnitTypes;		/// the unit type of a particular unit class for the civilization
-	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization
+	std::map<const UpgradeClass *, const CUpgrade *> ClassUpgrades;		/// the upgrade slot of a particular class for the civilization
 private:
 	String VictoryBackgroundFile;
 	String DefeatBackgroundFile;

@@ -663,7 +663,7 @@ static void InsertUpgradeToRequests(CUnitType *type)
 **
 **  @param upgrade  Upgrade to be appended.
 */
-static void InsertResearchRequests(CUpgrade *upgrade)
+static void InsertResearchRequests(const CUpgrade *upgrade)
 {
 	AiPlayer->ResearchRequests.push_back(upgrade);
 }
@@ -1229,7 +1229,7 @@ static int CclAiResearch(lua_State *l)
 	}
 	//Wyrmgus end
 	const char *str = LuaToString(l, 1);
-	CUpgrade *upgrade;
+	const CUpgrade *upgrade;
 
 	if (str) {
 		upgrade = CUpgrade::Get(str);
@@ -1738,7 +1738,10 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
-				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
+				const CUpgrade *upgrade = CUpgrade::Get(ident);
+				if (upgrade != nullptr) {
+					ai->ResearchRequests.push_back(upgrade);
+				}
 			}
 		} else if (!strcmp(value, "building")) {
 			CclParseBuildQueue(l, ai, j + 1);

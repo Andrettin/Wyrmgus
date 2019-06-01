@@ -58,8 +58,8 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
-/* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player)
+///* static */ COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade)
+/* static */ COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player)
 //Wyrmgus end
 {
 	COrder_Research *order = new COrder_Research();

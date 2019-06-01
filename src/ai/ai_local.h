@@ -340,7 +340,7 @@ public:
 	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
-	std::vector<CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
+	std::vector<const CUpgrade *> ResearchRequests;	/// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;		/// What the resource manager should build
 	int LastRepairBuilding = 0;						/// Last building checked for repair in this turn
 	//Wyrmgus start
@@ -485,7 +485,7 @@ extern void AiAddUnitTypeRequest(const CUnitType &type, const int count, const i
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(const CUnitType &type);
 /// Add research request to resource manager
-extern void AiAddResearchRequest(CUpgrade *upgrade);
+extern void AiAddResearchRequest(const CUpgrade *upgrade);
 /// Periodic called resource manager handler
 extern void AiResourceManager();
 /// Ask the ai to explore around pos

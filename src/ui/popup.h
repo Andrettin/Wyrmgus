@@ -30,6 +30,10 @@
 #ifndef __POPUP_H__
 #define __POPUP_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "script.h"
 #include "vec2i.h"
 #include "video/color.h"
@@ -46,9 +50,18 @@ class CFont;
 class CPopup;
 class ItemClass;
 class UnitClass;
+class UpgradeClass;
+
+/*----------------------------------------------------------------------------
+--  Defines
+----------------------------------------------------------------------------*/
 
 constexpr int MARGIN_X = 4;
 constexpr int MARGIN_Y = 2;
+
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
 
 class PopupConditionPanel
 {
@@ -78,7 +91,7 @@ public:
 	int CanStore = -1;				/// whether the button's unit type can store a particular resource
 	int ImproveIncome = -1;			/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade
-	int ResearchedUpgradeClass = -1;	/// whether the button's player has researched a particular upgrade class
+	UpgradeClass *ResearchedUpgradeClass = nullptr;	/// whether the button's player has researched a particular upgrade class
 	//Wyrmgus end
 	std::string ButtonValue;	/// value used in ValueStr field of button
 

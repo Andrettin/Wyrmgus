@@ -73,7 +73,7 @@ extern int UpgradeIdByIdent(const std::string &sid);
 extern void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade);
 
 /// Upgrade will be lost
-extern void UpgradeLost(CPlayer &player, int id);
+extern void UpgradeLost(CPlayer &player, const CUpgrade *upgrade);
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
 

@@ -639,8 +639,8 @@ void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush)
 ** @param flush    Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
-void SendCommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
+//void SendCommandResearch(CUnit &unit, const CUpgrade &what, int flush)
+void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {

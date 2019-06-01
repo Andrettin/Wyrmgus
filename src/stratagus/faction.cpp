@@ -275,21 +275,21 @@ const CUnitType *CFaction::GetFactionClassUnitType(const CFaction *faction, cons
 	return CCivilization::GetCivilizationClassUnitType(faction->Civilization, unit_class);
 }
 
-int CFaction::GetFactionClassUpgrade(const CFaction *faction, const int class_id)
+const CUpgrade *CFaction::GetFactionClassUpgrade(const CFaction *faction, const UpgradeClass *upgrade_class)
 {
-	if (faction == nullptr || class_id == -1) {
-		return -1;
+	if (faction == nullptr || upgrade_class == nullptr) {
+		return nullptr;
 	}
 	
-	if (faction->ClassUpgrades.find(class_id) != faction->ClassUpgrades.end()) {
-		return faction->ClassUpgrades.find(class_id)->second;
+	if (faction->ClassUpgrades.find(upgrade_class) != faction->ClassUpgrades.end()) {
+		return faction->ClassUpgrades.find(upgrade_class)->second;
 	}
 		
 	if (faction->ParentFaction != nullptr) {
-		return CFaction::GetFactionClassUpgrade(faction->ParentFaction, class_id);
+		return CFaction::GetFactionClassUpgrade(faction->ParentFaction, upgrade_class);
 	}
 	
-	return CCivilization::GetCivilizationClassUpgrade(faction->Civilization, class_id);
+	return CCivilization::GetCivilizationClassUpgrade(faction->Civilization, upgrade_class);
 }
 
 std::vector<CFiller> CFaction::GetFactionUIFillers(const CFaction *faction)

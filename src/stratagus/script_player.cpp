@@ -82,6 +82,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 //Wyrmgus start
 #include "ui/ui.h"
 #include "util.h"
@@ -1590,10 +1591,10 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string class_name = LuaToString(l, 1);
-	const UnitClass *unit_class = UnitClass::Get(class_name);
+	const UnitClass *unit_class = UnitClass::Get(class_name, false);
 	CCivilization *civilization = CCivilization::Get(LuaToString(l, 2));
 	std::string unit_type_ident;
-	if (civilization && unit_class != nullptr) {
+	if (civilization != nullptr && unit_class != nullptr) {
 		const CUnitType *unit_type = CCivilization::GetCivilizationClassUnitType(civilization, unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->Ident;
@@ -1601,11 +1602,11 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const int class_id = GetUpgradeClassIndexByName(class_name);
-		if (civilization && class_id != -1) {
-			int upgrade_id = CCivilization::GetCivilizationClassUpgrade(civilization, class_id);
-			if (upgrade_id != -1) {
-				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
+		const UpgradeClass *upgrade_class = UpgradeClass::Get(class_name, false);
+		if (civilization != nullptr && upgrade_class != nullptr) {
+			const CUpgrade *upgrade = CCivilization::GetCivilizationClassUpgrade(civilization, upgrade_class);
+			if (upgrade != nullptr) {
+				unit_type_ident = upgrade->Ident;
 			}
 		}
 	}
@@ -1646,11 +1647,11 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const int class_id = GetUpgradeClassIndexByName(class_name);
-		if (class_id != -1) {
-			int upgrade_id = CFaction::GetFactionClassUpgrade(faction, class_id);
-			if (upgrade_id != -1) {
-				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
+		const UpgradeClass *upgrade_class = UpgradeClass::Get(class_name);
+		if (upgrade_class != nullptr) {
+			const CUpgrade *upgrade = CFaction::GetFactionClassUpgrade(faction, upgrade_class);
+			if (upgrade != nullptr) {
+				unit_type_ident = upgrade->Ident;
 			}
 		}
 	}
@@ -3139,7 +3140,7 @@ static int CclSetPlayerData(lua_State *l)
 				UpgradeAcquire(*p, CUpgrade::Get(ident));
 			} else if (acquire == "F" || acquire == "A") {
 				if (UpgradeIdentAllowed(*p, ident) == 'R') {
-					UpgradeLost(*p, CUpgrade::Get(ident)->ID);
+					UpgradeLost(*p, CUpgrade::Get(ident));
 				}
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}

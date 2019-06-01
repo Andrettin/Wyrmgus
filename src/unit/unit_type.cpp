@@ -506,9 +506,7 @@ std::vector<int> LuxuryResources;
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-std::vector<std::string> UpgradeClasses;
-std::map<std::string, int> UpgradeClassStringToIndex;
-CUnitType *SettlementSiteUnitType;
+CUnitType *SettlementSiteUnitType = nullptr;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1413,8 +1411,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		this->Name = parent_type->Name;
 	}
 	this->Class = parent_type->Class;
-	if (this->Class != nullptr && std::find(this->Class->UnitTypes.begin(), this->Class->UnitTypes.end(), this) == this->Class->UnitTypes.end()) {
-		this->Class->UnitTypes.push_back(this);
+	if (this->Class != nullptr) {
+		this->Class->UnitTypes.insert(this);
 	}
 	this->DrawLevel = parent_type->DrawLevel;
 	this->File = parent_type->File;
@@ -2101,13 +2099,13 @@ void CUnitType::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_unit_class", "unit_class"), +[](CUnitType *unit_type, const String &unit_class_ident){
 		if (unit_type->Class != nullptr) {
-			unit_type->Class->UnitTypes.erase(std::remove(unit_type->Class->UnitTypes.begin(), unit_type->Class->UnitTypes.end(), unit_type), unit_type->Class->UnitTypes.end());
+			unit_type->Class->UnitTypes.erase(unit_type);
 		}
 		
 		unit_type->Class = UnitClass::Get(unit_class_ident);
 		
-		if (unit_type->Class != nullptr && std::find(unit_type->Class->UnitTypes.begin(), unit_type->Class->UnitTypes.end(), unit_type) == unit_type->Class->UnitTypes.end()) {
-			unit_type->Class->UnitTypes.push_back(unit_type);
+		if (unit_type->Class != nullptr) {
+			unit_type->Class->UnitTypes.insert(unit_type);
 		}
 	});
 	ClassDB::bind_method(D_METHOD("get_unit_class"), +[](const CUnitType *unit_type){ return unit_type->Class; });
@@ -2605,21 +2603,6 @@ void SaveUnitTypes(CFile &file)
 		}
 	}
 }
-
-//Wyrmgus start
-int GetUpgradeClassIndexByName(const std::string &class_name)
-{
-	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {
-		return UpgradeClassStringToIndex.find(class_name)->second;
-	}
-	return -1;
-}
-
-void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id)
-{
-	UpgradeClassStringToIndex[class_name] = class_id;
-}
-//Wyrmgus end
 
 /**
 **  Draw unit-type on map.

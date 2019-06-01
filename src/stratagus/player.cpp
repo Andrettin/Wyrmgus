@@ -104,6 +104,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -1132,7 +1133,7 @@ void CPlayer::SetCivilization(int civilization)
 	
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
 		if (CCivilization::Get(this->Race)->GetUpgrade() != nullptr && this->Allow.Upgrades[CCivilization::Get(this->Race)->GetUpgrade()->ID] == 'R') {
-			UpgradeLost(*this, CCivilization::Get(this->Race)->GetUpgrade()->ID);
+			UpgradeLost(*this, CCivilization::Get(this->Race)->GetUpgrade());
 		}
 	}
 	
@@ -1213,23 +1214,25 @@ void CPlayer::SetFaction(const CFaction *faction)
 
 	if (this->Faction != nullptr) {
 		if (!this->Faction->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(this->Faction->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(this->Faction->FactionUpgrade)->ID);
+			UpgradeLost(*this, CUpgrade::Get(this->Faction->FactionUpgrade));
 		}
 
 		const CUpgrade *faction_type_upgrade = this->Faction->GetType()->GetUpgrade();
 		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] == 'R') {
-			UpgradeLost(*this, faction_type_upgrade->ID);
+			UpgradeLost(*this, faction_type_upgrade);
 		}
 	}
 
 	if (old_faction != nullptr && faction != nullptr) {
-		for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
-			if (CFaction::GetFactionClassUpgrade(old_faction, i) != CFaction::GetFactionClassUpgrade(faction, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-				if (CFaction::GetFactionClassUpgrade(old_faction, i) != -1 && this->Allow.Upgrades[CFaction::GetFactionClassUpgrade(old_faction, i)] == 'R') {
-					UpgradeLost(*this, CFaction::GetFactionClassUpgrade(old_faction, i));
+		for (const UpgradeClass *upgrade_class : UpgradeClass::GetAll()) {
+			const CUpgrade *old_upgrade = CFaction::GetFactionClassUpgrade(old_faction, upgrade_class);
+			const CUpgrade *new_upgrade = CFaction::GetFactionClassUpgrade(faction, upgrade_class);
+			if (old_upgrade != new_upgrade) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+				if (old_upgrade != nullptr && this->Allow.Upgrades[old_upgrade->ID] == 'R') {
+					UpgradeLost(*this, old_upgrade);
 
-					if (CFaction::GetFactionClassUpgrade(faction, i) != -1) {
-						UpgradeAcquire(*this, AllUpgrades[CFaction::GetFactionClassUpgrade(faction, i)]);
+					if (new_upgrade != nullptr) {
+						UpgradeAcquire(*this, new_upgrade);
 					}
 				}
 			}
@@ -1377,7 +1380,7 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 	
 	if (this->Dynasty != nullptr) {
 		if (this->Dynasty->DynastyUpgrade != nullptr && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] == 'R') {
-			UpgradeLost(*this, this->Dynasty->DynastyUpgrade->ID);
+			UpgradeLost(*this, this->Dynasty->DynastyUpgrade);
 		}
 	}
 
@@ -1472,24 +1475,23 @@ Currency *CPlayer::GetCurrency() const
 
 void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 {
-	std::vector<CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
-	std::vector<CUpgrade *> potential_upgrades;
+	std::vector<const CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
+	std::vector<const CUpgrade *> potential_upgrades;
 
-	for (size_t i = 0; i < upgrade_list.size(); ++i) {
-		if (this->Allow.Upgrades[upgrade_list[i]->ID] != 'R') {
+	for (const CUpgrade *researchable_upgrade : upgrade_list) {
+		if (this->Allow.Upgrades[researchable_upgrade->ID] != 'R') {
 			continue;
 		}
 		
-		if (upgrade_list[i]->Class == -1) {
+		if (researchable_upgrade->Class == nullptr) {
 			continue;
 		}
 		
-		int upgrade_id = CFaction::GetFactionClassUpgrade(player.GetFaction(), upgrade_list[i]->Class);
-		if (upgrade_id == -1) {
+		const CUpgrade *upgrade = CFaction::GetFactionClassUpgrade(player.GetFaction(), researchable_upgrade->Class);
+		
+		if (upgrade == nullptr) {
 			continue;
 		}
-		
-		CUpgrade *upgrade = AllUpgrades[upgrade_id];
 		
 		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, &player)) {
 			continue;
@@ -1503,7 +1505,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	}
 	
 	if (potential_upgrades.size() > 0) {
-		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
+		const CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->GetName().empty()) {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->GetName().utf8().get_data(), this->Name.c_str());
@@ -1532,21 +1534,21 @@ bool CPlayer::IsPlayerColorAvailable(const CPlayerColor *player_color) const
 	return true;
 }
 
-bool CPlayer::HasUpgradeClass(const int upgrade_class) const
+bool CPlayer::HasUpgradeClass(const UpgradeClass *upgrade_class) const
 {
-	if (this->Race == -1 || upgrade_class == -1) {
+	if (this->Race == -1 || upgrade_class == nullptr) {
 		return false;
 	}
 	
-	int upgrade_id = -1;
+	const CUpgrade *upgrade = nullptr;
 	
 	if (this->Faction != nullptr) {
-		upgrade_id = CFaction::GetFactionClassUpgrade(this->Faction, upgrade_class);
+		upgrade = CFaction::GetFactionClassUpgrade(this->Faction, upgrade_class);
 	} else {
-		upgrade_id = CCivilization::GetCivilizationClassUpgrade(CCivilization::Get(this->Race), upgrade_class);
+		upgrade = CCivilization::GetCivilizationClassUpgrade(CCivilization::Get(this->Race), upgrade_class);
 	}
 	
-	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
+	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->ID] == 'R') {
 		return true;
 	}
 
@@ -2061,9 +2063,9 @@ void CPlayer::GetWorkerLandmasses(std::vector<int> &worker_landmasses, const CUn
 	}
 }
 
-std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
+std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 {
-	std::vector<CUpgrade *> researchable_upgrades;
+	std::vector<const CUpgrade *> researchable_upgrades;
 	for (std::map<const CUnitType *, int>::iterator iterator = this->UnitTypesAiActiveCount.begin(); iterator != this->UnitTypesAiActiveCount.end(); ++iterator) {
 		const CUnitType *type = iterator->first;
 		if (type->GetIndex() < ((int) AiHelpers.ResearchedUpgrades.size())) {
@@ -2913,7 +2915,7 @@ void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
 void CPlayer::RemoveModifier(CUpgrade *modifier)
 {
 	if (this->Allow.Upgrades[modifier->ID] == 'R') {
-		UpgradeLost(*this, modifier->ID);
+		UpgradeLost(*this, modifier);
 		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
 			if (this->Modifiers[i].first == modifier) {
 				this->Modifiers.erase(std::remove(this->Modifiers.begin(), this->Modifiers.end(), this->Modifiers[i]), this->Modifiers.end());

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_class.h - The unit class header file. */
+/**@name upgrade_class.h - The upgrade class header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNIT_CLASS_H__
-#define __UNIT_CLASS_H__
+#ifndef __UPGRADE_CLASS_H__
+#define __UPGRADE_CLASS_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -43,20 +43,20 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnitType;
+class CUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class UnitClass : public DataElement, public DataType<UnitClass>
+class UpgradeClass : public DataElement, public DataType<UpgradeClass>
 {
-	DATA_TYPE(UnitClass, DataElement)
+	DATA_TYPE(UpgradeClass, DataElement)
 
 public:
-	static constexpr const char *ClassIdentifier = "unit_class";
+	static constexpr const char *ClassIdentifier = "upgrade_class";
 	
-	std::set<CUnitType *> UnitTypes;
+	std::set<CUpgrade *> Upgrades;
 	
 protected:
 	static inline void _bind_methods() {}

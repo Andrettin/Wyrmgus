@@ -54,6 +54,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -767,7 +768,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "ResearchedUpgrade")) {
 			condition->ResearchedUpgrade = CUpgrade::Get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgradeClass")) {
-			condition->ResearchedUpgradeClass = GetUpgradeClassIndexByName(LuaToString(l, -1));
+			condition->ResearchedUpgradeClass = UpgradeClass::Get(LuaToString(l, -1));
 		} else if (!strcmp(key, "UpgradeResearched")) {
 			condition->UpgradeResearched = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Ability")) {

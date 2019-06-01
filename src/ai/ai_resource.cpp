@@ -1023,7 +1023,7 @@ static int AiMakeUnit(const CUnitType &typeToMake, const Vec2i &nearPos, int z, 
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
+static bool AiResearchUpgrade(const CUnitType &type, const CUpgrade &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1047,7 +1047,7 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 **
 **  @param upgrade  Upgrade to research
 */
-void AiAddResearchRequest(CUpgrade *upgrade)
+void AiAddResearchRequest(const CUpgrade *upgrade)
 {
 	// Check if resources are available.
 	//Wyrmgus start
@@ -2456,11 +2456,9 @@ void AiCheckUpgrades()
 		return;
 	}
 
-	std::vector<CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
+	std::vector<const CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
 	
-	for (size_t i = 0; i < potential_upgrades.size(); ++i) {
-		CUpgrade *upgrade = potential_upgrades[i];
-		
+	for (const CUpgrade *upgrade : potential_upgrades) {
 		if (!AiRequestedUpgradeAllowed(*AiPlayer->Player, upgrade)) {
 			continue;
 		}
@@ -2480,7 +2478,7 @@ void AiCheckUpgrades()
 		//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
-				CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
+				const CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
 				if (std::find(AiPlayer->ResearchRequests.begin(), AiPlayer->ResearchRequests.end(), removed_upgrade) != AiPlayer->ResearchRequests.end()) {
 					AiPlayer->ResearchRequests.erase(std::remove(AiPlayer->ResearchRequests.begin(), AiPlayer->ResearchRequests.end(), removed_upgrade), AiPlayer->ResearchRequests.end());
 				}

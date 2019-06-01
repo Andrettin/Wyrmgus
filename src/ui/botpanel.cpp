@@ -558,7 +558,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
-	if (condition->ResearchedUpgradeClass != -1) {
+	if (condition->ResearchedUpgradeClass != nullptr) {
 		if (!CPlayer::GetThisPlayer()->HasUpgradeClass(condition->ResearchedUpgradeClass)) {
 			return false;
 		}

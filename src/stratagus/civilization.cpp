@@ -66,21 +66,21 @@ const CUnitType *CCivilization::GetCivilizationClassUnitType(const CCivilization
 	return nullptr;
 }
 
-int CCivilization::GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id)
+const CUpgrade *CCivilization::GetCivilizationClassUpgrade(const CCivilization *civilization, const UpgradeClass *upgrade_class)
 {
-	if (civilization == nullptr || class_id == -1) {
-		return -1;
+	if (civilization == nullptr || upgrade_class == nullptr) {
+		return nullptr;
 	}
 	
-	if (civilization->ClassUpgrades.find(class_id) != civilization->ClassUpgrades.end()) {
-		return civilization->ClassUpgrades.find(class_id)->second;
+	if (civilization->ClassUpgrades.find(upgrade_class) != civilization->ClassUpgrades.end()) {
+		return civilization->ClassUpgrades.find(upgrade_class)->second;
 	}
 	
 	if (civilization->ParentCivilization) {
-		return CCivilization::GetCivilizationClassUpgrade(civilization->ParentCivilization, class_id);
+		return CCivilization::GetCivilizationClassUpgrade(civilization->ParentCivilization, upgrade_class);
 	}
 	
-	return -1;
+	return nullptr;
 }
 
 std::vector<CFiller> CCivilization::GetCivilizationUIFillers(const CCivilization *civilization)

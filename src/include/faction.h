@@ -58,6 +58,7 @@ class CSite;
 class FactionType;
 class LuaCallback;
 class UnitClass;
+class UpgradeClass;
 
 /*----------------------------------------------------------------------------
 --  Enumerations
@@ -99,7 +100,7 @@ public:
 	
 	static int GetFactionIndex(const std::string &faction_ident);
 	static const CUnitType *GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class);
-	static int GetFactionClassUpgrade(const CFaction *faction, const int class_id);
+	static const CUpgrade *GetFactionClassUpgrade(const CFaction *faction, const UpgradeClass *upgrade_class);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
@@ -197,7 +198,7 @@ public:
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<const UnitClass *, const CUnitType *> ClassUnitTypes;		/// the unit type of a particular unit class for the faction
-	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for the faction
+	std::map<const UpgradeClass *, const CUpgrade *> ClassUpgrades;		/// the upgrade slot of a particular class for the faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)

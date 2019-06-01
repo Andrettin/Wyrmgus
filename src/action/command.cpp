@@ -1210,8 +1210,8 @@ void CommandCancelUpgradeTo(CUnit &unit)
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
-void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
+//void CommandResearch(CUnit &unit, const CUpgrade &what, int flush)
+void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
