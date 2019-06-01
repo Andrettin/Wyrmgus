@@ -50,12 +50,12 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int startx = ParseAnimInt(unit, this->startXStr.c_str());
-	const int starty = ParseAnimInt(unit, this->startYStr.c_str());
-	const int destx = ParseAnimInt(unit, this->destXStr.c_str());
-	const int desty = ParseAnimInt(unit, this->destYStr.c_str());
+	const int startx = this->StartX;
+	const int starty = this->StartY;
+	const int destx = this->DestX;
+	const int desty = this->DestY;
 	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(ParseAnimFlags(unit, this->flagsStr.c_str()));
-	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr.c_str());
+	const int offsetnum = this->OffsetNum;
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
@@ -154,27 +154,37 @@
 	size_t end = str.find(' ', begin);
 	this->missileTypeStr.assign(str, begin, end - begin);
 
+	std::string start_x_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->startXStr.assign(str, begin, end - begin);
+	start_x_str.assign(str, begin, end - begin);
+	this->StartX = std::stoi(start_x_str);
 
+	std::string start_y_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->startYStr.assign(str, begin, end - begin);
+	start_y_str.assign(str, begin, end - begin);
+	this->StartY = std::stoi(start_y_str);
 
+	std::string dest_x_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->destXStr.assign(str, begin, end - begin);
+	dest_x_str.assign(str, begin, end - begin);
+	this->DestX = std::stoi(dest_x_str);
 
+	std::string dest_y_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->destYStr.assign(str, begin, end - begin);
+	dest_y_str.assign(str, begin, end - begin);
+	this->DestY = std::stoi(dest_y_str);
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
 	this->flagsStr.assign(str, begin, end - begin);
 
+	std::string offset_num_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->offsetNumStr.assign(str, begin, end - begin);
+	offset_num_str.assign(str, begin, end - begin);
+	this->OffsetNum = std::stoi(offset_num_str);
 }

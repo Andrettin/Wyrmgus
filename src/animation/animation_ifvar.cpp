@@ -67,8 +67,8 @@ static bool returnFalse(int, int) { return false; }
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int lop = ParseAnimInt(unit, this->leftVar.c_str());
-	const int rop = ParseAnimInt(unit, this->rightVar.c_str());
+	const int lop = this->LeftVar.GetValue(&unit);
+	const int rop = this->RightVar.GetValue(&unit);
 	const bool cond = this->binOpFunc(lop, rop);
 
 	if (cond) {
@@ -84,9 +84,11 @@ static bool returnFalse(int, int) { return false; }
 	const std::string str(s);
 	const size_t len = str.size();
 
+	std::string left_var_str;
 	size_t begin = 0;
 	size_t end = std::min(len, str.find(' ', begin));
-	this->leftVar.assign(str, begin, end - begin);
+	left_var_str.assign(str, begin, end - begin);
+	this->LeftVar.Parse(left_var_str);
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
@@ -130,9 +132,11 @@ static bool returnFalse(int, int) { return false; }
 		}
 	}
 
+	std::string right_var_str;
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->rightVar.assign(str, begin, end - begin);
+	right_var_str.assign(str, begin, end - begin);
+	this->RightVar.Parse(right_var_str);
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));

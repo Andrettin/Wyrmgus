@@ -56,12 +56,12 @@ public:
 
 private:
 	std::string missileTypeStr;
-	std::string startXStr;
-	std::string startYStr;
-	std::string destXStr;
-	std::string destYStr;
+	int StartX = 0;
+	int StartY = 0;
+	int DestX = 0;
+	int DestY = 0;
 	std::string flagsStr;
-	std::string offsetNumStr;
+	int OffsetNum = 0;
 };
 
 #endif

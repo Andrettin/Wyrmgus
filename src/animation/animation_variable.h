@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_ifvar.h - The if var animation header file. */
+/**@name animation_variable.h - The animation variable header file. */
 //
-//      (c) Copyright 2012-2019 by Joris Dauphin and Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,38 +27,40 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_IFVAR_H
-#define ANIMATION_IFVAR_H
+#ifndef __ANIMATION_VARIABLE_H__
+#define __ANIMATION_VARIABLE_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "animation/animation.h"
-#include "animation/animation_variable.h"
-
 #include <string>
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class CSpell;
+class CUnit;
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CAnimation_IfVar : public CAnimation
+class AnimationVariable
 {
 public:
-	CAnimation_IfVar() : CAnimation(AnimationIfVar) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
-
+	void Parse(const std::string &var_str);
+	int GetValue(const CUnit *unit) const;
+	
 private:
-	typedef bool BinOpFunc(int lhs, int rhs);
-
-private:
-	AnimationVariable LeftVar;
-	AnimationVariable RightVar;
-	BinOpFunc *binOpFunc = nullptr;
-	CAnimation *gotoLabel = nullptr;
+	int VariableIndex = -1;
+	bool Target = false;
+	bool InsideCount = false;
+	bool Max = false;
+	bool Percent = false;
+	const CSpell *Spell = nullptr;
+	int Value = 0;
 };
 
 #endif
