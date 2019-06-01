@@ -81,7 +81,8 @@ public:
 	static std::map<std::string, CTerrainType *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 	uint16_t GetFlags() const
 	{
@@ -110,7 +111,6 @@ public:
 		return this->Swamp;
 	}
 
-	std::string Name;
 	std::string Character;
 	CColor Color;
 	int SolidAnimationFrames = 0;

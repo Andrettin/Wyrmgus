@@ -144,206 +144,206 @@ CTerrainType::~CTerrainType()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CTerrainType::ProcessConfigData(const CConfigData *config_data)
+bool CTerrainType::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	std::string graphics_file;
-	std::string elevation_graphics_file;
-	std::string player_color_graphics_file;
+	if (key == "character") {
+		this->Character = value;
+		
+		if (CTerrainType::TerrainTypesByCharacter.find(this->Character) != CTerrainType::TerrainTypesByCharacter.end()) {
+			fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", this->Character.c_str());
+		} else {
+			CTerrainType::TerrainTypesByCharacter[this->Character] = this;
+		}
+	} else if (key == "color") {
+		this->Color = CColor::FromString(value);
+		
+		if (CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != CTerrainType::TerrainTypesByColor.end()) {
+			fprintf(stderr, "Color is already used by another terrain type.\n");
+		} else if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != TerrainFeatureColorToIndex.end()) {
+			fprintf(stderr, "Color is already used by a terrain feature.\n");
+		} else {
+			CTerrainType::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
+		}
+	} else if (key == "overlay") {
+		this->Overlay = StringToBool(value);
+	} else if (key == "buildable") {
+		this->Buildable = StringToBool(value);
+	} else if (key == "allow_single") {
+		this->AllowSingle = StringToBool(value);
+	} else if (key == "hidden") {
+		this->Hidden = StringToBool(value);
+	} else if (key == "resource") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Resource = GetResourceIdByName(value.c_str());
+	} else if (key == "flag") {
+		value = FindAndReplaceString(value, "_", "-");
+		uint16_t flag = CTerrainType::GetTerrainFlagByName(value);
+		if (flag) {
+			this->Flags |= flag;
+		}
+	} else if (key == "graphics") {
+		std::string graphics_file = value;
+		if (CanAccessFile(graphics_file.c_str())) {
+			if (!graphics_file.empty()) {
+				if (CGraphic::Get(graphics_file) == nullptr) {
+					CGraphic *graphics = CGraphic::New(graphics_file, CMap::PixelTileSize.x, CMap::PixelTileSize.y);
+				}
+				this->Graphics = CGraphic::Get(graphics_file);
+			}
+		} else {
+			fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "elevation_graphics") {
+		std::string elevation_graphics_file = value;
+		if (CanAccessFile(elevation_graphics_file.c_str())) {
+			if (!elevation_graphics_file.empty()) {
+				if (CGraphic::Get(elevation_graphics_file) == nullptr) {
+					CGraphic *graphics = CGraphic::New(elevation_graphics_file, CMap::PixelTileSize.x, CMap::PixelTileSize.y);
+				}
+				this->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
+			}
+		} else {
+			fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "player_color_graphics") {
+		std::string player_color_graphics_file = value;
+		if (CanAccessFile(player_color_graphics_file.c_str())) {
+			if (!player_color_graphics_file.empty()) {
+				if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
+					CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, CMap::PixelTileSize.x, CMap::PixelTileSize.y);
+				}
+				this->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
+			}
+		} else {
+			fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "pixel_width") {
+		this->PixelTileSize.x = std::stoi(value);
+	} else if (key == "pixel_height") {
+		this->PixelTileSize.y = std::stoi(value);
+	} else if (key == "base_terrain_type") {
+		CTerrainType *base_terrain_type = CTerrainType::Get(value);
+		this->BaseTerrainTypes.push_back(base_terrain_type);
+	} else if (key == "inner_border_terrain_type") {
+		CTerrainType *border_terrain_type = CTerrainType::Get(value);
+		this->InnerBorderTerrains.push_back(border_terrain_type);
+		this->BorderTerrains.push_back(border_terrain_type);
+		border_terrain_type->OuterBorderTerrains.push_back(this);
+		border_terrain_type->BorderTerrains.push_back(this);
+	} else if (key == "outer_border_terrain_type") {
+		CTerrainType *border_terrain_type = CTerrainType::Get(value);
+		this->OuterBorderTerrains.push_back(border_terrain_type);
+		this->BorderTerrains.push_back(border_terrain_type);
+		border_terrain_type->InnerBorderTerrains.push_back(this);
+		border_terrain_type->BorderTerrains.push_back(this);
+	} else if (key == "solid_tile") {
+		this->SolidTiles.push_back(std::stoi(value));
+	} else if (key == "damaged_tile") {
+		this->DamagedTiles.push_back(std::stoi(value));
+	} else if (key == "destroyed_tile") {
+		this->DestroyedTiles.push_back(std::stoi(value));
+	} else {
+		return false;
+	}
 	
-	for (const CConfigProperty &property : config_data->Properties) {
-		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-			continue;
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CTerrainType::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "season_graphics") {
+		std::string season_graphics_file;
+		CSeason *season = nullptr;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			if (property.Key == "season") {
+				season = CSeason::Get(property.Value);
+			} else if (property.Key == "graphics") {
+				season_graphics_file = property.Value;
+				if (!CanAccessFile(season_graphics_file.c_str())) {
+					fprintf(stderr, "File \"%s\" doesn't exist.\n", season_graphics_file.c_str());
+				}
+			} else {
+				fprintf(stderr, "Invalid season graphics property: \"%s\".\n", property.Key.c_str());
+			}
 		}
 		
-		if (property.Key == "name") {
-			this->Name = property.Value;
-		} else if (property.Key == "character") {
-			this->Character = property.Value;
-			
-			if (CTerrainType::TerrainTypesByCharacter.find(this->Character) != CTerrainType::TerrainTypesByCharacter.end()) {
-				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", this->Character.c_str());
+		if (season_graphics_file.empty()) {
+			fprintf(stderr, "Season graphics have no file.\n");
+			return true;
+		}
+		
+		if (!season) {
+			fprintf(stderr, "Season graphics have no season.\n");
+			return true;
+		}
+		
+		if (CGraphic::Get(season_graphics_file) == nullptr) {
+			CGraphic *graphics = CGraphic::New(season_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
+		}
+		this->SeasonGraphics[season] = CGraphic::Get(season_graphics_file);
+	} else if (section->Tag == "transition_tile" || section->Tag == "adjacent_transition_tile") {
+		int transition_terrain_id = -1; //any terrain, by default
+		int transition_type = -1;
+		std::vector<int> tiles;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
 				continue;
+			}
+			
+			if (property.Key == "terrain_type") {
+				CTerrainType *transition_terrain = CTerrainType::Get(property.Value);
+				if (transition_terrain != nullptr) {
+					transition_terrain_id = transition_terrain->GetIndex();
+				}
+			} else if (property.Key == "transition_type") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
+				transition_type = GetTransitionTypeIdByName(value);
+			} else if (property.Key == "tile") {
+				tiles.push_back(std::stoi(property.Value));
 			} else {
-				CTerrainType::TerrainTypesByCharacter[this->Character] = this;
+				fprintf(stderr, "Invalid transition tile property: \"%s\".\n", property.Key.c_str());
 			}
-		} else if (property.Key == "color") {
-			this->Color = CColor::FromString(property.Value);
-			
-			if (CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != CTerrainType::TerrainTypesByColor.end()) {
-				fprintf(stderr, "Color is already used by another terrain type.\n");
-				continue;
-			}
-			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != TerrainFeatureColorToIndex.end()) {
-				fprintf(stderr, "Color is already used by a terrain feature.\n");
-				continue;
-			}
-			CTerrainType::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
-		} else if (property.Key == "overlay") {
-			this->Overlay = StringToBool(property.Value);
-		} else if (property.Key == "buildable") {
-			this->Buildable = StringToBool(property.Value);
-		} else if (property.Key == "allow_single") {
-			this->AllowSingle = StringToBool(property.Value);
-		} else if (property.Key == "hidden") {
-			this->Hidden = StringToBool(property.Value);
-		} else if (property.Key == "resource") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->Resource = GetResourceIdByName(value.c_str());
-		} else if (property.Key == "flag") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			uint16_t flag = CTerrainType::GetTerrainFlagByName(value);
-			if (flag) {
-				this->Flags |= flag;
-			}
-		} else if (property.Key == "graphics") {
-			graphics_file = property.Value;
-			if (!CanAccessFile(graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", property.Value.c_str());
-			}
-		} else if (property.Key == "elevation_graphics") {
-			elevation_graphics_file = property.Value;
-			if (!CanAccessFile(elevation_graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", property.Value.c_str());
-			}
-		} else if (property.Key == "player_color_graphics") {
-			player_color_graphics_file = property.Value;
-			if (!CanAccessFile(player_color_graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", property.Value.c_str());
-			}
-		} else if (property.Key == "pixel_width") {
-			this->PixelTileSize.x = std::stoi(property.Value);
-		} else if (property.Key == "pixel_height") {
-			this->PixelTileSize.y = std::stoi(property.Value);
-		} else if (property.Key == "base_terrain_type") {
-			CTerrainType *base_terrain_type = CTerrainType::Get(property.Value);
-			this->BaseTerrainTypes.push_back(base_terrain_type);
-		} else if (property.Key == "inner_border_terrain_type") {
-			CTerrainType *border_terrain_type = CTerrainType::Get(property.Value);
-			this->InnerBorderTerrains.push_back(border_terrain_type);
-			this->BorderTerrains.push_back(border_terrain_type);
-			border_terrain_type->OuterBorderTerrains.push_back(this);
-			border_terrain_type->BorderTerrains.push_back(this);
-		} else if (property.Key == "outer_border_terrain_type") {
-			CTerrainType *border_terrain_type = CTerrainType::Get(property.Value);
-			this->OuterBorderTerrains.push_back(border_terrain_type);
-			this->BorderTerrains.push_back(border_terrain_type);
-			border_terrain_type->InnerBorderTerrains.push_back(this);
-			border_terrain_type->BorderTerrains.push_back(this);
-		} else if (property.Key == "solid_tile") {
-			this->SolidTiles.push_back(std::stoi(property.Value));
-		} else if (property.Key == "damaged_tile") {
-			this->DamagedTiles.push_back(std::stoi(property.Value));
-		} else if (property.Key == "destroyed_tile") {
-			this->DestroyedTiles.push_back(std::stoi(property.Value));
-		} else {
-			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", property.Key.c_str());
 		}
+		
+		if (transition_type == -1) {
+			fprintf(stderr, "Transition tile has no transition type.\n");
+			return true;
+		}
+		
+		for (size_t j = 0; j < tiles.size(); ++j) {
+			if (section->Tag == "transition_tile") {
+				this->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
+			} else if (section->Tag == "adjacent_transition_tile") {
+				this->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
+			}
+		}
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "season_graphics") {
-			std::string season_graphics_file;
-			CSeason *season = nullptr;
-			
-			for (const CConfigProperty &property : section->Properties) {
-				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-					continue;
-				}
-				
-				if (property.Key == "season") {
-					season = CSeason::Get(property.Value);
-				} else if (property.Key == "graphics") {
-					season_graphics_file = property.Value;
-					if (!CanAccessFile(season_graphics_file.c_str())) {
-						fprintf(stderr, "File \"%s\" doesn't exist.\n", season_graphics_file.c_str());
-					}
-				} else {
-					fprintf(stderr, "Invalid season graphics property: \"%s\".\n", property.Key.c_str());
-				}
-			}
-			
-			if (season_graphics_file.empty()) {
-				fprintf(stderr, "Season graphics have no file.\n");
-				continue;
-			}
-			
-			if (!season) {
-				fprintf(stderr, "Season graphics have no season.\n");
-				continue;
-			}
-			
-			if (CGraphic::Get(season_graphics_file) == nullptr) {
-				CGraphic *graphics = CGraphic::New(season_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
-			}
-			this->SeasonGraphics[season] = CGraphic::Get(season_graphics_file);
-		} else if (section->Tag == "transition_tile" || section->Tag == "adjacent_transition_tile") {
-			int transition_terrain_id = -1; //any terrain, by default
-			int transition_type = -1;
-			std::vector<int> tiles;
-			
-			for (const CConfigProperty &property : section->Properties) {
-				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-					continue;
-				}
-				
-				if (property.Key == "terrain_type") {
-					CTerrainType *transition_terrain = CTerrainType::Get(property.Value);
-					if (transition_terrain != nullptr) {
-						transition_terrain_id = transition_terrain->GetIndex();
-					}
-				} else if (property.Key == "transition_type") {
-					std::string value = FindAndReplaceString(property.Value, "_", "-");
-					transition_type = GetTransitionTypeIdByName(value);
-				} else if (property.Key == "tile") {
-					tiles.push_back(std::stoi(property.Value));
-				} else {
-					fprintf(stderr, "Invalid transition tile property: \"%s\".\n", property.Key.c_str());
-				}
-			}
-			
-			if (transition_type == -1) {
-				fprintf(stderr, "Transition tile has no transition type.\n");
-				continue;
-			}
-			
-			for (size_t j = 0; j < tiles.size(); ++j) {
-				if (section->Tag == "transition_tile") {
-					this->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
-				} else if (section->Tag == "adjacent_transition_tile") {
-					this->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
-				}
-			}
-		} else {
-			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", section->Tag.c_str());
-		}
-	}
-	
-	//get the graphics here, so that we can take the pixel tile size into account
-	if (!graphics_file.empty()) {
-		if (CGraphic::Get(graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
-		}
-		this->Graphics = CGraphic::Get(graphics_file);
-	}
-	if (!elevation_graphics_file.empty()) {
-		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
-		}
-		this->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
-	}
-	if (!player_color_graphics_file.empty()) {
-		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
-		}
-		this->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
-	}
+	return true;
 }
 
 /**

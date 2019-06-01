@@ -1418,15 +1418,15 @@ static void DrawEditorInfo()
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	*/
-	std::string terrain_name;
+	String terrain_name;
 	if (mf.Terrain) {
 		if (mf.OverlayTerrain) {
-			terrain_name = mf.OverlayTerrain->Name + " (" + mf.Terrain->Name + ")";
+			terrain_name = mf.OverlayTerrain->GetName() + " (" + mf.Terrain->GetName() + ")";
 		} else {
-			terrain_name = mf.Terrain->Name;
+			terrain_name = mf.Terrain->GetName();
 		}
 	}
-	snprintf(buf, sizeof(buf), "%s", terrain_name.c_str());
+	snprintf(buf, sizeof(buf), "%s", terrain_name.utf8().get_data());
 	//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
@@ -2136,7 +2136,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 //				const int tileindex = CMap::Map.Tileset->findTileIndexByTile(tile);
 //				const int base = CMap::Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 //				UI.StatusLine.Set(CMap::Map.Tileset->getTerrainName(base));
-				UI.StatusLine.Set(Editor.ShownTileTypes[i]->Name);
+				UI.StatusLine.Set(Editor.ShownTileTypes[i]->GetName().utf8().get_data());
 				//Wyrmgus end
 				Editor.CursorTileIndex = i;
 				return true;

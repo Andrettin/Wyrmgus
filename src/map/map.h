@@ -176,6 +176,7 @@ public:
 	~CMap();
 
 	static CMap Map;	/// The current map
+	static PixelSize PixelTileSize;
 
 	unsigned int getIndex(int x, int y, int z) const;
 	unsigned int getIndex(const Vec2i &pos, int z) const;

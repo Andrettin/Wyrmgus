@@ -93,6 +93,7 @@ std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 CMap CMap::Map;				/// The current map
+PixelSize CMap::PixelTileSize = PixelSize(32, 32);	/// The pixel tile size
 int FlagRevealMap;			/// Flag must reveal the map
 int ReplayRevealMap;		/// Reveal Map is replay
 int ForestRegeneration;		/// Forest regeneration
