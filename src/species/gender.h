@@ -43,7 +43,7 @@
 
 class CGender : public DataElement, public DataType<CGender>
 {
-	DATA_TYPE(CGender, DataElement)
+	GDCLASS(CGender, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "gender";

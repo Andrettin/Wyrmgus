@@ -61,7 +61,7 @@ struct lua_State;
 
 class CCampaign : public DataElement, public DataType<CCampaign>
 {
-	DATA_TYPE(CCampaign, DataElement)
+	GDCLASS(CCampaign, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "campaign";

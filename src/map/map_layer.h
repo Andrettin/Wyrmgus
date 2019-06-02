@@ -154,14 +154,14 @@ private:
 	void IncrementTimeOfDay();
 public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
-	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
+	void SetTimeOfDay(const CScheduledTimeOfDay *time_of_day);
 	CTimeOfDay *GetTimeOfDay() const;
 private:
 	void DecrementRemainingSeasonHours();
 	void IncrementSeason();
 public:
 	void SetSeasonByHours(const unsigned long long hours);
-	void SetSeason(CScheduledSeason *season);
+	void SetSeason(const CScheduledSeason *season);
 	CSeason *GetSeason() const;
 	
 	bool IsUnderground() const
@@ -185,11 +185,11 @@ private:
 	int Width = 0;								/// the width in tiles of the map layer
 	int Height = 0;								/// the height in tiles of the map layer
 public:
-	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
+	const CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
+	const CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
 	int RemainingTimeOfDayHours = 0;			/// the quantity of hours remaining for the current time of day to end
-	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
-	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
+	const CScheduledSeason *Season = nullptr;			/// the current season for the map layer
+	const CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
 private:
 	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer

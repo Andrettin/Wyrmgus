@@ -44,7 +44,7 @@
 
 class CConversibleColor : public DataElement
 {
-	DATA_TYPE(CConversibleColor, DataElement)
+	GDCLASS(CConversibleColor, DataElement)
 	
 public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

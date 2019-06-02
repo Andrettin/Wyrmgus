@@ -41,8 +41,6 @@ template <typename T, template<typename...> class U>
 class CRTP
 {
 protected:
-	CRTP() {}
-
 	T &GetUnderlying()
 	{
 		return static_cast<T &>(*this);

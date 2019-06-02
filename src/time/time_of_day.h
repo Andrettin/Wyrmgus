@@ -50,7 +50,7 @@ class CGraphic;
 
 class CTimeOfDay : public DataElement, public DataType<CTimeOfDay>
 {
-	DATA_TYPE(CTimeOfDay, DataElement)
+	GDCLASS(CTimeOfDay, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "time_of_day";

@@ -51,7 +51,7 @@ class CUpgrade;
 
 class UpgradeClass : public DataElement, public DataType<UpgradeClass>
 {
-	DATA_TYPE(UpgradeClass, DataElement)
+	GDCLASS(UpgradeClass, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "upgrade_class";

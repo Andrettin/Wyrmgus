@@ -45,53 +45,10 @@
 #include <vector>
 
 /*----------------------------------------------------------------------------
---  Macros
-----------------------------------------------------------------------------*/
-
-#define DATA_TYPE(class_name, base_class_name) \
-	typedef class_name ThisClass; \
-	\
-	GDCLASS(class_name, base_class_name) \
-	\
-protected: \
-	/**
-	**	@brief	Get a property of the data type by its key
-	**
-	**	@param	property_key	The key of the property
-	**
-	**	@return	The property if it exists, or null otherwise
-	*/ \
-	virtual PropertyCommonBase *GetProperty(const std::string &property_key) override \
-	{ \
-		std::map<std::string, std::function<PropertyCommonBase *(class_name *)>>::iterator find_iterator = class_name::Properties.find(property_key); \
-		if (find_iterator != class_name::Properties.end()) { \
-			return find_iterator->second(this); \
-		} else { \
-			return base_class_name::GetProperty(property_key); \
-		} \
-	} \
-	\
-private: \
-	static inline std::map<std::string, std::function<PropertyCommonBase *(class_name *)>> Properties; \
-	
-#define REGISTER_PROPERTY(property_variable) \
-	ThisClass::Properties.insert({PascalCaseToSnakeCase(#property_variable), std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
-
-/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class DataElement;
-
-template <typename T, typename O>
-class ExposedProperty;
-
-template <typename T, typename O>
-class Property;
-
-class PropertyCommonBase;
-
-extern std::string PascalCaseToSnakeCase(const std::string &str);
 
 extern std::vector<std::function<void()>> ClassClearFunctions;
 
@@ -102,14 +59,6 @@ extern std::vector<std::function<void()>> ClassClearFunctions;
 template <typename T>
 class DataType
 {
-	template <typename T2>
-	using Property = Property<T2, T>; //to reduce redundancy from the property declarations
-	
-	template <typename T2>
-	using ExposedProperty = ExposedProperty<T2, T>;
-	
-	using PropertyMap = std::map<std::string, PropertyCommonBase *T::*>;
-	
 public:
 	/**
 	**	@brief	Get an instance of the class by its string identifier

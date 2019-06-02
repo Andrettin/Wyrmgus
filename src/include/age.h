@@ -51,7 +51,7 @@ class CUpgrade;
 
 class CAge : public DetailedDataElement, public DataType<CAge>
 {
-	DATA_TYPE(CAge, DetailedDataElement)
+	GDCLASS(CAge, DetailedDataElement)
 	
 public:
 	CAge(const std::string &ident = "", const int index = -1) : DetailedDataElement(ident, index)

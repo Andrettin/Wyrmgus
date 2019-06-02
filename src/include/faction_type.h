@@ -49,7 +49,7 @@ class CUpgrade;
 
 class FactionType : public DataElement, public DataType<FactionType>
 {
-	DATA_TYPE(FactionType, DataElement)
+	GDCLASS(FactionType, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "faction_type";

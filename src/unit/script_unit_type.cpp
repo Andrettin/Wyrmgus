@@ -3570,7 +3570,7 @@ static int CclDefineSpecies(lua_State *l)
 			CPlane *plane = CPlane::Get(plane_ident);
 			if (plane) {
 				species->HomePlane = plane;
-				plane->Species.push_back(species);
+				plane->AddSpecies(species);
 			} else {
 				LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
 			}
@@ -3579,7 +3579,7 @@ static int CclDefineSpecies(lua_State *l)
 			CWorld *world = CWorld::Get(world_ident);
 			if (world) {
 				species->Homeworld = world;
-				world->Species.push_back(species);
+				world->AddSpecies(species);
 			} else {
 				LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
 			}
@@ -3589,11 +3589,11 @@ static int CclDefineSpecies(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
+				const CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 				if (terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
-				species->NativeTerrainTypes.push_back(terrain);
+				species->NativeTerrainTypes.insert(terrain);
 			}
 		} else if (!strcmp(value, "EvolvesFrom")) {
 			species->EvolvesFrom.clear();
@@ -3671,11 +3671,13 @@ static int CclGetSpeciesData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Terrains")) {
-		lua_createtable(l, species->NativeTerrainTypes.size(), 0);
-		for (size_t i = 1; i <= species->NativeTerrainTypes.size(); ++i)
+		lua_createtable(l, species->GetNativeTerrainTypes().size(), 0);
+		int index = 1;
+		for (const CTerrainType *terrain_type : species->GetNativeTerrainTypes())
 		{
-			lua_pushstring(l, species->NativeTerrainTypes[i-1]->Ident.c_str());
-			lua_rawseti(l, -2, i);
+			lua_pushstring(l, terrain_type->Ident.c_str());
+			lua_rawseti(l, -2, index);
+			index++;
 		}
 		return 1;
 	} else {

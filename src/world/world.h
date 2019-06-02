@@ -54,7 +54,7 @@ class Province;
 
 class CWorld : public DetailedDataElement, public DataType<CWorld>
 {
-	DATA_TYPE(CWorld, DetailedDataElement)
+	GDCLASS(CWorld, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "world";
@@ -64,18 +64,24 @@ public:
 	
 	CPlane *GetPlane() const { return this->Plane; }
 	
-	CTimeOfDaySchedule *GetTimeOfDaySchedule() const { return this->TimeOfDaySchedule; }
+	const CTimeOfDaySchedule *GetTimeOfDaySchedule() const { return this->TimeOfDaySchedule; }
 	
-	CSeasonSchedule *GetSeasonSchedule() const { return this->SeasonSchedule; }
+	const CSeasonSchedule *GetSeasonSchedule() const { return this->SeasonSchedule; }
+	
+	void AddProvince(Province *province) { this->Provinces.push_back(province); }
+	
+	void AddTerrainFeature(CTerrainFeature *terrain_feature) { this->TerrainFeatures.push_back(terrain_feature); }
+	const std::vector<CTerrainFeature *> &GetTerrainFeatures() const { return this->TerrainFeatures; }
+	
+	void AddSpecies(const CSpecies *species) { this->Species.insert(species); }
 	
 private:
 	CPlane *Plane = nullptr;
-public:
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// this world's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr;			/// this world's season schedule
+	const CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// this world's time of day schedule
+	const CSeasonSchedule *SeasonSchedule = nullptr;		/// this world's season schedule
 	std::vector<Province *> Provinces;					/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;		/// Terrain features in this world
-	std::vector<CSpecies *> Species;					/// Species in this world
+	std::set<const CSpecies *> Species;					/// Species in this world
 
 protected:
 	static void _bind_methods();

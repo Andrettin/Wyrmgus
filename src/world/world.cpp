@@ -80,12 +80,12 @@ void CWorld::_bind_methods()
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "plane"), "set_plane", "get_plane");
 	
 	ClassDB::bind_method(D_METHOD("set_time_of_day_schedule", "time_of_day_schedule"), +[](CWorld *world, const String &ident){ world->TimeOfDaySchedule = CTimeOfDaySchedule::Get(ident); });
-	ClassDB::bind_method(D_METHOD("get_time_of_day_schedule"), &CWorld::GetTimeOfDaySchedule);
+	ClassDB::bind_method(D_METHOD("get_time_of_day_schedule"), +[](const CWorld *world){ return const_cast<CTimeOfDaySchedule *>(world->GetTimeOfDaySchedule()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "time_of_day_schedule"), "set_time_of_day_schedule", "get_time_of_day_schedule");
 	
 	ClassDB::bind_method(D_METHOD("set_season_schedule", "season_schedule"), +[](CWorld *world, const String &ident){ world->SeasonSchedule = CSeasonSchedule::Get(ident); });
-	ClassDB::bind_method(D_METHOD("get_season_schedule"), &CWorld::GetSeasonSchedule);
+	ClassDB::bind_method(D_METHOD("get_season_schedule"), +[](const CWorld *world){ return const_cast<CSeasonSchedule *>(world->GetSeasonSchedule()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "season_schedule"), "set_season_schedule", "get_season_schedule");
 	
-	ClassDB::bind_method(D_METHOD("get_species"), +[](const CWorld *world){ return VectorToGodotArray(world->Species); });
+	ClassDB::bind_method(D_METHOD("get_species"), +[](const CWorld *world){ return SetToGodotArray(world->Species); });
 }

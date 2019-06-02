@@ -98,7 +98,7 @@ struct lua_State;
 /// Icon: rectangle image used in menus
 class CIcon : public DataElement, public DataType<CIcon>
 {
-	DATA_TYPE(CIcon, DataElement)
+	GDCLASS(CIcon, DataElement)
 	
 public:
 	/**

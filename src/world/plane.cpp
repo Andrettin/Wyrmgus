@@ -85,14 +85,14 @@ void CPlane::Clear()
 bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "empowered_deity_domain") {
-		CDeityDomain *deity_domain = CDeityDomain::Get(value);
-		if (deity_domain) {
-			this->EmpoweredDeityDomains.push_back(deity_domain);
+		const CDeityDomain *deity_domain = CDeityDomain::Get(value);
+		if (deity_domain != nullptr) {
+			this->EmpoweredDeityDomains.insert(deity_domain);
 		}
 	} else if (key == "empowered_school_of_magic") {
-		CSchoolOfMagic *school_of_magic = CSchoolOfMagic::Get(value);
-		if (school_of_magic) {
-			this->EmpoweredSchoolsOfMagic.push_back(school_of_magic);
+		const CSchoolOfMagic *school_of_magic = CSchoolOfMagic::Get(value);
+		if (school_of_magic != nullptr) {
+			this->EmpoweredSchoolsOfMagic.insert(school_of_magic);
 		}
 	} else {
 		return false;
@@ -103,5 +103,17 @@ bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value
 
 void CPlane::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_species"), +[](const CPlane *plane){ return VectorToGodotArray(plane->Species); });
+	ClassDB::bind_method(D_METHOD("set_time_of_day_schedule", "ident"), +[](CPlane *plane, const String &ident){
+		plane->TimeOfDaySchedule = CTimeOfDaySchedule::Get(ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_time_of_day_schedule"), +[](const CPlane *plane){ return const_cast<CTimeOfDaySchedule *>(plane->GetTimeOfDaySchedule()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "time_of_day_schedule"), "set_time_of_day_schedule", "get_time_of_day_schedule");
+
+	ClassDB::bind_method(D_METHOD("set_season_schedule", "ident"), +[](CPlane *plane, const String &ident){
+		plane->SeasonSchedule = CSeasonSchedule::Get(ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_season_schedule"), +[](const CPlane *plane){ return const_cast<CSeasonSchedule *>(plane->GetSeasonSchedule()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "season_schedule"), "set_season_schedule", "get_season_schedule");
+
+	ClassDB::bind_method(D_METHOD("get_species"), +[](const CPlane *plane){ return SetToGodotArray(plane->Species); });
 }

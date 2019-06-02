@@ -37,7 +37,6 @@
 
 #include "config.h"
 #include "config_operator.h"
-#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -67,21 +66,6 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 			}
 		} catch (std::exception &exception) {
 			fprintf(stderr, "%s\n", exception.what());
-		}
-		
-		PropertyCommonBase *property = this->GetProperty(config_property.Key);
-		if (property != nullptr) {
-			if (config_property.Operator == CConfigOperator::Assignment) {
-				*property = config_property.Value;
-			} else if (config_property.Operator == CConfigOperator::Addition) {
-				*property += config_property.Value;
-			} else if (config_property.Operator == CConfigOperator::Subtraction) {
-				*property -= config_property.Value;
-			} else {
-				fprintf(stderr, "Invalid operator enumeration index for property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
-			}
-			
-			continue;
 		}
 		
 		if (!this->ProcessConfigDataProperty(config_property.Key, config_property.Value)) {

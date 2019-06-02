@@ -43,7 +43,7 @@
 
 class CSpeciesCategoryRank : public DataElement, public DataType<CSpeciesCategoryRank>
 {
-	DATA_TYPE(CSpeciesCategoryRank, DataElement)
+	GDCLASS(CSpeciesCategoryRank, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "species_category_rank";

@@ -66,7 +66,7 @@ class UpgradeClass;
 
 class CCivilization : public DetailedDataElement, public DataType<CCivilization>
 {
-	DATA_TYPE(CCivilization, DetailedDataElement)
+	GDCLASS(CCivilization, DetailedDataElement)
 	
 public:
 	~CCivilization();

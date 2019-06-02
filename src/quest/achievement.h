@@ -57,7 +57,7 @@ struct lua_State;
 
 class CAchievement : public DataElement, public DataType<CAchievement>
 {
-	DATA_TYPE(CAchievement, DataElement)
+	GDCLASS(CAchievement, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "achievement";

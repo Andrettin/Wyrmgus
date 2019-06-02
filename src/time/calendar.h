@@ -66,7 +66,7 @@ public:
 
 class CCalendar : public DataElement, public DataType<CCalendar>
 {
-	DATA_TYPE(CCalendar, DataElement)
+	GDCLASS(CCalendar, DataElement)
 	
 public:
 	~CCalendar();

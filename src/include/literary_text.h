@@ -50,7 +50,7 @@ class CLiteraryTextPage;
 
 class CLiteraryText : public DataElement, public DataType<CLiteraryText>
 {
-	DATA_TYPE(CLiteraryText, DataElement)
+	GDCLASS(CLiteraryText, DataElement)
 	
 public:
 	CLiteraryText() {}

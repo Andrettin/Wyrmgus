@@ -49,7 +49,7 @@ class ItemSlot;
 
 class ItemClass : public DataElement, public DataType<ItemClass>
 {
-	DATA_TYPE(ItemClass, DataElement)
+	GDCLASS(ItemClass, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "item_class";

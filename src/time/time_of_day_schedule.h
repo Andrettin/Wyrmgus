@@ -68,7 +68,7 @@ public:
 
 class CTimeOfDaySchedule : public CTimePeriodSchedule, public DataType<CTimeOfDaySchedule>
 {
-	DATA_TYPE(CTimeOfDaySchedule, CTimePeriodSchedule)
+	GDCLASS(CTimeOfDaySchedule, CTimePeriodSchedule)
 	
 public:
 	~CTimeOfDaySchedule();

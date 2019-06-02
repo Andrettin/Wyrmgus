@@ -51,7 +51,7 @@ class CIcon;
 */
 class DetailedDataElement : public DataElement
 {
-	DATA_TYPE(DetailedDataElement, DataElement)
+	GDCLASS(DetailedDataElement, DataElement)
 
 public:
 	DetailedDataElement(const std::string &ident = "", const int index = -1) : DataElement(ident, index)

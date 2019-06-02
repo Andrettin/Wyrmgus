@@ -44,7 +44,7 @@
 
 class CTimeline : public DataElement, public DataType<CTimeline>
 {
-	DATA_TYPE(CTimeline, DataElement)
+	GDCLASS(CTimeline, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "timeline";

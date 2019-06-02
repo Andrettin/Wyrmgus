@@ -51,7 +51,7 @@ class CUnitType;
 
 class UnitClass : public DataElement, public DataType<UnitClass>
 {
-	DATA_TYPE(UnitClass, DataElement)
+	GDCLASS(UnitClass, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "unit_class";

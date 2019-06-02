@@ -38,6 +38,7 @@
 
 #include <cstdlib>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -118,6 +119,18 @@ inline Array VectorToGodotArray(const std::vector<T> &vector)
 	Array array;
 	
 	for (const T &element : vector) {
+		array.push_back(element);
+	}
+	
+	return array;
+}
+
+template <typename T>
+inline Array SetToGodotArray(const std::set<T> &set)
+{
+	Array array;
+	
+	for (const T &element : set) {
 		array.push_back(element);
 	}
 	

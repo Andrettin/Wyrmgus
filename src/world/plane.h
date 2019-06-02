@@ -37,6 +37,8 @@
 #include "data_type.h"
 #include "detailed_data_element.h"
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -53,33 +55,32 @@ class CTimeOfDaySchedule;
 
 class CPlane : public DetailedDataElement, public DataType<CPlane>
 {
-	DATA_TYPE(CPlane, DetailedDataElement)
+	GDCLASS(CPlane, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "plane";
 
-private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(SeasonSchedule);
-		REGISTER_PROPERTY(TimeOfDaySchedule);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
-public:
 	static CPlane *Add(const std::string &ident);
 	static void Clear();
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	
+	const CTimeOfDaySchedule *GetTimeOfDaySchedule() const { return this->TimeOfDaySchedule; }
+	
+	const CSeasonSchedule *GetSeasonSchedule() const { return this->SeasonSchedule; }
+	
+	const std::set<const CDeityDomain *> &GetEmpoweredDeityDomains() const { return this->EmpoweredDeityDomains; }
+	
+	const std::set<const CSchoolOfMagic *> &GetEmpoweredSchoolsOfMagic() const { return this->EmpoweredSchoolsOfMagic; }
 
-	Property<CTimeOfDaySchedule *> TimeOfDaySchedule = nullptr;			/// this plane's time of day schedule
-	Property<CSeasonSchedule *> SeasonSchedule = nullptr;				/// this plane's season schedule
-	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// schools of magic empowered in this plane
-	std::vector<CSpecies *> Species;									/// species native to this plane
+	void AddSpecies(const CSpecies *species) { this->Species.insert(species); }
+
+private:
+	const CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// this plane's time of day schedule
+	const CSeasonSchedule *SeasonSchedule = nullptr;		/// this plane's season schedule
+	std::set<const CDeityDomain *> EmpoweredDeityDomains;		/// deity domains empowered in this plane
+	std::set<const CSchoolOfMagic *> EmpoweredSchoolsOfMagic;	/// schools of magic empowered in this plane
+	std::set<const CSpecies *> Species;							/// species native to this plane
 
 protected:
 	static void _bind_methods();

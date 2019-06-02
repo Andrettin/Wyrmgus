@@ -52,7 +52,7 @@ class UnitClass;
 
 class CLanguageFamily : public DataElement, public DataType<CLanguageFamily>
 {
-	DATA_TYPE(CLanguageFamily, DataElement)
+	GDCLASS(CLanguageFamily, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "language_family";

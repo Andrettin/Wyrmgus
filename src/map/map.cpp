@@ -293,9 +293,9 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 	
 	Vec2i random_pos(-1, -1);
 	
-	std::vector<CTerrainType *> allowed_terrains;
+	std::vector<const CTerrainType *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->GetSpecies()) { //if the unit is a fauna one, it has to start on terrain it is native to
-		for (CTerrainType *terrain_type : unit_type->GetSpecies()->NativeTerrainTypes) {
+		for (const CTerrainType *terrain_type : unit_type->GetSpecies()->GetNativeTerrainTypes()) {
 			allowed_terrains.push_back(terrain_type);
 		}
 	}
@@ -303,7 +303,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
 		CUnitType *spawned_type = unit_type->SpawnUnits[i];
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->GetSpecies()) {
-			for (CTerrainType *terrain_type : spawned_type->GetSpecies()->NativeTerrainTypes) {
+			for (const CTerrainType *terrain_type : spawned_type->GetSpecies()->GetNativeTerrainTypes()) {
 				allowed_terrains.push_back(terrain_type);
 			}
 		}
@@ -1244,10 +1244,9 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
 		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = CMap::Map.MapLayers[z]->TimeOfDaySchedule;
-		if (schedule) {
-			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
-				CScheduledTimeOfDay *time_of_day = schedule->ScheduledTimesOfDay[i];
+		const CTimeOfDaySchedule *schedule = CMap::Map.MapLayers[z]->TimeOfDaySchedule;
+		if (schedule != nullptr) {
+			for (const CScheduledTimeOfDay *time_of_day : schedule->ScheduledTimesOfDay) {
 				if (time_of_day->TimeOfDay->Ident == time_of_day_ident)  {
 					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day);
 					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(CMap::Map.MapLayers[z]->GetSeason());
@@ -1276,8 +1275,8 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const u
 		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
 		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::Get(time_of_day_schedule_ident);
-		if (schedule) {
+		const CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::Get(time_of_day_schedule_ident);
+		if (schedule != nullptr) {
 			CMap::Map.MapLayers[z]->TimeOfDaySchedule = schedule;
 			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
 			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->TimeOfDay->GetHours(CMap::Map.MapLayers[z]->GetSeason());
@@ -1297,13 +1296,12 @@ void SetSeason(const std::string &season_ident, int z)
 		CMap::Map.MapLayers[z]->SetSeason(nullptr);
 		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = CMap::Map.MapLayers[z]->SeasonSchedule;
-		if (schedule) {
-			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
-				CScheduledSeason *season = schedule->ScheduledSeasons[i];
-				if (season->Season->Ident == season_ident)  {
-					CMap::Map.MapLayers[z]->SetSeason(season);
-					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
+		const CSeasonSchedule *schedule = CMap::Map.MapLayers[z]->SeasonSchedule;
+		if (schedule != nullptr) {
+			for (const CScheduledSeason *scheduled_season : schedule->ScheduledSeasons) {
+				if (scheduled_season->Season->Ident == season_ident)  {
+					CMap::Map.MapLayers[z]->SetSeason(scheduled_season);
+					CMap::Map.MapLayers[z]->RemainingSeasonHours = scheduled_season->Hours;
 					break;
 				}
 			}
@@ -1324,8 +1322,8 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 		CMap::Map.MapLayers[z]->SetSeason(nullptr);
 		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = CSeasonSchedule::Get(season_schedule_ident);
-		if (schedule) {
+		const CSeasonSchedule *schedule = CSeasonSchedule::Get(season_schedule_ident);
+		if (schedule != nullptr) {
 			CMap::Map.MapLayers[z]->SeasonSchedule = schedule;
 			CMap::Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
 			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->Season->Hours;

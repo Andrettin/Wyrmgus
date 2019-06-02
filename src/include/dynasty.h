@@ -51,7 +51,7 @@ class CUpgrade;
 
 class CDynasty : public DetailedDataElement, public DataType<CDynasty>
 {
-	DATA_TYPE(CDynasty, DetailedDataElement)
+	GDCLASS(CDynasty, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "dynasty";

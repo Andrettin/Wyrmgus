@@ -56,7 +56,7 @@ class UnitClass;
 
 class CLanguage : public DataElement, public DataType<CLanguage>
 {
-	DATA_TYPE(CLanguage, DataElement)
+	GDCLASS(CLanguage, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "language";

@@ -172,7 +172,7 @@ static int CclDefineProvince(lua_State *l)
 			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (world != nullptr) {
 				province->World = world;
-				world->Provinces.push_back(province);
+				world->AddProvince(province);
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}
@@ -600,23 +600,6 @@ static int CclGetPlaneData(lua_State *l)
 	} else if (!strcmp(data, "Index")) {
 		lua_pushnumber(l, plane->GetIndex());
 		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, plane->GetDescription().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, plane->GetBackground().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, plane->GetQuote().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "Species")) {
-		lua_createtable(l, plane->Species.size(), 0);
-		for (size_t i = 1; i <= plane->Species.size(); ++i)
-		{
-			lua_pushstring(l, plane->Species[i-1]->GetIdent().utf8().get_data());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -646,38 +629,6 @@ static int CclGetWorldData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Index")) {
 		lua_pushnumber(l, world->GetIndex());
-		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, world->GetDescription().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, world->GetBackground().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, world->GetQuote().utf8().get_data());
-		return 1;
-	} else if (!strcmp(data, "Plane")) {
-		if (world->GetPlane()) {
-			lua_pushstring(l, world->GetPlane()->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Provinces")) {
-		lua_createtable(l, world->Provinces.size(), 0);
-		for (size_t i = 1; i <= world->Provinces.size(); ++i)
-		{
-			lua_pushstring(l, world->Provinces[i-1]->GetName().utf8().get_data());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "Species")) {
-		lua_createtable(l, world->Species.size(), 0);
-		for (size_t i = 1; i <= world->Species.size(); ++i)
-		{
-			lua_pushstring(l, world->Species[i-1]->GetIdent().utf8().get_data());
-			lua_rawseti(l, -2, i);
-		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

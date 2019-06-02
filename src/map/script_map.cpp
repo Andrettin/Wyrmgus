@@ -2035,7 +2035,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (world != nullptr) {
 				terrain_feature->World = world;
-				world->TerrainFeatures.push_back(terrain_feature);
+				world->AddTerrainFeature(terrain_feature);
 				terrain_feature->Plane = world->GetPlane();
 			} else {
 				LuaError(l, "World doesn't exist.");

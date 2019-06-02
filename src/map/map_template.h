@@ -83,7 +83,7 @@ public:
 
 class CMapTemplate : public DataElement, public DataType<CMapTemplate>
 {
-	DATA_TYPE(CMapTemplate, DataElement)
+	GDCLASS(CMapTemplate, DataElement)
 	
 public:
 	~CMapTemplate();

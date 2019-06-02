@@ -107,7 +107,7 @@ public:
 
 class Province : public DetailedDataElement, public DataType<Province>
 {
-	DATA_TYPE(Province, DetailedDataElement)
+	GDCLASS(Province, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "province";

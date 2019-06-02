@@ -43,7 +43,7 @@
 
 class CGrammaticalGender : public DataElement, public DataType<CGrammaticalGender>
 {
-	DATA_TYPE(CGrammaticalGender, DataElement)
+	GDCLASS(CGrammaticalGender, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "grammatical_gender";

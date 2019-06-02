@@ -58,7 +58,7 @@ struct lua_State;
 
 class CTerrainType : public DataElement, public DataType<CTerrainType>
 {
-	DATA_TYPE(CTerrainType, DataElement)
+	GDCLASS(CTerrainType, DataElement)
 
 public:
 	CTerrainType()

@@ -49,7 +49,7 @@ class CGraphic;
 
 class CSeason : public DataElement, public DataType<CSeason>
 {
-	DATA_TYPE(CSeason, DataElement)
+	GDCLASS(CSeason, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "season";

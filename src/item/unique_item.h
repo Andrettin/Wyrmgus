@@ -52,7 +52,7 @@ class CSpell;
 
 class UniqueItem : public DetailedDataElement, public DataType<UniqueItem>
 {
-	DATA_TYPE(UniqueItem, DetailedDataElement)
+	GDCLASS(UniqueItem, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "unique_item";

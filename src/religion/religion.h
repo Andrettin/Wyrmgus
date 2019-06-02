@@ -50,36 +50,25 @@ class CDeityDomain;
 
 class CReligion : public DetailedDataElement, public DataType<CReligion>
 {
-	DATA_TYPE(CReligion, DetailedDataElement)
+	GDCLASS(CReligion, DetailedDataElement)
 
 public:
 	CReligion(const std::string &ident = "", const int index = -1) : DetailedDataElement(ident, index)
 	{
 	}
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(CulturalDeities);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
-public:
 	static constexpr const char *ClassIdentifier = "religion";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	Property<bool> CulturalDeities = false;	/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
+	bool HasCulturalDeities() const { return this->CulturalDeities; }
+
+private:	
+	bool CulturalDeities = false;	/// whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
 	std::vector<CDeityDomain *> Domains;
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

@@ -54,7 +54,7 @@ class UnitClass;
 
 class CHistoricalUnit : public DataElement, public DataType<CHistoricalUnit>
 {
-	DATA_TYPE(CHistoricalUnit, DataElement)
+	GDCLASS(CHistoricalUnit, DataElement)
 	
 public:
 	~CHistoricalUnit();

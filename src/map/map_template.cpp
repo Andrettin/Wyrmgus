@@ -606,8 +606,8 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		if (Editor.Running == EditorNotRunning) {
 			if (this->World && this->World->GetSeasonSchedule() != nullptr) {
 				CMap::Map.MapLayers[z]->SeasonSchedule = this->World->GetSeasonSchedule();
-			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule != nullptr) {
-				CMap::Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
+			} else if (!this->World && this->Plane && this->Plane->GetSeasonSchedule() != nullptr) {
+				CMap::Map.MapLayers[z]->SeasonSchedule = this->Plane->GetSeasonSchedule();
 			} else {
 				CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
 			}
@@ -624,8 +624,8 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 			) {
 				if (this->World && this->World->GetTimeOfDaySchedule() != nullptr) {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->World->GetTimeOfDaySchedule();
-				} else if (this->World == nullptr && this->Plane != nullptr && this->Plane->TimeOfDaySchedule != nullptr) {
-					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->Plane->TimeOfDaySchedule;
+				} else if (this->World == nullptr && this->Plane != nullptr && this->Plane->GetTimeOfDaySchedule() != nullptr) {
+					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->Plane->GetTimeOfDaySchedule();
 				} else {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
 				}

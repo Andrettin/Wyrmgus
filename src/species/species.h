@@ -37,6 +37,8 @@
 #include "data_type.h"
 #include "detailed_data_element.h"
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -56,63 +58,38 @@ struct lua_State;
 
 class CSpecies : public DetailedDataElement, public DataType<CSpecies>
 {
-	DATA_TYPE(CSpecies, DetailedDataElement)
+	GDCLASS(CSpecies, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "species";
 	
-private:
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(EvolvesFrom);
-		REGISTER_PROPERTY(EvolvesTo);
-		REGISTER_PROPERTY(NativeTerrainTypes);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-
-public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	
-	const CSpeciesCategory *GetCategory() const
-	{
-		return this->Category;
-	}
+	const CSpeciesCategory *GetCategory() const { return this->Category; }
 	
-	CPlane *GetHomePlane() const
-	{
-		return this->HomePlane;
-	}
+	CPlane *GetHomePlane() const { return this->HomePlane; }
 	
-	CWorld *GetHomeworld() const
-	{
-		return this->Homeworld;
-	}
+	CWorld *GetHomeworld() const { return this->Homeworld; }
 	
-	CUnitType *GetUnitType() const
-	{
-		return this->UnitType;
-	}
+	CUnitType *GetUnitType() const { return this->UnitType; }
 	
-	bool IsSapient() const
-	{
-		return this->Sapient;
-	}
+	bool IsSapient() const { return this->Sapient; }
 	
-	bool IsPrehistoric() const
-	{
-		return this->Prehistoric;
-	}
+	bool IsPrehistoric() const { return this->Prehistoric; }
 	
 	const std::vector<const CGender *> &GetGenders() const;
 	
+	const std::set<const CTerrainType *> &GetNativeTerrainTypes() const { return this->NativeTerrainTypes; }
+	
 	bool IsNativeToTerrainType(const CTerrainType *terrain_type) const
 	{
-		return std::find(this->NativeTerrainTypes.begin(), this->NativeTerrainTypes.end(), terrain_type) != this->NativeTerrainTypes.end();
+		return this->NativeTerrainTypes.find(terrain_type) != this->NativeTerrainTypes.end();
 	}
+	
+	const std::vector<CSpecies *> &GetEvolvesFrom() const { return this->EvolvesFrom; }
+	
+	const std::vector<CSpecies *> &GetEvolvesTo() const { return this->EvolvesTo; }
 	
 	bool CanEvolveToAUnitType(const CTerrainType *terrain = nullptr, const bool sapient_only = false) const;
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
@@ -135,30 +112,9 @@ private:
 	CWorld *Homeworld = nullptr;
 	CUnitType *UnitType = nullptr;
 	std::vector<const CGender *> Genders;
-public:
-	ExposedProperty<std::vector<CTerrainType *>> NativeTerrainTypes;	/// in which terrains does this species live
-	ExposedProperty<std::vector<CSpecies *>> EvolvesFrom {		/// from which species this one can evolve
-		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
-		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
-			this->EvolvesFrom.Value.push_back(species);
-			species->EvolvesTo.Value.push_back(this);
-		}),
-		ExposedProperty<std::vector<CSpecies *>>::RemoverType([this](CSpecies *species) {
-			this->EvolvesFrom.Value.erase(std::remove(this->EvolvesFrom.Value.begin(), this->EvolvesFrom.Value.end(), species), this->EvolvesFrom.Value.end());
-			species->EvolvesTo.Value.erase(std::remove(species->EvolvesTo.Value.begin(), species->EvolvesTo.Value.end(), this), species->EvolvesTo.Value.end());
-		})
-	};
-	ExposedProperty<std::vector<CSpecies *>> EvolvesTo {		/// to which species this one can evolve
-		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
-		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
-			this->EvolvesTo.Value.push_back(species);
-			species->EvolvesFrom.Value.push_back(this);
-		}),
-		ExposedProperty<std::vector<CSpecies *>>::RemoverType([this](CSpecies *species) {
-			this->EvolvesTo.Value.erase(std::remove(this->EvolvesTo.Value.begin(), this->EvolvesTo.Value.end(), species), this->EvolvesTo.Value.end());
-			species->EvolvesFrom.Value.erase(std::remove(species->EvolvesFrom.Value.begin(), species->EvolvesFrom.Value.end(), this), species->EvolvesFrom.Value.end());
-		})
-	};
+	std::set<const CTerrainType *> NativeTerrainTypes;	/// in which terrains does this species live
+	std::vector<CSpecies *> EvolvesFrom;			/// from which species this one can evolve
+	std::vector<CSpecies *> EvolvesTo;				/// to which species this one can evolve
 	
 private:
 	std::map<const CGender *, std::vector<CWord *>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the gender for which they can be used

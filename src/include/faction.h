@@ -91,7 +91,7 @@ enum FactionTiers {
 
 class CFaction : public DetailedDataElement, public DataType<CFaction>
 {
-	DATA_TYPE(CFaction, DetailedDataElement)
+	GDCLASS(CFaction, DetailedDataElement)
 	
 public:
 	~CFaction();

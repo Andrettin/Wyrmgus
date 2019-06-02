@@ -113,7 +113,7 @@ public:
 
 class CQuest : public DetailedDataElement, public DataType<CQuest>
 {
-	DATA_TYPE(CQuest, DetailedDataElement)
+	GDCLASS(CQuest, DetailedDataElement)
 	
 public:
 	~CQuest();

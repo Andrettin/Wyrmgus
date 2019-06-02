@@ -74,13 +74,13 @@ bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string val
 		CPlane *plane = CPlane::Get(value);
 		if (plane) {
 			this->HomePlane = plane;
-			plane->Species.push_back(this);
+			plane->AddSpecies(this);
 		}
 	} else if (key == "homeworld") {
 		CWorld *world = CWorld::Get(value);
 		if (world) {
 			this->Homeworld = world;
-			world->Species.push_back(this);
+			world->AddSpecies(this);
 		}
 	} else {
 		return false;
@@ -96,13 +96,13 @@ void CSpecies::Initialize()
 {
 	this->Initialized = true;
 	
-	for (const CSpecies *evolves_from : this->EvolvesFrom) {
+	for (const CSpecies *evolves_from : this->GetEvolvesFrom()) {
 		if (evolves_from->IsInitialized() && this->Era != -1 && evolves_from->Era != -1 && this->Era <= evolves_from->Era) {
 			fprintf(stderr, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter.\n", this->GetIdent().utf8().get_data(), evolves_from->GetIdent().utf8().get_data());
 		}
 	}
 	
-	for (const CSpecies *evolves_to : this->EvolvesTo) {
+	for (const CSpecies *evolves_to : this->GetEvolvesTo()) {
 		if (evolves_to->IsInitialized() && this->Era != -1 && evolves_to->Era != -1 && this->Era >= evolves_to->Era) {
 			fprintf(stderr, "Species \"%s\" is set to evolve to \"%s\", but is from the same or a later era than the latter.\n", this->GetIdent().utf8().get_data(), evolves_to->GetIdent().utf8().get_data());
 		}
@@ -237,4 +237,32 @@ void CSpecies::_bind_methods()
 	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), +[](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
 	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), +[](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
 	ClassDB::bind_method(D_METHOD("get_genders"), +[](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_native_terrain_types", "ident"), +[](CSpecies *species, const String &ident){ species->NativeTerrainTypes.insert(CTerrainType::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_native_terrain_types", "ident"), +[](CSpecies *species, const String &ident){ species->NativeTerrainTypes.erase(CTerrainType::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("get_native_terrain_types"), +[](const CSpecies *species){ return SetToGodotArray(species->NativeTerrainTypes); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_evolves_from", "ident"), +[](CSpecies *species, const String &ident){
+		CSpecies *evolves_from = CSpecies::Get(ident);
+		species->EvolvesFrom.push_back(evolves_from);
+		evolves_from->EvolvesTo.push_back(species);
+	});
+	ClassDB::bind_method(D_METHOD("remove_from_evolves_from", "ident"), +[](CSpecies *species, const String &ident){
+		CSpecies *evolves_from = CSpecies::Get(ident);
+		species->EvolvesFrom.erase(std::remove(species->EvolvesFrom.begin(), species->EvolvesFrom.end(), evolves_from), species->EvolvesFrom.end());
+		evolves_from->EvolvesTo.erase(std::remove(species->EvolvesTo.begin(), species->EvolvesTo.end(), species), species->EvolvesTo.end());
+	});
+	ClassDB::bind_method(D_METHOD("get_evolves_from"), +[](const CSpecies *species){ return VectorToGodotArray(species->EvolvesFrom); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_evolves_to", "ident"), +[](CSpecies *species, const String &ident){
+		CSpecies *evolves_to = CSpecies::Get(ident);
+		species->EvolvesTo.push_back(evolves_to);
+		evolves_to->EvolvesFrom.push_back(species);
+	});
+	ClassDB::bind_method(D_METHOD("remove_from_evolves_to", "ident"), +[](CSpecies *species, const String &ident){
+		CSpecies *evolves_to = CSpecies::Get(ident);
+		species->EvolvesTo.erase(std::remove(species->EvolvesTo.begin(), species->EvolvesTo.end(), evolves_to), species->EvolvesTo.end());
+		evolves_to->EvolvesFrom.erase(std::remove(species->EvolvesFrom.begin(), species->EvolvesFrom.end(), species), species->EvolvesFrom.end());
+	});
+	ClassDB::bind_method(D_METHOD("get_evolves_to"), +[](const CSpecies *species){ return VectorToGodotArray(species->EvolvesTo); });
 }

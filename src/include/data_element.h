@@ -35,7 +35,6 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "property.h"
 
 #include <core/object.h>
 #include <core/ustring.h>
@@ -67,10 +66,6 @@ public:
 	{
 	}
 	
-private:
-	static inline std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>> Properties;
-	
-public:
 	virtual void ProcessConfigData(const CConfigData *config_data);
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) { return false; }
 	virtual bool ProcessConfigDataSection(const CConfigData *section) { return false; }
@@ -121,17 +116,6 @@ public:
 	bool IsInitialized() const
 	{
 		return this->Initialized;
-	}
-	
-protected:
-	virtual PropertyCommonBase *GetProperty(const std::string &property_key)
-	{
-		std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>>::iterator find_iterator = DataElement::Properties.find(property_key);
-		if (find_iterator != DataElement::Properties.end()) {
-			return find_iterator->second(this);
-		} else {
-			return nullptr;
-		}
 	}
 	
 public:

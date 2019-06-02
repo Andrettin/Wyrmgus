@@ -100,7 +100,7 @@ enum CharacterTitles {
 
 class CCharacter : public DetailedDataElement, public DataType<CCharacter>
 {
-	DATA_TYPE(CCharacter, DetailedDataElement)
+	GDCLASS(CCharacter, DetailedDataElement)
 	
 public:
 	CCharacter()

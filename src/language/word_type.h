@@ -43,7 +43,7 @@
 
 class CWordType : public DataElement, public DataType<CWordType>
 {
-	DATA_TYPE(CWordType, DataElement)
+	GDCLASS(CWordType, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "word_type";

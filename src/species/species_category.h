@@ -36,7 +36,6 @@
 
 #include "data_element.h"
 #include "data_type.h"
-#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,7 +51,7 @@ class CWord;
 
 class CSpeciesCategory : public DataElement, public DataType<CSpeciesCategory>
 {
-	DATA_TYPE(CSpeciesCategory, DataElement)
+	GDCLASS(CSpeciesCategory, DataElement)
 	
 public:
 	CSpeciesCategory(const std::string &ident = "", const int index = -1) : DataElement(ident, index)

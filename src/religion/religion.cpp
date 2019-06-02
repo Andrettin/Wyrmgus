@@ -59,3 +59,10 @@ bool CReligion::ProcessConfigDataProperty(const std::string &key, std::string va
 	
 	return true;
 }
+
+void CReligion::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_cultural_deities", "cultural_deities"), +[](CReligion *religion, const bool cultural_deities){ religion->CulturalDeities = cultural_deities; });
+	ClassDB::bind_method(D_METHOD("is_cultural_deities"), &CReligion::HasCulturalDeities);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "cultural_deities"), "set_cultural_deities", "is_cultural_deities");
+}

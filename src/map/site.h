@@ -61,7 +61,7 @@ struct lua_State;
 
 class CSite : public DataElement, public DataType<CSite>
 {
-	DATA_TYPE(CSite, DataElement)
+	GDCLASS(CSite, DataElement)
 	
 public:	
 	static constexpr const char *ClassIdentifier = "site";

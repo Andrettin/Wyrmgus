@@ -53,7 +53,7 @@ struct lua_State;
 
 class CDialogue : public DataElement, public DataType<CDialogue>
 {
-	DATA_TYPE(CDialogue, DataElement)
+	GDCLASS(CDialogue, DataElement)
 	
 public:
 	~CDialogue();

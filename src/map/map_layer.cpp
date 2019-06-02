@@ -281,13 +281,13 @@ void CMapLayer::SetTimeOfDayByHours(const unsigned long long hours)
 **
 **	@param	time_of_day	The time of day
 */
-void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
+void CMapLayer::SetTimeOfDay(const CScheduledTimeOfDay *time_of_day)
 {
 	if (this->TimeOfDay == time_of_day) {
 		return;
 	}
 	
-	CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
+	const CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
 	this->TimeOfDay = time_of_day;
 	
 	if (GameRunning && this == UI.CurrentMapLayer) {
@@ -382,7 +382,7 @@ void CMapLayer::SetSeasonByHours(const unsigned long long hours)
 	}
 }
 
-void CMapLayer::SetSeason(CScheduledSeason *season)
+void CMapLayer::SetSeason(const CScheduledSeason *season)
 {
 	if (season == this->Season) {
 		return;
