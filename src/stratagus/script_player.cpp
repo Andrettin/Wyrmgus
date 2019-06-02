@@ -1591,7 +1591,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string class_name = LuaToString(l, 1);
-	const UnitClass *unit_class = UnitClass::Get(class_name, false);
+	const UnitClass *unit_class = UnitClass::Get(class_name, false); //"should_find" is false here because it could be an upgrade class instead
 	CCivilization *civilization = CCivilization::Get(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization != nullptr && unit_class != nullptr) {
@@ -1599,10 +1599,8 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->Ident;
 		}
-	}
-		
-	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const UpgradeClass *upgrade_class = UpgradeClass::Get(class_name, false);
+	} else if (unit_type_ident.empty()) { //if this isn't a unit class, see if it is an upgrade class instead
+		const UpgradeClass *upgrade_class = UpgradeClass::Get(class_name);
 		if (civilization != nullptr && upgrade_class != nullptr) {
 			const CUpgrade *upgrade = CCivilization::GetCivilizationClassUpgrade(civilization, upgrade_class);
 			if (upgrade != nullptr) {
@@ -1629,7 +1627,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 static int CclGetFactionClassUnitType(lua_State *l)
 {
 	std::string class_name = LuaToString(l, 1);
-	const UnitClass *unit_class = UnitClass::Get(class_name);
+	const UnitClass *unit_class = UnitClass::Get(class_name, false); //"should_find" is false here because it could be an upgrade class instead
 	CFaction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
@@ -1644,9 +1642,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->Ident;
 		}
-	}
-		
-	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
+	} else if (unit_type_ident.empty()) { //if this isn't a unit class, see if it is an upgrade class instead
 		const UpgradeClass *upgrade_class = UpgradeClass::Get(class_name);
 		if (upgrade_class != nullptr) {
 			const CUpgrade *upgrade = CFaction::GetFactionClassUpgrade(faction, upgrade_class);
