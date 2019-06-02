@@ -217,7 +217,7 @@ void CSpecies::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_scientific_name"), +[](const CSpecies *species){ return species->ScientificName; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "scientific_name"), "set_scientific_name", "get_scientific_name");
 	
-	ClassDB::bind_method(D_METHOD("set_name_plural", "name_plural"), +[](CSpecies *species, const String &name_plural){ species->ScientificName = name_plural; });
+	ClassDB::bind_method(D_METHOD("set_name_plural", "name_plural"), +[](CSpecies *species, const String &name_plural){ species->NamePlural = name_plural; });
 	ClassDB::bind_method(D_METHOD("get_name_plural"), +[](const CSpecies *species){ return species->NamePlural; });
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "name_plural"), "set_name_plural", "get_name_plural");
 	

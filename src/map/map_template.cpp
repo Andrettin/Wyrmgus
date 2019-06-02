@@ -1059,8 +1059,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				if (random) {
 					continue;
 				}
@@ -1068,8 +1067,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				subtemplate_pos.y = map_start_pos.y + subtemplate_pos.y - template_start_pos.y;
 				found_location = true;
 			}
-		}
-		else {
+		} else {
 			if (random) {
 				continue;
 			}
