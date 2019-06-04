@@ -194,6 +194,7 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 				value = FindAndReplaceString(value, "_", "-");
 				date = CDate::FromString(value);
 			} else if (key == "upgrade") {
+				value = FindAndReplaceString(value, "_", "-");
 				upgrade = CUpgrade::Get(value);
 			} else if (key == "has_upgrade") {
 				has_upgrade = StringToBool(value);
