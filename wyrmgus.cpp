@@ -96,6 +96,7 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_civilization", "ident"), +[](const Wyrmgus *wyrmgus, const String &ident){ return CCivilization::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_civilizations"),+[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCivilization::GetAll()); });
 
+	ClassDB::bind_method(D_METHOD("get_faction", "ident"), +[](const Wyrmgus *wyrmgus, const String &ident){ return CFaction::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_factions"),+[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CFaction::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), +[](const Wyrmgus *wyrmgus, const String &ident){ return CCampaign::Get(ident); });
