@@ -2510,7 +2510,7 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, faction->Playable);
+		lua_pushboolean(l, faction->IsPlayable());
 		return 1;
 	} else if (!strcmp(data, "FactionUpgrade")) {
 		if (faction->GetUpgrade() != nullptr) {

@@ -507,6 +507,10 @@ void CFaction::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_adjective", "ident"), +[](CFaction *faction, const String &adjective){ faction->Adjective = adjective; });
 	ClassDB::bind_method(D_METHOD("get_adjective"), &CFaction::GetAdjective);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "adjective"), "set_adjective", "get_adjective");
+	
+	ClassDB::bind_method(D_METHOD("set_playable", "playable"), +[](CFaction *faction, const bool playable){ faction->Playable = playable; });
+	ClassDB::bind_method(D_METHOD("is_playable"), &CFaction::IsPlayable);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "playable"), "set_playable", "is_playable");
 
 	ClassDB::bind_method(D_METHOD("add_to_develops_from", "ident"), +[](CFaction *faction, const String &ident){
 		CFaction *other_faction = CFaction::Get(ident);

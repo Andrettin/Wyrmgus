@@ -1347,7 +1347,7 @@ void CPlayer::SetRandomFaction()
 			continue;
 		}
 		
-		if (!faction->Playable) {
+		if (!faction->IsPlayable()) {
 			continue;
 		}
 		

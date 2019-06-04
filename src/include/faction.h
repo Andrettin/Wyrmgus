@@ -51,7 +51,6 @@ class CDeity;
 class CDynasty;
 class CForceTemplate;
 class CGender;
-class CIcon;
 class CPlayerColor;
 class CUpgrade;
 class CSite;
@@ -144,16 +143,6 @@ public:
 		return this->SecondaryColor;
 	}
 	
-	/**
-	**	@brief	Get the faction's icon
-	**
-	**	@return	The faction's icon
-	*/
-	CIcon *GetIcon() const
-	{
-		return this->Icon;
-	}
-	
 	const CUpgrade *GetUpgrade() const;
 	
 	const String &GetAdjective() const { return this->Adjective; }
@@ -166,6 +155,8 @@ public:
 	const std::vector<std::string> &GetShipNames() const;
 	
 	const std::string &GetDefaultAI() const { return this->DefaultAI; }
+	
+	bool IsPlayable() const { return this->Playable; }
 
 private:
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
@@ -177,10 +168,11 @@ public:
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
 	const CFaction *ParentFaction = nullptr;							/// the parent faction of this faction
+private:
 	bool Playable = true;												/// faction playability
+public:
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 private:
-	CIcon *Icon = nullptr;												/// the faction's icon
 	Currency *Currency = nullptr;										/// the faction's currency
 public:
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
