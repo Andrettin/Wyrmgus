@@ -43,6 +43,7 @@
 #include "faction_type.h"
 #include "grand_strategy.h"
 #include "luacallback.h"
+#include "map/site.h"
 #include "player.h"
 #include "player_color.h"
 #include "ui/icon.h"
@@ -207,6 +208,64 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		this->HistoricalUpgrades[upgrade->Ident][date] = has_upgrade;
+	} else if (section->Tag == "historical_capitals") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			key = FindAndReplaceString(key, "_", "-");
+			CDate date = CDate::FromString(key);
+			
+			std::string value = property.Value;
+			const CSite *site = CSite::Get(value);
+			
+			this->HistoricalCapitals.push_back(std::pair<CDate, std::string>(date, site->Ident));
+		}
+	} else if (section->Tag == "historical_tiers") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			key = FindAndReplaceString(key, "_", "-");
+			CDate date = CDate::FromString(key);
+			
+			std::string value = property.Value;
+			value = FindAndReplaceString(value, "_", "-");
+			const int faction_tier = GetFactionTierIdByName(value);
+			if (faction_tier == -1) {
+				fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.c_str());
+				continue;
+			}
+			
+			this->HistoricalTiers[date.Year] = faction_tier;
+		}
+	} else if (section->Tag == "historical_government_types") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			key = FindAndReplaceString(key, "_", "-");
+			CDate date = CDate::FromString(key);
+			
+			std::string value = property.Value;
+			value = FindAndReplaceString(value, "_", "-");
+			const int government_type = GetGovernmentTypeIdByName(value);
+			if (government_type == -1) {
+				fprintf(stderr, "Invalid government type: \"%s\".\n", value.c_str());
+				continue;
+			}
+			
+			this->HistoricalGovernmentTypes[date.Year] = government_type;
+		}
 	} else {
 		return false;
 	}
@@ -445,6 +504,10 @@ void CFaction::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction_upgrade"), +[](const CFaction *faction){ return const_cast<CUpgrade *>(faction->GetUpgrade()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction_upgrade"), "set_faction_upgrade", "get_faction_upgrade");
 	
+	ClassDB::bind_method(D_METHOD("set_adjective", "ident"), +[](CFaction *faction, const String &adjective){ faction->Adjective = adjective; });
+	ClassDB::bind_method(D_METHOD("get_adjective"), &CFaction::GetAdjective);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "adjective"), "set_adjective", "get_adjective");
+
 	ClassDB::bind_method(D_METHOD("add_to_develops_from", "ident"), +[](CFaction *faction, const String &ident){
 		CFaction *other_faction = CFaction::Get(ident);
 		if (other_faction != nullptr) {
