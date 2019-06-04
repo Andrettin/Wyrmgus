@@ -106,15 +106,9 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
-	CCivilization *GetCivilization() const
-	{
-		return this->Civilization;
-	}
+	CCivilization *GetCivilization() const { return this->Civilization; }
 	
-	const FactionType *GetType() const
-	{
-		return this->Type;
-	}
+	const FactionType *GetType() const { return this->Type; }
 	
 	/**
 	**	@brief	Get the faction's primary color with highest priority
@@ -160,18 +154,23 @@ public:
 		return this->Icon;
 	}
 	
+	const CUpgrade *GetUpgrade() const;
+	
+	const String &GetAdjective() const { return this->Adjective; }
+	
 	Currency *GetCurrency() const;
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &GetShipNames() const;
+	
+	const std::string &GetDefaultAI() const { return this->DefaultAI; }
 
-public:
-	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
-	std::string Adjective;												/// adjective pertaining to the faction
-	std::string DefaultAI = "land-attack";
 private:
+	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
+	String Adjective;													/// adjective pertaining to the faction
+	std::string DefaultAI = "land-attack";
 	CCivilization *Civilization = nullptr;								/// the faction's civilization
 	const FactionType *Type = nullptr;									/// faction type (e.g. tribe or polity)
 public:

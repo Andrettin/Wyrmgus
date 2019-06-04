@@ -234,8 +234,8 @@ void CSpecies::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_prehistoric"), &CSpecies::IsPrehistoric);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "prehistoric"), "set_prehistoric", "is_prehistoric");
 	
-	ClassDB::bind_method(D_METHOD("add_to_genders", "gender"), +[](CSpecies *species, const String &gender){ species->Genders.push_back(CGender::Get(gender)); });
-	ClassDB::bind_method(D_METHOD("remove_from_genders", "gender"), +[](CSpecies *species, const String &gender){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(gender)), species->Genders.end()); });
+	ClassDB::bind_method(D_METHOD("add_to_genders", "ident"), +[](CSpecies *species, const String &ident){ species->Genders.push_back(CGender::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_genders", "ident"), +[](CSpecies *species, const String &ident){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(ident)), species->Genders.end()); });
 	ClassDB::bind_method(D_METHOD("get_genders"), +[](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_native_terrain_types", "ident"), +[](CSpecies *species, const String &ident){ species->NativeTerrainTypes.insert(CTerrainType::Get(ident)); });

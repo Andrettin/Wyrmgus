@@ -8,6 +8,7 @@
 
 #include "character.h"
 #include "civilization.h"
+#include "faction.h"
 #include "game/game.h"
 #include "hair_color.h"
 #include "language/word.h"
@@ -93,6 +94,9 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_icons"),+[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CIcon::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_civilization", "ident"), +[](const Wyrmgus *wyrmgus, const String &ident){ return CCivilization::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_civilizations"),+[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCivilization::GetAll()); });
+
+	ClassDB::bind_method(D_METHOD("get_factions"),+[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CFaction::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), +[](const Wyrmgus *wyrmgus, const String &ident){ return CCampaign::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_campaigns"),+[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCampaign::GetAll()); });

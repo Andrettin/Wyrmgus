@@ -586,7 +586,7 @@ CPlayer *CPlayer::GetOrAddFactionPlayer(const CFaction *faction)
 			CPlayer::Players[i]->SetCivilization(faction->GetCivilization()->GetIndex());
 			CPlayer::Players[i]->SetFaction(faction);
 			CPlayer::Players[i]->AiEnabled = true;
-			CPlayer::Players[i]->AiName = faction->DefaultAI;
+			CPlayer::Players[i]->AiName = faction->GetDefaultAI();
 			CPlayer::Players[i]->Team = 1;
 			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
 			CPlayer::Players[i]->Resources[WoodCost] = 2500;
@@ -1213,8 +1213,9 @@ void CPlayer::SetFaction(const CFaction *faction)
 	}
 
 	if (this->Faction != nullptr) {
-		if (!this->Faction->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(this->Faction->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(this->Faction->FactionUpgrade));
+		const CUpgrade *faction_upgrade = this->Faction->GetUpgrade();
+		if (faction_upgrade != nullptr && this->Allow.Upgrades[faction_upgrade->ID] == 'R') {
+			UpgradeLost(*this, faction_upgrade);
 		}
 
 		const CUpgrade *faction_type_upgrade = this->Faction->GetType()->GetUpgrade();
@@ -1293,9 +1294,9 @@ void CPlayer::SetFaction(const CFaction *faction)
 			this->SecondaryColor = CPlayerColor::GetAll()[SyncRand(CPlayerColor::GetAll().size())]; //pick a random secondary color if the faction has none
 		}
 	
-		if (!this->Faction->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(this->Faction->FactionUpgrade);
-			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
+		const CUpgrade *faction_upgrade = this->Faction->GetUpgrade();
+		if (faction_upgrade != nullptr) {
+			if (this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
 				} else {
@@ -1698,15 +1699,10 @@ bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 		return false;
 	}
 	
-	if (!faction->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(faction->FactionUpgrade);
-		
-		if (faction_upgrade) {
-			if (!CheckDependencies(faction_upgrade, this, false, pre)) {
-				return false;
-			}
-		} else {
-			fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", faction->FactionUpgrade.c_str());
+	const CUpgrade *faction_upgrade = faction->GetUpgrade();
+	if (faction_upgrade != nullptr) {
+		if (!CheckDependencies(faction_upgrade, this, false, pre)) {
+			return false;
 		}
 	}
 

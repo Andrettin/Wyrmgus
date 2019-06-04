@@ -254,9 +254,9 @@ struct NumberDesc {
 		int Val;       /// Direct value.
 		NumberDesc *N; /// Other number.
 		//Wyrmgus start
-		CUnitType **Type;           /// Which unit type.
-		CUpgrade **Upgrade;         /// Which upgrade.
-		CFaction **Faction;			/// Which faction.
+		const CUnitType **Type;		/// Which unit type.
+		const CUpgrade **Upgrade;	/// Which upgrade.
+		const CFaction **Faction;	/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		BinOp binOp;   /// For binary operand.
@@ -267,10 +267,10 @@ struct NumberDesc {
 			int Loc;                   /// Location of Variables[].
 		} UnitStat;
 		struct {
-			CUnitType **Type;           /// Which unit type.
-			int Index;                 /// Which index variable.
-			EnumVariable Component;    /// Which component.
-			int Loc;                   /// Location of Variables[].
+			const CUnitType **Type;	/// Which unit type.
+			int Index;				/// Which index variable.
+			EnumVariable Component;	/// Which component.
+			int Loc;				/// Location of Variables[].
 		} TypeStat;
 		struct {
 			StringDesc *String; /// String.
@@ -319,9 +319,9 @@ struct StringDesc {
 		StringDesc *String;  /// String.
 		UnitDesc *Unit;      /// Unit desciption.
 		//Wyrmgus start
-		CUnitType **Type;           /// Which unit type.
-		CUpgrade **Upgrade;         /// Which upgrade.
-		CFaction **Faction;			/// Which faction.
+		const CUnitType **Type;		/// Which unit type.
+		const CUpgrade **Upgrade;	/// Which upgrade.
+		const CFaction **Faction;	/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		struct {
@@ -411,11 +411,11 @@ extern NumberDesc *Damage;  /// Damage calculation for missile.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
 extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
 extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
-extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
+extern const CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 //Wyrmgus start
-extern CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
+extern const CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
 extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
-extern CFaction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
+extern const CFaction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 

@@ -80,36 +80,7 @@ CFaction::~CFaction()
 */
 bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "civilization") {
-		this->Civilization = CCivilization::Get(value);
-	} else if (key == "primary_color") {
-		CPlayerColor *player_color = CPlayerColor::Get(value);
-		if (player_color != nullptr) {
-			this->PrimaryColors.push_back(player_color);
-		}
-	} else if (key == "secondary_color") {
-		CPlayerColor *player_color = CPlayerColor::Get(value);
-		if (player_color != nullptr) {
-			this->SecondaryColor = player_color;
-		}
-	} else if (key == "icon") {
-		this->Icon = CIcon::Get(value);
-	} else if (key == "faction_upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->FactionUpgrade = value;
-	} else if (key == "develops_from") {
-		CFaction *other_faction = CFaction::Get(value);
-		if (other_faction != nullptr) {
-			this->DevelopsFrom.push_back(other_faction);
-			other_faction->DevelopsTo.push_back(this);
-		}
-	} else if (key == "develops_to") {
-		CFaction *other_faction = CFaction::Get(value);
-		if (other_faction != nullptr) {
-			this->DevelopsTo.push_back(other_faction);
-			other_faction->DevelopsFrom.push_back(this);
-		}
-	} else if (key == "default_tier") {
+	if (key == "default_tier") {
 		value = FindAndReplaceString(value, "_", "-");
 		const int faction_tier = GetFactionTierIdByName(value);
 		if (faction_tier != -1) {
@@ -348,6 +319,24 @@ int CFaction::GetForceTypeWeight(int force_type) const
 }
 
 /**
+**	@brief	Get the faction's upgrade
+**
+**	@return	The faction's upgrade
+*/
+const CUpgrade *CFaction::GetUpgrade() const
+{
+	if (!this->FactionUpgrade.empty()) {
+		return CUpgrade::Get(this->FactionUpgrade);
+	}
+	
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetUpgrade();
+	}
+	
+	return nullptr;
+}
+
+/**
 **	@brief	Get the faction's currency
 **
 **	@return	The faction's currency
@@ -422,10 +411,69 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 
 void CFaction::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("set_type", "type_ident"), +[](CFaction *faction, const String &type_ident){ faction->Type = FactionType::Get(type_ident); });
+	ClassDB::bind_method(D_METHOD("set_type", "ident"), +[](CFaction *faction, const String &ident){ faction->Type = FactionType::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_type"), +[](const CFaction *faction){ return const_cast<FactionType *>(faction->GetType()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "type"), "set_type", "get_type");
 
+	ClassDB::bind_method(D_METHOD("set_civilization", "ident"), +[](CFaction *faction, const String &ident){ faction->Civilization = CCivilization::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_civilization"), &CFaction::GetCivilization);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "civilization"), "set_civilization", "get_civilization");
+
+	ClassDB::bind_method(D_METHOD("set_primary_color", "ident"), +[](CFaction *faction, const String &ident){
+		CPlayerColor *player_color = CPlayerColor::Get(ident);
+		if (player_color != nullptr) {
+			faction->PrimaryColors.push_back(player_color);
+		}
+	});
 	ClassDB::bind_method(D_METHOD("get_primary_color"), &CFaction::GetPrimaryColor);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "primary_color"), "set_primary_color", "get_primary_color");
+	
+	ClassDB::bind_method(D_METHOD("set_secondary_color", "ident"), +[](CFaction *faction, const String &ident){
+		CPlayerColor *player_color = CPlayerColor::Get(ident);
+		if (player_color != nullptr) {
+			faction->SecondaryColor = player_color;
+		}
+	});
 	ClassDB::bind_method(D_METHOD("get_secondary_color"), &CFaction::GetSecondaryColor);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "secondary_color"), "set_secondary_color", "get_secondary_color");
+	
+	ClassDB::bind_method(D_METHOD("set_faction_upgrade", "ident"), +[](CFaction *faction, const String &ident){
+		std::string faction_upgrade_ident = ident.utf8().get_data();
+		faction_upgrade_ident = FindAndReplaceString(faction_upgrade_ident, "_", "-");
+		faction->FactionUpgrade = faction_upgrade_ident;
+	});
+	ClassDB::bind_method(D_METHOD("get_faction_upgrade"), +[](const CFaction *faction){ return const_cast<CUpgrade *>(faction->GetUpgrade()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction_upgrade"), "set_faction_upgrade", "get_faction_upgrade");
+	
+	ClassDB::bind_method(D_METHOD("add_to_develops_from", "ident"), +[](CFaction *faction, const String &ident){
+		CFaction *other_faction = CFaction::Get(ident);
+		if (other_faction != nullptr) {
+			faction->DevelopsFrom.push_back(other_faction);
+			other_faction->DevelopsTo.push_back(faction);
+		}
+	});
+	ClassDB::bind_method(D_METHOD("remove_from_develops_from", "ident"), +[](CFaction *faction, const String &ident){
+		CFaction *other_faction = CFaction::Get(ident);
+		if (other_faction != nullptr) {
+			faction->DevelopsFrom.erase(std::remove(faction->DevelopsFrom.begin(), faction->DevelopsFrom.end(), other_faction), faction->DevelopsFrom.end());
+			other_faction->DevelopsTo.erase(std::remove(other_faction->DevelopsTo.begin(), other_faction->DevelopsTo.end(), faction), other_faction->DevelopsTo.end());
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_develops_from"), +[](const CFaction *faction){ return VectorToGodotArray(faction->DevelopsFrom); });
+
+	ClassDB::bind_method(D_METHOD("add_to_develops_to", "ident"), +[](CFaction *faction, const String &ident){
+		CFaction *other_faction = CFaction::Get(ident);
+		if (other_faction != nullptr) {
+			faction->DevelopsTo.push_back(other_faction);
+			other_faction->DevelopsFrom.push_back(faction);
+		}
+	});
+	ClassDB::bind_method(D_METHOD("remove_from_develops_to", "ident"), +[](CFaction *faction, const String &ident){
+		CFaction *other_faction = CFaction::Get(ident);
+		if (other_faction != nullptr) {
+			faction->DevelopsTo.erase(std::remove(faction->DevelopsTo.begin(), faction->DevelopsTo.end(), other_faction), faction->DevelopsTo.end());
+			other_faction->DevelopsFrom.erase(std::remove(other_faction->DevelopsFrom.begin(), other_faction->DevelopsFrom.end(), faction), other_faction->DevelopsFrom.end());
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_develops_to"), +[](const CFaction *faction){ return VectorToGodotArray(faction->DevelopsTo); });
 }

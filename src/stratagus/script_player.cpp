@@ -2482,8 +2482,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, faction->GetBackground().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
-		if (!faction->Adjective.empty()) {
-			lua_pushstring(l, faction->Adjective.c_str());
+		if (!faction->GetAdjective().empty()) {
+			lua_pushstring(l, faction->GetAdjective().utf8().get_data());
 		} else {
 			lua_pushstring(l, faction->GetName().utf8().get_data());
 		}
@@ -2513,7 +2513,11 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushboolean(l, faction->Playable);
 		return 1;
 	} else if (!strcmp(data, "FactionUpgrade")) {
-		lua_pushstring(l, faction->FactionUpgrade.c_str());
+		if (faction->GetUpgrade() != nullptr) {
+			lua_pushstring(l, faction->GetUpgrade()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
 		if (faction->ParentFaction != nullptr) {
@@ -2523,7 +2527,7 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "DefaultAI")) {
-		lua_pushstring(l, faction->DefaultAI.c_str());
+		lua_pushstring(l, faction->GetDefaultAI().c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

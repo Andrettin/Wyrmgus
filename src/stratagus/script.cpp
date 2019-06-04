@@ -516,9 +516,9 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CUnitType **Str2TypeRef(lua_State *l, const char *s)
+static const CUnitType **Str2TypeRef(lua_State *l, const char *s)
 {
-	CUnitType **res = nullptr; // Result.
+	const CUnitType **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Type")) {
@@ -541,9 +541,9 @@ static CUnitType **Str2TypeRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
+static const CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 {
-	CUpgrade **res = nullptr; // Result.
+	const CUpgrade **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Upgrade")) {
@@ -589,9 +589,9 @@ static int **Str2ResourceRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CFaction **Str2FactionRef(lua_State *l, const char *s)
+static const CFaction **Str2FactionRef(lua_State *l, const char *s)
 {
-	CFaction **res = nullptr; // Result.
+	const CFaction **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Faction")) {
@@ -633,9 +633,9 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 **
 **  @return   unit type referernce definition.
 */
-CUnitType **CclParseTypeDesc(lua_State *l)
+const CUnitType **CclParseTypeDesc(lua_State *l)
 {
-	CUnitType **res = nullptr;
+	const CUnitType **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -654,9 +654,9 @@ CUnitType **CclParseTypeDesc(lua_State *l)
 **
 **  @return   upgrade reference definition.
 */
-CUpgrade **CclParseUpgradeDesc(lua_State *l)
+const CUpgrade **CclParseUpgradeDesc(lua_State *l)
 {
-	CUpgrade **res = nullptr;
+	const CUpgrade **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2UpgradeRef(l, LuaToString(l, -1));
@@ -694,9 +694,9 @@ int **CclParseResourceDesc(lua_State *l)
 **
 **  @return   faction reference definition.
 */
-CFaction **CclParseFactionDesc(lua_State *l)
+const CFaction **CclParseFactionDesc(lua_State *l)
 {
-	CFaction **res = nullptr;
+	const CFaction **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2FactionRef(l, LuaToString(l, -1));
@@ -1356,7 +1356,7 @@ static int GetPlayerData(const int player, const char *prop, const char *arg)
 int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
-	CUnitType **type;
+	const CUnitType **type;
 	std::string s;
 	int a;
 	int b;
@@ -1490,14 +1490,14 @@ int EvalNumber(const NumberDesc *number)
 */
 std::string EvalString(const StringDesc *s)
 {
-	std::string res;    // Result string.
-	std::string tmp1;   // Temporary string.
-	const CUnit *unit;  // Temporary unit
+	std::string res; // Result string.
+	std::string tmp1; // Temporary string.
+	const CUnit *unit; // Temporary unit
 	//Wyrmgus start
-	CUnitType **type;	// Temporary unit type
-	CUpgrade **upgrade;	// Temporary upgrade
-	int **resource;		// Temporary resource
-	CFaction **faction;	// Temporary faction
+	const CUnitType **type; // Temporary unit type
+	const CUpgrade **upgrade; // Temporary upgrade
+	int **resource; // Temporary resource
+	const CFaction **faction; // Temporary faction
 	//Wyrmgus end
 
 	Assert(s);

@@ -147,17 +147,17 @@ protected:
 **  Data to referer game info when game running.
 */
 struct TriggerDataType {
-	CUnit *Attacker;  /// Unit which send the missile.
-	CUnit *Defender;  /// Unit which is hit by missile.
-	CUnit *Active;    /// Unit which is selected or else under cursor unit.
+	CUnit *Attacker;			/// Unit which send the missile.
+	CUnit *Defender;			/// Unit which is hit by missile.
+	CUnit *Active;				/// Unit which is selected or else under cursor unit.
 	//Wyrmgus start
-	CUnit *Unit;	  /// Unit used in trigger
+	CUnit *Unit;				/// Unit used in trigger
 	//Wyrmgus end
-	CUnitType *Type;  /// Type used in trigger;
+	const CUnitType *Type;		/// Type used in trigger;
 	//Wyrmgus start
-	CUpgrade *Upgrade; /// Upgrade used in trigger
-	int *Resource;		/// Resource used in trigger
-	CFaction *Faction; /// Faction used in trigger
+	const CUpgrade *Upgrade;	/// Upgrade used in trigger
+	int *Resource;				/// Resource used in trigger
+	const CFaction *Faction;	/// Faction used in trigger
 	//Wyrmgus end
 };
 

@@ -539,11 +539,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
-	CUpgrade *upgrade = nullptr;
+	const CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction && !CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-		upgrade = CUpgrade::Get(CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->FactionUpgrade);
+	} else if (button.Action == ButtonFaction && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade() != nullptr) {
+		upgrade = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade();
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {

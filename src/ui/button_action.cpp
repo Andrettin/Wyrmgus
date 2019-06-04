@@ -187,8 +187,8 @@ void ButtonAction::SetTriggerData() const
 		TriggerData.Upgrade = AllUpgrades[this->Value];
 	} else if (this->Action == ButtonFaction) {
 		TriggerData.Faction = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value];
-		if (!CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->FactionUpgrade);
+		if (CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->GetUpgrade() != nullptr) {
+			TriggerData.Upgrade = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->GetUpgrade();
 		}
 	}
 }

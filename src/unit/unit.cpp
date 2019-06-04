@@ -964,9 +964,9 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->GetCivilization() != nullptr && this->Type->GetFaction() != nullptr && !this->Type->GetFaction()->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(this->Type->GetFaction()->FactionUpgrade);
-		if (faction_upgrade) {
+	if (this->Type->GetCivilization() != nullptr && this->Type->GetFaction() != nullptr) {
+		const CUpgrade *faction_upgrade = this->Type->GetFaction()->GetUpgrade();
+		if (faction_upgrade != nullptr) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
@@ -3100,9 +3100,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->GetCivilization() != nullptr && unit->Type->GetFaction() != nullptr && !unit->Type->GetFaction()->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(unit->Type->GetFaction()->FactionUpgrade);
-		if (faction_upgrade) {
+	if (unit->Type->GetCivilization() != nullptr && unit->Type->GetFaction() != nullptr) {
+		const CUpgrade *faction_upgrade = unit->Type->GetFaction()->GetUpgrade();
+		if (faction_upgrade != nullptr) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
@@ -5012,7 +5012,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
 				(modifier_upgrade->ItemSlot == nullptr || this->EquippedItems.find(modifier_upgrade->ItemSlot) == this->EquippedItems.end() || this->EquippedItems.find(modifier_upgrade->ItemSlot)->second.empty())
 				&& !(newplayer.Race != -1 && modifier_upgrade == CCivilization::Get(newplayer.Race)->GetUpgrade())
-				&& !(newplayer.Race != -1 && newplayer.GetFaction() != nullptr && modifier_upgrade->Ident == newplayer.GetFaction()->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.GetFaction() != nullptr && modifier_upgrade == newplayer.GetFaction()->GetUpgrade())
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
