@@ -1674,14 +1674,8 @@ static int CclDefineFaction(lua_State *l)
 	}
 
 	std::string faction_name = LuaToString(l, 1);
-	std::string parent_faction;
 	
 	CFaction *faction = CFaction::GetOrAdd(faction_name);
-	if (faction->GetIndex() < ((int) CFaction::GetAll().size() - 1)) { // redefinition
-		if (faction->ParentFaction != nullptr) {
-			parent_faction = faction->ParentFaction->GetIdent().utf8().get_data();
-		}
-	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1747,7 +1741,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefaultAI")) {
 			faction->DefaultAI = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentFaction")) {
-			parent_faction = LuaToString(l, -1);
+			faction->ParentFaction = CFaction::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DefiniteArticle")) {
@@ -2066,40 +2060,8 @@ static int CclDefineFaction(lua_State *l)
 		}
 	}
 	
-	if (faction->GetType()->IsTribal()) {
-		faction->DefiniteArticle = true;
-	}
-	
-	if (!parent_faction.empty()) { //process this here
-		faction->ParentFaction = CFaction::Get(parent_faction);
+	faction->Initialize();
 		
-		if (faction->ParentFaction == nullptr) { //if a parent faction was set but wasn't found, give an error
-			LuaError(l, "Faction %s doesn't exist" _C_ parent_faction.c_str());
-		}
-		
-		if (faction->ParentFaction != nullptr && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
-			faction->FactionUpgrade = faction->ParentFaction->FactionUpgrade;
-		}
-		
-		if (faction->ParentFaction != nullptr) { //inherit button icons from parent civilization, for button actions which none are specified
-			for (std::map<int, IconConfig>::const_iterator iterator = faction->ParentFaction->ButtonIcons.begin(); iterator != faction->ParentFaction->ButtonIcons.end(); ++iterator) {
-				if (faction->ButtonIcons.find(iterator->first) == faction->ButtonIcons.end()) {
-					faction->ButtonIcons[iterator->first] = iterator->second;
-				}
-			}
-			
-			for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = faction->ParentFaction->HistoricalUpgrades.begin(); iterator != faction->ParentFaction->HistoricalUpgrades.end(); ++iterator) {
-				if (faction->HistoricalUpgrades.find(iterator->first) == faction->HistoricalUpgrades.end()) {
-					faction->HistoricalUpgrades[iterator->first] = iterator->second;
-				}
-			}
-		}
-	} else if (parent_faction.empty()) {
-		faction->ParentFaction = nullptr; // to allow redefinitions to remove the parent faction setting
-	}
-	
-	faction->Initialized = true;
-	
 	return 0;
 }
 
@@ -2520,8 +2482,8 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
-		if (faction->ParentFaction != nullptr) {
-			lua_pushstring(l, faction->ParentFaction->GetIdent().utf8().get_data());
+		if (faction->GetParentFaction() != nullptr) {
+			lua_pushstring(l, faction->GetParentFaction()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

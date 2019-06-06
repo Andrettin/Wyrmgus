@@ -528,8 +528,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (faction->GetType() != nullptr) {
 				f->printf("\tType = \"%s\",\n", faction->GetType()->Ident.c_str());
 			}
-			if (faction->ParentFaction != nullptr) {
-				f->printf("\tParentFaction = \"%s\",\n", faction->ParentFaction->GetIdent().utf8().get_data());
+			if (faction->GetParentFaction() != nullptr) {
+				f->printf("\tParentFaction = \"%s\",\n", faction->GetParentFaction()->GetIdent().utf8().get_data());
 			}
 			if (faction->GetPrimaryColors().size() > 0) {
 				f->printf("\tColors = {");

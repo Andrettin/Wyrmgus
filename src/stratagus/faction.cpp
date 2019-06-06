@@ -274,6 +274,51 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 	return true;
 }
 
+/**
+**	@brief	Initialize the faction
+*/
+void CFaction::Initialize()
+{
+	if (this->GetType()->IsTribal()) {
+		this->DefiniteArticle = true;
+	}
+	
+	if (this->GetParentFaction() != nullptr) {
+		if (this->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
+			this->FactionUpgrade = this->GetParentFaction()->FactionUpgrade;
+		}
+		
+		//inherit button icons from parent faction, for button actions which none are specified
+		for (std::map<int, IconConfig>::const_iterator iterator = this->GetParentFaction()->ButtonIcons.begin(); iterator != this->GetParentFaction()->ButtonIcons.end(); ++iterator) {
+			if (this->ButtonIcons.find(iterator->first) == this->ButtonIcons.end()) {
+				this->ButtonIcons[iterator->first] = iterator->second;
+			}
+		}
+		
+		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = this->GetParentFaction()->HistoricalUpgrades.begin(); iterator != this->GetParentFaction()->HistoricalUpgrades.end(); ++iterator) {
+			if (this->HistoricalUpgrades.find(iterator->first) == this->HistoricalUpgrades.end()) {
+				this->HistoricalUpgrades[iterator->first] = iterator->second;
+			}
+		}
+	}
+	
+	if (!this->GetCivilization()->IsHidden() && !this->IsHidden()) {
+		if (this->GetIcon() == nullptr) {
+			fprintf(stderr, "Faction \"%s\" has no icon.\n", this->Ident.c_str());
+		}
+		
+		if (this->GetPrimaryColor() == nullptr) {
+			fprintf(stderr, "Faction \"%s\" has no primary color.\n", this->Ident.c_str());
+		}
+		
+		if (this->GetSecondaryColor() == nullptr) {
+			fprintf(stderr, "Faction \"%s\" has no secondary color.\n", this->Ident.c_str());
+		}
+	}
+	
+	this->Initialized = true;
+}
+
 int CFaction::GetFactionIndex(const std::string &faction_ident)
 {
 	if (faction_ident.empty()) {
@@ -471,6 +516,10 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 
 void CFaction::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_parent_faction", "ident"), +[](CFaction *faction, const String &ident){ faction->ParentFaction = CFaction::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_parent_faction"), +[](const CFaction *faction){ return const_cast<CFaction *>(faction->GetParentFaction()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "parent_faction"), "set_parent_faction", "get_parent_faction");
+
 	ClassDB::bind_method(D_METHOD("set_type", "ident"), +[](CFaction *faction, const String &ident){ faction->Type = FactionType::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_type"), +[](const CFaction *faction){ return const_cast<FactionType *>(faction->GetType()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "type"), "set_type", "get_type");

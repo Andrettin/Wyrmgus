@@ -104,6 +104,9 @@ public:
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
+	
+	const CFaction *GetParentFaction() const { return this->ParentFaction; }
 	
 	CCivilization *GetCivilization() const { return this->Civilization; }
 	
@@ -167,8 +170,8 @@ private:
 public:
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
-	const CFaction *ParentFaction = nullptr;							/// the parent faction of this faction
 private:
+	const CFaction *ParentFaction = nullptr;							/// the parent faction of this faction
 	bool Playable = true;												/// faction playability
 public:
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")

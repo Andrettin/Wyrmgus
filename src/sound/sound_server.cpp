@@ -701,7 +701,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		bool found_music = false;
 		if (faction != nullptr) {
 			while (true) {
-				parent_faction = faction->ParentFaction;
+				parent_faction = faction->GetParentFaction();
 				if (parent_faction == nullptr) {
 					break;
 				}
