@@ -303,6 +303,18 @@ void CCivilization::Initialize()
 		CclCommand(button_definition);
 	}
 	
+	if (this->GetIcon() == nullptr) {
+		fprintf(stderr, "Civilization \"%s\" has no icon.\n", this->Ident.c_str());
+	}
+	
+	if (this->GetDefaultPrimaryPlayerColor() == nullptr) {
+		fprintf(stderr, "Civilization \"%s\" has no primary player color.\n", this->Ident.c_str());
+	}
+	
+	if (this->GetDefaultSecondaryPlayerColor() == nullptr) {
+		fprintf(stderr, "Civilization \"%s\" has no secondary player color.\n", this->Ident.c_str());
+	}
+	
 	this->Initialized = true;
 }
 
@@ -420,11 +432,17 @@ void CCivilization::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
 	
-	ClassDB::bind_method(D_METHOD("set_default_player_color", "player_color_ident"), +[](CCivilization *civilization, const String &player_color_ident){
-		civilization->DefaultPlayerColor = CPlayerColor::Get(player_color_ident);
+	ClassDB::bind_method(D_METHOD("set_default_primary_player_color", "ident"), +[](CCivilization *civilization, const String &ident){
+		civilization->DefaultPrimaryPlayerColor = CPlayerColor::Get(ident);
 	});
-	ClassDB::bind_method(D_METHOD("get_default_player_color"), &CCivilization::GetDefaultPlayerColor);
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "default_player_color"), "set_default_player_color", "get_default_player_color");
+	ClassDB::bind_method(D_METHOD("get_default_primary_player_color"), +[](const CCivilization *civilization){ return const_cast<CPlayerColor *>(civilization->GetDefaultPrimaryPlayerColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "default_primary_player_color"), "set_default_primary_player_color", "get_default_primary_player_color");
+	
+	ClassDB::bind_method(D_METHOD("set_default_secondary_player_color", "ident"), +[](CCivilization *civilization, const String &ident){
+		civilization->DefaultSecondaryPlayerColor = CPlayerColor::Get(ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_default_secondary_player_color"), +[](const CCivilization *civilization){ return const_cast<CPlayerColor *>(civilization->GetDefaultSecondaryPlayerColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "default_secondary_player_color"), "set_default_secondary_player_color", "get_default_secondary_player_color");
 	
 	ClassDB::bind_method(D_METHOD("get_victory_background_file"), &CCivilization::GetVictoryBackgroundFile);
 	ClassDB::bind_method(D_METHOD("get_defeat_background_file"), &CCivilization::GetDefeatBackgroundFile);

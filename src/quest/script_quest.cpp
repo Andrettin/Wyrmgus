@@ -620,7 +620,7 @@ static int CclDefineAchievement(lua_State *l)
 			std::string color_name = LuaToString(l, -1);
 			CPlayerColor *player_color = CPlayerColor::Get(color_name);
 			if (player_color != nullptr) {
-				achievement->PlayerColor = player_color;
+				achievement->PrimaryPlayerColor = player_color;
 			}
 		} else if (!strcmp(value, "CharacterLevel")) {
 			achievement->CharacterLevel = LuaToNumber(l, -1);
@@ -668,6 +668,8 @@ static int CclDefineAchievement(lua_State *l)
 		}
 	}
 	
+	achievement->Initialize();
+	
 	return 0;
 }
 
@@ -695,7 +697,7 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushstring(l, achievement->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		lua_pushstring(l, achievement->GetPlayerColor()->GetIdent().utf8().get_data());
+		lua_pushstring(l, achievement->GetPrimaryPlayerColor()->GetIdent().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Character")) {
 		if (achievement->Character) {
@@ -733,7 +735,7 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushnumber(l, achievement->GetProgressMax());
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, achievement->Icon.Name.c_str());
+		lua_pushstring(l, achievement->GetIcon()->Ident.c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

@@ -174,9 +174,14 @@ public:
 		return this->Playable;
 	}
 	
-	CPlayerColor *GetDefaultPlayerColor() const
+	const CPlayerColor *GetDefaultPrimaryPlayerColor() const
 	{
-		return this->DefaultPlayerColor;
+		return this->DefaultPrimaryPlayerColor;
+	}
+	
+	const CPlayerColor *GetDefaultSecondaryPlayerColor() const
+	{
+		return this->DefaultSecondaryPlayerColor;
 	}
 	
 	/**
@@ -285,8 +290,9 @@ private:
 	Currency *Currency = nullptr;	/// the currency used by the civilization
 	std::string Upgrade;			/// the string identifier for the civilization's upgrade
 	bool Playable = true;			/// whether the civilization is playable
+	CPlayerColor *DefaultPrimaryPlayerColor = nullptr;	/// the civilization's default primary color (used for the encyclopedia, tech tree, etc.)
+	CPlayerColor *DefaultSecondaryPlayerColor = nullptr;	/// the civilization's default secondary color (used for the encyclopedia, tech tree, etc.)
 public:
-	CPlayerColor *DefaultPlayerColor = nullptr;	/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::vector<CCivilization *> DevelopsFrom;	/// from which civilizations this civilization develops
 	std::vector<CCivilization *> DevelopsTo;	/// to which civilizations this civilization develops
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization

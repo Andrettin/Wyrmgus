@@ -70,12 +70,7 @@ void CAchievement::CheckAchievements()
 */
 bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "player_color") {
-		CPlayerColor *player_color = CPlayerColor::Get(value);
-		if (player_color != nullptr) {
-			this->PlayerColor = player_color;
-		}
-	} else if (key == "icon") {
+	if (key == "icon") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Icon.Name = value;
 		this->Icon.Icon = nullptr;
@@ -111,8 +106,16 @@ bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string
 */
 void CAchievement::Initialize()
 {
-	if (!this->PlayerColor) {
-		fprintf(stderr, "Achievement \"%s\" has no player color.\n", this->Ident.c_str());
+	if (this->GetIcon() == nullptr) {
+		fprintf(stderr, "Achievement \"%s\" has no icon.\n", this->Ident.c_str());
+	}
+	
+	if (this->GetPrimaryPlayerColor() == nullptr) {
+		fprintf(stderr, "Achievement \"%s\" has no primary player color.\n", this->Ident.c_str());
+	}
+	
+	if (this->GetSecondaryPlayerColor() == nullptr) {
+		fprintf(stderr, "Achievement \"%s\" has no secondary player color.\n", this->Ident.c_str());
 	}
 	
 	this->Initialized = true;
@@ -136,7 +139,7 @@ void CAchievement::Obtain(const bool save, const bool display)
 		lua_command += " achievement.\", nil, \"";
 		lua_command += this->Icon.Name;
 		lua_command += "\", \"";
-		lua_command += this->PlayerColor->GetIdent().utf8().get_data();
+		lua_command += this->GetPrimaryPlayerColor()->GetIdent().utf8().get_data();
 		lua_command += "\") end;";
 		CclCommand(lua_command);
 	}
@@ -232,25 +235,42 @@ void CAchievement::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_description", "description"), +[](CAchievement *achievement, const String &description){ achievement->Description = description; });
 	ClassDB::bind_method(D_METHOD("get_description"), &CAchievement::GetDescription);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "description"), "set_description", "get_description");
+	
 	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), +[](CAchievement *achievement, const bool hidden){ achievement->Hidden = hidden; });
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CAchievement::IsHidden);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hidden"), "set_hidden", "is_hidden");
+
 	ClassDB::bind_method(D_METHOD("is_obtained"), &CAchievement::IsObtained);
+	
 	ClassDB::bind_method(D_METHOD("set_unobtainable", "unobtainable"), +[](CAchievement *achievement, const bool unobtainable){ achievement->Unobtainable = unobtainable; });
 	ClassDB::bind_method(D_METHOD("is_unobtainable"), &CAchievement::IsUnobtainable);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "unobtainable"), "set_unobtainable", "is_unobtainable");
+	
 	ClassDB::bind_method(D_METHOD("set_character_level", "character_level"), +[](CAchievement *achievement, const int character_level){ achievement->CharacterLevel = character_level; });
 	ClassDB::bind_method(D_METHOD("get_character_level"), &CAchievement::GetCharacterLevel);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "character_level"), "set_character_level", "get_character_level");
+	
 	ClassDB::bind_method(D_METHOD("set_difficulty", "difficulty"), +[](CAchievement *achievement, const int difficulty){ achievement->Difficulty = difficulty; });
 	ClassDB::bind_method(D_METHOD("get_difficulty"), &CAchievement::GetDifficulty);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "difficulty"), "set_difficulty", "get_difficulty");
+
 	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
-	ClassDB::bind_method(D_METHOD("get_player_color"), &CAchievement::GetPlayerColor);
+	
+	ClassDB::bind_method(D_METHOD("set_primary_player_color", "ident"), +[](CAchievement *achievement, const String &ident){
+		achievement->PrimaryPlayerColor = CPlayerColor::Get(ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_primary_player_color"), +[](const CAchievement *achievement){ return const_cast<CPlayerColor *>(achievement->GetPrimaryPlayerColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "primary_player_color"), "set_primary_player_color", "get_primary_player_color");
+	
+	ClassDB::bind_method(D_METHOD("set_secondary_player_color", "ident"), +[](CAchievement *achievement, const String &ident){
+		achievement->SecondaryPlayerColor = CPlayerColor::Get(ident);
+	});
+	ClassDB::bind_method(D_METHOD("get_secondary_player_color"), +[](const CAchievement *achievement){ return const_cast<CPlayerColor *>(achievement->GetSecondaryPlayerColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "secondary_player_color"), "set_secondary_player_color", "get_secondary_player_color");
+	
 	ClassDB::bind_method(D_METHOD("get_progress"), &CAchievement::GetProgress);
 	ClassDB::bind_method(D_METHOD("get_progress_max"), &CAchievement::GetProgressMax);
-	
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "description"), "set_description", "get_description");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hidden"), "set_hidden", "is_hidden");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "unobtainable"), "set_unobtainable", "is_unobtainable");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "character_level"), "set_character_level", "get_character_level");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "difficulty"), "set_difficulty", "get_difficulty");
 }
 
 void SetAchievementObtained(const std::string &achievement_ident, const bool save, const bool display)

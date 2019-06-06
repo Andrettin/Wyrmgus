@@ -105,9 +105,14 @@ public:
 		return this->Icon.Icon;
 	}
 	
-	CPlayerColor *GetPlayerColor() const
+	const CPlayerColor *GetPrimaryPlayerColor() const
 	{
-		return this->PlayerColor;
+		return this->PrimaryPlayerColor;
+	}
+	
+	const CPlayerColor *GetSecondaryPlayerColor() const
+	{
+		return this->SecondaryPlayerColor;
 	}
 	
 	int GetProgress() const;
@@ -120,9 +125,10 @@ private:
 	bool Hidden = false;		/// whether the achievement is hidden
 	bool Obtained = false;		/// whether the achievement has been obtained
 	bool Unobtainable = false;	/// whether this achievement can be obtained by checking for it or not
-public:
-	CPlayerColor *PlayerColor = nullptr;	/// player color used for the achievement's icon
+	const CPlayerColor *PrimaryPlayerColor = nullptr;	/// primary player color used for the achievement's icon
+	const CPlayerColor *SecondaryPlayerColor = nullptr;	/// secondary player color used for the achievement's icon
 	IconConfig Icon;				/// achievement's icon
+public:
 	const CCharacter *Character = nullptr;	/// character related to the achievement's requirements
 	const CUnitType *CharacterType = nullptr;	/// unit type required for a character to have for the achievement
 	std::vector<const CQuest *> RequiredQuests;	/// quests required for obtaining this achievement

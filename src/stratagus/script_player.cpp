@@ -860,10 +860,15 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Currency")) {
 			Currency *currency = Currency::Get(LuaToString(l, -1));
 			civilization->Currency = currency;
-		} else if (!strcmp(value, "DefaultPlayerColor")) {
+		} else if (!strcmp(value, "DefaultPrimaryPlayerColor")) {
 			CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
 			if (player_color != nullptr) {
-				civilization->DefaultPlayerColor = player_color;
+				civilization->DefaultPrimaryPlayerColor = player_color;
+			}
+		} else if (!strcmp(value, "DefaultSecondaryPlayerColor")) {
+			CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
+			if (player_color != nullptr) {
+				civilization->DefaultSecondaryPlayerColor = player_color;
 			}
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
 			civilization->Upgrade = LuaToString(l, -1);
@@ -1505,8 +1510,8 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "DefaultPlayerColor")) {
-		if (civilization->DefaultPlayerColor) {
-			lua_pushstring(l, civilization->DefaultPlayerColor->GetIdent().utf8().get_data());
+		if (civilization->GetDefaultPrimaryPlayerColor()) {
+			lua_pushstring(l, civilization->GetDefaultPrimaryPlayerColor()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
