@@ -832,7 +832,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false) {
 		//Wyrmgus start
-		bool include_neutral = AiPlayer->Player->AtPeace();
+		const bool include_neutral = AiPlayer->Player->AtPeace();
 		//Wyrmgus end
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
@@ -1593,7 +1593,7 @@ void AiForce::Update()
 	//Wyrmgus end
 	Assert(CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
 	//Wyrmgus start
-	bool include_neutral = AiPlayer->Player->AtPeace();
+	const bool include_neutral = AiPlayer->Player->AtPeace();
 	//Wyrmgus end
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos

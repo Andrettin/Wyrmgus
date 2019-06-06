@@ -2925,7 +2925,7 @@ void CPlayer::RemoveModifier(CUpgrade *modifier)
 bool CPlayer::AtPeace() const
 {
 	for (int i = 0; i < PlayerNumNeutral; ++i) {
-		if (this->IsEnemy(*CPlayer::Players[i]) && this->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->GetUnitCount() > 0) {
+		if (this->IsEnemy(*CPlayer::Players[i]) && this->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->NumTownHalls > 0) {
 			return false;
 		}
 	}
