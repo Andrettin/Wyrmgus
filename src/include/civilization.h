@@ -84,6 +84,24 @@ public:
 	int GetForceTypeWeight(const int force_type) const;
 	
 	/**
+	**	@brief	Get the civilization's icon
+	**
+	**	@return	The civilization's icon
+	*/
+	virtual CIcon *GetIcon() const override
+	{
+		if (this->Icon != nullptr) {
+			return this->Icon;
+		}
+		
+		if (this->ParentCivilization != nullptr) {
+			return this->ParentCivilization->GetIcon();
+		}
+
+		return this->Icon;
+	}
+	
+	/**
 	**	@brief	Get the string identifier for the civilization's interface
 	**
 	**	@return	The string identifier for the civilization's interface
@@ -176,11 +194,27 @@ public:
 	
 	const CPlayerColor *GetDefaultPrimaryPlayerColor() const
 	{
+		if (this->DefaultPrimaryPlayerColor != nullptr) {
+			return this->DefaultPrimaryPlayerColor;
+		}
+		
+		if (this->ParentCivilization != nullptr) {
+			return this->ParentCivilization->GetDefaultPrimaryPlayerColor();
+		}
+
 		return this->DefaultPrimaryPlayerColor;
 	}
 	
 	const CPlayerColor *GetDefaultSecondaryPlayerColor() const
 	{
+		if (this->DefaultSecondaryPlayerColor != nullptr) {
+			return this->DefaultSecondaryPlayerColor;
+		}
+		
+		if (this->ParentCivilization != nullptr) {
+			return this->ParentCivilization->GetDefaultSecondaryPlayerColor();
+		}
+
 		return this->DefaultSecondaryPlayerColor;
 	}
 	

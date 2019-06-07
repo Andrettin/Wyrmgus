@@ -1262,18 +1262,20 @@ void CPlayer::SetFaction(const CFaction *faction)
 	}
 	if (this->Faction != nullptr) {
 		const CPlayerColor *chosen_player_color = nullptr;
-		for (const CPlayerColor *player_color : faction->GetPrimaryColors()) {
-			if (this->IsPlayerColorAvailable(player_color)) {
-				chosen_player_color = player_color;
-				break;
-			}
+		if (faction->GetPrimaryColor() != nullptr && this->IsPlayerColorAvailable(faction->GetPrimaryColor())) {
+			chosen_player_color = faction->GetPrimaryColor();
 		}
+		
 		if (chosen_player_color == nullptr) { //if all of the faction's colors are used, get an unused player color
+			std::vector<const CPlayerColor *> potential_player_colors;
 			for (const CPlayerColor *player_color : CPlayerColor::GetAll()) {
 				if (this->IsPlayerColorAvailable(player_color)) {
-					chosen_player_color = player_color;
-					break;
+					potential_player_colors.push_back(player_color);
 				}
+			}
+			
+			if (!potential_player_colors.empty()) {
+				chosen_player_color = potential_player_colors[SyncRand(potential_player_colors.size())];
 			}
 		}
 		

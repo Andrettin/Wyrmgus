@@ -830,6 +830,8 @@ static int CclDefineCivilization(lua_State *l)
 			civilization->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Adjective")) {
 			civilization->Adjective = LuaToString(l, -1);
+		} else if (!strcmp(value, "Icon")) {
+			civilization->Icon = CIcon::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Interface")) {
 			civilization->Interface = LuaToString(l, -1);
 		} else if (!strcmp(value, "Hidden")) {
@@ -1709,24 +1711,12 @@ static int CclDefineFaction(lua_State *l)
 			} else {
 				LuaError(l, "Faction type \"%s\" doesn't exist." _C_ faction_type_name.c_str());
 			}
-		} else if (!strcmp(value, "PrimaryColors")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			faction->PrimaryColors.clear(); //remove previously defined colors
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string color_name = LuaToString(l, -1, k + 1);
-				CPlayerColor *player_color = CPlayerColor::Get(color_name);
-				if (player_color != nullptr) {
-					faction->PrimaryColors.push_back(player_color);
-				}
-			}
+		} else if (!strcmp(value, "PrimaryColor")) {
+			const CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
+			faction->PrimaryColor = player_color;
 		} else if (!strcmp(value, "SecondaryColor")) {
-			CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
-			if (player_color != nullptr) {
-				faction->SecondaryColor = player_color;
-			}
+			const CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
+			faction->SecondaryColor = player_color;
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
 			int faction_tier = GetFactionTierIdByName(faction_tier_name);

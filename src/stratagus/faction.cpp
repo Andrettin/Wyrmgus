@@ -424,6 +424,60 @@ int CFaction::GetForceTypeWeight(int force_type) const
 }
 
 /**
+**	@brief	Get the faction's primary color
+**
+**	@return	The faction's primary color
+*/
+const CPlayerColor *CFaction::GetPrimaryColor() const
+{
+	if (this->PrimaryColor != nullptr) {
+		return this->PrimaryColor;
+	}
+	
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetPrimaryColor();
+	}
+	
+	return this->Civilization->GetDefaultPrimaryPlayerColor();
+}
+
+/**
+**	@brief	Get the faction's secondary color
+**
+**	@return	The faction's secondary color
+*/
+const CPlayerColor *CFaction::GetSecondaryColor() const
+{
+	if (this->SecondaryColor != nullptr) {
+		return this->SecondaryColor;
+	}
+	
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetSecondaryColor();
+	}
+	
+	return this->Civilization->GetDefaultSecondaryPlayerColor();
+}
+
+/**
+**	@brief	Get the faction's icon
+**
+**	@return	The faction's icon
+*/
+CIcon *CFaction::GetIcon() const
+{
+	if (this->Icon != nullptr) {
+		return this->Icon;
+	}
+	
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetIcon();
+	}
+	
+	return this->Civilization->GetIcon();
+}
+
+/**
 **	@brief	Get the faction's upgrade
 **
 **	@return	The faction's upgrade
@@ -529,12 +583,10 @@ void CFaction::_bind_methods()
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "civilization"), "set_civilization", "get_civilization");
 
 	ClassDB::bind_method(D_METHOD("set_primary_color", "ident"), +[](CFaction *faction, const String &ident){
-		CPlayerColor *player_color = CPlayerColor::Get(ident);
-		if (player_color != nullptr) {
-			faction->PrimaryColors.push_back(player_color);
-		}
+		const CPlayerColor *player_color = CPlayerColor::Get(ident);
+		faction->PrimaryColor = player_color;
 	});
-	ClassDB::bind_method(D_METHOD("get_primary_color"), &CFaction::GetPrimaryColor);
+	ClassDB::bind_method(D_METHOD("get_primary_color"), +[](const CFaction *faction){ return const_cast<CPlayerColor *>(faction->GetPrimaryColor()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "primary_color"), "set_primary_color", "get_primary_color");
 	
 	ClassDB::bind_method(D_METHOD("set_secondary_color", "ident"), +[](CFaction *faction, const String &ident){
@@ -543,7 +595,7 @@ void CFaction::_bind_methods()
 			faction->SecondaryColor = player_color;
 		}
 	});
-	ClassDB::bind_method(D_METHOD("get_secondary_color"), &CFaction::GetSecondaryColor);
+	ClassDB::bind_method(D_METHOD("get_secondary_color"), +[](const CFaction *faction){ return const_cast<CPlayerColor *>(faction->GetSecondaryColor()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "secondary_color"), "set_secondary_color", "get_secondary_color");
 	
 	ClassDB::bind_method(D_METHOD("set_faction_upgrade", "ident"), +[](CFaction *faction, const String &ident){

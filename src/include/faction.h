@@ -113,39 +113,16 @@ public:
 	const FactionType *GetType() const { return this->Type; }
 	
 	/**
-	**	@brief	Get the faction's primary color with highest priority
+	**	@brief	Get the faction's primary color
 	**
 	**	@return	The faction's primary color
 	*/
-	CPlayerColor *GetPrimaryColor() const
-	{
-		if (!this->PrimaryColors.empty()) {
-			return this->PrimaryColors.front();
-		} else {
-			return nullptr;
-		}
-	}
+	const CPlayerColor *GetPrimaryColor() const;
 	
-	/**
-	**	@brief	Get the faction's primary colors
-	**
-	**	@return	The faction's primary colors
-	*/
-	const std::vector<CPlayerColor *> &GetPrimaryColors() const
-	{
-		return this->PrimaryColors;
-	}
+	const CPlayerColor *GetSecondaryColor() const;
 	
-	/**
-	**	@brief	Get the faction's secondary color
-	**
-	**	@return	The faction's secondary color
-	*/
-	CPlayerColor *GetSecondaryColor() const
-	{
-		return this->SecondaryColor;
-	}
-	
+	virtual CIcon *GetIcon() const override;
+
 	const CUpgrade *GetUpgrade() const;
 	
 	const String &GetAdjective() const { return this->Adjective; }
@@ -181,8 +158,8 @@ public:
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
 private:
-	std::vector<CPlayerColor *> PrimaryColors;							/// the faction's primary player colors
-	CPlayerColor *SecondaryColor = nullptr;
+	const CPlayerColor *PrimaryColor = nullptr;							/// the faction's primary player colors
+	const CPlayerColor *SecondaryColor = nullptr;
 public:
 	std::vector<CFaction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop
