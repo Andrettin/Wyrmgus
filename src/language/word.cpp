@@ -111,7 +111,7 @@ const std::vector<CWord *> &CWord::GetSettlementNameWords()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CWord::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "personal_name") { //add as a personal name for all possible genders
 		const bool value_bool = StringToBool(value);
@@ -166,15 +166,15 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "personal_name") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = FindAndReplaceString(property.Key, "_", "-");
+			String key = property.Key.replace("_", "-");
 			const CGender *gender = CGender::Get(key);
 			
 			if (gender == nullptr) {
-				fprintf(stderr, "Invalid gender: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid gender: \"%s\".\n", key.utf8().get_data());
 				continue;
 			}
 			
@@ -188,15 +188,14 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "specimen_name") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = FindAndReplaceString(property.Key, "_", "-");
-			CSpecies *species = CSpecies::Get(key);
+			CSpecies *species = CSpecies::Get(property.Key);
 			
 			if (species == nullptr) {
-				fprintf(stderr, "Invalid species: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid species: \"%s\".\n", property.Key.utf8().get_data());
 				continue;
 			}
 			
@@ -228,15 +227,14 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			
 			for (const CConfigProperty &property : sub_section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = FindAndReplaceString(property.Key, "_", "-");
-				const CGender *gender = CGender::Get(key);
+				const CGender *gender = CGender::Get(property.Key);
 				
 				if (gender == nullptr) {
-					fprintf(stderr, "Invalid gender: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid gender: \"%s\".\n", property.Key.utf8().get_data());
 					continue;
 				}
 				
@@ -259,15 +257,14 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "unit_name") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = FindAndReplaceString(property.Key, "_", "-");
-			const UnitClass *unit_class = UnitClass::Get(key);
+			const UnitClass *unit_class = UnitClass::Get(property.Key);
 			
 			if (unit_class == nullptr) {
-				fprintf(stderr, "Invalid unit class: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid unit class: \"%s\".\n", property.Key.utf8().get_data());
 				continue;
 			}
 			
@@ -284,32 +281,32 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "number_case_inflection") {
 		int grammatical_number = GrammaticalNumberNoNumber;
 		int grammatical_case = GrammaticalCaseNoCase;
-		std::string inflection;
+		String inflection;
 
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			if (property.Key == "inflection") {
 				inflection = property.Value;
 			} else if (property.Key == "number") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				grammatical_number = GetGrammaticalNumberIdByName(value);
+				String value = property.Value.replace("_", "-");
+				grammatical_number = GetGrammaticalNumberIdByName(value.utf8().get_data());
 				if (grammatical_number == -1) {
-					fprintf(stderr, "Grammatical number \"%s\" doesn't exist.\n", value.c_str());
+					fprintf(stderr, "Grammatical number \"%s\" doesn't exist.\n", value.utf8().get_data());
 					return true;
 				}
 			} else if (property.Key == "case") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				grammatical_case = GetGrammaticalCaseIdByName(value);
+				String value = property.Value.replace("_", "-");
+				grammatical_case = GetGrammaticalCaseIdByName(value.utf8().get_data());
 				if (grammatical_case == -1) {
-					fprintf(stderr, "Grammatical case \"%s\" doesn't exist.\n", value.c_str());
+					fprintf(stderr, "Grammatical case \"%s\" doesn't exist.\n", value.utf8().get_data());
 					return true;
 				}
 			} else {
-				fprintf(stderr, "Invalid number case inflection property: \"%s\".\n", property.Key.c_str());
+				fprintf(stderr, "Invalid number case inflection property: \"%s\".\n", property.Key.utf8().get_data());
 			}
 		}
 		
@@ -318,7 +315,7 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			return true;
 		}
 		
-		this->NumberCaseInflections[std::tuple<int, int>(grammatical_number, grammatical_case)] = inflection.c_str();
+		this->NumberCaseInflections[std::tuple<int, int>(grammatical_number, grammatical_case)] = inflection;
 	} else {
 		return false;
 	}

@@ -192,7 +192,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					item_effects_string += " ";
 				}
 											
-				item_effects_string += GetVariableDisplayName(var);
+				item_effects_string += GetVariableDisplayName(var).utf8().get_data();
 			}
 			
 			if (variable_increase != 0) {
@@ -208,7 +208,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				item_effects_string += std::to_string((long long) variable_increase);
 				item_effects_string += " ";
 											
-				item_effects_string += GetVariableDisplayName(var, true);
+				item_effects_string += GetVariableDisplayName(var, true).utf8().get_data();
 			}
 		}
 
@@ -263,7 +263,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 						item_effects_string += " ";
 					}
 												
-					item_effects_string += GetVariableDisplayName(var);
+					item_effects_string += GetVariableDisplayName(var).utf8().get_data();
 					item_effects_string += " (Set Bonus)";
 				}
 				
@@ -280,7 +280,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					item_effects_string += std::to_string((long long) variable_increase);
 					item_effects_string += " ";
 												
-					item_effects_string += GetVariableDisplayName(var, true);
+					item_effects_string += GetVariableDisplayName(var, true).utf8().get_data();
 					item_effects_string += " (Set Bonus)";
 				}
 			}

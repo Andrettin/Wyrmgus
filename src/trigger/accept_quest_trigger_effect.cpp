@@ -53,7 +53,7 @@ void CAcceptQuestTriggerEffect::ProcessConfigData(const CConfigData *config_data
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
@@ -63,7 +63,7 @@ void CAcceptQuestTriggerEffect::ProcessConfigData(const CConfigData *config_data
 				this->Quest = quest;
 			}
 		} else {
-			fprintf(stderr, "Invalid accept quest trigger effect property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid accept quest trigger effect property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

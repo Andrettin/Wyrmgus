@@ -79,15 +79,15 @@ CFaction::~CFaction()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CFaction::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "default_tier") {
-		value = FindAndReplaceString(value, "_", "-");
-		const int faction_tier = GetFactionTierIdByName(value);
+		value = value.replace("_", "-");
+		const int faction_tier = GetFactionTierIdByName(value.utf8().get_data());
 		if (faction_tier != -1) {
 			this->DefaultTier = faction_tier;
 		} else {
-			fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.utf8().get_data());
 		}
 	} else {
 		return false;
@@ -111,23 +111,23 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "date") {
-				value = FindAndReplaceString(value, "_", "-");
-				date = CDate::FromString(value);
+				value = value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else {
 				const CResource *resource = CResource::Get(key);
 				
 				if (resource != nullptr) {
-					resource_quantities[resource] = std::stoi(value);
+					resource_quantities[resource] = value.to_int();
 				} else {
-					fprintf(stderr, "Invalid historical resources property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid historical resources property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 		}
@@ -142,26 +142,26 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "date") {
-				value = FindAndReplaceString(value, "_", "-");
-				date = CDate::FromString(value);
+				value = value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else if (key == "faction") {
 				other_faction = CFaction::Get(value);
 			} else if (key == "diplomacy_state") {
-				value = FindAndReplaceString(value, "_", "-");
-				diplomacy_state = GetDiplomacyStateIdByName(value);
+				value = value.replace("_", "-");
+				diplomacy_state = GetDiplomacyStateIdByName(value.utf8().get_data());
 				if (diplomacy_state == -1) {
-					fprintf(stderr, "Invalid diplomacy state: \"%s\".\n", value.c_str());
+					fprintf(stderr, "Invalid diplomacy state: \"%s\".\n", value.utf8().get_data());
 				}
 			} else {
-				fprintf(stderr, "Invalid historical resources property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid historical resources property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		
@@ -183,23 +183,23 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "date") {
-				value = FindAndReplaceString(value, "_", "-");
-				date = CDate::FromString(value);
+				value = value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else if (key == "upgrade") {
-				value = FindAndReplaceString(value, "_", "-");
-				upgrade = CUpgrade::Get(value);
+				value = value.replace("_", "-");
+				upgrade = CUpgrade::Get(value.utf8().get_data());
 			} else if (key == "has_upgrade") {
 				has_upgrade = StringToBool(value);
 			} else {
-				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		
@@ -212,35 +212,34 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "historical_capitals") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			key = FindAndReplaceString(key, "_", "-");
-			CDate date = CDate::FromString(key);
+			String key = property.Key;
+			key = key.replace("_", "-");
+			CDate date = CDate::FromString(key.utf8().get_data());
 			
-			std::string value = property.Value;
-			const CSite *site = CSite::Get(value);
+			const CSite *site = CSite::Get(property.Value);
 			
 			this->HistoricalCapitals.push_back(std::pair<CDate, std::string>(date, site->Ident));
 		}
 	} else if (section->Tag == "historical_tiers") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			key = FindAndReplaceString(key, "_", "-");
-			CDate date = CDate::FromString(key);
+			String key = property.Key;
+			key = key.replace("_", "-");
+			CDate date = CDate::FromString(key.utf8().get_data());
 			
-			std::string value = property.Value;
-			value = FindAndReplaceString(value, "_", "-");
-			const int faction_tier = GetFactionTierIdByName(value);
+			String value = property.Value;
+			value = value.replace("_", "-");
+			const int faction_tier = GetFactionTierIdByName(value.utf8().get_data());
 			if (faction_tier == -1) {
-				fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid faction tier: \"%s\".\n", value.utf8().get_data());
 				continue;
 			}
 			
@@ -249,19 +248,19 @@ bool CFaction::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "historical_government_types") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			key = FindAndReplaceString(key, "_", "-");
-			CDate date = CDate::FromString(key);
+			String key = property.Key;
+			key = key.replace("_", "-");
+			CDate date = CDate::FromString(key.utf8().get_data());
 			
-			std::string value = property.Value;
-			value = FindAndReplaceString(value, "_", "-");
-			const int government_type = GetGovernmentTypeIdByName(value);
+			String value = property.Value;
+			value = value.replace("_", "-");
+			const int government_type = GetGovernmentTypeIdByName(value.utf8().get_data());
 			if (government_type == -1) {
-				fprintf(stderr, "Invalid government type: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid government type: \"%s\".\n", value.utf8().get_data());
 				continue;
 			}
 			

@@ -97,7 +97,7 @@ CDependency *CDependency::FromConfigData(const CConfigData *config_data)
 	} else if (config_data->Tag == "trigger") {
 		dependency = new CTriggerDependency;
 	} else {
-		fprintf(stderr, "Invalid dependency type: \"%s\".\n", config_data->Tag.c_str());
+		fprintf(stderr, "Invalid dependency type: \"%s\".\n", config_data->Tag.utf8().get_data());
 	}
 	
 	dependency->ProcessConfigData(config_data);
@@ -114,7 +114,7 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
@@ -125,7 +125,7 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 		} else if (property.Key == "check_neutral_player") {
 			this->CheckNeutralPlayer = StringToBool(property.Value);
 		} else {
-			this->ProcessConfigDataProperty(std::pair<std::string, std::string>(property.Key, property.Value));
+			this->ProcessConfigDataProperty(std::pair<String, String>(property.Key, property.Value));
 		}
 	}
 	
@@ -134,14 +134,14 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void CDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	fprintf(stderr, "Invalid dependency property: \"%s\".\n", property.first.c_str());
+	fprintf(stderr, "Invalid dependency property: \"%s\".\n", property.first.utf8().get_data());
 }
 
 void CDependency::ProcessConfigDataSection(const CConfigData *section)
 {
-	fprintf(stderr, "Invalid dependency property: \"%s\".\n", section->Tag.c_str());
+	fprintf(stderr, "Invalid dependency property: \"%s\".\n", section->Tag.utf8().get_data());
 }
 
 bool CDependency::Check(const CPlayer *player, const bool ignore_units) const

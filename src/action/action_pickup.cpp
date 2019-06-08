@@ -238,7 +238,7 @@ enum {
 					item->Elixir = goal->Elixir;
 				}
 				if (goal->Unique) {
-					item->Name = goal->Name;
+					item->Name = goal->Name.c_str();
 					item->Unique = goal->Unique;
 				}
 				item->Bound = goal->Bound;

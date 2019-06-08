@@ -54,13 +54,13 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "date") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->Date = CDate::FromString(value);
+			String value = property.Value.replace("_", "-");
+			this->Date = CDate::FromString(value.utf8().get_data());
 		} else if (property.Key == "map_template") {
 			this->MapTemplate = CMapTemplate::Get(property.Value);
 		} else if (property.Key == "site") {
@@ -70,11 +70,11 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 				this->Position = this->Site->Position;
 			}
 		} else if (property.Key == "x") {
-			this->Position.x = std::stoi(property.Value);
+			this->Position.x = property.Value.to_int();
 		} else if (property.Key == "y") {
-			this->Position.y = std::stoi(property.Value);
+			this->Position.y = property.Value.to_int();
 		} else {
-			fprintf(stderr, "Invalid historical location property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid historical location property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

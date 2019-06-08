@@ -118,7 +118,7 @@ void CButtonLevel::ClearButtonLevels()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CButtonLevel::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CButtonLevel::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "cancel_button_level") {
 		const bool is_cancel_button_level = StringToBool(value);

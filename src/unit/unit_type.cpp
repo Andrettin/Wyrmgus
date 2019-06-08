@@ -709,12 +709,12 @@ void CUnitType::Clear()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CUnitType::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "parent") {
 		CUnitType *parent_type = CUnitType::Get(value);
 		if (!parent_type) {
-			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.utf8().get_data());
 		}
 		this->SetParent(parent_type);
 	} else if (key == "name_word") {
@@ -736,23 +736,23 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 			this->Faction = faction;
 		}
 	} else if (key == "animations") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Animations = AnimationsByIdent(value);
+		value = value.replace("_", "-");
+		this->Animations = AnimationsByIdent(value.utf8().get_data());
 		if (!this->Animations) {
-			fprintf(stderr, "Animations \"%s\" do not exist.\n", value.c_str());
+			fprintf(stderr, "Animations \"%s\" do not exist.\n", value.utf8().get_data());
 		}
 	} else if (key == "tile_width") {
-		this->TileSize.x = std::stoi(value);
+		this->TileSize.x = value.to_int();
 	} else if (key == "tile_height") {
-		this->TileSize.y = std::stoi(value);
+		this->TileSize.y = value.to_int();
 	} else if (key == "neutral_minimap_color") {
-		this->NeutralMinimapColorRGB = CColor::FromString(value);
+		this->NeutralMinimapColorRGB = CColor::FromString(value.utf8().get_data());
 	} else if (key == "box_width") {
-		this->BoxWidth = std::stoi(value);
+		this->BoxWidth = value.to_int();
 	} else if (key == "box_height") {
-		this->BoxHeight = std::stoi(value);
+		this->BoxHeight = value.to_int();
 	} else if (key == "draw_level") {
-		this->DrawLevel = std::stoi(value);
+		this->DrawLevel = value.to_int();
 	} else if (key == "type") {
 		if (value == "land") {
 			this->UnitType = UnitTypeLand;
@@ -767,32 +767,32 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 			this->UnitType = UnitTypeNaval;
 			this->SeaUnit = true;
 		} else {
-			fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "priority") {
-		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
-		this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
+		this->DefaultStat.Variables[PRIORITY_INDEX].Value = value.to_int();
+		this->DefaultStat.Variables[PRIORITY_INDEX].Max  = value.to_int();
 	} else if (key == "requirements_string") {
-		this->RequirementsString = value;
+		this->RequirementsString = value.utf8().get_data();
 	} else if (key == "experience_requirements_string") {
-		this->ExperienceRequirementsString = value;
+		this->ExperienceRequirementsString = value.utf8().get_data();
 	} else if (key == "building_rules_string") {
-		this->BuildingRulesString = value;
+		this->BuildingRulesString = value.utf8().get_data();
 	} else if (key == "max_attack_range") {
-		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
-		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = value.to_int();
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = value.to_int();
 		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
 	} else if (key == "missile") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Missile.Name = value;
+		value = value.replace("_", "-");
+		this->Missile.Name = value.utf8().get_data();
 		this->Missile.Missile = nullptr;
 	} else if (key == "fire_missile") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->FireMissile.Name = value;
+		value = value.replace("_", "-");
+		this->FireMissile.Name = value.utf8().get_data();
 		this->FireMissile.Missile = nullptr;
 	} else if (key == "corpse") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->CorpseName = value;
+		value = value.replace("_", "-");
+		this->CorpseName = value.utf8().get_data();
 		this->CorpseType = nullptr;
 	} else if (key == "weapon_class") {
 		const ::ItemClass *weapon_class = ::ItemClass::Get(value);
@@ -833,7 +833,7 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		} else if (value == "trade") {
 			this->MouseAction = MouseActionTrade;
 		} else {
-			fprintf(stderr, "Invalid right mouse action: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid right mouse action: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "can_attack") {
 		this->CanAttack = StringToBool(value);
@@ -859,17 +859,17 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 			this->CanTarget &= ~CanTargetAir;
 		}
 	} else if (key == "random_movement_probability") {
-		this->RandomMovementProbability = std::stoi(value);
+		this->RandomMovementProbability = value.to_int();
 	} else if (key == "random_movement_distance") {
-		this->RandomMovementDistance = std::stoi(value);
+		this->RandomMovementDistance = value.to_int();
 	} else if (key == "gives_resource") {
 		const CResource *resource = CResource::Get(value);
 		if (resource != nullptr) {
 			this->GivesResource = resource->GetIndex();
 		}
 	} else if (key == "can_cast_spell") {
-		value = FindAndReplaceString(value, "_", "-");
-		CSpell *spell = CSpell::GetSpell(value);
+		value = value.replace("_", "-");
+		CSpell *spell = CSpell::GetSpell(value.utf8().get_data());
 		if (spell != nullptr) {
 			this->Spells.push_back(spell);
 		}
@@ -877,13 +877,13 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		if (value == "false") {
 			this->AutoCastActiveSpells.clear();
 		} else {
-			value = FindAndReplaceString(value, "_", "-");
-			const CSpell *spell = CSpell::GetSpell(value);
+			value = value.replace("_", "-");
+			const CSpell *spell = CSpell::GetSpell(value.utf8().get_data());
 			if (spell != nullptr) {
 				if (spell->AutoCast) {
 					this->AutoCastActiveSpells.insert(spell);
 				} else {
-					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
+					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.utf8().get_data());
 				}
 			}
 		}
@@ -901,28 +901,28 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 			}
 		}
 	} else {
-		std::string key_pascal_case = SnakeCaseToPascalCase(key);
+		String key_pascal_case = SnakeCaseToPascalCase(key);
 		
-		int index = UnitTypeVar.VariableNameLookup[key_pascal_case.c_str()]; // variable index
+		int index = UnitTypeVar.VariableNameLookup[key_pascal_case.utf8().get_data()]; // variable index
 		if (index != -1) { // valid index
-			if (IsStringNumber(value)) {
+			if (value.is_valid_integer()) {
 				this->DefaultStat.Variables[index].Enable = 1;
-				this->DefaultStat.Variables[index].Value = std::stoi(value);
-				this->DefaultStat.Variables[index].Max = std::stoi(value);
+				this->DefaultStat.Variables[index].Value = value.to_int();
+				this->DefaultStat.Variables[index].Max = value.to_int();
 			} else if (IsStringBool(value)) {
 				this->DefaultStat.Variables[index].Enable = StringToBool(value);
 			} else { // error
-				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key_pascal_case.c_str(), this->Ident.c_str());
+				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.utf8().get_data(), key_pascal_case.utf8().get_data(), this->Ident.c_str());
 			}
 		} else {
 			if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
 				this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
 
-			index = UnitTypeVar.BoolFlagNameLookup[key_pascal_case.c_str()];
+			index = UnitTypeVar.BoolFlagNameLookup[key_pascal_case.utf8().get_data()];
 			if (index != -1) {
-				if (IsStringNumber(value)) {
-					this->BoolFlag[index].value = (std::stoi(value) != 0);
+				if (value.is_valid_integer()) {
+					this->BoolFlag[index].value = (value.to_int() != 0);
 				} else {
 					this->BoolFlag[index].value = StringToBool(value);
 				}
@@ -947,59 +947,59 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "costs") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
-			key = FindAndReplaceString(key, "_", "-");
+			key = key.replace("_", "-");
 			
-			const int resource = GetResourceIdByName(key.c_str());
+			const int resource = GetResourceIdByName(key.utf8().get_data());
 			if (resource != -1) {
-				this->DefaultStat.Costs[resource] = std::stoi(value);
+				this->DefaultStat.Costs[resource] = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 	} else if (section->Tag == "repair_costs") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
-			key = FindAndReplaceString(key, "_", "-");
+			key = key.replace("_", "-");
 			
-			const int resource = GetResourceIdByName(key.c_str());
+			const int resource = GetResourceIdByName(key.utf8().get_data());
 			if (resource != -1) {
-				this->RepairCosts[resource] = std::stoi(value);
+				this->RepairCosts[resource] = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 	} else if (section->Tag == "image") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "file") {
-				this->File = CModule::GetCurrentPath() + value;
+				this->File = CModule::GetCurrentPath() + value.utf8().get_data();
 			} else if (key == "width") {
-				this->Width = std::stoi(value);
+				this->Width = value.to_int();
 			} else if (key == "height") {
-				this->Height = std::stoi(value);
+				this->Height = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		
@@ -1022,22 +1022,22 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "default_equipment") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			const ItemSlot *item_slot = ItemSlot::Get(key);
 			if (item_slot == nullptr) {
-				fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.utf8().get_data());
 				return true;
 			}
 			
 			CUnitType *item = CUnitType::Get(value);
 			if (!item) {
-				fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.utf8().get_data());
 				return true;
 			}
 			
@@ -1046,73 +1046,73 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "sounds") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
-			value = FindAndReplaceString(value, "_", "-");
+			value = value.replace("_", "-");
 			
 			if (key == "selected") {
-				this->Sound.Selected.Name = value;
+				this->Sound.Selected.Name = value.utf8().get_data();
 			} else if (key == "acknowledge") {
-				this->Sound.Acknowledgement.Name = value;
+				this->Sound.Acknowledgement.Name = value.utf8().get_data();
 			} else if (key == "attack") {
-				this->Sound.Attack.Name = value;
+				this->Sound.Attack.Name = value.utf8().get_data();
 			} else if (key == "idle") {
-				this->Sound.Idle.Name = value;
+				this->Sound.Idle.Name = value.utf8().get_data();
 			} else if (key == "hit") {
-				this->Sound.Hit.Name = value;
+				this->Sound.Hit.Name = value.utf8().get_data();
 			} else if (key == "miss") {
-				this->Sound.Miss.Name = value;
+				this->Sound.Miss.Name = value.utf8().get_data();
 			} else if (key == "fire_missile") {
-				this->Sound.FireMissile.Name = value;
+				this->Sound.FireMissile.Name = value.utf8().get_data();
 			} else if (key == "step") {
-				this->Sound.Step.Name = value;
-			} else if (key.find("step_") != std::string::npos) {
-				std::string terrain_type_ident = FindAndReplaceString(key, "step_", "");
+				this->Sound.Step.Name = value.utf8().get_data();
+			} else if (key.find("step_") != -1) {
+				String terrain_type_ident = key.replace("step_", "");
 				const CTerrainType *terrain_type = CTerrainType::Get(terrain_type_ident);
 				if (terrain_type != nullptr) {
-					this->Sound.TerrainTypeStep[terrain_type].Name = value;
+					this->Sound.TerrainTypeStep[terrain_type].Name = value.utf8().get_data();
 				}
 			} else if (key == "used") {
-				this->Sound.Used.Name = value;
+				this->Sound.Used.Name = value.utf8().get_data();
 			} else if (key == "build") {
-				this->Sound.Build.Name = value;
+				this->Sound.Build.Name = value.utf8().get_data();
 			} else if (key == "ready") {
-				this->Sound.Ready.Name = value;
+				this->Sound.Ready.Name = value.utf8().get_data();
 			} else if (key == "repair") {
-				this->Sound.Repair.Name = value;
-			} else if (key.find("harvest_") != std::string::npos) {
-				std::string resource_ident = FindAndReplaceString(key, "harvest_", "");
-				resource_ident = FindAndReplaceString(resource_ident, "_", "-");
-				const int res = GetResourceIdByName(resource_ident.c_str());
+				this->Sound.Repair.Name = value.utf8().get_data();
+			} else if (key.find("harvest_") != -1) {
+				String resource_ident = key.replace("harvest_", "");
+				resource_ident = resource_ident.replace("_", "-");
+				const int res = GetResourceIdByName(resource_ident.utf8().get_data());
 				if (res != -1) {
-					this->Sound.Harvest[res].Name = value;
+					this->Sound.Harvest[res].Name = value.utf8().get_data();
 				} else {
-					fprintf(stderr, "Invalid resource: \"%s\".\n", resource_ident.c_str());
+					fprintf(stderr, "Invalid resource: \"%s\".\n", resource_ident.utf8().get_data());
 				}
 			} else if (key == "help") {
-				this->Sound.Help.Name = value;
+				this->Sound.Help.Name = value.utf8().get_data();
 			} else if (key == "dead") {
-				this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
-			} else if (key.find("dead_") != std::string::npos) {
-				std::string death_type_ident = FindAndReplaceString(key, "dead_", "");
-				death_type_ident = FindAndReplaceString(death_type_ident, "_", "-");
+				this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value.utf8().get_data();
+			} else if (key.find("dead_") != -1) {
+				String death_type_ident = key.replace("dead_", "");
+				death_type_ident = death_type_ident.replace("_", "-");
 				int death;
 				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-					if (death_type_ident == ExtraDeathTypes[death]) {
-						this->Sound.Dead[death].Name = value;
+					if (death_type_ident == ExtraDeathTypes[death].c_str()) {
+						this->Sound.Dead[death].Name = value.utf8().get_data();
 						break;
 					}
 				}
 				if (death == ANIMATIONS_DEATHTYPES) {
-					fprintf(stderr, "Invalid death type: \"%s\".\n", death_type_ident.c_str());
+					fprintf(stderr, "Invalid death type: \"%s\".\n", death_type_ident.utf8().get_data());
 				}
 			} else {
-				fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 	} else if (section->Tag == "predependencies") {
@@ -1138,30 +1138,30 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 		
 		this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
 	} else {
-		std::string tag = SnakeCaseToPascalCase(section->Tag);
+		String tag = SnakeCaseToPascalCase(section->Tag);
 		
-		const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
+		const int index = UnitTypeVar.VariableNameLookup[tag.utf8().get_data()]; // variable index
 		
 		if (index != -1) { // valid index
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "enable") {
 					this->DefaultStat.Variables[index].Enable = StringToBool(value);
 				} else if (key == "value") {
-					this->DefaultStat.Variables[index].Value = std::stoi(value);
+					this->DefaultStat.Variables[index].Value = value.to_int();
 				} else if (key == "max") {
-					this->DefaultStat.Variables[index].Max = std::stoi(value);
+					this->DefaultStat.Variables[index].Max = value.to_int();
 				} else if (key == "increase") {
-					this->DefaultStat.Variables[index].Increase = std::stoi(value);
+					this->DefaultStat.Variables[index].Increase = value.to_int();
 				} else {
-					fprintf(stderr, "Invalid variable property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid variable property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 		} else {
@@ -2028,7 +2028,7 @@ std::vector<String> CUnitType::GetStatStrings() const
 				stat_string += " ";
 			}
 			
-			stat_string += GetVariableDisplayName(var).c_str();
+			stat_string += GetVariableDisplayName(var);
 			
 			stat_strings.push_back(stat_string);
 			
@@ -2040,7 +2040,7 @@ std::vector<String> CUnitType::GetStatStrings() const
 				increase_stat_string += std::to_string((long long) this->DefaultStat.Variables[var].Increase).c_str();
 				increase_stat_string += " ";
 
-				increase_stat_string += GetVariableDisplayName(var, true).c_str();
+				increase_stat_string += GetVariableDisplayName(var, true);
 				stat_strings.push_back(increase_stat_string);
 			}
 		}
@@ -2065,7 +2065,7 @@ std::vector<String> CUnitType::GetStatStrings() const
 						stat_string += " ";
 					}
 
-					stat_string += GetVariableDisplayName(var).c_str();
+					stat_string += GetVariableDisplayName(var);
 					
 					stat_strings.push_back(stat_string);
 				}
@@ -2079,7 +2079,7 @@ std::vector<String> CUnitType::GetStatStrings() const
 					stat_string += std::to_string((long long) upgrade_modifier->Modifier.Variables[var].Increase).c_str();
 					stat_string += " ";
 												
-					stat_string += GetVariableDisplayName(var, true).c_str();
+					stat_string += GetVariableDisplayName(var, true);
 					
 					stat_strings.push_back(stat_string);
 				}
@@ -3032,7 +3032,7 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 					unit_type_stats_string += " ";
 				}
 
-				unit_type_stats_string += GetVariableDisplayName(var);
+				unit_type_stats_string += GetVariableDisplayName(var).utf8().get_data();
 			}
 		}
 			

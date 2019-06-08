@@ -132,22 +132,22 @@ bool CCivilization::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "date") {
-				value = FindAndReplaceString(value, "_", "-");
-				date = CDate::FromString(value);
+				value = value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else if (key == "upgrade") {
-				upgrade = CUpgrade::Get(value);
+				upgrade = CUpgrade::Get(value.utf8().get_data());
 			} else if (key == "has_upgrade") {
 				has_upgrade = StringToBool(value);
 			} else {
-				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		

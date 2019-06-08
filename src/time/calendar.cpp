@@ -57,17 +57,17 @@ void CDayOfTheWeek::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->Name = value.utf8().get_data();
 		} else {
-			fprintf(stderr, "Invalid day of the week property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid day of the week property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 }
@@ -81,19 +81,19 @@ void CMonth::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->Name = value.utf8().get_data();
 		} else if (key == "days") {
-			this->Days = std::stoi(value);
+			this->Days = value.to_int();
 		} else {
-			fprintf(stderr, "Invalid month property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid month property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 }
@@ -133,12 +133,12 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "name") {
 			this->Name = value.c_str();
@@ -148,14 +148,14 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 				CCalendar::BaseCalendar = this;
 			}
 		} else if (key == "year_label") {
-			this->YearLabel = value;
+			this->YearLabel = value.utf8().get_data();
 		} else if (key == "negative_year_label") {
-			this->NegativeYearLabel = value;
+			this->NegativeYearLabel = value.utf8().get_data();
 		} else if (key == "base_day_of_the_week") {
-			value = FindAndReplaceString(value, "_", "-");
-			base_day_of_the_week = value;
+			value = value.replace("_", "-");
+			base_day_of_the_week = value.utf8().get_data();
 		} else {
-			fprintf(stderr, "Invalid calendar property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid calendar property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
@@ -165,7 +165,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			day_of_the_week->ID = this->DaysOfTheWeek.size();
 			this->DaysOfTheWeek.push_back(day_of_the_week);
 			day_of_the_week->Calendar = this;
-			day_of_the_week->Ident = section->Ident;
+			day_of_the_week->Ident = section->Ident.utf8().get_data();
 			this->DaysOfTheWeekByIdent[day_of_the_week->Ident] = day_of_the_week;
 			day_of_the_week->ProcessConfigData(section);
 		} else if (section->Tag == "month") {
@@ -180,25 +180,24 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 				
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "calendar") {
-					value = FindAndReplaceString(value, "_", "-");
 					calendar = CCalendar::Get(value);
 					if (!calendar) {
-						fprintf(stderr, "Calendar \"%s\" does not exist.\n", value.c_str());
+						fprintf(stderr, "Calendar \"%s\" does not exist.\n", value.utf8().get_data());
 					}
 				} else if (key == "date") {
-					date = CDate::FromString(value);
+					date = CDate::FromString(value.utf8().get_data());
 				} else if (key == "intersecting_date") {
-					intersecting_date = CDate::FromString(value);
+					intersecting_date = CDate::FromString(value.utf8().get_data());
 				} else {
-					fprintf(stderr, "Invalid year difference property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid year difference property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -219,7 +218,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			
 			this->AddChronologicalIntersection(calendar, date, intersecting_date);
 		} else {
-			fprintf(stderr, "Invalid calendar property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid calendar property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 	

@@ -56,16 +56,16 @@ class DataElement;
 class CConfigData
 {
 public:
-	CConfigData(const std::string &tag) : Tag(tag)
+	CConfigData(const String &tag) : Tag(tag)
 	{
 	}
 	
 	static void ParseConfigData(const std::string &filepath, const bool define_only);
 	
 private:
-	static std::vector<std::string> ParseLine(const std::string &line);
-	static bool ParseEscapedCharacter(std::string &current_string, const char character);
-	static void ParseTokens(const std::vector<std::string> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements);
+	static std::vector<String> ParseLine(const std::wstring &line);
+	static bool ParseEscapedCharacter(String &current_string, const wchar_t character);
+	static void ParseTokens(const std::vector<String> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements);
 	
 public:
 	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
@@ -80,7 +80,7 @@ public:
 		for (const CConfigProperty &config_property : this->Properties) {
 			try {
 				if (!config_property.ProcessForObject(data_element)) {
-					fprintf(stderr, "Invalid %s property: \"%s\".\n", this->Tag.c_str(), config_property.Key.c_str());
+					fprintf(stderr, "Invalid %s property: \"%s\".\n", this->Tag.utf8().get_data(), config_property.Key.utf8().get_data());
 				}
 			} catch (std::exception &exception) {
 				fprintf(stderr, "%s\n", exception.what());
@@ -90,9 +90,9 @@ public:
 	
 	Color ProcessColor() const;
 	
-	std::string Tag;
-	std::string Ident;
-	std::vector<std::string> Aliases;	/// alias string identifiers for the data element
+	String Tag;
+	String Ident;
+	std::vector<String> Aliases;	/// alias string identifiers for the data element
 	CConfigData *Parent = nullptr;
 	bool Modification = false;	/// whether this is a modification of a pre-existing tag
 	std::vector<CConfigProperty> Properties;

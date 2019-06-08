@@ -104,13 +104,13 @@ extern char UpgradeIdAllowed(const CPlayer &player, int id);
 extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
 
 //Wyrmgus start
-extern std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand_strategy = false, bool multiline = false);
+extern std::string GetUpgradeEffectsString(const std::string &upgrade_ident);
 extern bool IsPercentageVariable(int var);
 extern bool IsBonusVariable(int var);
 extern bool IsBooleanVariable(int var);
 extern bool IsKnowledgeVariable(int var);
 extern bool IsPotentiallyNegativeVariable(int var);
-extern std::string GetVariableDisplayName(int var, bool increase = false);
+extern String GetVariableDisplayName(const int var_index, const bool increase = false);
 //Wyrmgus end
 
 #endif

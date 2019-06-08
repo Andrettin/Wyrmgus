@@ -68,7 +68,7 @@ CTimeOfDaySchedule::~CTimeOfDaySchedule()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CTimeOfDaySchedule::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CTimeOfDaySchedule::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "default_schedule") {
 		const bool is_default_schedule = StringToBool(value);
@@ -124,21 +124,21 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "time_of_day") {
 			this->TimeOfDay = CTimeOfDay::Get(value);
 		} else if (key == "hours") {
 			this->Schedule->TotalHours -= this->Hours; //remove old amount of hours from the schedule, if it has already been defined before
-			this->Hours = std::stoi(value);
+			this->Hours = value.to_int();
 			this->Schedule->TotalHours += this->Hours;
 		} else {
-			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
@@ -149,19 +149,19 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 			
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "season") {
 					season = CSeason::Get(value);
 				} else if (key == "hours") {
-					season_hours = std::stoi(value);
+					season_hours = value.to_int();
 				} else {
-					fprintf(stderr, "Invalid season hours for scheduled time of day property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid season hours for scheduled time of day property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -177,7 +177,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 			
 			this->SeasonHours[season] = season_hours;
 		} else {
-			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 	

@@ -57,19 +57,19 @@
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSpecies::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "era") {
-		value = FindAndReplaceString(value, "_", "-");
-		const int era_id = GetEraIdByName(value);
+		value = value.replace("_", "-");
+		const int era_id = GetEraIdByName(value.utf8().get_data());
 		if (era_id != -1) {
 			this->Era = era_id;
 		} else {
-			fprintf(stderr, "Invalid era: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid era: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "child_upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->ChildUpgrade = value;
+		value = value.replace("_", "-");
+		this->ChildUpgrade = value.utf8().get_data();
 	} else if (key == "home_plane") {
 		CPlane *plane = CPlane::Get(value);
 		if (plane) {

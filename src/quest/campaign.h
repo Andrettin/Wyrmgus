@@ -74,7 +74,7 @@ private:
 	static std::shared_mutex CampaignMutex;	/// Mutex for campaigns as a whole
 	
 public:
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	

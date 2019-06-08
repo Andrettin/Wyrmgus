@@ -110,8 +110,9 @@ extern size_t strnlen(const char *str, size_t strsize);
 
 extern std::vector<std::string> SplitString(const std::string &str, const char *separators);
 extern bool StringToBool(const std::string &str);
+extern bool StringToBool(const String &str);
 extern bool IsStringNumber(const std::string &str);
-extern bool IsStringBool(const std::string &str);
+extern bool IsStringBool(const String &str);
 
 template <typename T>
 inline Array VectorToGodotArray(const std::vector<T> &vector)
@@ -140,7 +141,7 @@ inline Array SetToGodotArray(const std::set<T> &set)
 extern String NumberToRomanNumeral(unsigned number);
 extern std::string FormatNumber(const int number);
 extern std::string PascalCaseToSnakeCase(const std::string &str);
-extern std::string SnakeCaseToPascalCase(const std::string &str);
+extern String SnakeCaseToPascalCase(const String &str);
 
 /*----------------------------------------------------------------------------
 --  Getopt
@@ -182,7 +183,7 @@ extern std::string FullyDecapitalizeString(const std::string &text);	/// Make ev
 extern std::string GetPluralForm(const std::string &name);
 extern std::string IdentToName(const std::string &text);				/// Make the ident string become a display name
 extern std::string NameToIdent(const std::string &text);				/// Make the name be formatted like an ident string
-extern std::string SeparateCapitalizedStringElements(const std::string &text);	/// Make the string's capitalized elements become separated
+extern String SeparateCapitalizedStringElements(const String &text);	/// Make the string's capitalized elements become separated
 extern std::string GeneratePersonalName(const std::string &unit_type_ident);
 //Wyrmgus end
 

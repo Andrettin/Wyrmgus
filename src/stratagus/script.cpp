@@ -1574,7 +1574,7 @@ std::string EvalString(const StringDesc *s)
 						return unit->Type->GetQuote().utf8().get_data();
 					}
 				} else {
-					return unit->Unique->Quote;
+					return unit->Unique->GetQuote().utf8().get_data();
 				}
 			} else {
 				return std::string();
@@ -1614,7 +1614,7 @@ std::string EvalString(const StringDesc *s)
 					if (!item_equipped) {
 						set_items_string += "~<";
 					}
-					set_items_string += unit->Unique->Set->UniqueItems[i]->Name;
+					set_items_string += unit->Unique->Set->UniqueItems[i]->GetName().utf8().get_data();;
 					if (!item_equipped) {
 						set_items_string += "~>";
 					}

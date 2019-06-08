@@ -194,16 +194,16 @@ static int CclGetUniqueItemData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, item->Name.c_str());
+		lua_pushstring(l, item->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, item->Description.c_str());
+		lua_pushstring(l, item->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, item->Background.c_str());
+		lua_pushstring(l, item->GetBackground().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, item->Quote.c_str());
+		lua_pushstring(l, item->GetQuote().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "ResourcesHeld")) {
 		lua_pushnumber(l, item->ResourcesHeld);

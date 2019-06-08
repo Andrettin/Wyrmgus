@@ -42,16 +42,16 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
+	const String &key = property.first;
+	String value = property.second;
 	if (key == "unit_type") {
 		this->UnitType = CUnitType::Get(value);
 	} else if (key == "count") {
-		this->Count = std::stoi(value);
+		this->Count = value.to_int();
 	} else {
-		fprintf(stderr, "Invalid unit type dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid unit type dependency property: \"%s\".\n", key.utf8().get_data());
 	}
 }
 

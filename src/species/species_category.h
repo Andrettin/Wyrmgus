@@ -60,7 +60,7 @@ public:
 	
 	static constexpr const char *ClassIdentifier = "species_category";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	
 	const String &GetCommonName() const { return this->CommonName; }
 	

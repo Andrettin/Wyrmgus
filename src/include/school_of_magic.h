@@ -62,7 +62,7 @@ private:
 	static std::map<const CUpgrade *, CSchoolOfMagic *> SchoolsOfMagicByUpgrade;
 
 public:
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the school of magic
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this school of magic

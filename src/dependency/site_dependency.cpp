@@ -44,10 +44,10 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CSiteDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CSiteDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
+	const String &key = property.first;
+	String value = property.second;
 	if (key == "site") {
 		this->Site = CSite::Get(value);
 	} else if (key == "faction") {
@@ -55,7 +55,7 @@ void CSiteDependency::ProcessConfigDataProperty(const std::pair<std::string, std
 	} else if (key == "enemy") {
 		this->Enemy = StringToBool(value);
 	} else {
-		fprintf(stderr, "Invalid site dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid site dependency property: \"%s\".\n", key.utf8().get_data());
 	}
 }
 

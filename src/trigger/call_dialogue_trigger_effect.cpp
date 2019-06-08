@@ -53,7 +53,7 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
@@ -63,7 +63,7 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 				this->Dialogue = dialogue;
 			}
 		} else {
-			fprintf(stderr, "Invalid call dialogue trigger effect property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid call dialogue trigger effect property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

@@ -56,7 +56,7 @@ public:
 	static CDependency *FromConfigData(const CConfigData *config_data);
 	
 	void ProcessConfigData(const CConfigData *config_data);
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
+	virtual void ProcessConfigDataProperty(const std::pair<String, String> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
 	bool Check(const CPlayer *player, const bool ignore_units = false) const;
 private:

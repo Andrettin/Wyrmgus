@@ -44,18 +44,18 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
+	const String &key = property.first;
+	String value = property.second;
 	if (key == "upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::Get(value);
+		value = value.replace("_", "-");
+		this->Upgrade = CUpgrade::Get(value.utf8().get_data());
 		if (!this->Upgrade) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 		}
 	} else {
-		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.utf8().get_data());
 	}
 }
 

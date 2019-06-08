@@ -137,15 +137,15 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "name") {
-			this->Name = value.c_str();
+			this->Name = value.utf8().get_data();
 			name_changed = true;
 		} else if (key == "name_word") {
 			CWord *name_word = CWord::Get(value);
@@ -188,7 +188,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					}
 				}
 			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "gender") {
 			this->Gender = CGender::Get(value);
@@ -205,27 +205,27 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "home_site") {
 			this->HomeSite = CSite::Get(value);
 		} else if (key == "hair_variation") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->HairVariation = value;
+			value = value.replace("_", "-");
+			this->HairVariation = value.utf8().get_data();
 		} else if (key == "trait") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->Trait = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "level") {
-			this->Level = std::stoi(value);
+			this->Level = value.to_int();
 		} else if (key == "birth_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->BirthDate = CDate::FromString(value);
+			value = value.replace("_", "-");
+			this->BirthDate = CDate::FromString(value.utf8().get_data());
 		} else if (key == "start_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->StartDate = CDate::FromString(value);
+			value = value.replace("_", "-");
+			this->StartDate = CDate::FromString(value.utf8().get_data());
 		} else if (key == "death_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->DeathDate = CDate::FromString(value);
+			value = value.replace("_", "-");
+			this->DeathDate = CDate::FromString(value.utf8().get_data());
 		} else if (key == "violent_death") {
 			this->ViolentDeath = StringToBool(value);
 		} else if (key == "father") {
@@ -248,7 +248,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 						}
 					}
 				} else {
-					fprintf(stderr, "Character \"%s\" set to be the biological father of \"%s\", but isn't male.\n", value.c_str(), this->Ident.c_str());
+					fprintf(stderr, "Character \"%s\" set to be the biological father of \"%s\", but isn't male.\n", value.utf8().get_data(), this->Ident.c_str());
 				}
 			}
 		} else if (key == "mother") {
@@ -271,7 +271,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 						}
 					}
 				} else {
-					fprintf(stderr, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female.\n", value.c_str(), this->Ident.c_str());
+					fprintf(stderr, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female.\n", value.utf8().get_data(), this->Ident.c_str());
 				}
 			}
 		} else if (key == "deity") {
@@ -283,14 +283,14 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
+			value = value.replace("_", "-");
+			this->Icon.Name = value.utf8().get_data();
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
 		} else if (key == "heroic_icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->HeroicIcon.Name = value;
+			value = value.replace("_", "-");
+			this->HeroicIcon.Name = value.utf8().get_data();
 			this->HeroicIcon.Icon = nullptr;
 			this->HeroicIcon.Load();
 			this->HeroicIcon.Icon->Load();
@@ -299,31 +299,31 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			if (unit_type) {
 				this->ForbiddenUpgrades.push_back(unit_type);
 			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "ability") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *ability_upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *ability_upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (ability_upgrade != nullptr) {
 				this->Abilities.push_back(ability_upgrade);
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "read_work") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->ReadWorks.push_back(upgrade);
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "consumed_elixir") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->ConsumedElixirs.push_back(upgrade);
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "preferred_deity_domain") {
 			CDeityDomain *deity_domain = CDeityDomain::Get(value);
@@ -331,7 +331,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				this->PreferredDeityDomains.push_back(deity_domain);
 			}
 		} else {
-			fprintf(stderr, "Invalid character property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid character property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
@@ -348,29 +348,29 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "title") {
-					value = FindAndReplaceString(value, "_", "-");
-					title = GetCharacterTitleIdByName(value);
+					value = value.replace("_", "-");
+					title = GetCharacterTitleIdByName(value.utf8().get_data());
 					if (title == -1) {
-						fprintf(stderr, "Character title \"%s\" does not exist.\n", value.c_str());
+						fprintf(stderr, "Character title \"%s\" does not exist.\n", value.utf8().get_data());
 					}
 				} else if (key == "start_date") {
-					value = FindAndReplaceString(value, "_", "-");
-					start_date = CDate::FromString(value);
+					value = value.replace("_", "-");
+					start_date = CDate::FromString(value.utf8().get_data());
 				} else if (key == "end_date") {
-					value = FindAndReplaceString(value, "_", "-");
-					end_date = CDate::FromString(value);
+					value = value.replace("_", "-");
+					end_date = CDate::FromString(value.utf8().get_data());
 				} else if (key == "faction") {
 					title_faction = CFaction::Get(value);
 				} else {
-					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -395,7 +395,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Items.push_back(item);
 			item->ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid character property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid character property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 	
@@ -811,7 +811,7 @@ CPersistentItem *CCharacter::GetItem(const CUnit *item) const
 			&& persistent_item->Identified == item->Identified
 			&& this->IsItemEquipped(persistent_item) == item->Container->IsItemEquipped(item)
 		) {
-			if (persistent_item->Name.empty() || persistent_item->Name == item->Name) {
+			if (persistent_item->Name.empty() || persistent_item->Name == item->Name.c_str()) {
 				return persistent_item;
 			}
 		}
@@ -1064,7 +1064,7 @@ void SaveHero(CCharacter *hero)
 				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", hero->Items[j]->Elixir->Ident.c_str());
 			}
 			if (!hero->Items[j]->Name.empty()) {
-				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.c_str());
+				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.utf8().get_data());
 			}
 			if (hero->Items[j]->Unique) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
 				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", hero->Items[j]->Unique->Ident.c_str());

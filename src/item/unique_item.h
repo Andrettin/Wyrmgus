@@ -45,6 +45,7 @@ class CIcon;
 class CUnitType;
 class CUpgrade;
 class CSpell;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -59,15 +60,14 @@ public:
 	
 	bool CanDrop() const;				/// Check whether this unique item can drop
 	int GetMagicLevel() const;			/// Get this unique item's magic level
-	CIcon *GetIcon() const;
+	virtual CIcon *GetIcon() const override;
+	
+	CIcon *GetSpecificIcon() const
+	{
+		return this->Icon;
+	}
 
 	int ResourcesHeld = 0;
-	std::string Ident;
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	CIcon *Icon = nullptr;		/// Unique item's icon (if it differs from that of its type)
 	CUnitType *Type = nullptr;	/// Item type of the item
 	CUpgrade *Prefix = nullptr;
 	CUpgrade *Suffix = nullptr;
@@ -75,6 +75,8 @@ public:
 	CSpell *Spell = nullptr;
 	CUpgrade *Work = nullptr;
 	CUpgrade *Elixir = nullptr;
+	
+	friend int CclDefineUniqueItem(lua_State *l);
 	
 protected:
 	static inline void _bind_methods() {}

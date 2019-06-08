@@ -47,14 +47,14 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CGenderDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CGenderDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
+	const String &key = property.first;
+	String value = property.second;
 	if (key == "gender") {
 		this->Gender = CGender::Get(value);
 	} else {
-		fprintf(stderr, "Invalid gender dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid gender dependency property: \"%s\".\n", key.utf8().get_data());
 	}
 }
 

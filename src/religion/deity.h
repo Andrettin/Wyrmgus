@@ -74,7 +74,7 @@ private:
 	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
 	
 public:
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value);
+	virtual bool ProcessConfigDataProperty(const String &key, String value);
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	

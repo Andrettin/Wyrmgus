@@ -261,10 +261,10 @@ CQuestObjective *CQuestObjective::FromConfigData(const CConfigData *config_data)
 {
 	CQuestObjective *objective = new CQuestObjective;
 	
-	std::string objective_type_tag = FindAndReplaceString(config_data->Tag, "_", "-");
-	objective->ObjectiveType = GetQuestObjectiveTypeIdByName(objective_type_tag);
+	String objective_type_tag = config_data->Tag.replace("_", "-");
+	objective->ObjectiveType = GetQuestObjectiveTypeIdByName(objective_type_tag.utf8().get_data());
 	if (objective->ObjectiveType == -1) {
-		fprintf(stderr, "Invalid quest objective type: \"%s\".\n", config_data->Tag.c_str());
+		fprintf(stderr, "Invalid quest objective type: \"%s\".\n", config_data->Tag.utf8().get_data());
 		return objective;
 	}
 	
@@ -286,14 +286,14 @@ void CQuestObjective::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "objective_string") {
-			this->ObjectiveString = property.Value;
+			this->ObjectiveString = property.Value.utf8().get_data();
 		} else if (property.Key == "quantity") {
-			this->Quantity = std::stoi(property.Value);
+			this->Quantity = property.Value.to_int();
 		} else if (property.Key == "resource") {
 			const CResource *resource = CResource::Get(property.Value);
 			if (resource != nullptr) {
@@ -310,7 +310,8 @@ void CQuestObjective::ProcessConfigData(const CConfigData *config_data)
 				this->UnitTypes.push_back(unit_type);
 			}
 		} else if (property.Key == "upgrade") {
-			const CUpgrade *upgrade = CUpgrade::Get(property.Value);
+			String value = property.Value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade != nullptr) {
 				this->Upgrade = upgrade;
 			}
@@ -335,7 +336,7 @@ void CQuestObjective::ProcessConfigData(const CConfigData *config_data)
 				this->Faction = faction;
 			}
 		} else {
-			fprintf(stderr, "Invalid quest objective property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid quest objective property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 }

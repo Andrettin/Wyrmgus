@@ -86,67 +86,67 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "variation_id") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->VariationId = value;
+			value = value.replace("_", "-");
+			this->VariationId = value.utf8().get_data();
 		} else if (key == "layer") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->ImageLayer = GetImageLayerIdByName(value);
+			value = value.replace("_", "-");
+			this->ImageLayer = GetImageLayerIdByName(value.utf8().get_data());
 			if (this->ImageLayer == -1) {
-				fprintf(stderr, "Invalid image layer: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid image layer: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "type_name") {
-			this->TypeName = value;
+			this->TypeName = value.utf8().get_data();
 		} else if (key == "file") {
-			this->File = CModule::GetCurrentPath() + value;
+			this->File = CModule::GetCurrentPath() + value.utf8().get_data();
 		} else if (key == "shadow_file") {
-			this->ShadowFile = CModule::GetCurrentPath() + value;
+			this->ShadowFile = CModule::GetCurrentPath() + value.utf8().get_data();
 		} else if (key == "light_file") {
-			this->LightFile = CModule::GetCurrentPath() + value;
+			this->LightFile = CModule::GetCurrentPath() + value.utf8().get_data();
 		} else if (key == "frame_width") {
-			this->FrameWidth = std::stoi(value);
+			this->FrameWidth = value.to_int();
 		} else if (key == "frame_height") {
-			this->FrameHeight = std::stoi(value);
+			this->FrameHeight = value.to_int();
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
+			value = value.replace("_", "-");
+			this->Icon.Name = value.utf8().get_data();
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
 		} else if (key == "animations") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Animations = AnimationsByIdent(value);
+			value = value.replace("_", "-");
+			this->Animations = AnimationsByIdent(value.utf8().get_data());
 			if (!this->Animations) {
-				fprintf(stderr, "Invalid animations: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid animations: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "construction") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Construction = ConstructionByIdent(value);
+			value = value.replace("_", "-");
+			this->Construction = ConstructionByIdent(value.utf8().get_data());
 			if (!this->Construction) {
-				fprintf(stderr, "Invalid construction: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid construction: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "required_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade != nullptr) {
 				this->UpgradesRequired.push_back(upgrade);
 			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "forbidden_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade != nullptr) {
 				this->UpgradesForbidden.push_back(upgrade);
 			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "item_class_equipped") {
 			const ItemClass *item_class = ItemClass::Get(value);
@@ -163,14 +163,14 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			if (unit_type != nullptr) {
 				this->ItemsEquipped.push_back(unit_type);
 			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "item_not_equipped") {
 			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ItemsNotEquipped.push_back(unit_type);
 			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "terrain") {
 			const CTerrainType *terrain_type = CTerrainType::Get(value);
@@ -193,13 +193,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				this->ForbiddenSeasons.push_back(season);
 			}
 		} else if (key == "resource_min") {
-			this->ResourceMin = std::stoi(value);
+			this->ResourceMin = value.to_int();
 		} else if (key == "resource_max") {
-			this->ResourceMax = std::stoi(value);
+			this->ResourceMax = value.to_int();
 		} else if (key == "weight") {
-			this->Weight = std::stoi(value);
+			this->Weight = value.to_int();
 		} else {
-			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
@@ -210,20 +210,20 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "file") {
-					file = CModule::GetCurrentPath() + value;
+					file = CModule::GetCurrentPath() + value.utf8().get_data();
 				} else if (key == "resource") {
-					value = FindAndReplaceString(value, "_", "-");
-					resource = GetResourceIdByName(value.c_str());
+					value = value.replace("_", "-");
+					resource = GetResourceIdByName(value.utf8().get_data());
 				} else {
-					fprintf(stderr, "Invalid unit type variation file when loaded property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid unit type variation file when loaded property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -244,20 +244,20 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "file") {
-					file = CModule::GetCurrentPath() + value;
+					file = CModule::GetCurrentPath() + value.utf8().get_data();
 				} else if (key == "resource") {
-					value = FindAndReplaceString(value, "_", "-");
-					resource = GetResourceIdByName(value.c_str());
+					value = value.replace("_", "-");
+					resource = GetResourceIdByName(value.utf8().get_data());
 				} else {
-					fprintf(stderr, "Invalid unit type variation file when empty property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid unit type variation file when empty property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -278,20 +278,20 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "file") {
-					file = CModule::GetCurrentPath() + value;
+					file = CModule::GetCurrentPath() + value.utf8().get_data();
 				} else if (key == "image_layer") {
-					value = FindAndReplaceString(value, "_", "-");
-					image_layer = GetImageLayerIdByName(value);
+					value = value.replace("_", "-");
+					image_layer = GetImageLayerIdByName(value.utf8().get_data());
 				} else {
-					fprintf(stderr, "Invalid unit type variation layer file property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid unit type variation layer file property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -312,21 +312,21 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "icon") {
-					value = FindAndReplaceString(value, "_", "-");
-					icon_ident = value;
+					value = value.replace("_", "-");
+					icon_ident = value.utf8().get_data();
 				} else if (key == "button_action") {
-					value = FindAndReplaceString(value, "_", "-");
-					button_action = GetButtonActionIdByName(value);
+					value = value.replace("_", "-");
+					button_action = GetButtonActionIdByName(value.utf8().get_data());
 				} else {
-					fprintf(stderr, "Invalid unit type variation button icon property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid unit type variation button icon property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 			
@@ -345,7 +345,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->ButtonIcons[button_action].Load();
 			this->ButtonIcons[button_action].Icon->Load();
 		} else {
-			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 }

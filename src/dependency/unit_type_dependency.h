@@ -53,7 +53,7 @@ public:
 	CUnitTypeDependency() {}
 	CUnitTypeDependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
 	
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual void ProcessConfigDataProperty(const std::pair<String, String> &property) override;
 private:
 	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const override;
 public:

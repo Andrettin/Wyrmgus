@@ -63,7 +63,7 @@ public:
 	static CPlane *Add(const std::string &ident);
 	static void Clear();
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	
 	const CTimeOfDaySchedule *GetTimeOfDaySchedule() const { return this->TimeOfDaySchedule; }
 	

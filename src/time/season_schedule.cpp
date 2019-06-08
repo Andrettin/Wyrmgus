@@ -67,7 +67,7 @@ CSeasonSchedule::~CSeasonSchedule()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSeasonSchedule::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSeasonSchedule::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "default_schedule") {
 		const bool is_default_schedule = StringToBool(value);
@@ -75,7 +75,7 @@ bool CSeasonSchedule::ProcessConfigDataProperty(const std::string &key, std::str
 			CSeasonSchedule::DefaultSeasonSchedule = this;
 		}
 	} else if (key == "hours_per_day") {
-		this->HoursPerDay = std::stoi(value);
+		this->HoursPerDay = value.to_int();
 	} else {
 		return false;
 	}
@@ -98,21 +98,21 @@ bool CSeasonSchedule::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "season") {
 				season = CSeason::Get(value);
 			} else if (key == "days") {
-				hours = std::stoi(value) * this->HoursPerDay;
+				hours = value.to_int() * this->HoursPerDay;
 			} else if (key == "hours") {
-				hours = std::stoi(value);
+				hours = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		

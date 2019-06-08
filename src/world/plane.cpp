@@ -82,7 +82,7 @@ void CPlane::Clear()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CPlane::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "empowered_deity_domain") {
 		const CDeityDomain *deity_domain = CDeityDomain::Get(value);

@@ -58,7 +58,7 @@ class CPersistentItem
 public:
 	void ProcessConfigData(const CConfigData *config_data);
 	
-	std::string Name;
+	String Name;
 	bool Bound = false;			/// Whether the item is bound to its owner and can't be dropped
 	bool Identified = true;		/// Whether the item has been identified
 	const CUnitType *Type = nullptr;	/// Item type of the item

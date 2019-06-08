@@ -108,12 +108,12 @@ void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_dat
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "base") {
 			if (value == "caster") {
@@ -121,19 +121,19 @@ void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_dat
 			} else if (value == "target") {
 				this->Base = LocBaseTarget;
 			} else {
-				fprintf(stderr, "Unsupported missile location base flag: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Unsupported missile location base flag: \"%s\".\n", value.utf8().get_data());
 			}
 			
 		} else if (key == "add_x") {
-			this->AddX = std::stoi(value);
+			this->AddX = value.to_int();
 		} else if (key == "add_y") {
-			this->AddY = std::stoi(value);
+			this->AddY = value.to_int();
 		} else if (key == "add_rand_x") {
-			this->AddRandX = std::stoi(value);
+			this->AddRandX = value.to_int();
 		} else if (key == "add_rand_y") {
-			this->AddRandY = std::stoi(value);
+			this->AddRandY = value.to_int();
 		} else {
-			fprintf(stderr, "Invalid spell action missile location property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid spell action missile location property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 }
@@ -147,17 +147,17 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "damage") {
-			this->Damage = std::stoi(value);
+			this->Damage = value.to_int();
 		} else if (key == "lightning_damage") {
-			this->LightningDamage = std::stoi(value);
+			this->LightningDamage = value.to_int();
 		} else if (key == "use_unit_var") {
 			this->UseUnitVar = StringToBool(value);
 		} else if (key == "always_hits") {
@@ -165,17 +165,17 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "always_critical") {
 			this->AlwaysCritical = StringToBool(value);
 		} else if (key == "delay") {
-			this->Delay = std::stoi(value);
+			this->Delay = value.to_int();
 		} else if (key == "ttl") {
-			this->TTL = std::stoi(value);
+			this->TTL = value.to_int();
 		} else if (key == "missile") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Missile = MissileTypeByIdent(value.c_str());
+			value = value.replace("_", "-");
+			this->Missile = MissileTypeByIdent(value.utf8().get_data());
 			if (this->Missile == nullptr) {
-				fprintf(stderr, "Invalid missile: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid missile: \"%s\".\n", value.utf8().get_data());
 			}
 		} else {
-			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
@@ -185,7 +185,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 		} else if (section->Tag == "end_point") {
 			this->EndPoint.ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 	

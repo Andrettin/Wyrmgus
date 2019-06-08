@@ -50,7 +50,7 @@ class CPlayer;
 class CAgeDependency : public CDependency
 {
 public:
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual void ProcessConfigDataProperty(const std::pair<String, String> &property) override;
 private:
 	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const override;
 public:

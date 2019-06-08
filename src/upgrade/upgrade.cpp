@@ -55,7 +55,6 @@
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/game.h"
-#include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
 //Wyrmgus start
@@ -248,7 +247,7 @@ CUpgrade::~CUpgrade()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CUpgrade::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "icon") {
 		CIcon *icon = CIcon::Get(value);
@@ -256,11 +255,10 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 			this->Icon = icon;
 		}
 	} else if (key == "class") {
-		value = FindAndReplaceString(value, "_", "-");
-		const std::string &class_name = value;
+		value = value.replace("_", "-");
 		
-		if (!class_name.empty()) {
-			UpgradeClass *upgrade_class = UpgradeClass::Get(class_name);
+		if (!value.empty()) {
+			UpgradeClass *upgrade_class = UpgradeClass::Get(value);
 			if (upgrade_class != nullptr) {
 				this->Class = upgrade_class;
 				upgrade_class->Upgrades.insert(this);
@@ -290,18 +288,18 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 		if (item != nullptr) {
 			this->Item = item;
 		} else {
-			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "description") {
-		this->Description = value;
+		this->Description = value.utf8().get_data();
 	} else if (key == "quote") {
-		this->Quote = value;
+		this->Quote = value.utf8().get_data();
 	} else if (key == "background") {
-		this->Background = value;
+		this->Background = value.utf8().get_data();
 	} else if (key == "effects_string") {
-		this->EffectsString = value;
+		this->EffectsString = value.utf8().get_data();
 	} else if (key == "requirements_string") {
-		this->RequirementsString = value;
+		this->RequirementsString = value.utf8().get_data();
 	} else {
 		return false;
 	}
@@ -321,20 +319,20 @@ bool CUpgrade::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "costs") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
-			key = FindAndReplaceString(key, "_", "-");
+			key = key.replace("_", "-");
 			
-			const int resource = GetResourceIdByName(key.c_str());
+			const int resource = GetResourceIdByName(key.utf8().get_data());
 			if (resource != -1) {
-				this->Costs[resource] = std::stoi(value);
+				this->Costs[resource] = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 	} else if (section->Tag == "predependencies") {
@@ -2692,14 +2690,11 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
-std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand_strategy, bool multiline)
+std::string GetUpgradeEffectsString(const std::string &upgrade_ident)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
 	
 	std::string padding_string = ", ";
-	if (multiline) {
-		padding_string = "\n";
-	}
 
 	if (upgrade) {
 		std::string upgrade_effects_string;
@@ -2707,10 +2702,6 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 		bool first_element = true;
 		//check if the upgrade makes modifications to any units
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-			if (grand_strategy) { // don't show modifiers in the grand strategy mode for now
-				continue;
-			}
-
 			if (!first_element) {
 				upgrade_effects_string += padding_string;
 			} else {
@@ -2727,14 +2718,6 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					continue;
 				}
 					
-				if (grand_strategy) {
-					if (
-						var == SUPPLY_INDEX // don't show supply effects in the grand strategy mode
-					) {
-						continue;
-					}
-				}
-
 				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
 					if (!first_var) {
 						upgrade_effects_string += padding_string;
@@ -2757,7 +2740,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 						upgrade_effects_string += " ";
 					}
 
-					upgrade_effects_string += GetVariableDisplayName(var);
+					upgrade_effects_string += GetVariableDisplayName(var).utf8().get_data();
 						
 					bool first_unit_type = true;
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
@@ -2787,41 +2770,39 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
 					upgrade_effects_string += " ";
 											
-					upgrade_effects_string += GetVariableDisplayName(var, true);
+					upgrade_effects_string += GetVariableDisplayName(var, true).utf8().get_data();
 				}
 			}
 				
-			if (!grand_strategy) {
-				bool first_res = true;
-				for (int i = 0; i < MaxCosts; ++i) {
-					if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]) {
-						if (!first_res) {
-							upgrade_effects_string += padding_string;
-						} else {
-							first_res = false;
-						}
-							
-						if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i] > 0) {
-							upgrade_effects_string += "+";
-						}
-						upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]);
-						upgrade_effects_string += "%";
-						upgrade_effects_string += " ";
-						upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
-						upgrade_effects_string += " Processing";
-							
-						bool first_unit_type = true;
-						for (CUnitType *unit_type : CUnitType::GetAll()) {
-							if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
-								if (!first_unit_type) {
-									upgrade_effects_string += ", ";
-								} else {
-									upgrade_effects_string += " for ";
-									first_unit_type = false;
-								}
-										
-								upgrade_effects_string += unit_type->GetNamePlural();
+			bool first_res = true;
+			for (int i = 0; i < MaxCosts; ++i) {
+				if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]) {
+					if (!first_res) {
+						upgrade_effects_string += padding_string;
+					} else {
+						first_res = false;
+					}
+						
+					if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i] > 0) {
+						upgrade_effects_string += "+";
+					}
+					upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]);
+					upgrade_effects_string += "%";
+					upgrade_effects_string += " ";
+					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
+					upgrade_effects_string += " Processing";
+						
+					bool first_unit_type = true;
+					for (CUnitType *unit_type : CUnitType::GetAll()) {
+						if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+							if (!first_unit_type) {
+								upgrade_effects_string += ", ";
+							} else {
+								upgrade_effects_string += " for ";
+								first_unit_type = false;
 							}
+									
+							upgrade_effects_string += unit_type->GetNamePlural();
 						}
 					}
 				}
@@ -2865,33 +2846,33 @@ bool IsPotentiallyNegativeVariable(int var)
 	return var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX;
 }
 
-std::string GetVariableDisplayName(int var, bool increase)
+String GetVariableDisplayName(const int var_index, const bool increase)
 {
-	std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+	String variable_name = UnitTypeVar.VariableNameLookup[var_index];
 
-	variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-	variable_name = FindAndReplaceString(variable_name, "DaySightRangeBonus", "DaySightBonus");
-	variable_name = FindAndReplaceString(variable_name, "NightSightRangeBonus", "NightSightBonus");
-	variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-	variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-	variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
-	variable_name = FindAndReplaceString(variable_name, "Supply", "FoodSupply");
-	variable_name = FindAndReplaceString(variable_name, "Demand", "FoodCost");
+	variable_name = variable_name.replace("BasicDamage", "Damage");
+	variable_name = variable_name.replace("DaySightRangeBonus", "DaySightBonus");
+	variable_name = variable_name.replace("NightSightRangeBonus", "NightSightBonus");
+	variable_name = variable_name.replace("SightRange", "Sight");
+	variable_name = variable_name.replace("AttackRange", "Range");
+	variable_name = variable_name.replace("HitPointBonus", "HitPoints");
+	variable_name = variable_name.replace("Supply", "FoodSupply");
+	variable_name = variable_name.replace("Demand", "FoodCost");
 	variable_name = SeparateCapitalizedStringElements(variable_name);
-	variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
-	variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
-	variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
+	variable_name = variable_name.replace("Backstab", "Backstab Bonus");
+	variable_name = variable_name.replace("Knowledge Magic", "Knowledge (Magic)");
+	variable_name = variable_name.replace("Knowledge Warfare", "Knowledge (Warfare)");
 	
 	if (increase) {
-		if (var == HP_INDEX || var == HITPOINTBONUS_INDEX) {
+		if (var_index == HP_INDEX || var_index == HITPOINTBONUS_INDEX) {
 			variable_name = "Regeneration";
-		} else if (var == GIVERESOURCE_INDEX) {
+		} else if (var_index == GIVERESOURCE_INDEX) {
 			variable_name = "Resource Replenishment";
 		} else {
 			variable_name += " per Cycle";
 		}
 	}
 
-	return _(variable_name.c_str());
+	return RTR(variable_name);
 }
 //Wyrmgus end

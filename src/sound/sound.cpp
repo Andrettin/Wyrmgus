@@ -798,7 +798,7 @@ CSound::~CSound()
 
 void CSound::ProcessConfigData(const CConfigData *config_data)
 {
-	std::string ident = config_data->Ident;
+	std::string ident = config_data->Ident.utf8().get_data();
 	ident = FindAndReplaceString(ident, "_", "-");
 	std::vector<std::string> files;
 	std::vector<CSound *> group_sounds; //sounds for sound group
@@ -806,25 +806,25 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "file") {
-			std::string file = CModule::GetCurrentPath() + property.Value;
+			std::string file = CModule::GetCurrentPath() + property.Value.utf8().get_data();
 			files.push_back(file);
 		} else if (property.Key == "group_sound") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CSound *group_sound = SoundForName(value);
+			String value = property.Value.replace("_", "-");
+			CSound *group_sound = SoundForName(value.utf8().get_data());
 			if (group_sound) {
 				group_sounds.push_back(group_sound);
 			} else {
-				fprintf(stderr, "Invalid sound: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid sound: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (property.Key == "range") {
-			range = std::stoi(property.Value);
+			range = property.Value.to_int();
 		} else {
-			fprintf(stderr, "Invalid sound property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid sound property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

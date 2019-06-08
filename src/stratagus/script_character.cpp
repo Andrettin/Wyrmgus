@@ -402,7 +402,7 @@ static int CclDefineCharacter(lua_State *l)
 						UniqueItem *unique_item = UniqueItem::Get(unique_ident);
 						item->Unique = unique_item;
 						if (unique_item != nullptr) {
-							item->Name = unique_item->Name;
+							item->Name = unique_item->GetName();
 							if (unique_item->Type != nullptr) {
 								item->Type = unique_item->Type;
 							} else {
@@ -757,11 +757,11 @@ static int CclDefineCustomHero(lua_State *l)
 						UniqueItem *unique_item = UniqueItem::Get(unique_ident);
 						item->Unique = unique_item;
 						if (unique_item != nullptr) {
-							item->Name = unique_item->Name;
+							item->Name = unique_item->GetName();
 							if (unique_item->Type != nullptr) {
 								item->Type = unique_item->Type;
 							} else {
-								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
+								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.utf8().get_data());
 							}
 							item->Prefix = unique_item->Prefix;
 							item->Suffix = unique_item->Suffix;

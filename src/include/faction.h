@@ -102,7 +102,7 @@ public:
 	static const CUpgrade *GetFactionClassUpgrade(const CFaction *faction, const UpgradeClass *upgrade_class);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	

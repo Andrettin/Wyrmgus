@@ -92,7 +92,7 @@ CMapTemplate::~CMapTemplate()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CMapTemplate::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "plane") {
 		CPlane *plane = CPlane::Get(value);
@@ -106,46 +106,46 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 			this->Plane = this->World->GetPlane();
 		}
 	} else if (key == "surface_layer") {
-		this->SurfaceLayer = std::stoi(value);
+		this->SurfaceLayer = value.to_int();
 		if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
 			UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
 		}
 	} else if (key == "terrain_file") {
-		this->TerrainFile = CModule::GetCurrentPath() + value;
+		this->TerrainFile = CModule::GetCurrentPath() + value.utf8().get_data();
 	} else if (key == "overlay_terrain_file") {
-		this->OverlayTerrainFile = CModule::GetCurrentPath() + value;
+		this->OverlayTerrainFile = CModule::GetCurrentPath() + value.utf8().get_data();
 	} else if (key == "terrain_image") {
-		this->TerrainImage = CModule::GetCurrentPath() + value;
+		this->TerrainImage = CModule::GetCurrentPath() + value.utf8().get_data();
 	} else if (key == "overlay_terrain_image") {
-		this->OverlayTerrainImage = CModule::GetCurrentPath() + value;
+		this->OverlayTerrainImage = CModule::GetCurrentPath() + value.utf8().get_data();
 	} else if (key == "pixel_tile_width") {
-		this->PixelTileSize.x = std::stoi(value);
+		this->PixelTileSize.x = value.to_int();
 	} else if (key == "pixel_tile_height") {
-		this->PixelTileSize.y = std::stoi(value);
+		this->PixelTileSize.y = value.to_int();
 	} else if (key == "start_x") {
-		this->StartPos.x = std::stoi(value);
+		this->StartPos.x = value.to_int();
 	} else if (key == "start_y") {
-		this->StartPos.y = std::stoi(value);
+		this->StartPos.y = value.to_int();
 	} else if (key == "end_x") {
-		this->EndPos.x = std::stoi(value);
+		this->EndPos.x = value.to_int();
 	} else if (key == "end_y") {
-		this->EndPos.y = std::stoi(value);
+		this->EndPos.y = value.to_int();
 	} else if (key == "min_x") {
-		this->MinPos.x = std::stoi(value);
+		this->MinPos.x = value.to_int();
 	} else if (key == "min_y") {
-		this->MinPos.y = std::stoi(value);
+		this->MinPos.y = value.to_int();
 	} else if (key == "max_x") {
-		this->MaxPos.x = std::stoi(value);
+		this->MaxPos.x = value.to_int();
 	} else if (key == "max_y") {
-		this->MaxPos.y = std::stoi(value);
+		this->MaxPos.y = value.to_int();
 	} else if (key == "min_x_percent") {
-		this->MinPosPercent.x = std::stoi(value);
+		this->MinPosPercent.x = value.to_int();
 	} else if (key == "min_y_percent") {
-		this->MinPosPercent.y = std::stoi(value);
+		this->MinPosPercent.y = value.to_int();
 	} else if (key == "max_x_percent") {
-		this->MaxPosPercent.x = std::stoi(value);
+		this->MaxPosPercent.x = value.to_int();
 	} else if (key == "max_y_percent") {
-		this->MaxPosPercent.y = std::stoi(value);
+		this->MaxPosPercent.y = value.to_int();
 	} else if (key == "main_template") {
 		CMapTemplate *main_template = CMapTemplate::Get(value);
 		this->MainTemplate = main_template;
@@ -226,22 +226,22 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "unit_type") {
 				unit_type = CUnitType::Get(value);
 				if (!unit_type) {
-					fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
+					fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.utf8().get_data());
 				}
 			} else if (key == "quantity") {
-				quantity = std::stoi(value);
+				quantity = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid generated neutral unit property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid generated neutral unit property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		
@@ -273,21 +273,21 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			if (property.Key == "x") {
-				pos.x = std::stoi(property.Value);
+				pos.x = property.Value.to_int();
 			} else if (property.Key == "y") {
-				pos.y = std::stoi(property.Value);
+				pos.y = property.Value.to_int();
 			} else if (property.Key == "date") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				date = CDate::FromString(value);
+				String value = property.Value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else if (property.Key == "terrain_type") {
 				terrain_type = CTerrainType::Get(property.Value);
 			} else {
-				fprintf(stderr, "Invalid historical terrain property: \"%s\".\n", property.Key.c_str());
+				fprintf(stderr, "Invalid historical terrain property: \"%s\".\n", property.Key.utf8().get_data());
 			}
 		}
 		
@@ -1937,18 +1937,18 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "terrain_type") {
 			this->TerrainType = CTerrainType::Get(property.Value);
 		} else if (property.Key == "seed_count") {
-			this->SeedCount = std::stoi(property.Value);
+			this->SeedCount = property.Value.to_int();
 		} else if (property.Key == "expansion_chance") {
-			this->ExpansionChance = std::stoi(property.Value);
+			this->ExpansionChance = property.Value.to_int();
 		} else if (property.Key == "max_percent") {
-			this->MaxPercent = std::stoi(property.Value);
+			this->MaxPercent = property.Value.to_int();
 		} else if (property.Key == "use_existing_as_seeds") {
 			this->UseExistingAsSeeds = StringToBool(property.Value);
 		} else if (property.Key == "use_subtemplate_borders_as_seeds") {
@@ -1959,7 +1959,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 				this->TargetTerrainTypes.push_back(target_terrain_type);
 			}
 		} else {
-			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

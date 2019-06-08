@@ -59,7 +59,7 @@ public:
 	
 	static constexpr const char *ClassIdentifier = "religion";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	
 	bool HasCulturalDeities() const { return this->CulturalDeities; }
 

@@ -508,7 +508,7 @@ public:
 	static CUnitType *Add(const std::string &ident);
 	static void Clear();
 
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	

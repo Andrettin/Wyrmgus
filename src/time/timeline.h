@@ -49,7 +49,7 @@ class CTimeline : public DataElement, public DataType<CTimeline>
 public:
 	static constexpr const char *ClassIdentifier = "timeline";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
 

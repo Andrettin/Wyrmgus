@@ -72,21 +72,21 @@ bool CIcon::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "file") {
-				file = CModule::GetCurrentPath() + value;
+				file = CModule::GetCurrentPath() + value.utf8().get_data();
 			} else if (key == "width") {
-				size.width = std::stoi(value);
+				size.width = value.to_int();
 			} else if (key == "height") {
-				size.height = std::stoi(value);
+				size.height = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		

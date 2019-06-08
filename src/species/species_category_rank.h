@@ -48,7 +48,7 @@ class CSpeciesCategoryRank : public DataElement, public DataType<CSpeciesCategor
 public:
 	static constexpr const char *ClassIdentifier = "species_category_rank";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual void Initialize() override;
 	
 	CSpeciesCategoryRank *GetLowerRank() const

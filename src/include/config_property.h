@@ -36,8 +36,9 @@
 
 #include "config_operator.h"
 
+#include <core/ustring.h>
+
 #include <stdexcept>
-#include <string>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -47,7 +48,7 @@
 class CConfigProperty
 {
 public:
-	CConfigProperty(const std::string &key, CConfigOperator property_operator, const std::string &value) : Key(key), Operator(property_operator), Value(value)
+	CConfigProperty(const String &key, CConfigOperator property_operator, const String &value) : Key(key), Operator(property_operator), Value(value)
 	{
 	}
 	
@@ -69,7 +70,7 @@ public:
 		data_element.get_property_list(&property_list);
 		for (List<PropertyInfo>::Element *element = property_list.front(); element != nullptr; element = element->next()) {
 			const PropertyInfo &current_property_info = element->get();
-			if (current_property_info.name == this->Key.c_str() || current_property_info.name == ("_" + this->Key).c_str()) {
+			if (current_property_info.name == this->Key || current_property_info.name == ("_" + this->Key)) {
 				property_info = &current_property_info;
 				break;
 			}
@@ -80,37 +81,37 @@ public:
 			Variant property_value;
 			if (property_info->type == Variant::STRING) {
 				if (this->Operator != CConfigOperator::Assignment) {
-					throw std::runtime_error("Wrong operator enumeration index for string property \"" + this->Key + "\": " + std::to_string((long long) this->Operator) + ".");
+					throw std::runtime_error("Wrong operator enumeration index for string property \"" + std::string(this->Key.utf8().get_data()) + "\": " + std::to_string((long long) this->Operator) + ".");
 				}
 				
-				property_value = Variant(String(this->Value.c_str()));
+				property_value = Variant(this->Value);
 			} else if (property_info->type == Variant::INT) {
 				if (this->Operator == CConfigOperator::Assignment) {
-					property_value = Variant(std::stoi(this->Value));
+					property_value = Variant(this->Value.to_int());
 				} else if (this->Operator == CConfigOperator::Addition) {
-					property_value = Variant(int(data_element.get(property_info->name)) + std::stoi(this->Value));
+					property_value = Variant(int(data_element.get(property_info->name)) + this->Value.to_int());
 				} else if (this->Operator == CConfigOperator::Subtraction) {
-					property_value = Variant(int(data_element.get(property_info->name)) - std::stoi(this->Value));
+					property_value = Variant(int(data_element.get(property_info->name)) - this->Value.to_int());
 				}
 			} else if (property_info->type == Variant::BOOL) {
 				if (this->Operator != CConfigOperator::Assignment) {
-					throw std::runtime_error("Wrong operator enumeration index for boolean property \"" + this->Key + "\": " + std::to_string((long long) this->Operator) + ".");
+					throw std::runtime_error("Wrong operator enumeration index for boolean property \"" + std::string(this->Key.utf8().get_data()) + "\": " + std::to_string((long long) this->Operator) + ".");
 				}
 				
 				property_value = Variant(StringToBool(this->Value));
 			} else if (property_info->type == Variant::OBJECT) {
 				if (this->Operator != CConfigOperator::Assignment) {
-					throw std::runtime_error("Wrong operator enumeration index for object property \"" + this->Key + "\": " + std::to_string((long long) this->Operator) + ".");
+					throw std::runtime_error("Wrong operator enumeration index for object property \"" + std::string(this->Key.utf8().get_data()) + "\": " + std::to_string((long long) this->Operator) + ".");
 				}
 				
-				property_value = Variant(String(this->Value.c_str())); //for objects, call the setter with a string, and the appropriate conversion will be done in it
+				property_value = Variant(this->Value); //for objects, call the setter with a string, and the appropriate conversion will be done in it
 			} else {
-				throw std::runtime_error("Failed to set property \"" + this->Key + "\", as the variant type of the property is neither string, nor integer, nor boolean.");
+				throw std::runtime_error("Failed to set property \"" + std::string(this->Key.utf8().get_data()) + "\", as the variant type of the property is neither string, nor integer, nor boolean.");
 			}
 			
 			data_element.set(property_info->name, property_value, &ok);
 			if (!ok) {
-				throw std::runtime_error("Failed to set property \"" + this->Key + "\" to \"" + this->Value + "\".");
+				throw std::runtime_error("Failed to set property \"" + std::string(this->Key.utf8().get_data()) + "\" to \"" + std::string(this->Value.utf8().get_data()) + "\".");
 			}
 			
 			return true;
@@ -119,8 +120,8 @@ public:
 		//if the operator is for addition, see if the class has any method with "add_" prefixed to the given property name
 		if (this->Operator == CConfigOperator::Addition) {
 			String addition_method_name = "add_to_";
-			addition_method_name += this->Key.c_str();
-			Variant value = String(this->Value.c_str());
+			addition_method_name += this->Key;
+			Variant value = this->Value;
 			if (data_element.has_method(addition_method_name)) {
 				const Variant *args[1] = { &value };
 				data_element.call(addition_method_name, args, 1, Variant::CallError());
@@ -131,8 +132,8 @@ public:
 		//if the operator is for subtraction, see if the class has any method with "remove_" prefixed to the given property name
 		if (this->Operator == CConfigOperator::Subtraction) {
 			String subtraction_method_name = "remove_from_";
-			subtraction_method_name += this->Key.c_str();
-			Variant value = String(this->Value.c_str());
+			subtraction_method_name += this->Key;
+			Variant value = this->Value;
 			if (data_element.has_method(subtraction_method_name)) {
 				const Variant *args[1] = { &value };
 				data_element.call(subtraction_method_name, args, 1, Variant::CallError());
@@ -143,9 +144,9 @@ public:
 		return false;
 	}
 	
-	std::string Key;
+	String Key;
 	CConfigOperator Operator;
-	std::string Value;
+	String Value;
 };
 
 #endif

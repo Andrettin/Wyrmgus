@@ -75,42 +75,42 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "apply_to") {
 			const CUnitType *unit_type = CUnitType::Get(value);
 			if (unit_type != nullptr) {
 				this->ApplyTo[unit_type->GetIndex()] = 'X';
 			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "remove_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *removed_upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			CUpgrade *removed_upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (removed_upgrade) {
 				this->RemoveUpgrades.push_back(removed_upgrade);
 			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 			}
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			
-			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
+			int index = UnitTypeVar.VariableNameLookup[key.utf8().get_data()]; // variable index
 			if (index != -1) { // valid index
-				if (IsStringNumber(value)) {
+				if (value.is_valid_integer()) {
 					this->Modifier.Variables[index].Enable = 1;
-					this->Modifier.Variables[index].Value = std::stoi(value);
-					this->Modifier.Variables[index].Max = std::stoi(value);
+					this->Modifier.Variables[index].Value = value.to_int();
+					this->Modifier.Variables[index].Max = value.to_int();
 				} else { // error
-					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.c_str(), key.c_str(), AllUpgrades[this->UpgradeId]->Ident.c_str());
+					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.utf8().get_data(), key.utf8().get_data(), AllUpgrades[this->UpgradeId]->Ident.c_str());
 				}
 			} else {
-				fprintf(stderr, "Invalid upgrade modifier property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid upgrade modifier property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 	}

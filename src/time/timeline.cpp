@@ -41,10 +41,10 @@
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CTimeline::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CTimeline::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "point_of_divergence") {
-		this->PointOfDivergence = CDate::FromString(value);
+		this->PointOfDivergence = CDate::FromString(value.utf8().get_data());
 	} else {
 		return false;
 	}

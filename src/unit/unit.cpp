@@ -1053,7 +1053,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 		}
 		item->Unique = this->Character->Items[i]->Unique;
 		if (!this->Character->Items[i]->Name.empty()) {
-			item->Name = this->Character->Items[i]->Name;
+			item->Name = this->Character->Items[i]->Name.utf8().get_data();
 		}
 		item->Bound = this->Character->Items[i]->Bound;
 		item->Identified = this->Character->Items[i]->Identified;
@@ -2050,10 +2050,10 @@ void CUnit::SetUnique(UniqueItem *unique)
 			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->MagicLevel;
 			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->MagicLevel;
 		}
-		Name = unique->Name;
+		this->Name = unique->GetName().utf8().get_data();
 		this->Unique = unique;
 	} else {
-		Name.clear();
+		this->Name.clear();
 		this->Unique = nullptr;
 		this->SetPrefix(nullptr);
 		this->SetSuffix(nullptr);
@@ -2136,7 +2136,7 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 void CUnit::UpdateItemName()
 {
 	if (this->Unique) {
-		this->Name = _(this->Unique->Name.c_str());
+		this->Name = this->Unique->GetName().utf8().get_data();
 		return;
 	}
 	
@@ -6822,8 +6822,8 @@ const CIcon *CUnit::GetIcon() const
 		return this->Character->HeroicIcon.Icon;
 	} else if (this->Character != nullptr && this->Character->Icon.Icon) {
 		return this->Character->Icon.Icon;
-	} else if (this->Unique != nullptr && this->Unique->Icon != nullptr) {
-		return this->Unique->Icon;
+	} else if (this->Unique != nullptr && this->Unique->GetSpecificIcon()) {
+		return this->Unique->GetSpecificIcon();
 	}
 	
 	const CUnitTypeVariation *variation = this->GetVariation();

@@ -53,19 +53,19 @@ void CChangeResourceTriggerEffect::ProcessConfigData(const CConfigData *config_d
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "quantity") {
-			this->Quantity = std::stoi(property.Value);
+			this->Quantity = property.Value.to_int();
 		} else if (property.Key == "resource") {
 			const CResource *resource = CResource::Get(property.Value);
 			if (resource != nullptr) {
 				this->Resource = resource;
 			}
 		} else {
-			fprintf(stderr, "Invalid change resource trigger effect property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid change resource trigger effect property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

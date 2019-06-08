@@ -56,7 +56,7 @@ public:
 	static CButtonLevel *CancelButtonLevel;
 	static CButtonLevel *InventoryButtonLevel;
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	
 protected:
 	static inline void _bind_methods() {}

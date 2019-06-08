@@ -49,7 +49,7 @@
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSpeciesCategoryRank::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSpeciesCategoryRank::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "lower_rank") {
 		CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);

@@ -65,14 +65,14 @@ CHistoricalUnit::~CHistoricalUnit()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CHistoricalUnit::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CHistoricalUnit::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "start_date") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->StartDate = CDate::FromString(value);
+		value = value.replace("_", "-");
+		this->StartDate = CDate::FromString(value.utf8().get_data());
 	} else if (key == "end_date") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->EndDate = CDate::FromString(value);
+		value = value.replace("_", "-");
+		this->EndDate = CDate::FromString(value.utf8().get_data());
 	} else {
 		return false;
 	}
@@ -99,17 +99,17 @@ bool CHistoricalUnit::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			if (property.Key == "date") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				date = CDate::FromString(value);
+				String value = property.Value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else if (property.Key == "faction") {
 				owner_faction = CFaction::Get(property.Value);
 			} else {
-				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.c_str());
+				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.utf8().get_data());
 			}
 		}
 		
@@ -177,7 +177,7 @@ void CHistoricalUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CHistoricalUnit *historical_unit){ return const_cast<CFaction *>(historical_unit->GetFaction()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
-	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), +[](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = UniqueItem::Get(unique_ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("set_unique", "unique_ident"), +[](CHistoricalUnit *historical_unit, const String &unique_ident){ historical_unit->Unique = UniqueItem::Get(unique_ident); });
 	ClassDB::bind_method(D_METHOD("get_unique"), &CHistoricalUnit::GetUnique);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "unique"), "set_unique", "get_unique");
 	

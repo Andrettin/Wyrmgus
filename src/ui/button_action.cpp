@@ -61,34 +61,34 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "pos") {
-			ba.Pos = std::stoi(value);
+			ba.Pos = value.to_int();
 		} else if (key == "level") {
-			value = FindAndReplaceString(value, "_", "-");
-			ba.Level = CButtonLevel::GetButtonLevel(value);
+			value = value.replace("_", "-");
+			ba.Level = CButtonLevel::GetButtonLevel(value.utf8().get_data());
 		} else if (key == "always_show") {
 			ba.AlwaysShow = StringToBool(value);
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			ba.Icon.Name = value;
+			value = value.replace("_", "-");
+			ba.Icon.Name = value.utf8().get_data();
 		} else if (key == "action") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int button_action_id = GetButtonActionIdByName(value);
+			value = value.replace("_", "-");
+			const int button_action_id = GetButtonActionIdByName(value.utf8().get_data());
 			if (button_action_id != -1) {
 				ba.Action = ButtonCmd(button_action_id);
 			} else {
-				fprintf(stderr, "Invalid button action: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid button action: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "value") {
-			value = FindAndReplaceString(value, "_", "-");
-			ba.ValueStr = value;
+			value = value.replace("_", "-");
+			ba.ValueStr = value.utf8().get_data();
 		} else if (key == "allowed") {
 			if (value == "check_true") {
 				ba.Allowed = ButtonCheckTrue;
@@ -133,42 +133,42 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 			} else if (value == "check_has_sub_buttons") {
 				ba.Allowed = ButtonCheckHasSubButtons;
 			} else {
-				fprintf(stderr, "Invalid button check: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid button check: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "allow_arg") {
-			value = FindAndReplaceString(value, "_", "-");
+			value = value.replace("_", "-");
 			if (!ba.AllowStr.empty()) {
 				ba.AllowStr += ",";
 			}
-			ba.AllowStr += value;
+			ba.AllowStr += value.utf8().get_data();
 		} else if (key == "key") {
-			ba.Key = GetHotKey(value);
+			ba.Key = GetHotKey(value.utf8().get_data());
 		} else if (key == "hint") {
-			ba.Hint = value;
+			ba.Hint = value.utf8().get_data();
 		} else if (key == "description") {
-			ba.Description = value;
+			ba.Description = value.utf8().get_data();
 		} else if (key == "comment_sound") {
-			value = FindAndReplaceString(value, "_", "-");
-			ba.CommentSound.Name = value;
+			value = value.replace("_", "-");
+			ba.CommentSound.Name = value.utf8().get_data();
 		} else if (key == "button_cursor") {
-			value = FindAndReplaceString(value, "_", "-");
-			ba.ButtonCursor = value;
+			value = value.replace("_", "-");
+			ba.ButtonCursor = value.utf8().get_data();
 		} else if (key == "popup") {
-			value = FindAndReplaceString(value, "_", "-");
-			ba.Popup = value;
+			value = value.replace("_", "-");
+			ba.Popup = value.utf8().get_data();
 		} else if (key == "for_unit") {
 			if (value == "*") {
-				ba.UnitMask = value;
+				ba.UnitMask = value.utf8().get_data();
 			} else {
-				value = FindAndReplaceString(value, "_", "-");
+				value = value.replace("_", "-");
 				if (ba.UnitMask.empty()) {
 					ba.UnitMask += ",";
 				}
-				ba.UnitMask += value;
+				ba.UnitMask += value.utf8().get_data();
 				ba.UnitMask += ",";
 			}
 		} else {
-			fprintf(stderr, "Invalid button property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid button property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	

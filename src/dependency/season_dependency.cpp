@@ -45,14 +45,14 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CSeasonDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CSeasonDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
+	const String &key = property.first;
+	String value = property.second;
 	if (key == "season") {
 		this->Season = CSeason::Get(value);
 	} else {
-		fprintf(stderr, "Invalid season dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid season dependency property: \"%s\".\n", key.utf8().get_data());
 	}
 }
 

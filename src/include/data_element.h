@@ -67,7 +67,7 @@ public:
 	}
 	
 	virtual void ProcessConfigData(const CConfigData *config_data);
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) { return false; }
+	virtual bool ProcessConfigDataProperty(const String &key, String value) { return false; }
 	virtual bool ProcessConfigDataSection(const CConfigData *section) { return false; }
 	
 	/**

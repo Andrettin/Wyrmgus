@@ -61,19 +61,19 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		key = SnakeCaseToPascalCase(key);
 		
-		int index = UnitTypeVar.VariableNameLookup[key.c_str()];
+		int index = UnitTypeVar.VariableNameLookup[key.utf8().get_data()];
 		if (index != -1) {
-			if (IsStringNumber(value)) {
-				const int number_value = std::stoi(value);
+			if (value.is_valid_integer()) {
+				const int number_value = value.to_int();
 				this->Var[index].Enable = number_value != 0;
 				this->Var[index].ModifEnable = 1;
 				this->Var[index].Value = number_value;
@@ -81,64 +81,64 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 				this->Var[index].Max = number_value;
 				this->Var[index].ModifMax = 1;
 			} else {
-				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining an adjust variable spell action.\n", value.c_str(), key.c_str());
+				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining an adjust variable spell action.\n", value.utf8().get_data(), key.utf8().get_data());
 			}
 		} else {
-			fprintf(stderr, "Invalid adjust variable spell action property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid adjust variable spell action property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
-		std::string tag = section->Tag;
+		String tag = section->Tag;
 		tag = SnakeCaseToPascalCase(tag);
 		
-		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
+		int index = UnitTypeVar.VariableNameLookup[tag.utf8().get_data()];
 		if (index != -1) {
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
-				std::string key = property.Key;
-				std::string value = property.Value;
+				String key = property.Key;
+				String value = property.Value;
 				
 				if (key == "enable") {
 					this->Var[index].Enable = StringToBool(value);
 					this->Var[index].ModifEnable = 1;
 				} else if (key == "value") {
-					this->Var[index].Value = std::stoi(value);
+					this->Var[index].Value = value.to_int();
 					this->Var[index].ModifValue = 1;
 				} else if (key == "max") {
-					this->Var[index].Max = std::stoi(value);
+					this->Var[index].Max = value.to_int();
 					this->Var[index].ModifMax = 1;
 				} else if (key == "increase") {
-					this->Var[index].Increase = std::stoi(value);
+					this->Var[index].Increase = value.to_int();
 					this->Var[index].ModifIncrease = 1;
 				} else if (key == "invert_enable") {
 					this->Var[index].InvertEnable = StringToBool(value);
 				} else if (key == "add_value") {
-					this->Var[index].AddValue = std::stoi(value);
+					this->Var[index].AddValue = value.to_int();
 				} else if (key == "add_max") {
-					this->Var[index].AddMax = std::stoi(value);
+					this->Var[index].AddMax = value.to_int();
 				} else if (key == "add_increase") {
-					this->Var[index].AddIncrease = std::stoi(value);
+					this->Var[index].AddIncrease = value.to_int();
 				} else if (key == "increase_time") {
-					this->Var[index].IncreaseTime = std::stoi(value);
+					this->Var[index].IncreaseTime = value.to_int();
 				} else if (key == "target_is_caster") {
 					if (value == "caster") {
 						this->Var[index].TargetIsCaster = 1;
 					} else if (value == "target") {
 						this->Var[index].TargetIsCaster = 0;
 					} else {
-						fprintf(stderr, "Invalid target_is_caster value: \"%s\".\n", value.c_str());
+						fprintf(stderr, "Invalid target_is_caster value: \"%s\".\n", value.utf8().get_data());
 					}
 				} else {
-					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.utf8().get_data());
 				}
 			}
 		} else {
-			fprintf(stderr, "Invalid adjust variable spell action property: \"%s\".\n", tag.c_str());
+			fprintf(stderr, "Invalid adjust variable spell action property: \"%s\".\n", tag.utf8().get_data());
 		}
 	}
 }

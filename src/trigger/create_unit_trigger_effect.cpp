@@ -58,12 +58,12 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "quantity") {
-			this->Quantity = std::stoi(property.Value);
+			this->Quantity = property.Value.to_int();
 		} else if (property.Key == "unit_type") {
 			const CUnitType *unit_type = CUnitType::Get(property.Value);
 			if (unit_type != nullptr) {
@@ -86,7 +86,7 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 				this->Site = site;
 			}
 		} else {
-			fprintf(stderr, "Invalid create unit trigger effect property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid create unit trigger effect property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

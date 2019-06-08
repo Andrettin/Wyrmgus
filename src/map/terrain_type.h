@@ -81,7 +81,7 @@ public:
 	static std::map<std::string, CTerrainType *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 	uint16_t GetFlags() const

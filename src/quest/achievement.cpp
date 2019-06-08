@@ -68,11 +68,11 @@ void CAchievement::CheckAchievements()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CAchievement::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "icon") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Icon.Name = value;
+		value = value.replace("_", "-");
+		this->Icon.Name = value.utf8().get_data();
 		this->Icon.Icon = nullptr;
 		this->Icon.Load();
 		this->Icon.Icon->Load();
@@ -86,10 +86,10 @@ bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string
 		if (unit_type) {
 			this->CharacterType = unit_type;
 		} else {
-			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.utf8().get_data());
 		}
 	} else if (key == "required_quest") {
-		value = FindAndReplaceString(value, "_", "-");
+		value = value.replace("_", "-");
 		const CQuest *required_quest = CQuest::Get(value);
 		if (required_quest != nullptr) {
 			this->RequiredQuests.push_back(required_quest);

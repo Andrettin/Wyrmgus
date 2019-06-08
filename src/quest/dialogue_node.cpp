@@ -94,7 +94,7 @@ void CDialogueNode::ProcessConfigData(const CConfigData *config_data)
 				this->ImmediateEffects.push_back(trigger_effect);
 			}
 		} else {
-			fprintf(stderr, "Invalid dialogue node section: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid dialogue node section: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 }

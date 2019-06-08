@@ -66,7 +66,7 @@ CTriggerEffect *CTriggerEffect::FromConfigData(const CConfigData *config_data)
 	} else if (config_data->Tag == "create_unit") {
 		trigger_effect = new CCreateUnitTriggerEffect;
 	} else {
-		fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", config_data->Tag.c_str());
+		fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", config_data->Tag.utf8().get_data());
 	}
 	
 	trigger_effect->ProcessConfigData(config_data);

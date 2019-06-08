@@ -63,7 +63,7 @@ class CSpecies : public DetailedDataElement, public DataType<CSpecies>
 public:
 	static constexpr const char *ClassIdentifier = "species";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual void Initialize() override;
 	
 	const CSpeciesCategory *GetCategory() const { return this->Category; }

@@ -64,7 +64,7 @@ public:
 	
 	static void CheckAchievements();
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual void Initialize() override;
 	
 	const String &GetDescription() const

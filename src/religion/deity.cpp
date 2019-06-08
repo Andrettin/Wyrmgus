@@ -116,7 +116,7 @@ void CDeity::Clear()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CDeity::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "pantheon") {
 		this->Pantheon = CPantheon::Get(value);
@@ -141,14 +141,14 @@ bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value
 			this->Domains.push_back(deity_domain);
 		}
 	} else if (key == "description") {
-		this->Description = value;
+		this->Description = value.utf8().get_data();
 	} else if (key == "background") {
-		this->Background = value;
+		this->Background = value.utf8().get_data();
 	} else if (key == "quote") {
-		this->Quote = value;
+		this->Quote = value.utf8().get_data();
 	} else if (key == "icon") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Icon.Name = value;
+		value = value.replace("_", "-");
+		this->Icon.Name = value.utf8().get_data();
 		this->Icon.Icon = nullptr;
 		this->Icon.Load();
 		this->Icon.Icon->Load();
@@ -158,21 +158,21 @@ bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value
 			this->HomePlane = plane;
 		}
 	} else if (key == "deity_upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		CUpgrade *upgrade = CUpgrade::Get(value);
+		value = value.replace("_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 		if (upgrade) {
 			this->DeityUpgrade = upgrade;
 			CDeity::DeitiesByUpgrade[upgrade] = this;
 		} else {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "character_upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		CUpgrade *upgrade = CUpgrade::Get(value);
+		value = value.replace("_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 		if (upgrade) {
 			this->CharacterUpgrade = upgrade;
 		} else {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "holy_order") {
 		CFaction *holy_order = CFaction::Get(value);
@@ -199,14 +199,14 @@ bool CDeity::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "cultural_names") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			const CCivilization *civilization = CCivilization::Get(property.Key);
 			
 			if (civilization) {
-				this->CulturalNames[civilization] = String(property.Value.c_str());
+				this->CulturalNames[civilization] = property.Value;
 			}
 		}
 	} else {

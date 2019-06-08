@@ -64,12 +64,12 @@
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSite::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "position_x") {
-		this->Position.x = std::stoi(value);
+		this->Position.x = value.to_int();
 	} else if (key == "position_y") {
-		this->Position.y = std::stoi(value);
+		this->Position.y = value.to_int();
 	} else if (key == "map_template") {
 		this->MapTemplate = CMapTemplate::Get(value);
 	} else if (key == "core") {
@@ -83,14 +83,14 @@ bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 			}
 		}
 	} else if (key == "region") {
-		value = FindAndReplaceString(value, "_", "-");
+		value = value.replace("_", "-");
 		
-		CRegion *region = GetRegion(value);
+		CRegion *region = GetRegion(value.utf8().get_data());
 		if (region != nullptr) {
 			this->Regions.push_back(region);
 			region->Sites.push_back(this);
 		} else {
-			fprintf(stderr, "Invalid region: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid region: \"%s\".\n", value.utf8().get_data());
 		}
 	} else {
 		return false;
@@ -111,20 +111,20 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "cultural_names") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			const CCivilization *civilization = CCivilization::Get(property.Key);
 			
 			if (civilization) {
-				this->CulturalNames[civilization] = property.Value.c_str();
+				this->CulturalNames[civilization] = property.Value;
 			}
 		}
 	} else if (section->Tag == "cultural_name_words") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
@@ -146,17 +146,17 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			if (property.Key == "date") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				date = CDate::FromString(value);
+				String value = property.Value.replace("_", "-");
+				date = CDate::FromString(value.utf8().get_data());
 			} else if (property.Key == "faction") {
 				owner_faction = CFaction::Get(property.Value);
 			} else {
-				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.c_str());
+				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.utf8().get_data());
 			}
 		}
 		
@@ -170,32 +170,31 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			if (property.Key == "start_date") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				start_date = CDate::FromString(value);
+				String value = property.Value.replace("_", "-");
+				start_date = CDate::FromString(value.utf8().get_data());
 			} else if (property.Key == "end_date") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				end_date = CDate::FromString(value);
+				String value = property.Value.replace("_", "-");
+				end_date = CDate::FromString(value.utf8().get_data());
 			} else if (property.Key == "building_class") {
 				building_class = UnitClass::Get(property.Value);
 			} else if (property.Key == "unique") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				unique = UniqueItem::Get(value);
+				unique = UniqueItem::Get(property.Value);
 				if (unique != nullptr) {
 					if (building_class == nullptr) {
 						building_class = unique->Type->GetClass();
 					}
 				} else {
-					fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
+					fprintf(stderr, "Invalid unique: \"%s\".\n", property.Value.utf8().get_data());
 				}
 			} else if (property.Key == "faction") {
 				building_owner_faction = CFaction::Get(property.Value);
 			} else {
-				fprintf(stderr, "Invalid historical building property: \"%s\".\n", property.Key.c_str());
+				fprintf(stderr, "Invalid historical building property: \"%s\".\n", property.Key.utf8().get_data());
 			}
 		}
 		
@@ -208,13 +207,13 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "historical_population") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = FindAndReplaceString(property.Key, "_", "-");
-			const CDate date = CDate::FromString(key);
-			this->HistoricalPopulation[date] = std::stoi(property.Value);
+			String key = property.Key.replace("_", "-");
+			const CDate date = CDate::FromString(key.utf8().get_data());
+			this->HistoricalPopulation[date] = property.Value.to_int();
 		}
 	} else {
 		return false;

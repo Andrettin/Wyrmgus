@@ -81,20 +81,20 @@ void CColor::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "red") {
-			this->R = std::stoi(property.Value);
+			this->R = property.Value.to_int();
 		} else if (property.Key == "green") {
-			this->G = std::stoi(property.Value);
+			this->G = property.Value.to_int();
 		} else if (property.Key == "blue") {
-			this->B = std::stoi(property.Value);
+			this->B = property.Value.to_int();
 		} else if (property.Key == "alpha") {
-			this->A = std::stoi(property.Value);
+			this->A = property.Value.to_int();
 		} else {
-			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 }

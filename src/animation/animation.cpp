@@ -489,20 +489,20 @@ bool CAnimations::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
 			CAnimation *anim = nullptr;
 			
 			if (section->Tag == "death" && property.Key == "death_type") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				death_type = value.c_str();
+				String value = property.Value.replace("_", "-");
+				death_type = value.utf8().get_data();
 			} else if (section->Tag == "harvest" && property.Key == "resource") {
-				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				res = GetResourceIdByName(value.c_str());
+				String value = property.Value.replace("_", "-");
+				res = GetResourceIdByName(value.utf8().get_data());
 				if (res == -1) {
-					fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.c_str());
+					fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.utf8().get_data());
 				}
 			} else if (property.Key == "frame") {
 				anim = new CAnimation_Frame;
@@ -539,12 +539,12 @@ bool CAnimations::ProcessConfigDataSection(const CConfigData *section)
 			} else if (property.Key == "random_goto") {
 				anim = new CAnimation_RandomGoto;
 			} else {
-				fprintf(stderr, "Invalid animation property: \"%s\".\n", property.Key.c_str());
+				fprintf(stderr, "Invalid animation property: \"%s\".\n", property.Key.utf8().get_data());
 				continue;
 			}
 			
 			if (anim) {
-				anim->Init(property.Value.c_str(), nullptr);
+				anim->Init(property.Value.utf8().get_data(), nullptr);
 				
 				if (!first_anim) {
 					first_anim = anim;

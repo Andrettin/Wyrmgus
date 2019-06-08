@@ -106,25 +106,25 @@ void CSchoolOfMagic::Clear()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSchoolOfMagic::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSchoolOfMagic::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		CUpgrade *upgrade = CUpgrade::Get(value);
+		value = value.replace("_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 		if (upgrade) {
 			this->Upgrade = upgrade;
 			CSchoolOfMagic::SchoolsOfMagicByUpgrade[upgrade] = this;
 		} else {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "ability") {
-		value = FindAndReplaceString(value, "_", "-");
-		CUpgrade *ability = CUpgrade::Get(value);
+		value = value.replace("_", "-");
+		CUpgrade *ability = CUpgrade::Get(value.utf8().get_data());
 		if (ability) {
 			this->Abilities.push_back(ability);
 			ability->SchoolsOfMagic.push_back(this);
 		} else {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 		}
 	} else {
 		return false;

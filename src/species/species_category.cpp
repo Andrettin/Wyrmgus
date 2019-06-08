@@ -53,7 +53,7 @@
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSpeciesCategory::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "lower_category") {
 		CSpeciesCategory *category = CSpeciesCategory::Get(value);

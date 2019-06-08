@@ -69,13 +69,13 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 		}
 		
 		if (!this->ProcessConfigDataProperty(config_property.Key, config_property.Value)) {
-			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.c_str(), config_property.Key.c_str());
+			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.utf8().get_data(), config_property.Key.utf8().get_data());
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
 		if (!this->ProcessConfigDataSection(section)) {
-			fprintf(stderr, "Invalid %s section: \"%s\".\n", config_data->Tag.c_str(), section->Tag.c_str());
+			fprintf(stderr, "Invalid %s section: \"%s\".\n", config_data->Tag.utf8().get_data(), section->Tag.utf8().get_data());
 		}
 	}
 	

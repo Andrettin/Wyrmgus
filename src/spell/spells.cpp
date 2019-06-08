@@ -379,19 +379,19 @@ void CSpell::ClearSpells()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CSpell::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "description") {
-		this->Description = value;
+		this->Description = value.utf8().get_data();
 	} else if (key == "mana_cost") {
-		this->ManaCost = std::stoi(value);
+		this->ManaCost = value.to_int();
 	} else if (key == "cooldown") {
-		this->CoolDown = std::stoi(value);
+		this->CoolDown = value.to_int();
 	} else if (key == "range") {
 		if (value == "infinite") {
 			this->Range = INFINITE_RANGE;
 		} else {
-			this->Range = std::stoi(value);
+			this->Range = value.to_int();
 		}
 	} else if (key == "repeat_cast") {
 		this->RepeatCast = StringToBool(value);
@@ -407,11 +407,11 @@ bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value
 		} else if (value == "position") {
 			this->Target = TargetPosition;
 		} else {
-			fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "sound_when_cast") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->SoundWhenCast.Name = value;
+		value = value.replace("_", "-");
+		this->SoundWhenCast.Name = value.utf8().get_data();
 		this->SoundWhenCast.MapSound();
 		
 		//check the sound
@@ -419,10 +419,10 @@ bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value
 			this->SoundWhenCast.Name.clear();
 		}
 	} else if (key == "depend_upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->DependencyId = UpgradeIdByIdent(value);
+		value = value.replace("_", "-");
+		this->DependencyId = UpgradeIdByIdent(value.utf8().get_data());
 		if (this->DependencyId == -1) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "item_spell") {
 		const ItemClass *item_class = ItemClass::Get(value);
@@ -454,7 +454,7 @@ bool CSpell::ProcessConfigDataSection(const CConfigData *section)
 			} else if (subsection->Tag == "spawn_missile") {
 				spell_action = new Spell_SpawnMissile;
 			} else {
-				fprintf(stderr, "Invalid spell action type: \"%s\".\n", subsection->Tag.c_str());
+				fprintf(stderr, "Invalid spell action type: \"%s\".\n", subsection->Tag.utf8().get_data());
 			}
 			
 			spell_action->ProcessConfigData(subsection);
@@ -481,23 +481,23 @@ bool CSpell::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "resource") {
-				value = FindAndReplaceString(value, "_", "-");
-				resource = GetResourceIdByName(value.c_str());
+				value = value.replace("_", "-");
+				resource = GetResourceIdByName(value.utf8().get_data());
 				if (resource == -1) {
-					fprintf(stderr, "Invalid resource: \"%s\".\n", value.c_str());
+					fprintf(stderr, "Invalid resource: \"%s\".\n", value.utf8().get_data());
 				}
 			} else if (key == "cost") {
-				cost = std::stoi(value);
+				cost = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		
@@ -977,20 +977,20 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "alliance") {
-			this->Alliance = StringToCondition(property.Value);
+			this->Alliance = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "opponent") {
-			this->Opponent = StringToCondition(property.Value);
+			this->Opponent = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "self") {
-			this->TargetSelf = StringToCondition(property.Value);
+			this->TargetSelf = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "thrusting_weapon") {
-			this->ThrustingWeapon = StringToCondition(property.Value);
+			this->ThrustingWeapon = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "faction_unit") {
-			this->FactionUnit = StringToCondition(property.Value);
+			this->FactionUnit = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "civilization_equivalent") {
 			const CCivilization *civilization = CCivilization::Get(property.Value);
 			if (civilization != nullptr) {
@@ -1002,55 +1002,55 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 				this->FactionEquivalent = faction;
 			}
 		} else {
-			std::string key = SnakeCaseToPascalCase(property.Key);
+			String key = SnakeCaseToPascalCase(property.Key);
 			
-			int index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
+			int index = UnitTypeVar.BoolFlagNameLookup[key.utf8().get_data()];
 			if (index != -1) {
-				this->BoolFlag[index] = StringToCondition(property.Value);
+				this->BoolFlag[index] = StringToCondition(property.Value.utf8().get_data());
 			} else {
-				fprintf(stderr, "Invalid spell condition property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid spell condition property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
-		std::string tag = section->Tag;
+		String tag = section->Tag;
 		tag = SnakeCaseToPascalCase(tag);
 		
-		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
+		int index = UnitTypeVar.VariableNameLookup[tag.utf8().get_data()];
 		if (index != -1) {
 			this->Variable[index].Check = true;
 			
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
 				if (property.Key == "enable") {
-					this->Variable[index].Enable = StringToCondition(property.Value);
+					this->Variable[index].Enable = StringToCondition(property.Value.utf8().get_data());
 				} else if (property.Key == "exact_value") {
-					this->Variable[index].ExactValue = std::stoi(property.Value);
+					this->Variable[index].ExactValue = property.Value.to_int();
 				} else if (property.Key == "except_value") {
-					this->Variable[index].ExceptValue = std::stoi(property.Value);
+					this->Variable[index].ExceptValue = property.Value.to_int();
 				} else if (property.Key == "min_value") {
-					this->Variable[index].MinValue = std::stoi(property.Value);
+					this->Variable[index].MinValue = property.Value.to_int();
 				} else if (property.Key == "max_value") {
-					this->Variable[index].MaxValue = std::stoi(property.Value);
+					this->Variable[index].MaxValue = property.Value.to_int();
 				} else if (property.Key == "min_max") {
-					this->Variable[index].MinMax = std::stoi(property.Value);
+					this->Variable[index].MinMax = property.Value.to_int();
 				} else if (property.Key == "min_value_percent") {
-					this->Variable[index].MinValuePercent = std::stoi(property.Value);
+					this->Variable[index].MinValuePercent = property.Value.to_int();
 				} else if (property.Key == "max_value_percent") {
-					this->Variable[index].MaxValuePercent = std::stoi(property.Value);
+					this->Variable[index].MaxValuePercent = property.Value.to_int();
 				} else if (property.Key == "condition_apply_on_caster") {
 					this->Variable[index].ConditionApplyOnCaster = StringToBool(property.Value);
 				} else {
-					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", property.Key.c_str());
+					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", property.Key.utf8().get_data());
 				}
 			}
 		} else {
-			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 }
@@ -1064,22 +1064,22 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "range") {
-			this->Range = std::stoi(property.Value);
+			this->Range = property.Value.to_int();
 		} else if (property.Key == "min_range") {
-			this->MinRange = std::stoi(property.Value);
+			this->MinRange = property.Value.to_int();
 		} else if (property.Key == "combat") {
-			this->Combat = StringToCondition(property.Value);
+			this->Combat = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "attacker") {
-			this->Attacker = StringToCondition(property.Value);
+			this->Attacker = StringToCondition(property.Value.utf8().get_data());
 		} else if (property.Key == "corpse") {
-			this->Corpse = StringToCondition(property.Value);
+			this->Corpse = StringToCondition(property.Value.utf8().get_data());
 		} else {
-			fprintf(stderr, "Invalid autocast property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid autocast property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	
@@ -1087,7 +1087,7 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 		if (section->Tag == "priority") {
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 					continue;
 				}
 				
@@ -1096,19 +1096,19 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 					if (property.Value == "distance") {
 						index = ACP_DISTANCE;
 					} else {
-						std::string value = SnakeCaseToPascalCase(property.Value);
-						index = UnitTypeVar.VariableNameLookup[value.c_str()];
+						String value = SnakeCaseToPascalCase(property.Value);
+						index = UnitTypeVar.VariableNameLookup[value.utf8().get_data()];
 					}
 					
 					if (index != -1) {
 						this->PriorityVar = index;
 					} else {
-						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", property.Value.c_str());
+						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", property.Value.utf8().get_data());
 					}
 				} else if (property.Key == "reverse_sort") {
 					this->ReverseSort = StringToBool(property.Value);
 				} else {
-					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", property.Key.c_str());
+					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", property.Key.utf8().get_data());
 				}
 			}
 		} else if (section->Tag == "condition") {
@@ -1117,7 +1117,7 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 			}
 			this->Condition->ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid autocast property: \"%s\".\n", section->Tag.c_str());
+			fprintf(stderr, "Invalid autocast property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
 }

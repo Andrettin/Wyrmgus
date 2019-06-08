@@ -88,7 +88,7 @@ CCampaign *CCampaign::GetCurrentCampaign()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CCampaign::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "faction") {
 		CFaction *faction = CFaction::Get(value);
@@ -96,10 +96,10 @@ bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string va
 			this->Faction = faction;
 		}
 	} else if (key == "start_date") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->StartDate = CDate::FromString(value);
+		value = value.replace("_", "-");
+		this->StartDate = CDate::FromString(value.utf8().get_data());
 	} else if (key == "required_quest") {
-		value = FindAndReplaceString(value, "_", "-");
+		value = value.replace("_", "-");
 		const CQuest *quest = CQuest::Get(value);
 		if (quest != nullptr) {
 			this->RequiredQuests.push_back(quest);
@@ -127,25 +127,25 @@ bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "map_template") {
 				map_template = CMapTemplate::Get(value);
 			} else if (key == "start_x") {
-				start_pos.x = std::stoi(value);
+				start_pos.x = value.to_int();
 			} else if (key == "start_y") {
-				start_pos.y = std::stoi(value);
+				start_pos.y = value.to_int();
 			} else if (key == "width") {
-				map_size.x = std::stoi(value);
+				map_size.x = value.to_int();
 			} else if (key == "height") {
-				map_size.y = std::stoi(value);
+				map_size.y = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		

@@ -800,7 +800,7 @@ CTrigger::~CTrigger()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CTrigger::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CTrigger::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "type") {
 		if (value == "global_trigger") {
@@ -808,14 +808,14 @@ bool CTrigger::ProcessConfigDataProperty(const std::string &key, std::string val
 		} else if (value == "player_trigger") {
 			this->Type = TriggerType::PlayerTrigger;
 		} else {
-			fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "only_once") {
 		this->OnlyOnce = StringToBool(value);
 	} else if (key == "campaign_only") {
 		this->CampaignOnly = StringToBool(value);
 	} else if (key == "historical_date") {
-		this->HistoricalDate = CDate::FromString(value);
+		this->HistoricalDate = CDate::FromString(value.utf8().get_data());
 	} else {
 		return false;
 	}

@@ -65,12 +65,12 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
-		std::string key = property.Key;
-		std::string value = property.Value;
+		String key = property.Key;
+		String value = property.Value;
 		
 		if (key == "name") {
 			this->Name = value;
@@ -80,51 +80,51 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 				this->Type = unit_type;
 			}
 		} else if (key == "prefix") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->Prefix = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "suffix") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->Suffix = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "spell") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CSpell *spell = CSpell::GetSpell(value);
+			value = value.replace("_", "-");
+			const CSpell *spell = CSpell::GetSpell(value.utf8().get_data());
 			if (spell) {
 				this->Spell = spell;
 			} else {
-				fprintf(stderr, "Spell \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Spell \"%s\" doesn't exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "work") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->Work = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "elixir") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
+			value = value.replace("_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (upgrade) {
 				this->Elixir = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "unique") {
-			value = FindAndReplaceString(value, "_", "-");
+			value = value.replace("_", "-");
 			UniqueItem *unique_item = UniqueItem::Get(value);
 			if (unique_item) {
 				this->Unique = unique_item;
-				this->Name = unique_item->Name;
+				this->Name = unique_item->GetName();
 				if (unique_item->Type != nullptr) {
 					this->Type = unique_item->Type;
 				} else {
@@ -136,7 +136,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 				this->Work = unique_item->Work;
 				this->Elixir = unique_item->Elixir;
 			} else {
-				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.utf8().get_data());
 			}
 		} else if (key == "bound") {
 			this->Bound = StringToBool(value);
@@ -145,7 +145,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "equipped") {
 			is_equipped = StringToBool(value);
 		} else {
-			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid item property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
@@ -200,7 +200,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 						item_effects_string += " ";
 					}
 												
-					item_effects_string += GetVariableDisplayName(var);
+					item_effects_string += GetVariableDisplayName(var).utf8().get_data();
 				}
 				
 				if (item->DefaultStat.Variables[var].Increase != 0) {
@@ -216,7 +216,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 					item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Increase);
 					item_effects_string += " ";
 												
-					item_effects_string += GetVariableDisplayName(var, true);
+					item_effects_string += GetVariableDisplayName(var, true).utf8().get_data();
 				}
 			}
 			
@@ -244,7 +244,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 							item_effects_string += " ";
 						}
 													
-						item_effects_string += GetVariableDisplayName(var);
+						item_effects_string += GetVariableDisplayName(var).utf8().get_data();
 					}
 					
 					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
@@ -260,7 +260,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 						item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
 						item_effects_string += " ";
 													
-						item_effects_string += GetVariableDisplayName(var, true);
+						item_effects_string += GetVariableDisplayName(var, true).utf8().get_data();
 					}
 				}
 			}

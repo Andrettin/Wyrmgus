@@ -46,7 +46,7 @@
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool CReligion::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool CReligion::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "domain") {
 		CDeityDomain *deity_domain = CDeityDomain::Get(value);

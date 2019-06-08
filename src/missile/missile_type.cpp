@@ -106,25 +106,25 @@ MissileType::~MissileType()
 **
 **	@return	True if the property can be processed, or false otherwise
 */
-bool MissileType::ProcessConfigDataProperty(const std::string &key, std::string value)
+bool MissileType::ProcessConfigDataProperty(const String &key, String value)
 {
 	if (key == "frames") {
-		this->SpriteFrames = std::stoi(value);
+		this->SpriteFrames = value.to_int();
 	} else if (key == "flip") {
 		this->Flip = StringToBool(value);
 	} else if (key == "num_directions") {
-		this->NumDirections = std::stoi(value);
+		this->NumDirections = value.to_int();
 	} else if (key == "transparency") {
-		this->Transparency = std::stoi(value);
+		this->Transparency = value.to_int();
 	} else if (key == "fired_sound") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->FiredSound = value;
+		value = value.replace("_", "-");
+		this->FiredSound = std::string(value.utf8().get_data());
 	} else if (key == "impact_sound") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->ImpactSound = value;
+		value = value.replace("_", "-");
+		this->ImpactSound = std::string(value.utf8().get_data());
 	} else if (key == "class") {
-		value = FindAndReplaceString(value, "_", "-");
-		const char *class_name = value.c_str();
+		value = value.replace("_", "-");
+		const char *class_name = value.utf8().get_data();
 		unsigned int i = 0;
 		for (; MissileClassNames[i]; ++i) {
 			if (!strcmp(class_name, MissileClassNames[i])) {
@@ -133,39 +133,39 @@ bool MissileType::ProcessConfigDataProperty(const std::string &key, std::string 
 			}
 		}
 		if (!MissileClassNames[i]) {
-			fprintf(stderr, "Invalid missile class: \"%s\".\n", value.c_str());
+			fprintf(stderr, "Invalid missile class: \"%s\".\n", value.utf8().get_data());
 		}
 	} else if (key == "num_bounces") {
-		this->NumBounces = std::stoi(value);
+		this->NumBounces = value.to_int();
 	} else if (key == "max_bounce_size") {
-		this->MaxBounceSize = std::stoi(value);
+		this->MaxBounceSize = value.to_int();
 	} else if (key == "parabol_coefficient") {
-		this->ParabolCoefficient = std::stoi(value);
+		this->ParabolCoefficient = value.to_int();
 	} else if (key == "delay") {
-		this->StartDelay = std::stoi(value);
+		this->StartDelay = value.to_int();
 	} else if (key == "sleep") {
-		this->Sleep = std::stoi(value);
+		this->Sleep = value.to_int();
 	} else if (key == "speed") {
-		this->Speed = std::stoi(value);
+		this->Speed = value.to_int();
 	} else if (key == "blizzard_speed") {
-		this->BlizzardSpeed = std::stoi(value);
+		this->BlizzardSpeed = value.to_int();
 	} else if (key == "attack_speed") {
-		this->AttackSpeed = std::stoi(value);
+		this->AttackSpeed = value.to_int();
 	} else if (key == "ttl") {
-		this->TTL = std::stoi(value);
+		this->TTL = value.to_int();
 	} else if (key == "reduce_factor") {
-		this->ReduceFactor = std::stoi(value);
+		this->ReduceFactor = value.to_int();
 	} else if (key == "smoke_precision") {
-		this->SmokePrecision = std::stoi(value);
+		this->SmokePrecision = value.to_int();
 	} else if (key == "missile_stop_flags") {
-		this->MissileStopFlags = std::stoi(value);
+		this->MissileStopFlags = value.to_int();
 	} else if (key == "draw_level") {
-		this->DrawLevel = std::stoi(value);
+		this->DrawLevel = value.to_int();
 	} else if (key == "range") {
-		this->Range = std::stoi(value);
+		this->Range = value.to_int();
 	} else if (key == "smoke_missile") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Smoke.Name = value;
+		value = value.replace("_", "-");
+		this->Smoke.Name = value.utf8().get_data();;
 	} else if (key == "can_hit_owner") {
 		this->CanHitOwner = StringToBool(value);
 	} else if (key == "always_fire") {
@@ -185,7 +185,7 @@ bool MissileType::ProcessConfigDataProperty(const std::string &key, std::string 
 	} else if (key == "always_hits") {
 		this->AlwaysHits = StringToBool(value);
 	} else if (key == "splash_factor") {
-		this->SplashFactor = std::stoi(value);
+		this->SplashFactor = value.to_int();
 	} else if (key == "correct_sphash_damage") {
 		this->CorrectSphashDamage = StringToBool(value);
 	} else {
@@ -209,21 +209,21 @@ bool MissileType::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 				continue;
 			}
 			
-			std::string key = property.Key;
-			std::string value = property.Value;
+			String key = property.Key;
+			String value = property.Value;
 			
 			if (key == "file") {
-				file = CModule::GetCurrentPath() + value;
+				file = CModule::GetCurrentPath() + value.utf8().get_data();
 			} else if (key == "width") {
-				this->size.x = std::stoi(value);
+				this->size.x = value.to_int();
 				} else if (key == "height") {
-				this->size.y = std::stoi(value);
+				this->size.y = value.to_int();
 			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
 			}
 		}
 		

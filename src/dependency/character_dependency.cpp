@@ -44,10 +44,10 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void CCharacterDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	const std::string &key = property.first;
-	std::string value = property.second;
+	const String &key = property.first;
+	String value = property.second;
 	if (key == "character") {
 		this->Character = CCharacter::Get(value);
 	} else if (key == "faction") {
@@ -55,7 +55,7 @@ void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string
 	} else if (key == "enemy") {
 		this->Enemy = StringToBool(value);
 	} else {
-		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.utf8().get_data());
 	}
 }
 

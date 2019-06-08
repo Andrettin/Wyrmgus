@@ -67,21 +67,21 @@
 */
 void CConfigData::ParseConfigData(const std::string &filepath, const bool define_only)
 {
-	std::vector<std::string> data;
+	std::vector<String> data;
 	std::vector<CConfigData *> config_data_elements;
 	
 	if (!CanAccessFile(filepath.c_str())) {
 		fprintf(stderr, "File \"%s\" not found.\n", filepath.c_str());
 	}
 	
-	std::ifstream text_stream(filepath);
-	std::string line;
+	std::wifstream text_stream(filepath);
+	std::wstring line;
 	
 	CConfigData *current_config_data = nullptr;
 	int line_index = 1;
 	while (std::getline(text_stream, line)) {
 		try {
-			std::vector<std::string> tokens = CConfigData::ParseLine(line);
+			std::vector<String> tokens = CConfigData::ParseLine(line);
 			CConfigData::ParseTokens(tokens, &current_config_data, config_data_elements);
 		} catch (std::exception &exception) {
 			fprintf(stderr, "Error parsing config file \"%s\", line %i: %s.\n", filepath.c_str(), line_index, exception.what());
@@ -104,15 +104,15 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 **
 **	@return	A vector holding the line's tokens
 */
-std::vector<std::string> CConfigData::ParseLine(const std::string &line)
+std::vector<String> CConfigData::ParseLine(const std::wstring &line)
 {
-	std::vector<std::string> tokens;
+	std::vector<String> tokens;
 	
 	bool opened_quotation_marks = false;
 	bool escaped = false;
-	std::string current_string;
+	String current_string;
 	
-	for (const char &character : line) {
+	for (const wchar_t &character : line) {
 		if (!escaped) {
 			if (character == '\"') {
 				opened_quotation_marks = !opened_quotation_marks;
@@ -165,7 +165,7 @@ std::vector<std::string> CConfigData::ParseLine(const std::string &line)
 **
 **	@return	True if an escaped character was added to the string, or false otherwise
 */
-bool CConfigData::ParseEscapedCharacter(std::string &current_string, const char character)
+bool CConfigData::ParseEscapedCharacter(String &current_string, const wchar_t character)
 {
 	if (character == 'n') {
 		current_string += '\n';
@@ -191,20 +191,20 @@ bool CConfigData::ParseEscapedCharacter(std::string &current_string, const char 
 **	@param	current_config_data		The current config data in the processing
 **	@param	config_data_elements	The config data elements added so far for this file
 */
-void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements)
+void CConfigData::ParseTokens(const std::vector<String> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements)
 {
-	std::string key;
+	String key;
 	CConfigOperator property_operator = CConfigOperator::None;
-	std::string value;
-	for (const std::string &token : tokens) {
+	String value;
+	for (const String &token : tokens) {
 		if (key.empty()) {
-			if (token.size() >= 3 && token.front() == '[' && token[1] != '/' && token.back() == ']') { //opens a tag
-				std::string tag_name = token;
-				tag_name = FindAndReplaceString(tag_name, "[", "");
-				tag_name = FindAndReplaceString(tag_name, "]", "");
+			if (token.size() >= 3 && token[0] == '[' && token[1] != '/' && token[token.length() - 1] == ']') { //opens a tag
+				String tag_name = token;
+				tag_name = tag_name.replace("[", "");
+				tag_name = tag_name.replace("]", "");
 				bool modification = false;
-				if (tag_name.front() == '+' || tag_name.back() == '+') {
-					tag_name = FindAndReplaceString(tag_name, "+", "");
+				if (tag_name[0] == '+' || tag_name[tag_name.length() - 1] == '+') {
+					tag_name = tag_name.replace("+", "");
 					modification = true;
 				}
 				CConfigData *new_config_data = new CConfigData(tag_name);
@@ -213,10 +213,10 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 					new_config_data->Parent = (*current_config_data);
 				}
 				(*current_config_data) = new_config_data;
-			} else if (token.size() >= 3 && token.front() == '[' && token[1] == '/' && token.back() == ']') { //closes a tag
-				std::string tag_name = token;
-				tag_name = FindAndReplaceString(tag_name, "[/", "");
-				tag_name = FindAndReplaceString(tag_name, "]", "");
+			} else if (token.size() >= 3 && token[0] == '[' && token[1] == '/' && token[token.length() - 1] == ']') { //closes a tag
+				String tag_name = token;
+				tag_name = tag_name.replace("[/", "");
+				tag_name = tag_name.replace("]", "");
 				if ((*current_config_data) != nullptr) { //closes current tag
 					if (tag_name == (*current_config_data)->Tag) {
 						if ((*current_config_data)->Parent == nullptr) {
@@ -228,16 +228,16 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 							(*current_config_data) = parent_config_data;
 						}
 					} else {
-						throw std::runtime_error("Tried closing a tag \"" + tag_name + "\" while the open tag was \"%s\".");
+						throw std::runtime_error("Tried closing a tag \"" + std::string(tag_name.utf8().get_data()) + "\" while the open tag was \"%s\".");
 					}
 				} else {
-					throw std::runtime_error("Tried closing tag \"" + tag_name + "\" before any tag had been opened.");
+					throw std::runtime_error("Tried closing tag \"" + std::string(tag_name.utf8().get_data()) + "\" before any tag had been opened.");
 				}
 			} else { //key
 				if ((*current_config_data) != nullptr) {
 					key = token;
 				} else {
-					throw std::runtime_error("Tried defining key \"" + token + "\" before any tag had been opened.");
+					throw std::runtime_error("Tried defining key \"" + std::string(token.utf8().get_data()) + "\" before any tag had been opened.");
 				}
 			}
 			
@@ -252,7 +252,7 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 			} else if (token == "-=") {
 				property_operator = CConfigOperator::Subtraction;
 			} else {
-				throw std::runtime_error("Tried using operator \"" + token + "\" for key \"" + key + "\", but it is not a valid operator.");
+				throw std::runtime_error("Tried using operator \"" + std::string(token.utf8().get_data()) + "\" for key \"" + key.utf8().get_data() + "\", but it is not a valid operator.");
 			}
 			
 			continue;
@@ -279,13 +279,12 @@ void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigDat
 */
 void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only)
 {
-	for (size_t i = 0; i < config_data_list.size(); ++i) {
-		CConfigData *config_data = config_data_list[i];
-		std::string ident = config_data->Ident;
-		ident = FindAndReplaceString(ident, "_", "-"); //for backwards compatibility with the Lua code
+	for (CConfigData *config_data : config_data_list) {
+		String ident = config_data->Ident;
+		ident = ident.replace("_", "-"); //for backwards compatibility with the Lua code
 		
 		if (ident.empty() && config_data->Tag != "button") {
-			fprintf(stderr, "String identifier is empty for config data belonging to tag \"%s\".\n", config_data->Tag.c_str());
+			fprintf(stderr, "String identifier is empty for config data belonging to tag \"%s\".\n", config_data->Tag.utf8().get_data());
 			continue;
 		}
 		
@@ -301,10 +300,10 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		//only load the history for characters that are already in the character database
 		const std::map<std::string, std::function<DataElement *(const std::string &)>> &function_map = can_add_new ? CConfigData::DataTypeGetOrAddFunctions : CConfigData::DataTypeGetFunctions;
 		
-		std::map<std::string, std::function<DataElement *(const std::string &)>>::const_iterator find_iterator = function_map.find(config_data->Tag);
+		std::map<std::string, std::function<DataElement *(const std::string &)>>::const_iterator find_iterator = function_map.find(config_data->Tag.utf8().get_data());
 		
 		if (find_iterator != function_map.end()) {
-			DataElement *data_element = find_iterator->second(ident);
+			DataElement *data_element = find_iterator->second(ident.utf8().get_data());
 			if (!data_element) {
 				continue;
 			}
@@ -313,19 +312,19 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			
 			//add aliases for the data element
-			std::map<std::string, std::function<void(const std::string &, const std::string &)>>::const_iterator add_alias_find_iterator = CConfigData::DataTypeAddAliasFunctions.find(config_data->Tag);
+			std::map<std::string, std::function<void(const std::string &, const std::string &)>>::const_iterator add_alias_find_iterator = CConfigData::DataTypeAddAliasFunctions.find(config_data->Tag.utf8().get_data());
 			
 			if (add_alias_find_iterator != CConfigData::DataTypeAddAliasFunctions.end()) {
-				for (const std::string &alias : config_data->Aliases) {
-					add_alias_find_iterator->second(ident, alias);
+				for (const String &alias : config_data->Aliases) {
+					add_alias_find_iterator->second(ident.utf8().get_data(), alias.utf8().get_data());
 				}
 			}
 		} else if (config_data->Tag == "animations") {
-			CAnimations *animations = AnimationsByIdent(ident);
+			CAnimations *animations = AnimationsByIdent(ident.utf8().get_data());
 			if (!animations) {
 				animations = new CAnimations;
-				AnimationMap[ident] = animations;
-				animations->Ident = ident;
+				AnimationMap[ident.utf8().get_data()] = animations;
+				animations->Ident = ident.utf8().get_data();
 			}
 			if (!define_only) {
 				animations->ProcessConfigData(config_data);
@@ -335,14 +334,14 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				ButtonAction::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "button_level") {
-			CButtonLevel *button_level = CButtonLevel::GetOrAddButtonLevel(ident);
+			CButtonLevel *button_level = CButtonLevel::GetOrAddButtonLevel(ident.utf8().get_data());
 			if (!define_only) {
 				button_level->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "missile_type") {
-			MissileType *missile_type = MissileTypeByIdent(ident);
+			MissileType *missile_type = MissileTypeByIdent(ident.utf8().get_data());
 			if (!missile_type) {
-				missile_type = NewMissileTypeSlot(ident);
+				missile_type = NewMissileTypeSlot(ident.utf8().get_data());
 			}
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
@@ -352,22 +351,22 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				CSound::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "spell") {
-			CSpell *spell = CSpell::GetOrAddSpell(ident);
+			CSpell *spell = CSpell::GetOrAddSpell(ident.utf8().get_data());
 			if (!define_only) {
 				spell->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "trigger") {
-			CTrigger *trigger = CTrigger::GetOrAddTrigger(ident);
+			CTrigger *trigger = CTrigger::GetOrAddTrigger(ident.utf8().get_data());
 			if (!define_only) {
 				trigger->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "upgrade") {
-			CUpgrade *upgrade = CUpgrade::New(ident);
+			CUpgrade *upgrade = CUpgrade::New(ident.utf8().get_data());
 			if (!define_only) {
 				upgrade->ProcessConfigData(config_data);
 			}
 		} else {
-			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.c_str());
+			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.utf8().get_data());
 		}
 	}
 }
@@ -383,20 +382,20 @@ Color CConfigData::ProcessColor() const
 	
 	for (const CConfigProperty &property : this->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
 		}
 		
 		if (property.Key == "red") {
-			color.r = std::stoi(property.Value) / 255.0;
+			color.r = property.Value.to_int() / 255.0;
 		} else if (property.Key == "green") {
-			color.g = std::stoi(property.Value) / 255.0;
+			color.g = property.Value.to_int() / 255.0;
 		} else if (property.Key == "blue") {
-			color.b = std::stoi(property.Value) / 255.0;
+			color.b = property.Value.to_int() / 255.0;
 		} else if (property.Key == "alpha") {
-			color.a = std::stoi(property.Value) / 255.0;
+			color.a = property.Value.to_int() / 255.0;
 		} else {
-			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.utf8().get_data());
 		}
 	}
 	

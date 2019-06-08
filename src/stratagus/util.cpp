@@ -313,6 +313,19 @@ bool StringToBool(const std::string &str)
 	return false;
 }
 
+bool StringToBool(const String &str)
+{
+	if (str == "true" || str == "yes" || str == "1") {
+		return true;
+	} else if (str == "false" || str == "no" || str == "0") {
+		return false;
+	}
+	
+	fprintf(stderr, "Invalid string used for conversion to boolean: \"%s\".\n", str.utf8().get_data());
+	
+	return false;
+}
+
 bool IsStringNumber(const std::string &str)
 {
 	for (size_t i = 0; i < str.length(); ++i) {
@@ -324,7 +337,7 @@ bool IsStringNumber(const std::string &str)
 	return true;
 }
 
-bool IsStringBool(const std::string &str)
+bool IsStringBool(const String &str)
 {
 	return str == "true" || str == "yes" || str == "false" || str == "no";
 }
@@ -400,21 +413,21 @@ std::string PascalCaseToSnakeCase(const std::string &str)
 	return result;
 }
 
-std::string SnakeCaseToPascalCase(const std::string &str)
+String SnakeCaseToPascalCase(const String &str)
 {
 	if (str.empty()) {
 		return str;
 	}
 	
-	std::string result(str);
+	String result;
+	result += towupper(str[0]);
 	
-	result[0] = toupper(result[0]);
-	
-	size_t pos = 0;
-	while ((pos = result.find('_', pos)) != std::string::npos) {
-		result.replace(pos, 1, "");
-		if (pos < result.length()) {
-			result[pos] = toupper(result[pos]);
+	for (size_t pos = 1; pos < str.length(); ++pos) {
+		if (str[pos] == '_') {
+			++pos;
+			result += towupper(str[pos]);
+		} else {
+			result += str[pos];
 		}
 	}
 	
@@ -1243,16 +1256,22 @@ std::string NameToIdent(const std::string &text)
 	return result;
 }
 
-std::string SeparateCapitalizedStringElements(const std::string &text)
+String SeparateCapitalizedStringElements(const String &text)
 {
-	std::string result(text);
-	
-	for (size_t pos = 1; pos < result.length(); ++pos) {
-		if (isupper(result[pos])) {
-			result.replace(pos, 1, " " + result.substr(pos, 1));
-			pos += 1;
-		}
+	if (text.empty()) {
+		return text;
 	}
+	
+	String result;
+	result += text[0];
+	
+	for (size_t pos = 1; pos < text.length(); ++pos) {
+		if (iswupper(text[pos])) {
+			result += ' ';
+		}
+		result += text[pos];
+	}
+	
 	return result;
 }
 
