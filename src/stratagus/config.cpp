@@ -52,7 +52,8 @@
 #include "unit/unit_type.h"
 #include "util.h"
 
-#include <fstream>
+#include <core/os/file_access.h>
+
 #include <stdexcept>
 
 /*----------------------------------------------------------------------------
@@ -74,12 +75,21 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 		fprintf(stderr, "File \"%s\" not found.\n", filepath.c_str());
 	}
 	
-	std::wifstream text_stream(filepath);
-	std::wstring line;
+	FileAccess *file = FileAccess::open(filepath.c_str(), FileAccess::READ);
+	
+	if (file == nullptr) {
+		throw std::runtime_error("Failed to open file: " + filepath);
+	}
+	
+	String line;
 	
 	CConfigData *current_config_data = nullptr;
 	int line_index = 1;
-	while (std::getline(text_stream, line)) {
+	bool is_eof = false;
+	while (!is_eof) {
+		line = file->get_line();
+		is_eof = file->eof_reached();
+		
 		try {
 			std::vector<String> tokens = CConfigData::ParseLine(line);
 			CConfigData::ParseTokens(tokens, &current_config_data, config_data_elements);
@@ -88,6 +98,9 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 		}
 		++line_index;
 	}
+	
+	file->close();
+	memdelete(file);
 	
 	if (config_data_elements.empty()) {
 		fprintf(stderr, "Could not parse output for config file \"%s\".\n", filepath.c_str());
@@ -104,7 +117,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 **
 **	@return	A vector holding the line's tokens
 */
-std::vector<String> CConfigData::ParseLine(const std::wstring &line)
+std::vector<String> CConfigData::ParseLine(const String &line)
 {
 	std::vector<String> tokens;
 	
@@ -112,7 +125,8 @@ std::vector<String> CConfigData::ParseLine(const std::wstring &line)
 	bool escaped = false;
 	String current_string;
 	
-	for (const wchar_t &character : line) {
+	for (size_t i = 0; i < line.length(); ++i) {
+		const wchar_t character = line[i];
 		if (!escaped) {
 			if (character == '\"') {
 				opened_quotation_marks = !opened_quotation_marks;

@@ -63,7 +63,7 @@ public:
 	static void ParseConfigData(const std::string &filepath, const bool define_only);
 	
 private:
-	static std::vector<String> ParseLine(const std::wstring &line);
+	static std::vector<String> ParseLine(const String &line);
 	static bool ParseEscapedCharacter(String &current_string, const wchar_t character);
 	static void ParseTokens(const std::vector<String> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements);
 	
