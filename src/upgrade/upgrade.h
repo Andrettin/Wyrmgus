@@ -82,6 +82,8 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
+	void SetParentUpgrade(const CUpgrade *parent_upgrade);
+	
 	const UpgradeClass *GetClass() const
 	{
 		return this->Class;
@@ -112,6 +114,11 @@ public:
 		return this->Item;
 	}
 	
+	int GetMagicLevel() const
+	{
+		return this->MagicLevel;
+	}
+	
 	const String &GetEffectsString() const
 	{
 		return this->EffectsString;
@@ -122,7 +129,13 @@ public:
 		return this->RequirementsString;
 	}
 
+	const std::vector<String> &GetEpithets() const
+	{
+		return this->Epithets;
+	}
+
 private:
+	const CUpgrade *ParentUpgrade = nullptr;	/// the upgrade's parent upgrade (from which it inherits features)
 	UpgradeClass *Class = nullptr;	/// upgrade class (i.e. siege weapon projectile I)
 	CCivilization *Civilization = nullptr;	/// which civilization this upgrade belongs to, if any
 	CFaction *Faction = nullptr;				/// which faction this upgrade belongs to, if any
@@ -139,8 +152,8 @@ public:
 	std::set<const ItemClass *> ItemSuffix;
 	bool IncompatibleAffixes[UpgradeMax];
 	std::vector<const ItemClass *> WeaponClasses;	/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
-	std::vector<std::string> Epithets;	/// Epithets when a character has a certain trait
 private:
+	std::vector<String> Epithets;		/// epithets when a character has a certain trait
 	const CUnitType *Item = nullptr;
 public:
 	int   Costs[MaxCosts];				/// costs for the upgrade
@@ -148,7 +161,9 @@ public:
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
+private:
 	int MagicLevel = 0;					/// Magic level of an affix
+public:
 	const ItemClass *Work = nullptr;	/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	CCharacter *Author = nullptr;		/// Author of this literary work (if it is one)

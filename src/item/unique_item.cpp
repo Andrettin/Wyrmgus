@@ -96,23 +96,23 @@ int UniqueItem::GetMagicLevel() const
 	int magic_level = 0;
 	
 	if (this->Prefix != nullptr) {
-		magic_level += this->Prefix->MagicLevel;
+		magic_level += this->Prefix->GetMagicLevel();
 	}
 	
 	if (this->Suffix != nullptr) {
-		magic_level += this->Suffix->MagicLevel;
+		magic_level += this->Suffix->GetMagicLevel();
 	}
 	
 	if (this->Set != nullptr) {
-		magic_level += this->Set->MagicLevel;
+		magic_level += this->Set->GetMagicLevel();
 	}
 	
 	if (this->Work != nullptr) {
-		magic_level += this->Work->MagicLevel;
+		magic_level += this->Work->GetMagicLevel();
 	}
 	
 	if (this->Elixir != nullptr) {
-		magic_level += this->Elixir->MagicLevel;
+		magic_level += this->Elixir->GetMagicLevel();
 	}
 	
 	return magic_level;

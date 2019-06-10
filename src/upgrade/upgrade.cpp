@@ -304,8 +304,59 @@ void CUpgrade::Initialize()
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
+/**
+**	@brief	Set the upgrade's parent upgrade
+**
+**	@param	parent_upgrade	The parent upgrade
+*/
+void CUpgrade::SetParentUpgrade(const CUpgrade *parent_upgrade)
+{
+	if (!parent_upgrade->Initialized) {
+		print_error("Upgrade \"" + this->GetIdent() + "\" is inheriting features from a non-initialized parent (\"" + parent_upgrade->GetIdent() + "\").");
+	}
+	
+	this->ParentUpgrade = parent_upgrade;
+	this->Name = parent_upgrade->Name;
+	this->Icon = parent_upgrade->Icon;
+	this->Class = parent_upgrade->Class;
+	this->Description = parent_upgrade->Description;
+	this->Quote = parent_upgrade->Quote;
+	this->Background = parent_upgrade->Background;
+	this->EffectsString = parent_upgrade->EffectsString;
+	this->RequirementsString = parent_upgrade->RequirementsString;
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->Costs[i] = parent_upgrade->Costs[i];
+		this->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
+		this->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
+	}
+	this->ItemPrefix = parent_upgrade->ItemPrefix;
+	this->ItemSuffix = parent_upgrade->ItemSuffix;
+	this->MaxLimit = parent_upgrade->MaxLimit;
+	this->MagicLevel = parent_upgrade->MagicLevel;
+	this->Ability = parent_upgrade->Ability;
+	this->ItemSlot = parent_upgrade->ItemSlot;
+	this->Item = parent_upgrade->Item;
+	this->MagicPrefix = parent_upgrade->MagicPrefix;
+	this->MagicSuffix = parent_upgrade->MagicSuffix;
+	this->RunicAffix = parent_upgrade->RunicAffix;
+	this->Work = parent_upgrade->Work;
+	this->UniqueOnly = parent_upgrade->UniqueOnly;
+	for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
+		this->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
+	}
+}
+
 void CUpgrade::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_parent_upgrade", "ident"), +[](CUpgrade *upgrade, const String &ident){
+		const CUpgrade *parent_upgrade = CUpgrade::Get(ident);
+		if (parent_upgrade != nullptr) {
+			upgrade->SetParentUpgrade(parent_upgrade);
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_parent_upgrade"), +[](const CUpgrade *upgrade){ return const_cast<CUpgrade *>(upgrade->ParentUpgrade); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "parent_upgrade"), "set_parent_upgrade", "get_parent_upgrade");
+	
 	ClassDB::bind_method(D_METHOD("set_upgrade_class", "ident"), +[](CUpgrade *upgrade, const String &ident){
 		if (upgrade->Class != nullptr) {
 			upgrade->Class->Upgrades.erase(upgrade);
@@ -340,6 +391,10 @@ void CUpgrade::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_item"), +[](const CUpgrade *upgrade){ return const_cast<CUnitType *>(upgrade->GetItem()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item"), "set_item", "get_item");
 	
+	ClassDB::bind_method(D_METHOD("set_magic_level", "magic_level"), +[](CUpgrade *upgrade, const int magic_level){ upgrade->MagicLevel = magic_level; });
+	ClassDB::bind_method(D_METHOD("get_magic_level"), &CUpgrade::GetMagicLevel);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "magic_level"), "set_magic_level", "get_magic_level");
+	
 	ClassDB::bind_method(D_METHOD("set_effects_string", "effects_string"), +[](CUpgrade *upgrade, const String &effects_string){ upgrade->EffectsString = effects_string; });
 	ClassDB::bind_method(D_METHOD("get_effects_string"), &CUpgrade::GetEffectsString);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "effects_string"), "set_effects_string", "get_effects_string");
@@ -347,6 +402,10 @@ void CUpgrade::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_requirements_string", "requirements_string"), +[](CUpgrade *upgrade, const String &requirements_string){ upgrade->RequirementsString = requirements_string; });
 	ClassDB::bind_method(D_METHOD("get_requirements_string"), &CUpgrade::GetRequirementsString);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "requirements_string"), "set_requirements_string", "get_requirements_string");
+	
+	ClassDB::bind_method(D_METHOD("add_to_epithets", "epithet"), +[](CUpgrade *upgrade, const String &epithet){ upgrade->Epithets.push_back(epithet); });
+	ClassDB::bind_method(D_METHOD("remove_from_epithets", "epithet"), +[](CUpgrade *upgrade, const String &epithet){ upgrade->Epithets.erase(std::remove(upgrade->Epithets.begin(), upgrade->Epithets.end(), epithet), upgrade->Epithets.end()); });
+	ClassDB::bind_method(D_METHOD("get_epithets"), +[](const CUpgrade *upgrade){ return VectorToGodotArray(upgrade->GetEpithets()); });
 }
 
 /**
@@ -432,38 +491,9 @@ static int CclDefineUpgrade(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Parent")) {
-			CUpgrade *parent_upgrade = CUpgrade::Get(LuaToString(l, -1));
+			const CUpgrade *parent_upgrade = CUpgrade::Get(LuaToString(l, -1));
 			if (parent_upgrade != nullptr) {
-				upgrade->Name = parent_upgrade->Name;
-				upgrade->Icon = parent_upgrade->Icon;
-				upgrade->Class = parent_upgrade->Class;
-				upgrade->Description = parent_upgrade->Description;
-				upgrade->Quote = parent_upgrade->Quote;
-				upgrade->Background = parent_upgrade->Background;
-				upgrade->EffectsString = parent_upgrade->EffectsString;
-				upgrade->RequirementsString = parent_upgrade->RequirementsString;
-				for (int i = 0; i < MaxCosts; ++i) {
-					upgrade->Costs[i] = parent_upgrade->Costs[i];
-					upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
-					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
-				}
-				upgrade->ItemPrefix = parent_upgrade->ItemPrefix;
-				upgrade->ItemSuffix = parent_upgrade->ItemSuffix;
-				upgrade->MaxLimit = parent_upgrade->MaxLimit;
-				upgrade->MagicLevel = parent_upgrade->MagicLevel;
-				upgrade->Ability = parent_upgrade->Ability;
-				upgrade->ItemSlot = parent_upgrade->ItemSlot;
-				upgrade->Item = parent_upgrade->Item;
-				upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
-				upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
-				upgrade->RunicAffix = parent_upgrade->RunicAffix;
-				upgrade->Work = parent_upgrade->Work;
-				upgrade->UniqueOnly = parent_upgrade->UniqueOnly;
-				for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
-					upgrade->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
-				}
-			} else {
-				LuaError(l, "Parent upgrade doesn't exist.");
+				upgrade->SetParentUpgrade(parent_upgrade);
 			}
 		} else if (!strcmp(value, "Name")) {
 			upgrade->Name = LuaToString(l, -1);
@@ -687,7 +717,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				std::string epithet = LuaToString(l, -1, j + 1);
+				String epithet = LuaToString(l, -1, j + 1);
 
 				upgrade->Epithets.push_back(epithet);
 			}
@@ -717,6 +747,8 @@ static int CclDefineUpgrade(lua_State *l)
 	if (upgrade->Icon != nullptr && !upgrade->Icon->Loaded) {
 		upgrade->Icon->Load();
 	}
+	
+	upgrade->Initialized = true;
 	
 	return 0;
 }

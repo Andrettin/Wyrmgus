@@ -1926,8 +1926,8 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
 			RemoveIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Prefix->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Prefix->GetMagicLevel();
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Prefix = prefix;
@@ -1938,8 +1938,8 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
 			ApplyIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Prefix->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Prefix->GetMagicLevel();
 	}
 	
 	this->UpdateItemName();
@@ -1951,8 +1951,8 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
 			RemoveIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Suffix->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Suffix->GetMagicLevel();
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Suffix = suffix;
@@ -1963,8 +1963,8 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
 			ApplyIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Suffix->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Suffix->GetMagicLevel();
 	}
 	
 	this->UpdateItemName();
@@ -1984,8 +1984,8 @@ void CUnit::SetSpell(const CSpell *spell)
 void CUnit::SetWork(const CUpgrade *work)
 {
 	if (this->Work != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->GetMagicLevel();
 	}
 	
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
@@ -1996,8 +1996,8 @@ void CUnit::SetWork(const CUpgrade *work)
 	this->Work = work;
 	
 	if (this->Work != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += this->Work->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Work->GetMagicLevel();
 	}
 	
 	this->UpdateItemName();
@@ -2006,8 +2006,8 @@ void CUnit::SetWork(const CUpgrade *work)
 void CUnit::SetElixir(const CUpgrade *elixir)
 {
 	if (this->Elixir != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->GetMagicLevel();
 	}
 	
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
@@ -2018,8 +2018,8 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 	this->Elixir = elixir;
 	
 	if (this->Elixir != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += this->Elixir->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Elixir->GetMagicLevel();
 	}
 	
 	this->UpdateItemName();
@@ -2028,8 +2028,8 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 void CUnit::SetUnique(UniqueItem *unique)
 {
 	if (this->Unique && this->Unique->Set) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->GetMagicLevel();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->GetMagicLevel();
 	}
 		
 	if (unique != nullptr) {
@@ -2045,8 +2045,8 @@ void CUnit::SetUnique(UniqueItem *unique)
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 		if (unique->Set) {
-			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->MagicLevel;
-			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->MagicLevel;
+			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->GetMagicLevel();
+			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->GetMagicLevel();
 		}
 		this->Name = unique->GetName().utf8().get_data();
 		this->Unique = unique;
@@ -3705,8 +3705,8 @@ void CUnit::UpdatePersonalName(const bool update_settlement_name)
 	}
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
-		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
-			this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
+		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && !this->Trait->GetEpithets().empty() && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+			this->ExtraName = this->Trait->GetEpithets()[SyncRand(this->Trait->GetEpithets().size())].utf8().get_data();
 		}
 	}
 	
@@ -3737,8 +3737,8 @@ void CUnit::UpdateExtraName()
 	
 	this->ExtraName.clear();
 	
-	if (this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
-		this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
+	if (this->Trait->GetEpithets().size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+		this->ExtraName = this->Trait->GetEpithets()[SyncRand(this->Trait->GetEpithets().size())].utf8().get_data();
 	}
 }
 
@@ -5999,19 +5999,19 @@ int CUnit::GetPrice() const
 	int cost = this->Type->Stats[this->Player->GetIndex()].GetPrice();
 	
 	if (this->Prefix != nullptr) {
-		cost += this->Prefix->MagicLevel * 1000;
+		cost += this->Prefix->GetMagicLevel() * 1000;
 	}
 	if (this->Suffix != nullptr) {
-		cost += this->Suffix->MagicLevel * 1000;
+		cost += this->Suffix->GetMagicLevel() * 1000;
 	}
 	if (this->Spell != nullptr) {
 		cost += 1000;
 	}
 	if (this->Work != nullptr) {
-		cost += this->Work->MagicLevel * 1000;
+		cost += this->Work->GetMagicLevel() * 1000;
 	}
 	if (this->Elixir != nullptr) {
-		cost += this->Elixir->MagicLevel * 1000;
+		cost += this->Elixir->GetMagicLevel() * 1000;
 	}
 	if (this->Character) {
 		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->GetIndex()].Variables[LEVEL_INDEX].Value) * 250;
