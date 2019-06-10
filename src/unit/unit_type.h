@@ -72,6 +72,7 @@ class CPlayer;
 class CPlayerColorGraphic;
 class CSpell;
 class CUnitTypeVariation;
+class CUpgrade;
 class CWord;
 class MissileType;
 //Wyrmgus start
@@ -599,15 +600,15 @@ public:
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
-	CUpgrade *Elixir = nullptr;				/// Which elixir does this (item) unit type always have
+	const CUpgrade *Elixir = nullptr;		/// Which elixir does this (item) unit type always have
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<CUnitType *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CSpell *> DropSpells;		/// Spells which can be applied to dropped items
-	std::vector<CUpgrade *> Affixes;		/// Affixes which can be generated for this unit type
-	std::vector<CUpgrade *> Traits;			/// Which traits this unit type can have
-	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
+	std::vector<const CUpgrade *> Affixes;	/// Affixes which can be generated for this unit type
+	std::vector<const CUpgrade *> Traits;	/// Which traits this unit type can have
+	std::vector<const CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
 	std::vector<CUnitType *> Trains;		/// Units trained by this unit
 	std::vector<CUnitType *> TrainedBy;		/// Units which can train this unit
 	std::map<std::string, std::vector<CUnitType *>> ModTrains;	/// Units trained by this unit (as set in a mod)

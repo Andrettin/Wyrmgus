@@ -160,10 +160,10 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 			
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				if (
-					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
-					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
-					|| (item->Work != nullptr && modifier->UpgradeId == item->Work->ID)
-					|| (item->Elixir != nullptr && modifier->UpgradeId == item->Elixir->ID)
+					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->GetIndex())
+					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->GetIndex())
+					|| (item->Work != nullptr && modifier->UpgradeId == item->Work->GetIndex())
+					|| (item->Elixir != nullptr && modifier->UpgradeId == item->Elixir->GetIndex())
 				) {
 					variable_value += modifier->Modifier.Variables[var].Value;
 					variable_increase += modifier->Modifier.Variables[var].Increase;

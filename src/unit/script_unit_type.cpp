@@ -829,7 +829,7 @@ static int CclDefineUnitType(lua_State *l)
 						if (upgrade != nullptr) {
 							variation->UpgradesRequired.push_back(upgrade);
 						} else {
-							variation->UpgradesRequired.push_back(CUpgrade::New(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+							variation->UpgradesRequired.push_back(CUpgrade::GetOrAdd(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "upgrade-forbidden")) {
 						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
@@ -837,7 +837,7 @@ static int CclDefineUnitType(lua_State *l)
 						if (upgrade != nullptr) {
 							variation->UpgradesForbidden.push_back(upgrade);
 						} else {
-							variation->UpgradesForbidden.push_back(CUpgrade::New(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+							variation->UpgradesForbidden.push_back(CUpgrade::GetOrAdd(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "item-class-equipped")) {
 						std::string item_class_ident = LuaToString(l, -1, k + 1);
@@ -1797,11 +1797,11 @@ static int CclDefineUnitType(lua_State *l)
 			type->CostModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Elixir")) {
 			std::string elixir_ident = LuaToString(l, -1);
-			int elixir_id = UpgradeIdByIdent(elixir_ident);
-			if (elixir_id != -1) {
-				type->Elixir = AllUpgrades[elixir_id];
+			const CUpgrade *elixir_upgrade = CUpgrade::Get(elixir_ident);
+			if (elixir_upgrade != nullptr) {
+				type->Elixir = elixir_upgrade;
 			} else {
-				type->Elixir = CUpgrade::New(elixir_ident); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				type->Elixir = CUpgrade::GetOrAdd(elixir_ident); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 			}
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
@@ -1856,11 +1856,11 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string affix_ident = LuaToString(l, -1, j + 1);
-				int affix_id = UpgradeIdByIdent(affix_ident);
-				if (affix_id != -1) {
-					type->Affixes.push_back(AllUpgrades[affix_id]);
+				const CUpgrade *affix_upgrade = CUpgrade::Get(affix_ident);
+				if (affix_upgrade != nullptr) {
+					type->Affixes.push_back(affix_upgrade);
 				} else {
-					type->Affixes.push_back(CUpgrade::New(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+					type->Affixes.push_back(CUpgrade::GetOrAdd(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 				}
 			}
 		} else if (!strcmp(value, "Traits")) {
@@ -1868,20 +1868,20 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string trait_ident = LuaToString(l, -1, j + 1);
-				int trait_id = UpgradeIdByIdent(trait_ident);
-				if (trait_id != -1) {
-					type->Traits.push_back(AllUpgrades[trait_id]);
+				const CUpgrade *trait_upgrade = CUpgrade::Get(trait_ident);
+				if (trait_upgrade != nullptr) {
+					type->Traits.push_back(trait_upgrade);
 				} else {
-					type->Traits.push_back(CUpgrade::New(trait_ident)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+					type->Traits.push_back(CUpgrade::GetOrAdd(trait_ident)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 				}
 			}
 		} else if (!strcmp(value, "StartingAbilities")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string ability_ident = LuaToString(l, -1, j + 1);
-				int ability_id = UpgradeIdByIdent(ability_ident);
-				if (ability_id != -1) {
-					type->StartingAbilities.push_back(AllUpgrades[ability_id]);
+				const CUpgrade *ability_upgrade = CUpgrade::Get(ability_ident);
+				if (ability_upgrade != nullptr) {
+					type->StartingAbilities.push_back(ability_upgrade);
 				} else {
 					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
 				}
@@ -2837,7 +2837,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			}
 		}
 		if (type->ItemClass != nullptr) {
-			for (const CUpgrade *upgrade : AllUpgrades) {
+			for (const CUpgrade *upgrade : CUpgrade::GetAll()) {
 				if (upgrade->MagicPrefix && upgrade->ItemPrefix.find(type->ItemClass) != upgrade->ItemPrefix.end()) {
 					prefixes.push_back(upgrade);
 				}
@@ -2852,7 +2852,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Suffixes")) {
-		std::vector<CUpgrade *> suffixes;
+		std::vector<const CUpgrade *> suffixes;
 		for (size_t i = 0; i < type->Affixes.size(); ++i)
 		{
 			if (type->Affixes[i]->MagicSuffix) {
@@ -2860,7 +2860,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			}
 		}
 		if (type->ItemClass != nullptr) {
-			for (CUpgrade *upgrade : AllUpgrades) {
+			for (CUpgrade *upgrade : CUpgrade::GetAll()) {
 				if (upgrade->MagicSuffix && upgrade->ItemSuffix.find(type->ItemClass) != upgrade->ItemSuffix.end()) {
 					suffixes.push_back(upgrade);
 				}
@@ -2875,11 +2875,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Works")) {
-		std::vector<CUpgrade *> works;
+		std::vector<const CUpgrade *> works;
 		if (type->ItemClass != nullptr) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[i]->Work == type->ItemClass && !AllUpgrades[i]->UniqueOnly) {
-					works.push_back(AllUpgrades[i]);
+			for (const CUpgrade *upgrade : CUpgrade::GetAll()) {
+				if (upgrade->Work == type->ItemClass && !upgrade->UniqueOnly) {
+					works.push_back(upgrade);
 				}
 			}
 		}

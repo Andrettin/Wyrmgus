@@ -915,24 +915,16 @@ void CPlayer::Save(CFile &file) const
 	// Allow saved by allow.
 
 	file.printf("\n  \"timers\", {");
-	//Wyrmgus start
 	first = true;
-	//Wyrmgus end
-	for (int j = 0; j < UpgradeMax; ++j) {
-		//Wyrmgus start
-//		if (j) {
-//			file.printf(" ,");
-//		}
-//		file.printf("%i", this->UpgradeTimers.Upgrades[j]);
-		if (this->UpgradeTimers.Upgrades[j]) {
+	for (const CUpgrade *upgrade : CUpgrade::GetAll()) {
+		if (this->UpgradeTimers.Upgrades[upgrade->GetIndex()]) {
 			if (first) {
 				first = false;
 			} else {
 				file.printf(", ");
 			}
-			file.printf("\"%s\", %i", AllUpgrades[j]->Ident.c_str(), this->UpgradeTimers.Upgrades[j]);
+			file.printf("\"%s\", %i", upgrade->Ident.c_str(), this->UpgradeTimers.Upgrades[upgrade->GetIndex()]);
 		}
-		//Wyrmgus end
 	}
 	file.printf("}");
 
@@ -1132,7 +1124,7 @@ void CPlayer::SetCivilization(int civilization)
 	String old_interface = this->GetInterface();
 	
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
-		if (CCivilization::Get(this->Race)->GetUpgrade() != nullptr && this->Allow.Upgrades[CCivilization::Get(this->Race)->GetUpgrade()->ID] == 'R') {
+		if (CCivilization::Get(this->Race)->GetUpgrade() != nullptr && this->Allow.Upgrades[CCivilization::Get(this->Race)->GetUpgrade()->GetIndex()] == 'R') {
 			UpgradeLost(*this, CCivilization::Get(this->Race)->GetUpgrade());
 		}
 	}
@@ -1165,7 +1157,7 @@ void CPlayer::SetCivilization(int civilization)
 	
 	if (this->Race != -1) {
 		const CUpgrade *civilization_upgrade = CCivilization::Get(this->Race)->GetUpgrade();
-		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
+		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->GetIndex()] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
 	}
@@ -1214,12 +1206,12 @@ void CPlayer::SetFaction(const CFaction *faction)
 
 	if (this->Faction != nullptr) {
 		const CUpgrade *faction_upgrade = this->Faction->GetUpgrade();
-		if (faction_upgrade != nullptr && this->Allow.Upgrades[faction_upgrade->ID] == 'R') {
+		if (faction_upgrade != nullptr && this->Allow.Upgrades[faction_upgrade->GetIndex()] == 'R') {
 			UpgradeLost(*this, faction_upgrade);
 		}
 
 		const CUpgrade *faction_type_upgrade = this->Faction->GetType()->GetUpgrade();
-		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] == 'R') {
+		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->GetIndex()] == 'R') {
 			UpgradeLost(*this, faction_type_upgrade);
 		}
 	}
@@ -1229,7 +1221,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			const CUpgrade *old_upgrade = CFaction::GetFactionClassUpgrade(old_faction, upgrade_class);
 			const CUpgrade *new_upgrade = CFaction::GetFactionClassUpgrade(faction, upgrade_class);
 			if (old_upgrade != new_upgrade) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-				if (old_upgrade != nullptr && this->Allow.Upgrades[old_upgrade->ID] == 'R') {
+				if (old_upgrade != nullptr && this->Allow.Upgrades[old_upgrade->GetIndex()] == 'R') {
 					UpgradeLost(*this, old_upgrade);
 
 					if (new_upgrade != nullptr) {
@@ -1298,9 +1290,9 @@ void CPlayer::SetFaction(const CFaction *faction)
 	
 		const CUpgrade *faction_upgrade = this->Faction->GetUpgrade();
 		if (faction_upgrade != nullptr) {
-			if (this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
+			if (this->Allow.Upgrades[faction_upgrade->GetIndex()] != 'R') {
 				if (GameEstablishing) {
-					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
+					AllowUpgradeId(*this, faction_upgrade->GetIndex(), 'R');
 				} else {
 					UpgradeAcquire(*this, faction_upgrade);
 				}
@@ -1308,9 +1300,9 @@ void CPlayer::SetFaction(const CFaction *faction)
 		}
 		
 		const CUpgrade *faction_type_upgrade = this->Faction->GetType()->GetUpgrade();
-		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] != 'R') {
+		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->GetIndex()] != 'R') {
 			if (GameEstablishing) {
-				AllowUpgradeId(*this, faction_type_upgrade->ID, 'R');
+				AllowUpgradeId(*this, faction_type_upgrade->GetIndex(), 'R');
 			} else {
 				UpgradeAcquire(*this, faction_type_upgrade);
 			}
@@ -1382,7 +1374,7 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 	CDynasty *old_dynasty = this->Dynasty;
 	
 	if (this->Dynasty != nullptr) {
-		if (this->Dynasty->DynastyUpgrade != nullptr && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] == 'R') {
+		if (this->Dynasty->DynastyUpgrade != nullptr && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->GetIndex()] == 'R') {
 			UpgradeLost(*this, this->Dynasty->DynastyUpgrade);
 		}
 	}
@@ -1394,9 +1386,9 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 	}
 	
 	if (this->Dynasty->DynastyUpgrade != nullptr) {
-		if (this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] != 'R') {
+		if (this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->GetIndex()] != 'R') {
 			if (GameEstablishing) {
-				AllowUpgradeId(*this, this->Dynasty->DynastyUpgrade->ID, 'R');
+				AllowUpgradeId(*this, this->Dynasty->DynastyUpgrade->GetIndex(), 'R');
 			} else {
 				UpgradeAcquire(*this, this->Dynasty->DynastyUpgrade);
 			}
@@ -1482,21 +1474,21 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	std::vector<const CUpgrade *> potential_upgrades;
 
 	for (const CUpgrade *researchable_upgrade : upgrade_list) {
-		if (this->Allow.Upgrades[researchable_upgrade->ID] != 'R') {
+		if (this->Allow.Upgrades[researchable_upgrade->GetIndex()] != 'R') {
 			continue;
 		}
 		
-		if (researchable_upgrade->Class == nullptr) {
+		if (researchable_upgrade->GetClass() == nullptr) {
 			continue;
 		}
 		
-		const CUpgrade *upgrade = CFaction::GetFactionClassUpgrade(player.GetFaction(), researchable_upgrade->Class);
+		const CUpgrade *upgrade = CFaction::GetFactionClassUpgrade(player.GetFaction(), researchable_upgrade->GetClass());
 		
 		if (upgrade == nullptr) {
 			continue;
 		}
 		
-		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, &player)) {
+		if (player.Allow.Upgrades[upgrade->GetIndex()] != 'A' || !CheckDependencies(upgrade, &player)) {
 			continue;
 		}
 	
@@ -1551,7 +1543,7 @@ bool CPlayer::HasUpgradeClass(const UpgradeClass *upgrade_class) const
 		upgrade = CCivilization::GetCivilizationClassUpgrade(CCivilization::Get(this->Race), upgrade_class);
 	}
 	
-	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->ID] == 'R') {
+	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->GetIndex()] == 'R') {
 		return true;
 	}
 
@@ -1674,9 +1666,9 @@ bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSite *settlement) con
 
 bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 {
-	if (upgrade->ID < (int) AiHelpers.Research.size()) {
-		for (size_t j = 0; j < AiHelpers.Research[upgrade->ID].size(); ++j) {
-			CUnitType *researcher_type = AiHelpers.Research[upgrade->ID][j];
+	if (upgrade->GetIndex() < (int) AiHelpers.Research.size()) {
+		for (size_t j = 0; j < AiHelpers.Research[upgrade->GetIndex()].size(); ++j) {
+			CUnitType *researcher_type = AiHelpers.Research[upgrade->GetIndex()][j];
 			if (this->GetUnitTypeCount(researcher_type) > 0 || HasUnitBuilder(researcher_type)) {
 				return true;
 			}
@@ -1812,7 +1804,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 		for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
 			const CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
-			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
+			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->GetIndex()) == 'R');
 			if (has_upgrade) {
 				if (ignore_lower_priority && this->Faction != nullptr && this->Faction->GetUpgradePriority(removed_upgrade) < this->Faction->GetUpgradePriority(upgrade)) {
 					continue;
@@ -2068,7 +2060,7 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 		const CUnitType *type = iterator->first;
 		if (type->GetIndex() < ((int) AiHelpers.ResearchedUpgrades.size())) {
 			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->GetIndex()].size(); ++i) {
-				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->GetIndex()][i];
+				const CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->GetIndex()][i];
 				if (std::find(researchable_upgrades.begin(), researchable_upgrades.end(), upgrade) == researchable_upgrades.end()) {
 					researchable_upgrades.push_back(upgrade);
 				}
@@ -2460,7 +2452,7 @@ void CPlayer::UpdateCurrentQuests()
 		if (objective->ObjectiveType == HaveResourceObjectiveType) {
 			objective->Counter = std::min(this->GetResource(objective->Resource, STORE_BOTH), objective->Quantity);
 		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
-			objective->Counter = UpgradeIdAllowed(*this, objective->Upgrade->ID) == 'R' ? 1 : 0;
+			objective->Counter = UpgradeIdAllowed(*this, objective->Upgrade->GetIndex()) == 'R' ? 1 : 0;
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
 			objective->Counter = this->HasHero(objective->Character) ? 1 : 0;
 		}
@@ -2649,7 +2641,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			
 			bool has_researcher = this->HasUpgradeResearcher(upgrade);
 				
-			if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
+			if (!has_researcher && upgrade->GetIndex() < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
 				for (CQuestObjective *second_objective : quest->Objectives) {
 					if (second_objective == objective) {
 						continue;
@@ -2669,7 +2661,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 						}
 
 						for (const CUnitType *unit_type : unit_types) {
-							if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+							if (std::find(AiHelpers.Research[upgrade->GetIndex()].begin(), AiHelpers.Research[upgrade->GetIndex()].end(), unit_type) != AiHelpers.Research[upgrade->GetIndex()].end()) { //if the unit type of the other objective is a researcher of this upgrade
 								has_researcher = true;
 								break;
 							}
@@ -2682,7 +2674,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				}
 			}
 				
-			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
+			if (!has_researcher || this->Allow.Upgrades[upgrade->GetIndex()] != 'A' || !CheckDependencies(upgrade, this)) {
 				return false;
 			}
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
@@ -2817,10 +2809,10 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
 			const CUpgrade *upgrade = objective->Upgrade;
 			
-			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
+			if (this->Allow.Upgrades[upgrade->GetIndex()] != 'R') {
 				bool has_researcher = this->HasUpgradeResearcher(upgrade);
 				
-				if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
+				if (!has_researcher && upgrade->GetIndex() < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
 					for (CPlayerQuestObjective *second_objective : this->QuestObjectives) {
 						if (second_objective->Quest != quest || second_objective == objective || second_objective->Counter >= second_objective->Quantity) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
 							continue;
@@ -2840,7 +2832,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 							}
 
 							for (const CUnitType *unit_type : unit_types) {
-								if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+								if (std::find(AiHelpers.Research[upgrade->GetIndex()].begin(), AiHelpers.Research[upgrade->GetIndex()].end(), unit_type) != AiHelpers.Research[upgrade->GetIndex()].end()) { //if the unit type of the other objective is a researcher of this upgrade
 									has_researcher = true;
 									break;
 								}
@@ -2853,7 +2845,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					}
 				}
 				
-				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
+				if (!has_researcher || this->Allow.Upgrades[upgrade->GetIndex()] != 'A' || !CheckDependencies(upgrade, this)) {
 					return "You can no longer research the required upgrade.";
 				}
 			}
@@ -2897,7 +2889,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 
 void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
 {
-	if (this->Allow.Upgrades[modifier->ID] == 'R') {
+	if (this->Allow.Upgrades[modifier->GetIndex()] == 'R') {
 		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
 			if (this->Modifiers[i].first == modifier) {
 				this->Modifiers[i].second = std::max(this->Modifiers[i].second, (int) (GameCycle + cycles));
@@ -2912,7 +2904,7 @@ void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
 
 void CPlayer::RemoveModifier(CUpgrade *modifier)
 {
-	if (this->Allow.Upgrades[modifier->ID] == 'R') {
+	if (this->Allow.Upgrades[modifier->GetIndex()] == 'R') {
 		UpgradeLost(*this, modifier);
 		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
 			if (this->Modifiers[i].first == modifier) {

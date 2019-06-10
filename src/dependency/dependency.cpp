@@ -251,7 +251,7 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool
 		return false;
 	}
 	
-	if (UpgradeIdAllowed(*player, target->ID) != 'A' && !((is_predependency || is_neutral_use) && UpgradeIdAllowed(*player, target->ID) == 'R')) {
+	if (UpgradeIdAllowed(*player, target->GetIndex()) != 'A' && !((is_predependency || is_neutral_use) && UpgradeIdAllowed(*player, target->GetIndex()) == 'R')) {
 		return false;
 	}
 
@@ -305,7 +305,7 @@ bool CheckDependencies(const CUpgrade *target, const CUnit *unit, const bool ign
 		return false;
 	}
 	
-	if (UpgradeIdAllowed(*unit->Player, target->ID) == 'F') {
+	if (UpgradeIdAllowed(*unit->Player, target->GetIndex()) == 'F') {
 		return false;
 	}
 

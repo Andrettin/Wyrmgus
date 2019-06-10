@@ -69,12 +69,12 @@ public:
 
 	int ResourcesHeld = 0;
 	CUnitType *Type = nullptr;	/// Item type of the item
-	CUpgrade *Prefix = nullptr;
-	CUpgrade *Suffix = nullptr;
+	const CUpgrade *Prefix = nullptr;
+	const CUpgrade *Suffix = nullptr;
 	CUpgrade *Set = nullptr;
 	CSpell *Spell = nullptr;
-	CUpgrade *Work = nullptr;
-	CUpgrade *Elixir = nullptr;
+	const CUpgrade *Work = nullptr;
+	const CUpgrade *Elixir = nullptr;
 	
 	friend int CclDefineUniqueItem(lua_State *l);
 	

@@ -50,6 +50,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade.h"
 
  /*----------------------------------------------------------------------------
 --  Functions
@@ -653,8 +654,8 @@ void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flus
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
 						   //Wyrmgus start
-//						   what.ID, 0, NoUnitP, nullptr, flush);
-						   what.ID, player, NoUnitP, nullptr, flush);
+//						   what.GetIndex(), 0, NoUnitP, nullptr, flush);
+						   what.GetIndex(), player, NoUnitP, nullptr, flush);
 						   //Wyrmgus end
 	}
 }
@@ -682,14 +683,14 @@ void SendCommandCancelResearch(CUnit &unit)
 ** @param unit     pointer to unit.
 ** @param what     upgrade-type of the ability.
 */
-void SendCommandLearnAbility(CUnit &unit, CUpgrade &what)
+void SendCommandLearnAbility(CUnit &unit, const CUpgrade &what)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandLearnAbility(unit, what);
 	} else {
 		NetworkSendCommand(MessageCommandLearnAbility, unit,
-						   what.ID, 0, NoUnitP, nullptr, 0);
+						   what.GetIndex(), 0, NoUnitP, nullptr, 0);
 	}
 }
 //Wyrmgus end
@@ -1073,12 +1074,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
 					   //Wyrmgus start
-//					   AllUpgrades[arg1]->Ident.c_str(), -1);
-					   AllUpgrades[arg1]->Ident.c_str(), arg2);
+//					   CUpgrade::Get(arg1)->Ident.c_str(), -1);
+					   CUpgrade::Get(arg1)->Ident.c_str(), arg2);
 					   //Wyrmgus end
 			//Wyrmgus start
-//			CommandResearch(unit, *AllUpgrades[arg1], status);
-			CommandResearch(unit, *AllUpgrades[arg1], arg2, status);
+//			CommandResearch(unit, *CUpgrade::Get(arg1), status);
+			CommandResearch(unit, *CUpgrade::Get(arg1), arg2, status);
 			//Wyrmgus end
 			break;
 		case MessageCommandCancelResearch:
@@ -1088,8 +1089,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandLearnAbility:
 			CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP,
-					   AllUpgrades[arg1]->Ident.c_str(), -1);
-			CommandLearnAbility(unit, *AllUpgrades[arg1]);
+					   CUpgrade::Get(arg1)->Ident.c_str(), -1);
+			CommandLearnAbility(unit, *CUpgrade::Get(arg1));
 			break;
 		case MessageCommandQuest: {
 			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, CQuest::Get(arg1)->Ident.c_str(), -1);

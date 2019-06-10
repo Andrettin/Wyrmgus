@@ -44,6 +44,7 @@
 #include "ui/widgets.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "upgrade/upgrade.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -184,7 +185,7 @@ void ButtonAction::SetTriggerData() const
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
 	}
 	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[this->Value];
+		TriggerData.Upgrade = CUpgrade::Get(this->Value);
 	} else if (this->Action == ButtonFaction) {
 		TriggerData.Faction = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value];
 		if (CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->GetUpgrade() != nullptr) {

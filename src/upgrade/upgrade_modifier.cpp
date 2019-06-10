@@ -107,7 +107,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 					this->Modifier.Variables[index].Value = value.to_int();
 					this->Modifier.Variables[index].Max = value.to_int();
 				} else { // error
-					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.utf8().get_data(), key.utf8().get_data(), AllUpgrades[this->UpgradeId]->Ident.c_str());
+					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.utf8().get_data(), key.utf8().get_data(), CUpgrade::Get(this->UpgradeId)->Ident.c_str());
 				}
 			} else {
 				fprintf(stderr, "Invalid upgrade modifier property: \"%s\".\n", key.utf8().get_data());

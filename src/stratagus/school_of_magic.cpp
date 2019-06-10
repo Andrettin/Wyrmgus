@@ -36,7 +36,7 @@
 #include "school_of_magic.h"
 
 #include "config.h"
-#include "upgrade/upgrade_structs.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

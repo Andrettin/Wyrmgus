@@ -830,8 +830,8 @@ void CCharacter::UpdateAttributes()
 		this->Attributes[i] = this->UnitType->DefaultStat.Variables[var].Value;
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			if (
-				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
-				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[modifier->UpgradeId]) != this->Abilities.end()
+				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->GetIndex())
+				|| std::find(this->Abilities.begin(), this->Abilities.end(), CUpgrade::Get(modifier->UpgradeId)) != this->Abilities.end()
 			) {
 				if (modifier->Modifier.Variables[var].Value != 0) {
 					this->Attributes[i] += modifier->Modifier.Variables[var].Value;

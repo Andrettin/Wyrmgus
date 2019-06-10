@@ -44,6 +44,7 @@
 #include "time/calendar.h"
 #include "ui/button_action.h"
 #include "unit/unit_class.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

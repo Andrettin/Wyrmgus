@@ -122,8 +122,8 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 /* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
 {
 	//Wyrmgus start
-//	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
-	unit.Variable[RESEARCH_INDEX].Value = CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[this->Upgrade->ID];
+//	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->GetIndex()];
+	unit.Variable[RESEARCH_INDEX].Value = CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[this->Upgrade->GetIndex()];
 	//Wyrmgus end
 	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
 }
@@ -155,10 +155,10 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *CPlayer::Players[this->Player];
-//	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
-	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+//	player.UpgradeTimers.Upgrades[upgrade.GetIndex()] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
+	player.UpgradeTimers.Upgrades[upgrade.GetIndex()] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
-	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
+	if (player.UpgradeTimers.Upgrades[upgrade.GetIndex()] >= upgrade.Costs[TimeCost]) {
 		if (upgrade.GetName().empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
@@ -191,10 +191,10 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
 	//Wyrmgus start
-//	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
+//	unit.Player->UpgradeTimers.Upgrades[upgrade.GetIndex()] = 0;
 
 //	unit.Player->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);
-	CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[upgrade.ID] = 0;
+	CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[upgrade.GetIndex()] = 0;
 
 	CPlayer::Players[this->Player]->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);
 	//Wyrmgus end

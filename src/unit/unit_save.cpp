@@ -49,6 +49,7 @@
 #include "player.h"
 #include "spell/spells.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade.h"
 
 #include <iomanip>
 #include <sstream>
@@ -419,7 +420,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	for (std::map<int, int>::const_iterator iterator = unit.IndividualUpgrades.begin(); iterator != unit.IndividualUpgrades.end(); ++iterator) {
 		int upgrade_id = iterator->first;
-		CUpgrade *upgrade = AllUpgrades[upgrade_id];
+		CUpgrade *upgrade = CUpgrade::Get(upgrade_id);
 		
 		if (unit.GetIndividualUpgrade(upgrade)) {
 			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", upgrade->Ident.c_str(), unit.GetIndividualUpgrade(upgrade));

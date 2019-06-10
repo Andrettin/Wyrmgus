@@ -87,6 +87,7 @@ class CReligion;
 class CSite;
 class CUnit;
 class CUnitType;
+class CUpgrade;
 class PlayerAi;
 class UpgradeClass;
 //Wyrmgus start

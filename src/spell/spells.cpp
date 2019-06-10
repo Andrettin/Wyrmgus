@@ -420,9 +420,9 @@ bool CSpell::ProcessConfigDataProperty(const String &key, String value)
 		}
 	} else if (key == "depend_upgrade") {
 		value = value.replace("_", "-");
-		this->DependencyId = UpgradeIdByIdent(value.utf8().get_data());
-		if (this->DependencyId == -1) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
+		const CUpgrade *upgrade = CUpgrade::Get(value);
+		if (upgrade != nullptr) {
+			this->DependencyId = upgrade->GetIndex();
 		}
 	} else if (key == "item_spell") {
 		const ItemClass *item_class = ItemClass::Get(value);
@@ -785,7 +785,7 @@ bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 
 	//Wyrmgus start
 //	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-	return dependencyId == -1 || unit.GetIndividualUpgrade(AllUpgrades[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::Get(dependencyId)) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
 	//Wyrmgus end
 }
 

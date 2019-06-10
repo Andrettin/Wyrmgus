@@ -48,7 +48,7 @@
 #include "player_color.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
-#include "upgrade/upgrade_structs.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

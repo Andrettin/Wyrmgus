@@ -45,6 +45,7 @@
 #include "time/season.h"
 #include "ui/button_action.h"
 #include "ui/icon.h"
+#include "upgrade/upgrade.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------

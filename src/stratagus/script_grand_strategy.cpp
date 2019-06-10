@@ -34,7 +34,9 @@
 #include "stratagus.h"
 
 #include "grand_strategy.h"
+
 #include "luacallback.h"
+#include "upgrade/upgrade.h"
 #include "world/world.h"
 
 /*----------------------------------------------------------------------------

@@ -175,11 +175,11 @@ int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			case ButtonResearch:
-				ba->Value = UpgradeIdByIdent(value);
+				ba->Value = CUpgrade::Get(value)->GetIndex();
 				break;
 			//Wyrmgus start
 			case ButtonLearnAbility:
-				ba->Value = UpgradeIdByIdent(value);
+				ba->Value = CUpgrade::Get(value)->GetIndex();
 				break;
 			case ButtonExperienceUpgradeTo:
 				ba->Value = UnitTypeIdByIdent(value);
@@ -511,7 +511,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->GetQuote().empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->GetQuote().empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->Quote.empty())) {
+	if (condition->Quote && type && type->GetQuote().empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->GetQuote().empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->GetQuote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->GetQuote().empty())) {
 		return false;
 	}
 	
@@ -541,19 +541,19 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	
 	const CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
-		upgrade = AllUpgrades[button.Value];
+		upgrade = CUpgrade::Get(button.Value);
 	} else if (button.Action == ButtonFaction && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade() != nullptr) {
 		upgrade = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade();
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
-		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->GetIndex()) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
 			return false;
 		}
 	}
 	
 	if (condition->ResearchedUpgrade) {
-		if (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), condition->ResearchedUpgrade->ID) != 'R') {
+		if (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), condition->ResearchedUpgrade->GetIndex()) != 'R') {
 			return false;
 		}
 	}
@@ -565,7 +565,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->Ability != CONDITION_TRUE) {
-		if ((condition->Ability == CONDITION_ONLY) ^ (upgrade && upgrade->Ability)) {
+		if ((condition->Ability == CONDITION_ONLY) ^ (upgrade && upgrade->IsAbility())) {
 			return false;
 		}
 	}
@@ -577,7 +577,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->RequirementsString.empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->GetRequirementsString().empty())))) {
 			return false;
 		}
 	}
@@ -883,8 +883,8 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 	switch (button.Action) {
 		case ButtonResearch:
 			//Wyrmgus start
-//			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
-			CPlayer::GetThisPlayer()->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
+//			memcpy(Costs, CUpgrade::Get(button.Value)->Costs, sizeof(CUpgrade::Get(button.Value)->Costs));
+			CPlayer::GetThisPlayer()->GetUpgradeCosts(CUpgrade::Get(button.Value), Costs);
 			//Wyrmgus end
 			break;
 		case ButtonSpellCast:
@@ -1192,8 +1192,8 @@ void CButtonPanel::Draw()
 			button_icon = CUnitType::Get(buttons[i].Value)->GetIcon();
 		} else if (buttons[i].Action == ButtonBuy) {
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon();
-		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
-			button_icon = AllUpgrades[buttons[i].Value]->Icon;
+		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && CUpgrade::Get(buttons[i].Value)->GetIcon()) {
+			button_icon = CUpgrade::Get(buttons[i].Value)->GetIcon();
 		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->GetIcon() != nullptr) {
 			button_icon = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->GetIcon();
 		}
@@ -1337,7 +1337,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 			break;
 		}
 		case ButtonResearch:
-			UI.StatusLine.SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
+			UI.StatusLine.SetCosts(0, 0, CUpgrade::Get(button.Value)->Costs);
 			break;
 		case ButtonSpellCast:
 			UI.StatusLine.SetCosts(CSpell::Spells[button.Value]->ManaCost, 0, CSpell::Spells[button.Value]->Costs);
@@ -1450,12 +1450,12 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonResearch:
 		case ButtonBuild:
 			if (buttonaction.Action == ButtonResearch) {
-				res = CheckDependencies(AllUpgrades[buttonaction.Value], unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 				if (res) {
 					//Wyrmgus start
 	//				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
-					res = (UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'R') && CheckDependencies(AllUpgrades[buttonaction.Value], CPlayer::GetThisPlayer(), false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-					res = res && (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] == AllUpgrades[UpgradeIdByIdent(buttonaction.ValueStr)]->Costs[TimeCost]); //don't show if is being researched elsewhere
+					res = (UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'R') && CheckDependencies(CUpgrade::Get(buttonaction.Value), CPlayer::GetThisPlayer(), false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+					res = res && (!unit.Player->UpgradeTimers.Upgrades[buttonaction.Value] || unit.Player->UpgradeTimers.Upgrades[buttonaction.Value] == CUpgrade::Get(buttonaction.Value)->Costs[TimeCost]); //don't show if is being researched elsewhere
 					//Wyrmgus end
 				}
 			} else {
@@ -1568,9 +1568,9 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonResearch:
 		case ButtonBuild:
 			if (buttonaction.Action == ButtonResearch) {
-				res = CheckDependencies(AllUpgrades[buttonaction.Value], unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 				if (res) {
-					res = UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' && CheckDependencies(AllUpgrades[buttonaction.Value], CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+					res = UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' && CheckDependencies(CUpgrade::Get(buttonaction.Value), CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				}
 			} else {
 				res = CheckDependencies(CUnitType::Get(buttonaction.Value), unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
@@ -2245,16 +2245,17 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 void CButtonPanel::DoClicked_Research(int button)
 {
 	const int index = CurrentButtons[button].Value;
+	const CUpgrade *upgrade = CUpgrade::Get(index);
 	//Wyrmgus start
 	int upgrade_costs[MaxCosts];
-	CPlayer::GetThisPlayer()->GetUpgradeCosts(AllUpgrades[index], upgrade_costs);
-//	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
+	CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, upgrade_costs);
+//	if (!Selected[0]->Player->CheckCosts(upgrade->Costs)) {
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		//PlayerSubCosts(player,Upgrades[i].Costs);
 		//Wyrmgus start
-//		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
-		SendCommandResearch(*Selected[0], *AllUpgrades[index], CPlayer::GetThisPlayer()->GetIndex(), !(KeyModifiers & ModifierShift));
+//		SendCommandResearch(*Selected[0], *upgrade, !(KeyModifiers & ModifierShift));
+		SendCommandResearch(*Selected[0], *upgrade, CPlayer::GetThisPlayer()->GetIndex(), !(KeyModifiers & ModifierShift));
 		//Wyrmgus end
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
@@ -2271,7 +2272,8 @@ void CButtonPanel::DoClicked_Research(int button)
 void CButtonPanel::DoClicked_LearnAbility(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	SendCommandLearnAbility(*Selected[0], *AllUpgrades[index]);
+	const CUpgrade *upgrade = CUpgrade::Get(index);
+	SendCommandLearnAbility(*Selected[0], *upgrade);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	LastDrawnButtonPopup = nullptr;

@@ -439,7 +439,7 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	}
 
 	// check if allowed
-	if (!CheckDependencies(AllUpgrades[button.Value], unit.Player, false, true)) {
+	if (!CheckDependencies(CUpgrade::Get(button.Value), unit.Player, false, true)) {
 		return false;
 	}
 	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)
@@ -462,8 +462,8 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 {
 	if (ButtonCheckResearch(unit, button)
 		//Wyrmgus start
-//		&& !unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)]) {
-		&& (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] == AllUpgrades[UpgradeIdByIdent(button.ValueStr)]->Costs[TimeCost])
+//		&& !unit.Player->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()]) {
+		&& (!unit.Player->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()] || unit.Player->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()] == CUpgrade::Get(button.ValueStr)->Costs[TimeCost])
 	) {
 		//Wyrmgus end
 		return true;

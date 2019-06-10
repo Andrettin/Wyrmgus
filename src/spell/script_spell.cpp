@@ -417,9 +417,9 @@ static int CclDefineSpell(lua_State *l)
 			}
 		} else if (!strcmp(value, "depend-upgrade")) {
 			value = LuaToString(l, i + 1);
-			spell->DependencyId = UpgradeIdByIdent(value);
-			if (spell->DependencyId == -1) {
-				lua_pushfstring(l, "Bad upgrade name: %s", value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade != nullptr) {
+				spell->DependencyId = upgrade->GetIndex();
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {

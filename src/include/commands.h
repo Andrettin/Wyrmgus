@@ -164,7 +164,7 @@ extern void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int f
 extern void CommandCancelResearch(CUnit &unit);
 //Wyrmgus start
 /// Prepare command learn ability
-extern void CommandLearnAbility(CUnit &unit, CUpgrade &what);
+extern void CommandLearnAbility(CUnit &unit, const CUpgrade &what);
 //Wyrmgus end
 /// Prepare command spellcast
 extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &spell, int flush, int z = 0, bool isAutocast = false);
@@ -290,7 +290,7 @@ extern void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, i
 extern void SendCommandCancelResearch(CUnit &unit);
 //Wyrmgus start
 /// Send learn ability command
-extern void SendCommandLearnAbility(CUnit &unit, CUpgrade &what);
+extern void SendCommandLearnAbility(CUnit &unit, const CUpgrade &what);
 //Wyrmgus end
 /// Send spell cast command
 //Wyrmgus start

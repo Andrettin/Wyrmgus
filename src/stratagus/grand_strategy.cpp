@@ -169,10 +169,10 @@ void CGrandStrategyGame::DoTurn()
 			continue;
 		}
 		
-		int civilization = this->UnpublishedWorks[i]->Civilization;
+		const CCivilization *civilization = this->UnpublishedWorks[i]->GetCivilization();
 		if (
 			(author != nullptr && author->ProvinceOfOrigin != nullptr)
-			|| (civilization != -1 && this->CultureProvinces.find(civilization) != this->CultureProvinces.end() && this->CultureProvinces[civilization].size() > 0)
+			|| (civilization != nullptr && this->CultureProvinces.find(civilization->GetIndex()) != this->CultureProvinces.end() && this->CultureProvinces[civilization->GetIndex()].size() > 0)
 		) {
 			bool characters_existed = true;
 			for (size_t j = 0; j < this->UnpublishedWorks[i]->Characters.size(); ++j) {
@@ -190,7 +190,7 @@ void CGrandStrategyGame::DoTurn()
 			if (author != nullptr && author->Province != nullptr) {
 				this->CreateWork(this->UnpublishedWorks[i], author, author->Province);
 			} else {
-				this->CreateWork(this->UnpublishedWorks[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
+				this->CreateWork(this->UnpublishedWorks[i], author, this->CultureProvinces[civilization->GetIndex()][SyncRand(this->CultureProvinces[civilization->GetIndex()].size())]);
 			}
 		}
 	}
@@ -219,7 +219,7 @@ void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, C
 	}
 }
 
-void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province)
+void CGrandStrategyGame::CreateWork(const CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province)
 {
 	if (!province || !province->Owner) {
 		return;
@@ -260,11 +260,11 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		}
 		work_creation_message += province->GetName().utf8().get_data();
 		work_creation_message += "!";
-		if (work != nullptr && !work->Description.empty()) {
-			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->Description, "\"", "\\\""), "\n", "\\n");
+		if (work != nullptr && !work->GetDescription().empty()) {
+			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->GetDescription().utf8().get_data(), "\"", "\\\""), "\n", "\\n");
 		}
-		if (work != nullptr && !work->Quote.empty()) {
-			work_creation_message += "\\n\\n" + FindAndReplaceString(FindAndReplaceString(work->Quote, "\"", "\\\""), "\n", "\\n");
+		if (work != nullptr && !work->GetQuote().empty()) {
+			work_creation_message += "\\n\\n" + FindAndReplaceString(FindAndReplaceString(work->GetQuote().utf8().get_data(), "\"", "\\\""), "\n", "\\n");
 		}
 		work_creation_message += "\"";
 		if (province->Owner == GrandStrategyGame.PlayerFaction) {
@@ -658,15 +658,17 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	
 	int change = has_technology ? 1 : -1;
 		
+	const CUpgrade *upgrade = CUpgrade::Get(upgrade_id);
+
 	//add military score bonuses
-	for (size_t z = 0; z < AllUpgrades[upgrade_id]->UpgradeModifiers.size(); ++z) {
+	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 		for (const CUnitType *unit_type : CUnitType::GetAll()) {
 				
-			Assert(AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == '?' || AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X');
+			Assert(upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == '?' || upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X');
 
-			if (AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
-				if (AllUpgrades[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
-					this->MilitaryScoreBonus[unit_type->GetIndex()] += AllUpgrades[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
+			if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
+					this->MilitaryScoreBonus[unit_type->GetIndex()] += upgrade->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
 				}
 			}
 		}
@@ -674,10 +676,10 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	
 	if (!secondary_setting) { //if this technology is not being set as a result of another technology of the same class being researched
 		if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
-			if (AllUpgrades[upgrade_id]->Class != nullptr) {
-				for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-					if (AllUpgrades[upgrade_id]->Class == AllUpgrades[i]->Class) {
-						this->SetTechnology(i, has_technology, true);
+			if (upgrade->GetClass() != nullptr) {
+				for (const CUpgrade *other_upgrade : CUpgrade::GetAll()) {
+					if (upgrade->GetClass() == other_upgrade->GetClass()) {
+						this->SetTechnology(other_upgrade->GetIndex(), has_technology, true);
 					}
 				}
 			}
@@ -849,7 +851,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 	
 	const CUpgrade *technology = CFaction::GetFactionClassUpgrade(CFaction::Get(this->Faction), UpgradeClass::Get(technology_class_name));
 	
-	if (technology != nullptr && this->Technologies[technology->ID] == true) {
+	if (technology != nullptr && this->Technologies[technology->GetIndex()] == true) {
 		return true;
 	}
 
@@ -1272,12 +1274,12 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 void InitializeGrandStrategyGame(bool show_loading)
 {
 	//initialize literary works
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->Work == nullptr || AllUpgrades[i]->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
+	for (const CUpgrade *upgrade : CUpgrade::GetAll()) {
+		if (upgrade->Work == nullptr || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
 			continue;
 		}
 		
-		GrandStrategyGame.UnpublishedWorks.push_back(AllUpgrades[i]);
+		GrandStrategyGame.UnpublishedWorks.push_back(upgrade);
 	}
 }
 

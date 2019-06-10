@@ -61,7 +61,7 @@ void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<String, Strin
 
 bool CUpgradeDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
-	return UpgradeIdAllowed(*player, this->Upgrade->ID) == 'R';
+	return UpgradeIdAllowed(*player, this->Upgrade->GetIndex()) == 'R';
 }
 
 bool CUpgradeDependency::Check(const CUnit *unit, const bool ignore_units) const

@@ -79,14 +79,14 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 **  @param n      Index to insert new into table
 **  @param base   Base type to insert into table.
 */
-static void AiHelperInsert(std::vector<std::vector<CUpgrade *> > &table,
-						   unsigned int n, CUpgrade &base)
+static void AiHelperInsert(std::vector<std::vector<const CUpgrade *> > &table,
+						   unsigned int n, const CUpgrade &base)
 {
 	if (n >= table.size()) {
 		table.resize(n + 1);
 	}
 	// Look if already known
-	std::vector<CUpgrade *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
+	std::vector<const CUpgrade *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
 	if (it != table[n].end()) {
 		return;
 	}
@@ -390,14 +390,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonResearch : {
-				int researchId = UpgradeIdByIdent(button.ValueStr);
+				const CUpgrade *research_upgrade = CUpgrade::Get(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Research, researchId, **j);
+					AiHelperInsert(aiHelper.Research, research_upgrade->GetIndex(), **j);
 				}
 				
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.ResearchedUpgrades, (**j).GetIndex(), *AllUpgrades[researchId]);
+					AiHelperInsert(aiHelper.ResearchedUpgrades, (**j).GetIndex(), *research_upgrade);
 				}
 				break;
 			}
@@ -435,9 +435,9 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonLearnAbility : {
-				CUpgrade *ability = CUpgrade::Get(button.ValueStr);
+				const CUpgrade *ability = CUpgrade::Get(button.ValueStr);
 
-				if (ability->Ability) {
+				if (ability->IsAbility()) {
 					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 						AiHelperInsert(aiHelper.LearnableAbilities, (**j).GetIndex(), *ability);
 					}

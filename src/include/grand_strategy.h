@@ -273,7 +273,7 @@ public:
 	void DrawInterface();					/// Draw the interface
 	void DoTurn();							/// Process the grand strategy turn
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
-	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
+	void CreateWork(const CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	CGrandStrategyHero *GetHero(std::string hero_full_name);
 
@@ -284,7 +284,7 @@ public:
 	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
 	std::vector<CGrandStrategyFaction *> Factions[MAX_RACES];
 	std::vector<CGrandStrategyHero *> Heroes;
-	std::vector<CUpgrade *> UnpublishedWorks;
+	std::vector<const CUpgrade *> UnpublishedWorks;
 	std::vector<CGrandStrategyEvent *> AvailableEvents;
 	CGrandStrategyFaction *PlayerFaction = nullptr;
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity

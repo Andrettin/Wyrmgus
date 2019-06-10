@@ -74,6 +74,7 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "wyrmgus.h"
 
@@ -1567,9 +1568,9 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr) {
 				if (!unit->Unique) {
 					if (unit->Work != nullptr) {
-						return unit->Work->Quote;
+						return unit->Work->GetQuote().utf8().get_data();
 					} else if (unit->Elixir != nullptr) {
-						return unit->Elixir->Quote;
+						return unit->Elixir->GetQuote().utf8().get_data();
 					} else {
 						return unit->Type->GetQuote().utf8().get_data();
 					}
@@ -1737,8 +1738,8 @@ std::string EvalString(const StringDesc *s)
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				if ((**upgrade).Civilization != -1) {
-					return CCivilization::Get((**upgrade).Civilization)->GetName().utf8().get_data();
+				if ((**upgrade).GetCivilization() != nullptr) {
+					return (**upgrade).GetCivilization()->GetName().utf8().get_data();
 				} else {
 					return std::string();
 				}
@@ -1748,14 +1749,14 @@ std::string EvalString(const StringDesc *s)
 		case EString_UpgradeEffectsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				return (**upgrade).EffectsString;
+				return (**upgrade).GetEffectsString().utf8().get_data();
 			} else { // ERROR.
 				return std::string();
 			}
 		case EString_UpgradeRequirementsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				return (**upgrade).RequirementsString;
+				return (**upgrade).GetRequirementsString().utf8().get_data();
 			} else { // ERROR.
 				return std::string();
 			}

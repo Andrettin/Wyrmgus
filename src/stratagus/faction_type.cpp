@@ -35,7 +35,7 @@
 
 #include "faction_type.h"
 
-#include "upgrade/upgrade_structs.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

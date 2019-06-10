@@ -1219,7 +1219,7 @@ void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 	}
 	
 	//Wyrmgus start
-	if (what.Ability) {
+	if (what.IsAbility()) {
 		AbilityAcquire(unit, &what);
 		return;
 	}
@@ -1271,13 +1271,13 @@ void CommandCancelResearch(CUnit &unit)
 **  @param what   what to learn.
 **  @param flush  if true, flush command queue.
 */
-void CommandLearnAbility(CUnit &unit, CUpgrade &what)
+void CommandLearnAbility(CUnit &unit, const CUpgrade &what)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	
-	if (what.Ability) {
+	if (what.IsAbility()) {
 		AbilityAcquire(unit, &what);
 	} else { //an individual upgrade of some other kind (i.e. a deity choice)
 		IndividualUpgradeAcquire(unit, &what);

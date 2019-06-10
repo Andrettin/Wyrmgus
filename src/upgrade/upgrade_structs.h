@@ -35,10 +35,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "economy/resource.h"
-
-#include <set>
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -57,19 +54,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCharacter;
-class CDeityDomain;
-class CDependency;
-class CIcon;
-class CSchoolOfMagic;
 class CUnitType;
-class CUpgradeModifier;
 class CVariable;
-class ItemClass;
-class ItemSlot;
-class UniqueItem;
-class UpgradeClass;
-struct lua_State;
 
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.
@@ -102,76 +88,6 @@ public:
 	int ImproveIncomes[MaxCosts];	/// Gives player an improved income
 	int ResourceDemand[MaxCosts];	/// Resource demand
 	std::map<const CUnitType *, int> UnitStock;	/// Units in stock
-};
-
-/**
-**  The main useable upgrades.
-*/
-class CUpgrade : public DataElement
-{
-	GDCLASS(CUpgrade, DataElement)
-	
-public:
-	CUpgrade(const std::string &ident = "");
-	~CUpgrade();
-
-	static CUpgrade *New(const std::string &ident);
-	static CUpgrade *Get(const std::string &ident);
-
-	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
-	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
-	virtual void Initialize() override;
-	
-	void SetIcon(CIcon *icon);
-
-	//Wyrmgus start
-	UpgradeClass *Class = nullptr;	/// upgrade class (i.e. siege weapon projectile I)
-	int Civilization = -1;			/// which civilization this upgrade belongs to, if any
-	int Faction = -1;				/// which faction this upgrade belongs to, if any
-	std::string Description;		/// Description of the upgrade
-	std::string Quote;				/// Quote of the upgrade
-	std::string Background;			/// Encyclopedia entry for the upgrade
-	std::string EffectsString;		/// Effects string of the upgrade
-	std::string RequirementsString;	/// Requirements string of the upgrade
-	bool Ability = false;
-	const ::ItemSlot *ItemSlot = nullptr;
-	bool MagicPrefix = false;
-	bool MagicSuffix = false;
-	bool RunicAffix = false;
-	bool UniqueOnly = false;		/// Whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
-	std::set<const ItemClass *> ItemPrefix;
-	std::set<const ItemClass *> ItemSuffix;
-	bool IncompatibleAffixes[UpgradeMax];
-	std::vector<const ItemClass *> WeaponClasses;	/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
-	std::vector<std::string> Epithets;	/// Epithets when a character has a certain trait
-	CUnitType *Item = nullptr;
-	//Wyrmgus end
-	int   ID = 0;						/// numerical id
-	int   Costs[MaxCosts];				/// costs for the upgrade
-	int   ScaledCosts[MaxCosts];		/// scaled costs for the upgrade
-	//Wyrmgus start
-	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
-	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
-	int MagicLevel = 0;					/// Magic level of an affix
-	const ItemClass *Work = nullptr;	/// Form in which was inscribed (i.e. scroll or book), if is a literary work
-	int Year = 0;						/// Year of publication, if is a literary work
-	CCharacter *Author = nullptr;		/// Author of this literary work (if it is one)
-	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
-	std::vector<UniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
-	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
-	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
-	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
-	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
-	//Wyrmgus end
-	// TODO: not used by buttons
-	CIcon *Icon = nullptr;					/// icon to display to the user
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
-	
-	friend int CclDefineUpgrade(lua_State *l);
-
-protected:
-	static inline void _bind_methods() {}
 };
 
 /**
@@ -225,11 +141,5 @@ public:
 	*/
 	int Upgrades[UpgradeMax];       /// counter for each upgrade
 };
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades
 
 #endif

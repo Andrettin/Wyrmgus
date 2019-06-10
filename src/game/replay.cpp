@@ -57,6 +57,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade.h"
 #include "include/version.h"
 
 #include <core/math/random_number_generator.h>

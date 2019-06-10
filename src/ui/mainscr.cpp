@@ -661,15 +661,15 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 				
-				CIcon &icon = *order.GetUpgrade().Icon;
+				const CIcon *icon = order.GetUpgrade().GetIcon();
 				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
+//				icon->DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
+				icon->DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
 			return true;

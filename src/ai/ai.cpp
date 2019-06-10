@@ -272,7 +272,7 @@ static void AiCheckUnits()
 	//  Look if some researches are missing.
 	n = (int)AiPlayer->ResearchRequests.size();
 	for (int i = 0; i < n; ++i) {
-		if (UpgradeIdAllowed(*AiPlayer->Player, AiPlayer->ResearchRequests[i]->ID) == 'A') {
+		if (UpgradeIdAllowed(*AiPlayer->Player, AiPlayer->ResearchRequests[i]->GetIndex()) == 'A') {
 			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
 		}
 	}
@@ -1645,12 +1645,12 @@ int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, cons
 
 bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests)
 {
-	if (UpgradeIdAllowed(*pai.Player, upgrade->ID) == 'R') {
+	if (UpgradeIdAllowed(*pai.Player, upgrade->GetIndex()) == 'R') {
 		return true;
 	}
 
 	if (include_requests) {
-		if (pai.Player->UpgradeTimers.Upgrades[upgrade->ID] > 0) { //already researching
+		if (pai.Player->UpgradeTimers.Upgrades[upgrade->GetIndex()] > 0) { //already researching
 			return true;
 		}
 		

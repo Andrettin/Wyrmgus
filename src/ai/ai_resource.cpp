@@ -467,15 +467,15 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool a
 //Wyrmgus start
 static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, bool allow_can_build_researcher = false)
 {
-	if (UpgradeIdAllowed(*AiPlayer->Player, upgrade->ID) != 'A') {
+	if (UpgradeIdAllowed(*AiPlayer->Player, upgrade->GetIndex()) != 'A') {
 		return false;
 	}
-	if (upgrade->ID >= (int) AiHelpers.Research.size()) {
+	if (upgrade->GetIndex() >= (int) AiHelpers.Research.size()) {
 		return false;
 	}
-	const size_t size = AiHelpers.Research[upgrade->ID].size();
+	const size_t size = AiHelpers.Research[upgrade->GetIndex()].size();
 	for (size_t i = 0; i < size; ++i) {
-		CUnitType &researcher = *AiHelpers.Research[upgrade->ID][i];
+		CUnitType &researcher = *AiHelpers.Research[upgrade->GetIndex()][i];
 
 		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependencies(upgrade, &player)) {
 			return true;
@@ -1065,12 +1065,12 @@ void AiAddResearchRequest(const CUpgrade *upgrade)
 	const int n = AiHelpers.Research.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
-	if (upgrade->ID >= n) { // Oops not known.
+	if (upgrade->GetIndex() >= n) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->GetIndex() _C_ upgrade->Ident.c_str());
 		return;
 	}
-	std::vector<CUnitType *> &table = tablep[upgrade->ID];
+	std::vector<CUnitType *> &table = tablep[upgrade->GetIndex()];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->GetIndex() _C_ upgrade->Ident.c_str());

@@ -431,7 +431,7 @@ public:
 	** The index is the unit type, giving a table of all
 	** upgrades that it can research.
 	*/
-	std::vector<std::vector<CUpgrade *> > ResearchedUpgrades;
+	std::vector<std::vector<const CUpgrade *> > ResearchedUpgrades;
 
 	/**
 	** The index is the unit that should perform an upgrade, giving a table of all
@@ -449,7 +449,7 @@ public:
 	** The index is the unit type that should acquire a learnable ability, giving a table of all
 	** abilities that it can learn.
 	*/
-	std::vector<std::vector<CUpgrade *> > LearnableAbilities;
+	std::vector<std::vector<const CUpgrade *> > LearnableAbilities;
 	
 	/**
 	** The sole index is 0, giving a table of all

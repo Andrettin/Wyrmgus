@@ -374,11 +374,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				trigger->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "upgrade") {
-			CUpgrade *upgrade = CUpgrade::New(ident.utf8().get_data());
-			if (!define_only) {
-				upgrade->ProcessConfigData(config_data);
-			}
 		} else {
 			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.utf8().get_data());
 		}

@@ -584,7 +584,7 @@ void CPlayer::Load(lua_State *l)
 				CUpgrade *timer_upgrade = CUpgrade::Get(LuaToString(l, j + 1, k + 1));
 				++k;
 				if (timer_upgrade) {
-					this->UpgradeTimers.Upgrades[timer_upgrade->ID] = LuaToNumber(l, j + 1, k + 1);
+					this->UpgradeTimers.Upgrades[timer_upgrade->GetIndex()] = LuaToNumber(l, j + 1, k + 1);
 				}
 				//Wyrmgus end
 			}
@@ -2220,7 +2220,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (!ability || !ability->Ability) {
+				if (!ability || !ability->IsAbility()) {
 					LuaError(l, "Ability doesn't exist.");
 				}
 
@@ -3099,7 +3099,7 @@ static int CclSetPlayerData(lua_State *l)
 				if (UpgradeIdentAllowed(*p, ident) == 'R') {
 					UpgradeLost(*p, CUpgrade::Get(ident));
 				}
-				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
+				AllowUpgradeId(*p, CUpgrade::Get(ident)->GetIndex(), acquire[0]);
 			}
 		//Wyrmgus start
 		} else if (!strncmp(ident, "unit-", 5)) {
