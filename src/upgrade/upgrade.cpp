@@ -330,7 +330,7 @@ void CUpgrade::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("set_ability", "ability"), +[](CUpgrade *upgrade, const bool ability){ upgrade->Ability = ability; });
 	ClassDB::bind_method(D_METHOD("is_ability"), &CUpgrade::IsAbility);
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "ability"), "set_ability", "is_ability");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "ability"), "set_ability", "is_ability");
 	
 	ClassDB::bind_method(D_METHOD("set_item_slot", "ident"), +[](CUpgrade *upgrade, const String &ident){ upgrade->ItemSlot = ::ItemSlot::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_item_slot"), +[](const CUpgrade *upgrade){ return const_cast<::ItemSlot *>(upgrade->GetItemSlot()); });
