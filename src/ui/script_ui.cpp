@@ -51,6 +51,7 @@
 #include "unit/unit_type.h"
 #include "util.h"
 #include "video/font.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -1159,10 +1160,13 @@ static int CclDefineIcon(lua_State *l)
 	}
 	
 	CIcon *icon = CIcon::GetOrAdd(ident);
-	icon->File = file.c_str();
-	icon->Size = size;
 	icon->Frame = frame;
-	icon->G = CPlayerColorGraphic::New(icon->File.utf8().get_data(), icon->Size.width, icon->Size.height);
+	icon->G = CPlayerColorGraphic::New(file, size.width, size.height);
+	
+	PaletteImage *image = PaletteImage::GetOrAdd(ident);
+	image->File = file.c_str();
+	image->FrameSize = size;
+	icon->Image = image;
 	
 	return 0;
 }
@@ -1186,7 +1190,7 @@ static int CclGetIconData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "File")) {
-		lua_pushstring(l, icon->GetFile().utf8().get_data());
+		lua_pushstring(l, icon->GetImage()->GetFile().utf8().get_data());
 		return 1;
 	} if (!strcmp(data, "Frame")) {
 		lua_pushnumber(l, icon->GetFrame());

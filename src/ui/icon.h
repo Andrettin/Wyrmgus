@@ -89,6 +89,7 @@ constexpr int IconCommandButton = 32;	/// is the icon a command button
 
 class ButtonStyle;
 class CPlayerColorGraphic;
+class PaletteImage;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -114,6 +115,7 @@ public:
 	static constexpr const char *ClassIdentifier = "icon";
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 	void Load();
 
@@ -130,22 +132,21 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
+	}
+	
 	int GetFrame() const
 	{
 		return this->Frame;
-	}
-	
-	const String &GetFile() const
-	{
-		return this->File;
 	}
 	
 public:
 	CPlayerColorGraphic *G = nullptr;		/// graphic data
 	CPlayerColorGraphic *GScale = nullptr;	/// icon when drawn grayscaled
 private:
-	String File;							/// the file containing the icon graphics
-	Vector2i Size = Vector2i(0, 0);			/// the size of the icon, in pixels
+	const PaletteImage *Image = nullptr;	/// the icon's image
 	int Frame = 0;							/// frame number in graphic
 public:
 	//Wyrmgus start

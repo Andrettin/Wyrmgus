@@ -42,6 +42,7 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -66,53 +67,29 @@ CIcon::~CIcon()
 */
 bool CIcon::ProcessConfigDataSection(const CConfigData *section)
 {
-	if (section->Tag == "image") {
-		std::string file;
-		Vector2i size(0, 0);
+	if (section->Tag == "image") { //allow defining the icon's palette image as a section of the icon, using the icon's ident for it
+		PaletteImage *image = PaletteImage::GetOrAdd(this->Ident);
+		image->ProcessConfigData(section);
+		this->Image = image;
 		
-		for (const CConfigProperty &property : section->Properties) {
-			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
-				continue;
-			}
-			
-			String key = property.Key;
-			String value = property.Value;
-			
-			if (key == "file") {
-				file = CModule::GetCurrentPath() + value.utf8().get_data();
-			} else if (key == "width") {
-				size.width = value.to_int();
-			} else if (key == "height") {
-				size.height = value.to_int();
-			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
-			}
-		}
-		
-		if (file.empty()) {
-			fprintf(stderr, "Image has no file.\n");
-			return true;
-		}
-		
-		if (size.width == 0) {
-			fprintf(stderr, "Image has no width.\n");
-			return true;
-		}
-		
-		if (size.height == 0) {
-			fprintf(stderr, "Image has no height.\n");
-			return true;
-		}
-		
-		this->G = CPlayerColorGraphic::New(file, size.width, size.height);
-		this->File = file.c_str();
-		this->Size = size;
+		this->G = CPlayerColorGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().width, image->GetFrameSize().height);
 	} else {
 		return false;
 	}
 	
 	return true;
+}
+
+/**
+**	@brief	Initialize the icon
+*/
+void CIcon::Initialize()
+{
+	if (this->Image == nullptr) {
+		print_error("Icon \"" + this->GetIdent() + "\" has no palette image.\n");
+	}
+	
+	this->Initialized = true;
 }
 
 void CIcon::Load()
@@ -345,9 +322,9 @@ void CIcon::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_frame"), &CIcon::GetFrame);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "frame"), "set_frame", "get_frame");
 	
-	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
-	
-	ClassDB::bind_method(D_METHOD("get_size"), +[](const CIcon *icon){ return Vector2(icon->Size); });
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CIcon *icon, const String &ident){ icon->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const CIcon *icon){ return const_cast<PaletteImage *>(icon->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
 }
 
 /**

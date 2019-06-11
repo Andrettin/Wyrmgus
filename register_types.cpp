@@ -94,6 +94,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "video/palette_image.h"
 #include "world/plane.h"
 #include "world/world.h"
 #include "wyrmgus.h"
@@ -161,6 +162,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<ItemClass>();
 	ClassDB::register_class<ItemSlot>();
 	ClassDB::register_class<MissileType>();
+	ClassDB::register_class<PaletteImage>();
 	ClassDB::register_class<UniqueItem>();
 	ClassDB::register_class<UnitClass>();
 	ClassDB::register_class<UpgradeClass>();
