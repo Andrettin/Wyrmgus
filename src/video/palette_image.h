@@ -38,6 +38,7 @@
 #include "data_type.h"
 
 #include <core/math/vector2.h>
+#include <scene/resources/texture.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -78,6 +79,7 @@ private:
 	const CPlayerColor *SourceSecondaryPlayerColor = nullptr;	/// the source secondary player color for the image
 	const CSkinColor *SourceSkinColor = nullptr;				/// the source skin color for the image
 	const CHairColor *SourceHairColor = nullptr;				/// the source hair color for the image
+	Ref<ImageTexture> Texture;									/// the image's texture
 
 	friend int CclDefineIcon(lua_State *l);
 	

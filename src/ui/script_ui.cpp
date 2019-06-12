@@ -1166,6 +1166,7 @@ static int CclDefineIcon(lua_State *l)
 	PaletteImage *image = PaletteImage::GetOrAdd(ident);
 	image->File = file.c_str();
 	image->FrameSize = size;
+	image->Initialize();
 	icon->Image = image;
 	
 	return 0;

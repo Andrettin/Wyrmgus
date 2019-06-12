@@ -39,6 +39,7 @@
 #include "module.h"
 #include "player_color.h"
 #include "skin_color.h"
+#include "wyrmgus.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -60,6 +61,18 @@ void PaletteImage::Initialize()
 	if (this->GetFrameSize().height == 0) {
 		print_error("Palette image \"" + this->GetIdent() + "\" has no frame height.\n");
 	}
+	
+	this->Texture.instance();
+	
+	String filepath = this->GetFile();
+	if (this->GetFile().find(Wyrmgus::GetInstance()->GetUserDirectory()) == -1) {
+		if (this->GetFile().find("dlcs/") != -1 || this->GetFile().find("modules/") != -1) {
+			filepath = "res://" + this->GetFile();
+		} else {
+			filepath = "res://graphics/" + this->GetFile();
+		}
+	}
+	this->Texture->load(filepath);
 	
 	this->Initialized = true;
 }
@@ -105,4 +118,6 @@ void PaletteImage::_bind_methods()
 	});
 	ClassDB::bind_method(D_METHOD("get_source_hair_color"), +[](const PaletteImage *image){ return const_cast<CHairColor *>(image->SourceHairColor); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "source_hair_color"), "set_source_hair_color", "get_source_hair_color");
+	
+	ClassDB::bind_method(D_METHOD("get_texture"), +[](const PaletteImage *image){ return image->Texture; });
 }
