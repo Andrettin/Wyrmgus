@@ -8542,6 +8542,7 @@ void CUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_type"), +[](const CUnit *unit){ return const_cast<CUnitType *>(unit->GetType()); });
 	ClassDB::bind_method(D_METHOD("get_tile_pos"), +[](const CUnit *unit){ return Vector2(unit->GetTilePos()); });
 	ClassDB::bind_method(D_METHOD("get_tile_pixel_size"), +[](const CUnit *unit){ return Vector2(unit->GetTilePixelSize()); });
+	ClassDB::bind_method(D_METHOD("get_half_tile_pixel_size"), +[](const CUnit *unit){ return Vector2(unit->GetHalfTilePixelSize()); });
 	
 	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
 	ADD_SIGNAL(MethodInfo("removed"));
