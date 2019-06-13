@@ -62,8 +62,6 @@ void PaletteImage::Initialize()
 		print_error("Palette image \"" + this->GetIdent() + "\" has no frame height.\n");
 	}
 	
-	this->Texture.instance();
-	
 	String filepath = this->GetFile();
 	if (this->GetFile().find(Wyrmgus::GetInstance()->GetUserDirectory()) == -1) {
 		if (this->GetFile().find("dlcs/") != -1 || this->GetFile().find("modules/") != -1) {
@@ -71,8 +69,17 @@ void PaletteImage::Initialize()
 		} else {
 			filepath = "res://graphics/" + this->GetFile();
 		}
+		this->Texture = ResourceLoader::load(filepath);
+	} else {
+		//for images that don't have import files, we need to do it a bit differently
+		Ref<Image> image;
+		image.instance();
+		image->load(filepath);
+		Ref<ImageTexture> image_texture;
+		image_texture.instance();
+		image_texture->create_from_image(image);
+		this->Texture = image_texture;
 	}
-	this->Texture->load(filepath);
 	
 	this->Initialized = true;
 }
