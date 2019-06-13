@@ -718,7 +718,6 @@ static int CclDefineUnitType(lua_State *l)
 		type->RemoveButtons(ButtonAttack);
 		type->RemoveButtons(ButtonPatrol);
 		type->RemoveButtons(ButtonStandGround);
-		type->RemoveButtons(ButtonReturn);
 		//Wyrmgus end
 	} else {
 		type = CUnitType::Add(str);

@@ -1155,7 +1155,6 @@ void CUnitType::Initialize()
 	this->RemoveButtons(ButtonAttack);
 	this->RemoveButtons(ButtonPatrol);
 	this->RemoveButtons(ButtonStandGround);
-	this->RemoveButtons(ButtonReturn);
 	
 	if (this->Class != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		const UnitClass *unit_class = this->Class;

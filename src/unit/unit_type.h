@@ -131,7 +131,7 @@ public:
 	int ResourceCapacity = 0;		/// Max amount of resources to carry.
 	unsigned WaitAtDepot = 0;		/// Cycles the unit waits while returning.
 	unsigned ResourceId = 0;		/// Id of the resource harvested. Redundant.
-	unsigned char LoseResources = 0;	/// The unit will lose it's resource when distracted.
+	bool LoseResources = false;		/// the unit will lose its resource when distracted.
 	unsigned char RefineryHarvester = 0;	/// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded = nullptr;	/// The graphic corresponding to FileWhenLoaded.

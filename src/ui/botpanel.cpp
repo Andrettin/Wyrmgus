@@ -1422,10 +1422,11 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			//Wyrmgus end
 			break;
 		case ButtonReturn:
-			if (!(!unit.CurrentResource
-				  || !(unit.ResourcesHeld > 0 && !unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources)
-				  || (unit.ResourcesHeld != unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity
-					  && unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources))) {
+			if (
+				unit.CurrentResource
+				&& unit.ResourcesHeld > 0
+				&& (!unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources || unit.ResourcesHeld == unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity)
+			) {
 				res = true;
 			}
 			break;

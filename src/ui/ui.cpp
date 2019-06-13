@@ -146,8 +146,6 @@ CUnitInfoPanel::~CUnitInfoPanel()
 
 
 CUserInterface::CUserInterface() :
-	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
-	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	NormalFontColor("yellow"), ReverseFontColor("white"), 
 	SingleSelectedButton(nullptr),
 	MaxSelectedFont(nullptr), MaxSelectedTextX(0), MaxSelectedTextY(0),

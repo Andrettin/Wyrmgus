@@ -362,16 +362,16 @@ public:
 
 	void Load();
 
-	bool MouseScroll;                   /// Enable mouse scrolling
-	bool KeyScroll;                     /// Enable keyboard scrolling
+	bool MouseScroll = false;			/// Enable mouse scrolling
+	bool KeyScroll = false;				/// Enable keyboard scrolling
 	/// Key Scroll Speed
-	int KeyScrollSpeed;
+	int KeyScrollSpeed = 1;
 	/// Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeed;
+	int MouseScrollSpeed = 1;
 	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeedDefault;
+	int MouseScrollSpeedDefault = 0;
 	/// Middle-Mouse Scroll Speed with Control pressed
-	int MouseScrollSpeedControl;
+	int MouseScrollSpeedControl = 0;
 
 	PixelPos MouseWarpPos;				/// Cursor warp screen position
 
