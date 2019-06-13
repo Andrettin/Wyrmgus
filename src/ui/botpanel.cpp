@@ -2138,7 +2138,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	//Wyrmgus end
 	}
 	*/
-	CUnit *best_training_place = nullptr;
+	CUnit *best_training_place = Selected[0];
 	int lowest_queue = Selected[0]->Orders.size();
 	
 	for (size_t i = 0; i != Selected.size(); ++i) {
