@@ -11,6 +11,7 @@
 #include "faction.h"
 #include "game/game.h"
 #include "hair_color.h"
+#include "map/map.h"
 #include "language/word.h"
 #include "literary_text.h"
 #include "player.h"
@@ -134,6 +135,8 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_game_paused"), +[](const Wyrmgus *wyrmgus){ return IsGamePaused(); });
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "game_paused"), "set_game_paused", "is_game_paused");
 	
+	ClassDB::bind_method(D_METHOD("get_pixel_tile_size"), +[](const Wyrmgus *wyrmgus){ return Vector2(CMap::Map.PixelTileSize); });
+	
 	ADD_SIGNAL(MethodInfo("initialized"));
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
@@ -143,8 +146,6 @@ void Wyrmgus::_bind_methods()
 	
 	//this signal is triggered when any unit is placed on the map, so that its graphics can be depicted
 	ADD_SIGNAL(MethodInfo("unit_placed", PropertyInfo(Variant::OBJECT, "unit")));
-	//this signal is triggered when any unit is removed from the map, so that it is no longer displayed
-	ADD_SIGNAL(MethodInfo("unit_removed", PropertyInfo(Variant::OBJECT, "unit")));
 	//this signal occurs when a unit owned by the player has been hit
 	ADD_SIGNAL(MethodInfo("unit_hit"));
 	
