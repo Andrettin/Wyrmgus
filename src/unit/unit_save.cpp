@@ -130,25 +130,25 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\nUnit(%d, {", UnitNumber(unit));
 
 	// 'type and 'player must be first, needed to create the unit slot
-	file.printf("\"type\", \"%s\", ", unit.Type->Ident.c_str());
+	file.printf("\"type\", \"%s\", ", unit.GetType()->Ident.c_str());
 	if (unit.Seen.Type) {
 		file.printf("\"seen-type\", \"%s\", ", unit.Seen.Type->Ident.c_str());
 	}
 
-	file.printf("\"player\", %d,\n  ", unit.Player->GetIndex());
+	file.printf("\"player\", %d,\n  ", unit.GetPlayer()->GetIndex());
 
 	if (unit.MapLayer) {
 		file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
 	}
-	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
-	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
+	file.printf("\"tile\", {%d, %d}, ", unit.GetTilePos().x, unit.GetTilePos().y);
+	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.TilePos.x, unit.Seen.TilePos.y);
 
 	file.printf("\"refs\", %d, ", unit.Refs);
 #if 0
 	// latimerius: why is this so complex?
 	// JOHNS: An unit can be owned by a new player and have still the old stats
 	for (i = 0; i < PlayerMax; ++i) {
-		if (&unit.Type->Stats[i] == unit.Stats) {
+		if (&unit.GetType()->Stats[i] == unit.Stats) {
 			file.printf("\"stats\", %d,\n  ", i);
 			break;
 		}
@@ -158,7 +158,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"stats\", \"S%08X\",\n  ", (int)unit.Stats);
 	}
 #else
-	file.printf("\"stats\", %d,\n  ", unit.Player->GetIndex());
+	file.printf("\"stats\", %d,\n  ", unit.GetPlayer()->GetIndex());
 #endif
 	file.printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
 	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
@@ -209,7 +209,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (!unit.Identified) {
 		file.printf("\"identified\", false, ");
 	}
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->IsItemEquipped(&unit)) {
+	if (unit.GetType()->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->IsItemEquipped(&unit)) {
 		file.printf("\"equipped\", true, ");
 	}
 	if (unit.Container != nullptr && std::find(unit.Container->SoldUnits.begin(), unit.Container->SoldUnits.end(), &unit) != unit.Container->SoldUnits.end()) {
@@ -248,7 +248,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	//Wyrmgus start
 	// have variables before the host-info, since the latter maps ethereal vision sight
 	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
+		if (unit.Variable[i] != unit.GetType()->DefaultStat.Variables[i]) {
 			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
 						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
 						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
@@ -263,9 +263,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Container && unit.Removed) {
 		file.printf(" \"host-info\", {%d, %d, %d, %d, %d}, ",
 					unit.Container->MapLayer->ID,
-					unit.Container->tilePos.x, unit.Container->tilePos.y,
-					unit.Container->Type->TileSize.x,
-					unit.Container->Type->TileSize.y);
+					unit.Container->GetTilePos().x, unit.Container->GetTilePos().y,
+					unit.Container->GetType()->TileSize.x,
+					unit.Container->GetType()->TileSize.y);
 	}
 	file.printf(" \"seen-by-player\", \"");
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -293,7 +293,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	//Wyrmgus start
 //	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-//		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
+//		if (unit.Variable[i] != unit.GetType()->DefaultStat.Variables[i]) {
 //			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
 //						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
 //						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
@@ -407,7 +407,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
-	for (std::map<const CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->GetIndex()].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->GetIndex()].UnitStock.end(); ++iterator) {
+	for (std::map<const CUnitType *, int>::const_iterator iterator = unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].UnitStock.begin(); iterator != unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].UnitStock.end(); ++iterator) {
 		const CUnitType *unit_type = iterator->first;
 		
 		if (unit.GetUnitStock(unit_type) != 0) {

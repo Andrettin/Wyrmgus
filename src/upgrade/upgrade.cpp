@@ -1366,8 +1366,8 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 
 		//  Convert already existing units to this type.
 		//Wyrmgus start
-//		if (unit.Type == &src) {
-		if (unit.Type == &src && !unit.Character) { //don't do this for persistent characters
+//		if (unit.GetType() == &src) {
+		if (unit.GetType() == &src && !unit.Character) { //don't do this for persistent characters
 		//Wyrmgus end
 			CommandTransformIntoType(unit, dst);
 			//  Convert trained units to this type.
@@ -1502,8 +1502,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
-						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
+						unit.GetPlayer()->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
 			}
@@ -1515,8 +1515,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
-						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
+					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
+						unit.GetPlayer()->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
 			}
@@ -1606,7 +1606,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 
-					if (unit.Player->GetIndex() != player.GetIndex()) {
+					if (unit.GetPlayer()->GetIndex() != player.GetIndex()) {
 						continue;
 					}
 					
@@ -1674,12 +1674,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (size_t j = 0; j != unitupgrade.size(); ++j) {
 				CUnit &unit = *unitupgrade[j];
 
-				if (unit.Player->GetIndex() != player.GetIndex()) {
+				if (unit.GetPlayer()->GetIndex() != player.GetIndex()) {
 					continue;
 				}
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
-				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
+				for (const CUpgrade *ability_upgrade : unit.GetType()->StartingAbilities) {
 					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckDependencies(ability_upgrade, &unit)) {
 						IndividualUpgradeAcquire(unit, ability_upgrade);
 					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckDependencies(ability_upgrade, &unit)) {
@@ -1791,8 +1791,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
-						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
+						unit.GetPlayer()->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
 			}
@@ -1804,8 +1804,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->GetIndex() == pn && unit.IsAlive()) {
-						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
+					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
+						unit.GetPlayer()->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
 			}
@@ -1821,9 +1821,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
 						//Wyrmgus start
-//						m = std::max(m, player.GetUnit(k).Type->Stats[player.GetIndex()].ImproveIncomes[j]);
-						if (player.GetUnit(k).Type != nullptr) {
-							m = std::max(m, player.GetUnit(k).Type->Stats[player.GetIndex()].ImproveIncomes[j]);
+//						m = std::max(m, player.GetUnit(k).GetType()->Stats[player.GetIndex()].ImproveIncomes[j]);
+						if (player.GetUnit(k).GetType() != nullptr) {
+							m = std::max(m, player.GetUnit(k).GetType()->Stats[player.GetIndex()].ImproveIncomes[j]);
 						}
 						//Wyrmgus end
 					}
@@ -1876,8 +1876,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				int m = DEFAULT_TRADE_COST;
 
 				for (int k = 0; k < player.GetUnitCount(); ++k) {
-					if (player.GetUnit(k).Type != nullptr) {
-						m = std::min(m, player.GetUnit(k).Type->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Value);
+					if (player.GetUnit(k).GetType() != nullptr) {
+						m = std::min(m, player.GetUnit(k).GetType()->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Value);
 					}
 				}
 				player.TradeCost = m;
@@ -1901,7 +1901,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 
-					if (unit.Player->GetIndex() != player.GetIndex()) {
+					if (unit.GetPlayer()->GetIndex() != player.GetIndex()) {
 						continue;
 					}
 					
@@ -1969,12 +1969,12 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (size_t j = 0; j != unitupgrade.size(); ++j) {
 				CUnit &unit = *unitupgrade[j];
 
-				if (unit.Player->GetIndex() != player.GetIndex()) {
+				if (unit.GetPlayer()->GetIndex() != player.GetIndex()) {
 					continue;
 				}
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
-				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
+				for (const CUpgrade *ability_upgrade : unit.GetType()->StartingAbilities) {
 					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckDependencies(ability_upgrade, &unit)) {
 						IndividualUpgradeAcquire(unit, ability_upgrade);
 					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckDependencies(ability_upgrade, &unit)) {
@@ -2040,7 +2040,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
-			unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+			unit.GetPlayer()->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
 		}
 	}
 
@@ -2139,7 +2139,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
-			unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+			unit.GetPlayer()->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
 		}
 	}
 	
@@ -2353,13 +2353,13 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, const bool save)
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != nullptr && save) {
-		if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+		if (unit.GetPlayer()->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 			unit.Character->Abilities.push_back(upgrade);
 			SaveHero(unit.Character);
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
-	unit.Player->UpdateLevelUpUnits();
+	unit.GetPlayer()->UpdateLevelUpUnits();
 }
 
 /**
@@ -2376,14 +2376,14 @@ void AbilityLost(CUnit &unit, const CUpgrade *upgrade, const bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
 	if (!IsNetworkGame() && unit.Character != nullptr) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
-			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+			if (unit.GetPlayer()->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
 				SaveHero(unit.Character);
 			}
 		}
 	}
 	IndividualUpgradeLost(unit, upgrade);
-	unit.Player->UpdateLevelUpUnits();
+	unit.GetPlayer()->UpdateLevelUpUnits();
 	
 	if (lose_all && unit.GetIndividualUpgrade(upgrade) > 0) {
 		AbilityLost(unit, upgrade, lose_all);
@@ -2409,7 +2409,7 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (unit.Player == CPlayer::GetThisPlayer()) {
+	if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2455,7 +2455,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 			for (CUnitType *unit_type : CUnitType::GetAll()) {
 				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
 					applies_to_any_unit_types = true;
-					if (unit_type->GetIndex() == unit.Type->GetIndex()) {
+					if (unit_type->GetIndex() == unit.GetType()->GetIndex()) {
 						applies_to_this = true;
 						break;
 					}
@@ -2471,7 +2471,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (unit.Player == CPlayer::GetThisPlayer()) {
+	if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2509,7 +2509,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 			for (CUnitType *unit_type : CUnitType::GetAll()) {
 				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
 					applies_to_any_unit_types = true;
-					if (unit_type->GetIndex() == unit.Type->GetIndex()) {
+					if (unit_type->GetIndex() == unit.GetType()->GetIndex()) {
 						applies_to_this = true;
 						break;
 					}
@@ -2525,7 +2525,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (unit.Player == CPlayer::GetThisPlayer()) {
+	if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 	

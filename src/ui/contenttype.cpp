@@ -95,7 +95,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
 	if (this->ShowName) {
 		//Wyrmgus start
-//		label.DrawCentered(x, y, unit.Type->Name);
+//		label.DrawCentered(x, y, unit.GetType()->Name);
 		label.DrawCentered(x, y, unit.GetTypeName());
 		//Wyrmgus end
 		return;
@@ -119,7 +119,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 					Assert(0);
 			}
 		} else {
-			int value = unit.Type->MapDefaultStat.Variables[this->Index].Value;
+			int value = unit.GetType()->MapDefaultStat.Variables[this->Index].Value;
 			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {
@@ -244,7 +244,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		case UnitRefWorker :
 			//Wyrmgus start
 //			if (unit.CurrentAction() == UnitActionBuilt) {
-			if (unit.CurrentAction() == UnitActionBuilt && !unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value) {
+			if (unit.CurrentAction() == UnitActionBuilt && !unit.GetType()->BoolFlag[BUILDEROUTSIDE_INDEX].value) {
 			//Wyrmgus end
 				COrder_Built &order = *static_cast<COrder_Built *>(unit.CurrentOrder());
 

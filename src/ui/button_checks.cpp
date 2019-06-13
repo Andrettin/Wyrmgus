@@ -93,11 +93,11 @@ bool ButtonCheckFalse(const CUnit &, const ButtonAction &)
 */
 bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 {
-	CPlayer *player = unit.Player;
+	CPlayer *player = unit.GetPlayer();
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		if (UpgradeIdentAllowed(*unit.Player, s) != 'R') {
+		if (UpgradeIdentAllowed(*unit.GetPlayer(), s) != 'R') {
 			delete[] buf;
 			return false;
 		}
@@ -129,11 +129,11 @@ bool ButtonCheckUpgradeNot(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckUpgradeOr(const CUnit &unit, const ButtonAction &button)
 {
-	CPlayer *player = unit.Player;
+	CPlayer *player = unit.GetPlayer();
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		if (UpgradeIdentAllowed(*unit.Player, s) == 'R') {
+		if (UpgradeIdentAllowed(*unit.GetPlayer(), s) == 'R') {
 			delete[] buf;
 			return true;
 		}
@@ -274,7 +274,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button)
 {
-	CPlayer *player = unit.Player;
+	CPlayer *player = unit.GetPlayer();
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
@@ -297,7 +297,7 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button)
 {
-	CPlayer *player = unit.Player;
+	CPlayer *player = unit.GetPlayer();
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
@@ -370,8 +370,8 @@ bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction &)
 //		   && action != UnitActionUpgradeTo
 //		   && action != UnitActionResearch;
 	//don't stop showing the button for a quick moment if the time cost is 0
-	return (action != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0)
-		   && (action != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0)
+	return (action != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] == 0)
+		   && (action != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] == 0)
 		   && (action != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0);
 	//Wyrmgus end
 }
@@ -404,7 +404,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependencies(CUnitType::Get(button.Value), unit.Player, false, true);
+	return CheckDependencies(CUnitType::Get(button.Value), unit.GetPlayer(), false, true);
 }
 
 /**
@@ -418,7 +418,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 bool ButtonCheckAttack(const CUnit &unit, const ButtonAction &)
 {
 	//Wyrmgus start
-//	return unit.Type->CanAttack;
+//	return unit.GetType()->CanAttack;
 	return unit.CanAttack(true);
 	//Wyrmgus end
 }
@@ -439,11 +439,11 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	}
 
 	// check if allowed
-	if (!CheckDependencies(CUpgrade::Get(button.Value), unit.Player, false, true)) {
+	if (!CheckDependencies(CUpgrade::Get(button.Value), unit.GetPlayer(), false, true)) {
 		return false;
 	}
 	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)
-		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A' && UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'R') {
+		&& UpgradeIdentAllowed(*unit.GetPlayer(), button.ValueStr) != 'A' && UpgradeIdentAllowed(*unit.GetPlayer(), button.ValueStr) != 'R') {
 		return false;
 	}
 	return true;
@@ -462,8 +462,8 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 {
 	if (ButtonCheckResearch(unit, button)
 		//Wyrmgus start
-//		&& !unit.Player->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()]) {
-		&& (!unit.Player->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()] || unit.Player->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()] == CUpgrade::Get(button.ValueStr)->Costs[TimeCost])
+//		&& !unit.GetPlayer()->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()]) {
+		&& (!unit.GetPlayer()->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()] || unit.GetPlayer()->UpgradeTimers.Upgrades[CUpgrade::Get(button.ValueStr)->GetIndex()] == CUpgrade::Get(button.ValueStr)->Costs[TimeCost])
 	) {
 		//Wyrmgus end
 		return true;
@@ -505,7 +505,7 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button)
 		}
 
 		char unit_ident[128];
-		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+		sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
 		if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
 			continue;
 		}

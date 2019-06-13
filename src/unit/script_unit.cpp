@@ -397,7 +397,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "equipped")) {
 			bool is_equipped = LuaToBoolean(l, 2, j + 1);
 			if (is_equipped && unit->Container != nullptr) {
-				unit->Container->EquippedItems[unit->Type->ItemClass->GetSlot()].push_back(unit);
+				unit->Container->EquippedItems[unit->GetType()->ItemClass->GetSlot()].push_back(unit);
 			}
 		} else if (!strcmp(value, "sold-unit")) {
 			bool is_sold = LuaToBoolean(l, 2, j + 1);
@@ -441,7 +441,7 @@ static int CclUnit(lua_State *l)
 			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight, z);
 			//Wyrmgus end
 			// Detectcloak works in container
-			if (unit->Type->BoolFlag[DETECTCLOAK_INDEX].value) {
+			if (unit->GetType()->BoolFlag[DETECTCLOAK_INDEX].value) {
 				//Wyrmgus start
 //				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
 				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak, z);
@@ -458,12 +458,12 @@ static int CclUnit(lua_State *l)
 			unit->MapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "tile")) {
 			lua_rawgeti(l, 2, j + 1);
-			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
+			CclGetPos(l, &unit->TilePos.x , &unit->TilePos.y, -1);
 			lua_pop(l, 1);
-			unit->Offset = CMap::Map.getIndex(unit->tilePos, unit->MapLayer->ID);
+			unit->Offset = CMap::Map.getIndex(unit->GetTilePos(), unit->MapLayer->ID);
 		} else if (!strcmp(value, "seen-tile")) {
 			lua_rawgeti(l, 2, j + 1);
-			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);
+			CclGetPos(l, &unit->Seen.TilePos.x , &unit->Seen.TilePos.y, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[LuaToNumber(l, 2, j + 1)];
@@ -655,7 +655,7 @@ static int CclUnit(lua_State *l)
 			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
-				unit->Player->DecreaseCountsForUnit(unit);
+				unit->GetPlayer()->DecreaseCountsForUnit(unit);
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -749,14 +749,14 @@ static int CclUnit(lua_State *l)
 	// for loading of units from a MAP, and not a savegame, we won't
 	// have orders for those units.  They should appear here as if
 	// they were just created.
-	if (!unit->Player) {
+	if (!unit->GetPlayer()) {
 		Assert(player);
 		unit->AssignToPlayer(*player);
 		UpdateForNewUnit(*unit, 0);
 	}
 
 	//  Revealers are units that can see while removed
-	if (unit->Removed && unit->Type->BoolFlag[REVEALER_INDEX].value) {
+	if (unit->Removed && unit->GetType()->BoolFlag[REVEALER_INDEX].value) {
 		MapMarkUnitSight(*unit);
 	}
 
@@ -791,7 +791,7 @@ static int CclMoveUnit(lua_State *l)
 	} else {
 		const int heading = SyncRand() % 256;
 
-		unit->tilePos = ipos;
+		unit->TilePos = ipos;
 		DropOutOnSide(*unit, heading, nullptr);
 	}
 	lua_pushvalue(l, 1);
@@ -883,16 +883,16 @@ static int CclCreateUnit(lua_State *l)
 		if (UnitCanBeAt(*unit, ipos, z)
 		//Wyrmgus end
 			//Wyrmgus start
-//			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0))) {
+//			|| (unit->GetType()->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->GetType(), ipos, 0))) {
 //			unit->Place(ipos);
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, z))) {
+			|| (unit->GetType()->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->GetType(), ipos, 0, true, z))) {
 			unit->Place(ipos, z);
 			//Wyrmgus end
 		} else {
 			const int heading = SyncRand() % 256;
 
 			Vec2i res_pos;
-			FindNearestDrop(*unit->Type, ipos, res_pos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
+			FindNearestDrop(*unit->GetType(), ipos, res_pos, heading, z, unit->GetType()->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
 			if (!CMap::Map.Info.IsPointOnMap(res_pos, z)) {
 				unit->Place(Vec2i(0, 0), z);
 				return 0;
@@ -938,8 +938,8 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	lua_pop(l, 1);
 
 	Vec2i ipos;
-	ipos.x = transporter->tilePos.x;
-	ipos.y = transporter->tilePos.y;
+	ipos.x = transporter->GetTilePos().x;
+	ipos.y = transporter->GetTilePos().y;
 
 	if (playerno == -1) {
 		fprintf(stderr, "CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
@@ -957,19 +957,19 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer->ID)
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, transporter->MapLayer->ID))) {
+			|| (unit->GetType()->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->GetType(), ipos, 0, true, transporter->MapLayer->ID))) {
 			unit->Place(ipos, transporter->MapLayer->ID);
 		} else {
 			const int heading = SyncRand() % 256;
 
-			unit->tilePos = ipos;
+			unit->TilePos = ipos;
 			unit->MapLayer = transporter->MapLayer;
 			DropOutOnSide(*unit, heading, nullptr);
 		}
 
 		// Place the unit inside the transporter.
 		unit->Remove(transporter);
-		transporter->BoardCount += unit->Type->GetBoardSize();
+		transporter->BoardCount += unit->GetType()->GetBoardSize();
 		unit->Boarded = 1;
 		transporter->UpdateContainerAttackRange();
 
@@ -1011,8 +1011,8 @@ static int CclCreateUnitOnTop(lua_State *l)
 	lua_pop(l, 1);
 
 	Vec2i ipos;
-	ipos.x = on_top->tilePos.x;
-	ipos.y = on_top->tilePos.y;
+	ipos.x = on_top->GetTilePos().x;
+	ipos.y = on_top->GetTilePos().y;
 	int z = on_top->MapLayer->ID;
 
 	if (playerno == -1) {
@@ -1094,12 +1094,12 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer->ID)
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, new_pos, 0, true, worker->MapLayer->ID))) {
+			|| (unit->GetType()->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->GetType(), new_pos, 0, true, worker->MapLayer->ID))) {
 			unit->Place(new_pos, worker->MapLayer->ID);
 		} else {
 			const int heading = SyncRand() % 256;
 
-			unit->tilePos = new_pos;
+			unit->TilePos = new_pos;
 			unit->MapLayer = worker->MapLayer;
 			DropOutOnSide(*unit, heading, nullptr);
 		}
@@ -1197,7 +1197,7 @@ static int CclSetTeleportDestination(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	if (unit->Type->BoolFlag[TELEPORTER_INDEX].value == false) {
+	if (unit->GetType()->BoolFlag[TELEPORTER_INDEX].value == false) {
 		LuaError(l, "Unit not a teleporter");
 	}
 	lua_pushvalue(l, 2);
@@ -1269,10 +1269,10 @@ static int CclOrderUnit(lua_State *l)
 		CUnit &unit = *table[i];
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
-			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
-			|| unittype == unit.Type) {
-			if (plynr == -1 || plynr == unit.Player->GetIndex()) {
+			|| (unittype == ALL_FOODUNITS && !unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == ALL_BUILDINGS && unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+			|| unittype == unit.GetType()) {
+			if (plynr == -1 || plynr == unit.GetPlayer()->GetIndex()) {
 				if (!strcmp(order, "move")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
 				} else if (!strcmp(order, "attack")) {
@@ -1310,9 +1310,9 @@ public:
 	explicit HasSameUnitTypeAs(const CUnitType *_type) : type(_type) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return (type == ANY_UNIT || type == unit->Type
-				|| (type == ALL_FOODUNITS && !unit->Type->BoolFlag[BUILDING_INDEX].value)
-				|| (type == ALL_BUILDINGS && unit->Type->BoolFlag[BUILDING_INDEX].value));
+		return (type == ANY_UNIT || type == unit->GetType()
+				|| (type == ALL_FOODUNITS && !unit->GetType()->BoolFlag[BUILDING_INDEX].value)
+				|| (type == ALL_BUILDINGS && unit->GetType()->BoolFlag[BUILDING_INDEX].value));
 	}
 private:
 	const CUnitType *type;
@@ -1416,10 +1416,10 @@ static int CclKillUnitAt(lua_State *l)
 		CUnit &unit = **it;
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
-			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
-			|| unittype == unit.Type) {
-			if ((plynr == -1 || plynr == unit.Player->GetIndex()) && unit.IsAlive()) {
+			|| (unittype == ALL_FOODUNITS && !unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == ALL_BUILDINGS && unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+			|| unittype == unit.GetType()) {
+			if ((plynr == -1 || plynr == unit.GetPlayer()->GetIndex()) && unit.IsAlive()) {
 				LetUnitDie(unit);
 				++s;
 			}
@@ -1583,7 +1583,7 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 		SelectAroundUnit(unit, range, table);
 		//Wyrmgus end
 	} else {
-		SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
+		SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.GetPlayer()));
 	}
 	size_t n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
@@ -1615,11 +1615,11 @@ static int CclGetPlayersAroundUnit(lua_State *l)
 	const int range = LuaToNumber(l, 2);
 	lua_newtable(l);
 	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, range, table, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasNotSamePlayerAs(*unit.Player)));
+	SelectAroundUnit(unit, range, table, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasNotSamePlayerAs(*unit.GetPlayer())));
 	std::vector<int> players_around;
 	for (size_t i = 0; i < table.size(); ++i) {
-		if (table[i]->IsAliveOnMap() && std::find(players_around.begin(), players_around.end(), table[i]->Player->GetIndex()) == players_around.end()) {
-			players_around.push_back(table[i]->Player->GetIndex());
+		if (table[i]->IsAliveOnMap() && std::find(players_around.begin(), players_around.end(), table[i]->GetPlayer()->GetIndex()) == players_around.end()) {
+			players_around.push_back(table[i]->GetPlayer()->GetIndex());
 		}
 	}
 	size_t n = 0;
@@ -1695,7 +1695,7 @@ static int CclGetUnitBoolFlag(lua_State *l)
 	if (index == -1) {
 		LuaError(l, "Bad bool-flag name '%s'\n" _C_ value);
 	}
-	lua_pushboolean(l, unit->Type->BoolFlag[index].value);
+	lua_pushboolean(l, unit->GetType()->BoolFlag[index].value);
 	return 1;
 }
 
@@ -1723,19 +1723,19 @@ static int CclGetUnitVariable(lua_State *l)
 	if (!strcmp(value, "RegenerationRate")) {
 		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
 	} else if (!strcmp(value, "Ident")) {
-		lua_pushstring(l, unit->Type->Ident.c_str());
+		lua_pushstring(l, unit->GetType()->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
 	} else if (!strcmp(value, "GiveResourceType")) {
 		//Wyrmgus start
-//		lua_pushnumber(l, unit->Type->GivesResource);
+//		lua_pushnumber(l, unit->GetType()->GivesResource);
 		lua_pushnumber(l, unit->GivesResource);
 		//Wyrmgus end
 	} else if (!strcmp(value, "CurrentResource")) {
 		lua_pushnumber(l, unit->CurrentResource);
 	} else if (!strcmp(value, "Name")) {
 	//Wyrmgus start
-//		lua_pushstring(l, unit->Type->Name.c_str());
+//		lua_pushstring(l, unit->GetType()->Name.c_str());
 		lua_pushstring(l, unit->GetName().c_str());
 	} else if (!strcmp(value, "Character")) {
 		if (unit->Character != nullptr) {
@@ -1757,7 +1757,7 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(value, "GiveResourceTypeName")) {
 		//Wyrmgus start
-//		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
+//		lua_pushstring(l, DefaultResourceNames[unit->GetType()->GivesResource].c_str());
 		lua_pushstring(l, DefaultResourceNames[unit->GivesResource].c_str());
 		//Wyrmgus end
 	} else if (!strcmp(value, "CurrentResourceName")) {
@@ -1809,7 +1809,7 @@ static int CclGetUnitVariable(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(value, "PlayerType")) {
-		lua_pushinteger(l, unit->Player->Type);
+		lua_pushinteger(l, unit->GetPlayer()->Type);
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
@@ -1847,7 +1847,7 @@ static int CclGetUnitVariable(lua_State *l)
 		std::string resource_ident = LuaToString(l, 3);
 		int resource = GetResourceIdByName(resource_ident.c_str());
 		if (resource != -1) {
-			lua_pushnumber(l, unit->Player->GetEffectiveResourceSellPrice(resource));
+			lua_pushnumber(l, unit->GetPlayer()->GetEffectiveResourceSellPrice(resource));
 		} else {
 			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 		}
@@ -1857,7 +1857,7 @@ static int CclGetUnitVariable(lua_State *l)
 		std::string resource_ident = LuaToString(l, 3);
 		int resource = GetResourceIdByName(resource_ident.c_str());
 		if (resource != -1) {
-			lua_pushnumber(l, unit->Player->GetEffectiveResourceBuyPrice(resource));
+			lua_pushnumber(l, unit->GetPlayer()->GetEffectiveResourceBuyPrice(resource));
 		} else {
 			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 		}
@@ -1953,11 +1953,11 @@ static int CclSetUnitVariable(lua_State *l)
 		bool ai_active = LuaToBoolean(l, 3);
 		if (ai_active != unit->Active) {
 			if (ai_active) {
-				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, 1);
+				unit->GetPlayer()->ChangeUnitTypeAiActiveCount(unit->GetType(), 1);
 			} else {
-				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, -1);
-				if (unit->Player->GetUnitTypeAiActiveCount(unit->Type) < 0) { // if unit AI active count is negative, something wrong happened
-					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->GetIndex(), unit->Type->Ident.c_str(), unit->Player->GetUnitTypeAiActiveCount(unit->Type));
+				unit->GetPlayer()->ChangeUnitTypeAiActiveCount(unit->GetType(), -1);
+				if (unit->GetPlayer()->GetUnitTypeAiActiveCount(unit->GetType()) < 0) { // if unit AI active count is negative, something wrong happened
+					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->GetPlayer()->GetIndex(), unit->GetType()->Ident.c_str(), unit->GetPlayer()->GetUnitTypeAiActiveCount(unit->GetType()));
 				}
 			}
 		}
@@ -1969,8 +1969,8 @@ static int CclSetUnitVariable(lua_State *l)
 		unit->SetCharacter(LuaToString(l, 3), true);
 	} else if (!strcmp(name, "Variation")) {
 		size_t variation_index = LuaToNumber(l, 3);
-		if (variation_index >= 0 && variation_index < unit->Type->Variations.size()) {
-			unit->SetVariation(unit->Type->Variations[variation_index]);
+		if (variation_index >= 0 && variation_index < unit->GetType()->Variations.size()) {
+			unit->SetVariation(unit->GetType()->Variations[variation_index]);
 			unit->Variable[VARIATION_INDEX].Value = unit->Variation;
 		}
 	} else if (!strcmp(name, "LayerVariation")) {
@@ -1979,8 +1979,8 @@ static int CclSetUnitVariable(lua_State *l)
 		int image_layer = GetImageLayerIdByName(image_layer_name);
 		if (image_layer != -1) {
 			size_t variation_index = LuaToNumber(l, 4);
-			if (variation_index >= 0 && variation_index < unit->Type->LayerVariations[image_layer].size()) {
-				unit->SetVariation(unit->Type->LayerVariations[image_layer][variation_index], nullptr, image_layer);
+			if (variation_index >= 0 && variation_index < unit->GetType()->LayerVariations[image_layer].size()) {
+				unit->SetVariation(unit->GetType()->LayerVariations[image_layer][variation_index], nullptr, image_layer);
 			}
 		} else {
 			LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
@@ -2110,7 +2110,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (index == ATTACKRANGE_INDEX && unit->Container) {
 			unit->Container->UpdateContainerAttackRange();
 		} else if (index == LEVELUP_INDEX) {
-			unit->Player->UpdateLevelUpUnits();
+			unit->GetPlayer()->UpdateLevelUpUnits();
 		} else if (index == LEVEL_INDEX || index == POINTS_INDEX) {
 			unit->UpdateXPRequired();
 		} else if (index == XP_INDEX) {
@@ -2175,7 +2175,7 @@ static int CclUnitIsAt(lua_State *l)
 	CclGetPos(l, &minPos.x, &minPos.y, 2);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 3);
 
-	if (unit->tilePos.x >= minPos.x && unit->tilePos.x <= maxPos.x && unit->tilePos.y >= minPos.y && unit->tilePos.y <= maxPos.y) {
+	if (unit->GetTilePos().x >= minPos.x && unit->GetTilePos().x <= maxPos.x && unit->GetTilePos().y >= minPos.y && unit->GetTilePos().y <= maxPos.y) {
 		lua_pushboolean(l, true);
 	} else {
 		lua_pushboolean(l, false);

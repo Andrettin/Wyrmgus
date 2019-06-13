@@ -1191,7 +1191,11 @@ static int CclGetIconData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "File")) {
-		lua_pushstring(l, icon->GetImage()->GetFile().utf8().get_data());
+		if (icon->GetImage() != nullptr) {
+			lua_pushstring(l, icon->GetImage()->GetFile().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} if (!strcmp(data, "Frame")) {
 		lua_pushnumber(l, icon->GetFrame());

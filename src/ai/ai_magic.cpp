@@ -56,15 +56,15 @@ void AiCheckMagic()
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = player.GetUnit(i);
 
-		if (unit.Type->Spells.size() > 0) {
+		if (unit.GetType()->Spells.size() > 0) {
 			// Check only idle magic units
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionSpellCast) {
 					return;
 				}
 			}
-			for (unsigned int j = 0; j < unit.Type->Spells.size(); ++j) {
-				CSpell *spell = unit.Type->Spells[j];
+			for (unsigned int j = 0; j < unit.GetType()->Spells.size(); ++j) {
+				CSpell *spell = unit.GetType()->Spells[j];
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (spell->IsAvailableForUnit(unit)
 					&& spell->AICast) {

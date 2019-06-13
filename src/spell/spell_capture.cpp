@@ -72,7 +72,7 @@
 */
 /* virtual */ int Spell_Capture::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
-	if (!target || caster.Player == target->Player) {
+	if (!target || caster.GetPlayer() == target->GetPlayer()) {
 		return 0;
 	}
 
@@ -92,18 +92,18 @@
 			return 1;
 		}
 	}
-	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
+	caster.GetPlayer()->Score += target->Variable[POINTS_INDEX].Value;
 	if (caster.IsEnemy(*target)) {
-		if (target->Type->BoolFlag[BUILDING_INDEX].value) {
-			caster.Player->TotalRazings++;
+		if (target->GetType()->BoolFlag[BUILDING_INDEX].value) {
+			caster.GetPlayer()->TotalRazings++;
 		} else {
-			caster.Player->TotalKills++;
+			caster.GetPlayer()->TotalKills++;
 		}
 		//Wyrmgus start
-		caster.Player->UnitTypeKills[target->Type->GetIndex()]++;
+		caster.GetPlayer()->UnitTypeKills[target->GetType()->GetIndex()]++;
 		
 		//distribute experience between nearby units belonging to the same player
-		if (!target->Type->BoolFlag[BUILDING_INDEX].value) {
+		if (!target->GetType()->BoolFlag[BUILDING_INDEX].value) {
 			caster.ChangeExperience(UseHPForXp ? target->Variable[HP_INDEX].Value : target->Variable[POINTS_INDEX].Value, ExperienceRange);
 		}
 		//Wyrmgus end
@@ -111,12 +111,12 @@
 		caster.Variable[KILL_INDEX].Max++;
 		caster.Variable[KILL_INDEX].Enable = 1;
 	}
-	target->ChangeOwner(*caster.Player);
+	target->ChangeOwner(*caster.GetPlayer());
 	UnitClearOrders(*target);
-	if (this->JoinToAIForce && caster.Player->AiEnabled) {
-		int force = caster.Player->Ai->Force.GetForce(caster);
+	if (this->JoinToAIForce && caster.GetPlayer()->AiEnabled) {
+		int force = caster.GetPlayer()->Ai->Force.GetForce(caster);
 		if (force != -1) {
-			caster.Player->Ai->Force[force].Insert(*target);
+			caster.GetPlayer()->Ai->Force[force].Insert(*target);
 			target->GroupId = caster.GroupId;
 			CommandDefend(*target, caster, FlushCommands);
 		}

@@ -77,7 +77,7 @@ class IsDyingAndNotABuilding
 public:
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->CurrentAction() == UnitActionDie && !unit->Type->BoolFlag[BUILDING_INDEX].value;
+		return unit->CurrentAction() == UnitActionDie && !unit->GetType()->BoolFlag[BUILDING_INDEX].value;
 	}
 };
 
@@ -108,7 +108,7 @@ public:
 		cansummon = false;
 
 		if (unit != nullptr) { //  Found a corpse. eliminate it and proceed to summoning.
-			pos = unit->tilePos;
+			pos = unit->GetTilePos();
 			z = unit->MapLayer->ID;
 			unit->Remove(nullptr);
 			unit->Release();
@@ -121,16 +121,16 @@ public:
 	if (cansummon) {
 		//Wyrmgus start
 //		DebugPrint("Summoning a %s\n" _C_ unit_type.Name.c_str());
-		DebugPrint("Summoning a %s\n" _C_ unit_type.GetDefaultName(caster.Player).c_str());
+		DebugPrint("Summoning a %s\n" _C_ unit_type.GetDefaultName(caster.GetPlayer()).c_str());
 		//Wyrmgus end
 
 		//
 		// Create units.
 		// FIXME: do summoned units count on food?
 		//
-		target = MakeUnit(unit_type, caster.Player);
+		target = MakeUnit(unit_type, caster.GetPlayer());
 		if (target != nullptr) {
-			target->tilePos = pos;
+			target->TilePos = pos;
 			target->MapLayer = CMap::Map.MapLayers[z];
 			DropOutOnSide(*target, LookingW, nullptr);
 			// To avoid defending summoned unit for AI
@@ -143,10 +143,10 @@ public:
 			}
 
 			// Insert summoned unit to AI force so it will help them in battle
-			if (this->JoinToAiForce && caster.Player->AiEnabled) {
-				int force = caster.Player->Ai->Force.GetForce(caster);
+			if (this->JoinToAiForce && caster.GetPlayer()->AiEnabled) {
+				int force = caster.GetPlayer()->Ai->Force.GetForce(caster);
 				if (force != -1) {
-					caster.Player->Ai->Force[force].Insert(*target);
+					caster.GetPlayer()->Ai->Force[force].Insert(*target);
 					target->GroupId = caster.GroupId;
 					CommandDefend(*target, caster, FlushCommands);
 				}

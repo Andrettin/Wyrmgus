@@ -868,7 +868,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		DebugPrint(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
 		return;
 	}
-	Assert(unit.Type);
+	Assert(unit.GetType());
 
 	const int status = (msgnr & 0x80) >> 7;
 	// Note: destroyed destination unit is handled by the action routines.
@@ -892,7 +892,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandDefend: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("defend", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandDefend(unit, dest, status);
 			}
@@ -901,7 +901,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandFollow: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("follow", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandFollow(unit, dest, status);
 			}
@@ -924,7 +924,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandPickUp: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("pick-up", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandPickUp(unit, dest, status);
 			}
@@ -935,7 +935,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &UnitManager.GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				Assert(dest && dest->GetType());
 			}
 			CommandLog("repair", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandRepair(unit, pos, dest, status);
@@ -949,7 +949,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &UnitManager.GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				Assert(dest && dest->GetType());
 			}
 			CommandLog("attack", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandAttack(unit, pos, dest, status);
@@ -963,7 +963,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandUse: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("use", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandUse(unit, dest, status);
 			}
@@ -972,7 +972,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandTrade: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("trade", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandTrade(unit, dest, status);
 			}
@@ -986,7 +986,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandBoard: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("board", &unit, status, arg1, arg2, &dest, nullptr, -1);
 				CommandBoard(unit, dest, status);
 			}
@@ -996,7 +996,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &UnitManager.GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				Assert(dest && dest->GetType());
 			}
 			CommandLog("unload", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandUnload(unit, pos, dest, status);
@@ -1017,7 +1017,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandResource: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("resource", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandResource(unit, dest, status);
 			}
@@ -1100,7 +1100,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandBuy: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				Assert(dest.GetType());
 				CommandLog("buy", &unit, 0, -1, -1, &dest, nullptr, arg1);
 				CommandBuy(unit, &dest, arg1);
 			}
@@ -1128,7 +1128,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CUnit *dest = nullptr;
 				if (dstnr != (unsigned short)0xFFFF) {
 					dest = &UnitManager.GetSlotUnit(dstnr);
-					Assert(dest && dest->Type);
+					Assert(dest && dest->GetType());
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);
 				CommandSpellCast(unit, pos, dest, *CSpell::Spells[id], status);

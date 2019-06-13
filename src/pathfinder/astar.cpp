@@ -721,12 +721,12 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	}
 #endif
 	int cost = 0;
-	const uint16_t mask = unit.Type->MovementMask;
-	const CUnitTypeFinder unit_finder((UnitTypeType)unit.Type->UnitType);
+	const uint16_t mask = unit.GetType()->MovementMask;
+	const CUnitTypeFinder unit_finder(static_cast<UnitTypeType>(unit.GetType()->UnitType));
 
 	// verify each tile of the unit.
-	int h = unit.Type->TileSize.y;
-	const int w = unit.Type->TileSize.x;
+	int h = unit.GetType()->TileSize.y;
+	const int w = unit.GetType()->TileSize.x;
 	do {
 		const CMapField *mf = CMap::Map.Field(index, z);
 		int i = w;
@@ -741,7 +741,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			const uint16_t flag = check_flags & mask;
 			//Wyrmgus end
 			
-			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsTeamExplored(*unit.Player))) {
+			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsTeamExplored(*unit.GetPlayer()))) {
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
@@ -763,9 +763,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 					if (&unit != goal) {
 						//Wyrmgus start
 						/*
-//						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
+//						if (goal->GetPlayer()->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.GetType(), *goal->GetType())
 						//Wyrmgus end
-							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.Player)) {
+							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 								cost += 2 * AStarMovingUnitCrossingCost;
 						} else {
 						*/
@@ -779,7 +779,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				}
 			}
 			// Add cost of crossing unknown tiles if required
-			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsTeamExplored(*unit.Player)) {
+			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
@@ -787,8 +787,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus start
 			if (
 				(mf->GetTerrain(false)->IsDesert())
-				&& mf->Owner != unit.Player->GetIndex()
-				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
+				&& mf->Owner != unit.GetPlayer()->GetIndex()
+				&& unit.GetType()->BoolFlag[ORGANIC_INDEX].value
 				&& unit.MapLayer->GetTimeOfDay() != nullptr
 				&& unit.MapLayer->GetTimeOfDay()->IsDay()
 				&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
@@ -798,7 +798,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus end
 			
 			// Add tile movement cost
-			if (unit.Type->UnitType == UnitTypeFly || unit.Type->UnitType == UnitTypeFlyLow) {
+			if (unit.GetType()->UnitType == UnitTypeFly || unit.GetType()->UnitType == UnitTypeFlyLow) {
 				cost += DefaultTileMovementCost;
 			} else {
 				cost += mf->getCost();
@@ -1312,7 +1312,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		return PF_UNREACHABLE;
 	}
 	
-	allow_diagonal = allow_diagonal && !unit.Type->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
+	allow_diagonal = allow_diagonal && !unit.GetType()->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
 	//Wyrmgus end
 
 	ProfileBegin("AStarFindPath");

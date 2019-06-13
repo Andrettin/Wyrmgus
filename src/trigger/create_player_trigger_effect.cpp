@@ -97,7 +97,7 @@ void CCreatePlayerTriggerEffect::Do(CPlayer *player) const
 	if (this->StartSite != nullptr) {
 		const CUnit *site_unit = this->StartSite->SiteUnit;
 		if (site_unit != nullptr) {
-			new_player->SetStartView(site_unit->tilePos, site_unit->MapLayer->GetIndex());
+			new_player->SetStartView(site_unit->GetTilePos(), site_unit->MapLayer->GetIndex());
 		} else {
 			fprintf(stderr, "Player start site \"%s\" has no site unit.\n", this->StartSite->GetIdent().utf8().get_data());
 		}

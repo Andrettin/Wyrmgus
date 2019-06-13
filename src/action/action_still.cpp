@@ -143,13 +143,13 @@ public:
 
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*attacker->Player)
+		return unit->IsVisibleAsGoal(*attacker->GetPlayer())
 			   && IsDistanceCorrect(attacker->MapDistanceTo(*unit));
 	}
 private:
 	bool IsDistanceCorrect(int distance) const
 	{
-		return attacker->Type->MinAttackRange < distance
+		return attacker->GetType()->MinAttackRange < distance
 			   && distance <= attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
 	}
 private:
@@ -172,7 +172,7 @@ private:
 		return;
 	}
 
-	FireMissile(unit, goal, goal->tilePos, goal->MapLayer->ID);
+	FireMissile(unit, goal, goal->GetTilePos(), goal->MapLayer->ID);
 	UnHideUnit(unit);
 	unit.StepCount = 0;
 }
@@ -194,20 +194,20 @@ void UnHideUnit(CUnit &unit)
 */
 static bool MoveRandomly(CUnit &unit)
 {
-	if (!unit.Type->RandomMovementProbability || SyncRand(100) > unit.Type->RandomMovementProbability) {
+	if (!unit.GetType()->RandomMovementProbability || SyncRand(100) > unit.GetType()->RandomMovementProbability) {
 		return false;
 	}
 	// pick random location
-	Vec2i pos = unit.tilePos;
+	Vec2i pos = unit.GetTilePos();
 
-	pos.x += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
-	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
+	pos.x += SyncRand(unit.GetType()->RandomMovementDistance * 2 + 1) - unit.GetType()->RandomMovementDistance;
+	pos.y += SyncRand(unit.GetType()->RandomMovementDistance * 2 + 1) - unit.GetType()->RandomMovementDistance;
 
 	// restrict to map
 	CMap::Map.Clamp(pos, unit.MapLayer->ID);
 
 	// move if possible
-	if (pos != unit.tilePos) {
+	if (pos != unit.GetTilePos()) {
 		// if the tile the unit is moving to happens to have a layer connector, use it, if appropriate for the unit
 		bool found_connector = false;
 		CUnitCache &unitcache = CMap::Map.Field(pos, unit.MapLayer->ID)->UnitCache;
@@ -231,8 +231,8 @@ static bool MoveRandomly(CUnit &unit)
 			}
 			
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->GetSpecies() != nullptr && unit.Type->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
-				if (!unit.Type->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(connector->ConnectingDestination->GetTileCenterPos(), false, connector->ConnectingDestination->MapLayer->ID))) {
+			if (unit.GetType()->GetSpecies() != nullptr && unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.GetTilePos(), false, unit.MapLayer->ID))) {
+				if (!unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(connector->ConnectingDestination->GetTileCenterPos(), false, connector->ConnectingDestination->MapLayer->ID))) {
 					continue;
 				}
 			}
@@ -250,25 +250,25 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->GetSpecies() != nullptr && unit.Type->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
-				if (!unit.Type->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
+			if (unit.GetType()->GetSpecies() != nullptr && unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.GetTilePos(), false, unit.MapLayer->ID))) {
+				if (!unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
 					return false;
 				}
 			}
 			
-			if (unit.Type->BoolFlag[PEOPLEAVERSION_INDEX].value) {
+			if (unit.GetType()->BoolFlag[PEOPLEAVERSION_INDEX].value) {
 				std::vector<CUnit *> table;
-				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.Player));
+				SelectAroundUnit(unit, std::max(6, unit.GetType()->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.GetPlayer()));
 				if (!table.size()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
 					//don't go near settled areas
 					Vec2i minpos = pos;
 					Vec2i maxpos = pos;
-					minpos.x = pos.x - std::max(6, unit.Type->RandomMovementDistance);
-					minpos.y = pos.y - std::max(6, unit.Type->RandomMovementDistance);
-					maxpos.x = pos.x + std::max(6, unit.Type->RandomMovementDistance);
-					maxpos.y = pos.y + std::max(6, unit.Type->RandomMovementDistance);
+					minpos.x = pos.x - std::max(6, unit.GetType()->RandomMovementDistance);
+					minpos.y = pos.y - std::max(6, unit.GetType()->RandomMovementDistance);
+					maxpos.x = pos.x + std::max(6, unit.GetType()->RandomMovementDistance);
+					maxpos.y = pos.y + std::max(6, unit.GetType()->RandomMovementDistance);
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.Player));
+					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.GetPlayer()));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -281,7 +281,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + 1;
 					maxpos.y = pos.y + 1;
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.Player));
+					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.GetPlayer()));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -312,24 +312,24 @@ static bool LeaveShelter(CUnit &unit)
 {
 	if (
 		!unit.Container
-		|| (unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)
-		|| (!unit.Player->AiEnabled && !(unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Player->Type == PlayerNeutral))
+		|| (unit.Container->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && unit.GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)
+		|| (!unit.GetPlayer()->AiEnabled && !(unit.GetType()->BoolFlag[FAUNA_INDEX].value && unit.GetPlayer()->Type == PlayerNeutral))
 		|| unit.Container->CanMove() //is a transporter, not a shelter
-		|| !unit.Container->Type->CanTransport() //is not a garrisonable building
-		|| (unit.Container->Type->BoolFlag[RECRUITHEROES_INDEX].value && unit.Character && unit.Player->Type == PlayerNeutral) //if is a hireable hero in a hero recruitment building, don't leave it
+		|| !unit.Container->GetType()->CanTransport() //is not a garrisonable building
+		|| (unit.Container->GetType()->BoolFlag[RECRUITHEROES_INDEX].value && unit.Character && unit.GetPlayer()->Type == PlayerNeutral) //if is a hireable hero in a hero recruitment building, don't leave it
 	) {
 		return false;
 	}
 	
 	std::vector<CUnit *> table;
-	if (unit.Type->BoolFlag[FAUNA_INDEX].value) {
-		SelectAroundUnit(*unit.Container, 1, table, HasNotSamePlayerAs(*unit.Player));
+	if (unit.GetType()->BoolFlag[FAUNA_INDEX].value) {
+		SelectAroundUnit(*unit.Container, 1, table, HasNotSamePlayerAs(*unit.GetPlayer()));
 	} else {
-		SelectAroundUnit(*unit.Container, unit.CurrentSightRange, table, MakeAndPredicate(IsEnemyWith(*unit.Player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+		SelectAroundUnit(*unit.Container, unit.CurrentSightRange, table, MakeAndPredicate(IsEnemyWith(*unit.GetPlayer()), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 	}
 
 	if (table.size() > 0) {
-		CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands, unit.Container->MapLayer->ID);
+		CommandUnload(*unit.Container, unit.Container->GetTilePos(), &unit, FlushCommands, unit.Container->MapLayer->ID);
 		return true;
 	}
 
@@ -344,8 +344,8 @@ static bool LeaveShelter(CUnit &unit)
 static bool PickUpItem(CUnit &unit)
 {
 	if (
-		!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| !unit.Player->AiEnabled
+		!unit.GetType()->BoolFlag[ORGANIC_INDEX].value
+		|| !unit.GetPlayer()->AiEnabled
 	) {
 		return false;
 	}
@@ -380,7 +380,7 @@ static bool PickUpItem(CUnit &unit)
 */
 static bool MoveUnderground(CUnit &unit)
 {
-	if (!unit.Type->BoolFlag[FAUNA_INDEX].value || !unit.IsNocturnal()) {
+	if (!unit.GetType()->BoolFlag[FAUNA_INDEX].value || !unit.IsNocturnal()) {
 		return false; //must be a nocturnal animal
 	}
 	
@@ -448,12 +448,12 @@ public:
 	bool operator()(CUnit *unit) const
 	{
 		return (unit->IsTeamed(*worker)
-				&& unit->Type->GetRepairHP()
+				&& unit->GetType()->GetRepairHP()
 				//Wyrmgus start
 //				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
 				&& unit->Variable[HP_INDEX].Value < unit->GetModifiedVariable(HP_INDEX, VariableMax)
 				//Wyrmgus end
-				&& unit->IsVisibleAsGoal(*worker->Player));
+				&& unit->IsVisibleAsGoal(*worker->GetPlayer()));
 	}
 private:
 	const CUnit *worker;
@@ -474,7 +474,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
 	const Vec2i offset(range, range);
 
-	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, unit.MapLayer->ID, IsAReparableUnitBy(unit));
+	return FindUnit_If(unit.GetTilePos() - offset, unit.GetTilePos() + offset, unit.MapLayer->ID, IsAReparableUnitBy(unit));
 }
 
 /**
@@ -485,7 +485,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 bool AutoRepair(CUnit &unit)
 {
 	//Wyrmgus start
-//	const int repairRange = unit.Type->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
+//	const int repairRange = unit.GetType()->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
 	const int repairRange = unit.Variable[AUTOREPAIRRANGE_INDEX].Value;
 	//Wyrmgus end
 
@@ -514,7 +514,7 @@ bool AutoRepair(CUnit &unit)
 bool COrder_Still::AutoAttackStand(CUnit &unit)
 {
 	//Wyrmgus start
-//	if (unit.Type->CanAttack == false) {
+//	if (unit.GetType()->CanAttack == false) {
 	if (unit.CanAttack() == false) {
 	//Wyrmgus end
 		return false;
@@ -534,14 +534,14 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 		return false;
 	}
-	if (CMap::Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
+	if (CMap::Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.GetTilePos(), autoAttackUnit->GetTilePos(), MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
-//	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+//	UnitHeadingFromDeltaXY(unit, autoAttackUnit->GetTilePos() + autoAttackUnit->GetType()->GetHalfTileSize() - unit.GetTilePos());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }
@@ -568,7 +568,7 @@ bool COrder_Still::AutoCastStand(CUnit &unit)
 bool AutoAttack(CUnit &unit)
 {
 	//Wyrmgus start
-//	if (unit.Type->CanAttack == false) {
+//	if (unit.GetType()->CanAttack == false) {
 	if (unit.CanAttack() == false) {
 	//Wyrmgus end
 		return false;
@@ -583,14 +583,14 @@ bool AutoAttack(CUnit &unit)
 
 	if (unit.CurrentAction() == UnitActionStill) {
 		//Wyrmgus start
-//		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
-		savedOrder = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer->ID);
+//		savedOrder = COrder::NewActionAttack(unit, unit.GetTilePos());
+		savedOrder = COrder::NewActionAttack(unit, unit.GetTilePos(), unit.MapLayer->ID);
 		//Wyrmgus end
 	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands, goal->MapLayer->ID);
+	CommandAttack(unit, goal->GetTilePos(), nullptr, FlushCommands, goal->MapLayer->ID);
 
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
@@ -604,8 +604,8 @@ bool AutoAttack(CUnit &unit)
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
 		//Wyrmgus start
-//		&& (unit.Container == nullptr || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
-		&& (unit.Container == nullptr || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
+//		&& (unit.Container == nullptr || unit.Container->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
+		&& (unit.Container == nullptr || !unit.Container->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
 			if (unit.Container != nullptr) {
 				LeaveShelter(unit); // leave shelter if surrounded
 			}
@@ -617,7 +617,7 @@ bool AutoAttack(CUnit &unit)
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
 			//Wyrmgus start
-//			UnitShowAnimation(unit, unit.Type->Animations->Still);
+//			UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 			if (unit.Variable[STUN_INDEX].Value == 0) { //only show the idle animation when still if the unit is not stunned
 				UnitShowAnimation(unit, unit.GetAnimations()->Still);
 			}

@@ -93,7 +93,7 @@ public:
 	void operator()(const CUnit *const unit) const
 	{
 		if (!unit->IsVisibleAsGoal(*player)) {
-			*fogmask &= ~unit->Type->FieldFlags;
+			*fogmask &= ~unit->GetType()->FieldFlags;
 		}
 	}
 private:
@@ -143,14 +143,14 @@ public:
 	void operator()(CUnit *const unit) const
 	{
 		//Wyrmgus start
-		if (unit->Type == nullptr) {
-			fprintf(stderr, "Unit has no type: \"%s\" (%d, %d)\n", unit->Name.c_str(), unit->tilePos.x, unit->tilePos.y);
+		if (unit->GetType() == nullptr) {
+			fprintf(stderr, "Unit has no type: \"%s\" (%d, %d)\n", unit->Name.c_str(), unit->GetTilePos().x, unit->GetTilePos().y);
 			return;
 		}
 		//Wyrmgus end
 		//Wyrmgus start
-//		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
-		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value || ethereal != (int)unit->Type->BoolFlag[ETHEREAL_INDEX].value) {
+//		if (cloak != (int)unit->GetType()->BoolFlag[PERMANENTCLOAK_INDEX].value) {
+		if (cloak != (int)unit->GetType()->BoolFlag[PERMANENTCLOAK_INDEX].value || ethereal != (int)unit->GetType()->BoolFlag[ETHEREAL_INDEX].value) {
 		//Wyrmgus end
 			return ;
 		}

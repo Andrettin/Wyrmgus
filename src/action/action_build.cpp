@@ -98,10 +98,10 @@ enum {
 	order->Settlement = settlement;
 	//Wyrmgus end
 	if (building.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
-		order->Range = builder.Type->RepairRange;
+		order->Range = builder.GetType()->RepairRange;
 	} else {
 		// If building inside, but be next to stop
-		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.Type->UnitType == UnitTypeLand) {
+		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.GetType()->UnitType == UnitTypeLand) {
 			// Peon won't dive :-)
 			order->Range = 1;
 		}
@@ -217,12 +217,12 @@ enum {
 void COrder_Build::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_
-			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
+			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_
+			   unit.GetType()->Ident.c_str() _C_ this->Type->Ident.c_str());
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
-//		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
-		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
+//		AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *this->Type);
+		AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *this->Type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
 		//Wyrmgus end
 	}
 }
@@ -244,11 +244,11 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			//Wyrmgus start
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
 							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
@@ -267,10 +267,10 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 			}
 
 			//Wyrmgus start
-//			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
-			unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("%s cannot reach building place"), unit.GetMessageName().c_str());
+//			unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), "%s", _("You cannot reach building place"));
+			unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, _("%s cannot reach building place"), unit.GetMessageName().c_str());
 			//Wyrmgus end
-			if (unit.Player->AiEnabled) {
+			if (unit.GetPlayer()->AiEnabled) {
 				//Wyrmgus start
 //				AiCanNotReach(unit, this->GetUnitType());
 				AiCanNotReach(unit, this->GetUnitType(), CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
@@ -290,13 +290,13 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 
 static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landmass, const CSite *settlement)
 {
-	const CPlayer &player = *unit.Player;
+	const CPlayer &player = *unit.GetPlayer();
 	bool isOk = true;
 
 	// Check if enough resources for the building.
 	if (player.CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
-		player.Notify(NotifyYellow, unit.tilePos,
+		player.Notify(NotifyYellow, unit.GetTilePos(),
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Not enough resources to build %s"), type.Name.c_str());
@@ -307,7 +307,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landm
 
 	// Check if hiting any limits for the building.
 	if (player.CheckLimits(type) < 0) {
-		player.Notify(NotifyYellow, unit.tilePos,
+		player.Notify(NotifyYellow, unit.GetTilePos(),
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Can't build more units %s"), type.Name.c_str());
@@ -330,8 +330,8 @@ public:
 		worker(&unit), type(&t) {}
 	bool operator()(const CUnit *const unit) const
 	{
-		return (!unit->Destroyed && unit->Type == type
-				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
+		return (!unit->Destroyed && unit->GetType() == type
+				&& (worker->GetPlayer() == unit->GetPlayer() || worker->IsAllied(*unit)));
 	}
 	CUnit *Find(const CMapField *const mf) const
 	{
@@ -358,7 +358,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 
 	//Wyrmgus start
 //	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
-	bool ignore_exploration = unit.Player->AiEnabled;
+	bool ignore_exploration = unit.GetPlayer()->AiEnabled;
 	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, ignore_exploration, this->MapLayer);
 	//Wyrmgus end
 
@@ -386,11 +386,11 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 	if (unit.CurrentOrder() == this) {
 		  DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 		  //Wyrmgus start
-//		  _C_ unit.Player->GetIndex() _C_ unit.Slot
-//		  _C_ building->Type->Name.c_str()
+//		  _C_ unit.GetPlayer()->GetIndex() _C_ unit.Slot
+//		  _C_ building->GetType()->Name.c_str()
 //		  _C_ building->Slot);
-		  _C_ unit.Player->GetIndex() _C_ UnitNumber(unit)
-		  _C_ building.Type->GetDefaultName(unit.Player).c_str()
+		  _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit)
+		  _C_ building.GetType()->GetDefaultName(unit.GetPlayer()).c_str()
 		  _C_ UnitNumber(building));
 		  //Wyrmgus end
 
@@ -409,9 +409,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 {
 	const CUnitType &type = this->GetUnitType();
 
-	unit.Player->SubUnitType(type);
+	unit.GetPlayer()->SubUnitType(type);
 
-	CUnit *build = MakeUnit(type, unit.Player);
+	CUnit *build = MakeUnit(type, unit.GetPlayer());
 	
 	//Wyrmgus start
 	build->Name.clear(); // under construction buildings should have no proper name
@@ -420,13 +420,13 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	// If unable to make unit, stop, and report message
 	if (build == nullptr) {
 		// FIXME: Should we retry this?
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
+		unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 							//Wyrmgus start
 							unit.MapLayer->ID,
 //							_("Unable to create building %s"), type.Name.c_str());
-							_("Unable to create building %s"), type.GetDefaultName(unit.Player).c_str());
+							_("Unable to create building %s"), type.GetDefaultName(unit.GetPlayer()).c_str());
 							//Wyrmgus end
-		if (unit.Player->AiEnabled) {
+		if (unit.GetPlayer()->AiEnabled) {
 			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
 		}
 		return false;
@@ -439,8 +439,8 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		CBuildRestrictionOnTop *b;
 
 		//Wyrmgus start
-//		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
-		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build->Type, ontop.Type));
+//		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.GetType()));
+		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build->GetType(), ontop.GetType()));
 		//Wyrmgus end
 		Assert(b);
 		if (b->ReplaceOnBuild) {
@@ -460,17 +460,17 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	build->Player->NumBuildingsUnderConstruction++;
-	build->Player->ChangeUnitTypeUnderConstructionCount(&type, 1);
+	build->GetPlayer()->NumBuildingsUnderConstruction++;
+	build->GetPlayer()->ChangeUnitTypeUnderConstructionCount(&type, 1);
 	//Wyrmgus end
 
 	// HACK: the building is not ready yet
-	build->Player->DecreaseCountsForUnit(build);
+	build->GetPlayer()->DecreaseCountsForUnit(build);
 
 	// We need somebody to work on it.
 	if (!type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Remove(build);
@@ -482,9 +482,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		this->State = State_BuildFromOutside;
 		this->BuildingUnit = build;
 		//Wyrmgus start
-//		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
+//		unit.Direction = DirectionToHeading(build->GetTilePos() - unit.GetTilePos());
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+		const Vec2i dir = PixelSize(PixelSize(build->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) - unit.GetHalfTilePixelSize();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}
@@ -501,7 +501,7 @@ void COrder_Build::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 static void AnimateActionBuild(CUnit &unit)
 {
 	//Wyrmgus start
-//	CAnimations *animations = unit.Type->Animations;
+//	CAnimations *animations = unit.GetType()->Animations;
 	CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
@@ -551,7 +551,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
@@ -610,13 +610,13 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		}
 	}
 	if (this->State == State_StartBuilding_Failed) {
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
+		unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 							//Wyrmgus start
 							unit.MapLayer->ID,
 //							_("You cannot build %s here"), type.Name.c_str());
-							_("You cannot build a %s here"), type.GetDefaultName(unit.Player).c_str());
+							_("You cannot build a %s here"), type.GetDefaultName(unit.GetPlayer()).c_str());
 							//Wyrmgus end
-		if (unit.Player->AiEnabled) {
+		if (unit.GetPlayer()->AiEnabled) {
 			//Wyrmgus start
 //			AiCanNotBuild(unit, type);
 			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);

@@ -1313,12 +1313,12 @@ void CPlayer::SetFaction(const CFaction *faction)
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (!unit.Unique && unit.Type->PersonalNames.size() == 0) {
-			if (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval && ship_names_changed) {
+		if (!unit.Unique && unit.GetType()->PersonalNames.size() == 0) {
+			if (!unit.GetType()->BoolFlag[ORGANIC_INDEX].value && unit.GetType()->UnitType == UnitTypeNaval && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->GetCivilization()->GetSpecies() && unit.Type == CFaction::GetFactionClassUnitType(faction, unit.Type->GetClass())) {
+		if (personal_names_changed && unit.GetType()->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.GetType()->GetCivilization() != nullptr && unit.GetType()->GetCivilization()->GetSpecies() == faction->GetCivilization()->GetSpecies() && unit.GetType() == CFaction::GetFactionClassUnitType(faction, unit.GetType()->GetClass())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1503,7 +1503,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		const CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->GetName().empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->GetName().utf8().get_data(), this->Name.c_str());
+			player.Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->GetName().utf8().get_data(), this->Name.c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
@@ -1556,7 +1556,7 @@ bool CPlayer::HasSettlement(const CSite *settlement) const
 		return false;
 	}
 	
-	if (settlement->SiteUnit && settlement->SiteUnit->Player == this && settlement->SiteUnit->UnderConstruction == false) {
+	if (settlement->SiteUnit && settlement->SiteUnit->GetPlayer() == this && settlement->SiteUnit->UnderConstruction == false) {
 		return true;
 	}
 
@@ -1590,13 +1590,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 			continue;
 		}
 		
-		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->GetTilePos(), settlement_unit->MapLayer->ID);
 		if (std::find(CMap::Map.BorderLandmasses[settlement_landmass].begin(), CMap::Map.BorderLandmasses[settlement_landmass].end(), water_zone) == CMap::Map.BorderLandmasses[settlement_landmass].end()) { //settlement's landmass doesn't even border the water zone, continue
 			continue;
 		}
 		
 		Vec2i pos(0, 0);
-		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer->ID, water_zone)) {
+		if (FindTerrainType(0, 0, 8, *this, settlement_unit->GetTilePos(), &pos, settlement_unit->MapLayer->ID, water_zone)) {
 			return true;
 		}
 	}
@@ -1610,13 +1610,13 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 	int best_distance = -1;
 	
 	for (CUnit *settlement_unit : CMap::Map.SiteUnits) {
-		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
+		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->GetType()->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
-		if (!this->HasNeutralFactionType() && this != settlement_unit->Player) {
+		if (!this->HasNeutralFactionType() && this != settlement_unit->GetPlayer()) {
 			continue;
 		}
-		int distance = MapDistance(size, pos, z, settlement_unit->Type->TileSize, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		int distance = MapDistance(size, pos, z, settlement_unit->GetType()->TileSize, settlement_unit->GetTilePos(), settlement_unit->MapLayer->ID);
 		if (!best_hall || distance < best_distance) {
 			best_hall = settlement_unit;
 			best_distance = distance;
@@ -1653,7 +1653,7 @@ bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSite *settlement) con
 				} else {
 					for (int i = 0; i < this->GetUnitCount(); ++i) {
 						CUnit &unit = this->GetUnit(i);
-						if (unit.Type == AiHelpers.Upgrade[type->GetIndex()][j] && unit.Settlement == settlement) {
+						if (unit.GetType() == AiHelpers.Upgrade[type->GetIndex()][j] && unit.Settlement == settlement) {
 							return true;
 						}
 					}
@@ -1711,7 +1711,7 @@ bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 		//check if the required core settlements are owned by the player
 		if (CCampaign::GetCurrentCampaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
-				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitActionBuilt) {
+				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->GetPlayer() != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitActionBuilt) {
 					return false;
 				}
 			}
@@ -2044,7 +2044,7 @@ void CPlayer::GetWorkerLandmasses(std::vector<int> &worker_landmasses, const CUn
 			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->GetIndex()][i], worker_table, true);
 
 			for (size_t j = 0; j != worker_table.size(); ++j) {
-				int worker_landmass = CMap::Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer->ID);
+				int worker_landmass = CMap::Map.GetTileLandmass(worker_table[j]->GetTilePos(), worker_table[j]->MapLayer->ID);
 				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
 					worker_landmasses.push_back(worker_landmass);
 				}
@@ -2183,7 +2183,7 @@ void CPlayer::Clear()
 
 void CPlayer::AddUnit(CUnit &unit)
 {
-	Assert(unit.Player != this);
+	Assert(unit.GetPlayer() != this);
 	Assert(unit.PlayerSlot == static_cast<size_t>(-1));
 	unit.PlayerSlot = this->Units.size();
 	this->Units.push_back(&unit);
@@ -2193,10 +2193,10 @@ void CPlayer::AddUnit(CUnit &unit)
 
 void CPlayer::RemoveUnit(CUnit &unit)
 {
-	Assert(unit.Player == this);
+	Assert(unit.GetPlayer() == this);
 	//Wyrmgus start
 	if (unit.PlayerSlot == -1 || this->Units[unit.PlayerSlot] != &unit) {
-		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %zu, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.Type ? unit.Type->Ident.c_str() : "");
+		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %zu, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.GetType() ? unit.GetType()->Ident.c_str() : "");
 		return;
 	}
 	//Wyrmgus end
@@ -2226,8 +2226,8 @@ void CPlayer::UpdateFreeWorkers()
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = this->GetUnit(i);
 		//Wyrmgus start
-//		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
-		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed && !unit.Type->BoolFlag[TRADER_INDEX].value) {
+//		if (unit.IsAlive() && unit.GetType()->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
+		if (unit.IsAlive() && unit.GetType()->BoolFlag[HARVESTER_INDEX].value && !unit.Removed && !unit.GetType()->BoolFlag[TRADER_INDEX].value) {
 		//Wyrmgus end
 			if (unit.CurrentAction() == UnitActionStill) {
 				FreeWorkers.push_back(&unit);
@@ -2439,7 +2439,7 @@ void CPlayer::AvailableQuestsChanged()
 			
 		}
 		
-		if (!Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
+		if (!Selected.empty() && Selected[0]->GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 			UI.ButtonPanel.Update();
 		}
 	}
@@ -3604,7 +3604,7 @@ int CPlayer::GetUnitTypeAiActiveCount(const CUnitType *type) const
 
 void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 {
-	const CUnitType *type = unit->Type;
+	const CUnitType *type = unit->GetType();
 
 	this->ChangeUnitTypeCount(type, 1);
 	this->UnitsByType[type].push_back(unit);
@@ -3622,7 +3622,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 		this->ResourceDemand[i] += type->Stats[this->Index].ResourceDemand[i];
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::Map.Info.IsPointOnMap(unit->GetTilePos(), unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	
@@ -3635,7 +3635,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 
 void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 {
-	const CUnitType *type = unit->Type;
+	const CUnitType *type = unit->GetType();
 
 	this->ChangeUnitTypeCount(type, -1);
 	
@@ -4123,30 +4123,30 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 {
 	//Wyrmgus start
 	if (
-		unit.Player->Type == PlayerNeutral
-		&& unit.Type->BoolFlag[PREDATOR_INDEX].value
+		unit.GetPlayer()->Type == PlayerNeutral
+		&& unit.GetType()->BoolFlag[PREDATOR_INDEX].value
 		&& this->Type != PlayerNeutral
 	) {
 		return true;
 	}
 	
 	if (
-		this != unit.Player
+		this != unit.GetPlayer()
 		&& this->Type != PlayerNeutral
 		&& unit.CurrentAction() == UnitActionAttack
 		&& unit.CurrentOrder()->HasGoal()
-		&& unit.CurrentOrder()->GetGoal()->Player == this
-		&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
+		&& unit.CurrentOrder()->GetGoal()->GetPlayer() == this
+		&& !unit.CurrentOrder()->GetGoal()->GetType()->BoolFlag[HIDDENOWNERSHIP_INDEX].value
 	) {
 		return true;
 	}
 	
-	if (unit.Player != this && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->HasNeutralFactionType()) {
+	if (unit.GetPlayer() != this && this->Type != PlayerNeutral && unit.GetType()->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->HasNeutralFactionType()) {
 		return true;
 	}
 	//Wyrmgus end
 	
-	return IsEnemy(*unit.Player);
+	return IsEnemy(*unit.GetPlayer());
 }
 
 /**
@@ -4162,7 +4162,7 @@ bool CPlayer::IsAllied(const CPlayer &player) const
 */
 bool CPlayer::IsAllied(const CUnit &unit) const
 {
-	return IsAllied(*unit.Player);
+	return IsAllied(*unit.GetPlayer());
 }
 
 
@@ -4184,7 +4184,7 @@ bool CPlayer::IsSharedVision(const CPlayer &player) const
 */
 bool CPlayer::IsSharedVision(const CUnit &unit) const
 {
-	return IsSharedVision(*unit.Player);
+	return IsSharedVision(*unit.GetPlayer());
 }
 
 /**
@@ -4200,7 +4200,7 @@ bool CPlayer::IsBothSharedVision(const CPlayer &player) const
 */
 bool CPlayer::IsBothSharedVision(const CUnit &unit) const
 {
-	return IsBothSharedVision(*unit.Player);
+	return IsBothSharedVision(*unit.GetPlayer());
 }
 
 /**
@@ -4216,7 +4216,7 @@ bool CPlayer::IsTeamed(const CPlayer &player) const
 */
 bool CPlayer::IsTeamed(const CUnit &unit) const
 {
-	return IsTeamed(*unit.Player);
+	return IsTeamed(*unit.GetPlayer());
 }
 
 //Wyrmgus start

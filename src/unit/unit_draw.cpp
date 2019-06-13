@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@
 #include "unit/unit_type_variation.h"
 #include "video/cursor.h"
 #include "video/font.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -135,10 +136,10 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	IntColor color;
 
 	//Wyrmgus start
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
-	int frame_width = type.Width;
-	int frame_height = type.Height;
+	int frame_width = type.GetFrameSize().x;
+	int frame_height = type.GetFrameSize().y;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
 	const CUnitTypeVariation *variation = unit.GetVariation();
@@ -152,9 +153,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
-	if (Preference.PlayerColorCircle && unit.Player->GetIndex() != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
-		DrawSelectionCircleWithTrans(unit.Player->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
-//		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
+	if (Preference.PlayerColorCircle && unit.GetPlayer()->GetIndex() != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
+		DrawSelectionCircleWithTrans(unit.GetPlayer()->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
+//		DrawSelectionRectangle(unit.GetPlayer()->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
 	
@@ -163,15 +164,15 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
-		if (unit.Player->GetIndex() == PlayerNumNeutral) {
+		if (unit.GetPlayer()->GetIndex() == PlayerNumNeutral) {
 			color = ColorYellow;
 		} else if ((unit.Selected || (unit.Blink & 1))
-				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
+				   && (unit.GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 			color = ColorGreen;
 		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
-			color = unit.Player->Color;
+			color = unit.GetPlayer()->Color;
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
@@ -179,9 +180,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 				}
 			}
 		}
-	} else if (CursorBuilding && unit.Type->BoolFlag[BUILDING_INDEX].value
+	} else if (CursorBuilding && unit.GetType()->BoolFlag[BUILDING_INDEX].value
 			   && unit.CurrentAction() != UnitActionDie
-			   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
+			   && (unit.GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {
@@ -190,23 +191,23 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	//Wyrmgus start
 	/*
-//	const CUnitType &type = *unit.Type;
+//	const CUnitType &type = *unit.GetType();
 //	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
-//	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
-//	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
+//	const int x = screenPos.x - type.BoxWidth / 2 - (type.GetFrameSize().x - (type.Sprite ? type.Sprite->Width : 0)) / 2;
+//	const int y = screenPos.y - type.BoxHeight / 2 - (type.GetFrameSize().y - (type.Sprite ? type.Sprite->Height : 0)) / 2;
 	*/
 	//Wyrmgus end
 
 	//Wyrmgus start
 	int box_width = type.BoxWidth;
 	int box_height = type.BoxHeight;
-	if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
+	if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->BoxWidth > box_width && table[i]->Type->BoxHeight > box_height) {
-				box_width = table[i]->Type->BoxWidth;
-				box_height = table[i]->Type->BoxHeight;
+			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->GetType()->BoxWidth > box_width && table[i]->GetType()->BoxHeight > box_height) {
+				box_width = table[i]->GetType()->BoxWidth;
+				box_height = table[i]->GetType()->BoxHeight;
 			}
 		}
 	}
@@ -615,22 +616,22 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (var.HideHalf && value != 0 && value != max)
 			  || (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
 			  || (var.ShowOnlySelected && !unit.Selected)
-			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
+			  || (unit.GetPlayer()->Type == PlayerNeutral && var.HideNeutral)
 			  //Wyrmgus start
-			  || (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
+			  || (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
 			  //Wyrmgus end
 			  || (CPlayer::GetThisPlayer()->IsEnemy(unit) && !var.ShowOpponent)
-			  || (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && var.HideAllied)
+			  || (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.GetPlayer() != CPlayer::GetThisPlayer()) && var.HideAllied)
 			  //Wyrmgus start
-			  || (unit.Player == CPlayer::GetThisPlayer() && var.HideSelf)
-			  || unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
+			  || (unit.GetPlayer() == CPlayer::GetThisPlayer() && var.HideSelf)
+			  || unit.GetType()->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
 //			  || max == 0)) {
 			  || (var.ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y / 100,
+				x + var.OffsetX + var.OffsetXPercent * unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.GetType()->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -638,21 +639,21 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 	// Draw group number
 	if (unit.Selected && unit.GroupId != 0
 #ifndef DEBUG
-		&& unit.Player == CPlayer::GetThisPlayer()
+		&& unit.GetPlayer() == CPlayer::GetThisPlayer()
 #endif
 	   ) {
 		int groupId = 0;
 
-		if (unit.Player->AiEnabled) {
+		if (unit.GetPlayer()->AiEnabled) {
 			groupId = unit.GroupId - 1;
 		} else {
 			for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId) {
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.Type->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x + unit.Type->BoxWidth) / 2 - width;
+		x += (unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x + unit.GetType()->BoxWidth) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.Type->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y + unit.Type->BoxHeight) / 2 - height;
+		y += (unit.GetType()->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y + unit.GetType()->BoxHeight) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -807,7 +808,7 @@ void ShowOrder(const CUnit &unit)
 		return;
 	}
 #ifndef DEBUG
-	if (!CPlayer::GetThisPlayer()->IsAllied(unit) && unit.Player != CPlayer::GetThisPlayer()) {
+	if (!CPlayer::GetThisPlayer()->IsAllied(unit) && unit.GetPlayer() != CPlayer::GetThisPlayer()) {
 		return;
 	}
 #endif
@@ -886,7 +887,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		//Wyrmgus end
 			if (Preference.ShowReactionRange) {
 				//Wyrmgus start
-//				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+//				const int value = (unit.GetPlayer()->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
 				//Wyrmgus end
 				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
@@ -914,7 +915,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
-				const int value = AuraRange - (unit.Type->TileSize.x - 1);
+				const int value = AuraRange - (unit.GetType()->TileSize.x - 1);
 				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
@@ -1038,10 +1039,10 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		pos.x += type.OffsetX - type.Width / 2;
-//		pos.y += type.OffsetY - type.Height / 2;
-		int frame_width = type.Width;
-		int frame_height = type.Height;
+//		pos.x += type.OffsetX - type.GetFrameSize().x / 2;
+//		pos.y += type.OffsetY - type.GetFrameSize().y / 2;
+		int frame_width = type.GetFrameSize().x;
+		int frame_height = type.GetFrameSize().y;
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;
@@ -1112,7 +1113,7 @@ void CUnit::Draw(const CViewport &vp) const
 			cframe = nullptr;
 		}
 	} else {
-		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
+		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.TilePos);
 
 		screenPos.x += this->Seen.IX;
 		screenPos.y += this->Seen.IY;
@@ -1390,10 +1391,10 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->tilePos.y + c1->Type->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c1->IY;
-		const int pos2 = (c2->tilePos.y + c2->Type->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c2->IY;
+		const int pos1 = (c1->GetTilePos().y + c1->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c1->IY;
+		const int pos2 = (c2->GetTilePos().y + c2->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c2->IY;
 		return pos1 == pos2 ?
-			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
+			   (c1->GetTilePos().x != c2->GetTilePos().x ? c1->GetTilePos().x < c2->GetTilePos().x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {
 		return drawlevel1 < drawlevel2;
 	}

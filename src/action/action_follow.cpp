@@ -73,7 +73,7 @@ enum {
 	// Should be handled in action, but is not possible!
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
-		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
+		order->goalPos = dest.GetTilePos() + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer->ID;
 	} else {
 		order->SetGoal(&dest);
@@ -169,7 +169,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -186,7 +186,7 @@ enum {
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
@@ -201,7 +201,7 @@ enum {
 	// Reached target
 	if (this->State == State_TargetReached) {
 
-		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
+		if (!goal || !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 			DebugPrint("Goal gone\n");
 			this->Finished = true;
 			return ;
@@ -214,8 +214,8 @@ enum {
 		}
 
 		//Wyrmgus start
-//		if (goal->tilePos == this->goalPos) {
-		if (goal->tilePos == this->goalPos && goal->MapLayer->ID == this->MapLayer) {
+//		if (goal->GetTilePos() == this->goalPos) {
+		if (goal->GetTilePos() == this->goalPos && goal->MapLayer->ID == this->MapLayer) {
 		//Wyrmgus end
 			// Move to the next order
 			if (unit.Orders.size() > 1) {
@@ -238,14 +238,14 @@ enum {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return;
 					}
@@ -263,7 +263,7 @@ enum {
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
 			// goal shouldn't be busy and portal should be alive
-			if (goal->Type->BoolFlag[TELEPORTER_INDEX].value && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
+			if (goal->GetType()->BoolFlag[TELEPORTER_INDEX].value && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
 				if (!goal->IsIdle()) { // wait
 					unit.Wait = 10;
 					return;
@@ -277,22 +277,20 @@ enum {
 				}
 				// Everything is OK, now teleport the unit
 				unit.Remove(nullptr);
-				unit.tilePos = goal->Goal->tilePos;
-				//Wyrmgus start
+				unit.TilePos = goal->Goal->GetTilePos();
 				unit.MapLayer = goal->Goal->MapLayer;
-				//Wyrmgus end
 				DropOutOnSide(unit, unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;
 
 				if (dest.NewOrder == nullptr
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
+					|| (dest.NewOrder->Action == UnitActionResource && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value)
 					//Wyrmgus start
-//					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
+//					|| (dest.NewOrder->Action == UnitActionAttack && !unit.GetType()->CanAttack)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
 					//Wyrmgus end
-					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitActionBoard && unit.GetType()->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;
 				} else {
@@ -309,7 +307,7 @@ enum {
 					}
 				}
 			}
-			this->goalPos = goal->tilePos;
+			this->goalPos = goal->GetTilePos();
 			this->MapLayer = goal->MapLayer->ID;
 			this->State = State_TargetReached;
 		}
@@ -319,9 +317,9 @@ enum {
 	}
 
 	// Target destroyed?
-	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+	if (goal && !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 		DebugPrint("Goal gone\n");
-		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
+		this->goalPos = goal->GetTilePos() + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer->ID;
 		this->ClearGoal();
 		goal = nullptr;
@@ -335,7 +333,7 @@ enum {
 	// If don't set the goal, the unit can than choose a
 	//  better goal if moving nearer to enemy.
 	//Wyrmgus start
-//	if (unit.Type->CanAttack
+//	if (unit.GetType()->CanAttack
 	if (unit.CanAttack()
 	//Wyrmgus end
 		//Wyrmgus start
@@ -353,8 +351,8 @@ enum {
 
 			this->Finished = true;
 			//Wyrmgus start
-//			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
-			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos, target->MapLayer->ID));
+//			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->GetTilePos()));
+			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->GetTilePos(), target->MapLayer->ID));
 			//Wyrmgus end
 
 			if (savedOrder != nullptr) {

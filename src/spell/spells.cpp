@@ -89,7 +89,7 @@ std::map<std::string, CSpell *> CSpell::SpellsByIdent;
 */
 static Target *NewTargetUnit(CUnit &unit)
 {
-	return new Target(TargetUnit, &unit, unit.tilePos, unit.MapLayer->ID);
+	return new Target(TargetUnit, &unit, unit.GetTilePos(), unit.MapLayer->ID);
 }
 
 // ****************************************************************************
@@ -119,7 +119,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		return false;
 	}
 	// Check caster's resources
-	if (caster.Player->CheckCosts(spell.Costs, false)) {
+	if (caster.GetPlayer()->CheckCosts(spell.Costs, false)) {
 		return false;
 	}
 	if (spell.Target == TargetUnit) { // Casting a unit spell without a target.
@@ -131,7 +131,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		return true;
 	}
 	
-	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
+	if (target && !target->GetType()->CheckUserBoolFlags(condition->BoolFlag)) {
 		return false;
 	}
 
@@ -221,7 +221,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
 			// own units could be not allied ?
-			(caster.IsAllied(*target) || target->Player == caster.Player)) {
+			(caster.IsAllied(*target) || target->GetPlayer() == caster.GetPlayer())) {
 			return false;
 		}
 	}
@@ -243,17 +243,17 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->FactionUnit != CONDITION_TRUE) {
-		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.Type->GetFaction() != nullptr)) {
+		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.GetType()->GetFaction() != nullptr)) {
 			return false;
 		}
 	}
 	if (condition->CivilizationEquivalent != -1) {
-		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->GetIndex() == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->GetIndex() == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Get(condition->CivilizationEquivalent)->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Get(condition->CivilizationEquivalent), caster.Type->GetClass()) == nullptr || (caster.Character && !caster.Character->Custom)) {
+		if (caster.GetType()->GetCivilization() == nullptr || (caster.GetType()->GetCivilization()->GetIndex() == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->GetIndex() == condition->CivilizationEquivalent))) || caster.GetType()->GetCivilization()->GetSpecies() != CCivilization::Get(condition->CivilizationEquivalent)->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Get(condition->CivilizationEquivalent), caster.GetType()->GetClass()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->GetCivilization() || CFaction::GetFactionClassUnitType(condition->FactionEquivalent, caster.Type->GetClass()) == nullptr || (caster.Character && !caster.Character->Custom)) {
+		if (caster.GetType()->GetCivilization() == nullptr || caster.GetType()->GetCivilization() != condition->FactionEquivalent->GetCivilization() || CFaction::GetFactionClassUnitType(condition->FactionEquivalent, caster.GetType()->GetClass()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
@@ -612,13 +612,13 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 	}
 	//Wyrmgus end
 	
-	if (!PassCondition(caster, *this, target, caster.tilePos, this->Condition, target->MapLayer) || !PassCondition(caster, *this, target, caster.tilePos, autocast->Condition, target->MapLayer)) {
+	if (!PassCondition(caster, *this, target, caster.GetTilePos(), this->Condition, target->MapLayer) || !PassCondition(caster, *this, target, caster.GetTilePos(), autocast->Condition, target->MapLayer)) {
 		return false;
 	}
 
 	//Wyrmgus start
 	int range = this->Range;
-	if (CMap::Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
+	if (CMap::Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.GetTilePos(), target->GetTilePos(), MapFieldAirUnpassable, target->MapLayer->ID)) {
 		range = 1; //if there are e.g. dungeon walls between the caster and the target, the unit reachable check must see if the target is reachable with a range of 1 instead of the spell's normal range (to make sure the spell can be cast; spells can't be cast through dungeon walls)
 	}
 
@@ -655,7 +655,7 @@ std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, co
 	}
 	
 	//select all units around the caster
-	SelectAroundUnit(caster, range, potential_targets, OutOfMinRange(min_range, caster.tilePos, caster.MapLayer->ID));
+	SelectAroundUnit(caster, range, potential_targets, OutOfMinRange(min_range, caster.GetTilePos(), caster.MapLayer->ID));
 	
 	//check each unit to see if it is a possible target
 	int n = 0;
@@ -682,14 +682,14 @@ std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, co
 */
 static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 {
-	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.Player->AiEnabled);
+	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.GetPlayer()->AiEnabled);
 	Assert(autocast);
 	
 	if (!spell.CheckAutoCastGenericConditions(caster, autocast)) {
 		return nullptr;
 	}
 	
-	const Vec2i &pos = caster.tilePos;
+	const Vec2i &pos = caster.GetTilePos();
 	CMapLayer *map_layer = caster.MapLayer;
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
@@ -700,10 +700,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 
 	// Select all units around the caster
 	std::vector<CUnit *> table;
-	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
+	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.GetTilePos(), caster.MapLayer->ID));
 
 	if (spell.Target == TargetSelf) {
-		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.Condition, map_layer) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->Condition, map_layer)) {
+		if (PassCondition(caster, spell, &caster, caster.GetTilePos(), spell.Condition, map_layer) && PassCondition(caster, spell, &caster, caster.GetTilePos(), autocast->Condition, map_layer)) {
 			return NewTargetUnit(caster);
 		}
 	} else if (spell.Target == TargetPosition) {
@@ -785,7 +785,7 @@ bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 
 	//Wyrmgus start
 //	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::Get(dependencyId)) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::Get(dependencyId)) > 0 || UpgradeIdAllowed(*unit.GetPlayer(), dependencyId) == 'R';
 	//Wyrmgus end
 }
 
@@ -860,19 +860,19 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 
 	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
-		pos = target->tilePos;
+		pos = target->GetTilePos();
 		map_layer = target->MapLayer;
 	}
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
 	if (spell.Target == TargetSelf) {
-		pos = caster.tilePos;
+		pos = caster.GetTilePos();
 		map_layer = caster.MapLayer;
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
-			   caster.Type->GetName().utf8().get_data() _C_ target ? target->Type->GetName().utf8().get_data() : "none" _C_ pos.x _C_ pos.y);
+			   caster.GetType()->GetName().utf8().get_data() _C_ target ? target->GetType()->GetName().utf8().get_data() : "none" _C_ pos.x _C_ pos.y);
 	if (CanCastSpell(caster, spell, target, pos, map_layer)) {
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.
@@ -884,16 +884,16 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
 			} else {
 				//Wyrmgus start
-//				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
-				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
+//				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->GetTilePos() : goalPos), spell.SoundWhenCast.Sound->Range));
+				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->GetTilePos() : goalPos), spell.SoundWhenCast.Sound->Range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
 				//Wyrmgus end
 			}
 		//Wyrmgus start
-		} else if (caster.Type->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
+		} else if (caster.GetType()->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
 			if (spell.Target == TargetSelf) {
-				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
+				PlayUnitSound(caster, caster.GetType()->MapSound.Hit.Sound);
 			} else {
-				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->Range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
+				PlayGameSound(caster.GetType()->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->GetTilePos() : goalPos), caster.GetType()->MapSound.Hit.Sound->Range) * caster.GetType()->MapSound.Hit.Sound->VolumePercent / 100);
 			}
 		//Wyrmgus end
 		}
@@ -914,7 +914,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 		}
-		caster.Player->SubCosts(spell.Costs);
+		caster.GetPlayer()->SubCosts(spell.Costs);
 		if (spell.CoolDown > 0) {
 			caster.SpellCoolDownTimers[&spell] = spell.CoolDown;
 		}

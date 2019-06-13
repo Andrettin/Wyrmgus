@@ -66,7 +66,7 @@
 	COrder_Repair *order = new COrder_Repair();
 
 	if (target.Destroyed) {
-		order->goalPos = target.tilePos + target.GetHalfTileSize();
+		order->goalPos = target.GetTilePos() + target.GetHalfTileSize();
 		order->MapLayer = target.MapLayer->ID;
 	} else {
 		order->SetGoal(&target);
@@ -175,12 +175,12 @@
 	const CUnit &unit = *input.GetUnit();
 
 	input.SetMinRange(0);
-	input.SetMaxRange(ReparableTarget != nullptr ? unit.Type->RepairRange : 0);
+	input.SetMaxRange(ReparableTarget != nullptr ? unit.GetType()->RepairRange : 0);
 
 	Vec2i tileSize;
 	if (ReparableTarget != nullptr) {
 		tileSize = ReparableTarget->GetTileSize();
-		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer->ID);
+		input.SetGoal(ReparableTarget->GetTilePos(), tileSize, ReparableTarget->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -194,12 +194,12 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 
 	// Check if enough resources are available
 	for (int i = 1; i < MaxCosts; ++i) {
-		RepairCosts[i] = goal.Type->RepairCosts[i] *
+		RepairCosts[i] = goal.GetType()->RepairCosts[i] *
 						 (goal.CurrentAction() == UnitActionBuilt ? ResourcesMultiBuildersMultiplier : 1);
 	}
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (!player.CheckResource(i, RepairCosts[i])) {
-			player.Notify(NotifyYellow, unit.tilePos,
+			player.Notify(NotifyYellow, unit.GetTilePos(),
 						  //Wyrmgus start
 						  unit.MapLayer->ID,
 //						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
@@ -224,7 +224,7 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 */
 bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 {
-	CPlayer &player = *unit.Player;
+	CPlayer &player = *unit.GetPlayer();
 
 	if (goal.CurrentAction() == UnitActionBuilt) {
 		COrder_Built &order = *static_cast<COrder_Built *>(goal.CurrentOrder());
@@ -249,7 +249,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 		return true;
 	}
 
-	goal.Variable[HP_INDEX].Value += goal.Type->GetRepairHP();
+	goal.Variable[HP_INDEX].Value += goal.GetType()->GetRepairHP();
 	//Wyrmgus start
 //	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
 	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableMax)) {
@@ -271,7 +271,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 static void AnimateActionRepair(CUnit &unit)
 {
 	//Wyrmgus start
-//	UnitShowAnimation(unit, unit.Type->Animations->Repair);
+//	UnitShowAnimation(unit, unit.GetType()->Animations->Repair);
 	UnitShowAnimation(unit, unit.GetAnimations()->Repair);
 	//Wyrmgus end
 }
@@ -293,21 +293,21 @@ static void AnimateActionRepair(CUnit &unit)
 				CUnit *goal = this->GetGoal();
 
 				if (goal) {
-					if (!goal->IsVisibleAsGoal(*unit.Player)) {
+					if (!goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 						DebugPrint("repair target gone.\n");
-						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
+						this->goalPos = goal->GetTileCenterPos();
 						this->MapLayer = goal->MapLayer->ID;
 						ReparableTarget = nullptr;
 						this->ClearGoal();
 						goal = nullptr;
 					}
-				} else if (unit.Player->AiEnabled) {
+				} else if (unit.GetPlayer()->AiEnabled) {
 					// Ai players workers should stop if target is killed
 					err = -1;
 				}
 
 				// Have reached target? FIXME: could use return value
-				if (goal && unit.MapDistanceTo(*goal) <= unit.Type->RepairRange
+				if (goal && unit.MapDistanceTo(*goal) <= unit.GetType()->RepairRange
 					//Wyrmgus start
 //					&& goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					&& goal->Variable[HP_INDEX].Value < goal->GetModifiedVariable(HP_INDEX, VariableMax)) {
@@ -315,22 +315,22 @@ static void AnimateActionRepair(CUnit &unit)
 					this->State = 2;
 					this->RepairCycle = 0;
 					//Wyrmgus start
-//					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+//					const Vec2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
+					const Vec2i dir = PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
 					//Wyrmgus start
 					//if is unreachable and is on a raft, see if the raft can move closer
 					if (err == PF_UNREACHABLE) {
-						if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+							Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 							for (size_t i = 0; i != table.size(); ++i) {
-								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+								if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 									}
 									return;
 								}
@@ -353,9 +353,9 @@ static void AnimateActionRepair(CUnit &unit)
 			CUnit *goal = this->GetGoal();
 
 			if (goal) {
-				if (!goal->IsVisibleAsGoal(*unit.Player)) {
+				if (!goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 					DebugPrint("repair goal is gone\n");
-					this->goalPos = goal->tilePos + goal->GetHalfTileSize();
+					this->goalPos = goal->GetTilePos() + goal->GetHalfTileSize();
 					this->MapLayer = goal->MapLayer->ID;
 					// FIXME: should I clear this here?
 					this->ClearGoal();
@@ -364,12 +364,12 @@ static void AnimateActionRepair(CUnit &unit)
 				} else {
 					const int dist = unit.MapDistanceTo(*goal);
 
-					if (dist <= unit.Type->RepairRange) {
+					if (dist <= unit.GetType()->RepairRange) {
 						if (RepairUnit(unit, *goal)) {
 							this->Finished = true;
 							return ;
 						}
-					} else if (dist > unit.Type->RepairRange) {
+					} else if (dist > unit.GetType()->RepairRange) {
 						// If goal has move, chase after it
 						this->State = 0;
 					}

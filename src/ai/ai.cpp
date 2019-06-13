@@ -283,16 +283,16 @@ static void AiCheckUnits()
 		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == nullptr) {
 			for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
 				CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
-				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
+				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->GetType()->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
 					continue;
 				}
 				
-				for (size_t j = 0; j < hero_recruiter->SoldUnits.size(); ++j) {
+				for (CUnit *sold_unit : hero_recruiter->SoldUnits) {
 					int buy_costs[MaxCosts];
 					memset(buy_costs, 0, sizeof(buy_costs));
-					buy_costs[CopperCost] = hero_recruiter->SoldUnits[j]->GetPrice();
-					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero_recruiter->SoldUnits[j]->Type) >= 1) {
-						CommandBuy(*hero_recruiter, hero_recruiter->SoldUnits[j], AiPlayer->Player->GetIndex());
+					buy_costs[CopperCost] = sold_unit->GetPrice();
+					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*sold_unit->GetType()) >= 1) {
+						CommandBuy(*hero_recruiter, sold_unit, AiPlayer->Player->GetIndex());
 						break;
 					}
 				}
@@ -309,17 +309,17 @@ static void AiCheckUnits()
 			}
 			for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
 				CUnit *mercenary_building = &CPlayer::Players[i]->GetUnit(j);
-				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
+				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->GetType()->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
 					continue;
 				}
 
-				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
-					for (size_t k = 0; k < mercenary_building->SoldUnits.size(); ++k) {
+				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->GetType()->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
+					for (CUnit *sold_unit : mercenary_building->SoldUnits) {
 						int buy_costs[MaxCosts];
 						memset(buy_costs, 0, sizeof(buy_costs));
-						buy_costs[CopperCost] = mercenary_building->SoldUnits[k]->GetPrice();
-						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_building->SoldUnits[k]->Type) >= 1) {
-							CommandBuy(*mercenary_building, mercenary_building->SoldUnits[k], AiPlayer->Player->GetIndex());
+						buy_costs[CopperCost] = sold_unit->GetPrice();
+						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*sold_unit->GetType()) >= 1) {
+							CommandBuy(*mercenary_building, sold_unit, AiPlayer->Player->GetIndex());
 							break;
 						}
 					}
@@ -341,7 +341,7 @@ static void AiCheckUnits()
 							if (
 								mercenary_type->GetClass() == queue.Type->GetClass()
 								&& queue.Want > queue.Made
-								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
+								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->GetTilePos(), mercenary_building->MapLayer->ID))
 								&& (!queue.Settlement || queue.Settlement == mercenary_building->Settlement)
 							) {
 								queue.Made++;
@@ -451,7 +451,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		for (size_t j = 0; j != unitsCount; ++j) {
 			const CUnit &aiunit = *ai.Force[i].Units[j];
 			file.printf(" %d, \"%s\",", UnitNumber(aiunit),
-						aiunit.Type->Ident.c_str());
+						aiunit.GetType()->Ident.c_str());
 		}
 		file.printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",
 					ai.Force[i].State, ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
@@ -568,7 +568,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		file.printf("  \"scouts\", {");
 		for (size_t i = 0; i != ai.Scouts.size(); ++i) {
 			const CUnit &aiunit = *ai.Scouts[i];
-			file.printf(" %d, \"%s\",", UnitNumber(aiunit), aiunit.Type->Ident.c_str());
+			file.printf(" %d, \"%s\",", UnitNumber(aiunit), aiunit.GetType()->Ident.c_str());
 		}
 		file.printf("},\n");
 	}
@@ -914,19 +914,19 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, con
 void AiHelpMe(const CUnit *attacker, CUnit &defender)
 {
 	/* Friendly Fire - typical splash */
-	if (!attacker || attacker->Player->GetIndex() == defender.Player->GetIndex()) {
+	if (!attacker || attacker->GetPlayer()->GetIndex() == defender.GetPlayer()->GetIndex()) {
 		//FIXME - try react somehow
 		return;
 	}
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
-			   defender.Player->GetIndex() _C_ UnitNumber(defender) _C_
-			   defender.Type->Ident.c_str() _C_ defender.tilePos.x _C_ defender.tilePos.y);
+			   defender.GetPlayer()->GetIndex() _C_ UnitNumber(defender) _C_
+			   defender.GetType()->Ident.c_str() _C_ defender.GetTilePos().x _C_ defender.GetTilePos().y);
 
 	//  Don't send help to scouts (zeppelin,eye of vision).
 	//Wyrmgus start
-//	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeFly) {
-	if (!defender.CanAttack() && defender.Type->UnitType == UnitTypeFly) {
+//	if (!defender.GetType()->CanAttack && defender.GetType()->UnitType == UnitTypeFly) {
+	if (!defender.CanAttack() && defender.GetType()->UnitType == UnitTypeFly) {
 	//Wyrmgus end
 		return;
 	}
@@ -935,7 +935,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		return;
 	}
 
-	PlayerAi &pai = *defender.Player->Ai;
+	PlayerAi &pai = *defender.GetPlayer()->Ai;
 	AiPlayer = &pai;
 	
 	//Wyrmgus start
@@ -965,7 +965,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+			if (aiunit.IsAgressive() && CanTarget(*aiunit.GetType(), *attacker->GetType())
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
@@ -990,9 +990,9 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					//Wyrmgus end
 					
 					//Wyrmgus start
-//					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-//					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+//					CommandAttack(aiunit, attacker->GetTilePos(), const_cast<CUnit *>(attacker), FlushCommands);
+//					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->GetTilePos());
+					CommandAttack(aiunit, attacker->GetTilePos(), const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
 					//Wyrmgus end
 
 					//Wyrmgus start
@@ -1008,7 +1008,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		}
 		if (!aiForce.Defending && aiForce.State > 0) {
 			DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
-					   defender.Player->GetIndex() _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
+					   defender.GetPlayer()->GetIndex() _C_ UnitNumber(defender) _C_ defender.GetType()->Ident.c_str());
 			// unit belongs to an attacking force,
 			// so don't send others force in such case.
 			// FIXME: there may be other attacking the same place force who can help
@@ -1022,7 +1022,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	/*
 	// Send defending forces, also send attacking forces if they are home/traning.
 	// This is still basic model where we suspect only one base ;(
-	const Vec2i &pos = attacker->tilePos;
+	const Vec2i &pos = attacker->GetTilePos();
 
 	for (unsigned int i = 0; i < pai.Force.Size(); ++i) {
 		AiForce &aiForce = pai.Force[i];
@@ -1056,7 +1056,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				// if unit is idle or attacking a non-agressive target and
 				// can attack our attacker then ask for help
 				// FIXME ad support for help from Coward type units
-				if (aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+				if (aiunit.IsAgressive() && CanTarget(*aiunit.GetType(), *attacker->GetType())
 					&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 					bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
@@ -1078,13 +1078,13 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 						aiunit.Wait += delay;
 						
-						CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+						CommandAttack(aiunit, attacker->GetTilePos(), const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
 					}
 				}
 			}
 			if (!aiForce.Defending && aiForce.State > 0) {
 				DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
-						   defender.Player->GetIndex() _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
+						   defender.GetPlayer()->GetIndex() _C_ UnitNumber(defender) _C_ defender.GetType()->Ident.c_str());
 				// unit belongs to an attacking force,
 				// so don't send others force in such case.
 				// FIXME: there may be other attacking the same place force who can help
@@ -1101,7 +1101,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	for (int max_dist = 16; max_dist <= MaxMapWidth; max_dist *= 2) { //search for units in increasingly greater distances, until a helper is found
 		bool has_helper = false;
 		std::vector<CUnit *> helper_table;
-		SelectAroundUnit(defender, max_dist, helper_table, HasSamePlayerAs(*defender.Player));
+		SelectAroundUnit(defender, max_dist, helper_table, HasSamePlayerAs(*defender.GetPlayer()));
 		for (size_t i = 0; i < helper_table.size(); ++i) {
 			CUnit &aiunit = *helper_table[i];
 
@@ -1121,14 +1121,14 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				continue;
 			}
 
-			if (aiunit.Type->BoolFlag[HARVESTER_INDEX].value) { //harvesters shouldn't go to help units being attacked
+			if (aiunit.GetType()->BoolFlag[HARVESTER_INDEX].value) { //harvesters shouldn't go to help units being attacked
 				continue;
 			}
 			
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+			if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.GetType(), *attacker->GetType())
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
@@ -1143,7 +1143,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 
 				if (shouldAttack) {
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer->ID);
+					CommandAttack(aiunit, attacker->GetTilePos(), const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer->ID);
 					has_helper = true;
 				}
 			}
@@ -1163,19 +1163,19 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 void AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed\n" _C_
-			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str());
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.GetPlayer()->Type != PlayerPerson);
 
 	if (unit.GroupId) {
-		AiForce &force = unit.Player->Ai->Force[unit.GroupId - 1];
+		AiForce &force = unit.GetPlayer()->Ai->Force[unit.GroupId - 1];
 
 		force.Remove(unit);
 		if (force.Size() == 0) {
 			force.Attacking = false;
 			if (!force.Defending && force.State > 0) {
 				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-						   _C_ unit.Player->GetIndex() _C_(long unsigned int)(&force  - & (unit.Player->Ai->Force[0])));
+						   _C_ unit.GetPlayer()->GetIndex() _C_(long unsigned int)(&force  - & (unit.GetPlayer()->Ai->Force[0])));
 				force.Reset(true);
 			}
 		}
@@ -1194,17 +1194,17 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 {
 	if (unit) {
 		DebugPrint("%d: %d(%s) build %s at %d,%d completed\n" _C_
-				   what.Player->GetIndex() _C_ UnitNumber(*unit) _C_ unit->Type->Ident.c_str() _C_
-				   what.Type->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
+				   what.GetPlayer()->GetIndex() _C_ UnitNumber(*unit) _C_ unit->GetType()->Ident.c_str() _C_
+				   what.GetType()->Ident.c_str() _C_ unit->GetTilePos().x _C_ unit->GetTilePos().y);
 	} else {
 		DebugPrint("%d: building %s at %d,%d completed\n" _C_
-				   what.Player->GetIndex() _C_ what.Type->Ident.c_str() _C_ what.tilePos.x _C_ what.tilePos.y);
+				   what.GetPlayer()->GetIndex() _C_ what.GetType()->Ident.c_str() _C_ what.GetTilePos().x _C_ what.GetTilePos().y);
 	}
 
-	Assert(what.Player->Type != PlayerPerson);
+	Assert(what.GetPlayer()->Type != PlayerPerson);
 	//Wyrmgus start
-//	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+//	AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType());
+	AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType(), CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID), what.Settlement);
 	//Wyrmgus end
 }
 
@@ -1220,13 +1220,13 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, const int landmass,
 //Wyrmgus end
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
-			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str() _C_
+			   what.Ident.c_str() _C_ unit.GetTilePos().x _C_ unit.GetTilePos().y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.GetPlayer()->Type != PlayerPerson);
 	//Wyrmgus start
-//	AiReduceMadeInBuilt(*unit.Player->Ai, what);
-	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass, settlement);
+//	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, what);
+	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, what, landmass, settlement);
 	//Wyrmgus end
 }
 
@@ -1241,10 +1241,10 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, const int landmass,
 void AiCanNotReach(CUnit &unit, const CUnitType &what, const int landmass, const CSite *settlement)
 //Wyrmgus end
 {
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.GetPlayer()->Type != PlayerPerson);
 	//Wyrmgus start
-//	AiReduceMadeInBuilt(*unit.Player->Ai, what);
-	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass, settlement);
+//	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, what);
+	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, what, landmass, settlement);
 	//Wyrmgus end
 }
 
@@ -1258,15 +1258,15 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	Vec2i movablepos[16];
 	int movablenb;
 
-	AiPlayer = unit.Player->Ai;
+	AiPlayer = unit.GetPlayer()->Ai;
 
 	// No more than 1 move per 10 cycle ( avoid stressing the pathfinder )
 	if (GameCycle <= AiPlayer->LastCanNotMoveGameCycle + 10) {
 		return;
 	}
 
-	const CUnitType &unit_type = *unit.Type;
-	const Vec2i u0 = unit.tilePos;
+	const CUnitType &unit_type = *unit.GetType();
+	const Vec2i u0 = unit.GetTilePos();
 	const Vec2i u1(u0 + unit_type.TileSize - 1);
 
 	movablenb = 0;
@@ -1294,35 +1294,35 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		if (!blocker.CanMove() || blocker.Moving) {
 			continue;
 		}
-		if (blocker.Player != unit.Player && blocker.Player->IsAllied(*unit.Player) == false) {
+		if (blocker.GetPlayer() != unit.GetPlayer() && blocker.GetPlayer()->IsAllied(*unit.GetPlayer()) == false) {
 			continue;
 		}
 		//Wyrmgus start
-		if (!blocker.Player->AiEnabled) {
+		if (!blocker.GetPlayer()->AiEnabled) {
 			continue;
 		}
 		
-		int blocker_force = blocker.Player->Ai->Force.GetForce(blocker);
-		if (blocker_force != -1 && blocker.Player->Ai->Force[blocker_force].Attacking) { //don't try to move the blocker if it is part of a force that is attacking
+		int blocker_force = blocker.GetPlayer()->Ai->Force.GetForce(blocker);
+		if (blocker_force != -1 && blocker.GetPlayer()->Ai->Force[blocker_force].Attacking) { //don't try to move the blocker if it is part of a force that is attacking
 			if (unit.CurrentAction() != UnitActionBoard) { //unless the unit is trying to board a ship, in which case the blocker should be moved
 				continue;
 			}
 		}
 		//Wyrmgus end
-		const CUnitType &blockertype = *blocker.Type;
+		const CUnitType &blockertype = *blocker.GetType();
 
 		if (blockertype.UnitType != unit_type.UnitType) {
 			continue;
 		}
 
-		const Vec2i b0 = blocker.tilePos;
+		const Vec2i b0 = blocker.GetTilePos();
 		const Vec2i b1(b0 + blockertype.TileSize - 1);
 
 		if (&unit == &blocker) {
 			continue;
 		}
 		// Check for collision
-		if (unit.MapDistanceTo(blocker) >= unit.Type->TileSize.x + 1) {
+		if (unit.MapDistanceTo(blocker) >= unit.GetType()->TileSize.x + 1) {
 			continue;
 		}
 
@@ -1333,7 +1333,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			r = (r + 1) & 7;
 			--trycount;
 
-			const Vec2i pos = blocker.tilePos + blocker.Type->TileSize * dirs[r];
+			const Vec2i pos = blocker.GetTilePos() + blocker.GetType()->TileSize * dirs[r];
 
 			// Out of the map => no !
 			if (!CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer)) {
@@ -1386,12 +1386,12 @@ void AiCanNotMove(CUnit &unit)
 	const int gw = unit.pathFinderData->input.GetGoalSize().x;
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
-	AiPlayer = unit.Player->Ai;
+	AiPlayer = unit.GetPlayer()->Ai;
 	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.MapLayer->ID)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		//Wyrmgus start
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		if (!unit.GetType()->BoolFlag[HARVESTER_INDEX].value) {
 			unit.Wait = CYCLES_PER_SECOND * 10; // wait a bit before trying to move the unit again; this is so when units are attacking an enemy they won't clog performance if one blocks the other; not for workers since otherwise they will spend too much time doing nothing if blocked briefly by another worker during gathering
 		}
 		//Wyrmgus end
@@ -1419,34 +1419,34 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
 			   //Wyrmgus start
-//			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-			   what.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+//			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str() _C_
+			   what.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str() _C_
 			   //Wyrmgus end
-			   what.Type->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+			   what.GetType()->Ident.c_str() _C_ unit.GetTilePos().x _C_ unit.GetTilePos().y);
 
-	Assert(what.Player->Type != PlayerPerson);
+	Assert(what.GetPlayer()->Type != PlayerPerson);
 
 	//Wyrmgus start
-//	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
-	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+//	AiRemoveFromBuilt(unit.GetPlayer()->Ai, *what.GetType());
+	if (unit.GetPlayer() == what.GetPlayer()) {
+		AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType(), CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		const CUnitType *requested_unit_type = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->GetClass());
+		const CUnitType *requested_unit_type = CFaction::GetFactionClassUnitType(what.GetPlayer()->GetFaction(), what.GetType()->GetClass());
 		if (requested_unit_type != nullptr) {
-			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+			AiRemoveFromBuilt(what.GetPlayer()->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID), what.Settlement);
 		}
 	}
 	//Wyrmgus end
 
 	//Wyrmgus start
-	what.Player->Ai->Force.RemoveDeadUnit();
-	what.Player->Ai->Force.Assign(what, -1);
+	what.GetPlayer()->Ai->Force.RemoveDeadUnit();
+	what.GetPlayer()->Ai->Force.Assign(what, -1);
 	
-	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
-		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeNaval || what.Type->UnitType == UnitTypeFly || what.Type->UnitType == UnitTypeFlyLow)) {
-			int landmass = CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID);
+	if (what.GetPlayer()->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
+		if (what.GetType()->CanTransport() && what.CanMove() && (what.GetType()->UnitType == UnitTypeNaval || what.GetType()->UnitType == UnitTypeFly || what.GetType()->UnitType == UnitTypeFlyLow)) {
+			int landmass = CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID);
 			
-			what.Player->Ai->Transporters[landmass].push_back(&what);
+			what.GetPlayer()->Ai->Transporters[landmass].push_back(&what);
 		}
 	}
 	//Wyrmgus end
@@ -1461,10 +1461,10 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 void AiUpgradeToComplete(CUnit &unit, const CUnitType &what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
-			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str() _C_
+			   what.Ident.c_str() _C_ unit.GetTilePos().x _C_ unit.GetTilePos().y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.GetPlayer()->Type != PlayerPerson);
 }
 
 /**
@@ -1476,10 +1476,10 @@ void AiUpgradeToComplete(CUnit &unit, const CUnitType &what)
 void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
-			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-			   what->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str() _C_
+			   what->Ident.c_str() _C_ unit.GetTilePos().x _C_ unit.GetTilePos().y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.GetPlayer()->Type != PlayerPerson);
 
 	// FIXME: upgrading knights -> paladins, must rebuild lists!
 }
@@ -1602,7 +1602,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int lan
 		for (size_t i = 0; i < table.size(); ++i) {
 			CUnit &unit = *table[i];
 					
-			if (CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) == landmass) {
+			if (CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID) == landmass) {
 				count++;
 			}
 		}

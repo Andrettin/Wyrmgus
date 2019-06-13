@@ -83,7 +83,7 @@
 				Exit(1);
 				return;
 			}
-			goal->Type->DamageType = this->valueStr;
+			goal->GetType()->DamageType = this->valueStr;
 			return;
 		}
 		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);

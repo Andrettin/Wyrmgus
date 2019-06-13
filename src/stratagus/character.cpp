@@ -800,7 +800,7 @@ CPersistentItem *CCharacter::GetItem(const CUnit *item) const
 {
 	for (CPersistentItem *persistent_item : this->Items) {
 		if (
-			persistent_item->Type == item->Type
+			persistent_item->Type == item->GetType()
 			&& persistent_item->Prefix == item->Prefix
 			&& persistent_item->Suffix == item->Suffix
 			&& persistent_item->Spell == item->Spell

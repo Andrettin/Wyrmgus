@@ -81,6 +81,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "video/font.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 #include "world/plane.h"
 //Wyrmgus start
@@ -920,16 +921,19 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
+			
+			PaletteImage *image = PaletteImage::GetOrAdd(type->Ident);
+			
 			int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				++k;
 
 				if (!strcmp(value, "file")) {
-					type->File = LuaToString(l, -1, k + 1);
+					image->File = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->Width, &type->Height);
+					CclGetPos(l, &image->FrameSize.x, &image->FrameSize.y);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
@@ -939,6 +943,9 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->Sprite);
 				type->Sprite = nullptr;
 			}
+			
+			image->Initialize();
+			type->Image = image;
 		} else if (!strcmp(value, "Shadow")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2428,7 +2435,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->BuildingRulesString.c_str());
 		return 1;
 	} else if (!strcmp(data, "Image")) {
-		lua_pushstring(l, type->File.c_str());
+		if (type->GetImage() != nullptr) {
+			lua_pushstring(l, type->GetImage()->GetFile().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Shadow")) {
@@ -2436,10 +2447,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Width")) {
-		lua_pushnumber(l, type->Width);
+		lua_pushnumber(l, type->GetFrameSize().x);
 		return 1;
 	} else if (!strcmp(data, "Height")) {
-		lua_pushnumber(l, type->Height);
+		lua_pushnumber(l, type->GetFrameSize().y);
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
 		if (type->Animations != nullptr) {
@@ -3349,7 +3360,7 @@ static int CclGetAnimations(lua_State *l)
 */
 void UpdateUnitVariables(CUnit &unit)
 {
-	const CUnitType *type = unit.Type;
+	const CUnitType *type = unit.GetType();
 	
 	//Wyrmgus start
 	if (!type) {
@@ -3401,14 +3412,14 @@ void UpdateUnitVariables(CUnit &unit)
 	}
 
 	//Wyrmgus
-	unit.Variable[VARIATION_INDEX].Max = unit.Type->Variations.size();
+	unit.Variable[VARIATION_INDEX].Max = unit.GetType()->Variations.size();
 	unit.Variable[VARIATION_INDEX].Enable = 1;
 	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
 
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVEL_INDEX].Max = 100000;
-	if (!IsNetworkGame() && unit.Character != nullptr && unit.Player->AiEnabled == false) {
+	if (!IsNetworkGame() && unit.Character != nullptr && unit.GetPlayer()->AiEnabled == false) {
 		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->GetLevel()) { //save level, if unit has a persistent character
 			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
 			SaveHero(unit.Character);
@@ -3416,9 +3427,9 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->GetSpecies() != nullptr && !unit.Type->GetSpecies()->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.GetType()->GetSpecies() != nullptr && !unit.GetType()->GetSpecies()->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
-		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->GetSpecies()->ChildUpgrade));
+		IndividualUpgradeLost(unit, CUpgrade::Get(unit.GetType()->GetSpecies()->ChildUpgrade));
 	}
 	//Wyrmgus end
 
@@ -3427,13 +3438,13 @@ void UpdateUnitVariables(CUnit &unit)
 
 	// Transport
 	unit.Variable[TRANSPORT_INDEX].Value = unit.BoardCount;
-	unit.Variable[TRANSPORT_INDEX].Max = unit.Type->MaxOnBoard;
+	unit.Variable[TRANSPORT_INDEX].Max = unit.GetType()->MaxOnBoard;
 
 	unit.CurrentOrder()->UpdateUnitVariables(unit);
 
 	// Resources.
 	//Wyrmgus start
-//	if (unit.Type->GivesResource) {
+//	if (unit.GetType()->GivesResource) {
 	if (unit.GivesResource) {
 	//Wyrmgus end
 		unit.Variable[GIVERESOURCE_INDEX].Value = unit.ResourcesHeld;
@@ -3442,9 +3453,9 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[GIVERESOURCE_INDEX].Enable = 1;
 		//Wyrmgus end
 	}
-	if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.CurrentResource) {
+	if (unit.GetType()->BoolFlag[HARVESTER_INDEX].value && unit.CurrentResource) {
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
-		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
+		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}
 
 	//Wyrmgus start
@@ -3467,9 +3478,9 @@ void UpdateUnitVariables(CUnit &unit)
 
 	// Position
 	if (unit.MapLayer) {
-		unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
+		unit.Variable[POSX_INDEX].Value = unit.GetTilePos().x;
 		unit.Variable[POSX_INDEX].Max = unit.MapLayer->GetWidth();
-		unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
+		unit.Variable[POSY_INDEX].Value = unit.GetTilePos().y;
 		unit.Variable[POSY_INDEX].Max = unit.MapLayer->GetHeight();
 	}
 
@@ -3497,7 +3508,7 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[ISALIVE_INDEX].Max = 1;
 
 	// Player
-	unit.Variable[PLAYER_INDEX].Value = unit.Player->GetIndex();
+	unit.Variable[PLAYER_INDEX].Value = unit.GetPlayer()->GetIndex();
 	unit.Variable[PLAYER_INDEX].Max = PlayerMax;
 	
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values

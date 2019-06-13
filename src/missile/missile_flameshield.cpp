@@ -69,11 +69,11 @@ void MissileFlameShield::Action()
 	while (unit->Container) {
 		unit = unit->Container;
 	}
-	const Vec2i upos = unit->tilePos;
+	const Vec2i upos = unit->GetTilePos();
 	const int ix = unit->IX;
 	const int iy = unit->IY;
-	const int uw = unit->Type->TileSize.x;
-	const int uh = unit->Type->TileSize.y;
+	const int uw = unit->GetType()->TileSize.x;
+	const int uh = unit->GetType()->TileSize.y;
 	this->position.x = upos.x * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
 	this->position.y = upos.y * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitActionDie) {

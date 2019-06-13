@@ -302,7 +302,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end(); ++it) {
 			CUnit &unit = **it;
 
-			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.IsEnemy(caster)) {
+			if (unit.GetType()->BoolFlag[ORGANIC_INDEX].value && unit.IsEnemy(caster)) {
 				table[count++] = &unit;
 			}
 		}
@@ -312,8 +312,8 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 			for (std::vector<CUnit *>::iterator it = table.begin(); it != table.begin() + count && damageLeft > 0; ++it) {
 				CUnit &unit = **it;
 				if (unit.IsAliveOnMap()) {
-					EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos, &startPos);
-					EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.tilePos, &endPos);
+					EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.GetTilePos(), &startPos);
+					EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.GetTilePos(), &endPos);
 					//Wyrmgus start
 //					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos, z);

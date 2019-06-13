@@ -60,6 +60,8 @@ class PaletteImage : public DataElement, public DataType<PaletteImage>
 public:
 	static constexpr const char *ClassIdentifier = "palette_image";
 	
+	static inline const Vector2i EmptyFrameSize = Vector2i(0, 0);
+	
 	virtual void Initialize() override;
 	
 	const String &GetFile() const
@@ -82,6 +84,7 @@ private:
 	Ref<ImageTexture> Texture;									/// the image's texture
 
 	friend int CclDefineIcon(lua_State *l);
+	friend int CclDefineUnitType(lua_State *l);
 	
 protected:
 	static void _bind_methods();

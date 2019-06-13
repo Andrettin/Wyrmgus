@@ -508,7 +508,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	log->GameCycle = GameCycle;
 
 	log->UnitNumber = (unit ? UnitNumber(*unit) : -1);
-	log->UnitIdent = (unit ? unit->Type->Ident.c_str() : "");
+	log->UnitIdent = (unit ? unit->GetType()->Ident.c_str() : "");
 
 	log->Action = action;
 	log->Flush = flush;
@@ -856,7 +856,7 @@ static void DoNextReplay()
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 
-	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
+	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->GetType()->Ident);
 
 	if (RNG->get_seed() != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG

@@ -178,7 +178,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->GetResource() != -1) {
 		order->CurrentResource = CMap::Map.Field(pos, z)->GetResource();
 		//  Find the closest resource tile next to a tile where the unit can move
-		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, CMap::Map.Field(pos, z)->GetResource(), 20, *harvester.Player, pos, &ressourceLoc, z)) {
+		if (!FindNearestReachableTerrainType(harvester.GetType()->MovementMask, CMap::Map.Field(pos, z)->GetResource(), 20, *harvester.GetPlayer(), pos, &ressourceLoc, z)) {
 			DebugPrint("FIXME: Give up???\n");
 			ressourceLoc = pos;
 		}
@@ -195,7 +195,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 
 	order->SetGoal(&mine);
 	order->Resource.Mine = &mine;
-	order->Resource.Pos = mine.tilePos + mine.GetHalfTileSize();
+	order->Resource.Pos = mine.GetTilePos() + mine.GetHalfTileSize();
 	order->Resource.MapLayer = mine.MapLayer->ID;
 	order->CurrentResource = mine.GivesResource;
 	return order;
@@ -220,7 +220,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 		order->UnitGotoGoal(harvester, depot, SUB_MOVE_TO_DEPOT);
 	} else {
 		order->State = SUB_UNREACHABLE_DEPOT;
-		order->goalPos = harvester.tilePos;
+		order->goalPos = harvester.GetTilePos();
 		order->MapLayer = harvester.MapLayer->ID;
 	}
 	return order;
@@ -231,9 +231,9 @@ Vec2i COrder_Resource::GetHarvestLocation() const
 {
 	//Wyrmgus start
 //	if (this->Resource.Mine != nullptr) {
-	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
+	if (this->Resource.Mine != nullptr && this->Resource.Mine->GetType() != nullptr) {
 	//Wyrmgus end
-		return this->Resource.Mine->tilePos;
+		return this->Resource.Mine->GetTilePos();
 	} else {
 		return this->Resource.Pos;
 	}
@@ -244,7 +244,7 @@ int COrder_Resource::GetHarvestMapLayer() const
 {
 	//Wyrmgus start
 //	if (this->Resource.Mine != nullptr) {
-	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
+	if (this->Resource.Mine != nullptr && this->Resource.Mine->GetType() != nullptr) {
 	//Wyrmgus end
 		return this->Resource.Mine->MapLayer->ID;
 	} else {
@@ -311,7 +311,7 @@ COrder_Resource::~COrder_Resource()
 	//Wyrmgus end
 	//Wyrmgus start
 //	if (this->Resource.Mine != nullptr) {
-	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
+	if (this->Resource.Mine != nullptr && this->Resource.Mine->GetType() != nullptr) {
 	//Wyrmgus end
 		file.printf(" \"res-mine\", \"%s\",", UnitReference(this->Resource.Mine).c_str());
 	}
@@ -344,7 +344,7 @@ COrder_Resource::~COrder_Resource()
 		this->Resource.Mine = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
 		//Wyrmgus start
-		if (this->Resource.Mine->Type == nullptr) {
+		if (this->Resource.Mine->GetType() == nullptr) {
 			this->Resource.Mine = nullptr;
 		}
 		//Wyrmgus end
@@ -431,7 +431,7 @@ COrder_Resource::~COrder_Resource()
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -471,7 +471,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	// Wood gone, look somewhere else.
 	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->IsTerrainResourceOnMap(CurrentResource) == false)
 		&& (!unit.IX) && (!unit.IY)) {
-		if (!FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
+		if (!FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 16, *unit.GetPlayer(), this->goalPos, &pos, this->MapLayer)) {
 			// no wood in range
 			return -1;
 		} else {
@@ -482,14 +482,14 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -497,14 +497,14 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			}
 			//Wyrmgus end
 			unit.Wait = 10;
-			if (unit.Player->AiEnabled) {
+			if (unit.GetPlayer()->AiEnabled) {
 				this->Range++;
 				if (this->Range >= 5) {
 					this->Range = 0;
 					AiCanNotMove(unit);
 				}
 			}
-			if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 9999, *unit.Player, unit.tilePos, &pos, z)) {
+			if (FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 9999, *unit.GetPlayer(), unit.GetTilePos(), &pos, z)) {
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
 				// FIXME: can't this overflow? It really shouldn't, since
@@ -516,7 +516,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		case PF_REACHED:
 			return 1;
 		case PF_WAIT:
-			if (unit.Player->AiEnabled) {
+			if (unit.GetPlayer()->AiEnabled) {
 				this->Range++;
 				if (this->Range >= 5) {
 					this->Range = 0;
@@ -542,14 +542,14 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -560,7 +560,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 		case PF_REACHED:
 			break;
 		case PF_WAIT:
-			if (unit.Player->AiEnabled) {
+			if (unit.GetPlayer()->AiEnabled) {
 				this->Range++;
 				if (this->Range >= 5) {
 					this->Range = 0;
@@ -569,7 +569,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 			}
 		default:
 			// Goal gone or something.
-			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(*unit.Player)) {
+			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 				return 0;
 			}
 			break;
@@ -586,7 +586,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 */
 int COrder_Resource::MoveToResource(CUnit &unit)
 {
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
@@ -622,18 +622,18 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 int COrder_Resource::StartGathering(CUnit &unit)
 {
 	CUnit *goal;
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 	Assert(!unit.IX);
 	Assert(!unit.IY);
 
 	//Wyrmgus start
 	const int input_resource = CResource::GetAll()[this->CurrentResource]->InputResource;
-	if (input_resource && (unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
+	if (input_resource && (unit.GetPlayer()->Resources[input_resource] + unit.GetPlayer()->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
 		const char *input_name = DefaultResourceNames[input_resource].c_str();
 		const char *input_actionName = CResource::GetAll()[input_resource]->ActionName.c_str();
-		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
-		if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
-			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
+		unit.GetPlayer()->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
+		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.GetPlayer()->Race][input_resource].Sound) {
+			PlayGameSound(GameSounds.NotEnoughRes[unit.GetPlayer()->Race][input_resource].Sound, MaxSampleVolume);
 		}
 		this->Finished = true;
 		return 0;
@@ -651,9 +651,9 @@ int COrder_Resource::StartGathering(CUnit &unit)
 			return 0;
 		}
 #endif
-		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
+		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.GetTilePos());
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.GetPlayer()->SpeedResourcesHarvest[resinfo.ResourceId]);
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -669,15 +669,15 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	// Target is dead, stop getting resources.
 	//Wyrmgus start
-//	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false) {
+//	if (!goal || goal->IsVisibleAsGoal(*unit.GetPlayer()) == false) {
 	//the goal could also have changed its given resource
-	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false || goal->GivesResource != this->CurrentResource) {
+	if (!goal || goal->IsVisibleAsGoal(*unit.GetPlayer()) == false || goal->GivesResource != this->CurrentResource) {
 	//Wyrmgus end
 		// Find an alternative, but don't look too far.
 		this->goalPos.x = -1;
 		this->goalPos.y = -1;
 		//Wyrmgus start
-//		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled))) {
+//		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.GetPlayer()->AiEnabled))) {
 		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true))) {
 		//Wyrmgus end
 			this->State = SUB_START_RESOURCE;
@@ -694,12 +694,12 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
-//	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
+//	UnitHeadingFromDeltaXY(unit, goal->GetTilePos() - unit.GetTilePos() + goal->GetType()->GetHalfTileSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!
-	if ((goal->Type->MaxOnBoard && goal->Resource.Active >= goal->Type->MaxOnBoard)
+	if ((goal->GetType()->MaxOnBoard && goal->Resource.Active >= goal->GetType()->MaxOnBoard)
 		|| goal->CurrentAction() == UnitActionBuilt) {
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
@@ -712,7 +712,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Place unit inside the resource
 	//Wyrmgus start
 //	if (!resinfo.HarvestFromOutside) {
-	if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+	if (!goal->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
@@ -747,12 +747,12 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	if (resinfo.WaitAtResource) {
 		//Wyrmgus start
-//		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+//		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.GetPlayer()->SpeedResourcesHarvest[resinfo.ResourceId]);
 		int wait_at_resource = resinfo.WaitAtResource;
-		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+		if (!goal->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 			wait_at_resource = resinfo.WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.GetPlayer()->SpeedResourcesHarvest[resinfo.ResourceId] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -769,8 +769,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 static void AnimateActionHarvest(CUnit &unit)
 {
 	//Wyrmgus start
-//	Assert(unit.Type->Animations->Harvest[unit.CurrentResource]);
-//	UnitShowAnimation(unit, unit.Type->Animations->Harvest[unit.CurrentResource]);
+//	Assert(unit.GetType()->Animations->Harvest[unit.CurrentResource]);
+//	UnitShowAnimation(unit, unit.GetType()->Animations->Harvest[unit.CurrentResource]);
 	Assert(unit.GetAnimations()->Harvest[unit.CurrentResource]);
 	UnitShowAnimation(unit, unit.GetAnimations()->Harvest[unit.CurrentResource]);
 	//Wyrmgus end
@@ -786,10 +786,10 @@ static void AnimateActionHarvest(CUnit &unit)
 void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 {
 	CUnit *depot;
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
-	const CUnitType &source_type = *source.Type;
+	const CUnitType &source_type = *source.GetType();
 	
 //	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
 //		   || (!unit.Container && resinfo.HarvestFromOutside));
@@ -827,7 +827,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// If we are fully loaded first search for a depot.
 	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.CurrentResource))) {
 		if (unit.Container) {
-			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), &source);
+			DropOutNearest(unit, depot->GetTilePos() + depot->GetHalfTileSize(), &source);
 		}
 		// Remember where it mined, so it can look around for another resource.
 		//
@@ -836,7 +836,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 		this->DoneHarvesting = true;
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Going to depot\n"
-				   _C_ unit.Player->GetIndex() _C_ UnitNumber(unit));
+				   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit));
 		return;
 	}
 	// No depot found, or harvester empty
@@ -852,17 +852,17 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	this->goalPos.y = -1;
 	//use depot as goal
 	//Wyrmgus start
-//	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
+//	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.GetPlayer()->AiEnabled);
 	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true);
 	//Wyrmgus end
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
-				   _C_ unit.Player->GetIndex() _C_ UnitNumber(unit));
+				   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit));
 		this->State = SUB_START_RESOURCE;
 		this->SetGoal(depot);
 	} else {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Just sits around confused.\n"
-				   _C_ unit.Player->GetIndex() _C_ UnitNumber(unit));
+				   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit));
 		this->Finished = true;
 	}
 }
@@ -879,11 +879,11 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 int COrder_Resource::GatherResource(CUnit &unit)
 {
 	CUnit *source = 0;
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 	int addload;
 
 	//Wyrmgus start
-	bool harvest_from_outside = (this->GetGoal() && this->GetGoal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
+	bool harvest_from_outside = (this->GetGoal() && this->GetGoal()->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 //	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
 	if (harvest_from_outside || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 	//Wyrmgus end
@@ -922,9 +922,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		//FIXME: rb - how should it look for WaitAtResource == 0
 		if (resinfo.WaitAtResource) {
 			// Wyrmgus start
-//			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+//			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.GetPlayer()->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = resinfo.WaitAtResource;
-			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo.ResourceId];
+			int resource_harvest_speed = unit.GetPlayer()->SpeedResourcesHarvest[resinfo.ResourceId];
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
 				wait_at_resource = resinfo.WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
 			}
@@ -944,7 +944,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			//Wyrmgus start
 //			addload = resinfo.ResourceCapacity;
 			if (this->CurrentResource == TradeCost) { // the load added when trading depends on the price difference between the two players
-				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, resinfo.ResourceCapacity);
+				addload = unit.GetPlayer()->ConvergePricesWith(*unit.Container->GetPlayer(), resinfo.ResourceCapacity);
 				addload = std::max(10, addload);
 			} else {
 				addload = std::min(100, resinfo.ResourceCapacity);
@@ -996,7 +996,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			//Wyrmgus start
 			UpdateUnitVariables(*source); //update resource source's variables
 			//Wyrmgus end
-			bool is_visible = source->IsVisibleAsGoal(*unit.Player);
+			bool is_visible = source->IsVisibleAsGoal(*unit.GetPlayer());
 			// Target is not dead, getting resources.
 			if (is_visible) {
 				// Don't load more that there is.
@@ -1006,14 +1006,14 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //				source->ResourcesHeld -= addload;
 				const int input_resource = CResource::GetAll()[this->CurrentResource]->InputResource;
 				if (input_resource) {
-					addload = std::min(unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource], addload);
+					addload = std::min(unit.GetPlayer()->Resources[input_resource] + unit.GetPlayer()->StoredResources[input_resource], addload);
 					
 					if (!addload) {
 						const char *input_name = DefaultResourceNames[input_resource].c_str();
 						const char *input_actionName = CResource::GetAll()[input_resource]->ActionName.c_str();
-						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
-						if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
-							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
+						unit.GetPlayer()->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
+						if (unit.GetPlayer() == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.GetPlayer()->Race][input_resource].Sound) {
+							PlayGameSound(GameSounds.NotEnoughRes[unit.GetPlayer()->Race][input_resource].Sound, MaxSampleVolume);
 						}
 
 						if (unit.Container) {
@@ -1023,10 +1023,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						return 0;
 					}
 					
-					unit.Player->ChangeResource(input_resource, -addload, true);
+					unit.GetPlayer()->ChangeResource(input_resource, -addload, true);
 				}
 				unit.ChangeResourcesHeld(addload);
-				if (!source->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
+				if (!source->GetType()->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
 					source->ChangeResourcesHeld(-addload);
 				}
 				//Wyrmgus end
@@ -1038,7 +1038,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				if (unit.Anim.Unbreakable) {
 					return 0;
 				}
-				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.Player->GetIndex() _C_ UnitNumber(unit));
+				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit));
 				bool dead = source->IsAlive() == false;
 
 				// Improved version of DropOutAll that makes workers go to the depot.
@@ -1056,9 +1056,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// This only happens when it's empty.
 				if (!dead) {
 					if (Preference.MineNotifications
-						&& unit.Player->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()
+						&& unit.GetPlayer()->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()
 						&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::GetAll()[this->CurrentResource]->DefaultIncome * 10)) {
-							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->GetName().utf8().get_data());
+							unit.GetPlayer()->Notify(NotifyYellow, source->GetTilePos(), source->MapLayer->ID, _("Our %s has been depleted!"), source->GetType()->GetName().utf8().get_data());
 					}
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
@@ -1121,7 +1121,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 int COrder_Resource::StopGathering(CUnit &unit)
 {
 	CUnit *source = 0;
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
 //	if (!resinfo.TerrainHarvester) {
@@ -1129,7 +1129,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (resinfo.HarvestFromOutside) {
-		if (this->GetGoal() && this->GetGoal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+		if (this->GetGoal() && this->GetGoal()->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 		//Wyrmgus end
 			source = this->GetGoal();
 			this->ClearGoal();
@@ -1141,16 +1141,16 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		//Store resource position.
 		this->Resource.Mine = source;
 		
-		if (Preference.MineNotifications && unit.Player->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()
+		if (Preference.MineNotifications && unit.GetPlayer()->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()
 			&& source->IsAlive()
 			&& !source->MineLow
 			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
 			&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::GetAll()[this->CurrentResource]->DefaultIncome * 10)) {
-				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->GetName().utf8().get_data());
+				unit.GetPlayer()->Notify(NotifyYellow, source->GetTilePos(), source->MapLayer->ID, _("Our %s is nearing depletion!"), source->GetType()->GetName().utf8().get_data());
 				source->MineLow = 1;
 		}
 
-		if (source->Type->MaxOnBoard) {
+		if (source->GetType()->MaxOnBoard) {
 			int count = 0;
 			CUnit *worker = source->Resource.Workers;
 			CUnit *next = nullptr;
@@ -1169,9 +1169,9 @@ int COrder_Resource::StopGathering(CUnit &unit)
 				}
 			}
 			if (next) {
-				if (!unit.Player->AiEnabled) {
+				if (!unit.GetPlayer()->AiEnabled) {
 					DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
-							   _C_ unit.Player->GetIndex() _C_ UnitNumber(unit)
+							   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit)
 							   _C_ UnitNumber(*next) _C_ next->Wait
 							   _C_ UnitNumber(*source) _C_ source->Resource.Assigned
 							   _C_ count);
@@ -1184,7 +1184,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		}
 	} else {
 		// Store resource position.
-		this->Resource.Pos = unit.tilePos;
+		this->Resource.Pos = unit.GetTilePos();
 		this->Resource.MapLayer = unit.MapLayer->ID;
 		Assert(this->Resource.Mine == nullptr);
 	}
@@ -1200,7 +1200,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
+		if (!((source && source->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutOnSide(unit, LookingW, source);
@@ -1213,16 +1213,16 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
-				   _C_ unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.CurrentResource);
+				   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.CurrentResource);
 		this->Finished = true;
 		return 0;
 	} else {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
+		if (!((source && source->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			Assert(unit.Container);
-			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), source);
+			DropOutNearest(unit, depot->GetTilePos() + depot->GetHalfTileSize(), source);
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 	}
@@ -1243,23 +1243,23 @@ int COrder_Resource::StopGathering(CUnit &unit)
 */
 int COrder_Resource::MoveToDepot(CUnit &unit)
 {
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 	CUnit &goal = *this->GetGoal();
-	CPlayer &player = *unit.Player;
+	CPlayer &player = *unit.GetPlayer();
 	Assert(&goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -1270,7 +1270,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		case PF_REACHED:
 			break;
 		case PF_WAIT:
-			if (unit.Player->AiEnabled) {
+			if (unit.GetPlayer()->AiEnabled) {
 				this->Range++;
 				if (this->Range >= 5) {
 					this->Range = 0;
@@ -1379,8 +1379,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	if (unit.Wait) {
 		//Wyrmgus start
-//		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo.ResourceId] / SPEEDUP_FACTOR);
-		unit.Wait /= std::max(1, (unit.Player->SpeedResourcesReturn[resinfo.ResourceId] + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+//		unit.Wait /= std::max(1, unit.GetPlayer()->SpeedResourcesReturn[resinfo.ResourceId] / SPEEDUP_FACTOR);
+		unit.Wait /= std::max(1, (unit.GetPlayer()->SpeedResourcesReturn[resinfo.ResourceId] + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 		//Wyrmgus end
 		if (unit.Wait) {
 			unit.Wait--;
@@ -1398,20 +1398,20 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 */
 bool COrder_Resource::WaitInDepot(CUnit &unit)
 {
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
-	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId, unit.MapLayer->ID);
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
+	const CUnit *depot = ResourceDepositOnMap(unit.GetTilePos(), resinfo.ResourceId, unit.MapLayer->ID);
 
 	//Assert(depot);
 
 	// Range hardcoded. don't stray too far though
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
-	if (!this->Resource.Mine || this->Resource.Mine->Type == nullptr) {
+	if (!this->Resource.Mine || this->Resource.Mine->GetType() == nullptr) {
 	//Wyrmgus end
 		Vec2i pos = this->Resource.Pos;
 		int z = this->Resource.MapLayer = unit.MapLayer->ID;
 
-		if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 10, *unit.Player, pos, &pos, z)) {
+		if (FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 10, *unit.GetPlayer(), pos, &pos, z)) {
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
 			}
@@ -1435,17 +1435,17 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
 
 		//Wyrmgus start
-//		if (unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
-		if (depot && unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) { //check if the depot is valid
+//		if (unit.GetPlayer()->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
+		if (depot && unit.GetPlayer()->AiEnabled && AiPlayer && AiPlayer->BuildDepots) { //check if the depot is valid
 		//Wyrmgus end
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
 			//Wyrmgus start
 //			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
-			if (longWay || !mine || mine->Type == nullptr || (depot->Refs > tooManyWorkers)) {
+			if (longWay || !mine || mine->GetType() == nullptr || (depot->Refs > tooManyWorkers)) {
 			//Wyrmgus end
 				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
-				if (newdepot == nullptr && longWay && unit.Player->NumTownHalls > 0) {
+				if (newdepot == nullptr && longWay && unit.GetPlayer()->NumTownHalls > 0) {
 					// We need a new depot
 					AiNewDepotRequest(unit);
 				}
@@ -1456,15 +1456,15 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		if (!goal) {
 			//Wyrmgus start
 //			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
-//									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
-			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->Type) ? *mine : unit), (mine && mine->Type) ? range : 1000,
+//									this->CurrentResource, unit.GetPlayer()->AiEnabled, newdepot ? newdepot : depot);
+			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->GetType()) ? *mine : unit), (mine && mine->GetType()) ? range : 1000,
 									this->CurrentResource, true, newdepot ? newdepot : depot, true, false, false, false, true, true, true);
 			//Wyrmgus end
 		}
 
 		if (goal) {
 			if (depot) {
-				DropOutNearest(unit, goal->tilePos + goal->GetHalfTileSize(), depot);
+				DropOutNearest(unit, goal->GetTilePos() + goal->GetHalfTileSize(), depot);
 			}
 
 			if (goal != mine) {
@@ -1478,10 +1478,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
 #ifdef DEBUG
-			const Vec2i &pos = mine ? mine->tilePos : unit.tilePos;
+			const Vec2i &pos = mine ? mine->GetTilePos() : unit.GetTilePos();
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
-					   _C_ unit.Player->GetIndex() _C_ UnitNumber(unit)
-					   _C_ unit.tilePos.x _C_ unit.tilePos.y
+					   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit)
+					   _C_ unit.GetTilePos().x _C_ unit.GetTilePos().y
 					   _C_ pos.x _C_ pos.y _C_ range);
 #endif
 			if (depot) {
@@ -1501,7 +1501,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 void COrder_Resource::DropResource(CUnit &unit)
 {
 	if (unit.CurrentResource) {
-		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
+		const ResourceInfo &resinfo = *unit.GetType()->ResInfo[unit.CurrentResource];
 
 		//Wyrmgus start
 //		if (!resinfo.TerrainHarvester) {
@@ -1529,7 +1529,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 */
 void COrder_Resource::ResourceGiveUp(CUnit &unit)
 {
-	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.Player->GetIndex() _C_ UnitNumber(unit));
+	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit));
 	if (this->HasGoal()) {
 		DropResource(unit);
 		this->ClearGoal();
@@ -1546,7 +1546,7 @@ void COrder_Resource::ResourceGiveUp(CUnit &unit)
 bool COrder_Resource::FindAnotherResource(CUnit &unit)
 {
 	if (this->CurrentResource) {
-		const ResourceInfo *resinfo = unit.Type->ResInfo[this->CurrentResource];
+		const ResourceInfo *resinfo = unit.GetType()->ResInfo[this->CurrentResource];
 		if (resinfo) {
 			//Wyrmgus start
 	//		if (!resinfo.TerrainHarvester) {
@@ -1554,7 +1554,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 			//Wyrmgus end
 				//Wyrmgus start
 //				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
-				CUnit *newGoal = UnitFindResource(unit, (this->Resource.Mine && this->Resource.Mine->Type) ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1, nullptr, true, false, false, false, true);
+				CUnit *newGoal = UnitFindResource(unit, (this->Resource.Mine && this->Resource.Mine->GetType()) ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1, nullptr, true, false, false, false, true);
 				//Wyrmgus end
 
 				if (newGoal) {
@@ -1572,7 +1572,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				}
 			} else {
 				Vec2i resPos;
-				if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
+				if (FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 8, *unit.GetPlayer(), unit.GetTilePos(), &resPos, unit.MapLayer->ID)) {
 					this->goalPos = resPos;
 					this->MapLayer = unit.MapLayer->ID;
 					this->State = SUB_MOVE_TO_RESOURCE;
@@ -1633,7 +1633,7 @@ void COrder_Resource::Execute(CUnit &unit)
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;

@@ -165,12 +165,12 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 //Wyrmgus start
 static void StopRaft(CUnit &unit)
 {
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	if ((mf.GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
+	if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
 			}
 		}
@@ -182,7 +182,7 @@ static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int ne
 	for (CUnit *connector : CMap::Map.MapLayers[old_z]->GetLayerConnectors()) {
 		CUnit *connector_destination = connector->ConnectingDestination;
 		std::vector<CUnit *> connector_path;
-		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.Player)) {
+		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.GetPlayer())) {
 			connector_path.push_back(connector);
 			checked_connectors.push_back(connector);
 			checked_connectors.push_back(connector_destination);
@@ -252,7 +252,7 @@ void CommandStandGround(CUnit &unit, int flush)
 {
 	COrderPtr *order;
 
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -342,14 +342,14 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
+	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
 	CMapField &new_mf = *CMap::Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
-	if ((mf.GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+	if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
 				if ((new_mf.GetFlags() & MapFieldWaterAllowed) || (new_mf.GetFlags() & MapFieldCoastAllowed) || (mf.GetFlags() & MapFieldWaterAllowed)) { // if is standing on water, tell the raft to go to the nearest coast, even if the ultimate goal is on land
 					CommandStopUnit(unit);
@@ -440,7 +440,7 @@ void CommandQuest(CUnit &unit, CQuest *quest)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	unit.Player->AcceptQuest(quest);
+	unit.GetPlayer()->AcceptQuest(quest);
 }
 
 /**
@@ -522,7 +522,7 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -572,13 +572,13 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
+	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
 	CMapField &new_mf = *CMap::Map.Field(pos, z);
-	if ((mf.GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+	if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
 			}
 		}
@@ -590,7 +590,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 	COrderPtr *order;
 
 	//Wyrmgus start
-//	if (!unit.Type->CanAttack) {
+//	if (!unit.GetType()->CanAttack) {
 	if (!unit.CanAttack(true)) {
 	//Wyrmgus end
 		ClearNewAction(unit);
@@ -633,7 +633,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 	COrderPtr *order;
 
 	//Wyrmgus start
-//	if (!unit.Type->CanAttack) {
+//	if (!unit.GetType()->CanAttack) {
 	if (!unit.CanAttack(true)) {
 	//Wyrmgus end
 		ClearNewAction(unit);
@@ -758,8 +758,8 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 		}
 	}
 	//Wyrmgus start
-//	*order = COrder::NewActionPatrol(unit.tilePos, pos);
-	*order = COrder::NewActionPatrol(unit.tilePos, pos, unit.MapLayer->ID, z);
+//	*order = COrder::NewActionPatrol(unit.GetTilePos(), pos);
+	*order = COrder::NewActionPatrol(unit.GetTilePos(), pos, unit.MapLayer->ID, z);
 	//Wyrmgus end
 
 	ClearSavedAction(unit);
@@ -786,7 +786,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -855,8 +855,8 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, 
 	COrderPtr *order;
 
 	//Wyrmgus start
-//	if (unit.Type->BoolFlag[BUILDING_INDEX].value && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos, z) > unit.Type->RepairRange) {
+//	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.GetType()->RepairRange) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos, z) > unit.GetType()->RepairRange) {
 	//Wyrmgus end
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
@@ -886,22 +886,22 @@ void CommandDismiss(CUnit &unit, bool salvage)
 	} else {
 		if (salvage) {
 			std::vector<CUnit *> table;
-			SelectAroundUnit(unit, 16, table, IsEnemyWith(*unit.Player));
+			SelectAroundUnit(unit, 16, table, IsEnemyWith(*unit.GetPlayer()));
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (
 					(table[i]->CurrentAction() == UnitActionAttack || table[i]->CurrentAction() == UnitActionSpellCast)
 					&& table[i]->CurrentOrder()->HasGoal()
 					&& table[i]->CurrentOrder()->GetGoal() == &unit
 				) {
-					if (unit.Player->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
-						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
+					if (unit.GetPlayer()->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
+						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.GetTilePos(), unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
 				}
 			}
 			int type_costs[MaxCosts];
-			unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
-			unit.Player->AddCostsFactor(type_costs, unit.Variable[SALVAGEFACTOR_INDEX].Value * unit.Variable[HP_INDEX].Value / unit.GetModifiedVariable(HP_INDEX, VariableMax));
+			unit.GetPlayer()->GetUnitTypeCosts(unit.GetType(), type_costs, false, true);
+			unit.GetPlayer()->AddCostsFactor(type_costs, unit.Variable[SALVAGEFACTOR_INDEX].Value * unit.Variable[HP_INDEX].Value / unit.GetModifiedVariable(HP_INDEX, VariableMax));
 		}
 		DebugPrint("Suicide unit ... \n");
 		LetUnitDie(unit, true);
@@ -924,7 +924,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	if (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+	if (!unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value) {
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -934,7 +934,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -965,7 +965,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	if (dest.Destroyed) {
 		return ;
 	}
-	if (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+	if (!unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value) {
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -975,7 +975,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -1000,8 +1000,8 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	if ((unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.ResourcesHeld == 0)
-		|| (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value)) {
+	if ((unit.GetType()->BoolFlag[HARVESTER_INDEX].value && unit.ResourcesHeld == 0)
+		|| (!unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value)) {
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -1014,7 +1014,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	
 	COrderPtr *order;
 
-	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -1045,26 +1045,26 @@ void CommandTrainUnit(CUnit &unit, const CUnitType &type, const int player, cons
 	// Check if enough resources remains? (NETWORK!)
 	// FIXME: wrong if append to message queue!!!
 	//Wyrmgus start
-//	if (unit.Player->CheckLimits(type) < 0
-//		|| unit.Player->CheckUnitType(type)) {
+//	if (unit.GetPlayer()->CheckLimits(type) < 0
+//		|| unit.GetPlayer()->CheckUnitType(type)) {
 	if (CPlayer::Players[player]->CheckLimits(type) < 0
-		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&type) != 0)) {
+		|| CPlayer::Players[player]->CheckUnitType(type, unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].GetUnitStock(&type) != 0)) {
 	//Wyrmgus end
 		return;
 	}
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
+	if (unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
 		if (player == CPlayer::GetThisPlayer()->GetIndex()) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
 		return;
 	}
 	
-	if (unit.Player->GetIndex() != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
-		CPlayer::Players[player]->ShareUpgradeProgress(*unit.Player, unit);
+	if (unit.GetPlayer()->GetIndex() != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
+		CPlayer::Players[player]->ShareUpgradeProgress(*unit.GetPlayer(), unit);
 	}
 
-	if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
+	if (unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
 			return;
 		}
@@ -1115,7 +1115,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 			unit.CurrentOrder()->Cancel(unit);
 			RemoveOrder(unit, 0);
 		}
-		if (unit.Player == CPlayer::GetThisPlayer() && unit.Selected) {
+		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && unit.Selected) {
 			SelectedUnitChanged();
 		}
 	} else if (unit.Orders.size() <= static_cast<size_t>(slot)) {
@@ -1135,7 +1135,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		RemoveOrder(unit, slot);
 
 		// Update interface.
-		if (unit.Player == CPlayer::GetThisPlayer() && unit.Selected) {
+		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && unit.Selected) {
 			SelectedUnitChanged();
 		}
 	}
@@ -1155,7 +1155,7 @@ void CommandUpgradeTo(CUnit &unit, const CUnitType &type, int flush)
 	}
 
 	// Check if enough resources remains? (NETWORK!)
-	if (unit.Player->CheckUnitType(type)) {
+	if (unit.GetPlayer()->CheckUnitType(type)) {
 		return;
 	}
 
@@ -1227,7 +1227,7 @@ void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 	
 	// Check if enough resources remains? (NETWORK!)
 	//Wyrmgus start
-//	if (unit.Player->CheckCosts(what.Costs)) {
+//	if (unit.GetPlayer()->CheckCosts(what.Costs)) {
 	int upgrade_costs[MaxCosts];
 	CPlayer::Players[player]->GetUpgradeCosts(&what, upgrade_costs);
 	if (CPlayer::Players[player]->CheckCosts(upgrade_costs)) {
@@ -1298,7 +1298,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
-	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
+	Assert(std::find(unit.GetType()->Spells.begin(), unit.GetType()->Spells.end(), &spell) != unit.GetType()->Spells.end());
 	
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 

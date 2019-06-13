@@ -182,7 +182,7 @@ bool CDependency::Check(const CPlayer *player, const bool ignore_units) const
 bool CDependency::Check(const CUnit *unit, bool ignore_units) const
 {
 	//dependencies check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
-	return this->Check(unit->Player, ignore_units);
+	return this->Check(unit->GetPlayer(), ignore_units);
 }
 
 /**
@@ -288,7 +288,7 @@ bool CheckDependencies(const CUnitType *target, const CUnit *unit, const bool ig
 		return false;
 	}
 	
-	if (UnitIdAllowed(*unit->Player, target->GetIndex()) == 0) {
+	if (UnitIdAllowed(*unit->GetPlayer(), target->GetIndex()) == 0) {
 		return false;
 	}
 	
@@ -305,7 +305,7 @@ bool CheckDependencies(const CUpgrade *target, const CUnit *unit, const bool ign
 		return false;
 	}
 	
-	if (UpgradeIdAllowed(*unit->Player, target->GetIndex()) == 'F') {
+	if (UpgradeIdAllowed(*unit->GetPlayer(), target->GetIndex()) == 'F') {
 		return false;
 	}
 

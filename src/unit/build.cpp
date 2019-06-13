@@ -68,11 +68,11 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *par
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
+//	for (std::vector<CBuildRestriction *>::const_iterator i = unit.GetType()->BuildingRules.begin();
 	for (std::vector<CBuildRestriction *>::const_iterator i = type.BuildingRules.begin();
 	//Wyrmgus end
 		//Wyrmgus start
-//		 i != unit.Type->BuildingRules.end(); ++i) {
+//		 i != unit.GetType()->BuildingRules.end(); ++i) {
 		i != type.BuildingRules.end(); ++i) {
 		//Wyrmgus end
 		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
@@ -161,7 +161,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
-	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
+	CPlayer* player = builder != nullptr ? builder->GetPlayer() : CPlayer::GetThisPlayer();
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -188,37 +188,37 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (this->RestrictClass != nullptr && this->RestrictClass == table[i]->Type->GetClass()) || (!this->RestrictType && this->RestrictClass == nullptr && this->RestrictTypeOwner.size() > 0)) &&
+			(this->RestrictType == table[i]->GetType() || (this->RestrictClass != nullptr && this->RestrictClass == table[i]->GetType()->GetClass()) || (!this->RestrictType && this->RestrictClass == nullptr && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
-			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||
-			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->Player || player->IsAllied(*table[i]->Player))) ||
+			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->GetPlayer()) ||
+			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->GetPlayer() || player->IsAllied(*table[i]->GetPlayer()))) ||
 			 //Wyrmgus start
-//			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i]->Player)))) {
+//			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i]->GetPlayer())))) {
 			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i])))) {
 			 //Wyrmgus end
 
 			switch (this->DistanceType) {
 				case GreaterThan :
 				case GreaterThanEqual :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
-						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) <= distance) {
+						return Diagonal ? false : !(pos.x != table[i]->GetTilePos().x || pos.y != table[i]->GetTilePos().y);
 					}
 					break;
 				case LessThan :
 				case LessThanEqual :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
-						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) <= distance) {
+						return Diagonal || pos.x == table[i]->GetTilePos().x || pos.y == table[i]->GetTilePos().y;
 					}
 					break;
 				case Equal :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
-						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
+						return Diagonal || pos.x == table[i]->GetTilePos().x || pos.y == table[i]->GetTilePos().y;
 					}
 					break;
 				case NotEqual :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
-						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
+						return Diagonal ? false : !(pos.x != table[i]->GetTilePos().x || pos.y != table[i]->GetTilePos().y);
 					}
 					break;
 			}
@@ -239,7 +239,7 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
-	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
+	CPlayer* player = builder != nullptr ? builder->GetPlayer() : CPlayer::GetThisPlayer();
 	int count = 0;
 	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);
@@ -312,14 +312,14 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
+			(this->RestrictType == table[i]->GetType() || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
-				(!this->RestrictTypeOwner.compare("self") && builder->Player == table[i]->Player) ||
-				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == table[i]->Player || builder->Player->IsAllied(*table[i]->Player))) ||
+				(!this->RestrictTypeOwner.compare("self") && builder->GetPlayer() == table[i]->GetPlayer()) ||
+				(!this->RestrictTypeOwner.compare("allied") && (builder->GetPlayer() == table[i]->GetPlayer() || builder->GetPlayer()->IsAllied(*table[i]->GetPlayer()))) ||
 				//Wyrmgus start
-//				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i]->Player)))) {
-				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i])))) {
+//				(!this->RestrictTypeOwner.compare("enemy") && builder->GetPlayer()->IsEnemy(*table[i]->GetPlayer())))) {
+				(!this->RestrictTypeOwner.compare("enemy") && builder->GetPlayer()->IsEnemy(*table[i])))) {
 				//Wyrmgus end
 
 			switch (this->DistanceType) {
@@ -328,17 +328,17 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 				break;
 			case LessThan:
 			case LessThanEqual:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) <= distance) {
 					count++;
 				}
 				break;
 			case Equal:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
 					count++;
 				}
 				break;
 			case NotEqual:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
 					count++;
 				}
 				break;
@@ -360,7 +360,7 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 
 inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit) const
 {
-	return (unit->Type == Parent && unit->tilePos == this->pos);
+	return (unit->GetType() == Parent && unit->GetTilePos() == this->pos);
 }
 
 /**
@@ -387,9 +387,9 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i
 */
 inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 {
-	if (unit->tilePos == pos
+	if (unit->GetTilePos() == pos
 		&& !unit->Destroyed && unit->Orders[0]->Action != UnitActionDie) {
-		if (unit->Type == this->Parent && unit->Orders[0]->Action != UnitActionBuilt) {
+		if (unit->GetType() == this->Parent && unit->Orders[0]->Action != UnitActionBuilt) {
 			// Available to build on
 			ontop = unit;
 		} else {
@@ -407,7 +407,7 @@ public:
 	explicit AliveConstructedAndSameTypeAs(const CUnitType &unitType) : type(&unitType) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitActionBuilt;
+		return unit->IsAlive() && unit->GetType() == type && unit->CurrentAction() != UnitActionBuilt;
 	}
 private:
 	const CUnitType *type;
@@ -423,11 +423,11 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
 
-	if (it != cache.end() && (*it)->tilePos == pos) {
+	if (it != cache.end() && (*it)->GetTilePos() == pos) {
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
-		Vec2i endPos(found.tilePos + found.Type->TileSize - 1);
-		Select(found.tilePos, endPos, table, found.MapLayer->ID);
+		Vec2i endPos(found.GetTilePos() + found.GetType()->TileSize - 1);
+		Select(found.GetTilePos(), endPos, table, found.MapLayer->ID);
 		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
 			if (*it == *it2) {
 				continue;
@@ -437,11 +437,11 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 			}
 			//Wyrmgus start
 			// allow to build if a decoration is present under the deposit
-			if ((*it2)->Type->BoolFlag[DECORATION_INDEX].value) {
+			if ((*it2)->GetType()->BoolFlag[DECORATION_INDEX].value) {
 				continue;
 			}
 			//Wyrmgus end
-			if (found.Type->UnitType == (*it2)->Type->UnitType) {
+			if (found.GetType()->UnitType == (*it2)->GetType()->UnitType) {
 				return false;
 			}
 		}
@@ -523,7 +523,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	if (unit) {
 		for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
 			for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->Owner != -1 && CMap::Map.Field(x, y, z)->Owner != unit->Player->GetIndex()) {
+				if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->Owner != -1 && CMap::Map.Field(x, y, z)->Owner != unit->GetPlayer()->GetIndex()) {
 					return nullptr;
 				}
 			}
@@ -564,7 +564,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 
 	// Check special rules for AI players
-	if (unit && unit->Player->AiEnabled) {
+	if (unit && unit->GetPlayer()->AiEnabled) {
 		bool aiChecked = true;
 		size_t count = type.AiBuildingRules.size();
 		if (count > 0) {
@@ -615,7 +615,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		return nullptr;
 	}
 	
-	if (unit && z != unit->Player->StartMapLayer && (CMap::Map.MapLayers[z]->GetPlane() != CMap::Map.MapLayers[unit->Player->StartMapLayer]->GetPlane() || CMap::Map.MapLayers[z]->GetWorld() != CMap::Map.MapLayers[unit->Player->StartMapLayer]->GetWorld())) {
+	if (unit && z != unit->GetPlayer()->StartMapLayer && (CMap::Map.MapLayers[z]->GetPlane() != CMap::Map.MapLayers[unit->GetPlayer()->StartMapLayer]->GetPlane() || CMap::Map.MapLayers[z]->GetWorld() != CMap::Map.MapLayers[unit->GetPlayer()->StartMapLayer]->GetWorld())) {
 		return nullptr;
 	}
 
@@ -671,10 +671,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 	CPlayer *player = nullptr;
 
 	//Wyrmgus start
-//	if (unit && unit->Player->Type == PlayerPerson) {
+//	if (unit && unit->GetPlayer()->Type == PlayerPerson) {
 	if (unit) {
 	//Wyrmgus end
-		player = unit->Player;
+		player = unit->GetPlayer();
 	}
 	int testmask;
 	//Wyrmgus start

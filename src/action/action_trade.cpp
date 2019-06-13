@@ -81,7 +81,7 @@ enum {
 	// Should be handled in action, but is not possible!
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
-		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
+		order->goalPos = dest.GetTilePos() + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer->ID;
 	} else {
 		order->SetGoal(&dest);
@@ -171,7 +171,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -200,18 +200,18 @@ enum {
 	// Reached target
 	if (this->State == State_TargetReached || (goal && goal->Container == &unit)) {
 
-		if (!goal || (!goal->IsVisibleAsGoal(*unit.Player) && goal->Container != &unit)) {
+		if (!goal || (!goal->IsVisibleAsGoal(*unit.GetPlayer()) && goal->Container != &unit)) {
 			DebugPrint("Goal gone\n");
 			this->Finished = true;
 			return ;
 		}
 
-		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != nullptr)) {
+		if (goal && (goal->GetType()->BoolFlag[ITEM_INDEX].value || goal->GetType()->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != nullptr)) {
 			std::string goal_name = goal->GetMessageName();
 			if (!goal->Unique) {
 				goal_name = "the " + goal_name;
 			}
-			if (unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && unit.CanEquipItem(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
+			if (unit.HasInventory() && goal->GetType()->BoolFlag[ITEM_INDEX].value && unit.CanEquipItem(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
 				if (!unit.IsItemEquipped(goal)) {
 					unit.EquipItem(goal);
 				} else {
@@ -224,64 +224,64 @@ enum {
 					unit.Remove(nullptr);
 					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
 					RestoreSelection();
-					if (unit.Player == CPlayer::GetThisPlayer() && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer() && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}
 					PlayUnitSound(*goal->ConnectingDestination, VoiceUsed);
 				} else if (goal->Spell != nullptr) {
-					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
+					CommandSpellCast(unit, unit.GetTilePos(), nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
 					unit.ReadWork(goal->Work);
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
 					}
 				} else if (goal->Elixir != nullptr) {
 					unit.ConsumeElixir(goal->Elixir);
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->Ident).c_str());
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->Ident).c_str());
 					}
-				} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
+				} else if (goal->GetType()->GivesResource && goal->ResourcesHeld > 0) {
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->GetType()->GivesResource].c_str());
 					}
-					unit.Player->ChangeResource(goal->Type->GivesResource, goal->ResourcesHeld);
-					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
+					unit.GetPlayer()->ChangeResource(goal->GetType()->GivesResource, goal->ResourcesHeld);
+					unit.GetPlayer()->TotalResources[goal->GetType()->GivesResource] += (goal->ResourcesHeld * unit.GetPlayer()->Incomes[goal->GetType()->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
 					}
 					unit.Variable[HP_INDEX].Value += hp_healed;
 					
 					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)) { //if unit is still damaged, see if there are further healing items for it to use
 						unit.HealingItemAutoUse();
 					}
-				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
+				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.GetType()->UnitType != UnitTypeFly && unit.GetType()->UnitType != UnitTypeFlyLow) {
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+						unit.GetPlayer()->Notify(NotifyRed, unit.GetTilePos(), unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 					}
 					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
-				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+				} else if (goal->GetType()->BoolFlag[SLOWS_INDEX].value && unit.GetType()->UnitType != UnitTypeFly && unit.GetType()->UnitType != UnitTypeFlyLow) {
 					unit.Variable[SLOW_INDEX].Value = 1000;
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
+					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+						unit.GetPlayer()->Notify(NotifyRed, unit.GetTilePos(), unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
 					}
 				}
 			} else { //cannot use
-				if (unit.Player == CPlayer::GetThisPlayer()) {
-					unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
+				if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
+					unit.GetPlayer()->Notify(NotifyRed, unit.GetTilePos(), unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
 				}
 				this->Finished = true;
 				return;
 			}
 			PlayUnitSound(*goal, VoiceUsed);
-			if (goal->Type->BoolFlag[POWERUP_INDEX].value || (goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->IsConsumable())) { //only destroy item if it is consumable
+			if (goal->GetType()->BoolFlag[POWERUP_INDEX].value || (goal->GetType()->BoolFlag[ITEM_INDEX].value && goal->GetType()->ItemClass->IsConsumable())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);
 				} else {
-					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player->AiEnabled == false && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
+					if (!IsNetworkGame() && goal->Container->Character && goal->Container->GetPlayer()->AiEnabled == false && goal->GetType()->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
 						CPersistentItem *item = goal->Container->Character->GetItem(goal);
 						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
 						delete item;
@@ -302,14 +302,14 @@ enum {
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return;
 					}
@@ -325,7 +325,7 @@ enum {
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
 			// goal shouldn't be busy and portal should be alive
-			if (goal->Type->BoolFlag[TELEPORTER_INDEX].value && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
+			if (goal->GetType()->BoolFlag[TELEPORTER_INDEX].value && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
 				if (!goal->IsIdle()) { // wait
 					unit.Wait = 10;
 					return;
@@ -339,7 +339,7 @@ enum {
 				}
 				// Everything is OK, now teleport the unit
 				unit.Remove(nullptr);
-				unit.tilePos = goal->Goal->tilePos;
+				unit.TilePos = goal->Goal->GetTilePos();
 				unit.MapLayer = goal->Goal->MapLayer;
 				DropOutOnSide(unit, unit.Direction, nullptr);
 
@@ -347,9 +347,9 @@ enum {
 				CUnit &dest = *goal->Goal;
 
 				if (dest.NewOrder == nullptr
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
+					|| (dest.NewOrder->Action == UnitActionResource && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
-					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitActionBoard && unit.GetType()->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;
 				} else {
@@ -366,7 +366,7 @@ enum {
 					}
 				}
 			}
-			this->goalPos = goal->tilePos;
+			this->goalPos = goal->GetTilePos();
 			this->MapLayer = goal->MapLayer->ID;
 			this->State = State_TargetReached;
 		}
@@ -376,9 +376,9 @@ enum {
 	}
 
 	// Target destroyed?
-	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+	if (goal && !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 		DebugPrint("Goal gone\n");
-		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
+		this->goalPos = goal->GetTilePos() + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer->ID;
 		this->ClearGoal();
 		goal = nullptr;

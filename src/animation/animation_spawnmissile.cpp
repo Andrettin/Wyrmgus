@@ -58,7 +58,7 @@
 	const int offsetnum = this->OffsetNum;
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
+	const PixelPos moff = goal->GetType()->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
 	PixelPos dest;
 	MissileType *mtype = MissileTypeByIdent(this->missileTypeStr);
@@ -70,11 +70,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
-		start.y = goal->tilePos.y * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
+		start.x = goal->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
+		start.y = goal->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
-		start.y = (goal->tilePos.y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
+		start.x = (goal->GetTilePos().x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
+		start.y = (goal->GetTilePos().y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -105,8 +105,8 @@
 			dest.x = target->GetMapPixelPosCenter().x + destx;
 			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
-			dest.y = (target->tilePos.y + desty) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
+			dest.x = (target->GetTilePos().x + destx) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
+			dest.y = (target->GetTilePos().y + desty) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
 			dest += target->GetTilePixelSize() / 2;
 		}
 	} else {
@@ -114,8 +114,8 @@
 			dest.x = goal->GetMapPixelPosCenter().x + destx;
 			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-			dest.y = (goal->tilePos.y + desty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+			dest.x = (goal->GetTilePos().x + destx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
+			dest.y = (goal->GetTilePos().y + desty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
 			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
@@ -123,7 +123,7 @@
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)
-		&& dist < goal->Type->MinAttackRange) {
+		&& dist < goal->GetType()->MinAttackRange) {
 	} else {
 		Missile *missile = MakeMissile(*mtype, start, dest, unit.MapLayer->ID);
 		if (flags & SM_SetDirection) {

@@ -7,9 +7,8 @@ class Vec2i
 
 class CUnit
 {
-	tolua_readonly Vec2i tilePos;
-
-	tolua_readonly CUnitType *Type;
+	const CUnitType *GetType() const;
+	
 	CUnit *Goal;
 	bool Active;
 	int ResourcesHeld;
@@ -55,13 +54,6 @@ class CPreference
 	CGraphic *ProgressBarG;
 	//Wyrmgus end
 };
-
-class CUnitManager
-{
-	CUnit &GetSlotUnit(int index) const;
-};
-
-CUnitManager UnitManager;   /// Unit manager
 
 CPreference Preference;
 

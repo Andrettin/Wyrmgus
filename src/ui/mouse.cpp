@@ -131,8 +131,8 @@ void CancelBuildingMode()
 
 static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 {
-	for (int j = 0; j < unit.Type->TileSize.y; ++j) {
-		for (int i = 0; i < unit.Type->TileSize.x; ++i) {
+	for (int j = 0; j < unit.GetType()->TileSize.y; ++j) {
+		for (int i = 0; i < unit.GetType()->TileSize.x; ++i) {
 			const Vec2i tempPos(i, j);
 			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				return false;
@@ -146,8 +146,8 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 {
 	CUnit &unit = *Selected[0];
 
-	if (unit.Player->GetIndex() != PlayerNumNeutral || dest == nullptr
-		|| !(dest->Player == CPlayer::GetThisPlayer() || dest->IsTeamed(*CPlayer::GetThisPlayer()))) {
+	if (unit.GetPlayer()->GetIndex() != PlayerNumNeutral || dest == nullptr
+		|| !(dest->GetPlayer() == CPlayer::GetThisPlayer() || dest->IsTeamed(*CPlayer::GetThisPlayer()))) {
 		return;
 	}
 	// tell to go and harvest from a unit
@@ -155,13 +155,13 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 
 	//Wyrmgus start
 //	if (res
-//		&& dest->Type->BoolFlag[HARVESTER_INDEX].value
-//		&& dest->Type->ResInfo[res]
-//		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
-//		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
+//		&& dest->GetType()->BoolFlag[HARVESTER_INDEX].value
+//		&& dest->GetType()->ResInfo[res]
+//		&& dest->ResourcesHeld < dest->GetType()->ResInfo[res]->ResourceCapacity
+//		&& unit.GetType()->BoolFlag[CANHARVEST_INDEX].value) {
 	if (
 		dest->CanHarvest(&unit)
-		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
+		&& dest->ResourcesHeld < dest->GetType()->ResInfo[res]->ResourceCapacity
 	) {
 	//Wyrmgus end
 		unit.Blink = 4;
@@ -178,9 +178,9 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 		return false;
 	}
 	// dest is the transporter
-	if (dest->Type->CanTransport()) {
+	if (dest->GetType()->CanTransport()) {
 		// Let the transporter move to the unit. And QUEUE!!!
-		if (dest->CanMove() && CanTransport(*dest, unit) && dest->Player == CPlayer::GetThisPlayer()) {
+		if (dest->CanMove() && CanTransport(*dest, unit) && dest->GetPlayer() == CPlayer::GetThisPlayer()) {
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
@@ -190,7 +190,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			SendCommandFollow(*dest, unit, 0);
 		}
 		// FIXME : manage correctly production units.
-		if ((!unit.CanMove() && dest->Player == CPlayer::GetThisPlayer()) || CanTransport(*dest, unit)) {
+		if ((!unit.CanMove() && dest->GetPlayer() == CPlayer::GetThisPlayer()) || CanTransport(*dest, unit)) {
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
@@ -217,7 +217,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Want to transport but no unit can move\n");
 			return true;
 		}
-		if (dest->Player == CPlayer::GetThisPlayer()) {
+		if (dest->GetPlayer() == CPlayer::GetThisPlayer()) {
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
@@ -249,9 +249,9 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	}
 	
 	if (!unit.AutoCastSpells.empty()) {
-		for (CSpell *spell : unit.Type->Spells) {
+		for (CSpell *spell : unit.GetType()->Spells) {
 			if (unit.CanAutoCastSpell(spell)) {
-				const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
+				const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.GetPlayer()->AiEnabled);
 				
 				if (!spell->CheckAutoCastGenericConditions(unit, autocast, true)) {
 					continue;
@@ -280,9 +280,9 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// Return a loaded harvester to deposit
 	if (unit.ResourcesHeld > 0
 	//Wyrmgus start
-//		&& dest.Type->CanStore[unit.CurrentResource]
-//		&& (dest.Player == unit.Player
-//			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
+//		&& dest.GetType()->CanStore[unit.CurrentResource]
+//		&& (dest.GetPlayer() == unit.GetPlayer()
+//			|| (dest.GetPlayer()->IsAllied(*unit.GetPlayer()) && unit.GetPlayer()->IsAllied(*dest.GetPlayer())))) {
 		&& unit.CanReturnGoodsTo(&dest)) {
 	//Wyrmgus end
 		dest.Blink = 4;
@@ -295,13 +295,13 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	}
 	// Go and harvest from a unit
 	//Wyrmgus start
-//	const int res = dest.Type->GivesResource;
+//	const int res = dest.GetType()->GivesResource;
 	const int res = dest.GivesResource;
 	//Wyrmgus end
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	//Wyrmgus start
-//	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
-//		&& (dest.Player == unit.Player || dest.Player->GetIndex() == PlayerNumNeutral)) {
+//	if (res && type.ResInfo[res] && dest.GetType()->BoolFlag[CANHARVEST_INDEX].value
+//		&& (dest.GetPlayer() == unit.GetPlayer() || dest.GetPlayer()->GetIndex() == PlayerNumNeutral)) {
 	if (unit.CanHarvest(&dest)) {
 	//Wyrmgus end
 			//Wyrmgus start
@@ -332,26 +332,26 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			}
 	//Wyrmgus start
 	// make unit build harvesting building on top if right-clicked
-	} else if (res && type.ResInfo[res] && !dest.Type->BoolFlag[CANHARVEST_INDEX].value
-		&& (dest.Player == unit.Player || dest.Player->GetIndex() == PlayerNumNeutral)) {
+	} else if (res && type.ResInfo[res] && !dest.GetType()->BoolFlag[CANHARVEST_INDEX].value
+		&& (dest.GetPlayer() == unit.GetPlayer() || dest.GetPlayer()->GetIndex() == PlayerNumNeutral)) {
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				for (CUnitType *unit_type : CUnitType::GetAll()) {
-					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
-						if (CheckDependencies(unit_type, unit.Player)) {
-							if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.Type) != AiHelpers.Build[unit_type->GetIndex()].end()) {
+					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.GetTilePos(), 1, false, dest.MapLayer->ID)) {
+						if (CheckDependencies(unit_type, unit.GetPlayer())) {
+							if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.GetType()) != AiHelpers.Build[unit_type->GetIndex()].end()) {
 								dest.Blink = 4;
-								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
+								SendCommandBuildBuilding(unit, dest.GetTilePos(), *unit_type, flush, dest.MapLayer->ID);
 								if (!acknowledged) {
 									PlayUnitSound(unit, VoiceBuild);
 									acknowledged = 1;
 								}
 								break;
 							}
-						} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-							CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+						} else if (CheckDependencies(unit_type, unit.GetPlayer(), false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+							CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.GetTilePos(), dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
 					}
@@ -368,12 +368,12 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
-						if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
-							if (CheckDependencies(unit_type, unit.Player)) {
-								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
+						if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.GetTilePos(), 1, false, dest.MapLayer->ID)) {
+							if (CheckDependencies(unit_type, unit.GetPlayer())) {
+								SendCommandBuildBuilding(unit, dest.GetTilePos(), *unit_type, 0, dest.MapLayer->ID);
 								break;
-							} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-								CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+							} else if (CheckDependencies(unit_type, unit.GetPlayer(), false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+								CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.GetTilePos(), dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
 						}
@@ -389,10 +389,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 
 static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, int &acknowledged)
 {
-	if (!UI.CurrentMapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!UI.CurrentMapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return false;
 	}
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	// FIXME: support harvesting more types of terrain.
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (type.ResInfo[res]
@@ -439,16 +439,16 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 
 static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 
 	// Go and repair
 	if (type.RepairRange && dest != nullptr
-		&& dest->Type->GetRepairHP()
+		&& dest->GetType()->GetRepairHP()
 		//Wyrmgus start
 //		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableMax)
 		//Wyrmgus end
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
+		&& (dest->GetPlayer() == unit.GetPlayer() || unit.IsAllied(*dest))) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceRepairing);
@@ -502,12 +502,12 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
-	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->GetIndex() == PlayerNumNeutral || dest->Player == unit.Player)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->GetType() == SettlementSiteUnitType && (dest->GetPlayer()->GetIndex() == PlayerNumNeutral || dest->GetPlayer() == unit.GetPlayer())) {
 		for (CUnitType *unit_type : CUnitType::GetAll()) {
-			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
-				if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.Type) != AiHelpers.Build[unit_type->GetIndex()].end()) {
+			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.GetPlayer()) && CanBuildUnitType(&unit, *unit_type, dest->GetTilePos(), 1, false, dest->MapLayer->ID)) {
+				if (unit_type->GetIndex() < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->GetIndex()].begin(), AiHelpers.Build[unit_type->GetIndex()].end(), unit.GetType()) != AiHelpers.Build[unit_type->GetIndex()].end()) {
 					dest->Blink = 4;
-					SendCommandBuildBuilding(unit, dest->tilePos, *unit_type, flush, dest->MapLayer->ID);
+					SendCommandBuildBuilding(unit, dest->GetTilePos(), *unit_type, flush, dest->MapLayer->ID);
 					if (!acknowledged) {
 						PlayUnitSound(unit, VoiceBuild);
 						acknowledged = 1;
@@ -521,8 +521,8 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// Follow another unit
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit
 		//Wyrmgus start
-//		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->GetIndex() == PlayerNumNeutral)) {
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->GetIndex() == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
+//		&& (dest->GetPlayer() == unit.GetPlayer() || unit.IsAllied(*dest) || dest->GetPlayer()->GetIndex() == PlayerNumNeutral)) {
+		&& (dest->GetPlayer() == unit.GetPlayer() || unit.IsAllied(*dest) || (dest->GetPlayer()->GetIndex() == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->GetType()->BoolFlag[OBSTACLE_INDEX].value))) {
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -530,8 +530,8 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			acknowledged = 1;
 		}
 		//Wyrmgus start
-//		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
-		if ((dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) || dest->Type->BoolFlag[BRIDGE_INDEX].value) {
+//		if (dest->GetType()->CanMove() == false && !dest->GetType()->BoolFlag[TELEPORTER_INDEX].value) {
+		if ((dest->GetType()->CanMove() == false && !dest->GetType()->BoolFlag[TELEPORTER_INDEX].value) || dest->GetType()->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			SendCommandMove(unit, pos, flush);
@@ -544,13 +544,13 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	// make workers attack enemy units if those are right-clicked upon
-	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->GetType()->BoolFlag[OBSTACLE_INDEX].value)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
 			acknowledged = 1;
 		}
-		if (CanTarget(type, *dest->Type)) {
+		if (CanTarget(type, *dest->GetType())) {
 			//Wyrmgus start
 //			SendCommandAttack(unit, pos, dest, flush);
 			SendCommandAttack(unit, pos, dest, flush, UI.CurrentMapLayer->ID);
@@ -578,25 +578,25 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 
 static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	const int action = type.MouseAction;
 
 	//Wyrmgus start
 //	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
-	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value) {
+	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.GetType()->BoolFlag[OBSTACLE_INDEX].value) {
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
 			acknowledged = 1;
 		}
-		if (action == MouseActionSpellCast && unit.Type->Spells.size() > 0) {
+		if (action == MouseActionSpellCast && unit.GetType()->Spells.size() > 0) {
 			// This is for demolition squads and such
-			Assert(unit.Type->Spells.size() > 0);
+			Assert(unit.GetType()->Spells.size() > 0);
 			int spellnum = type.Spells[0]->Slot;
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush, UI.CurrentMapLayer->ID);
 		} else {
-			if (CanTarget(type, *dest.Type)) {
+			if (CanTarget(type, *dest.GetType())) {
 				SendCommandAttack(unit, pos, &dest, flush, UI.CurrentMapLayer->ID);
 			} else { // No valid target
 				SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
@@ -627,15 +627,15 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		return true;
 	}
 	//Wyrmgus end
-	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->GetIndex() == PlayerNumNeutral) && &dest != &unit) {
+	if ((dest.GetPlayer() == unit.GetPlayer() || unit.IsAllied(dest) || dest.GetPlayer()->GetIndex() == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
 		//Wyrmgus start
-//		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
-		if ((!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
+//		if (!dest.GetType()->CanMove() && !dest.GetType()->BoolFlag[TELEPORTER_INDEX].value) {
+		if ((!dest.GetType()->CanMove() && !dest.GetType()->BoolFlag[TELEPORTER_INDEX].value) || dest.GetType()->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
 			SendCommandMove(unit, pos, flush, UI.CurrentMapLayer->ID);
 		} else {
@@ -732,19 +732,19 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 		return true;
 	}
 	//Wyrmgus end
-	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->GetIndex() == PlayerNumNeutral) {
+	if (dest.GetPlayer() == unit.GetPlayer() || unit.IsAllied(dest) || dest.GetPlayer()->GetIndex() == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
 		//Wyrmgus start
-//		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
-		if ((dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
+//		if (dest.GetType()->CanMove() == false && !dest.GetType()->BoolFlag[TELEPORTER_INDEX].value) {
+		if ((dest.GetType()->CanMove() == false && !dest.GetType()->BoolFlag[TELEPORTER_INDEX].value) || dest.GetType()->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
 			//Wyrmgus start
-//			SendCommandMove(unit, dest.tilePos, flush);
-			SendCommandMove(unit, dest.tilePos, flush, UI.CurrentMapLayer->ID);
+//			SendCommandMove(unit, dest.GetTilePos(), flush);
+			SendCommandMove(unit, dest.GetTilePos(), flush, UI.CurrentMapLayer->ID);
 			//Wyrmgus end
 		} else {
 			SendCommandFollow(unit, dest, flush);
@@ -756,7 +756,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 
 static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 
 	// tell to return a loaded harvester to deposit
 	if (dest.ResourcesHeld > 0
@@ -764,7 +764,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 //		&& type.CanStore[dest.CurrentResource]
 		&& dest.CanReturnGoodsTo(&unit)
 	//Wyrmgus end
-		&& dest.Player == unit.Player) {
+		&& dest.GetPlayer() == unit.GetPlayer()) {
 		dest.Blink = 4;
 		SendCommandReturnGoods(dest, &unit, flush);
 		if (!acknowledged) {
@@ -780,14 +780,14 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	//Wyrmgus end
 	//Wyrmgus start
 //	if (res
-//		&& dest.Type->ResInfo[res]
-//		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
+//		&& dest.GetType()->ResInfo[res]
+//		&& dest.ResourcesHeld < dest.GetType()->ResInfo[res]->ResourceCapacity
 //		&& type.BoolFlag[CANHARVEST_INDEX].value
 	if (
 		dest.CanHarvest(&unit)
-		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
+		&& dest.ResourcesHeld < dest.GetType()->ResInfo[res]->ResourceCapacity
 	//Wyrmgus end
-		&& dest.Player == unit.Player) {
+		&& dest.GetPlayer() == unit.GetPlayer()) {
 		unit.Blink = 4;
 		SendCommandResource(dest, unit, flush);
 		return true;
@@ -799,8 +799,8 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 {
 	// Go and harvest from a unit
 	//Wyrmgus start
-//	if (dest != nullptr && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
-//		&& (dest->Player == unit.Player || dest->Player->GetIndex() == PlayerNumNeutral)) {
+//	if (dest != nullptr && dest->GetType()->GivesResource && dest->GetType()->BoolFlag[CANHARVEST_INDEX].value
+//		&& (dest->GetPlayer() == unit.GetPlayer() || dest->GetPlayer()->GetIndex() == PlayerNumNeutral)) {
 	if (unit.CanHarvest(dest)) {
 		//Wyrmgus end
 		dest->Blink = 4;
@@ -813,7 +813,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	}
 	// FIXME: support harvesting more types of terrain.
 	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
-	if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
+	if (mf.playerInfo.IsTeamExplored(*unit.GetPlayer()) && mf.IsTerrainResourceOnMap()) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
@@ -836,7 +836,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if (unit.Removed) {
 		return;
 	}
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	const int action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
 	const int flush = !(KeyModifiers & ModifierShift);
@@ -850,7 +850,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	
 	//  Control + alt click - ground attack
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
-		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
+		if (unit.GetType()->BoolFlag[GROUNDATTACK_INDEX].value) {
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
@@ -911,7 +911,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//  Handle resource workers.
 //	if (action == MouseActionHarvest) {
-	if (action == MouseActionHarvest && (!dest || !dest->Type->CanTransport() || dest->Player == CPlayer::GetThisPlayer() || dest->Player->Type != PlayerNeutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
+	if (action == MouseActionHarvest && (!dest || !dest->GetType()->CanTransport() || dest->GetPlayer() == CPlayer::GetThisPlayer() || dest->GetPlayer()->Type != PlayerNeutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
 	//Wyrmgus end
 		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
@@ -937,7 +937,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 
 	// Manage harvester from the destination side.
-	if (dest != nullptr && dest->Type->BoolFlag[HARVESTER_INDEX].value) {
+	if (dest != nullptr && dest->GetType()->BoolFlag[HARVESTER_INDEX].value) {
 		if (DoRightButton_Harvest_Reverse(unit, *dest, flush, acknowledged)) {
 			return;
 		}
@@ -973,7 +973,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
 	CUnit *dest;            // unit under the cursor if any.
 
-	if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+	if (UnitUnderCursor != nullptr && !UnitUnderCursor->GetType()->BoolFlag[DECORATION_INDEX].value) {
 		dest = UnitUnderCursor;
 	} else {
 		dest = nullptr;
@@ -982,12 +982,12 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	//  Unit selected isn't owned by the player.
 	//  You can't select your own units + foreign unit(s)
 	//  except if it is neutral and it is a resource.
-	if (!CanSelectMultipleUnits(*Selected[0]->Player)) {
+	if (!CanSelectMultipleUnits(*Selected[0]->GetPlayer())) {
 		DoRightButton_ForForeignUnit(dest);
 		return;
 	}
 
-	if (dest != nullptr && dest->Type->CanTransport()) {
+	if (dest != nullptr && dest->GetType()->CanTransport()) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (CanTransport(*dest, *Selected[i])) {
 				// We are clicking on a transporter. We have to:
@@ -1142,7 +1142,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 	}
 	if (!Selected.empty()) {
-		if (Selected.size() == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForTransporter) {
+		if (Selected.size() == 1 && Selected[0]->GetType()->CanTransport() && Selected[0]->BoardCount && CurrentButtonLevel == Selected[0]->GetType()->ButtonLevelForTransporter) {
 			const size_t size = UI.TransportingButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0;) {
@@ -1524,14 +1524,14 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		}
 		
 		//Wyrmgus start
-		if (show && Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer()) {
+		if (show && Selected.size() >= 1 && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 			bool has_terrain_resource = false;
 			const CViewport &vp = *UI.MouseViewport;
 			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (Selected[0]->Type->ResInfo[res]
+				if (Selected[0]->GetType()->ResInfo[res]
 					//Wyrmgus start
-//					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
+//					&& Selected[0]->GetType()->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end
 					&& UI.CurrentMapLayer->Field(tilePos)->IsTerrainResourceOnMap(res)
 				) {
@@ -1568,8 +1568,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			} else {
 				GameCursor = UI.YellowHair.Cursor;
 			}
-			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
-				if (UnitUnderCursor->Player == CPlayer::GetThisPlayer() ||
+			if (UnitUnderCursor != nullptr && !UnitUnderCursor->GetType()->BoolFlag[DECORATION_INDEX].value) {
+				if (UnitUnderCursor->GetPlayer() == CPlayer::GetThisPlayer() ||
 					CPlayer::GetThisPlayer()->IsAllied(*UnitUnderCursor)) {
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
@@ -1580,8 +1580,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 						//Wyrmgus end
 					}
 				//Wyrmgus start
-//				} else if (UnitUnderCursor->Player->GetIndex() != PlayerNumNeutral) {
-				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
+//				} else if (UnitUnderCursor->GetPlayer()->GetIndex() != PlayerNumNeutral) {
+				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->GetType()->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
@@ -1606,20 +1606,20 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//  Cursor pointing.
 	if (CursorOn == CursorOnMap) {
 		//  Map
-		if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
+		if (UnitUnderCursor != nullptr && !UnitUnderCursor->GetType()->BoolFlag[DECORATION_INDEX].value
 			&& (UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap)) {
 			//Wyrmgus start
 //			GameCursor = UI.Glass.Cursor;
 			if (
-				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() && UnitUnderCursor->Player != CPlayer::GetThisPlayer()
-				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
+				Selected.size() >= 1 && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() && UnitUnderCursor->GetPlayer() != CPlayer::GetThisPlayer()
+				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->GetType()->BoolFlag[OBSTACLE_INDEX].value)
 			) {
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
-				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() &&
+				Selected.size() >= 1 && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() &&
 				(
 					Selected[0]->CanHarvest(UnitUnderCursor, false)
-					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
+					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->GetType()->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->GetPlayer() != CPlayer::GetThisPlayer()))
 				)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
@@ -1661,12 +1661,12 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 //	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 	if (dest && dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableMax)
 	//Wyrmgus end
-		&& dest->Type->GetRepairHP()
-		&& (dest->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*dest))) {
+		&& dest->GetType()->GetRepairHP()
+		&& (dest->GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*dest))) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
-			if (unit->Type->RepairRange) {
+			if (unit->GetType()->RepairRange) {
 				//Wyrmgus start
 //				const int flush = !(KeyModifiers & ModifierShift);
 				//Wyrmgus end
@@ -1728,7 +1728,7 @@ static int SendMove(const Vec2i &tilePos, int flush)
 	//Wyrmgus end
 	} else {
 		// Move to a transporter.
-		if (goal && goal->Type->CanTransport()) {
+		if (goal && goal->GetType()->CanTransport()) {
 			size_t i;
 			for (i = 0; i != Selected.size(); ++i) {
 				if (CanTransport(*goal, *Selected[i])) {
@@ -1790,17 +1790,17 @@ static int SendAttack(const Vec2i &tilePos, int flush)
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
-	if (dest && dest->Type->BoolFlag[DECORATION_INDEX].value) {
+	if (dest && dest->GetType()->BoolFlag[DECORATION_INDEX].value) {
 		dest = nullptr;
 	}
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
 		//Wyrmgus start
-//		if (unit.Type->CanAttack) {
+//		if (unit.GetType()->CanAttack) {
 		if (unit.CanAttack(true)) {
 		//Wyrmgus end
-			if (!dest || (dest != &unit && CanTarget(*unit.Type, *dest->Type))) {
+			if (!dest || (dest != &unit && CanTarget(*unit.GetType(), *dest->GetType()))) {
 				if (dest) {
 					dest->Blink = 4;
 				}
@@ -1841,7 +1841,7 @@ static int SendAttackGround(const Vec2i &tilePos, int flush)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 		//Wyrmgus start
-//		if (unit.Type->CanAttack) {
+//		if (unit.GetType()->CanAttack) {
 		if (unit.CanAttack(true)) {
 		//Wyrmgus end
 			//Wyrmgus start
@@ -1907,20 +1907,20 @@ static int SendResource(const Vec2i &pos, int flush)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		if (unit.GetType()->BoolFlag[HARVESTER_INDEX].value) {
 			if (dest
 				//Wyrmgus start
-//				&& (res = dest->Type->GivesResource) != 0
+//				&& (res = dest->GetType()->GivesResource) != 0
 				&& (res = dest->GivesResource) != 0
 				//Wyrmgus end
 				//Wyrmgus start
-//				&& unit.Type->ResInfo[res]
+//				&& unit.GetType()->ResInfo[res]
 				&& unit.CanHarvest(dest)
 				//Wyrmgus end
-				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
+				&& unit.ResourcesHeld < unit.GetType()->ResInfo[res]->ResourceCapacity
 				//Wyrmgus start
-//				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
-//				&& (dest->Player == unit.Player || dest->Player->GetIndex() == PlayerMax - 1)) {
+//				&& dest->GetType()->BoolFlag[CANHARVEST_INDEX].value
+//				&& (dest->GetPlayer() == unit.GetPlayer() || dest->GetPlayer()->GetIndex() == PlayerMax - 1)) {
 				) {
 				//Wyrmgus end
 				dest->Blink = 4;
@@ -1929,15 +1929,15 @@ static int SendResource(const Vec2i &pos, int flush)
 				continue;
 			} else {
 				for (res = 0; res < MaxCosts; ++res) {
-					if (unit.Type->ResInfo[res]
+					if (unit.GetType()->ResInfo[res]
 						//Wyrmgus start
-//						&& unit.Type->ResInfo[res]->TerrainHarvester
-//						&& mf.playerInfo.IsExplored(*unit.Player)
-						&& mf.playerInfo.IsTeamExplored(*unit.Player)
+//						&& unit.GetType()->ResInfo[res]->TerrainHarvester
+//						&& mf.playerInfo.IsExplored(*unit.GetPlayer())
+						&& mf.playerInfo.IsTeamExplored(*unit.GetPlayer())
 						//Wyrmgus end
 						&& mf.IsTerrainResourceOnMap(res)
-						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
+						&& unit.ResourcesHeld < unit.GetType()->ResInfo[res]->ResourceCapacity
+						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.GetType()->ResInfo[res]->ResourceCapacity)) {
 						//Wyrmgus start
 //						SendCommandResourceLoc(unit, pos, flush);
 						SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
@@ -1953,8 +1953,8 @@ static int SendResource(const Vec2i &pos, int flush)
 		}
 		if (!unit.CanMove()) {
 			//Wyrmgus start
-//			if (dest && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
-			if (dest && dest->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+//			if (dest && dest->GetType()->GivesResource && dest->GetType()->BoolFlag[CANHARVEST_INDEX].value) {
+			if (dest && dest->GivesResource && dest->GetType()->BoolFlag[CANHARVEST_INDEX].value) {
 			//Wyrmgus end
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
@@ -1962,8 +1962,8 @@ static int SendResource(const Vec2i &pos, int flush)
 				continue;
 			}
 			//Wyrmgus start
-//			if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
-			if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
+//			if (mf.playerInfo.IsExplored(*unit.GetPlayer()) && mf.IsTerrainResourceOnMap()) {
+			if (mf.playerInfo.IsTeamExplored(*unit.GetPlayer()) && mf.IsTerrainResourceOnMap()) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				SendCommandResourceLoc(unit, pos, flush);
@@ -2030,9 +2030,9 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 	 */
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
-		if (unit.Type->Spells.size() == 0) {
+		if (unit.GetType()->Spells.size() == 0) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
-					   UnitNumber(unit) _C_ unit.Type->GetName().utf8().get_data());
+					   UnitNumber(unit) _C_ unit.GetType()->GetName().utf8().get_data());
 			// this unit cannot cast spell
 			continue;
 		}
@@ -2048,7 +2048,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			ExitFatal(1);
 		}
 		
-		if (std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), spell) == unit.Type->Spells.end()) {
+		if (std::find(unit.GetType()->Spells.begin(), unit.GetType()->Spells.end(), spell) == unit.GetType()->Spells.end()) {
 			continue; //the unit's type cannot cast this spell
 		}
 		
@@ -2174,10 +2174,10 @@ static void SendCommand(const Vec2i &tilePos)
 			//Wyrmgus end
 				//Wyrmgus start
 				/*
-				if (Selected[i]->Type->MapSound.Attack.Sound) {
+				if (Selected[i]->GetType()->MapSound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
-				} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
+				} else if (Selected[i]->GetType()->MapSound.Acknowledgement.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
@@ -2186,19 +2186,19 @@ static void SendCommand(const Vec2i &tilePos)
 				break;
 				//Wyrmgus end
 			//Wyrmgus start
-//			} else if (CursorAction == ButtonRepair && Selected[i]->Type->MapSound.Repair.Sound) {
+//			} else if (CursorAction == ButtonRepair && Selected[i]->GetType()->MapSound.Repair.Sound) {
 			} else if (CursorAction == ButtonRepair) {
 			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceRepairing);
 				break;
 			//Wyrmgus start
-//			} else if (CursorAction == ButtonBuild && Selected[i]->Type->MapSound.Build.Sound) {
+//			} else if (CursorAction == ButtonBuild && Selected[i]->GetType()->MapSound.Build.Sound) {
 			} else if (CursorAction == ButtonBuild) {
 			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceBuild);
 				break;
 			//Wyrmgus start
-//			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
+//			} else if (Selected[i]->GetType()->MapSound.Acknowledgement.Sound) {
 			} else {
 			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceAcknowledging);
@@ -2408,7 +2408,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		UnitUnderCursor = nullptr;
 		GameCursor = UI.Point.Cursor;  // Reset
 		CursorStartScreenPos = CursorScreenPos;
-		if (!Selected.empty() && Selected[0]->Player == CPlayer::GetThisPlayer() && CursorState == CursorStatePoint) {
+		if (!Selected.empty() && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() && CursorState == CursorStatePoint) {
 			CursorState = CursorStatePieMenu;
 		}
 #ifdef USE_TOUCHSCREEN
@@ -2423,7 +2423,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID))
-				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+				&& !UnitUnderCursor->GetType()->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
 				if (!ClickMissile.empty()) {
@@ -2549,7 +2549,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
@@ -2563,7 +2563,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->GetType()->Ident.c_str());
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
 			}
@@ -2571,7 +2571,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel research %s\n" _C_ Selected[0]->GetType()->Ident.c_str());
 					SendCommandCancelResearch(*Selected[0]);
 				}
 			}
@@ -2580,22 +2580,22 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  for transporter
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->IsAllied(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->IsAllied(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
 					size_t j = 0;
 
 					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
+						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->GetPlayer() != CPlayer::GetThisPlayer() && uins->GetPlayer() != CPlayer::GetThisPlayer())) {
 							continue;
 						}
 						if (ButtonAreaUnderCursor == ButtonAreaTransporting
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
 								Assert(uins->Boarded);
 								const int flush = !(KeyModifiers & ModifierShift);
-								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
-									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->GetPlayer() == CPlayer::GetThisPlayer()) {
+									SendCommandUnload(*Selected[0], Selected[0]->GetTilePos(), uins, flush);
 								}
 						}
 						++j;
@@ -2607,7 +2607,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
@@ -2647,7 +2647,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					}
 					UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 				} else if ((1 << button) == RightButton) {
-					std::string encyclopedia_ident = Selected[0]->Type->Ident;
+					std::string encyclopedia_ident = Selected[0]->GetType()->Ident;
 					std::string encyclopedia_state = "units";
 					if (Selected[0]->Character != nullptr && Selected[0]->Character->GetIcon() != nullptr && !Selected[0]->Character->Custom) {
 						encyclopedia_ident = Selected[0]->Character->Ident;
@@ -2670,7 +2670,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()) {
 					size_t j = 0;
@@ -2707,7 +2707,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->GetType()->Ident.c_str());
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
 			}
@@ -2715,7 +2715,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel research %s\n" _C_ Selected[0]->GetType()->Ident.c_str());
 					SendCommandCancelResearch(*Selected[0]);
 				}
 			}
@@ -2724,22 +2724,22 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			//  for transporter
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->IsAllied(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->IsAllied(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
 					size_t j = 0;
 
 					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
+						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->GetPlayer() != CPlayer::GetThisPlayer() && uins->GetPlayer() != CPlayer::GetThisPlayer())) {
 							continue;
 						}
 						if (ButtonAreaUnderCursor == ButtonAreaTransporting
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
 								Assert(uins->Boarded);
 								const int flush = !(KeyModifiers & ModifierShift);
-								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
-									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
+								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->GetPlayer() == CPlayer::GetThisPlayer()) {
+									SendCommandUnload(*Selected[0], Selected[0]->GetTilePos(), uins, flush, Selected[0]->MapLayer->ID);
 								}
 						}
 						++j;
@@ -2755,24 +2755,24 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					size_t j = 0;
 
 					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-						if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
+						if (!uins->GetType()->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->GetPlayer() != CPlayer::GetThisPlayer() && uins->GetPlayer() != CPlayer::GetThisPlayer())) {
 							continue;
 						}
 						if (ButtonAreaUnderCursor == ButtonAreaInventory
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
-								Assert(uins->Type->BoolFlag[ITEM_INDEX].value);
+								Assert(uins->GetType()->BoolFlag[ITEM_INDEX].value);
 								const int flush = !(KeyModifiers & ModifierShift);
-								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
+								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->GetPlayer() == CPlayer::GetThisPlayer()) {
 									if ((1 << button) == LeftButton) {
 										if  (!uins->Bound) {
-											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
+											SendCommandUnload(*Selected[0], Selected[0]->GetTilePos(), uins, flush, Selected[0]->MapLayer->ID);
 										} else {
-											if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+											if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 												std::string item_name = uins->GetMessageName();
 												if (!uins->Unique) {
 													item_name = "the " + item_name;
 												}
-												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
+												Selected[0]->GetPlayer()->Notify(NotifyRed, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
 											}
 										}
 									} else if ((1 << button) == RightButton) {
@@ -2788,7 +2788,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
@@ -3065,7 +3065,7 @@ void UIHandleButtonUp(unsigned button)
 		
 		//Wyrmgus start
 //		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
+		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer()))) {
 		//Wyrmgus end
 			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
@@ -3163,15 +3163,15 @@ void UIHandleButtonUp(unsigned button)
 					// Don't allow to select own and enemy units.
 					// Don't allow mixing buildings
 				} else if (KeyModifiers & ModifierShift
-						   && (unit->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*unit))
+						   && (unit->GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*unit))
 						   //Wyrmgus start
-//						   && !unit->Type->BoolFlag[BUILDING_INDEX].value
+//						   && !unit->GetType()->BoolFlag[BUILDING_INDEX].value
 						   && (!Selected.size() || UnitCanBeSelectedWith(*Selected[0], *unit))
 						   //Wyrmgus end
 						   //Wyrmgus start
-//						   && (Selected.size() != 1 || !Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)
+//						   && (Selected.size() != 1 || !Selected[0]->GetType()->BoolFlag[BUILDING_INDEX].value)
 						   //Wyrmgus end
-						   && (Selected.size() != 1 || Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]))) {
+						   && (Selected.size() != 1 || Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]))) {
 					num = ToggleSelectUnit(*unit);
 					if (!num) {
 						SelectionChanged();
@@ -3198,13 +3198,13 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (Selected.size() == 1) {
-				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->Player->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
+				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->GetPlayer()->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
-				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
-						   || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) {
+				} else if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
+						   || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer())) {
 					PlayUnitSound(*Selected[0], VoiceSelected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
@@ -3212,22 +3212,22 @@ void UIHandleButtonUp(unsigned button)
 				//Wyrmgus start
 				/*
 				//Wyrmgus start
-//				if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
-				if (Selected[0]->Player == CPlayer::GetThisPlayer() && !Selected[0]->Type->BoolFlag[HERO_INDEX].value) { // don't display this for heroes
+//				if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
+				if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() && !Selected[0]->GetType()->BoolFlag[HERO_INDEX].value) { // don't display this for heroes
 				//Wyrmgus end
 					char buf[64];
-					if (Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type) > 1) {
+					if (Selected[0]->GetPlayer()->GetUnitTypeCount(Selected[0]->GetType()) > 1) {
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
-								 Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type),
+								 Selected[0]->GetPlayer()->GetUnitTypeCount(Selected[0]->GetType()),
 								//Wyrmgus start
-//								 Selected[0]->Type->Name.c_str());
+//								 Selected[0]->GetType()->Name.c_str());
 								 Selected[0]->GetTypeName().c_str());
 								//Wyrmgus end
 					} else {
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
-								 Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type),
+								 Selected[0]->GetPlayer()->GetUnitTypeCount(Selected[0]->GetType()),
 								//Wyrmgus start
-//								 Selected[0]->Type->Name.c_str());
+//								 Selected[0]->GetType()->Name.c_str());
 								 Selected[0]->GetTypeName().c_str());
 								//Wyrmgus end
 					}

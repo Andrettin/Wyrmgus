@@ -159,7 +159,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -181,11 +181,11 @@ enum {
 */
 int COrder_Board::MoveToTransporter(CUnit &unit)
 {
-	const Vec2i oldPos = unit.tilePos;
+	const Vec2i oldPos = unit.GetTilePos();
 	const int res = DoActionMove(unit);
 
 	// We have to reset a lot, or else they will circle each other and stuff.
-	if (oldPos != unit.tilePos) {
+	if (oldPos != unit.GetTilePos()) {
 		this->Range = 1;
 	}
 	return res;
@@ -215,8 +215,8 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 	}
 
 	//Wyrmgus start
-//	if (!trans->IsVisibleAsGoal(*unit.Player)) {
-	if (!trans->IsVisibleAsGoal(*unit.Player) && unit.Player->Type != PlayerNeutral) { // neutral units continue waiting for the transporter even if it is not visible
+//	if (!trans->IsVisibleAsGoal(*unit.GetPlayer())) {
+	if (!trans->IsVisibleAsGoal(*unit.GetPlayer()) && unit.GetPlayer()->Type != PlayerNeutral) { // neutral units continue waiting for the transporter even if it is not visible
 	//Wyrmgus end
 		DebugPrint("Transporter Gone\n");
 		this->ClearGoal();
@@ -255,18 +255,18 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 
 	Assert(transporter != nullptr);
 
-	if (!transporter->IsVisibleAsGoal(*unit.Player)) {
+	if (!transporter->IsVisibleAsGoal(*unit.GetPlayer())) {
 		DebugPrint("Transporter gone\n");
 		return;
 	}
 
-	if (transporter->BoardCount < transporter->Type->MaxOnBoard) {
+	if (transporter->BoardCount < transporter->GetType()->MaxOnBoard) {
 		// Place the unit inside the transporter.
 		unit.Remove(transporter);
-		transporter->BoardCount += unit.Type->GetBoardSize();
+		transporter->BoardCount += unit.GetType()->GetBoardSize();
 		unit.Boarded = 1;
 		transporter->UpdateContainerAttackRange();
-		if (!unit.Player->AiEnabled) {
+		if (!unit.GetPlayer()->AiEnabled) {
 			// Don't make anything funny after going out of the transporter.
 			CommandStopUnit(unit);
 		}
@@ -288,7 +288,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 				this->State = State_EnterTransporter;
 			} else {
 				//Wyrmgus start
-//				UnitShowAnimation(unit, unit.Type->Animations->Still);
+//				UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 				UnitShowAnimation(unit, unit.GetAnimations()->Still);
 				//Wyrmgus end
 			}
@@ -317,14 +317,14 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 					if (pathRet == PF_UNREACHABLE) {
 						//Wyrmgus start
 						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+							Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 							for (size_t i = 0; i != table.size(); ++i) {
-								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+								if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 									}
 									return;
 								}

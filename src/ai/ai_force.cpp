@@ -66,7 +66,7 @@ public:
 	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, int find_type, bool include_neutral, bool allow_water) :
 	//Wyrmgus end
 		unit(unit),
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(unit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		attackrange(unit.GetModifiedVariable(ATTACKRANGE_INDEX)),
 		find_type(find_type),
 		include_neutral(include_neutral),
@@ -92,7 +92,7 @@ private:
 
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 	
@@ -102,7 +102,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			tile_owner != -1
 			&& (
 				unit.IsEnemy(*CPlayer::Players[tile_owner])
-				|| (include_neutral && !unit.IsAllied(*CPlayer::Players[tile_owner]) && unit.Player->GetIndex() != tile_owner && !unit.Player->HasBuildingAccess(*CPlayer::Players[tile_owner]))
+				|| (include_neutral && !unit.IsAllied(*CPlayer::Players[tile_owner]) && unit.GetPlayer()->GetIndex() != tile_owner && !unit.GetPlayer()->HasBuildingAccess(*CPlayer::Players[tile_owner]))
 			)
 		) {
 			*result_enemy_wall_pos = pos;
@@ -124,11 +124,11 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 
 	std::vector<CUnit *> table;
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
-	Vec2i maxpos = pos + Vec2i(unit.Type->TileSize - 1 + attackrange);
+	Vec2i maxpos = pos + Vec2i(unit.GetType()->TileSize - 1 + attackrange);
 	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
-		const CUnitType &dtype = *dest->Type;
+		const CUnitType &dtype = *dest->GetType();
 
 		if (!dest->IsAliveOnMap()) {
 			continue;
@@ -137,9 +137,9 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			(
 				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->GetIndex() == dest->Player->GetIndex() || unit.Player->HasBuildingAccess(*dest->Player))
+				&& (!include_neutral || unit.IsAllied(*dest) || unit.GetPlayer()->GetIndex() == dest->GetPlayer()->GetIndex() || unit.GetPlayer()->HasBuildingAccess(*dest->GetPlayer()))
 			)
-			|| !CanTarget(*unit.Type, dtype)
+			|| !CanTarget(*unit.GetType(), dtype)
 		) {
 			continue;
 		}
@@ -193,13 +193,13 @@ public:
 	//Wyrmgus end
 	{
 		//Wyrmgus start
-//		if (unit->Type->CanAttack == false) {
-		if (unit->CanAttack() == false || std::find(CheckedTypes.begin(), CheckedTypes.end(), unit->Type) != CheckedTypes.end()) { // don't check for multiple units of the same type, since the result will be the same in almost all cases, so we save performance
+//		if (unit->GetType()->CanAttack == false) {
+		if (unit->CanAttack() == false || std::find(CheckedTypes.begin(), CheckedTypes.end(), unit->GetType()) != CheckedTypes.end()) { // don't check for multiple units of the same type, since the result will be the same in almost all cases, so we save performance
 		//Wyrmgus end
 			return *enemy == nullptr;
 		}
 		//Wyrmgus start
-		CheckedTypes.push_back(unit->Type);
+		CheckedTypes.push_back(unit->GetType());
 		//Wyrmgus end
 		if (FIND_TYPE == AIATTACK_RANGE) {
 			//Wyrmgus start
@@ -280,7 +280,7 @@ public:
 	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && (unit->Player->GetIndex() == player->GetIndex()
+		return unit->IsVisibleAsGoal(*player) && (unit->GetPlayer()->GetIndex() == player->GetIndex()
 												  || unit->IsAllied(*player));
 	}
 private:
@@ -404,12 +404,12 @@ public:
 	}
 	inline void operator()(const CUnit *const unit) const
 	{
-		data[UnitTypeEquivs[unit->Type->GetIndex()]]++;
+		data[UnitTypeEquivs[unit->GetType()->GetIndex()]]++;
 		
-		const UnitClass *unit_class = unit->Type->GetClass();
+		const UnitClass *unit_class = unit->GetType()->GetClass();
 		if (unit_class != nullptr) {
 			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
-				if (class_unit_type != unit->Type) {
+				if (class_unit_type != unit->GetType()) {
 					data[UnitTypeEquivs[class_unit_type->GetIndex()]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
 			}
@@ -498,7 +498,7 @@ public:
 	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos, int z) :
 	//Wyrmgus end
 		startUnit(startUnit), distance(distance), startPos(startPos),
-		movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
+		movemask(startUnit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
 		//Wyrmgus start
 //		resultPos(resultPos)
 		resultPos(resultPos), z(z)
@@ -519,7 +519,7 @@ private:
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	//Wyrmgus start
-	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
+	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*startUnit.GetPlayer())) { // don't pick unexplored positions
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -532,13 +532,13 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	
 	const int minDist = 15;
 	//Wyrmgus start
-//	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist) == false
+//	if (AiEnemyUnitsInDistance(*startUnit.GetPlayer(), nullptr, pos, minDist) == false
 //		&& Distance(pos, startPos) <= abs(distance - minDist)) {
 //		*resultPos = pos;
 //		return VisitResult_Finished;
 //	}
 	
-	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist, z) > 0) { // if there are enemies within the minimum distance here, then it is a dead end
+	if (AiEnemyUnitsInDistance(*startUnit.GetPlayer(), nullptr, pos, minDist, z) > 0) { // if there are enemies within the minimum distance here, then it is a dead end
 		return VisitResult_DeadEnd;
 	}
 	
@@ -591,8 +591,8 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
-//	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos);
-	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos, z);
+//	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.GetTilePos(), resultPos);
+	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.GetTilePos(), resultPos, z);
 	//Wyrmgus end
 
 	return terrainTraversal.Run(aiForceRallyPointFinder);
@@ -624,11 +624,11 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.GetTileLandmass(ai_unit.GetTilePos(), ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
-		transport_capacity_needed += ai_unit.Type->GetBoardSize();
+		transport_capacity_needed += ai_unit.GetType()->GetBoardSize();
 	}
 	
 	int net_transport_capacity_needed = transport_capacity_needed - transport_capacity;
@@ -650,7 +650,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		if (!ai_transporter->IsIdle()) { //is already moving, may be going to a unit to transport it
 			continue;
 		}
-		if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) <= 0) { //already full
+		if ((ai_transporter->GetType()->MaxOnBoard - ai_transporter->BoardCount) <= 0) { //already full
 			continue;
 		}
 		
@@ -669,7 +669,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.GetTileLandmass(ai_unit.GetTilePos(), ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
@@ -685,7 +685,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		for (size_t j = 0; j != transporters.size(); ++j) {
 			CUnit *ai_transporter = transporters[j];
 			
-			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit.Type->GetBoardSize()) { //the unit's board size is too big to fit in the transporter
+			if ((ai_transporter->GetType()->MaxOnBoard - ai_transporter->BoardCount) < ai_unit.GetType()->GetBoardSize()) { //the unit's board size is too big to fit in the transporter
 				continue;
 			}
 			
@@ -707,7 +707,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit &ai_unit = *this->Units[i];
 		
-		if (CMap::Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.GetTileLandmass(ai_unit.GetTilePos(), ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 
@@ -718,7 +718,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 				continue;
 			}
 			
-			if (ai_unit.Container->Type->MaxOnBoard > ai_unit.Container->BoardCount && has_unboarded_unit) { //send the transporter to unload units if it is full, or if all of the force's units are already boarded
+			if (ai_unit.Container->GetType()->MaxOnBoard > ai_unit.Container->BoardCount && has_unboarded_unit) { //send the transporter to unload units if it is full, or if all of the force's units are already boarded
 				//sending a transporter that is full to unload, even if all of the force's units aren't boarded yet, is useful to prevent transporter congestion
 				continue;
 			}
@@ -748,11 +748,11 @@ int AiForce::GetForceType() const
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 		
-		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
+		if (unit->GetType()->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->GetType()->CanTransport()) { //one naval unit that can attack makes this a naval force
 			return NavalForceType;
 		}
 		
-		if (unit->Type->UnitType != UnitTypeFly) { //all units must be of UnitTypeFly for it to be considered an air force
+		if (unit->GetType()->UnitType != UnitTypeFly) { //all units must be of UnitTypeFly for it to be considered an air force
 			force_type = LandForceType;
 		}
 	}
@@ -811,7 +811,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		// Remember the original force position so we can return there after attack
 		if (this->Role == AiForceRoleDefend
 			|| (this->Role == AiForceRoleAttack && this->State == AiForceAttackingState_Waiting)) {
-			this->HomePos = this->Units[this->Units.size() - 1]->tilePos;
+			this->HomePos = this->Units[this->Units.size() - 1]->GetTilePos();
 			this->HomeMapLayer = this->Units[this->Units.size() - 1]->MapLayer->ID;
 		}
 		this->Attacking = true;
@@ -823,8 +823,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 		//Wyrmgus start
-//		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
-		if (unit->Type->CanTransport()) {
+//		if (unit->GetType()->CanTransport() && unit->IsAgressive() == false) {
+		if (unit->GetType()->CanTransport()) {
 		//Wyrmgus end
 			isTransporter = true;
 			break;
@@ -855,13 +855,13 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			//Wyrmgus end
 		}
 		if (enemy) {
-			goalPos = enemy->tilePos;
+			goalPos = enemy->GetTilePos();
 			//Wyrmgus start
 			z = enemy->MapLayer->ID;
-			if (!AiPlayer->Player->IsEnemy(*enemy->Player) && enemy->Player->Type != PlayerNeutral) {
-				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
-				if (AiPlayer->Player->IsSharedVision(*enemy->Player)) {
-					CommandSharedVision(AiPlayer->Player->GetIndex(), false, enemy->Player->GetIndex());
+			if (!AiPlayer->Player->IsEnemy(*enemy->GetPlayer()) && enemy->GetPlayer()->Type != PlayerNeutral) {
+				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->GetPlayer());
+				if (AiPlayer->Player->IsSharedVision(*enemy->GetPlayer())) {
+					CommandSharedVision(AiPlayer->Player->GetIndex(), false, enemy->GetPlayer()->GetIndex());
 				}
 			}
 			//Wyrmgus end
@@ -908,7 +908,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit *const unit = this->Units[i];
 
-			if (unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
+			if (unit->GetType()->UnitType != UnitTypeFly && unit->GetType()->UnitType != UnitTypeFlyLow && CMap::Map.GetTileLandmass(unit->GetTilePos(), unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
 				needs_transport = true;
 				break;
 			}
@@ -1107,11 +1107,11 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool hero)
 	if (force != -1) {
 		AiForce &f = forces[force];
 		//Wyrmgus start
-//		if (f.IsBelongsTo(*unit.Type)) {
-		if (f.IsBelongsTo(*unit.Type) || hero) {
+//		if (f.IsBelongsTo(*unit.GetType())) {
+		if (f.IsBelongsTo(*unit.GetType()) || hero) {
 		//Wyrmgus end
 			if (hero && f.Units.size() > 0) { //make heroes move to where the rest of the force is
-				CommandMove(unit, f.Units[0]->tilePos, FlushCommands, f.Units[0]->MapLayer->ID);
+				CommandMove(unit, f.Units[0]->GetTilePos(), FlushCommands, f.Units[0]->MapLayer->ID);
 			}
 			f.Insert(unit);
 			unit.GroupId = force + 1;
@@ -1146,7 +1146,7 @@ void AiForceManager::CheckUnits(int *counter)
 		if (force.State > AiForceAttackingState_Free && force.IsAttacking()) {
 			for (unsigned int j = 0; j < force.Size(); ++j) {
 				const CUnit *unit = force.Units[j];
-				attacking[unit->Type->GetIndex()]++;
+				attacking[unit->GetType()->GetIndex()]++;
 			}
 		}
 	}
@@ -1218,7 +1218,7 @@ void AiAssignFreeUnitsToForce(int force)
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (unit.Active && unit.GroupId == 0) {
-			AiPlayer->Force.Assign(unit, force, unit.Character != nullptr && !unit.Type->BoolFlag[HARVESTER_INDEX].value);
+			AiPlayer->Force.Assign(unit, force, unit.Character != nullptr && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value);
 		}
 	}
 }
@@ -1388,8 +1388,8 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 	for (; transporterIndex < aiForce.Size(); ++transporterIndex) {
 		const CUnit &unit = *aiForce.Units[transporterIndex];
 
-		if (unit.Type->CanTransport() && unit.Type->MaxOnBoard - unit.BoardCount > 0) {
-			nbToTransport = unit.Type->MaxOnBoard - unit.BoardCount;
+		if (unit.GetType()->CanTransport() && unit.GetType()->MaxOnBoard - unit.BoardCount > 0) {
+			nbToTransport = unit.GetType()->MaxOnBoard - unit.BoardCount;
 			break;
 		}
 	}
@@ -1427,8 +1427,8 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 					for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
 						const CUnit &nextTransporter = *aiForce.Units[transporterIndex];
 
-						if (nextTransporter.Type->CanTransport()) {
-							nbToTransport = nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
+						if (nextTransporter.GetType()->CanTransport()) {
+							nbToTransport = nextTransporter.GetType()->MaxOnBoard - nextTransporter.BoardCount;
 							break ;
 						}
 					}
@@ -1490,7 +1490,7 @@ void AiForce::Update()
 	for (unsigned int i = 0; i < Size(); ++i) {
 		CUnit *aiunit = Units[i];
 
-		if (aiunit->Type->CanAttack) {
+		if (aiunit->GetType()->CanAttack) {
 			Attacking = true;
 			break;
 		}
@@ -1526,7 +1526,7 @@ void AiForce::Update()
 		for (unsigned int i = 0; i != Size(); ++i) {
 			CUnit &aiunit = *Units[i];
 			
-			if (aiunit.CanMove() && aiunit.Type->MaxOnBoard) {
+			if (aiunit.CanMove() && aiunit.GetType()->MaxOnBoard) {
 				transporters.push_back(&aiunit);
 				if (aiunit.BoardCount > 0) {
 					emptyTrans = false;
@@ -1564,7 +1564,7 @@ void AiForce::Update()
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
-		if (unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow && unit->Type->UnitType != UnitTypeNaval && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
+		if (unit->GetType()->UnitType != UnitTypeFly && unit->GetType()->UnitType != UnitTypeFlyLow && unit->GetType()->UnitType != UnitTypeNaval && CMap::Map.GetTileLandmass(unit->GetTilePos(), unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
 		}
@@ -1651,12 +1651,12 @@ void AiForce::Update()
 				}
 			}
 			if (unit) {
-				this->GoalPos = unit->tilePos;
+				this->GoalPos = unit->GetTilePos();
 				this->GoalMapLayer = unit->MapLayer->ID;
-				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
-					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
-						CommandSharedVision(AiPlayer->Player->GetIndex(), false, unit->Player->GetIndex());
+				if (!AiPlayer->Player->IsEnemy(*unit->GetPlayer()) && unit->GetPlayer()->Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->GetPlayer());
+					if (AiPlayer->Player->IsSharedVision(*unit->GetPlayer())) {
+						CommandSharedVision(AiPlayer->Player->GetIndex(), false, unit->GetPlayer()->GetIndex());
 					}
 				}
 			} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1757,16 +1757,16 @@ void AiForce::Update()
 		} else {
 			Vec2i resultPos;
 			if (unit) {
-				NewRallyPoint(unit->tilePos, &resultPos, unit->MapLayer->ID);
+				NewRallyPoint(unit->GetTilePos(), &resultPos, unit->MapLayer->ID);
 				if (resultPos.x == 0 && resultPos.y == 0) {
-					resultPos = unit->tilePos;
+					resultPos = unit->GetTilePos();
 				}
 				this->GoalPos = resultPos;
 				this->GoalMapLayer = unit->MapLayer->ID;
-				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
-					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
-						CommandSharedVision(AiPlayer->Player->GetIndex(), false, unit->Player->GetIndex());
+				if (!AiPlayer->Player->IsEnemy(*unit->GetPlayer()) && unit->GetPlayer()->Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->GetPlayer());
+					if (AiPlayer->Player->IsSharedVision(*unit->GetPlayer())) {
+						CommandSharedVision(AiPlayer->Player->GetIndex(), false, unit->GetPlayer()->GetIndex());
 					}
 				}
 			} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1804,8 +1804,8 @@ void AiForce::Update()
 			if (aiunit.IsAgressive()) {
 				if (State == AiForceAttackingState_Attacking) {
 					//Wyrmgus start
-//					CommandAttack(aiunit, leader->tilePos, nullptr, FlushCommands);
-					CommandAttack(aiunit, leader->tilePos, nullptr, FlushCommands, leader->MapLayer);
+//					CommandAttack(aiunit, leader->GetTilePos(), nullptr, FlushCommands);
+					CommandAttack(aiunit, leader->GetTilePos(), nullptr, FlushCommands, leader->MapLayer);
 					//Wyrmgus end
 				} else {
 					//Wyrmgus start
@@ -2010,7 +2010,7 @@ void AiForceManager::Update()
 						//Wyrmgus start
 						force.GoalMapLayer,
 						//Wyrmgus end
-					   IsAnAlliedUnitOf(*force.Units[0]->Player));
+					   IsAnAlliedUnitOf(*force.Units[0]->GetPlayer()));
 				if (nearGoal.empty()) {
 					force.ReturnToHome();
 				} else {
@@ -2036,7 +2036,7 @@ void AiForceManager::Update()
 							unit->Wait += delay;
 							//Wyrmgus end
 							//Wyrmgus start
-//							if (unit->Type->CanAttack) {
+//							if (unit->GetType()->CanAttack) {
 							if (unit->CanAttack() && unit->IsAgressive()) {
 							//Wyrmgus end
 								CommandAttack(*unit, force.GoalPos, nullptr, FlushCommands, force.GoalMapLayer);

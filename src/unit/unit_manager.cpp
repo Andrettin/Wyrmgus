@@ -180,7 +180,7 @@ void CUnitManager::Save(CFile &file) const
 	//add items owned by persistent heroes here, as if they were released
 	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
 		const CUnit &unit = **it;
-		if (unit.Container && unit.Container->Character && unit.Container->HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value) { // don't save items for persistent heroes
+		if (unit.Container && unit.Container->Character && unit.Container->HasInventory() && unit.GetType()->BoolFlag[ITEM_INDEX].value) { // don't save items for persistent heroes
 			file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(unit), (unsigned int) GameCycle);
 		}
 	}
@@ -190,7 +190,7 @@ void CUnitManager::Save(CFile &file) const
 	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
 		const CUnit &unit = **it;
 		//Wyrmgus start
-		if (unit.Container && unit.Container->Character && unit.Container->HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value) { // don't save items for persistent heroes
+		if (unit.Container && unit.Container->Character && unit.Container->HasInventory() && unit.GetType()->BoolFlag[ITEM_INDEX].value) { // don't save items for persistent heroes
 			continue;
 		}
 		//Wyrmgus end

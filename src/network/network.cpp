@@ -725,7 +725,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	const unsigned int slot = nc.Unit;
 	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : nullptr;
 
-	if (unit && (unit->Player->GetIndex() == player || CPlayer::Players[player]->IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
+	if (unit && (unit->GetPlayer()->GetIndex() == player || CPlayer::Players[player]->IsTeamed(*unit) || unit->GetPlayer()->Type == PlayerNeutral)) {
 		return true;
 	} else {
 		return false;
@@ -739,7 +739,7 @@ static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index, con
 	const unsigned int slot = nc.Unit;
 	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : nullptr;
 
-	if (unit && unit->Type->ClicksToExplode) {
+	if (unit && unit->GetType()->ClicksToExplode) {
 		return true;
 	}
 	return IsAValidCommand_Command(packet, index, player);

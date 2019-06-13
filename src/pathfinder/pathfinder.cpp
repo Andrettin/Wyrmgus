@@ -128,14 +128,14 @@ void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 	//Wyrmgus start
 	if (startUnit == nullptr) {
 		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.\n");
-	} else if (startUnit->Type == nullptr) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
+	} else if (startUnit->GetType() == nullptr) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->GetTilePos().x, startUnit->GetTilePos().y);
 	}
 	//Wyrmgus end
 	const Vec2i offset(1, 1);
-	const Vec2i extraTileSize(startUnit->Type->TileSize - 1);
-	const Vec2i start = startUnit->tilePos - offset;
-	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
+	const Vec2i extraTileSize(startUnit->GetType()->TileSize - 1);
+	const Vec2i start = startUnit->GetTilePos() - offset;
+	const Vec2i end = startUnit->GetTilePos() + extraTileSize + offset;
 
 	for (Vec2i it = start; it.y <= end.y; ++it.y) {
 		for (it.x = start.x; it.x <= end.x; ++it.x) {
@@ -221,14 +221,14 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 	
 	int i = PF_FAILED;
 	if (!src.Container || !from_outside_container) {
-		i = AStarFindPath(src.tilePos, goalPos, w, h,
-						  src.Type->TileSize.x, src.Type->TileSize.y,
+		i = AStarFindPath(src.GetTilePos(), goalPos, w, h,
+						  src.GetType()->TileSize.x, src.GetType()->TileSize.y,
 						  minrange, range, nullptr, 0, src, max_length, z);
 	} else {
 		const Vec2i offset(1, 1);
-		const Vec2i extra_tile_size(src.Container->Type->TileSize - 1);
-		const Vec2i start_pos = src.Container->tilePos - offset;
-		const Vec2i end_pos = src.Container->tilePos + extra_tile_size + offset;
+		const Vec2i extra_tile_size(src.Container->GetType()->TileSize - 1);
+		const Vec2i start_pos = src.Container->GetTilePos() - offset;
+		const Vec2i end_pos = src.Container->GetTilePos() + extra_tile_size + offset;
 		const Vec2i pos_diff = end_pos - start_pos;
 
 		int temp_i = PF_FAILED;
@@ -238,7 +238,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 					continue;
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
-						  src.Type->TileSize.x, src.Type->TileSize.y,
+						  src.GetType()->TileSize.x, src.GetType()->TileSize.y,
 						  minrange, range, nullptr, 0, src, max_length, z);
 						  
 				if (temp_i > i && i < PF_REACHED) {
@@ -285,13 +285,13 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 //Wyrmgus end
 {
 	//  Find a path to the goal.
-	if (src.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (src.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		return 0;
 	}
-	const int depth = PlaceReachable(src, dst.tilePos,
+	const int depth = PlaceReachable(src, dst.GetTilePos(),
 									 //Wyrmgus start
-//									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range);
-									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range, max_length, dst.MapLayer->ID, from_outside_container);
+//									 dst.GetType()->TileSize.x, dst.GetType()->TileSize.y, 0, range);
+									 dst.GetType()->TileSize.x, dst.GetType()->TileSize.y, 0, range, max_length, dst.MapLayer->ID, from_outside_container);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
@@ -303,11 +303,11 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
-const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
+const Vec2i &PathFinderInput::GetUnitPos() const { return unit->GetTilePos(); }
 const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer->ID; }
 Vec2i PathFinderInput::GetUnitSize() const
 {
-	return unit->Type->TileSize;
+	return unit->GetType()->TileSize;
 }
 
 void PathFinderInput::SetUnit(CUnit &_unit)
@@ -324,11 +324,11 @@ void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
 	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
-	if (newPos.x + unit->Type->TileSize.x - 1 >= CMap::Map.Info.MapWidths[z]) {
-		newPos.x = CMap::Map.Info.MapWidths[z] - unit->Type->TileSize.x;
+	if (newPos.x + unit->GetType()->TileSize.x - 1 >= CMap::Map.Info.MapWidths[z]) {
+		newPos.x = CMap::Map.Info.MapWidths[z] - unit->GetType()->TileSize.x;
 	}
-	if (newPos.y + unit->Type->TileSize.y - 1 >= CMap::Map.Info.MapHeights[z]) {
-		newPos.y = CMap::Map.Info.MapHeights[z] - unit->Type->TileSize.y;
+	if (newPos.y + unit->GetType()->TileSize.y - 1 >= CMap::Map.Info.MapHeights[z]) {
+		newPos.y = CMap::Map.Info.MapHeights[z] - unit->GetType()->TileSize.y;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
@@ -362,7 +362,7 @@ void PathFinderInput::SetMaxRange(int range)
 
 void PathFinderInput::PathRacalculated()
 {
-	unitSize = unit->Type->TileSize;
+	unitSize = unit->GetType()->TileSize;
 
 	isRecalculatePathNeeded = false;
 }
@@ -454,7 +454,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	const Vec2i dir(*pxd, *pyd);
 	int result = output.Length;
 	output.Length--;
-	if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer->ID)) {
+	if (!UnitCanBeAt(unit, unit.GetTilePos() + dir, unit.MapLayer->ID)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
@@ -471,7 +471,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			if (result > 0) {
 				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
 				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-				if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer->ID)) {
+				if (!UnitCanBeAt(unit, unit.GetTilePos() + dir, unit.MapLayer->ID)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;

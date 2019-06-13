@@ -67,7 +67,7 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 	// FIXME: if you give quick an other order, the resources are lost!
 	//Wyrmgus start
 	order->Player = player;
-//	unit.Player->SubCosts(upgrade.Costs);
+//	unit.GetPlayer()->SubCosts(upgrade.Costs);
 	int upgrade_costs[MaxCosts];
 	CPlayer::Players[player]->GetUpgradeCosts(&upgrade, upgrade_costs);
 	CPlayer::Players[player]->SubCosts(upgrade_costs);
@@ -122,7 +122,7 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 /* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
 {
 	//Wyrmgus start
-//	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->GetIndex()];
+//	unit.Variable[RESEARCH_INDEX].Value = unit.GetPlayer()->UpgradeTimers.Upgrades[this->Upgrade->GetIndex()];
 	unit.Variable[RESEARCH_INDEX].Value = CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[this->Upgrade->GetIndex()];
 	//Wyrmgus end
 	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
@@ -136,7 +136,7 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 /* virtual */ void COrder_Research::Execute(CUnit &unit)
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 
 
 	//Wyrmgus start
@@ -153,7 +153,7 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 	}
 #endif
 	//Wyrmgus start
-//	CPlayer &player = *unit.Player;
+//	CPlayer &player = *unit.GetPlayer();
 	CPlayer &player = *CPlayer::Players[this->Player];
 //	player.UpgradeTimers.Upgrades[upgrade.GetIndex()] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	player.UpgradeTimers.Upgrades[upgrade.GetIndex()] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
@@ -161,16 +161,16 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 	if (player.UpgradeTimers.Upgrades[upgrade.GetIndex()] >= upgrade.Costs[TimeCost]) {
 		if (upgrade.GetName().empty()) {
 			//Wyrmgus start
-//			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
+//			player.Notify(NotifyGreen, unit.GetTilePos(), _("%s: research complete"), type.Name.c_str());
+			player.Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 		} else {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.GetName().utf8().get_data());
+			player.Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s: research complete"), upgrade.GetName().utf8().get_data());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start
 //			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
-			CSound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
+			CSound *sound = GameSounds.ResearchComplete[unit.GetPlayer()->Race].Sound;
 			//Wyrmgus end
 
 			if (sound) {
@@ -191,9 +191,9 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
 	//Wyrmgus start
-//	unit.Player->UpgradeTimers.Upgrades[upgrade.GetIndex()] = 0;
+//	unit.GetPlayer()->UpgradeTimers.Upgrades[upgrade.GetIndex()] = 0;
 
-//	unit.Player->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);
+//	unit.GetPlayer()->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);
 	CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[upgrade.GetIndex()] = 0;
 
 	CPlayer::Players[this->Player]->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);

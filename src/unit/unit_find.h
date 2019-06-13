@@ -72,7 +72,7 @@ public:
 	explicit HasSameTypeAs(const CUnitType &_type) : type(&_type) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->Type == type;
+		return unit->GetType() == type;
 	}	
 private:
 	const CUnitType *type;
@@ -84,7 +84,7 @@ public:
 	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->Player == player;
+		return unit->GetPlayer() == player;
 	}
 private:
 	const CPlayer *player;
@@ -96,7 +96,7 @@ public:
 	explicit HasNotSamePlayerAs(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->Player != player;
+		return unit->GetPlayer() != player;
 	}
 private:
 	const CPlayer *player;
@@ -130,7 +130,7 @@ class HasSamePlayerAndTypeAs : public CUnitFilter
 {
 public:
 	explicit HasSamePlayerAndTypeAs(const CUnit &unit) :
-		player(unit.Player), type(unit.Type)
+		player(unit.GetPlayer()), type(unit.GetType())
 	{}
 	
 	HasSamePlayerAndTypeAs(const CPlayer &_player, const CUnitType &_type) :
@@ -139,7 +139,7 @@ public:
 
 	bool operator()(const CUnit *unit) const
 	{
-		return (unit->Player == player && unit->Type == type);
+		return (unit->GetPlayer() == player && unit->GetType() == type);
 	}
 
 private:
@@ -164,7 +164,7 @@ class IsBuildingType : public CUnitFilter
 public:
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->Type->BoolFlag[BUILDING_INDEX].value;
+		return unit->GetType()->BoolFlag[BUILDING_INDEX].value;
 	}
 };
 
@@ -173,7 +173,7 @@ class IsNotBuildingType : public CUnitFilter
 public:
 	bool operator()(const CUnit *unit) const
 	{
-		return !unit->Type->BoolFlag[BUILDING_INDEX].value;
+		return !unit->GetType()->BoolFlag[BUILDING_INDEX].value;
 	}
 };
 
@@ -182,7 +182,7 @@ class IsOrganicType : public CUnitFilter
 public:
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->Type->BoolFlag[ORGANIC_INDEX].value;
+		return unit->GetType()->BoolFlag[ORGANIC_INDEX].value;
 	}
 };
 
@@ -270,12 +270,12 @@ public:
 			return false;
 		}
 
-		if (!unit->Type) {
+		if (!unit->GetType()) {
 			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
 			return false;
 		}
 
-		const CUnitType &type = *unit->Type;
+		const CUnitType &type = *unit->GetType();
 		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;
 		}
@@ -364,13 +364,13 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 {
 	const Vec2i offset(range, range);
 	//Wyrmgus start
-//	const Vec2i typeSize(unit.Type->TileSize.x - 1, unit.Type->TileSize.y - 1);
+//	const Vec2i typeSize(unit.GetType()->TileSize.x - 1, unit.GetType()->TileSize.y - 1);
 	const CUnit *firstContainer = unit.GetFirstContainer();
-	const Vec2i typeSize(firstContainer->Type->TileSize - 1);
+	const Vec2i typeSize(firstContainer->GetType()->TileSize - 1);
 	//Wyrmgus end
 
-	Select(unit.tilePos - offset,
-		   unit.tilePos + typeSize + offset, around,
+	Select(unit.GetTilePos() - offset,
+		   unit.GetTilePos() + typeSize + offset, around,
 		   //Wyrmgus start
 		   unit.MapLayer->ID,
 //		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));

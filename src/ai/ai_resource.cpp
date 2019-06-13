@@ -220,7 +220,7 @@ public:
 	{
 		return unit->IsVisibleAsGoal(*player)
 			   && unit->IsEnemy(*player)
-			   && CanTarget(*unit->Type, *type);
+			   && CanTarget(*unit->GetType(), *type);
 	}
 private:
 	const CPlayer *player;
@@ -278,8 +278,8 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
-	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range, z);
+//	return AiEnemyUnitsInDistance(*unit.GetPlayer(), unit.GetType(), unit.GetTilePos(), range);
+	return AiEnemyUnitsInDistance(*unit.GetPlayer(), unit.GetType(), unit.GetTilePos(), range, z);
 	//Wyrmgus end
 }
 
@@ -334,7 +334,7 @@ static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, con
 		}
 		
 		if (landmass) {
-			int worker_landmass = CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
+			int worker_landmass = CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID);
 			if (worker_landmass != landmass && std::find(CMap::Map.BorderLandmasses[landmass].begin(), CMap::Map.BorderLandmasses[landmass].end(), worker_landmass) == CMap::Map.BorderLandmasses[landmass].end()) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
 				continue;
 			}
@@ -517,7 +517,7 @@ void AiNewDepotRequest(CUnit &worker)
 {
 #if 0
 	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n"
-			   _C_ worker->Player->GetIndex() _C_ worker->Slot
+			   _C_ worker->GetPlayer()->GetIndex() _C_ worker->Slot
 			   _C_ worker->CurrentResource
 			   _C_ worker->Data.Move.Cycles);
 #endif
@@ -531,7 +531,7 @@ void AiNewDepotRequest(CUnit &worker)
 	//Wyrmgus end
 	const int range = 15;
 
-	if (pos.x != -1 && nullptr != FindDepositNearLoc(*worker.Player, pos, range, resource, z)) {
+	if (pos.x != -1 && nullptr != FindDepositNearLoc(*worker.GetPlayer(), pos, range, resource, z)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
@@ -544,7 +544,7 @@ void AiNewDepotRequest(CUnit &worker)
 	// Count the already made build requests.
 	int counter[UnitTypeMax];
 
-	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
+	AiGetBuildRequestsCount(*worker.GetPlayer()->Ai, counter);
 
 	const int n = AiHelpers.Depots[resource].size();
 
@@ -554,14 +554,14 @@ void AiNewDepotRequest(CUnit &worker)
 		if (counter[type.GetIndex()]) { // Already ordered.
 			return;
 		}
-		if (!AiRequestedTypeAllowed(*worker.Player, type)) {
+		if (!AiRequestedTypeAllowed(*worker.GetPlayer(), type)) {
 			continue;
 		}
 
 		// Check if resources available.
 		//int needmask = AiCheckUnitTypeCosts(type);
 		int type_costs[MaxCosts];
-		worker.Player->GetUnitTypeCosts(&type, type_costs);
+		worker.GetPlayer()->GetUnitTypeCosts(&type, type_costs);
 		int cost = 0;
 		for (int c = 1; c < MaxCosts; ++c) {
 			cost += type_costs[c];
@@ -586,10 +586,10 @@ void AiNewDepotRequest(CUnit &worker)
 		queue.MapLayer = z;
 		//Wyrmgus end
 
-		worker.Player->Ai->UnitTypeBuilt.push_back(queue);
+		worker.GetPlayer()->Ai->UnitTypeBuilt.push_back(queue);
 
 		DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n"
-				   _C_ worker.Player->GetIndex() _C_ UnitNumber(worker)
+				   _C_ worker.GetPlayer()->GetIndex() _C_ UnitNumber(worker)
 				   _C_ queue.Pos.x _C_ queue.Pos.y);
 		/*
 		} else {
@@ -605,7 +605,7 @@ public:
 	explicit IsAWorker() {}
 	bool operator()(const CUnit *const unit) const
 	{
-		return (unit->Type->BoolFlag[HARVESTER_INDEX].value && !unit->Removed);
+		return (unit->GetType()->BoolFlag[HARVESTER_INDEX].value && !unit->Removed);
 	}
 };
 
@@ -638,11 +638,11 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	std::vector<CUnit *> depots;
 	const Vec2i offset(MaxMapWidth, MaxMapHeight);
 
-	for (std::vector<CUnit *>::iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
+	for (std::vector<CUnit *>::iterator it = worker.GetPlayer()->UnitBegin(); it != worker.GetPlayer()->UnitEnd(); ++it) {
 		CUnit &unit = **it;
 
 		//Wyrmgus start
-//		if (unit.Type->CanStore[resource] && !unit.IsUnusable()) {
+//		if (unit.GetType()->CanStore[resource] && !unit.IsUnusable()) {
 		if (worker.CanReturnGoodsTo(&unit, resource) && !unit.IsUnusable()) {
 		//Wyrmgus end
 			depots.push_back(&unit);
@@ -670,7 +670,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 			continue;
 		}
 		//Wyrmgus start
-//		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
+//		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.GetPlayer()->AiEnabled);
 		CUnit *res = UnitFindResource(worker, unit, range, resource, true, nullptr, true, false, false, false, true);
 		//Wyrmgus end
 		if (res) {
@@ -731,7 +731,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 				for (size_t j = 0; j != builder_table.size(); ++j) {
 					CUnit &builder_unit = *builder_table[j];
 					
-					if (CMap::Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
+					if (CMap::Map.GetTileLandmass(builder_unit.GetTilePos(), builder_unit.MapLayer->ID) == landmass) {
 						has_builder = true;
 						break;
 					}
@@ -922,7 +922,7 @@ static bool AiTrainUnit(const CUnitType &type, const CUnitType &what, const int 
 		CUnit &unit = *table[i];
 
 		//Wyrmgus start
-		if (landmass && CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) != landmass) {
+		if (landmass && CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID) != landmass) {
 			continue;
 		}
 		
@@ -1180,8 +1180,8 @@ static void AiCheckingWork()
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 			queuep->Settlement
 			&& (
-				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->Player != AiPlayer->Player)
-				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->Player->GetIndex() != PlayerNumNeutral)
+				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->GetPlayer() != AiPlayer->Player)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->GetPlayer()->GetIndex() != PlayerNumNeutral)
 			)
 		) {
 			AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
@@ -1252,13 +1252,13 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 	//Wyrmgus end
 
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, resource, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer->ID)) {
+	if (FindTerrainType(unit.GetType()->MovementMask, resource, resource_range, *unit.GetPlayer(), unit.GetTilePos(), &forestPos, unit.MapLayer->ID)) {
 		CommandResourceLoc(unit, forestPos, FlushCommands, unit.MapLayer->ID);
 		return 1;
 	}
 	// Ask the AI to explore...
 	//Wyrmgus start
-//	AiExplore(unit.tilePos, MapFieldLandUnit);
+//	AiExplore(unit.GetTilePos(), MapFieldLandUnit);
 	//Wyrmgus end
 
 	// Failed.
@@ -1291,7 +1291,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 		//Wyrmgus start
 //		CommandResource(unit, *mine, FlushCommands);
 //		return 1;
-		if (mine->Type->BoolFlag[CANHARVEST_INDEX].value) {
+		if (mine->GetType()->BoolFlag[CANHARVEST_INDEX].value) {
 			CommandResource(unit, *mine, FlushCommands);
 			return 1;
 		} else { // if the resource isn't readily harvestable (but is a deposit), build a mine there
@@ -1302,10 +1302,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 
 				if (
 					type.GetIndex() < (int) AiHelpers.Build.size()
-					&& std::find(AiHelpers.Build[type.GetIndex()].begin(), AiHelpers.Build[type.GetIndex()].end(), unit.Type) != AiHelpers.Build[type.GetIndex()].end()
-					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer->ID)
+					&& std::find(AiHelpers.Build[type.GetIndex()].begin(), AiHelpers.Build[type.GetIndex()].end(), unit.GetType()) != AiHelpers.Build[type.GetIndex()].end()
+					&& CanBuildUnitType(&unit, type, mine->GetTilePos(), 1, true, mine->MapLayer->ID)
 				) {
-					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer->ID);
+					CommandBuildBuilding(unit, mine->GetTilePos(), type, FlushCommands, mine->MapLayer->ID);
 					return 1;
 				}
 			}
@@ -1340,7 +1340,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 		}
 	}
 	// Ask the AI to explore
-	AiExplore(unit.tilePos, exploremask);
+	AiExplore(unit.GetTilePos(), exploremask);
 	*/
 	//Wyrmgus end
 	// Failed.
@@ -1368,7 +1368,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit), AiPlayer->Scouts.end());
 	}
 
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
+	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[resource];
 	Assert(&resinfo);
 
 	//Wyrmgus start
@@ -1428,7 +1428,7 @@ static void AiProduceResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (unit.Type->GetIndex() >= ((int) AiHelpers.ProducedResources.size()) || AiHelpers.ProducedResources[unit.Type->GetIndex()].size() == 0 || !unit.Active) {
+		if (unit.GetType()->GetIndex() >= ((int) AiHelpers.ProducedResources.size()) || AiHelpers.ProducedResources[unit.GetType()->GetIndex()].size() == 0 || !unit.Active) {
 			continue;
 		}
 		
@@ -1438,8 +1438,8 @@ static void AiProduceResources()
 
 		int chosen_resource = 0;
 		int best_value = 0;
-		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->GetIndex()].size(); ++j) {
-			int resource = AiHelpers.ProducedResources[unit.Type->GetIndex()][j];
+		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.GetType()->GetIndex()].size(); ++j) {
+			int resource = AiHelpers.ProducedResources[unit.GetType()->GetIndex()][j];
 			
 			if (!CResource::GetAll()[resource]->LuxuryResource && AiCanSellResource(resource)) {
 				continue;
@@ -1466,7 +1466,7 @@ static void AiProduceResources()
 			}
 		}
 
-		if (!chosen_resource && unit.Type->GivesResource) { // don't toggle off resource production if a building should always have a resource produced
+		if (!chosen_resource && unit.GetType()->GivesResource) { // don't toggle off resource production if a building should always have a resource produced
 			continue;
 		}
 
@@ -1507,8 +1507,8 @@ static void AiCollectResources()
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 		//Wyrmgus start
-//		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
+//		if (!unit.GetType()->BoolFlag[HARVESTER_INDEX].value) {
+		if (!unit.GetType()->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
 		//Wyrmgus end
 			continue;
 		}
@@ -1554,7 +1554,7 @@ static void AiCollectResources()
 
 		// Look what the unit can do
 		for (int c = 1; c < MaxCosts; ++c) {
-			if (unit.Type->ResInfo[c]) {
+			if (unit.GetType()->ResInfo[c]) {
 				units_unassigned[c].push_back(&unit);
 				num_units_unassigned[c]++;
 			}
@@ -1631,7 +1631,7 @@ static void AiCollectResources()
 					
 				// remove it from other ressources
 				for (size_t j = 0; j < CResource::GetAll().size(); ++j) {
-					if (j == c || !unit->Type->ResInfo[j]) {
+					if (j == c || !unit->GetType()->ResInfo[j]) {
 						continue;
 					}
 					for (int k = 0; k < num_units_unassigned[j]; ++k) {
@@ -1716,7 +1716,7 @@ static void AiCollectResources()
 					//Wyrmgus end
 					
 					// unit can't harvest : next one
-					if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
+					if (!unit->GetType()->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
 						unit = nullptr;
 						continue;
 					}
@@ -1814,7 +1814,7 @@ static void AiCollectResources()
 	//explore with the workers that are still idle (as that means they haven't gotten something to harvest)
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
+		if (!unit.GetType()->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
 			continue;
 		}
 
@@ -1915,7 +1915,7 @@ static int AiRepairUnit(CUnit &unit)
 {
 	int n = AiHelpers.Repair.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	if (type.GetIndex() >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->GetIndex() _C_ type.Ident.c_str());
@@ -1978,14 +1978,14 @@ static void AiCheckRepair()
 		}
 
 		int type_costs[MaxCosts];
-		AiPlayer->Player->GetUnitTypeCosts(unit.Type, type_costs);
+		AiPlayer->Player->GetUnitTypeCosts(unit.GetType(), type_costs);
 			
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
-		if (unit.Type->GetRepairHP()
+		if (unit.GetType()->GetRepairHP()
 			//Wyrmgus start
 //			&& unit.CurrentAction() != UnitActionBuilt
-			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value)
+			&& (unit.CurrentAction() != UnitActionBuilt || unit.GetType()->BoolFlag[BUILDEROUTSIDE_INDEX].value)
 			//Wyrmgus end
 			&& unit.CurrentAction() != UnitActionUpgradeTo
 			//Wyrmgus start
@@ -2131,7 +2131,7 @@ static void AiCheckPathwayConstruction()
 					
 		// Building should have pathways but doesn't?
 		if (
-			unit.Type->BoolFlag[BUILDING_INDEX].value
+			unit.GetType()->BoolFlag[BUILDING_INDEX].value
 			&& unit.CurrentAction() != UnitActionBuilt //only build pathways for buildings that have already been constructed
 		) {
 			//
@@ -2142,14 +2142,14 @@ static void AiCheckPathwayConstruction()
 			}
 			
 			std::vector<Vec2i> pathway_tiles;
-			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileSize.x + 1; ++x) {
-				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileSize.y + 1; ++y) {
+			for (int x = unit.GetTilePos().x - 1; x < unit.GetTilePos().x + unit.GetType()->TileSize.x + 1; ++x) {
+				for (int y = unit.GetTilePos().y - 1; y < unit.GetTilePos().y + unit.GetType()->TileSize.y + 1; ++y) {
 					pathway_tiles.push_back(Vec2i(x, y));
 				}
 			}
 
-			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
-				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
+			if (unit.GetType()->GivesResource) { //if is a mine, build pathways to the depot as well
+				const CUnit *depot = FindDepositNearLoc(*unit.GetPlayer(), unit.GetTilePos() + Vec2i((unit.GetType()->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
 					const CUnitType *test_worker_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("worker"));
@@ -2157,12 +2157,12 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
-						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), *test_worker_type, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
+						CUnit *test_worker = MakeUnitAndPlace(unit.GetTilePos() + Vec2i((unit.GetType()->TileSize - 1) / 2), *test_worker_type, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 						char worker_path[64];
 						
 						//make the first path
-						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
-						Vec2i worker_path_pos(test_worker->tilePos);
+						int worker_path_length = AStarFindPath(test_worker->GetTilePos(), depot->GetTilePos(), depot->GetType()->TileSize.x, depot->GetType()->TileSize.y, test_worker->GetType()->TileSize.x, test_worker->GetType()->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
+						Vec2i worker_path_pos(test_worker->GetTilePos());
 						std::vector<Vec2i> first_path_tiles;
 						std::vector<CMapField *> unpassable_marked_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
@@ -2187,8 +2187,8 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
-						worker_path_pos = test_worker->tilePos;
+						worker_path_length = AStarFindPath(test_worker->GetTilePos(), depot->GetTilePos(), depot->GetType()->TileSize.x, depot->GetType()->TileSize.y, test_worker->GetType()->TileSize.x, test_worker->GetType()->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
+						worker_path_pos = test_worker->GetTilePos();
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
@@ -2329,7 +2329,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (settlement_unit->Player->GetIndex() != PlayerNumNeutral) {
+		if (settlement_unit->GetPlayer()->GetIndex() != PlayerNumNeutral) {
 			continue;
 		}
 		
@@ -2337,7 +2337,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->GetTilePos(), settlement_unit->MapLayer->ID);
 		if (std::find(worker_landmasses.begin(), worker_landmasses.end(), settlement_landmass) == worker_landmasses.end()) {
 			continue;
 		}
@@ -2346,7 +2346,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer->ID)) {
+		if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->GetTilePos(), settlement_unit->MapLayer->ID)) {
 			continue;
 		}
 		
@@ -2359,7 +2359,7 @@ void AiCheckSettlementConstruction()
 			// The type is available
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->GetIndex()][j])) {
-				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->GetTilePos(), settlement_unit->MapLayer->ID);
 				requested_settlement = true;
 				break;
 			}
@@ -2423,7 +2423,7 @@ void AiCheckDockConstruction()
 		for (size_t j = 0; j < dock_table.size(); ++j) {
 			CUnit &dock_unit = *dock_table[j];
 					
-			if (CMap::Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer->ID) == water_landmass) {
+			if (CMap::Map.GetTileLandmass(dock_unit.GetTilePos(), dock_unit.MapLayer->ID) == water_landmass) {
 				has_dock = true;
 				break;
 			}

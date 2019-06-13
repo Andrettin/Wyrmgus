@@ -59,7 +59,7 @@
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z)) {
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
-		caster.tilePos = goalPos;
+		caster.TilePos = goalPos;
 		caster.MapLayer = CMap::Map.MapLayers[z];
 		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {

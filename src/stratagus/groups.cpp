@@ -69,7 +69,7 @@ public:
 	{
 		if (CPlayer::GetThisPlayer()->IsTeamed(unit)) {
 			if (!tainted) {
-				tainted = unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value != true;
+				tainted = unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value != true;
 			}
 			units.push_back(&unit);
 			unit.GroupId |= (1 << num);
@@ -88,7 +88,7 @@ public:
 		units.pop_back();
 
 		// Update tainted flag.
-		if (tainted && !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (tainted && !unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			updateTainted();
 		}
 	}
@@ -98,7 +98,7 @@ private:
 	{
 		tainted = false;
 		for (size_t i = 0; i != units.size(); ++i) {
-			if (units[i]->Type && !units[i]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+			if (units[i]->GetType() && !units[i]->GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 				tainted = true;
 			}
 		}

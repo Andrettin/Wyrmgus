@@ -217,20 +217,20 @@ static int CclGetNumUnitsAt(lua_State *l)
 		// Check unit type
 		
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[REVEALER_INDEX].value) {
+		if (unit.GetType()->BoolFlag[REVEALER_INDEX].value) {
 			continue;
 		}
 		//Wyrmgus end
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
-			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
-			|| (unittype == unit.Type && !unit.UnderConstruction)) {
+			|| (unittype == ALL_FOODUNITS && !unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == ALL_BUILDINGS && unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == unit.GetType() && !unit.UnderConstruction)) {
 
 			// Check the player
 			//Wyrmgus start
-//			if (plynr == -1 || plynr == unit.Player->GetIndex()) {
-			if (plynr == -1 || plynr == unit.Player->GetIndex() || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can be used for the player field to mean any non-neutral player
+//			if (plynr == -1 || plynr == unit.GetPlayer()->GetIndex()) {
+			if (plynr == -1 || plynr == unit.GetPlayer()->GetIndex() || (plynr == -2 && unit.GetPlayer()->Type != PlayerNeutral)) { // -2 can be used for the player field to mean any non-neutral player
 			//Wyrmgus end
 				if (unit.IsAlive()) {
 					++s;
@@ -288,7 +288,7 @@ static int CclIfNearUnit(lua_State *l)
 	for (size_t i = 0; i != unitsOfType.size(); ++i) {
 		const CUnit &centerUnit = *unitsOfType[i];
 
-		if (other_plynr != -1 && other_plynr != centerUnit.Player->GetIndex()) {
+		if (other_plynr != -1 && other_plynr != centerUnit.GetPlayer()->GetIndex()) {
 			continue;
 		}
 				
@@ -302,12 +302,12 @@ static int CclIfNearUnit(lua_State *l)
 
 			// Check unit type
 			if (unittype == ANY_UNIT
-				|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
-				|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
-				|| (unittype == unit.Type)) {
+				|| (unittype == ALL_FOODUNITS && !unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+				|| (unittype == ALL_BUILDINGS && unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+				|| (unittype == unit.GetType())) {
 
 				// Check the player
-				if (plynr == -1 || plynr == unit.Player->GetIndex()) {
+				if (plynr == -1 || plynr == unit.GetPlayer()->GetIndex()) {
 					++s;
 				}
 			}
@@ -363,12 +363,12 @@ static int CclIfRescuedNearUnit(lua_State *l)
 				// Check unit type
 
 				if (unittype == ANY_UNIT
-					|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
-					|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
-					|| (unittype == unit.Type)) {
+					|| (unittype == ALL_FOODUNITS && !unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+					|| (unittype == ALL_BUILDINGS && unit.GetType()->BoolFlag[BUILDING_INDEX].value)
+					|| (unittype == unit.GetType())) {
 
 					// Check the player
-					if (plynr == -1 || plynr == unit.Player->GetIndex()) {
+					if (plynr == -1 || plynr == unit.GetPlayer()->GetIndex()) {
 						++s;
 					}
 				}
@@ -398,7 +398,7 @@ int GetNumOpponents(int player)
 		if ((CPlayer::Players[player]->IsEnemy(*CPlayer::Players[i])) || (CPlayer::Players[i]->IsEnemy(*CPlayer::Players[player]))) {
 			// Don't count walls
 			for (int j = 0; j < unitCount; ++j) {
-				if (CPlayer::Players[i]->GetUnit(j).Type->BoolFlag[WALL_INDEX].value == false) {
+				if (CPlayer::Players[i]->GetUnit(j).GetType()->BoolFlag[WALL_INDEX].value == false) {
 					++n;
 					break;
 				}

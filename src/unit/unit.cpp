@@ -102,6 +102,7 @@
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end
+#include "video/palette_image.h"
 #include "video/video.h"
 #include "world/plane.h"
 #include "wyrmgus.h"
@@ -460,8 +461,8 @@ void CUnit::Init()
 	this->SoldUnits.clear();
 	//Wyrmgus end
 
-	tilePos.x = 0;
-	tilePos.y = 0;
+	this->TilePos.x = 0;
+	this->TilePos.y = 0;
 	//Wyrmgus start
 	RallyPointPos.x = -1;
 	RallyPointPos.y = -1;
@@ -710,7 +711,7 @@ void CUnit::ChangeExperience(int amount, int around_range)
 
 	if (around_range > 0) {
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->Type->BoolFlag[ORGANIC_INDEX].value) {
+			if (table[i]->GetType()->BoolFlag[ORGANIC_INDEX].value) {
 				table[i]->Variable[XP_INDEX].Max += amount;
 				table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
 				table[i]->XPChanged();
@@ -787,7 +788,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 				CUnitType *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
-					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->GetName().utf8().get_data());
+					this->Player->Notify(NotifyGreen, this->GetTilePos(), this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->GetName().utf8().get_data());
 				}
 				TransformUnitIntoType(*this, *chosen_unit_type);
 				upgrade_found = true;
@@ -808,7 +809,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						AbilityAcquire(*this, chosen_ability);
 						upgrade_found = true;
 						if (this->Player == CPlayer::GetThisPlayer()) {
-							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->GetName().utf8().get_data());
+							this->Player->Notify(NotifyGreen, this->GetTilePos(), this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->GetName().utf8().get_data());
 						}
 					}
 				}
@@ -874,7 +875,7 @@ void CUnit::Retrain()
 	}
 	
 	if (this->Player == CPlayer::GetThisPlayer()) {
-		this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s's level-up choices have been reset."), unit_name.c_str());
+		this->Player->Notify(NotifyGreen, this->GetTilePos(), this->MapLayer->ID, _("%s's level-up choices have been reset."), unit_name.c_str());
 	}
 }
 
@@ -887,11 +888,11 @@ void CUnit::HealingItemAutoUse()
 	CUnit *uins = this->UnitInside;
 	
 	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
-		if (!uins->Type->BoolFlag[ITEM_INDEX].value || uins->Elixir) {
+		if (!uins->GetType()->BoolFlag[ITEM_INDEX].value || uins->Elixir) {
 			continue;
 		}
 		
-		if (uins->Type->ItemClass->IsConsumable() == false) {
+		if (uins->GetType()->ItemClass->IsConsumable() == false) {
 			continue;
 		}
 		
@@ -1035,7 +1036,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
-		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+		CUnit *item = MakeUnitAndPlace(this->GetTilePos(), *this->Character->Items[i]->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		if (this->Character->Items[i]->Prefix != nullptr) {
 			item->SetPrefix(this->Character->Items[i]->Prefix);
 		}
@@ -1081,14 +1082,14 @@ bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 {
 	//if the variation has one or more terrain set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (variation->Terrains.size() > 0) {
-		if (!CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+		if (!CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer)) {
 			return false;
 		}
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->Terrains.end()) {
+				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vec2i(x, y), this->MapLayer)) {
+					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->Terrains.end()) {
 						terrain_check = false;
 						break;
 					}
@@ -1105,14 +1106,14 @@ bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 	
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (variation->TerrainsForbidden.size() > 0) {
-		if (!CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+		if (!CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer)) {
 			return false;
 		}
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->TerrainsForbidden.end()) {
+				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vec2i(x, y), this->MapLayer)) {
+					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->TerrainsForbidden.end()) {
 						terrain_check = false;
 						break;
 					}
@@ -1353,17 +1354,17 @@ void CUnit::ChooseButtonIcon(const int button_action)
 			
 		for (const CUnit *equipment_unit : iterator->second) {
 			if (button_action == ButtonAttack || button_action == ButtonStandGround) {
-				if (item_slot->IsWeapon() && equipment_unit->Type->ItemClass->AllowsArrows()) { //use the arrow icon for attack/stand ground buttons instead if the weapon allows arrows
+				if (item_slot->IsWeapon() && equipment_unit->GetType()->ItemClass->AllowsArrows()) { //use the arrow icon for attack/stand ground buttons instead if the weapon allows arrows
 					continue;
 				}
 			} else if (button_action == ButtonStop) {
-				if (!equipment_unit->Type->ItemClass->IsShield()) {
+				if (!equipment_unit->GetType()->ItemClass->IsShield()) {
 					continue;
 				}
 			}
 			
 			if (button_action == ButtonStandGround) {
-				if (equipment_unit->Type->ButtonIcons.find(button_action) == equipment_unit->Type->ButtonIcons.end()) {
+				if (equipment_unit->GetType()->ButtonIcons.find(button_action) == equipment_unit->GetType()->ButtonIcons.end()) {
 					continue;
 				}
 			} else {
@@ -1382,7 +1383,7 @@ void CUnit::ChooseButtonIcon(const int button_action)
 	}
 	if (button_unit != nullptr) {
 		if (button_action == ButtonStandGround) {
-			this->ButtonIcons[button_action] = button_unit->Type->ButtonIcons.find(button_action)->second.Icon;
+			this->ButtonIcons[button_action] = button_unit->GetType()->ButtonIcons.find(button_action)->second.Icon;
 		} else {
 			this->ButtonIcons[button_action] = button_unit->GetIcon();
 		}
@@ -1881,7 +1882,7 @@ void CUnit::ApplyAura(int aura_index)
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;
 			for (int j = 0; j < table[i]->InsideCount; ++j, uins = uins->NextContained) {
-				if (uins->Player == this->Player || uins->IsAllied(*this->Player)) {
+				if (uins->GetPlayer() == this->GetPlayer() || uins->IsAllied(*this->GetPlayer())) {
 					uins->ApplyAuraEffect(aura_index);
 				}
 			}
@@ -1929,7 +1930,7 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Prefix->GetMagicLevel();
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Prefix->GetMagicLevel();
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->GetPlayer()->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
@@ -1954,7 +1955,7 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Suffix->GetMagicLevel();
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Suffix->GetMagicLevel();
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->GetPlayer()->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
@@ -1972,7 +1973,7 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 
 void CUnit::SetSpell(const CSpell *spell)
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->GetPlayer()->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Spell = spell;
 		SaveHero(Container->Character);
 	}
@@ -1988,7 +1989,7 @@ void CUnit::SetWork(const CUpgrade *work)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->GetMagicLevel();
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->GetPlayer()->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Work = work;
 		SaveHero(Container->Character);
 	}
@@ -2010,7 +2011,7 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->GetMagicLevel();
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->GetPlayer()->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Elixir = elixir;
 		SaveHero(Container->Character);
 	}
@@ -2063,15 +2064,15 @@ void CUnit::SetUnique(UniqueItem *unique)
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->GetPlayer()->AiEnabled == false && Container->Character->GetItem(this) != nullptr && Container->Character->GetItem(this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(this)->Identified = true;
 		SaveHero(Container->Character);
 	}
 	
 	this->Identified = true;
 	
-	if (this->Container != nullptr && this->Container->Player == CPlayer::GetThisPlayer()) {
-		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, this->Container->MapLayer->ID, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
+	if (this->Container != nullptr && this->Container->GetPlayer() == CPlayer::GetThisPlayer()) {
+		this->Container->GetPlayer()->Notify(NotifyGreen, this->Container->GetTilePos(), this->Container->MapLayer->ID, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
 	}
 }
 
@@ -2084,7 +2085,7 @@ void CUnit::CheckIdentification()
 	CUnit *uins = this->UnitInside;
 	
 	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
-		if (!uins->Type->BoolFlag[ITEM_INDEX].value) {
+		if (!uins->GetType()->BoolFlag[ITEM_INDEX].value) {
 			continue;
 		}
 		
@@ -2176,7 +2177,7 @@ void CUnit::GenerateDrop()
 		return;
 	}
 	
-	Vec2i drop_pos = this->tilePos;
+	Vec2i drop_pos = this->GetTilePos();
 	drop_pos.x += SyncRand(this->Type->TileSize.x);
 	drop_pos.y += SyncRand(this->Type->TileSize.y);
 	CUnit *droppedUnit = nullptr;
@@ -2219,13 +2220,13 @@ void CUnit::GenerateDrop()
 		}
 			
 		if (droppedUnit != nullptr) {
-			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
+			if (droppedUnit->GetType()->BoolFlag[FAUNA_INDEX].value) {
 				droppedUnit->GenerateName();
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
 			
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+			if (droppedUnit->GetType()->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
 				if (droppedUnit->Prefix != nullptr || droppedUnit->Suffix != nullptr || droppedUnit->Spell != nullptr || droppedUnit->Work != nullptr || droppedUnit->Elixir != nullptr) {
 					ttl_cycles *= 4;
@@ -2550,7 +2551,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->UnderConstruction == true || !CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->UnderConstruction == true || !CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -2612,16 +2613,16 @@ void CUnit::UpdateSoldUnits()
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
 			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->UnitType, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->GetTilePos(), *chosen_hero->UnitType, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
 			const CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->GetTilePos(), *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
 			if (new_unit->Unique && this->Player == CPlayer::GetThisPlayer()) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
-				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, "%s", _("Unique item available for sale"));
+				this->Player->Notify(NotifyGreen, this->GetTilePos(), this->MapLayer->ID, "%s", _("Unique item available for sale"));
 			}
 		}
 		new_unit->Remove(this);
@@ -2639,11 +2640,11 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 {
 	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
 	DropOutOnSide(*sold_unit, sold_unit->Direction, this);
-	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
+	if (!sold_unit->GetType()->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
 	CPlayer::Players[player]->ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
-	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
+	if (CPlayer::Players[player]->AiEnabled && !sold_unit->GetType()->BoolFlag[ITEM_INDEX].value && !sold_unit->GetType()->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		CPlayer::Players[player]->Ai->Force.RemoveDeadUnit();
 		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
 	}
@@ -2752,7 +2753,7 @@ void CUnit::Scout()
 {
 	int scout_range = std::max(16, this->CurrentSightRange * 2);
 			
-	Vec2i target_pos = this->tilePos;
+	Vec2i target_pos = this->GetTilePos();
 
 	target_pos.x += SyncRand(scout_range * 2 + 1) - scout_range;
 	target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
@@ -2761,7 +2762,7 @@ void CUnit::Scout()
 	CMap::Map.Clamp(target_pos, this->MapLayer->ID);
 
 	// move if possible
-	if (target_pos != this->tilePos) {
+	if (target_pos != this->GetTilePos()) {
 		// if the tile the scout is moving to happens to have a layer connector, use it
 		CUnitCache &unitcache = CMap::Map.Field(target_pos, this->MapLayer->ID)->UnitCache;
 		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
@@ -3092,46 +3093,46 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//Wyrmgus start
 	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
-	if (unit->Type->GetCivilization() != nullptr && unit->Type->GetCivilization()->GetUpgrade() != nullptr) {
-		const CUpgrade *civilization_upgrade = unit->Type->GetCivilization()->GetUpgrade();
+	if (unit->GetType()->GetCivilization() != nullptr && unit->GetType()->GetCivilization()->GetUpgrade() != nullptr) {
+		const CUpgrade *civilization_upgrade = unit->GetType()->GetCivilization()->GetUpgrade();
 		if (civilization_upgrade) {
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->GetCivilization() != nullptr && unit->Type->GetFaction() != nullptr) {
-		const CUpgrade *faction_upgrade = unit->Type->GetFaction()->GetUpgrade();
+	if (unit->GetType()->GetCivilization() != nullptr && unit->GetType()->GetFaction() != nullptr) {
+		const CUpgrade *faction_upgrade = unit->GetType()->GetFaction()->GetUpgrade();
 		if (faction_upgrade != nullptr) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
 
 	// generate a trait for the unit, if any are available (only if the editor isn't running)
-	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
-		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
+	if (Editor.Running == EditorNotRunning && unit->GetType()->Traits.size() > 0) {
+		TraitAcquire(*unit, unit->GetType()->Traits[SyncRand(unit->GetType()->Traits.size())]);
 	}
 	
-	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependencies(unit->Type->StartingAbilities[i], unit)) {
-			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
+	for (size_t i = 0; i < unit->GetType()->StartingAbilities.size(); ++i) {
+		if (CheckDependencies(unit->GetType()->StartingAbilities[i], unit)) {
+			IndividualUpgradeAcquire(*unit, unit->GetType()->StartingAbilities[i]);
 		}
 	}
 	
-	if (unit->Type->Elixir) { //set the unit type's elixir, if any
-		unit->SetElixir(unit->Type->Elixir);
+	if (unit->GetType()->Elixir) { //set the unit type's elixir, if any
+		unit->SetElixir(unit->GetType()->Elixir);
 	}
 	
 	unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	//Wyrmgus end
 	
-	if (unit->Type->OnInit) {
-		unit->Type->OnInit->pushPreamble();
-		unit->Type->OnInit->pushInteger(UnitNumber(*unit));
-		unit->Type->OnInit->run();
+	if (unit->GetType()->OnInit) {
+		unit->GetType()->OnInit->pushPreamble();
+		unit->GetType()->OnInit->pushInteger(UnitNumber(*unit));
+		unit->GetType()->OnInit->run();
 	}
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.BoolFlag[BUILDING_INDEX].value && FancyBuildings
-		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
+		&& unit->GetType()->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
 	
@@ -3158,25 +3159,25 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	Assert(f);
 	//Wyrmgus start
 	/*
-	MapSight(*unit.Player, pos, width, height,
+	MapSight(*unit.GetPlayer(), pos, width, height,
 			 unit.GetFirstContainer()->CurrentSightRange, f);
 
-	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
-		MapSight(*unit.Player, pos, width, height,
+	if (unit.GetType() && unit.GetType()->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
+		MapSight(*unit.GetPlayer(), pos, width, height,
 				 unit.GetFirstContainer()->CurrentSightRange, f2);
 	}
 	*/
 
-	MapSight(*unit.Player, pos, width, height,
+	MapSight(*unit.GetPlayer(), pos, width, height,
 			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f, unit.MapLayer->ID);
 
-	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
-		MapSight(*unit.Player, pos, width, height,
+	if (unit.GetType() && unit.GetType()->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
+		MapSight(*unit.GetPlayer(), pos, width, height,
 				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2, unit.MapLayer->ID);
 	}
 	
 	if (unit.Variable[ETHEREALVISION_INDEX].Value && f3) {
-		MapSight(*unit.Player, pos, width, height,
+		MapSight(*unit.GetPlayer(), pos, width, height,
 				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f3, unit.MapLayer->ID);
 	}
 	//Wyrmgus end
@@ -3218,9 +3219,9 @@ CUnit *CUnit::GetFirstContainer() const
 void MapMarkUnitSight(CUnit &unit)
 {
 	CUnit *container = unit.GetFirstContainer();// First container of the unit.
-	Assert(container->Type);
+	Assert(container->GetType());
 
-	MapMarkUnitSightRec(unit, container->tilePos, container->Type->TileSize.x, container->Type->TileSize.y,
+	MapMarkUnitSightRec(unit, container->GetTilePos(), container->GetType()->TileSize.x, container->GetType()->TileSize.y,
 						//Wyrmgus start
 //						MapMarkTileSight, MapMarkTileDetectCloak);
 						MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal);
@@ -3229,19 +3230,19 @@ void MapMarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-						 unit.Type->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
+			MapMarkRadar(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
+						 unit.GetType()->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-							   unit.Type->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
+			MapMarkRadarJammer(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
+							   unit.GetType()->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
 		}
 	}
 
 	//Wyrmgus start
 	if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-		MapMarkOwnership(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-						   unit.Type->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer->ID);
+		MapMarkOwnership(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
+						   unit.GetType()->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer->ID);
 	}
 	//Wyrmgus end
 }
@@ -3255,12 +3256,12 @@ void MapMarkUnitSight(CUnit &unit)
 */
 void MapUnmarkUnitSight(CUnit &unit)
 {
-	Assert(unit.Type);
+	Assert(unit.GetType());
 
 	CUnit *container = unit.GetFirstContainer();
-	Assert(container->Type);
+	Assert(container->GetType());
 	MapMarkUnitSightRec(unit,
-						container->tilePos, container->Type->TileSize.x, container->Type->TileSize.y,
+						container->GetTilePos(), container->GetType()->TileSize.x, container->GetType()->TileSize.y,
 						//Wyrmgus start
 //						MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 						MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal);
@@ -3269,20 +3270,20 @@ void MapUnmarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-						   unit.Type->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
+			MapUnmarkRadar(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
+						   unit.GetType()->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-								 unit.Type->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
+			MapUnmarkRadarJammer(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
+								 unit.GetType()->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
 		}
 		
 	}
 	
 	//Wyrmgus start
 	if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-		MapUnmarkOwnership(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-							 unit.Type->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer->ID);
+		MapUnmarkOwnership(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
+							 unit.GetType()->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer->ID);
 	}
 	//Wyrmgus end
 }
@@ -3356,14 +3357,14 @@ void UpdateUnitSightRange(CUnit &unit)
 */
 void MarkUnitFieldFlags(const CUnit &unit)
 {
-	const unsigned int flags = unit.Type->FieldFlags;
-	int h = unit.Type->TileSize.y;          // Tile height of the unit.
-	const int width = unit.Type->TileSize.x; // Tile width of the unit.
+	const unsigned int flags = unit.GetType()->FieldFlags;
+	int h = unit.GetType()->TileSize.y;          // Tile height of the unit.
+	const int width = unit.GetType()->TileSize.x; // Tile width of the unit.
 	unsigned int index = unit.Offset;
 
 	//Wyrmgus start
-//	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
-	if (unit.Type->BoolFlag[VANISHES_INDEX].value || unit.CurrentAction() == UnitActionDie) {
+//	if (unit.GetType()->BoolFlag[VANISHES_INDEX].value) {
+	if (unit.GetType()->BoolFlag[VANISHES_INDEX].value || unit.CurrentAction() == UnitActionDie) {
 	//Wyrmgus end
 		return ;
 	}
@@ -3387,7 +3388,7 @@ public:
 	void operator()(CUnit *const unit) const
 	{
 		if (main != unit && unit->CurrentAction() != UnitActionDie) {
-			mf->Flags |= unit->Type->FieldFlags;
+			mf->Flags |= unit->GetType()->FieldFlags;
 		}
 	}
 private:
@@ -3403,12 +3404,12 @@ private:
 */
 void UnmarkUnitFieldFlags(const CUnit &unit)
 {
-	const unsigned int flags = ~unit.Type->FieldFlags;
-	const int width = unit.Type->TileSize.x;
-	int h = unit.Type->TileSize.y;
+	const unsigned int flags = ~unit.GetType()->FieldFlags;
+	const int width = unit.GetType()->TileSize.x;
+	int h = unit.GetType()->TileSize.y;
 	unsigned int index = unit.Offset;
 
-	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
+	if (unit.GetType()->BoolFlag[VANISHES_INDEX].value) {
 		return ;
 	}
 	do {
@@ -3491,7 +3492,7 @@ void CUnit::UpdateContainerAttackRange()
 		if (this->BoardCount > 0) {
 			CUnit *boarded_unit = this->UnitInside;
 			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
-				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > this->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
+				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > this->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
 					this->Variable[ATTACKRANGE_INDEX].Enable = 1;
 					this->Variable[ATTACKRANGE_INDEX].Max = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
 					this->Variable[ATTACKRANGE_INDEX].Value = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -3803,7 +3804,7 @@ void CUnit::UpdateSettlement()
 			return;
 		}
 		
-		this->Settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->TileSize);
+		this->Settlement = this->Player->GetNearestSettlement(this->GetTilePos(), this->MapLayer->ID, this->Type->TileSize);
 	}
 }
 
@@ -3823,7 +3824,7 @@ void CUnit::UpdateBuildingSettlementAssignment(CSite *old_settlement)
 		}
 		for (int i = 0; i < CPlayer::Players[p]->GetUnitCount(); ++i) {
 			CUnit *settlement_unit = &CPlayer::Players[p]->GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->Type == SettlementSiteUnitType || this->MapLayer != settlement_unit->MapLayer) {
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->GetType()->BoolFlag[BUILDING_INDEX].value || settlement_unit->GetType()->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->GetType() == SettlementSiteUnitType || this->MapLayer != settlement_unit->MapLayer) {
 				continue;
 			}
 			if (old_settlement && settlement_unit->Settlement != old_settlement) {
@@ -3848,7 +3849,7 @@ void CUnit::XPChanged()
 		this->Variable[XP_INDEX].Max -= this->Variable[XPREQUIRED_INDEX].Max;
 		this->Variable[XP_INDEX].Value -= this->Variable[XPREQUIRED_INDEX].Value;
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has leveled up!"), GetMessageName().c_str());
+			this->Player->Notify(NotifyGreen, this->GetTilePos(), this->MapLayer->ID, _("%s has leveled up!"), GetMessageName().c_str());
 		}
 		this->IncreaseLevel(1);
 	}
@@ -3876,7 +3877,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	
 	CUnit *unit_inside = unit.UnitInside;
 
-	unit.tilePos = pos;
+	unit.TilePos = pos;
 	unit.Offset = CMap::Map.getIndex(pos, z);
 	unit.MapLayer = CMap::Map.MapLayers[z];
 	
@@ -3932,8 +3933,8 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
 			}
 			CUnit &unit = *cache[i];
-			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[TRAP_INDEX].value) {
-				FireMissile(unit, this, this->tilePos, this->MapLayer->ID);
+			if (unit.IsAliveOnMap() && unit.GetType()->BoolFlag[TRAP_INDEX].value) {
+				FireMissile(unit, this, this->GetTilePos(), this->MapLayer->ID);
 				LetUnitDie(unit);
 			}
 		}
@@ -3985,8 +3986,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		
 		//remove pathways, destroyed walls and decoration units under buildings
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
-			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileSize.x; ++x) {
-				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileSize.y; ++y) {
+			for (int x = this->GetTilePos().x; x < this->GetTilePos().x + this->Type->TileSize.x; ++x) {
+				for (int y = this->GetTilePos().y; y < this->GetTilePos().y + this->Type->TileSize.y; ++y) {
 					if (!CMap::Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
@@ -3999,7 +4000,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 					std::vector<CUnit *> table;
 					Select(building_tile_pos, building_tile_pos, table, this->MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+						if (table[i] && table[i]->IsAlive() && table[i]->GetType()->UnitType == UnitTypeLand && table[i]->GetType()->BoolFlag[DECORATION_INDEX].value) {
 							if (Editor.Running == EditorNotRunning) {
 								LetUnitDie(*table[i]);			
 							} else {
@@ -4020,6 +4021,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		}
 	}
 	//Wyrmgus end
+	
+	Wyrmgus::GetInstance()->emit_signal("unit_placed", this);
 }
 
 /**
@@ -4106,7 +4109,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileSize - 1) / 2);
 		for (int i = 0; i < 9; ++i) {
-			CUnit *metal_rock_unit = CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
+			CUnit *metal_rock_unit = CreateUnit(unit->GetTilePos() + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
 	}
 			
@@ -4235,7 +4238,7 @@ found:
 */
 void CUnit::Remove(CUnit *host)
 {
-	if (Removed) { // could happen!
+	if (this->Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
 		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ UnitNumber(*this));
 		return;
@@ -4246,7 +4249,7 @@ void CUnit::Remove(CUnit *host)
 	if (host) {
 		AddInContainer(*host);
 		UpdateUnitSightRange(*this);
-		UnitInXY(*this, host->tilePos, host->MapLayer->ID);
+		UnitInXY(*this, host->GetTilePos(), host->MapLayer->ID);
 		MapMarkUnitSight(*this);
 	}
 
@@ -4279,6 +4282,8 @@ void CUnit::Remove(CUnit *host)
 	if (UnitUnderCursor == this) {
 		UnitUnderCursor = nullptr;
 	}
+	
+	Wyrmgus::GetInstance()->emit_signal("unit_removed", this);
 }
 
 /**
@@ -4290,7 +4295,7 @@ void CUnit::Remove(CUnit *host)
 */
 void UnitLost(CUnit &unit)
 {
-	CPlayer &player = *unit.Player;
+	CPlayer &player = *unit.GetPlayer();
 
 	Assert(&player);  // Next code didn't support no player!
 
@@ -4308,7 +4313,7 @@ void UnitLost(CUnit &unit)
 
 	//  Remove the unit from the player's units table.
 
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	if (!type.BoolFlag[VANISHES_INDEX].value) {
 		player.RemoveUnit(unit);
 
@@ -4374,7 +4379,7 @@ void UnitLost(CUnit &unit)
 				int m = CResource::GetAll()[i]->DefaultIncome;
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
-					m = std::max(m, player.GetUnit(j).Type->Stats[player.GetIndex()].ImproveIncomes[i]);
+					m = std::max(m, player.GetUnit(j).GetType()->Stats[player.GetIndex()].ImproveIncomes[i]);
 				}
 				player.Incomes[i] = m;
 			}
@@ -4384,8 +4389,8 @@ void UnitLost(CUnit &unit)
 			int m = DEFAULT_TRADE_COST;
 
 			for (int j = 0; j < player.GetUnitCount(); ++j) {
-				if (player.GetUnit(j).Type->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Enable) {
-					m = std::min(m, player.GetUnit(j).Type->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Value);
+				if (player.GetUnit(j).GetType()->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Enable) {
+					m = std::min(m, player.GetUnit(j).GetType()->Stats[player.GetIndex()].Variables[TRADECOST_INDEX].Value);
 				}
 			}
 			player.TradeCost = m;
@@ -4395,7 +4400,7 @@ void UnitLost(CUnit &unit)
 		if (type.BoolFlag[TOWNHALL_INDEX].value) {
 			bool lost_town_hall = true;
 			for (int j = 0; j < player.GetUnitCount(); ++j) {
-				if (player.GetUnit(j).Type->BoolFlag[TOWNHALL_INDEX].value) {
+				if (player.GetUnit(j).GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 					lost_town_hall = false;
 				}
 			}
@@ -4421,14 +4426,14 @@ void UnitLost(CUnit &unit)
 	// Destroy resource-platform, must re-make resource patch.
 	//Wyrmgus start
 //	CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit.GetType(), nullptr);
 	//Wyrmgus end
 	if (b != nullptr) {
 		//Wyrmgus start
 //		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 		if (b->ReplaceOnDie && (!type.GivesResource || unit.ResourcesHeld != 0)) {
 		//Wyrmgus end
-			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
+			CUnit *temp = MakeUnitAndPlace(unit.GetTilePos(), *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -4453,7 +4458,7 @@ void UnitLost(CUnit &unit)
 					}
 				}
 				if (unit.Settlement != nullptr) {
-					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
+					if (unit.GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 						temp->Settlement = unit.Settlement;
 						temp->Settlement->SiteUnit = temp;
 						CMap::Map.SiteUnits.erase(std::remove(CMap::Map.SiteUnits.begin(), CMap::Map.SiteUnits.end(), &unit), CMap::Map.SiteUnits.end());
@@ -4498,8 +4503,8 @@ void UnitClearOrders(CUnit &unit)
 */
 void UpdateForNewUnit(const CUnit &unit, int upgrade)
 {
-	const CUnitType &type = *unit.Type;
-	CPlayer &player = *unit.Player;
+	const CUnitType &type = *unit.GetType();
+	CPlayer &player = *unit.GetPlayer();
 
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
@@ -4545,12 +4550,12 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 */
 void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 {
-	const int x = unit.tilePos.x;
-	const int y = unit.tilePos.y;
+	const int x = unit.GetTilePos().x;
+	const int y = unit.GetTilePos().y;
 
 	*dpos = pos;
-	dpos->x = std::clamp<short int>(dpos->x, x, x + unit.Type->TileSize.x - 1);
-	dpos->y = std::clamp<short int>(dpos->y, y, y + unit.Type->TileSize.y - 1);
+	dpos->x = std::clamp<short int>(dpos->x, x, x + unit.GetType()->TileSize.x - 1);
+	dpos->y = std::clamp<short int>(dpos->y, y, y + unit.GetType()->TileSize.y - 1);
 }
 
 /**
@@ -4562,11 +4567,11 @@ void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 static void UnitFillSeenValues(CUnit &unit)
 {
 	// Seen values are undefined for visible units.
-	unit.Seen.tilePos = unit.tilePos;
+	unit.Seen.TilePos = unit.GetTilePos();
 	unit.Seen.IY = unit.IY;
 	unit.Seen.IX = unit.IX;
 	unit.Seen.Frame = unit.Frame;
-	unit.Seen.Type = unit.Type;
+	unit.Seen.Type = unit.GetType();
 	unit.Seen.UnderConstruction = unit.UnderConstruction;
 
 	unit.CurrentOrder()->FillSeenValues(unit);
@@ -4587,11 +4592,11 @@ enum {
 */
 void CorrectWallDirections(CUnit &unit)
 {
-	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
-	Assert(unit.Type->NumDirections == 16);
-	Assert(!unit.Type->Flip);
+	Assert(unit.GetType()->BoolFlag[WALL_INDEX].value);
+	Assert(unit.GetType()->NumDirections == 16);
+	Assert(!unit.GetType()->Flip);
 
-	if (!CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
+	if (!CMap::Map.Info.IsPointOnMap(unit.GetTilePos(), unit.MapLayer)) {
 		return;
 	}
 	const struct {
@@ -4603,7 +4608,7 @@ void CorrectWallDirections(CUnit &unit)
 	int flags = 0;
 
 	for (int i = 0; i != sizeof(configs) / sizeof(*configs); ++i) {
-		const Vec2i pos = unit.tilePos + configs[i].offset;
+		const Vec2i pos = unit.GetTilePos() + configs[i].offset;
 		const int dirFlag = configs[i].dirFlag;
 
 		if (CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
@@ -4627,12 +4632,12 @@ void CorrectWallDirections(CUnit &unit)
 */
 void CorrectWallNeighBours(CUnit &unit)
 {
-	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
+	Assert(unit.GetType()->BoolFlag[WALL_INDEX].value);
 
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
-		const Vec2i pos = unit.tilePos + offset[i];
+		const Vec2i pos = unit.GetTilePos() + offset[i];
 
 		if (CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
 			continue;
@@ -4655,7 +4660,7 @@ void CorrectWallNeighBours(CUnit &unit)
 */
 void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 {
-	if (unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
+	if (unit.GetType()->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 		if (player.Type == PlayerPerson && !unit.Destroyed) {
 			unit.RefsIncrease();
 		}
@@ -4696,7 +4701,7 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 */
 void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 {
-	if (!unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
+	if (!unit.GetType()->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 		return;
 	}
 	if (unit.Seen.ByPlayer & (1 << (player.GetIndex()))) {
@@ -4717,7 +4722,7 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 */
 void UnitCountSeen(CUnit &unit)
 {
-	Assert(unit.Type);
+	Assert(unit.GetType());
 
 	// FIXME: optimize, only work on certain players?
 	// This is for instance good for updating shared vision...
@@ -4732,8 +4737,8 @@ void UnitCountSeen(CUnit &unit)
 	}
 
 	//  Calculate new VisCount values.
-	const int height = unit.Type->TileSize.y;
-	const int width = unit.Type->TileSize.x;
+	const int height = unit.GetType()->TileSize.y;
+	const int width = unit.GetType()->TileSize.x;
 
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (CPlayer::Players[p]->Type != PlayerNobody) {
@@ -4744,12 +4749,12 @@ void UnitCountSeen(CUnit &unit)
 				CMapField *mf = unit.MapLayer->Field(index);
 				int x = width;
 				do {
-					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != CPlayer::Players[p]) {
+					if (unit.GetType()->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.GetPlayer() != CPlayer::Players[p]) {
 						if (mf->playerInfo.VisCloak[p]) {
 							newv++;
 						}
 					//Wyrmgus start
-					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != CPlayer::Players[p]) {
+					} else if (unit.GetType()->BoolFlag[ETHEREAL_INDEX].value && unit.GetPlayer() != CPlayer::Players[p]) {
 						if (mf->playerInfo.VisEthereal[p]) {
 							newv++;
 						}
@@ -4777,7 +4782,7 @@ void UnitCountSeen(CUnit &unit)
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
 				// be released
-				if (!unit.Type) {
+				if (!unit.GetType()) {
 					break;
 				}
 				UnitGoesOutOfFog(unit, *CPlayer::Players[p]);
@@ -4841,8 +4846,8 @@ bool CUnit::IsVisibleOnMinimap() const
 //			   && !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->GetIndex()));
 			   && !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->GetIndex()))
 			   && !Destroyed
-			   && CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
-			   && this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
+			   && CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer)
+			   && this->MapLayer->Field(this->GetTilePos())->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
 			   //Wyrmgus end
 	}
 }
@@ -4863,27 +4868,23 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 //	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (Type->Width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + Type->OffsetX;
 //	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (Type->Height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
 
-	int frame_width = Type->Width;
-	int frame_height = Type->Height;
+	int frame_width = this->GetType()->GetFrameSize().width;
+	int frame_height = this->GetType()->GetFrameSize().height;
 	const CUnitTypeVariation *variation = this->GetVariation();
 	if (variation && variation->FrameWidth && variation->FrameHeight) {
 		frame_width = variation->FrameWidth;
 		frame_height = variation->FrameHeight;
 	}
 
-	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX - (frame_width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x) / 2 + Type->OffsetX;
-	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y + IY - (frame_height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y) / 2 + Type->OffsetY;
+	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX - (frame_width - this->Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x) / 2 + Type->OffsetX;
+	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y + IY - (frame_height - this->Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y) / 2 + Type->OffsetY;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
-	//Wyrmgus start
-//	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
-//		|| y + Type->Height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
 	if (x + frame_width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
 		|| y + frame_height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
-	//Wyrmgus end
 		return false;
 	}
 
@@ -5058,7 +5059,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 #if 0
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
 			   _C_ this->Player->GetIndex() _C_ this->Slot
-			   _C_ mine.Type->Name.c_str()
+			   _C_ mine.GetType()->Name.c_str()
 			   _C_ mine.Slot
 			   _C_ mine.Data.Resource.Assigned);
 #endif
@@ -5077,7 +5078,7 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
 			   _C_ this->Player->GetIndex() _C_ this->Slot
-			   _C_ mine.Type->Name.c_str()
+			   _C_ mine.GetType()->Name.c_str()
 			   _C_ mine.Slot
 			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
@@ -5165,25 +5166,25 @@ void RescueUnits()
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
 					//Wyrmgus start
-//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
-					if (around[i]->CanAttack() && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
+//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->GetPlayer()->Type != PlayerRescuePassive && around[i]->GetPlayer()->Type != PlayerRescueActive) {
+					if (around[i]->CanAttack() && unit.IsAllied(*around[i]) && around[i]->GetPlayer()->Type != PlayerRescuePassive && around[i]->GetPlayer()->Type != PlayerRescueActive) {
 					//Wyrmgus end
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
 						//Wyrmgus start
-//						if (unit.Type->CanStore[GoldCost]) {
-						if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
+//						if (unit.GetType()->CanStore[GoldCost]) {
+						if (unit.GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 						//Wyrmgus end
-							ChangePlayerOwner(*p, *around[i]->Player);
+							ChangePlayerOwner(*p, *around[i]->GetPlayer());
 							break;
 						}
-						unit.RescuedFrom = unit.Player;
+						unit.RescuedFrom = unit.GetPlayer();
 						//Wyrmgus start
-//						unit.ChangeOwner(*around[i]->Player);
-						unit.ChangeOwner(*around[i]->Player, true);
+//						unit.ChangeOwner(*around[i]->GetPlayer());
+						unit.ChangeOwner(*around[i]->GetPlayer(), true);
 //						unit.Blink = 5;
-//						PlayGameSound(GameSounds.Rescue[unit.Player->Race].Sound, MaxSampleVolume);
+//						PlayGameSound(GameSounds.Rescue[unit.GetPlayer()->Race].Sound, MaxSampleVolume);
 						//Wyrmgus end
 						break;
 					}
@@ -5269,7 +5270,7 @@ void UnitUpdateHeading(CUnit &unit)
 {
 	//Wyrmgus start
 	//fix direction if it does not correspond to one of the defined directions
-	int num_dir = std::max<int>(8, unit.Type->NumDirections);
+	int num_dir = std::max<int>(8, unit.GetType()->NumDirections);
 	if (unit.Direction % (256 / num_dir) != 0) {
 		unit.Direction = unit.Direction - (unit.Direction % (256 / num_dir));
 	}
@@ -5285,11 +5286,11 @@ void UnitUpdateHeading(CUnit &unit)
 	} else {
 		neg = false;
 	}
-	unit.Frame /= unit.Type->NumDirections / 2 + 1;
-	unit.Frame *= unit.Type->NumDirections / 2 + 1;
+	unit.Frame /= unit.GetType()->NumDirections / 2 + 1;
+	unit.Frame *= unit.GetType()->NumDirections / 2 + 1;
 	// Remove heading, keep animation frame
 
-	nextdir = 256 / unit.Type->NumDirections;
+	nextdir = 256 / unit.GetType()->NumDirections;
 	dir = ((unit.Direction + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
 		unit.Frame += dir;
@@ -5297,7 +5298,7 @@ void UnitUpdateHeading(CUnit &unit)
 		unit.Frame += 256 / nextdir - dir;
 		unit.Frame = -unit.Frame - 1;
 	}
-	if (neg && !unit.Frame && unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (neg && !unit.Frame && unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		unit.Frame = -1;
 	}
 }
@@ -5312,7 +5313,7 @@ void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 {
 	//Wyrmgus start
 //	unit.Direction = DirectionToHeading(delta);
-	int num_dir = std::max<int>(8, unit.Type->NumDirections);
+	int num_dir = std::max<int>(8, unit.GetType()->NumDirections);
 	int heading = DirectionToHeading(delta) + ((256 / num_dir) / 2);
 	if (heading % (256 / num_dir) != 0) {
 		heading = heading - (heading % (256 / num_dir));
@@ -5343,10 +5344,10 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 	//Wyrmgus end
 
 	if (container) {
-		pos = container->tilePos;
-		pos -= unit.Type->TileSize - 1;
-		addx = container->Type->TileSize.x + unit.Type->TileSize.x - 1;
-		addy = container->Type->TileSize.y + unit.Type->TileSize.y - 1;
+		pos = container->GetTilePos();
+		pos -= unit.GetType()->TileSize - 1;
+		addx = container->GetType()->TileSize.x + unit.GetType()->TileSize.x - 1;
+		addy = container->GetType()->TileSize.y + unit.GetType()->TileSize.y - 1;
 		z = container->MapLayer->ID;
 
 		if (heading < LookingNE || heading > LookingNW) {
@@ -5365,7 +5366,7 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 			goto startw;
 		}
 	} else {
-		pos = unit.tilePos;
+		pos = unit.GetTilePos();
 		z = unit.MapLayer->ID;
 
 		if (heading < LookingNE || heading > LookingNW) {
@@ -5450,14 +5451,14 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 
 	if (container) {
 		Assert(unit.Removed);
-		pos = container->tilePos;
-		pos -= unit.Type->TileSize - 1;
-		addx = container->Type->TileSize.x + unit.Type->TileSize.x - 1;
-		addy = container->Type->TileSize.y + unit.Type->TileSize.y - 1;
+		pos = container->GetTilePos();
+		pos -= unit.GetType()->TileSize - 1;
+		addx = container->GetType()->TileSize.x + unit.GetType()->TileSize.x - 1;
+		addy = container->GetType()->TileSize.y + unit.GetType()->TileSize.y - 1;
 		--pos.x;
 		z = container->MapLayer->ID;
 	} else {
-		pos = unit.tilePos;
+		pos = unit.GetTilePos();
 		z = unit.MapLayer->ID;
 	}
 	// FIXME: if we reach the map borders we can go fast up, left, ...
@@ -5543,7 +5544,7 @@ void DropOutAll(const CUnit &source)
 	}
 	
 	//Wyrmgus start
-	if (unit->Type->BoolFlag[ITEM_INDEX].value && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+	if (unit->GetType()->BoolFlag[ITEM_INDEX].value && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
 		if (unit->Prefix != nullptr || unit->Suffix != nullptr || unit->Spell != nullptr || unit->Work != nullptr || unit->Elixir != nullptr) {
 			ttl_cycles *= 4;
@@ -5583,7 +5584,7 @@ CUnit *UnitOnScreen(int x, int y)
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
-		const CUnitType &type = *unit.Type;
+		const CUnitType &type = *unit.GetType();
 		if (!type.Sprite) {
 			continue;
 		}
@@ -5594,9 +5595,9 @@ CUnit *UnitOnScreen(int x, int y)
 		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
 		//Wyrmgus start
 //		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-//						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+//						  (type.GetFrameSize().x - type.Sprite->Width) / 2 + type.BoxOffsetX;
 //		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-//						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+//						  (type.GetFrameSize().y - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->File.empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
@@ -5605,9 +5606,9 @@ CUnit *UnitOnScreen(int x, int y)
 							  (variation->FrameHeight - variation->Sprite->Height) / 2 + type.BoxOffsetY;
 		} else {
 			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-							  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+							  (type.GetFrameSize().x - type.Sprite->Width) / 2 + type.BoxOffsetX;
 			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-							  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+							  (type.GetFrameSize().y - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		}
 		//Wyrmgus end
 		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
@@ -5616,9 +5617,9 @@ CUnit *UnitOnScreen(int x, int y)
 			candidate = &unit;
 			//Wyrmgus start
 			std::vector<CUnit *> table;
-			Select(candidate->tilePos, candidate->tilePos, table, candidate->MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
-//			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
-			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size()) || !candidate->IsAlive()) { // don't select a neutral unit if there's a player-owned unit there as well; don't selected a dead unit
+			Select(candidate->GetTilePos(), candidate->GetTilePos(), table, candidate->MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+//			if (IsOnlySelected(*candidate) || candidate->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+			if (IsOnlySelected(*candidate) || candidate->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->GetPlayer()->Type == PlayerNeutral && table.size()) || !candidate->IsAlive()) { // don't select a neutral unit if there's a player-owned unit there as well; don't selected a dead unit
 			//Wyrmgus end
 				continue;
 			} else {
@@ -5633,39 +5634,14 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::GetMapPixelPosTopLeft() const
 {
-	const PixelPos pos(tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX, tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y + IY);
+	const PixelPos pos(this->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX, this->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y + IY);
 	return pos;
 }
 
-PixelPos CUnit::GetMapPixelPosCenter() const
-{
-	return GetMapPixelPosTopLeft() + this->GetHalfTilePixelSize();
-}
-
 //Wyrmgus start
-Vec2i CUnit::GetTileSize() const
-{
-	return this->Type->GetTileSize();
-}
-
-Vec2i CUnit::GetHalfTileSize() const
-{
-	return this->GetTileSize() / 2;
-}
-
 PixelSize CUnit::GetTilePixelSize() const
 {
 	return PixelSize(this->GetTileSize()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID);
-}
-
-PixelSize CUnit::GetHalfTilePixelSize() const
-{
-	return this->GetTilePixelSize() / 2;
-}
-
-Vec2i CUnit::GetTileCenterPos() const
-{
-	return this->tilePos + this->Type->GetTileCenterPosOffset();
 }
 
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
@@ -6132,9 +6108,9 @@ int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, c
 	CUnit *inside_unit = this->UnitInside;
 	for (int j = 0; j < this->InsideCount; ++j, inside_unit = inside_unit->NextContained) {
 		if ( //only count units of the faction, ignore items
-			(!player || inside_unit->Player == player)
-			&& (!ignore_items || !inside_unit->Type->BoolFlag[ITEM_INDEX].value)
-			&& (!type || inside_unit->Type == type)
+			(!player || inside_unit->GetPlayer() == player)
+			&& (!ignore_items || !inside_unit->GetType()->BoolFlag[ITEM_INDEX].value)
+			&& (!type || inside_unit->GetType() == type)
 		) {
 			inside_count++;
 		}
@@ -6150,7 +6126,7 @@ bool CUnit::CanAttack(bool count_inside) const
 		if (count_inside && this->BoardCount > 0) {
 			CUnit *boarded_unit = this->UnitInside;
 			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
-				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
+				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && boarded_unit->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
 					return true;
 				}
 			}
@@ -6158,7 +6134,7 @@ bool CUnit::CanAttack(bool count_inside) const
 		return false;
 	}
 	
-	if (this->Container && (!this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !this->Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
+	if (this->Container && (!this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !this->Container->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
 		return false;
 	}
 	
@@ -6174,7 +6150,7 @@ bool CUnit::IsInCombat() const
 	for (size_t i = 0; i < table.size(); ++i) {
 		const CUnit &target = *table[i];
 
-		if (target.IsVisibleAsGoal(*this->Player) && (CanTarget(*this->Type, *target.Type) || CanTarget(*target.Type, *this->Type))) {
+		if (target.IsVisibleAsGoal(*this->Player) && (CanTarget(*this->Type, *target.GetType()) || CanTarget(*target.GetType(), *this->Type))) {
 			return true;
 		}
 	}
@@ -6196,7 +6172,7 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 		return false;
 	}
 	
-	if (!dest->Type->BoolFlag[CANHARVEST_INDEX].value && only_harvestable) {
+	if (!dest->GetType()->BoolFlag[CANHARVEST_INDEX].value && only_harvestable) {
 		return false;
 	}
 	
@@ -6205,18 +6181,18 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 	}
 	
 	if (dest->GivesResource == TradeCost) {
-		if (dest->Player == this->Player) { //can only trade with markets owned by other players
+		if (dest->GetPlayer() == this->Player) { //can only trade with markets owned by other players
 			return false;
 		}
 		
-		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
+		if (this->Type->UnitType != UnitTypeNaval && dest->GetType()->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeNaval) { //ships cannot trade with land markets
+		if (this->Type->UnitType == UnitTypeNaval && !dest->GetType()->BoolFlag[SHOREBUILDING_INDEX].value && dest->GetType()->UnitType != UnitTypeNaval) { //ships cannot trade with land markets
 			return false;
 		}
 	} else {
-		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player)) && dest->Player->GetIndex() != PlayerNumNeutral) {
+		if (dest->GetPlayer() != this->Player && !(dest->GetPlayer()->IsAllied(*this->Player) && this->Player->IsAllied(*dest->GetPlayer())) && dest->GetPlayer()->GetIndex() != PlayerNumNeutral) {
 			return false;
 		}
 	}
@@ -6242,23 +6218,23 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 		return false;
 	}
 	
-	if (!dest->Type->CanStore[this->CurrentResource]) {
+	if (!dest->GetType()->CanStore[this->CurrentResource]) {
 		return false;
 	}
 	
 	if (resource == TradeCost) {
-		if (dest->Player != this->Player) { //can only return trade to markets owned by the same player
+		if (dest->GetPlayer() != this->Player) { //can only return trade to markets owned by the same player
 			return false;
 		}
 		
-		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
+		if (this->Type->UnitType != UnitTypeNaval && dest->GetType()->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeNaval) { //ships cannot return trade to land markets
+		if (this->Type->UnitType == UnitTypeNaval && !dest->GetType()->BoolFlag[SHOREBUILDING_INDEX].value && dest->GetType()->UnitType != UnitTypeNaval) { //ships cannot return trade to land markets
 			return false;
 		}
 	} else {
-		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player))) {
+		if (dest->GetPlayer() != this->Player && !(dest->GetPlayer()->IsAllied(*this->Player) && this->Player->IsAllied(*dest->GetPlayer()))) {
 			return false;
 		}
 	}
@@ -6510,7 +6486,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 	}
 	
 	if (item->Spell != nullptr) {
-		if (!this->HasInventory() || !::CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer)) {
+		if (!this->HasInventory() || !::CanCastSpell(*this, *item->Spell, this, this->GetTilePos(), this->MapLayer)) {
 			return false;
 		}
 	}
@@ -6670,23 +6646,23 @@ bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
 
 bool CUnit::CanEat(const CUnit &unit) const
 {
-	if (this->Type->BoolFlag[CARNIVORE_INDEX].value && unit.Type->BoolFlag[FLESH_INDEX].value) {
+	if (this->Type->BoolFlag[CARNIVORE_INDEX].value && unit.GetType()->BoolFlag[FLESH_INDEX].value) {
 		return true;
 	}
 	
-	if (this->Type->BoolFlag[INSECTIVORE_INDEX].value && unit.Type->BoolFlag[INSECT_INDEX].value) {
+	if (this->Type->BoolFlag[INSECTIVORE_INDEX].value && unit.GetType()->BoolFlag[INSECT_INDEX].value) {
 		return true;
 	}
 	
-	if (this->Type->BoolFlag[HERBIVORE_INDEX].value && unit.Type->BoolFlag[VEGETABLE_INDEX].value) {
+	if (this->Type->BoolFlag[HERBIVORE_INDEX].value && unit.GetType()->BoolFlag[VEGETABLE_INDEX].value) {
 		return true;
 	}
 	
 	if (
 		this->Type->BoolFlag[DETRITIVORE_INDEX].value
 		&& (
-			unit.Type->BoolFlag[DETRITUS_INDEX].value
-			|| (unit.CurrentAction() == UnitActionDie && (unit.Type->BoolFlag[FLESH_INDEX].value || unit.Type->BoolFlag[INSECT_INDEX].value))
+			unit.GetType()->BoolFlag[DETRITUS_INDEX].value
+			|| (unit.CurrentAction() == UnitActionDie && (unit.GetType()->BoolFlag[FLESH_INDEX].value || unit.GetType()->BoolFlag[INSECT_INDEX].value))
 		)
 	) {
 		return true;
@@ -6758,8 +6734,8 @@ bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
 bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 {
 	bool has_adjacent_rail = false;
-	Vec2i top_left_pos(this->tilePos - Vec2i(1, 1));
-	Vec2i bottom_right_pos(this->tilePos + this->Type->TileSize);
+	Vec2i top_left_pos(this->GetTilePos() - Vec2i(1, 1));
+	Vec2i bottom_right_pos(this->GetTilePos() + this->Type->TileSize);
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 		Vec2i tile_pos(x, top_left_pos.y);
@@ -6979,7 +6955,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	unit.TTL = 0;
 	unit.Anim.Unbreakable = 0;
 
-	const CUnitType *type = unit.Type;
+	const CUnitType *type = unit.GetType();
 
 	while (unit.Resource.Workers) {
 		unit.Resource.Workers->DeAssignWorkerFromMine(unit);
@@ -7044,11 +7020,11 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	// Transporters lose or save their units and buildings their workers
 	//Wyrmgus start
-//	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
+//	if (unit.UnitInside && unit.GetType()->BoolFlag[SAVECARGO_INDEX].value) {
 	if (
 		unit.UnitInside
 		&& (
-			unit.Type->BoolFlag[SAVECARGO_INDEX].value
+			unit.GetType()->BoolFlag[SAVECARGO_INDEX].value
 			|| (unit.HasInventory() && unit.Character == nullptr)
 		)
 	) {
@@ -7060,11 +7036,11 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	
 	//Wyrmgus start
 	//if is a raft or bridge, destroy all land units on it
-	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) {
+	if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) {
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (table[i]->IsAliveOnMap() && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
@@ -7081,7 +7057,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (!suicide && unit.CurrentAction() != UnitActionBuilt && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
+	if (!suicide && unit.CurrentAction() != UnitActionBuilt && (unit.Character || unit.GetType()->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
 		unit.GenerateDrop();
 	}
 	//Wyrmgus end
@@ -7112,10 +7088,10 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit.IX = (type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2;
-		unit.IY = (type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2;
+		unit.IX = (type->CorpseType->GetFrameSize().x - type->CorpseType->Sprite->Width) / 2;
+		unit.IY = (type->CorpseType->GetFrameSize().y - type->CorpseType->Sprite->Height) / 2;
 
-		unit.CurrentSightRange = type->CorpseType->Stats[unit.Player->GetIndex()].Variables[SIGHTRANGE_INDEX].Max;
+		unit.CurrentSightRange = type->CorpseType->Stats[unit.GetPlayer()->GetIndex()].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
 		unit.CurrentSightRange = 0;
 	}
@@ -7180,14 +7156,14 @@ void DestroyAllInside(CUnit &source)
 
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
-	const CUnitType &type = *unit.Type;
-	const CUnitType &dtype = *dest.Type;
+	const CUnitType &type = *unit.GetType();
+	const CUnitType &dtype = *dest.GetType();
 	int cost = 0;
 
 	// Buildings, non-aggressive and invincible units have the lowest priority
 	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
-		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
-		if (dest.Type->CanMove() == false) {
+		|| dest.GetType()->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+		if (dest.GetType()->CanMove() == false) {
 			return INT_MAX;
 		} else {
 			return INT_MAX / 2;
@@ -7234,11 +7210,11 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 	const unsigned long lastattack = target.Attacked;
 
 	target.Attacked = GameCycle ? GameCycle : 1;
-	if (target.Type->BoolFlag[WALL_INDEX].value || (lastattack && GameCycle <= lastattack + 2 * CYCLES_PER_SECOND)) {
+	if (target.GetType()->BoolFlag[WALL_INDEX].value || (lastattack && GameCycle <= lastattack + 2 * CYCLES_PER_SECOND)) {
 		return;
 	}
 	// NOTE: perhaps this should also be moved into the notify?
-	if (target.Player == CPlayer::GetThisPlayer()) {
+	if (target.GetPlayer() == CPlayer::GetThisPlayer()) {
 		// FIXME: Problem with load+save.
 
 		//
@@ -7248,23 +7224,23 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 		if (HelpMeLastCycle < GameCycle) {
 			if (!HelpMeLastCycle
 				|| HelpMeLastCycle + CYCLES_PER_SECOND * 120 < GameCycle
-				|| target.tilePos.x < HelpMeLastX - 14
-				|| target.tilePos.x > HelpMeLastX + 14
-				|| target.tilePos.y < HelpMeLastY - 14
-				|| target.tilePos.y > HelpMeLastY + 14) {
+				|| target.GetTilePos().x < HelpMeLastX - 14
+				|| target.GetTilePos().x > HelpMeLastX + 14
+				|| target.GetTilePos().y < HelpMeLastY - 14
+				|| target.GetTilePos().y > HelpMeLastY + 14) {
 				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
-				HelpMeLastX = target.tilePos.x;
-				HelpMeLastY = target.tilePos.y;
+				HelpMeLastX = target.GetTilePos().x;
+				HelpMeLastY = target.GetTilePos().y;
 				PlayUnitSound(target, VoiceHelpMe);
-				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
+				target.GetPlayer()->Notify(NotifyRed, target.GetTilePos(), target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
 			}
 		}
 	}
 
-	if (GameCycle > (lastattack + 2 * (CYCLES_PER_SECOND * 60)) && attacker && !target.Type->BoolFlag[BUILDING_INDEX].value) { //only trigger this every two minutes for the unit
+	if (GameCycle > (lastattack + 2 * (CYCLES_PER_SECOND * 60)) && attacker && !target.GetType()->BoolFlag[BUILDING_INDEX].value) { //only trigger this every two minutes for the unit
 		if (
-			target.Player->AiEnabled
-			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
+			target.GetPlayer()->AiEnabled
+			&& !attacker->GetType()->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 		) {
 			AiHelpMe(attacker->GetFirstContainer(), target);
 		}
@@ -7277,12 +7253,12 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		return;
 	}
 	
-	if (attacker->Player == target.Player || attacker->Player->GetIndex() == PlayerNumNeutral || target.Player->GetIndex() == PlayerNumNeutral) {
+	if (attacker->GetPlayer() == target.GetPlayer() || attacker->GetPlayer()->GetIndex() == PlayerNumNeutral || target.GetPlayer()->GetIndex() == PlayerNumNeutral) {
 		return;
 	}
 	
 	int var_index;
-	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (target.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		var_index = RAIDING_INDEX;
 	} else {
 		var_index = MUGGING_INDEX;
@@ -7307,12 +7283,12 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 	}
 	
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (target.Type->Stats[target.Player->GetIndex()].Costs[i] > 0) {
-			int resource_change = target.Type->Stats[target.Player->GetIndex()].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
-			resource_change = std::min(resource_change, target.Player->GetResource(i, STORE_BOTH));
-			attacker->Player->ChangeResource(i, resource_change);
-			attacker->Player->TotalResources[i] += resource_change;
-			target.Player->ChangeResource(i, -resource_change);
+		if (target.GetType()->Stats[target.GetPlayer()->GetIndex()].Costs[i] > 0) {
+			int resource_change = target.GetType()->Stats[target.GetPlayer()->GetIndex()].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
+			resource_change = std::min(resource_change, target.GetPlayer()->GetResource(i, STORE_BOTH));
+			attacker->GetPlayer()->ChangeResource(i, resource_change);
+			attacker->GetPlayer()->TotalResources[i] += resource_change;
+			target.GetPlayer()->ChangeResource(i, -resource_change);
 		}
 	}
 }
@@ -7329,18 +7305,18 @@ static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, in
 
 static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 {
-	attacker.Player->Score += target.Variable[POINTS_INDEX].Value;
-	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
-		attacker.Player->TotalRazings++;
+	attacker.GetPlayer()->Score += target.Variable[POINTS_INDEX].Value;
+	if (target.GetType()->BoolFlag[BUILDING_INDEX].value) {
+		attacker.GetPlayer()->TotalRazings++;
 	} else {
-		attacker.Player->TotalKills++;
+		attacker.GetPlayer()->TotalKills++;
 	}
 	
 	//Wyrmgus start
-	attacker.Player->UnitTypeKills[target.Type->GetIndex()]++;
+	attacker.GetPlayer()->UnitTypeKills[target.GetType()->GetIndex()]++;
 	
 	//distribute experience between nearby units belonging to the same player
-	if (!target.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (!target.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		attacker.ChangeExperience(UseHPForXp ? target.Variable[HP_INDEX].Value : target.Variable[POINTS_INDEX].Value, ExperienceRange);
 	}
 	//Wyrmgus end
@@ -7350,28 +7326,27 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	attacker.Variable[KILL_INDEX].Enable = 1;
 	
 	//Wyrmgus start
-	for (size_t i = 0; i < attacker.Player->QuestObjectives.size(); ++i) {
-		CPlayerQuestObjective *objective = attacker.Player->QuestObjectives[i];
+	for (CPlayerQuestObjective *objective : attacker.GetPlayer()->QuestObjectives) {
 		if (
 			(
 				objective->ObjectiveType == DestroyUnitsObjectiveType
 				&& (
-					std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end()
-					|| std::find(objective->UnitClasses.begin(), objective->UnitClasses.end(), target.Type->GetClass()) != objective->UnitClasses.end()
+					std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.GetType()) != objective->UnitTypes.end()
+					|| std::find(objective->UnitClasses.begin(), objective->UnitClasses.end(), target.GetType()->GetClass()) != objective->UnitClasses.end()
 				)
 				&& (!objective->Settlement || objective->Settlement == target.Settlement)
 			)
 			|| (objective->ObjectiveType == DestroyHeroObjectiveType && target.Character && objective->Character == target.Character)
 			|| (objective->ObjectiveType == DestroyUniqueObjectiveType && target.Unique && objective->Unique == target.Unique)
 		) {
-			if (!objective->Faction || objective->Faction == target.Player->GetFaction()) {
+			if (!objective->Faction || objective->Faction == target.GetPlayer()->GetFaction()) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
 			const CPlayer *faction_player = CPlayer::GetFactionPlayer(objective->Faction);
 			
 			if (faction_player) {
-				int dying_faction_units = faction_player == target.Player ? 1 : 0;
+				int dying_faction_units = faction_player == target.GetPlayer() ? 1 : 0;
 				dying_faction_units += target.GetTotalInsideCount(faction_player, true, true);
 				
 				if (dying_faction_units > 0 && faction_player->GetUnitCount() <= dying_faction_units) {
@@ -7384,11 +7359,11 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	//also increase score for units inside the target that will be destroyed when the target dies
 	if (
 		target.UnitInside
-		&& !target.Type->BoolFlag[SAVECARGO_INDEX].value
+		&& !target.GetType()->BoolFlag[SAVECARGO_INDEX].value
 	) {
 		CUnit *boarded_unit = target.UnitInside;
 		for (int i = 0; i < target.InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
-			if (!boarded_unit->Type->BoolFlag[ITEM_INDEX].value) { //ignore items
+			if (!boarded_unit->GetType()->BoolFlag[ITEM_INDEX].value) { //ignore items
 				HitUnit_IncreaseScoreForKill(attacker, *boarded_unit);
 			}
 		}
@@ -7415,7 +7390,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	//distribute experience between nearby units belonging to the same player
 
 //	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
-	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.Player->Type == PlayerNeutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.GetPlayer()->Type == PlayerNeutral) && !target.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		attacker->ChangeExperience(damage, ExperienceRange);
 	}
 	//Wyrmgus end
@@ -7435,10 +7410,10 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
 	// Only worker types can capture.
 	// Still possible to destroy building if not careful (too many attackers)
 	if (EnableBuildingCapture && attacker
-		&& target.Type->BoolFlag[BUILDING_INDEX].value && target.Variable[HP_INDEX].Value <= damage * 3
+		&& target.GetType()->BoolFlag[BUILDING_INDEX].value && target.Variable[HP_INDEX].Value <= damage * 3
 		&& attacker->IsEnemy(target)
-		&& attacker->Type->RepairRange) {
-		target.ChangeOwner(*attacker->Player);
+		&& attacker->GetType()->RepairRange) {
+		target.ChangeOwner(*attacker->GetPlayer());
 		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
 	}
 }
@@ -7458,7 +7433,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 static void HitUnit_ShowImpactMissile(const CUnit &target)
 {
 	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
-	const CUnitType &type = *target.Type;
+	const CUnitType &type = *target.GetType();
 
 	if (target.Variable[SHIELD_INDEX].Value > 0
 		&& !type.Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
@@ -7540,14 +7515,14 @@ void HitUnit_NormalHitSpecialDamageEffects(CUnit &attacker, CUnit &target)
 
 void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
 {
-	if (dmg_var == COLDDAMAGE_INDEX && target.Variable[COLDRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) { //if resistance to cold is 100%, the effect has no chance of being applied
+	if (dmg_var == COLDDAMAGE_INDEX && target.Variable[COLDRESISTANCE_INDEX].Value < 100 && target.GetType()->BoolFlag[ORGANIC_INDEX].value) { //if resistance to cold is 100%, the effect has no chance of being applied
 		int rand_max = 100 * 100 / (100 - target.Variable[COLDRESISTANCE_INDEX].Value);
 		if (SyncRand(rand_max) == 0) {
 			target.Variable[SLOW_INDEX].Enable = 1;
 			target.Variable[SLOW_INDEX].Value = std::max(200, target.Variable[SLOW_INDEX].Value);
 			target.Variable[SLOW_INDEX].Max = 1000;
 		}
-	} else if (dmg_var == LIGHTNINGDAMAGE_INDEX && target.Variable[LIGHTNINGRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) {
+	} else if (dmg_var == LIGHTNINGDAMAGE_INDEX && target.Variable[LIGHTNINGRESISTANCE_INDEX].Value < 100 && target.GetType()->BoolFlag[ORGANIC_INDEX].value) {
 		int rand_max = 100 * 100 / (100 - target.Variable[LIGHTNINGRESISTANCE_INDEX].Value);
 		if (SyncRand(rand_max) == 0) {
 			target.Variable[STUN_INDEX].Enable = 1;
@@ -7563,14 +7538,14 @@ void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
 void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 //Wyrmgus end
 {
-	Vec2i pos = target.tilePos - attacker.tilePos;
+	Vec2i pos = target.GetTilePos() - attacker.GetTilePos();
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
 	if (!d) {
 		d = 1;
 	}
-	pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
-	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
+	pos.x = target.GetTilePos().x + (pos.x * 5) / d + (SyncRand() & 3);
+	pos.y = target.GetTilePos().y + (pos.y * 5) / d + (SyncRand() & 3);
 	CMap::Map.Clamp(pos, target.MapLayer->ID);
 	CommandStopUnit(target);
 	CommandMove(target, pos, 0, target.MapLayer->ID);
@@ -7582,8 +7557,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	COrder *savedOrder = nullptr;
 
 	//Wyrmgus start
-//	if (target.Player->AiEnabled == false) {
-	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
+//	if (target.GetPlayer()->AiEnabled == false) {
+	if (target.GetPlayer()->AiEnabled == false && target.GetPlayer()->Type != PlayerNeutral) { // allow neutral units to strike back
 	//Wyrmgus end
 		if (target.CurrentAction() == UnitActionAttack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
@@ -7603,7 +7578,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	CUnit *oldgoal = target.CurrentOrder()->GetGoal();
 	CUnit *goal, *best = oldgoal;
 
-	if (RevealAttacker && CanTarget(*target.Type, *attacker.Type)) {
+	if (RevealAttacker && CanTarget(*target.GetType(), *attacker.GetType())) {
 		// Reveal Unit that is attacking
 		goal = &attacker;
 	} else {
@@ -7619,16 +7594,16 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
 		best = goal;
 	}
-	if (CanTarget(*target.Type, *attacker.Type)
+	if (CanTarget(*target.GetType(), *attacker.GetType())
 		&& (!best || (goal != &attacker
 					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
 		best = &attacker;
 	}
 	//Wyrmgus start
-//	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
-	if (best && best != oldgoal && (best->Player != target.Player || target.Player->Type == PlayerNeutral) && best->IsAllied(target) == false) {
+//	if (best && best != oldgoal && best->GetPlayer() != target.GetPlayer() && best->IsAllied(target) == false) {
+	if (best && best != oldgoal && (best->GetPlayer() != target.GetPlayer() || target.GetPlayer()->Type == PlayerNeutral) && best->IsAllied(target) == false) {
 	//Wyrmgus end
-		CommandAttack(target, best->tilePos, best, FlushCommands, best->MapLayer->ID);
+		CommandAttack(target, best->GetTilePos(), best, FlushCommands, best->MapLayer->ID);
 		// Set threshold value only for aggressive units
 		if (best->IsAgressive()) {
 			target.Threshold = threshold;
@@ -7652,14 +7627,14 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile, bool show_damage)
 //Wyrmgus end
 {
-	const CUnitType *type = target.Type;
+	const CUnitType *type = target.GetType();
 	if (!damage) {
 		// Can now happen by splash damage
 		// Multiple places send x/y as damage, which may be zero
 		return;
 	}
 
-	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.GetType()->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 		// vladi: units with active UnholyArmour are invulnerable
 		return;
 	}
@@ -7668,22 +7643,20 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		return;
 	}
 
-	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
+	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.GetType()->BoolFlag[VANISHES_INDEX].value);
 
-	//Wyrmgus start
 	if (
-		(attacker != nullptr && attacker->Player == CPlayer::GetThisPlayer())
-		&& target.Player != CPlayer::GetThisPlayer()
+		(attacker != nullptr && attacker->GetPlayer() == CPlayer::GetThisPlayer())
+		&& target.GetPlayer() != CPlayer::GetThisPlayer()
 	) {
 		Wyrmgus::GetInstance()->emit_signal("unit_hit");
 	}
-	//Wyrmgus end
 
 	if (GodMode) {
-		if (attacker && attacker->Player == CPlayer::GetThisPlayer()) {
+		if (attacker && attacker->GetPlayer() == CPlayer::GetThisPlayer()) {
 			damage = target.Variable[HP_INDEX].Value;
 		}
-		if (target.Player == CPlayer::GetThisPlayer()) {
+		if (target.GetPlayer() == CPlayer::GetThisPlayer()) {
 			damage = 0;
 		}
 	}
@@ -7694,7 +7667,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		//Wyrmgus start
 		HitUnit_LastAttack(attacker, target); //only trigger the help me notification and AI code if there is actually an attacker
 		//Wyrmgus end
-		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
+		target.DamagedType = ExtraDeathIndex(attacker->GetType()->DamageType.c_str());
 	}
 
 	// Increase variables and call OnImpact
@@ -7725,7 +7698,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		if (!destroyer) {
 			int best_distance = 0;
 			std::vector<CUnit *> table;
-			SelectAroundUnit(target, ExperienceRange, table, IsEnemyWith(*target.Player));
+			SelectAroundUnit(target, ExperienceRange, table, IsEnemyWith(*target.GetPlayer()));
 			for (size_t i = 0; i < table.size(); i++) {
 				CUnit *potential_destroyer = table[i];
 				int distance = target.MapDistanceTo(*potential_destroyer);
@@ -7736,7 +7709,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 			}
 		}
 		if (destroyer) {
-			if (target.IsEnemy(*destroyer) || target.Player->Type == PlayerNeutral) {
+			if (target.IsEnemy(*destroyer) || target.GetPlayer()->Type == PlayerNeutral) {
 				HitUnit_IncreaseScoreForKill(*destroyer, target);
 			}
 		}
@@ -7757,13 +7730,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 //	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning) {
-	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.UnderConstruction && target.Type->TileSize.x != 1 && target.Type->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.UnderConstruction && target.GetType()->TileSize.x != 1 && target.GetType()->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
 
 	/* Target Reaction on Hit */
-	if (target.Player->AiEnabled) {
+	if (target.GetPlayer()->AiEnabled) {
 		if (target.CurrentOrder()->OnAiHitUnit(target, attacker, damage)) {
 			return;
 		}
@@ -7777,11 +7750,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus start
 //	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
 	if (
-		(!target.IsAgressive() || attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value)
+		(!target.IsAgressive() || attacker->GetType()->BoolFlag[INDESTRUCTIBLE_INDEX].value)
 		&& target.CanMove()
 		&& (target.CurrentAction() == UnitActionStill || target.Variable[TERROR_INDEX].Value > 0)
 		&& !target.BoardCount
-		&& !target.Type->BoolFlag[BRIDGE_INDEX].value
+		&& !target.GetType()->BoolFlag[BRIDGE_INDEX].value
 	) {
 	//Wyrmgus end
 		HitUnit_RunAway(target, *attacker);
@@ -7798,10 +7771,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 //	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
 	if (
 		target.Threshold == 0
-		&& (target.IsAgressive() || (target.CanAttack() && target.Type->BoolFlag[COWARD_INDEX].value && (attacker->Type->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].Value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
+		&& (target.IsAgressive() || (target.CanAttack() && target.GetType()->BoolFlag[COWARD_INDEX].value && (attacker->GetType()->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].Value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
 		&& target.CanMove()
 		&& !target.ReCast
-		&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
+		&& !attacker->GetType()->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 	) {
 	//Wyrmgus end
 		// Attack units in range (which or the attacker?)
@@ -7831,7 +7804,7 @@ int CUnit::MapDistanceTo(const CUnit &dst) const
 		return 16384;
 	}
 	
-	return MapDistanceBetweenTypes(*this->GetFirstContainer()->Type, this->tilePos, this->MapLayer->ID, *dst.Type, dst.tilePos, dst.MapLayer->ID);
+	return MapDistanceBetweenTypes(*this->GetFirstContainer()->Type, this->GetTilePos(), this->MapLayer->ID, *dst.GetType(), dst.GetTilePos(), dst.MapLayer->ID);
 }
 
 /**
@@ -7852,23 +7825,23 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 	int dx;
 	int dy;
 
-	if (pos.x <= tilePos.x) {
-		dx = tilePos.x - pos.x;
+	if (pos.x <= this->GetTilePos().x) {
+		dx = this->GetTilePos().x - pos.x;
 	//Wyrmgus start
 	} else if (this->Container) { //if unit is within another, use the tile size of the transporter to calculate the distance
-		dx = std::max<int>(0, pos.x - tilePos.x - this->Container->Type->TileSize.x + 1);
+		dx = std::max<int>(0, pos.x - this->GetTilePos().x - this->Container->GetType()->TileSize.x + 1);
 	//Wyrmgus end
 	} else {
-		dx = std::max<int>(0, pos.x - tilePos.x - Type->TileSize.x + 1);
+		dx = std::max<int>(0, pos.x - this->GetTilePos().x - this->GetType()->TileSize.x + 1);
 	}
-	if (pos.y <= tilePos.y) {
-		dy = tilePos.y - pos.y;
+	if (pos.y <= this->GetTilePos().y) {
+		dy = this->GetTilePos().y - pos.y;
 	//Wyrmgus start
 	} else if (this->Container) {
-		dy = std::max<int>(0, pos.y - tilePos.y - this->Container->Type->TileSize.y + 1);
+		dy = std::max<int>(0, pos.y - this->GetTilePos().y - this->Container->GetType()->TileSize.y + 1);
 	//Wyrmgus end
 	} else {
-		dy = std::max<int>(0, pos.y - tilePos.y - Type->TileSize.y + 1);
+		dy = std::max<int>(0, pos.y - this->GetTilePos().y - this->GetType()->TileSize.y + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
@@ -7993,7 +7966,7 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 */
 int CanTransport(const CUnit &transporter, const CUnit &unit)
 {
-	if (!transporter.Type->CanTransport()) {
+	if (!transporter.GetType()->CanTransport()) {
 		return 0;
 	}
 	if (transporter.CurrentAction() == UnitActionBuilt) { // Under construction
@@ -8004,7 +7977,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	//Wyrmgus start
 	/*
-	if (transporter.BoardCount >= transporter.Type->MaxOnBoard) { // full
+	if (transporter.BoardCount >= transporter.GetType()->MaxOnBoard) { // full
 		return 0;
 	}
 	*/
@@ -8014,7 +7987,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	//Wyrmgus end
 
-	if (transporter.BoardCount + unit.Type->GetBoardSize() > transporter.Type->MaxOnBoard) { // too big unit
+	if (transporter.BoardCount + unit.GetType()->GetBoardSize() > transporter.GetType()->MaxOnBoard) { // too big unit
 		return 0;
 	}
 
@@ -8022,13 +7995,13 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	// FIXME : should be parametrable.
 	//Wyrmgus start
 //	if (!transporter.IsTeamed(unit)) {
-	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral) {
+	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.GetPlayer()->Type != PlayerNeutral && unit.GetPlayer()->Type != PlayerNeutral) {
 	//Wyrmgus end
 		return 0;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (transporter.Type->BoolFlag[i].CanTransport != CONDITION_TRUE) {
-			if ((transporter.Type->BoolFlag[i].CanTransport == CONDITION_ONLY) ^ unit.Type->BoolFlag[i].value) {
+		if (transporter.GetType()->BoolFlag[i].CanTransport != CONDITION_TRUE) {
+			if ((transporter.GetType()->BoolFlag[i].CanTransport == CONDITION_ONLY) ^ unit.GetType()->BoolFlag[i].value) {
 				return 0;
 			}
 		}
@@ -8047,13 +8020,13 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 */
 bool CanPickUp(const CUnit &picker, const CUnit &unit)
 {
-	if (!picker.Type->BoolFlag[ORGANIC_INDEX].value) { //only organic units can pick up power-ups and items
+	if (!picker.GetType()->BoolFlag[ORGANIC_INDEX].value) { //only organic units can pick up power-ups and items
 		return false;
 	}
-	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
+	if (!unit.GetType()->BoolFlag[ITEM_INDEX].value && !unit.GetType()->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && unit.Type->ItemClass->IsConsumable() == false) { //only consumable items can be picked up as if they were power-ups for units with no inventory
+	if (!unit.GetType()->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && unit.GetType()->ItemClass->IsConsumable() == false) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction
@@ -8062,10 +8035,10 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (&picker == &unit) { // Cannot pick up itself.
 		return false;
 	}
-	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
-		if (picker.Player == CPlayer::GetThisPlayer()) {
+	if (picker.HasInventory() && unit.GetType()->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
+		if (picker.GetPlayer() == CPlayer::GetThisPlayer()) {
 			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
-			picker.Player->Notify(NotifyRed, picker.tilePos, picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());
+			picker.GetPlayer()->Notify(NotifyRed, picker.GetTilePos(), picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());
 		}
 		return false;
 	}
@@ -8102,19 +8075,19 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		this->Player->Type == PlayerNeutral
 		&& this->Type->BoolFlag[FAUNA_INDEX].value
 		&& this->Type->BoolFlag[ORGANIC_INDEX].value
-		&& unit.Type->BoolFlag[ORGANIC_INDEX].value
-		&& this->Type != unit.Type
+		&& unit.GetType()->BoolFlag[ORGANIC_INDEX].value
+		&& this->Type != unit.GetType()
 	) {
 		if (
 			this->Type->BoolFlag[PREDATOR_INDEX].value
-			&& !unit.Type->BoolFlag[PREDATOR_INDEX].value
+			&& !unit.GetType()->BoolFlag[PREDATOR_INDEX].value
 			&& this->CanEat(unit)
 		) {
 			return true;
 		} else if (
 			this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value
-			&& !unit.Type->BoolFlag[FAUNA_INDEX].value
-			&& unit.Player->Type != PlayerNeutral
+			&& !unit.GetType()->BoolFlag[FAUNA_INDEX].value
+			&& unit.GetPlayer()->Type != PlayerNeutral
 			&& this->MapDistanceTo(unit) <= 1
 		) {
 			return true;
@@ -8122,32 +8095,32 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 	}
 		
 	if (
-		unit.Player->Type == PlayerNeutral
-		&& unit.Type->BoolFlag[PREDATOR_INDEX].value
+		unit.GetPlayer()->Type == PlayerNeutral
+		&& unit.GetType()->BoolFlag[PREDATOR_INDEX].value
 		&& this->Player->Type != PlayerNeutral
 	) {
 		return true;
 	}
 	
 	if (
-		this->Player != unit.Player
+		this->Player != unit.GetPlayer()
 		&& this->Player->Type != PlayerNeutral
 		&& unit.CurrentAction() == UnitActionAttack
 		&& unit.CurrentOrder()->HasGoal()
-		&& unit.CurrentOrder()->GetGoal()->Player == this->Player
-		&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
+		&& unit.CurrentOrder()->GetGoal()->GetPlayer() == this->Player
+		&& !unit.CurrentOrder()->GetGoal()->GetType()->BoolFlag[HIDDENOWNERSHIP_INDEX].value
 	) {
 		return true;
 	}
 	
 	if (
-		this->Player != unit.Player && this->Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->HasNeutralFactionType()
-		&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
+		this->Player != unit.GetPlayer() && this->Player->Type != PlayerNeutral && unit.GetPlayer()->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.GetPlayer()) && !this->Player->HasNeutralFactionType()
+		&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.GetType()->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
 	) {
 		return true;
 	}
 
-	return IsEnemy(*unit.Player);
+	return IsEnemy(*unit.GetPlayer());
 	//Wyrmgus end
 }
 
@@ -8168,7 +8141,7 @@ bool CUnit::IsAllied(const CPlayer &player) const
 */
 bool CUnit::IsAllied(const CUnit &unit) const
 {
-	return IsAllied(*unit.Player);
+	return IsAllied(*unit.GetPlayer());
 }
 
 /**
@@ -8188,7 +8161,7 @@ bool CUnit::IsSharedVision(const CPlayer &player) const
 */
 bool CUnit::IsSharedVision(const CUnit &unit) const
 {
-	return IsSharedVision(*unit.Player);
+	return IsSharedVision(*unit.GetPlayer());
 }
 
 /**
@@ -8208,7 +8181,7 @@ bool CUnit::IsBothSharedVision(const CPlayer &player) const
 */
 bool CUnit::IsBothSharedVision(const CUnit &unit) const
 {
-	return IsBothSharedVision(*unit.Player);
+	return IsBothSharedVision(*unit.GetPlayer());
 }
 
 /**
@@ -8228,7 +8201,7 @@ bool CUnit::IsTeamed(const CPlayer &player) const
 */
 bool CUnit::IsTeamed(const CUnit &unit) const
 {
-	return this->IsTeamed(*unit.Player);
+	return this->IsTeamed(*unit.GetPlayer());
 }
 
 /**
@@ -8261,8 +8234,8 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		&& goal->IsAliveOnMap()
 		&& (
 			this->MapDistanceTo(*goal) > 1
-			|| (this->Type->UnitType != UnitTypeFly && goal->Type->UnitType == UnitTypeFly)
-			|| (this->Type->UnitType == UnitTypeFly && goal->Type->UnitType != UnitTypeFly)
+			|| (this->Type->UnitType != UnitTypeFly && goal->GetType()->UnitType == UnitTypeFly)
+			|| (this->Type->UnitType == UnitTypeFly && goal->GetType()->UnitType != UnitTypeFly)
 		)
 	) {
 		return true;
@@ -8422,12 +8395,12 @@ void CUnit::HandleBuffsEachSecond()
 		}
 		
 		//apply "-stalk" abilities
-		if ((this->GetVariableValue(DESERTSTALK_INDEX) > 0 || this->GetVariableValue(FORESTSTALK_INDEX) > 0 || this->GetVariableValue(SWAMPSTALK_INDEX) > 0) && CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)) {
+		if ((this->GetVariableValue(DESERTSTALK_INDEX) > 0 || this->GetVariableValue(FORESTSTALK_INDEX) > 0 || this->GetVariableValue(SWAMPSTALK_INDEX) > 0) && CMap::Map.Info.IsPointOnMap(this->GetTilePos().x, this->GetTilePos().y, this->MapLayer)) {
 			if (
 				(
-					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetTerrain(false)->IsDesert())
-					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && this->MapLayer->TileBlockHasTree(this->tilePos - 1, this->Type->TileSize + 2))
-					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetTerrain(false)->IsSwamp())
+					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && this->MapLayer->Field(this->GetTilePos().x, this->GetTilePos().y)->GetTerrain(false)->IsDesert())
+					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && this->MapLayer->TileBlockHasTree(this->GetTilePos() - 1, this->Type->TileSize + 2))
+					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && this->MapLayer->Field(this->GetTilePos().x, this->GetTilePos().y)->GetTerrain(false)->IsSwamp())
 				)
 				&& (this->GetVariableValue(INVISIBLE_INDEX) > 0 || !this->IsInCombat())
 			) {				
@@ -8442,10 +8415,10 @@ void CUnit::HandleBuffsEachSecond()
 		}
 		
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
-			this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->GetTerrain(false)->IsDesert()
+			this->MapLayer->Field(this->GetTilePos().x, this->GetTilePos().y)->GetTerrain(false)->IsDesert()
 			&& this->Type->BoolFlag[ORGANIC_INDEX].value
-			&& CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)
-			&& this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Owner != this->Player->GetIndex()
+			&& CMap::Map.Info.IsPointOnMap(this->GetTilePos().x, this->GetTilePos().y, this->MapLayer)
+			&& this->MapLayer->Field(this->GetTilePos().x, this->GetTilePos().y)->Owner != this->Player->GetIndex()
 			&& this->MapLayer->GetTimeOfDay() != nullptr
 			&& this->MapLayer->GetTimeOfDay()->IsDay()
 			&& this->GetVariableValue(HYDRATING_INDEX) <= 0
@@ -8566,6 +8539,8 @@ void CUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_name"), +[](const CUnit *unit){ return String(unit->GetName().c_str()); });
 	ClassDB::bind_method(D_METHOD("get_player"), &CUnit::GetPlayer);
 	ClassDB::bind_method(D_METHOD("get_icon"), +[](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
+	ClassDB::bind_method(D_METHOD("get_type"), +[](const CUnit *unit){ return const_cast<CUnitType *>(unit->GetType()); });
+	ClassDB::bind_method(D_METHOD("get_tile_pos"), +[](const CUnit *unit){ return Vector2(unit->GetTilePos()); });
 }
 
 /*----------------------------------------------------------------------------
@@ -8607,7 +8582,7 @@ void CleanUnits()
 		*/
 		//Wyrmgus end
 		//Wyrmgus start
-		if (unit.Type == nullptr) {
+		if (unit.GetType() == nullptr) {
 			fprintf(stderr, "Unit \"%d\"'s type is null.\n", UnitNumber(unit));
 		}
 		//Wyrmgus end

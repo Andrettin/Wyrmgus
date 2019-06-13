@@ -181,7 +181,7 @@ void ButtonAction::SetTriggerData() const
 	if (this->Action != ButtonUnit && this->Action != ButtonBuy) {
 		TriggerData.Type = CUnitType::Get(this->Value);
 	} else {
-		TriggerData.Type = CUnitType::Get(UnitManager.GetSlotUnit(this->Value).Type->GetIndex());
+		TriggerData.Type = CUnitType::Get(UnitManager.GetSlotUnit(this->Value).GetType()->GetIndex());
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
 	}
 	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {

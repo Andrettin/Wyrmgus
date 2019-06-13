@@ -179,9 +179,9 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 {
 	Vec2i pos = startPos;
 
-	pos -= unit.Type->TileSize - 1;
-	int addx = transporter.Type->TileSize.x + unit.Type->TileSize.x - 1;
-	int addy = transporter.Type->TileSize.y + unit.Type->TileSize.y - 1;
+	pos -= unit.GetType()->TileSize - 1;
+	int addx = transporter.GetType()->TileSize.x + unit.GetType()->TileSize.x - 1;
+	int addy = transporter.GetType()->TileSize.y + unit.GetType()->TileSize.y - 1;
 
 	--pos.x;
 	for (int range = 0; range < maxRange; ++range) {
@@ -251,17 +251,17 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 
 	Assert(unit.Removed);
 	//Wyrmgus start
-//	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
-	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos, transporter.MapLayer->ID, landmass)) {
+//	if (!FindUnloadPosition(transporter, unit, transporter.GetTilePos(), maxRange, &pos)) {
+	if (!FindUnloadPosition(transporter, unit, transporter.GetTilePos(), maxRange, &pos, transporter.MapLayer->ID, landmass)) {
 	//Wyrmgus end
 		return false;
 	}
 	//Wyrmgus start
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && transporter.HasInventory() && transporter.IsItemEquipped(&unit)) { //if the unit is an equipped item in the transporter's inventory, deequip it
+	if (unit.GetType()->BoolFlag[ITEM_INDEX].value && transporter.HasInventory() && transporter.IsItemEquipped(&unit)) { //if the unit is an equipped item in the transporter's inventory, deequip it
 		transporter.DeequipItem(&unit);
 	}
 	
-	if (!IsNetworkGame() && transporter.Character && transporter.Player->AiEnabled == false && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
+	if (!IsNetworkGame() && transporter.Character && transporter.GetPlayer()->AiEnabled == false && unit.GetType()->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
 		CPersistentItem *item = transporter.Character->GetItem(&unit);
 		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
 		delete item;
@@ -270,7 +270,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	
 	//Wyrmgus start
 	//if this is a naval transporter and the unit has a disembarkment bonus, apply it
-	if (transporter.Type->UnitType == UnitTypeNaval && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
+	if (transporter.GetType()->UnitType == UnitTypeNaval && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
 		unit.Variable[INSPIRE_INDEX].Enable = 1;
 		unit.Variable[INSPIRE_INDEX].Value = 1000;
 		unit.Variable[INSPIRE_INDEX].Max = 1000;
@@ -280,15 +280,15 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	/*
 	unit.Boarded = 0;
 	unit.Place(pos);
-	transporter.BoardCount -= unit.Type->GetBoardSize();
+	transporter.BoardCount -= unit.GetType()->GetBoardSize();
 	*/
 	if (unit.Boarded) {
 		unit.Boarded = 0;
-		transporter.BoardCount -= unit.Type->GetBoardSize();
+		transporter.BoardCount -= unit.GetType()->GetBoardSize();
 	}
 	unit.Place(pos, transporter.MapLayer->ID);
 
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
+	if (unit.GetType()->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
 		if (unit.Prefix != nullptr || unit.Suffix != nullptr || unit.Spell != nullptr || unit.Work != nullptr || unit.Elixir != nullptr) {
 			ttl_cycles *= 4;
@@ -459,7 +459,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	//Wyrmgus end
 	if (!isTransporterRemoved) {
 		//Wyrmgus start
-//		transporter.Place(transporter.tilePos);
+//		transporter.Place(transporter.GetTilePos());
 		MarkUnitFieldFlags(transporter);
 		//Wyrmgus end
 		if (selected) {
@@ -567,7 +567,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;

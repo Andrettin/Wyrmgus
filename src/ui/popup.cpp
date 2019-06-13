@@ -540,7 +540,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 			}
 		} else {
 			if (
-				UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value
+				UnitManager.GetSlotUnit(button.Value).GetType()->BoolFlag[ITEM_INDEX].value
 				&& this->Index != HITPOINTHEALING_INDEX
 				&& UnitManager.GetSlotUnit(button.Value).Container
 				&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
@@ -557,7 +557,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 			} else {
 				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
 				if (
-					(UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy)
+					(UnitManager.GetSlotUnit(button.Value).GetType()->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy)
 					|| IsBonusVariable(this->Index)
 				) {
 					if (value >= 0) {

@@ -71,8 +71,8 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 	// FIXME: if you give quick an other order, the resources are lost!
 	//Wyrmgus start
 	order->Player = player;
-//	trainer.Player->SubUnitType(type);
-	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->GetIndex()].GetUnitStock(&type) != 0);
+//	trainer.GetPlayer()->SubUnitType(type);
+	CPlayer::Players[player]->SubUnitType(type, trainer.GetType()->Stats[trainer.GetPlayer()->GetIndex()].GetUnitStock(&type) != 0);
 	//Wyrmgus end
 
 	return order;
@@ -126,7 +126,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 {
 	DebugPrint("Cancel training\n");
 	//Wyrmgus start
-//	CPlayer &player = *unit.Player;
+//	CPlayer &player = *unit.GetPlayer();
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 
@@ -144,7 +144,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
 	//Wyrmgus start
-//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->GetIndex()].Costs[TimeCost];
+//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost];
 	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].Costs[TimeCost];
 	//Wyrmgus end
 }
@@ -152,7 +152,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 {
 	//Wyrmgus start
-//	const CPlayer &player = *unit.Player;
+//	const CPlayer &player = *unit.GetPlayer();
 	const CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const int oldCost = this->Type->Stats[player.GetIndex()].Costs[TimeCost];
@@ -179,26 +179,26 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	}
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		if (!unit.GetType()->BoolFlag[HARVESTER_INDEX].value) {
 			return false;
 		}
 		//  Also check if new unit can harvest this specific resource.
 		CUnit *goal = order->GetGoal();
 		//Wyrmgus start
-//		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
-		if (goal && !unit.Type->ResInfo[goal->GivesResource]) {
+//		if (goal && !unit.GetType()->ResInfo[goal->GetType()->GivesResource]) {
+		if (goal && !unit.GetType()->ResInfo[goal->GivesResource]) {
 		//Wyrmgus end
 			return false;
 		}
 		return true;
 	}
 	//Wyrmgus start
-//	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
+//	if (order->Action == UnitActionAttack && !unit.GetType()->CanAttack) {
 	if (order->Action == UnitActionAttack && !unit.CanAttack(true)) {
 	//Wyrmgus end
 		return false;
 	}
-	if (order->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand) {
+	if (order->Action == UnitActionBoard && unit.GetType()->UnitType != UnitTypeLand) {
 		return false;
 	}
 	return true;
@@ -208,10 +208,10 @@ static void AnimateActionTrain(CUnit &unit)
 {
 	//Wyrmgus start
 	/*
-	if (unit.Type->Animations->Train) {
-		UnitShowAnimation(unit, unit.Type->Animations->Train);
+	if (unit.GetType()->Animations->Train) {
+		UnitShowAnimation(unit, unit.GetType()->Animations->Train);
 	} else {
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 	}
 	*/
 	if (unit.GetAnimations()->Train) {
@@ -241,7 +241,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-//	CPlayer &player = *unit.Player;
+//	CPlayer &player = *unit.GetPlayer();
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const CUnitType &nType = *this->Type;
@@ -264,7 +264,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
 	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	
-	if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
+	if (unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].GetUnitStock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;
 	}
 	//Wyrmgus end
@@ -281,8 +281,8 @@ static void AnimateActionTrain(CUnit &unit)
 	// Check if enough supply available.
 	const int food = player.CheckLimits(nType);
 	if (food < 0) {
-		if (food == -3 && unit.Player->AiEnabled) {
-			AiNeedMoreSupply(*unit.Player);
+		if (food == -3 && unit.GetPlayer()->AiEnabled) {
+			AiNeedMoreSupply(*unit.GetPlayer());
 		}
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
@@ -293,7 +293,7 @@ static void AnimateActionTrain(CUnit &unit)
 	//Wyrmgus start
 	if (nType.BoolFlag[RAIL_INDEX].value && !unit.HasAdjacentRailForUnitType(&nType)) {
 		if (&player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		}
 		unit.Wait = CYCLES_PER_SECOND * 10;
@@ -312,8 +312,8 @@ static void AnimateActionTrain(CUnit &unit)
 
 	if (newUnit == nullptr) { // No more memory :/
 		//Wyrmgus start
-//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
+//		player.Notify(NotifyYellow, unit.GetTilePos(), _("Unable to train %s"), nType.Name.c_str());
+		player.Notify(NotifyYellow, unit.GetTilePos(), _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
 		//Wyrmgus end
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
@@ -323,14 +323,14 @@ static void AnimateActionTrain(CUnit &unit)
 	UpdateForNewUnit(*newUnit, 0);
 
 	// Set life span
-	if (unit.Type->DecayRate) {
-		newUnit->TTL = GameCycle + unit.Type->DecayRate * 6 * CYCLES_PER_SECOND;
+	if (unit.GetType()->DecayRate) {
+		newUnit->TTL = GameCycle + unit.GetType()->DecayRate * 6 * CYCLES_PER_SECOND;
 	}
 	*/
 	
 	/* Auto Group Add */
 	/*
-	if (!unit.Player->AiEnabled && unit.GroupId) {
+	if (!unit.GetPlayer()->AiEnabled && unit.GroupId) {
 		int num = 0;
 		while (!(unit.GroupId & (1 << num))) {
 			++num;
@@ -341,12 +341,12 @@ static void AnimateActionTrain(CUnit &unit)
 	DropOutOnSide(*newUnit, LookingW, &unit);
 	//Wyrmgus start
 	//we don't need to send the player a message every time a new unit is ready
-	//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+	//player.Notify(NotifyGreen, newUnit->GetTilePos(), _("New %s ready"), nType.Name.c_str());
 	//Wyrmgus end
 	if (&player == CPlayer::GetThisPlayer()) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}
-	if (unit.Player->AiEnabled) {
+	if (unit.GetPlayer()->AiEnabled) {
 		AiTrainingComplete(unit, *newUnit);
 	}
 
@@ -366,7 +366,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		if (unit.Type->Stats[unit.Player->GetIndex()].GetUnitStock(&nType) != 0) {
+		if (unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].GetUnitStock(&nType) != 0) {
 			if (unit.GetUnitStock(&nType) > 0) {
 				unit.ChangeUnitStock(&nType, -1);
 			} else {
@@ -381,8 +381,8 @@ static void AnimateActionTrain(CUnit &unit)
 
 		if (newUnit == nullptr) { // No more memory :/
 			//Wyrmgus start
-	//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
+	//		player.Notify(NotifyYellow, unit.GetTilePos(), _("Unable to train %s"), nType.Name.c_str());
+			player.Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return ;
@@ -392,13 +392,13 @@ static void AnimateActionTrain(CUnit &unit)
 		UpdateForNewUnit(*newUnit, 0);
 
 		// Set life span
-		if (unit.Type->DecayRate) {
-			newUnit->TTL = GameCycle + unit.Type->DecayRate * 6 * CYCLES_PER_SECOND;
+		if (unit.GetType()->DecayRate) {
+			newUnit->TTL = GameCycle + unit.GetType()->DecayRate * 6 * CYCLES_PER_SECOND;
 		}
 		
 		/* Auto Group Add */
 		/*
-		if (!unit.Player->AiEnabled && unit.GroupId) {
+		if (!unit.GetPlayer()->AiEnabled && unit.GroupId) {
 			int num = 0;
 			while (!(unit.GroupId & (1 << num))) {
 				++num;
@@ -410,18 +410,18 @@ static void AnimateActionTrain(CUnit &unit)
 		DropOutOnSide(*newUnit, LookingW, &unit);
 
 		//Wyrmgus start
-		if (this->Player != unit.Player->GetIndex() && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
-			unit.Player->ChangeResource(CopperCost, newUnit->GetPrice(), true);
+		if (this->Player != unit.GetPlayer()->GetIndex() && unit.GetPlayer()->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.GetPlayer())) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
+			unit.GetPlayer()->ChangeResource(CopperCost, newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
 		
 		//we don't need to send the player a message every time a new unit is ready
-		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+		//player.Notify(NotifyGreen, newUnit->GetTilePos(), _("New %s ready"), nType.Name.c_str());
 
 		if (&player == CPlayer::GetThisPlayer()) {
 			PlayUnitSound(*newUnit, VoiceReady);
 		}
-		if (newUnit->Player->AiEnabled) {
+		if (newUnit->GetPlayer()->AiEnabled) {
 			AiTrainingComplete(unit, *newUnit);
 		}
 
@@ -447,19 +447,19 @@ static void AnimateActionTrain(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.RallyPointPos, unit.RallyPointPos, table, unit.RallyPointMapLayer->ID);
 			for (size_t j = 0; j != table.size(); ++j) {
-				if (!table[j]->IsAliveOnMap() || table[j]->Type->BoolFlag[DECORATION_INDEX].value) {
+				if (!table[j]->IsAliveOnMap() || table[j]->GetType()->BoolFlag[DECORATION_INDEX].value) {
 					continue;
 				}
-				if (newUnit->Type->RepairRange && table[j]->Type->GetRepairHP() && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableMax) && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
+				if (newUnit->GetType()->RepairRange && table[j]->GetType()->GetRepairHP() && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableMax) && (table[j]->GetPlayer() == newUnit->GetPlayer() || newUnit->IsAllied(*table[j]))) { //see if can repair
 					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands, unit.RallyPointMapLayer->ID);
 					command_found = true;
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
-				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->GetIndex() == PlayerNumNeutral)) { // see if can build mine on top of deposit
+				} else if (newUnit->GetType()->BoolFlag[HARVESTER_INDEX].value && table[j]->GetType()->GivesResource && newUnit->GetType()->ResInfo[table[j]->GetType()->GivesResource] && !table[j]->GetType()->BoolFlag[CANHARVEST_INDEX].value && (table[j]->GetPlayer() == newUnit->GetPlayer() || table[j]->GetPlayer()->GetIndex() == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
-						if (unit_type && unit_type->GivesResource == table[j]->Type->GivesResource && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *unit_type, table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
-							CommandBuildBuilding(*newUnit, table[j]->tilePos, *unit_type, FlushCommands, table[j]->MapLayer->ID);
+						if (unit_type && unit_type->GivesResource == table[j]->GetType()->GivesResource && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *unit_type, table[j]->GetTilePos(), 1, false, table[j]->MapLayer->ID)) {
+							CommandBuildBuilding(*newUnit, table[j]->GetTilePos(), *unit_type, FlushCommands, table[j]->MapLayer->ID);
 							command_found = true;
 							break;
 						}
@@ -471,9 +471,9 @@ static void AnimateActionTrain(CUnit &unit)
 				}
 			}
 			
-			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->playerInfo.IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
+			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->playerInfo.IsTeamExplored(*newUnit->GetPlayer())) { // see if can harvest terrain
 				for (size_t res = 0; res < CResource::GetAll().size(); ++res) {
-					if (newUnit->Type->ResInfo[res] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->IsTerrainResourceOnMap(res)) {
+					if (newUnit->GetType()->ResInfo[res] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->IsTerrainResourceOnMap(res)) {
 						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
 						command_found = true;
 						break;

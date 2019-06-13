@@ -211,7 +211,7 @@ static int MixChannelsToStereo32(int *buffer, int size)
 		if (Channels[channel].Playing && Channels[channel].Sample) {
 			//Wyrmgus start
 			if ((Channels[channel].Point & 1)) {
-				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d, Sample Filename: \"%s\"\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->Len, Channels[channel].Sample->File.c_str());
+				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d, Sample Filename: \"%s\"\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).GetType()->Ident.c_str() : "", Channels[channel].Sample->Len, Channels[channel].Sample->File.c_str());
 			}
 			//Wyrmgus end
 			int i = MixSampleToStereo32(Channels[channel].Sample,

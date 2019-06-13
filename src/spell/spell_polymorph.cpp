@@ -117,13 +117,13 @@
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
 		const CUnitType *new_unit_type = nullptr;
-		if (this->Civilization != nullptr && this->Faction != nullptr && this->Civilization == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
-			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->Type->GetClass());
-		} else if (this->Civilization != nullptr && this->Civilization != target->Type->GetCivilization()) {
-			new_unit_type = CCivilization::GetCivilizationClassUnitType(this->Civilization, target->Type->GetClass());
+		if (this->Civilization != nullptr && this->Faction != nullptr && this->Civilization == target->GetType()->GetCivilization()) { //get faction equivalent, if is of the same civilization
+			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->GetType()->GetClass());
+		} else if (this->Civilization != nullptr && this->Civilization != target->GetType()->GetCivilization()) {
+			new_unit_type = CCivilization::GetCivilizationClassUnitType(this->Civilization, target->GetType()->GetClass());
 		}
-		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->GetFaction() != nullptr) {
-			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->Type->GetCivilization(), target->Type->GetClass());
+		if (this->Detachment && target->GetType()->GetCivilization() != nullptr && target->GetType()->GetFaction() != nullptr) {
+			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->GetType()->GetCivilization(), target->GetType()->GetClass());
 		}
 		if (new_unit_type != nullptr) {
 			unit_type = new_unit_type;
@@ -140,22 +140,22 @@
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
+//	caster.GetPlayer()->Score += target->Variable[POINTS_INDEX].Value;
 	//Wyrmgus end
 	if (caster.IsEnemy(*target)) {
 		//Wyrmgus start
-		caster.Player->Score += target->Variable[POINTS_INDEX].Value;
+		caster.GetPlayer()->Score += target->Variable[POINTS_INDEX].Value;
 		//Wyrmgus end
-		if (target->Type->BoolFlag[BUILDING_INDEX].value) {
-			caster.Player->TotalRazings++;
+		if (target->GetType()->BoolFlag[BUILDING_INDEX].value) {
+			caster.GetPlayer()->TotalRazings++;
 		} else {
-			caster.Player->TotalKills++;
+			caster.GetPlayer()->TotalKills++;
 		}
 		//Wyrmgus start
-		caster.Player->UnitTypeKills[target->Type->GetIndex()]++;
+		caster.GetPlayer()->UnitTypeKills[target->GetType()->GetIndex()]++;
 		
 		//distribute experience between nearby units belonging to the same player
-		if (!target->Type->BoolFlag[BUILDING_INDEX].value) {
+		if (!target->GetType()->BoolFlag[BUILDING_INDEX].value) {
 			caster.ChangeExperience(UseHPForXp ? target->Variable[HP_INDEX].Value : target->Variable[POINTS_INDEX].Value, ExperienceRange);
 		}
 		//Wyrmgus end
@@ -182,24 +182,24 @@
 		//Wyrmgus end
 	} else if (this->PlayerNeutral == 2) {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, unit_type, caster.Player);
-		target->ChangeOwner(*caster.Player);
+//		MakeUnitAndPlace(resPos, unit_type, caster.GetPlayer());
+		target->ChangeOwner(*caster.GetPlayer());
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, unit_type, target->Player);
+//		MakeUnitAndPlace(resPos, unit_type, target->GetPlayer());
 		//Wyrmgus end
 	}
 	//Wyrmgus start
 	if (target->Character && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
-		target->Player->Heroes.erase(std::remove(target->Player->Heroes.begin(), target->Player->Heroes.end(), target), target->Player->Heroes.end());
+		target->GetPlayer()->Heroes.erase(std::remove(target->GetPlayer()->Heroes.begin(), target->GetPlayer()->Heroes.end(), target), target->GetPlayer()->Heroes.end());
 		target->Character = nullptr;
 	}
 //	UnitLost(*target);
 //	UnitClearOrders(*target);
 //	target->Release();
 	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
-		if (target->Player->AiEnabled == false) {
+		if (target->GetPlayer()->AiEnabled == false) {
 			target->Character->UnitType = unit_type;
 			SaveHero(target->Character);
 		}

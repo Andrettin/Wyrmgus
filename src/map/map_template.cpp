@@ -855,7 +855,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 				std::vector<CUnit *> table;
 				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(*CPlayer::Players[i]));
 				for (size_t j = 0; j < table.size(); ++j) {
-					if (table[j]->Type->BoolFlag[TOWNHALL_INDEX].value) {
+					if (table[j]->GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 						start_pos_has_town_hall = true;
 						break;
 					}
@@ -864,13 +864,13 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 				if (!start_pos_has_town_hall) { //if the start pos doesn't have a town hall, create the workers in the position of a town hall the player has
 					for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
 						CUnit *town_hall_unit = &CPlayer::Players[i]->GetUnit(j);
-						if (!town_hall_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+						if (!town_hall_unit->GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 							continue;
 						}
 						if (town_hall_unit->MapLayer->ID != z) {
 							continue;
 						}
-						worker_pos = town_hall_unit->tilePos;
+						worker_pos = town_hall_unit->GetTilePos();
 					}
 				}
 				
@@ -1281,8 +1281,8 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {
-					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
-						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
+					for (int x = unit->GetTilePos().x - 1; x < unit->GetTilePos().x + unit->GetType()->TileSize.x + 1; ++x) {
+						for (int y = unit->GetTilePos().y - 1; y < unit->GetTilePos().y + unit->GetType()->TileSize.y + 1; ++y) {
 							if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 								continue;
 							}
@@ -1373,10 +1373,10 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
 			if (CMap::Map.MapLayers[second_z]->GetPlane() == std::get<2>(this->PlaneConnectors[i])) {
-				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
-						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = CMap::Map.MapLayers[second_z]->LayerConnectors[j];
+				for (CUnit *layer_connector : CMap::Map.MapLayers[second_z]->LayerConnectors) {
+					if (layer_connector->GetType() == unit->GetType() && layer_connector->Unique == unit->Unique && layer_connector->ConnectingDestination == nullptr) {
+						layer_connector->ConnectingDestination = unit;
+						unit->ConnectingDestination = layer_connector;
 						found_other_connector = true;
 						break;
 					}
@@ -1416,10 +1416,10 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
 			if (CMap::Map.MapLayers[second_z]->GetWorld() == std::get<2>(this->WorldConnectors[i])) {
-				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
-						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = CMap::Map.MapLayers[second_z]->LayerConnectors[j];
+				for (CUnit *layer_connector : CMap::Map.MapLayers[second_z]->LayerConnectors) {
+					if (layer_connector->GetType() == unit->GetType() && layer_connector->Unique == unit->Unique && layer_connector->ConnectingDestination == nullptr) {
+						layer_connector->ConnectingDestination = unit;
+						unit->ConnectingDestination = layer_connector;
 						found_other_connector = true;
 						break;
 					}
@@ -1459,7 +1459,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
 			std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
 			for (const CUnit *connector : other_layer_connectors) {
-				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->GetPlane() == this->Plane && connector->ConnectingDestination->MapLayer->GetWorld() == this->World && connector->ConnectingDestination->MapLayer->GetSurfaceLayer() == this->SurfaceLayer) {
+				if (connector->GetType() == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->GetPlane() == this->Plane && connector->ConnectingDestination->MapLayer->GetWorld() == this->World && connector->ConnectingDestination->MapLayer->GetSurfaceLayer() == this->SurfaceLayer) {
 					already_implemented = true;
 					break;
 				}
@@ -1476,7 +1476,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 				//if the upper/lower layer has a surface layer connector to this layer that has no connecting destination, and this connector leads to that surface layer, place this connection in the same position as the other one
 				std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
 				for (const CUnit *potential_connector : other_layer_connectors) {
-					if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
+					if (potential_connector->GetType() == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
 						unit_pos = potential_connector->GetTileCenterPos();
 						break;
 					}
@@ -1502,7 +1502,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		CUnit *best_layer_connector = nullptr;
 		int best_distance = -1;
 		for (CUnit *potential_connector : other_layer_connectors) {
-			if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
+			if (potential_connector->GetType() == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
 				int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
 				if (best_distance == -1 || distance < best_distance) {
 					best_layer_connector = potential_connector;
@@ -1614,7 +1614,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			}
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->UnitType, player, z);
 			unit->SetCharacter(hero->Ident);
-			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
+			if (!unit->GetType()->BoolFlag[BUILDING_INDEX].value && !unit->GetType()->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
 				player->ChangeUnitTypeAiActiveCount(hero->UnitType, -1);
 			}
@@ -1742,7 +1742,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 					CUnit *best_layer_connector = nullptr;
 					int best_distance = -1;
 					for (CUnit *potential_connector : other_layer_connectors) {
-						if (potential_connector->Type == unit_type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
+						if (potential_connector->GetType() == unit_type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
 							int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
 							if (best_distance == -1 || distance < best_distance) {
 								best_layer_connector = potential_connector;

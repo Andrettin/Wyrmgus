@@ -81,6 +81,7 @@
 //Wyrmgus end
 #include "upgrade/upgrade_modifier.h"
 #include "util.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 #include <cstring>
@@ -983,39 +984,11 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			}
 		}
 	} else if (section->Tag == "image") {
-		for (const CConfigProperty &property : section->Properties) {
-			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
-				continue;
-			}
-			
-			String key = property.Key;
-			String value = property.Value;
-			
-			if (key == "file") {
-				this->File = CModule::GetCurrentPath() + value.utf8().get_data();
-			} else if (key == "width") {
-				this->Width = value.to_int();
-			} else if (key == "height") {
-				this->Height = value.to_int();
-			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
-			}
-		}
+		PaletteImage *image = PaletteImage::GetOrAdd(this->Ident);
+		image->ProcessConfigData(section);
+		this->Image = image;
 		
-		if (this->File.empty()) {
-			fprintf(stderr, "Image has no file.\n");
-		}
-		
-		if (this->Width == 0) {
-			fprintf(stderr, "Image has no width.\n");
-		}
-		
-		if (this->Height == 0) {
-			fprintf(stderr, "Image has no height.\n");
-		}
-		
-		if (this->Sprite) {
+		if (this->Sprite != nullptr) {
 			CGraphic::Free(this->Sprite);
 			this->Sprite = nullptr;
 		}
@@ -1348,26 +1321,11 @@ void CUnitType::Initialize()
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
-Vec2i CUnitType::GetTileSize() const
-{
-	return this->TileSize;
-}
-
-Vec2i CUnitType::GetHalfTileSize() const
-{
-	return this->GetTileSize() / 2;
-}
-
 PixelSize CUnitType::GetTilePixelSize(const int map_layer) const
 {
 	return PixelSize(PixelSize(this->GetTileSize()) * CMap::Map.GetMapLayerPixelTileSize(map_layer));
 }
 
-Vec2i CUnitType::GetTileCenterPosOffset() const
-{
-	return (this->GetTileSize() - 1) / 2;
-}
-	
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
@@ -1415,9 +1373,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		this->Class->UnitTypes.insert(this);
 	}
 	this->DrawLevel = parent_type->DrawLevel;
-	this->File = parent_type->File;
-	this->Width = parent_type->Width;
-	this->Height = parent_type->Height;
+	this->Image = parent_type->Image;
 	this->OffsetX = parent_type->OffsetX;
 	this->OffsetY = parent_type->OffsetY;
 	this->ShadowFile = parent_type->ShadowFile;
@@ -1670,6 +1626,15 @@ void CUnitType::UpdateDefaultBoolFlags()
 	this->BoolFlag[SEAUNIT_INDEX].value = this->SeaUnit;
 	this->BoolFlag[EXPLODEWHENKILLED_INDEX].value = this->ExplodeWhenKilled;
 	this->BoolFlag[CANATTACK_INDEX].value = this->CanAttack;
+}
+
+const Vector2i &CUnitType::GetFrameSize() const
+{
+	if (this->GetImage() != nullptr) {
+		return this->GetImage()->GetFrameSize();
+	}
+	
+	return PaletteImage::EmptyFrameSize;
 }
 
 //Wyrmgus start
@@ -2117,6 +2082,10 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
 	ClassDB::bind_method(D_METHOD("is_hidden_in_editor"), &CUnitType::IsHiddenInEditor);
 	ClassDB::bind_method(D_METHOD("get_terrain_type"), +[](const CUnitType *unit_type){ return unit_type->TerrainType; });
+	
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CUnitType *unit_type, const String &ident){ unit_type->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const CUnitType *unit_type){ return const_cast<PaletteImage *>(unit_type->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
 	
 	ClassDB::bind_method(D_METHOD("get_stat_strings"), +[](const CUnitType *unit_type){ return VectorToGodotArray(unit_type->GetStatStrings()); });
 	
@@ -2627,8 +2596,8 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-//	pos.y -= (type.Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+//	pos.x -= (type.GetFrameSize().x - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+//	pos.y -= (type.GetFrameSize().y - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	//Wyrmgus end
@@ -2792,30 +2761,30 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (!resinfo->FileWhenLoaded.empty()) {
 				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-																	 type.Width, type.Height);
+																	 type.GetFrameSize().x, type.GetFrameSize().y);
 				resinfo->SpriteWhenLoaded->Load();
 			}
 			if (!resinfo->FileWhenEmpty.empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-																	type.Width, type.Height);
+																	type.GetFrameSize().x, type.GetFrameSize().y);
 				resinfo->SpriteWhenEmpty->Load();
 			}
 		}
 	}
 
-	if (!type.File.empty()) {
-		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
+	if (type.GetImage() != nullptr && !type.GetImage()->GetFile().empty()) {
+		type.Sprite = CPlayerColorGraphic::New(type.GetImage()->GetFile().utf8().get_data(), type.GetImage()->GetFrameSize().x, type.GetImage()->GetFrameSize().y);
 		type.Sprite->Load();
 	}
 
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {
-		type.LightSprite = CGraphic::New(type.LightFile, type.Width, type.Height);
+		type.LightSprite = CGraphic::New(type.LightFile, type.GetFrameSize().x, type.GetFrameSize().y);
 		type.LightSprite->Load();
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (!type.LayerFiles[i].empty()) {
-			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.Width, type.Height);
+			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.GetFrameSize().x, type.GetFrameSize().y);
 			type.LayerSprites[i]->Load();
 		}
 	}
@@ -2823,8 +2792,8 @@ void LoadUnitTypeSprite(CUnitType &type)
 
 	//Wyrmgus start
 	for (CUnitTypeVariation *variation : type.Variations) {
-		int frame_width = type.Width;
-		int frame_height = type.Height;
+		int frame_width = type.GetFrameSize().x;
+		int frame_height = type.GetFrameSize().y;
 		if (variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
@@ -2866,7 +2835,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		for (CUnitTypeVariation *layer_variation : type.LayerVariations[i]) {
 			if (!layer_variation->File.empty()) {
-				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.Width, type.Height);
+				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.GetFrameSize().x, type.GetFrameSize().y);
 				layer_variation->Sprite->Load();
 			}
 		}

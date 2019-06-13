@@ -81,7 +81,7 @@
 			// FIXME: where check if spell needs a unit as destination?
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
 			const Vec2i diag(order->Range, order->Range);
-			order->goalPos = target->tilePos /* + target->GetHalfTileSize() */ - diag;
+			order->goalPos = target->GetTilePos() /* + target->GetHalfTileSize() */ - diag;
 			order->MapLayer = target->MapLayer->ID;
 			order->Range <<= 1;
 		} else {
@@ -189,7 +189,7 @@
 //	input.SetMaxRange(this->Range);
 	int distance = this->Range;
 	if (CMap::Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
-		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
 			distance = 1;
 		}
 	}
@@ -200,7 +200,7 @@
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -215,7 +215,7 @@
 {
 	UnHideUnit(unit); // unit is invisible until attacks
 	CUnit *goal = GetGoal();
-	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+	if (goal && !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 		unit.ReCast = 0;
 	} else {
 		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, CMap::Map.MapLayers[this->MapLayer]);
@@ -232,7 +232,7 @@
 		return goalPos;
 	}
 	if (this->HasGoal()) {
-		return this->GetGoal()->tilePos;
+		return this->GetGoal()->GetTilePos();
 	}
 	return invalidPos;
 }
@@ -262,7 +262,7 @@
 static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
 	//Wyrmgus start
-//	const CAnimations *animations = unit.Type->Animations;
+//	const CAnimations *animations = unit.GetType()->Animations;
 	const CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
@@ -295,13 +295,13 @@ bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 	const CUnit *goal = this->GetGoal();
 
 	// Position or valid target, it is ok.
-	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
+	if (!goal || goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 		return false;
 	}
 
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
-	this->goalPos = goal->tilePos;
+	this->goalPos = goal->GetTilePos();
 	this->MapLayer = goal->MapLayer->ID;
 	this->Range = 0;
 	this->ClearGoal();
@@ -334,7 +334,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 	
 	//Wyrmgus start
-	bool obstacle_check = !CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
+	bool obstacle_check = !CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.GetTilePos(), goal ? goal->GetTilePos() : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -343,8 +343,8 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	//Wyrmgus end
 		// there is goal and it is in range
 		//Wyrmgus start
-//		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+//		UnitHeadingFromDeltaXY(unit, goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos());
+		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize());
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
@@ -353,20 +353,20 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range && obstacle_check) {
 	//Wyrmgus end
 		// there is no goal and target spot is in range
-		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
+		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.GetTilePos());
 		this->State++; // cast the spell
 		return false;
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+		if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 					if (table[i]->CurrentAction() == UnitActionStill) {
 						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 					}
 					return false;
 				}
@@ -390,7 +390,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
@@ -407,50 +407,50 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, CMap::Map.MapLayers[order.MapLayer])) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: not enough mana for spell: %s"),
 										_("%s does not have enough mana to use the %s ability."),
-//										unit.Type->Name.c_str(), spell.Name.c_str());
+//										unit.GetType()->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.GetName().utf8().get_data());
 										//Wyrmgus end
 				} else if (unit.SpellCoolDownTimers.find(&spell) != unit.SpellCoolDownTimers.end()) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: spell is not ready yet: %s"),
 										_("%s's ability %s is not ready yet."),
-//										unit.Type->Name.c_str(), spell.Name.c_str());
+//										unit.GetType()->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.GetName().utf8().get_data());
 										//Wyrmgus end
-				} else if (unit.Player->CheckCosts(spell.Costs, false)) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+				} else if (unit.GetPlayer()->CheckCosts(spell.Costs, false)) {
+					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: not enough resources to cast spell: %s"),
 										_("You do not have enough resources for %s to use the %s ability."),
-//										unit.Type->Name.c_str(), spell.Name.c_str());
+//										unit.GetType()->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.GetName().utf8().get_data());
 										//Wyrmgus end
 				//Wyrmgus start
 				} else if (spell.Target == TargetUnit && order.GetGoal() == nullptr) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
+					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.GetName().utf8().get_data());
 				//Wyrmgus end
 				} else {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: can't cast spell: %s"),
 										_("%s cannot use the %s ability."),
-//										unit.Type->Name.c_str(), spell.Name.c_str());
+//										unit.GetType()->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.GetName().utf8().get_data());
 										//Wyrmgus end
 				}
 
-				if (unit.Player->AiEnabled) {
+				if (unit.GetPlayer()->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
 				if (!unit.RestoreOrder()) {
@@ -490,7 +490,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
 				CUnit *goal = order.GetGoal();
-				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
+				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 					unit.ReCast = 0;
 				} else {
 					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, CMap::Map.MapLayers[order.MapLayer]);
@@ -513,13 +513,13 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				}
 				if (this->isAutocast) {
 					//Wyrmgus start
-//					if (order.GetGoal() && order.GetGoal()->tilePos != order.goalPos) {
-					if (order.GetGoal() && (order.GetGoal()->tilePos != order.goalPos || order.GetGoal()->MapLayer->ID != order.MapLayer)) {
+//					if (order.GetGoal() && order.GetGoal()->GetTilePos() != order.goalPos) {
+					if (order.GetGoal() && (order.GetGoal()->GetTilePos() != order.goalPos || order.GetGoal()->MapLayer->ID != order.MapLayer)) {
 					//Wyrmgus end
-						order.goalPos = order.GetGoal()->tilePos;
+						order.goalPos = order.GetGoal()->GetTilePos();
 						order.MapLayer = order.GetGoal()->MapLayer->ID;
 					}
-					if (unit.Player->AiEnabled) {
+					if (unit.GetPlayer()->AiEnabled) {
 						if (!unit.RestoreOrder()) {
 							this->Finished = true;
 						}

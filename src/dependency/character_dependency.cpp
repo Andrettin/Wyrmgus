@@ -97,7 +97,7 @@ bool CCharacterDependency::CheckInternal(const CPlayer *player, const bool ignor
 bool CCharacterDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
 	if (this->Faction != nullptr || this->Enemy) {
-		return this->CheckInternal(unit->Player, ignore_units);
+		return this->CheckInternal(unit->GetPlayer(), ignore_units);
 	}
 	
 	return unit->Character == this->Character;

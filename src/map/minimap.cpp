@@ -636,13 +636,13 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	const CUnitType *type;
 
 	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*CPlayer::GetThisPlayer())) {
-		type = unit.Type;
+		type = unit.GetType();
 	} else {
 		type = unit.Seen.Type;
 		// This will happen for radar if the unit has not been seen and we
 		// have it on radar.
 		if (!type) {
-			type = unit.Type;
+			type = unit.GetType();
 		}
 	}
 
@@ -655,11 +655,11 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 
 	Uint32 color;
 	//Wyrmgus start
-//	if (unit.Player->GetIndex() == PlayerNumNeutral) {
+//	if (unit.GetPlayer()->GetIndex() == PlayerNumNeutral) {
 	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
 	//Wyrmgus end
 		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
-	} else if (unit.Player == CPlayer::GetThisPlayer() && !Editor.Running) {
+	} else if (unit.GetPlayer() == CPlayer::GetThisPlayer() && !Editor.Running) {
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
@@ -669,15 +669,15 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			color = ColorGreen;
 		}
 	} else {
-		color = unit.Player->Color;
+		color = unit.GetPlayer()->Color;
 	}
 
 	//Wyrmgus start
-//	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
-//	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
+//	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.GetTilePos().x];
+//	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.GetTilePos().y];
 //	int w = Map2MinimapX[type->TileSize.x];
-	int mx = 1 + UI.Minimap.XOffset[UI.CurrentMapLayer->ID] + Map2MinimapX[UI.CurrentMapLayer->ID][unit.tilePos.x];
-	int my = 1 + UI.Minimap.YOffset[UI.CurrentMapLayer->ID] + Map2MinimapY[UI.CurrentMapLayer->ID][unit.tilePos.y];
+	int mx = 1 + UI.Minimap.XOffset[UI.CurrentMapLayer->ID] + Map2MinimapX[UI.CurrentMapLayer->ID][unit.GetTilePos().x];
+	int my = 1 + UI.Minimap.YOffset[UI.CurrentMapLayer->ID] + Map2MinimapY[UI.CurrentMapLayer->ID][unit.GetTilePos().y];
 	int w = Map2MinimapX[UI.CurrentMapLayer->ID][type->TileSize.x];
 	//Wyrmgus end
 	if (mx + w >= UI.Minimap.W) { // clip right side

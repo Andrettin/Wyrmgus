@@ -195,19 +195,19 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		hBar = 5;
 		hAll = 7;
 	}
-	y += unit.Type->GetIcon()->G->Height;
+	y += unit.GetType()->GetIcon()->G->Height;
 	//Wyrmgus start
 	/*
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-		unit.Type->GetIcon()->G->Width + 8, hAll);
+		unit.GetType()->GetIcon()->G->Width + 8, hAll);
 	*/
 	if (Preference.BarFrameG) {
 		Preference.BarFrameG->DrawClip(x - 2 - 4, y + 4 - 4);
 		Video.FillRectangleClip(ColorBlack, x - 2, y + 4,
-			unit.Type->GetIcon()->G->Width + 6 - 2, hBar);
+			unit.GetType()->GetIcon()->G->Width + 6 - 2, hBar);
 	} else {
 		Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-			unit.Type->GetIcon()->G->Width + 8, hAll);
+			unit.GetType()->GetIcon()->G->Width + 8, hAll);
 	}
 	//Wyrmgus end
 
@@ -241,7 +241,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 			//Wyrmgus end
 		}
 
-		f = (f * (unit.Type->GetIcon()->G->Width + 6)) / 100;
+		f = (f * (unit.GetType()->GetIcon()->G->Width + 6)) / 100;
 		Video.FillRectangleClip(color, x - 2, y + 4,
 			f > 1 ? f - 2 : 0, hBar);
 		//Wyrmgus start
@@ -262,8 +262,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 static void UiDrawManaBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
-	y += unit.Type->GetIcon()->G->Height;
-	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->GetIcon()->G->Width, 4);
+	y += unit.GetType()->GetIcon()->G->Height;
+	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.GetType()->GetIcon()->G->Width, 4);
 
 	//Wyrmgus start
 //	if (unit.Stats->Variables[MANA_INDEX].Max) {
@@ -273,7 +273,7 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 //		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
 		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableValue)) / unit.GetModifiedVariable(MANA_INDEX, VariableMax);
 		//Wyrmgus end
-		f = (f * (unit.Type->GetIcon()->G->Width)) / 100;
+		f = (f * (unit.GetType()->GetIcon()->G->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
@@ -293,15 +293,15 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		return true;
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
-		|| (unit.Player->Type == PlayerNeutral && condition->HideNeutral)
-		|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && condition->HideNeutral)
+		|| (unit.GetPlayer()->Type == PlayerNeutral && condition->HideNeutral)
+		|| (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && condition->HideNeutral)
 		|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !condition->ShowOpponent)
-		|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && condition->HideAllied)
+		|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.GetPlayer() != CPlayer::GetThisPlayer()) && condition->HideAllied)
 		|| (condition->ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
 	) {
 		return false;
 	}
-	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
+	if (condition->BoolFlags && !unit.GetType()->CheckUserBoolFlags(condition->BoolFlags)) {
 		return false;
 	}
 	//Wyrmgus start
@@ -363,7 +363,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			var = &unit.Variable[index];
 			break;
 		case 1: // Type:
-			var = &unit.Type->MapDefaultStat.Variables[index];
+			var = &unit.GetType()->MapDefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
 			var = &unit.Stats->Variables[index];
@@ -400,8 +400,8 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
 				//Wyrmgus start
-//				val.i = unit.Type->GivesResource;
-//				val.s = DefaultResourceNames[unit.Type->GivesResource].c_str();
+//				val.i = unit.GetType()->GivesResource;
+//				val.s = DefaultResourceNames[unit.GetType()->GivesResource].c_str();
 				val.i = unit.GivesResource;
 				val.s = DefaultResourceNames[unit.GivesResource].c_str();
 				//Wyrmgus end
@@ -531,7 +531,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			//Wyrmgus start
-//			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
+//			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.GetPlayer()->GetIndex());
 			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer());
 			//Wyrmgus end
 		}
@@ -567,7 +567,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
-//					icon->DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
+//					icon->DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.GetPlayer()->GetIndex());
 					icon->DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer());
 					//Wyrmgus end
 					train_counter.push_back(1);
@@ -593,7 +593,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	
 	if (UI.SingleSelectedButton) {
 		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
@@ -609,7 +609,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		 //Wyrmgus end
 
 		//Wyrmgus start
-//		type.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
+//		type.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.GetPlayer()->GetIndex());
 		unit.GetIcon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 		//Wyrmgus end
 	}
@@ -621,7 +621,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 		case UnitActionTrain: { //  Building training units.
 			//Wyrmgus start
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
-			if (order.GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0) { //don't show the training button for a quick moment if the time cost is 0
+			if (order.GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] == 0) { //don't show the training button for a quick moment if the time cost is 0
 				return false;
 			}
 			//Wyrmgus end
@@ -633,7 +633,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 				
 				//Wyrmgus start
-				if (order.GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
+				if (order.GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
 					return false;
 				}
 				//Wyrmgus end
@@ -645,7 +645,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
+//				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.GetPlayer()->GetIndex());
 				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
@@ -668,7 +668,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon->DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.Player->GetIndex());
+//				icon->DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->GetIndex() : unit.GetPlayer()->GetIndex());
 				icon->DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
@@ -687,12 +687,12 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
 		//Wyrmgus start
 //		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
-		if (!uins->Boarded || j >= UI.TransportingButtons.size() || (unit.Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
+		if (!uins->Boarded || j >= UI.TransportingButtons.size() || (unit.GetPlayer() != CPlayer::GetThisPlayer() && uins->GetPlayer() != CPlayer::GetThisPlayer())) {
 		//Wyrmgus end
 			continue;
 		}
 		//Wyrmgus start
-//		const CIcon &icon = *uins->Type->GetIcon();
+//		const CIcon &icon = *uins->GetType()->GetIcon();
 		const CIcon &icon = *uins->GetIcon();
 		//Wyrmgus end
 		
@@ -703,13 +703,13 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus end
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
-//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->GetIndex() : uins->Player->GetIndex());
+//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->GetIndex() : uins->GetPlayer()->GetIndex());
 		uins->GetIcon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer());
 		//Wyrmgus end
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
-//		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-		if (uins->Type->Spells.size() > 0 && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
+//		if (uins->GetType()->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
+		if (uins->GetType()->Spells.size() > 0 && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			UiDrawManaBar(*uins, pos.x, pos.y);
@@ -719,7 +719,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		if (ButtonAreaUnderCursor == ButtonAreaTransporting
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
 			//Wyrmgus start
-//			UI.StatusLine.Set(uins->Type->Name);
+//			UI.StatusLine.Set(uins->GetType()->Name);
 			if (!Preference.NoStatusLineTooltips) {
 				UI.StatusLine.Set(uins->GetMessageName());
 			}
@@ -736,7 +736,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 	size_t j = 0;
 
 	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
-		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
+		if (!uins->GetType()->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
 		const CIcon &icon = *uins->GetIcon();
@@ -751,7 +751,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->GetIndex());
+		uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.GetPlayer()->GetIndex());
 		++j;
 	}
 }
@@ -777,15 +777,15 @@ static void DrawUnitInfo(CUnit &unit)
 		}
 	}
 
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 	Assert(&type);
 
 	// Draw IconUnit
 	DrawUnitInfo_portrait(unit);
 
 	//Wyrmgus start
-//	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player)) {
-	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*unit.Player)) {
+//	if (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.GetPlayer())) {
+	if (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.GetPlayer()) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*unit.GetPlayer())) {
 	//Wyrmgus end
 		return;
 	}
@@ -798,7 +798,7 @@ static void DrawUnitInfo(CUnit &unit)
 	}
 
 	//  Transporting units.
-	if (type.CanTransport() && unit.BoardCount && CurrentButtonLevel == unit.Type->ButtonLevelForTransporter) {
+	if (type.CanTransport() && unit.BoardCount && CurrentButtonLevel == unit.GetType()->ButtonLevelForTransporter) {
 		DrawUnitInfo_transporter(unit);
 		return;
 	}
@@ -1005,8 +1005,8 @@ void DrawPopups()
 			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
-				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-					PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
+				if (UnitUnderCursor && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
+					PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->GetTilePos(), UnitUnderCursor->MapLayer);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
 					std::string unit_name;
 					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
@@ -1018,8 +1018,8 @@ void DrawPopups()
 					} else {
 						unit_name = UnitUnderCursor->GetTypeName();
 					}
-					if (UnitUnderCursor->Player->GetIndex() != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
-						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
+					if (UnitUnderCursor->GetPlayer()->GetIndex() != PlayerNumNeutral && !UnitUnderCursor->GetType()->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
+						unit_name += " (" + UnitUnderCursor->GetPlayer()->Name + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
 					ButtonAction *ba = new ButtonAction;
@@ -1064,12 +1064,12 @@ void DrawPopups()
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
+		if (!(Selected[0]->GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->GetPlayer()) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer())) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 
 			for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
+				if (!uins->GetType()->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 					continue;
 				}
 				
@@ -1085,7 +1085,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->GetIndex());
+				uins->GetIcon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->GetPlayer()->GetIndex());
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					if (!Preference.NoStatusLineTooltips) {
@@ -1877,7 +1877,7 @@ static void InfoPanel_draw_no_selection()
 {
 	DrawInfoPanelBackground(0);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
-		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+		&& !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		// FIXME: not correct for enemies units
 		DrawUnitInfo(*UnitUnderCursor);
 	} else {
@@ -1944,7 +1944,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	int panelIndex;
 
 	// FIXME: not correct for enemy's units
-	if (unit.Player == CPlayer::GetThisPlayer()
+	if (unit.GetPlayer() == CPlayer::GetThisPlayer()
 		|| CPlayer::GetThisPlayer()->IsTeamed(unit)
 		|| CPlayer::GetThisPlayer()->IsAllied(unit)
 		|| ReplayRevealMap) {
@@ -1969,12 +1969,12 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	//draw icon panel frame, if any
 	if (
 		Preference.InfoPanelFrameG
-		&& (unit.CurrentAction() != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
-		&& (unit.CurrentAction() != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] == 0)
+		&& (unit.CurrentAction() != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
+		&& (unit.CurrentAction() != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] == 0)
 		&& (unit.CurrentAction() != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
 		&& unit.CurrentAction() != UnitActionBuilt
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
-		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
+		&& (unit.GetPlayer()->Type != PlayerNeutral || unit.GetType()->GivesResource)
 	) {
 		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4, UI.InfoPanel.Y + 93);
 	}
@@ -1984,7 +1984,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	/*
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		//Wyrmgus start
-//		UI.StatusLine.Set(unit.Type->Name);
+//		UI.StatusLine.Set(unit.GetType()->Name);
 		if (!Preference.NoStatusLineTooltips) {
 			UI.StatusLine.Set(unit.GetMessageName());
 		}
@@ -2010,7 +2010,7 @@ static void InfoPanel_draw_multiple_selection()
 	DrawInfoPanelBackground(0);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		//Wyrmgus start
-//		const CIcon &icon = *Selected[i]->Type->GetIcon();
+//		const CIcon &icon = *Selected[i]->GetType()->GetIcon();
 		//Wyrmgus end
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start
@@ -2020,7 +2020,7 @@ static void InfoPanel_draw_multiple_selection()
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  //Wyrmgus start
-//						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->GetIndex() : Selected[i]->Player->GetIndex());
+//						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->GetIndex() : Selected[i]->GetPlayer()->GetIndex());
 						  pos, "", Selected[i]->GetDisplayPlayer());
 						  //Wyrmgus end
 
@@ -2034,7 +2034,7 @@ static void InfoPanel_draw_multiple_selection()
 			} else if (Selected[i]->Prefix != nullptr || Selected[i]->Suffix != nullptr) {
 				text_color = "light-blue";
 			}
-//			UI.StatusLine.Set(Selected[i]->Type->Name);
+//			UI.StatusLine.Set(Selected[i]->GetType()->Name);
 			if (!Preference.NoStatusLineTooltips) {
 				UI.StatusLine.Set(Selected[i]->GetMessageName());
 			}
@@ -2061,7 +2061,7 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value
+	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value
 		&& (ReplayRevealMap || UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer()))) {
 			InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {

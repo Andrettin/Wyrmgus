@@ -227,7 +227,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (!CanBuildUnitType(unit, *unit->Type, pos, 1, true, UI.CurrentMapLayer->ID)) {
+		if (!CanBuildUnitType(unit, *unit->GetType(), pos, 1, true, UI.CurrentMapLayer->ID)) {
 			units_to_remove.push_back(unit);
 		}
 	}
@@ -496,7 +496,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 	//Wyrmgus start
 //	CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, nullptr);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit->GetType(), nullptr);
 	//Wyrmgus end
 	if (b && b->ReplaceOnBuild) {
 		CUnitCache &unitCache = UI.CurrentMapLayer->Field(pos)->UnitCache;
@@ -579,9 +579,9 @@ static void EditorRemoveUnit(CUnit &unit)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypeRemoveUnit;
-	editorAction.tilePos = unit.tilePos;
-	editorAction.UnitType = unit.Type;
-	editorAction.Player = unit.Player;
+	editorAction.tilePos = unit.GetTilePos();
+	editorAction.UnitType = unit.GetType();
+	editorAction.Player = unit.GetPlayer();
 
 	EditorActionRemoveUnit(unit);
 	EditorAddUndoAction(editorAction);
@@ -1449,11 +1449,11 @@ static void ShowUnitInfo(const CUnit &unit)
 	int n = sprintf(buf, _("#%d '%s' Player: #%d %s"), UnitNumber(unit),
 	//Wyrmgus end
 					//Wyrmgus start
-//					unit.Type->Name.c_str(), unit.Player->GetIndex(),
-					unit.GetTypeName().c_str(), (unit.Player->GetIndex() == PlayerNumNeutral) ? 16 : unit.Player->GetIndex() + 1,
+//					unit.GetType()->Name.c_str(), unit.GetPlayer()->GetIndex(),
+					unit.GetTypeName().c_str(), (unit.GetPlayer()->GetIndex() == PlayerNumNeutral) ? 16 : unit.GetPlayer()->GetIndex() + 1,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
-	if (unit.Type->GivesResource) {
+	if (unit.GetType()->GivesResource) {
 		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
 	}
 	UI.StatusLine.Set(buf);

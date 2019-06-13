@@ -54,8 +54,8 @@ void CMap::Insert(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.Type->TileSize.x;
-	const int h = unit.Type->TileSize.y;
+	const int w = unit.GetType()->TileSize.x;
+	const int h = unit.GetType()->TileSize.y;
 	int j, i = h;
 
 	do {
@@ -64,9 +64,9 @@ void CMap::Insert(CUnit &unit)
 		do {
 			mf->UnitCache.Insert(&unit);
 			++mf;
-		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->GetWidth());
+		} while (--j && unit.GetTilePos().x + (j - w) < unit.MapLayer->GetWidth());
 		index += unit.MapLayer->GetWidth();
-	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->GetHeight());
+	} while (--i && unit.GetTilePos().y + (i - h) < unit.MapLayer->GetHeight());
 }
 
 /**
@@ -78,8 +78,8 @@ void CMap::Remove(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.Type->TileSize.x;
-	const int h = unit.Type->TileSize.y;
+	const int w = unit.GetType()->TileSize.x;
+	const int h = unit.GetType()->TileSize.y;
 	int j, i = h;
 
 	do {
@@ -88,9 +88,9 @@ void CMap::Remove(CUnit &unit)
 		do {
 			mf->UnitCache.Remove(&unit);
 			++mf;
-		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->GetWidth());
+		} while (--j && unit.GetTilePos().x + (j - w) < unit.MapLayer->GetWidth());
 		index += unit.MapLayer->GetWidth();
-	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->GetHeight());
+	} while (--i && unit.GetTilePos().y + (i - h) < unit.MapLayer->GetHeight());
 }
 
 //Wyrmgus start

@@ -218,7 +218,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 
 	std::vector<CUnit *> unit_group;
 	for (size_t i = 0; i != units.size(); ++i) {
-		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
+		if (units[i]->GetType() && units[i]->GetType()->CanSelect(mode)) {
 			unit_group.push_back(units[i]);
 		}
 	}
@@ -258,12 +258,12 @@ static void UiAddGroupToSelection(unsigned group)
 	}
 
 	//  Don't allow to mix units and buildings
-	if (!Selected.empty() && Selected[0]->Type->BoolFlag[BUILDING_INDEX].value) {
+	if (!Selected.empty() && Selected[0]->GetType()->BoolFlag[BUILDING_INDEX].value) {
 		return;
 	}
 
 	for (size_t i = 0; i != units.size(); ++i) {
-		if (!(units[i]->Removed || units[i]->Type->BoolFlag[BUILDING_INDEX].value)) {
+		if (!(units[i]->Removed || units[i]->GetType()->BoolFlag[BUILDING_INDEX].value)) {
 			SelectUnit(*units[i]);
 		}
 	}
@@ -278,7 +278,7 @@ static void UiAddGroupToSelection(unsigned group)
 static void UiDefineGroup(unsigned group)
 {
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player == CPlayer::GetThisPlayer() && Selected[i]->GroupId) {
+		if (Selected[i]->GetPlayer() == CPlayer::GetThisPlayer() && Selected[i]->GroupId) {
 			RemoveUnitFromGroups(*Selected[i]);
 		}
 	}

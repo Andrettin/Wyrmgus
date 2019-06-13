@@ -390,24 +390,24 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 
 	if (unit && unit->IsAliveOnMap()) {
 		int backgroundColor;
-		if (unit->Player->GetIndex() == (*tplayer).GetIndex()) {
+		if (unit->GetPlayer()->GetIndex() == (*tplayer).GetIndex()) {
 			backgroundColor = Video.MapRGB(TheScreen->format, 0, 0, 252);
-		} else if (unit->Player->IsAllied(*tplayer)) {
+		} else if (unit->GetPlayer()->IsAllied(*tplayer)) {
 			backgroundColor = Video.MapRGB(TheScreen->format, 0, 176, 0);
-		} else if (unit->Player->IsEnemy(*tplayer)) {
+		} else if (unit->GetPlayer()->IsEnemy(*tplayer)) {
 			backgroundColor = Video.MapRGB(TheScreen->format, 252, 0, 0);
 		} else {
 			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
 		}
 		//Wyrmgus start
-//		width = font.getWidth(unit->Type->Name) + 10;
+//		width = font.getWidth(unit->GetType()->Name) + 10;
 		width = font.getWidth(unit->GetTypeName()) + 10;
 		//Wyrmgus end
 		x = std::min<int>(GameCursor->G->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		//Wyrmgus start
-//		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
+//		label.DrawCentered(x + width / 2, y + 3, unit->GetType()->Name);
 		label.DrawCentered(x + width / 2, y + 3, unit->GetTypeName());
 		//Wyrmgus end
 	} else if (hidden) {
@@ -447,7 +447,7 @@ void CViewport::Draw() const
 
 
 		while ((i < nunits && j < nmissiles)) {
-			if (unittable[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+			if (unittable[i]->GetType()->DrawLevel <= missiletable[j]->Type->DrawLevel) {
 				unittable[i]->Draw(*this);
 				++i;
 			} else {
@@ -518,10 +518,10 @@ void CViewport::Draw() const
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
 			//Wyrmgus start
-//			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
-			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
+//			&& ((isMapFieldVisile && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
+			&& ((isMapFieldVisile && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
+			PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->GetTilePos(), UnitUnderCursor->MapLayer);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
@@ -533,8 +533,8 @@ void CViewport::Draw() const
 			} else {
 				unit_name = UnitUnderCursor->GetTypeName();
 			}
-			if (UnitUnderCursor->Player->GetIndex() != PlayerNumNeutral) {
-				unit_name += " (" + UnitUnderCursor->Player->Name + ")";
+			if (UnitUnderCursor->GetPlayer()->GetIndex() != PlayerNumNeutral) {
+				unit_name += " (" + UnitUnderCursor->GetPlayer()->Name + ")";
 			}
 			//hackish way to make the popup appear correctly for the unit under cursor
 			ButtonAction *ba = new ButtonAction;

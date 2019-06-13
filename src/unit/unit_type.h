@@ -87,6 +87,7 @@ class CWorld;
 class ItemClass;
 class ItemSlot;
 class LuaCallback;
+class PaletteImage;
 class UnitClass;
 struct lua_State;
 
@@ -513,11 +514,27 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	Vec2i GetTileSize() const;
-	Vec2i GetHalfTileSize() const;
-	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
+	const Vec2i &GetTileSize() const
+	{
+		return this->TileSize;
+	}
+	
+	Vec2i GetHalfTileSize() const
+	{
+		return this->GetTileSize() / 2;
+	}
+	
+	PixelSize GetHalfTilePixelSize(const int map_layer) const
+	{
+		return GetTilePixelSize(map_layer) / 2;
+	}
+	
 	PixelSize GetTilePixelSize(const int map_layer) const;
-	Vec2i GetTileCenterPosOffset() const;
+	
+	Vec2i GetTileCenterPosOffset() const
+	{
+		return (this->GetTileSize() - 1) / 2;
+	}
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
@@ -559,6 +576,13 @@ public:
 	{
 		return this->Species;
 	}
+	
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
+	}
+	
+	const Vector2i &GetFrameSize() const;
 	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
@@ -615,7 +639,9 @@ public:
 	std::map<std::string, std::vector<CUnitType *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
 	std::map<std::string, std::vector<CUnitType *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
-	std::string File;				/// Sprite files
+private:
+	PaletteImage *Image = nullptr;	/// the unit type's sprite
+public:
 	std::string ShadowFile;			/// Shadow file
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
@@ -624,8 +650,6 @@ public:
 	std::map<const ItemSlot *, CUnitType *> DefaultEquipment;	/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
-	int Width = 0;										/// Sprite width
-	int Height = 0;										/// Sprite height
 	int OffsetX = 0;									/// Sprite horizontal offset
 	int OffsetY = 0;									/// Sprite vertical offset
 	int DrawLevel = 0;									/// Level to Draw UnitType at

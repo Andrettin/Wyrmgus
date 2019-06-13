@@ -1527,7 +1527,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr) {
 				//Wyrmgus start
-//				return unit->Type->Name;
+//				return unit->GetType()->Name;
 				if (!unit->GetName().empty() && unit->Identified) {
 					return unit->GetName();
 				} else if (!unit->Identified) {
@@ -1572,7 +1572,7 @@ std::string EvalString(const StringDesc *s)
 					} else if (unit->Elixir != nullptr) {
 						return unit->Elixir->GetQuote().utf8().get_data();
 					} else {
-						return unit->Type->GetQuote().utf8().get_data();
+						return unit->GetType()->GetQuote().utf8().get_data();
 					}
 				} else {
 					return unit->Unique->GetQuote().utf8().get_data();
@@ -1583,10 +1583,10 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
-				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
+				const CCivilization *civilization = unit->Settlement->SiteUnit->GetType()->GetCivilization();
 				const CUnit *site_unit = unit->Settlement->SiteUnit;
-				const CPlayer *site_player = site_unit->Player;
-				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->Type == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->Type->GetClass()))) {
+				const CPlayer *site_player = site_unit->GetPlayer();
+				if (civilization != nullptr && site_player->GetFaction() != nullptr && (CCivilization::Get(site_player->Race) == civilization || site_unit->GetType() == CFaction::GetFactionClassUnitType(site_player->GetFaction(), site_unit->GetType()->GetClass()))) {
 					civilization = CCivilization::Get(site_player->Race);
 				}
 				return unit->Settlement->GetCulturalName(civilization).utf8().get_data();
@@ -1795,7 +1795,7 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == CPlayer::GetThisPlayer() && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitActionBuilt;
+					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->GetPlayer() == CPlayer::GetThisPlayer() && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitActionBuilt;
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
@@ -2198,7 +2198,7 @@ static int AliasTypeVar(lua_State *l, const char *s)
 	lua_pushstring(l, "Loc");
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
-		//           and Initial is for unit->Type->Var... (no upgrade modification)
+		//           and Initial is for unit->GetType()->Var... (no upgrade modification)
 		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
 		const char *key;
@@ -2260,7 +2260,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 	lua_pushstring(l, "Loc");
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
-		//           and Initial is for unit->Type->Var... (no upgrade modification)
+		//           and Initial is for unit->GetType()->Var... (no upgrade modification)
 		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
 		const char *key;
@@ -3710,7 +3710,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			CUnit *unit = *it;
 
-			if (unit->Type == unit_type) {
+			if (unit->GetType() == unit_type) {
 				units_to_remove.push_back(unit);
 			}
 		}

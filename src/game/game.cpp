@@ -101,6 +101,7 @@
 //Wyrmgus end
 #include "include/version.h"
 #include "video/font.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 //Wyrmgus start
 #include "world/province.h"
@@ -564,8 +565,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (unit_type->GetClass() != nullptr) {
 				f->printf("\tClass = \"%s\",\n", unit_type->GetClass()->GetIdent().utf8().get_data());
 			}
-			if (!unit_type->File.empty() && (!unit_type->Parent || unit_type->File != unit_type->Parent->File)) {
-				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", unit_type->File.c_str(), unit_type->Width, unit_type->Height);
+			if (unit_type->GetImage() != nullptr && !unit_type->GetImage()->GetFile().empty() && (!unit_type->Parent || unit_type->GetImage() != unit_type->Parent->GetImage())) {
+				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", unit_type->GetImage()->GetFile().utf8().get_data(), unit_type->GetImage()->GetFrameSize().x, unit_type->GetImage()->GetFrameSize().y);
 			}
 			if (unit_type->GetIcon() != nullptr && (!unit_type->Parent || unit_type->GetIcon() != unit_type->Parent->GetIcon())) {
 				f->printf("\tIcon = \"%s\",\n", unit_type->GetIcon()->Ident.c_str());
@@ -914,16 +915,16 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-					  unit.Type->Ident.c_str(),
-					  unit.Player->GetIndex(),
-					  unit.tilePos.x, unit.tilePos.y);
-			if (unit.Type->GivesResource) {
+					  unit.GetType()->Ident.c_str(),
+					  unit.GetPlayer()->GetIndex(),
+					  unit.GetTilePos().x, unit.GetTilePos().y);
+			if (unit.GetType()->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
 			if (!unit.Active) { //Active is true by default
 				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 			}
-			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
+			if (unit.GetType()->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
 				teleporters.push_back(*it);
 			}
 		}
@@ -941,10 +942,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 				const CUnit &unit = **it;
 				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-						  unit.Type->Ident.c_str(),
-						  unit.Player->GetIndex(),
-						  unit.tilePos.x, unit.tilePos.y);
-				if (unit.Type->GivesResource) {
+						  unit.GetType()->Ident.c_str(),
+						  unit.GetPlayer()->GetIndex(),
+						  unit.GetTilePos().x, unit.GetTilePos().y);
+				if (unit.GetType()->GivesResource) {
 					f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 				}
 				if (!unit.Active) { //Active is true by default
@@ -979,7 +980,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (unit.Variable[HP_INDEX].Value != unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
 					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
 				}
-				if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
+				if (unit.GetType()->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
 					teleporters.push_back(*it);
 				}
 			}
@@ -1779,7 +1780,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		if (unit.RescuedFrom) {
 			unit.Colors = &unit.RescuedFrom->UnitColors;
 		} else {
-			unit.Colors = &unit.Player->UnitColors;
+			unit.Colors = &unit.GetPlayer()->UnitColors;
 		}
 	}
 

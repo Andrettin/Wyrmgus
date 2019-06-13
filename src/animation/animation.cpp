@@ -190,7 +190,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			fprintf(stderr, "Bad bool-flag name '%s'\n", cur);
 			ExitFatal(1);
 		}
-		return goal->Type->BoolFlag[index].value;
+		return goal->GetType()->BoolFlag[index].value;
 	} else if (s[0] == 's') { //spell type detected
 		Assert(goal->CurrentAction() == UnitActionSpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());

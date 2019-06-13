@@ -577,7 +577,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->GetRequirementsString().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->GetRequirementsString().empty())))) {
 			return false;
 		}
 	}
@@ -624,7 +624,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
 				CUnit &unit = UnitManager.GetSlotUnit(button.Value);
-				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->HasInventory()) {
+				if (unit.GetType()->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->HasInventory()) {
 					if (i == BASICDAMAGE_INDEX) {
 						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, i) != 0 || unit.Container->GetItemVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
 							return false;
@@ -671,7 +671,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		
 	if (button.Action == ButtonUnit || button.Action == ButtonBuy) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
-		if (unit.Type->BoolFlag[ITEM_INDEX].value) {
+		if (unit.GetType()->BoolFlag[ITEM_INDEX].value) {
 			if (condition->Equipped != CONDITION_TRUE) {
 				if ((condition->Equipped == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->IsItemEquipped(&unit))) {
 					return false;
@@ -683,7 +683,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Consumable != CONDITION_TRUE) {
-				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Type->ItemClass->IsConsumable())) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.GetType()->BoolFlag[ITEM_INDEX].value && unit.GetType()->ItemClass->IsConsumable())) {
 					return false;
 				}
 			}
@@ -728,27 +728,27 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Weapon != CONDITION_TRUE) {
-				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsWeapon())) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.GetType()->ItemClass != nullptr && unit.GetType()->ItemClass->GetSlot() != nullptr && unit.GetType()->ItemClass->GetSlot()->IsWeapon())) {
 					return false;
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsShield())) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (unit.GetType()->ItemClass != nullptr && unit.GetType()->ItemClass->GetSlot() != nullptr && unit.GetType()->ItemClass->GetSlot()->IsShield())) {
 					return false;
 				}
 			}
 			if (condition->Boots != CONDITION_TRUE) {
-				if ((condition->Boots == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsBoots())) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (unit.GetType()->ItemClass != nullptr && unit.GetType()->ItemClass->GetSlot() != nullptr && unit.GetType()->ItemClass->GetSlot()->IsBoots())) {
 					return false;
 				}
 			}
 			if (condition->Arrows != CONDITION_TRUE) {
-				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->GetSlot() != nullptr && unit.Type->ItemClass->GetSlot()->IsArrows())) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.GetType()->ItemClass != nullptr && unit.GetType()->ItemClass->GetSlot() != nullptr && unit.GetType()->ItemClass->GetSlot()->IsArrows())) {
 					return false;
 				}
 			}
 			if (condition->ItemClass != nullptr) {
-				if (condition->ItemClass != unit.Type->ItemClass) {
+				if (condition->ItemClass != unit.GetType()->ItemClass) {
 					return false;
 				}
 			}
@@ -775,7 +775,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		if (!(button.Action == ButtonBuy && unit.Character) && condition->Neutral != CONDITION_TRUE) {
-			if ((condition->Neutral == CONDITION_ONLY) ^ (!CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && CPlayer::GetThisPlayer() != unit.Player && (unit.Container == nullptr || (!CPlayer::GetThisPlayer()->IsEnemy(*unit.Container) && !CPlayer::GetThisPlayer()->IsAllied(*unit.Container) && CPlayer::GetThisPlayer() != unit.Container->Player)))) {
+			if ((condition->Neutral == CONDITION_ONLY) ^ (!CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && CPlayer::GetThisPlayer() != unit.GetPlayer() && (unit.Container == nullptr || (!CPlayer::GetThisPlayer()->IsEnemy(*unit.Container) && !CPlayer::GetThisPlayer()->IsAllied(*unit.Container) && CPlayer::GetThisPlayer() != unit.Container->GetPlayer())))) {
 				return false;
 			}
 		}
@@ -831,7 +831,7 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 //		if (CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value))) {
 		if (
 			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value)))
-			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).Type->GetIndex())))
+			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).GetType()->GetIndex())))
 		) {
 		//Wyrmgus end
 			// Automatically write the calculated coordinates.
@@ -899,7 +899,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 //				   sizeof(CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Costs));
 //			Costs[FoodCost] = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value;
 			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(button.Value)) != 0);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->GetType()->Stats[Selected[0]->GetPlayer()->GetIndex()].GetUnitStock(CUnitType::Get(button.Value)) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
 			Costs[FoodCost] = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value;
 			//Wyrmgus end
@@ -947,7 +947,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 //		if (CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value))) {
 		if (
 			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value)))
-			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).Type->GetIndex())))
+			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).GetType()->GetIndex())))
 		) {
 		//Wyrmgus end
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
@@ -1116,9 +1116,9 @@ void CButtonPanel::Draw()
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
 		if (
 			!buttons[i].AlwaysShow
-			&& Selected[0]->Player != CPlayer::GetThisPlayer()
+			&& Selected[0]->GetPlayer() != CPlayer::GetThisPlayer()
 			&& !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
-			&& CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, buttons[i].Action)
+			&& CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), buttons[i].Action)
 			&& !IsNeutralUsableButtonAction(buttons[i].Action)
 		) {
 			continue;
@@ -1180,7 +1180,7 @@ void CButtonPanel::Draw()
 		const CIcon *button_icon = buttons[i].Icon.Icon;
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != nullptr) {
+		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->GetType()->CanTransport() && Selected[0]->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->GetType()->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
 		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
@@ -1233,16 +1233,16 @@ void CButtonPanel::Draw()
 												   pos, buf, player, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 												   
 				if (
-					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0)
+					(buttons[i].Action == ButtonTrain && Selected[0]->GetType()->Stats[Selected[0]->GetPlayer()->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0)
 					|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
 				) {
 					std::string number_string;
-					if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string((long long) Selected[0]->GetUnitStock(CUnitType::Get(buttons[i].Value))) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)));
+					if (buttons[i].Action == ButtonTrain && Selected[0]->GetType()->Stats[Selected[0]->GetPlayer()->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string((long long) Selected[0]->GetUnitStock(CUnitType::Get(buttons[i].Value))) + "/" + std::to_string((long long) Selected[0]->GetType()->Stats[Selected[0]->GetPlayer()->GetIndex()].GetUnitStock(CUnitType::Get(buttons[i].Value)));
 					} else if (buttons[i].Action == ButtonSellResource) {
-						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
+						number_string = std::to_string((long long) Selected[0]->GetPlayer()->GetEffectiveResourceSellPrice(buttons[i].Value));
 					} else if (buttons[i].Action == ButtonBuyResource) {
-						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceBuyPrice(buttons[i].Value));
+						number_string = std::to_string((long long) Selected[0]->GetPlayer()->GetEffectiveResourceBuyPrice(buttons[i].Value));
 					}
 					std::string oldnc;
 					std::string oldrc;
@@ -1293,7 +1293,7 @@ void CButtonPanel::Draw()
 		size_t j = 0;
 
 		for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-			if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
+			if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->GetPlayer() != CPlayer::GetThisPlayer() && uins->GetPlayer() != CPlayer::GetThisPlayer())) {
 				continue;
 			}
 			if (static_cast<size_t>(ButtonUnderCursor) == j) {
@@ -1331,7 +1331,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 //			const CUnitStats &stats = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()];
 //			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->Type->Stats[Selected[0]->Player->GetIndex()].GetUnitStock(CUnitType::Get(button.Value)) != 0);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::Get(button.Value), type_costs, Selected[0]->GetType()->Stats[Selected[0]->GetPlayer()->GetIndex()].GetUnitStock(CUnitType::Get(button.Value)) != 0);
 			UI.StatusLine.SetCosts(0, CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value * (CUnitType::Get(button.Value)->TrainQuantity ? CUnitType::Get(button.Value)->TrainQuantity : 1), type_costs);
 			//Wyrmgus end
 			break;
@@ -1379,7 +1379,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 	}
 	
 	//Wyrmgus start
-	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
+	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
 		return false;
 	}
 	//Wyrmgus end
@@ -1403,16 +1403,16 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = true;
 			break;
 		case ButtonRepair:
-			res = unit.Type->RepairRange > 0;
+			res = unit.GetType()->RepairRange > 0;
 			break;
 		case ButtonPatrol:
 			res = unit.CanMove();
 			break;
 		case ButtonHarvest:
 			if (!unit.CurrentResource
-				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
-				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
-					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
+				|| !(unit.ResourcesHeld > 0 && !unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources)
+				|| (unit.ResourcesHeld != unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity
+					&& unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources)) {
 				res = true;
 			}
 			//Wyrmgus start
@@ -1423,9 +1423,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		case ButtonReturn:
 			if (!(!unit.CurrentResource
-				  || !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
-				  || (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
-					  && unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
+				  || !(unit.ResourcesHeld > 0 && !unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources)
+				  || (unit.ResourcesHeld != unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity
+					  && unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources))) {
 				res = true;
 			}
 			break;
@@ -1433,7 +1433,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
 		case ButtonAttackGround:
-			if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
+			if (unit.GetType()->BoolFlag[GROUNDATTACK_INDEX].value) {
 				res = true;
 			}
 			break;
@@ -1442,7 +1442,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 				break;
 			}
-			if (unit.Player->GetIndex() == PlayerNumNeutral && !unit.CanHireMercenary(CUnitType::Get(buttonaction.Value))) {
+			if (unit.GetPlayer()->GetIndex() == PlayerNumNeutral && !unit.CanHireMercenary(CUnitType::Get(buttonaction.Value))) {
 				break;
 			}
 		// FALL THROUGH
@@ -1450,16 +1450,16 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonResearch:
 		case ButtonBuild:
 			if (buttonaction.Action == ButtonResearch) {
-				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.GetPlayer(), false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 				if (res) {
 					//Wyrmgus start
-	//				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
+	//				res = UpgradeIdentAllowed(*unit.GetPlayer(), buttonaction.ValueStr) == 'A';
 					res = (UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'R') && CheckDependencies(CUpgrade::Get(buttonaction.Value), CPlayer::GetThisPlayer(), false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-					res = res && (!unit.Player->UpgradeTimers.Upgrades[buttonaction.Value] || unit.Player->UpgradeTimers.Upgrades[buttonaction.Value] == CUpgrade::Get(buttonaction.Value)->Costs[TimeCost]); //don't show if is being researched elsewhere
+					res = res && (!unit.GetPlayer()->UpgradeTimers.Upgrades[buttonaction.Value] || unit.GetPlayer()->UpgradeTimers.Upgrades[buttonaction.Value] == CUpgrade::Get(buttonaction.Value)->Costs[TimeCost]); //don't show if is being researched elsewhere
 					//Wyrmgus end
 				}
 			} else {
-				res = CheckDependencies(CUnitType::Get(buttonaction.Value), unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(CUnitType::Get(buttonaction.Value), unit.GetPlayer(), false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			}
 			break;
 		case ButtonExperienceUpgradeTo:
@@ -1475,7 +1475,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonUnload:
-			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
+			res = (Selected[0]->GetType()->CanTransport() && Selected[0]->BoardCount);
 			break;
 		case ButtonCancel:
 			res = true;
@@ -1485,14 +1485,14 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 //			res = unit.CurrentAction() == UnitActionUpgradeTo
 //				  || unit.CurrentAction() == UnitActionResearch;
 			//don't show the cancel button for a quick moment if the time cost is 0
-			res = (unit.CurrentAction() == UnitActionUpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] > 0)
+			res = (unit.CurrentAction() == UnitActionUpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] > 0)
 				|| (unit.CurrentAction() == UnitActionResearch && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] > 0);
 			//Wyrmgus end
 			break;
 		case ButtonCancelTrain:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitActionTrain;
-			res = unit.CurrentAction() == UnitActionTrain && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->GetIndex()].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
+			res = unit.CurrentAction() == UnitActionTrain && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
 			//Wyrmgus end
 			break;
 		case ButtonCancelBuild:
@@ -1503,7 +1503,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CPlayer::GetThisPlayer()->GetFaction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < (int) CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttonaction.Value], true);
 			break;
 		case ButtonQuest:
-			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
+			res = buttonaction.Value < (int) unit.GetPlayer()->AvailableQuests.size() && unit.GetPlayer()->CanAcceptQuest(unit.GetPlayer()->AvailableQuests[buttonaction.Value]);
 			break;
 		case ButtonBuy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
@@ -1568,12 +1568,12 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonResearch:
 		case ButtonBuild:
 			if (buttonaction.Action == ButtonResearch) {
-				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.GetPlayer(), false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 				if (res) {
 					res = UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' && CheckDependencies(CUpgrade::Get(buttonaction.Value), CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				}
 			} else {
-				res = CheckDependencies(CUnitType::Get(buttonaction.Value), unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(CUnitType::Get(buttonaction.Value), unit.GetPlayer(), false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			}
 			break;
 		case ButtonExperienceUpgradeTo:
@@ -1682,7 +1682,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		sprintf(individual_unit_ident[i], ",%s,", Selected[i]->Type->Ident.c_str());
+		sprintf(individual_unit_ident[i], ",%s,", Selected[i]->GetType()->Ident.c_str());
 	}
 	//Wyrmgus end
 
@@ -1763,7 +1763,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
-		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+		sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
 	}
 	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
 		ButtonAction &buttonaction = *UnitButtonTable[i];
@@ -1797,7 +1797,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 		int researchCheck = true;
 		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonResearch
 			//Wyrmgus start
-//			&& UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R') {
+//			&& UpgradeIdentAllowed(*unit.GetPlayer(), buttonaction.ValueStr) == 'R') {
 			&& UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'R') {
 			//Wyrmgus end
 			researchCheck = false;
@@ -1829,8 +1829,8 @@ void CButtonPanel::Update()
 	CUnit &unit = *Selected[0];
 	// foreign unit
 	//Wyrmgus start
-//	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit)) {
-	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*unit.Player)) {
+//	if (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit)) {
+	if (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*unit.GetPlayer())) {
 	//Wyrmgus end
 		CurrentButtons.clear();
 		return;
@@ -1846,7 +1846,7 @@ void CButtonPanel::Update()
 				continue;
 			}
 			char unit_ident[128];
-			sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+			sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
 			if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
 				continue;
 			}
@@ -1892,7 +1892,7 @@ void CButtonPanel::Update()
 	bool sameType = true;
 	// multiple selected
 	for (size_t i = 1; i < Selected.size(); ++i) {
-		if (Selected[i]->Type != unit.Type) {
+		if (Selected[i]->GetType() != unit.GetType()) {
 			sameType = false;
 			break;
 		}
@@ -1934,9 +1934,9 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  Unload on coast valid only for sea units
 	//
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitActionStill
-		 && Selected[0]->Type->UnitType == UnitTypeNaval && Selected[0]->MapLayer->Field(Selected[0]->tilePos)->CoastOnMap())
+		 && Selected[0]->GetType()->UnitType == UnitTypeNaval && Selected[0]->MapLayer->Field(Selected[0]->GetTilePos())->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
-		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush, Selected[0]->MapLayer->ID);
+		SendCommandUnload(*Selected[0], Selected[0]->GetTilePos(), NoUnitP, flush, Selected[0]->MapLayer->ID);
 		return ;
 	}
 	DoClicked_SelectTarget(button);
@@ -1986,7 +1986,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit &unit = *Selected[i];
 			// CursorValue here holds the spell type id
-			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush, unit.MapLayer->ID);
+			SendCommandSpellCast(unit, unit.GetTilePos(), &unit, spellId, flush, unit.MapLayer->ID);
 		}
 		return;
 	}
@@ -2111,11 +2111,11 @@ void CButtonPanel::DoClicked_Train(int button)
 	/*
 	if (Selected[0]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
 		//Wyrmgus start
-//		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
+//		Selected[0]->GetPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), "%s", _("Unit training queue is full"));
+		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), "%s", _("Unit training queue is full"));
 		//Wyrmgus end
 	//Wyrmgus start
-//	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
+//	} else if (Selected[0]->GetPlayer()->CheckLimits(type) >= 0 && !Selected[0]->GetPlayer()->CheckUnitType(type)) {
 	} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type)) {
 	//Wyrmgus end
 		//PlayerSubUnitType(player,type);
@@ -2126,9 +2126,9 @@ void CButtonPanel::DoClicked_Train(int button)
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 	//Wyrmgus start
-//	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
-//		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
-//			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
+//	} else if (Selected[0]->GetPlayer()->CheckLimits(type) == -3) {
+//		if (GameSounds.NotEnoughFood[Selected[0]->GetPlayer()->Race].Sound) {
+//			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->GetPlayer()->Race].Sound, MaxSampleVolume);
 //		}
 	} else if (CPlayer::GetThisPlayer()->CheckLimits(type) == -3) {
 		if (GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound) {
@@ -2137,11 +2137,11 @@ void CButtonPanel::DoClicked_Train(int button)
 	//Wyrmgus end
 	}
 	*/
-	int best_training_place = 0;
+	CUnit *best_training_place = nullptr;
 	int lowest_queue = Selected[0]->Orders.size();
 	
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Type == Selected[0]->Type) {
+		if (Selected[i]->GetType() == Selected[0]->GetType()) {
 			int selected_queue = 0;
 			for (size_t j = 0; j < Selected[i]->Orders.size(); ++j) {
 				if (Selected[i]->Orders[j]->Action == UnitActionTrain) {
@@ -2150,15 +2150,15 @@ void CButtonPanel::DoClicked_Train(int button)
 			}
 			if (selected_queue < lowest_queue) {
 				lowest_queue = selected_queue;
-				best_training_place = i;
+				best_training_place = Selected[i];
 			}
 		}
 	}
 	
 	if (type.BoolFlag[RAIL_INDEX].value) {
-		bool has_adjacent_rail = Selected[best_training_place]->HasAdjacentRailForUnitType(&type);
+		bool has_adjacent_rail = best_training_place->HasAdjacentRailForUnitType(&type);
 		if (!has_adjacent_rail) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, best_training_place->GetTilePos(), best_training_place->MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			return;
 		}
@@ -2170,11 +2170,11 @@ void CButtonPanel::DoClicked_Train(int button)
 	}
 	
 	for (int i = 0; i < unit_count; ++i) {
-		if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
+		if (best_training_place->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, best_training_place->GetTilePos(), best_training_place->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->GetIndex()].GetUnitStock(&type) != 0)) {
-			SendCommandTrainUnit(*Selected[best_training_place], type, CPlayer::GetThisPlayer()->GetIndex(), FlushCommands);
+		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type, best_training_place->GetType()->Stats[best_training_place->GetPlayer()->GetIndex()].GetUnitStock(&type) != 0)) {
+			SendCommandTrainUnit(*best_training_place, type, CPlayer::GetThisPlayer()->GetIndex(), FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
 		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) == -3) {
@@ -2192,7 +2192,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 	// FIXME: store pointer in button table!
 	CUnitType &type = *CUnitType::Get(CurrentButtons[button].Value);
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
+		if (Selected[i]->GetPlayer()->CheckLimits(type) != -6 && !Selected[i]->GetPlayer()->CheckUnitType(type)) {
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
@@ -2210,13 +2210,13 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 	// FIXME: store pointer in button table!
 	CUnitType &type = *CUnitType::Get(CurrentButtons[button].Value);
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.GetIndex()] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
+		if (Selected[0]->GetPlayer()->GetUnitTotalCount(type) < Selected[0]->GetPlayer()->Allow.Units[type.GetIndex()] || Selected[0]->GetPlayer()->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
 				if (!IsNetworkGame() && Selected[i]->Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->UnitType->GetIndex() != type.GetIndex()) {
-						if (Selected[i]->Player->AiEnabled == false) {
+						if (Selected[i]->GetPlayer()->AiEnabled == false) {
 							Selected[i]->Character->UnitType = CUnitType::Get(CurrentButtons[button].Value);
 							SaveHero(Selected[i]->Character);
 							CAchievement::CheckAchievements();
@@ -2226,7 +2226,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
-				Selected[i]->Player->UpdateLevelUpUnits();
+				Selected[i]->GetPlayer()->UpdateLevelUpUnits();
 			}
 		} else {
 			break;
@@ -2236,7 +2236,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 	
-	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+	if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2249,7 +2249,7 @@ void CButtonPanel::DoClicked_Research(int button)
 	//Wyrmgus start
 	int upgrade_costs[MaxCosts];
 	CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, upgrade_costs);
-//	if (!Selected[0]->Player->CheckCosts(upgrade->Costs)) {
+//	if (!Selected[0]->GetPlayer()->CheckCosts(upgrade->Costs)) {
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		//PlayerSubCosts(player,Upgrades[i].Costs);
@@ -2278,7 +2278,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 	UI.StatusLine.ClearCosts();
 	LastDrawnButtonPopup = nullptr;
 	
-	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+	if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2290,7 +2290,7 @@ void CButtonPanel::DoClicked_Faction(int button)
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
-	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+	if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2298,11 +2298,11 @@ void CButtonPanel::DoClicked_Faction(int button)
 void CButtonPanel::DoClicked_Quest(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	SendCommandQuest(*Selected[0], Selected[0]->Player->AvailableQuests[index]);
+	SendCommandQuest(*Selected[0], Selected[0]->GetPlayer()->AvailableQuests[index]);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
-	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+	if (Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2312,7 +2312,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 	int buy_costs[MaxCosts];
 	memset(buy_costs, 0, sizeof(buy_costs));
 	buy_costs[CopperCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
-	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
+	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetType()) >= 0) {
 		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), CPlayer::GetThisPlayer()->GetIndex());
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
@@ -2320,7 +2320,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
-	} else if (CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) == -3) {
+	} else if (CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetType()) == -3) {
 		if (GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound) {
 			PlayGameSound(GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		}
@@ -2332,7 +2332,7 @@ void CButtonPanel::DoClicked_ProduceResource(int button)
 	const int resource = CurrentButtons[button].Value;
 	if (resource != Selected[0]->GivesResource) {
 		SendCommandProduceResource(*Selected[0], resource);
-	} else if (!Selected[0]->Type->GivesResource) { //if resource production button was clicked when it was already active, then this means it should be toggled off; only do this if the building's type doesn't have a default produced resource, though, since in those cases it should always produce a resource
+	} else if (!Selected[0]->GetType()->GivesResource) { //if resource production button was clicked when it was already active, then this means it should be toggled off; only do this if the building's type doesn't have a default produced resource, though, since in those cases it should always produce a resource
 		SendCommandProduceResource(*Selected[0], 0);
 	}
 }
@@ -2342,7 +2342,7 @@ void CButtonPanel::DoClicked_SellResource(int button)
 	const bool toggle_autosell = (KeyModifiers & ModifierControl) != 0;
 	const int resource = CurrentButtons[button].Value;
 	
-	if (toggle_autosell && Selected[0]->Player == CPlayer::GetThisPlayer()) {
+	if (toggle_autosell && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 		SendCommandAutosellResource(CPlayer::GetThisPlayer()->GetIndex(), resource);
 	} else {
 		int sell_resource_costs[MaxCosts];
@@ -2359,7 +2359,7 @@ void CButtonPanel::DoClicked_BuyResource(int button)
 	const int resource = CurrentButtons[button].Value;
 	int buy_resource_costs[MaxCosts];
 	memset(buy_resource_costs, 0, sizeof(buy_resource_costs));
-	buy_resource_costs[CopperCost] = Selected[0]->Player->GetEffectiveResourceBuyPrice(resource);
+	buy_resource_costs[CopperCost] = Selected[0]->GetPlayer()->GetEffectiveResourceBuyPrice(resource);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_resource_costs)) {
 		SendCommandBuyResource(*Selected[0], resource, CPlayer::GetThisPlayer()->GetIndex());
 	}
@@ -2416,7 +2416,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action)) || (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), CurrentButtons[button].Action)) || (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
@@ -2427,18 +2427,18 @@ void CButtonPanel::DoClicked(int button)
 			(CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), CurrentButtons[button].ValueStr) == 'R')
 			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
 		) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
 		} else if (CurrentButtons[button].Action == ButtonBuy && CPlayer::GetThisPlayer()->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != nullptr) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The hero limit has been reached"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The hero limit has been reached"));
 		} else {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 		}
 		PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		return;
 	}
 
 	if (GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
-		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The cooldown is active"));
+		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The cooldown is active"));
 		PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		return;
 	}

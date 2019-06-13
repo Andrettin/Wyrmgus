@@ -189,7 +189,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
 		if (unit.IsAliveOnMap()) {
-			if (unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore MapFieldAirUnpassable related to units (i.e. doors)
+			if (unit.GetType()->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore MapFieldAirUnpassable related to units (i.e. doors)
 				this->Flags |= MapFieldUnpassable;
 				this->Flags |= MapFieldAirUnpassable;
 			}
@@ -244,7 +244,7 @@ void CMapField::RemoveOverlayTerrain()
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+		if (unit.IsAliveOnMap() && unit.GetType()->BoolFlag[AIRUNPASSABLE_INDEX].value) {
 			this->Flags |= MapFieldUnpassable;
 			this->Flags |= MapFieldAirUnpassable;
 		}

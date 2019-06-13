@@ -276,7 +276,7 @@ const String &CSite::GetCulturalName(const CCivilization *civilization) const
 Vec2i CSite::GetMapPos() const
 {
 	if (this->SiteUnit != nullptr) {
-		return this->SiteUnit->tilePos;
+		return this->SiteUnit->GetTilePos();
 	}
 	
 	if (this->MapTemplate != nullptr && this->Position.x != -1 && this->Position.y != -1) {

@@ -102,8 +102,8 @@
 	//Wyrmgus start
 //	Vec2i minpos = goalPos - offset;
 //	Vec2i maxpos = goalPos + offset;
-	Vec2i minpos = caster.tilePos - offset;
-	Vec2i maxpos = caster.tilePos + Vec2i(caster.Type->TileSize - 1) + offset;
+	Vec2i minpos = caster.GetTilePos() - offset;
+	Vec2i maxpos = caster.GetTilePos() + Vec2i(caster.GetType()->TileSize - 1) + offset;
 	//Wyrmgus end
 
 	CMap::Map.FixSelectionArea(minpos, maxpos, z);
@@ -118,7 +118,7 @@
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 				const CMapField &mf = *CMap::Map.Field(ipos, z);
 				//Wyrmgus start
-//				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
+//				if (SquareDistance(ipos, caster.GetTilePos()) > square(this->Range)) {
 				if (caster.MapDistanceTo(ipos, z) > this->Range) {
 				//Wyrmgus end
 					// Not in circle range
@@ -144,7 +144,7 @@
 		//Wyrmgus end
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
-			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
+			if (unit.GetType()->UnitType != UnitTypeFly && unit.IsAlive()
 				//Wyrmgus start
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!

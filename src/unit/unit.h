@@ -195,6 +195,13 @@ public:
 	/// Release a unit
 	void Release(bool final = false);
 	
+	[[nodiscard]]
+	const CUnitType *GetType() const
+	{
+		return this->Type;
+	}
+	
+	[[nodiscard]]
 	CPlayer *GetPlayer() const
 	{
 		return this->Player;
@@ -253,6 +260,7 @@ public:
 	bool CanStoreOrder(COrder *order);
 
 	// Cowards and invisible units don't attack unless ordered.
+	[[nodiscard]]
 	bool IsAgressive() const
 	{
 		//Wyrmgus start
@@ -263,8 +271,10 @@ public:
 	}
 
 	/// Returns true, if unit is directly seen by an allied unit.
+	[[nodiscard]]
 	bool IsVisible(const CPlayer &player) const;
 
+	[[nodiscard]]
 	inline bool IsInvisibile(const CPlayer &player) const
 	{
 		return (&player != Player && !!Variable[INVISIBLE_INDEX].Value
@@ -277,6 +287,7 @@ public:
 	**
 	**  @return        True if alive, false otherwise.
 	*/
+	[[nodiscard]]
 	bool IsAlive() const;
 
 	/**
@@ -285,9 +296,10 @@ public:
 	**
 	**  @return        True if alive, false otherwise.
 	*/
+	[[nodiscard]]
 	inline bool IsAliveOnMap() const
 	{
-		return !Removed && IsAlive();
+		return !this->Removed && this->IsAlive();
 	}
 
 	/**
@@ -297,6 +309,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
+	[[nodiscard]]
 	inline bool IsVisibleAsGoal(const CPlayer &player) const
 	{
 		// Invisibility
@@ -331,35 +344,61 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
+	[[nodiscard]]
 	inline bool IsVisibleOnMap(const CPlayer &player) const
 	{
 		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
 	}
 
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
+	[[nodiscard]]
 	bool IsVisibleOnMinimap() const;
 
 	/// Returns true if unit is visible under radar (By player, or by shared vision)
+	[[nodiscard]]
 	bool IsVisibleOnRadar(const CPlayer &pradar) const;
 
 	/// Returns true if unit is visible in a viewport. Only for ThisPlayer.
+	[[nodiscard]]
 	bool IsVisibleInViewport(const CViewport &vp) const;
 
+	[[nodiscard]]
 	bool IsEnemy(const CPlayer &player) const;
+	
+	[[nodiscard]]
 	bool IsEnemy(const CUnit &unit) const;
+	
+	[[nodiscard]]
 	bool IsAllied(const CPlayer &player) const;
+	
+	[[nodiscard]]
 	bool IsAllied(const CUnit &unit) const;
+	
+	[[nodiscard]]
 	bool IsSharedVision(const CPlayer &player) const;
+	
+	[[nodiscard]]
 	bool IsSharedVision(const CUnit &unit) const;
+	
+	[[nodiscard]]
 	bool IsBothSharedVision(const CPlayer &player) const;
+	
+	[[nodiscard]]
 	bool IsBothSharedVision(const CUnit &unit) const;
+	
+	[[nodiscard]]
 	bool IsTeamed(const CPlayer &player) const;
+	
+	[[nodiscard]]
 	bool IsTeamed(const CUnit &unit) const;
 
+	[[nodiscard]]
 	bool IsUnusable(bool ignore_built_state = false) const;
 
+	[[nodiscard]]
 	int MapDistanceTo(const CUnit &dst) const;
 
+	[[nodiscard]]
 	int MapDistanceTo(const Vec2i &pos, int z) const;
 
 	/**
@@ -368,24 +407,60 @@ public:
 	**
 	**  @return true if unit can move.
 	*/
+	[[nodiscard]]
 	bool CanMove() const { return Type->CanMove(); }
 
+	[[nodiscard]]
 	int GetDrawLevel() const;
 
+	[[nodiscard]]
 	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z);
 
+	[[nodiscard]]
 	PixelPos GetMapPixelPosTopLeft() const;
-	PixelPos GetMapPixelPosCenter() const;
 	
-	//Wyrmgus start
-	Vec2i GetTileSize() const;
-	Vec2i GetHalfTileSize() const;
+	[[nodiscard]]
+	PixelPos GetMapPixelPosCenter() const
+	{
+		return this->GetMapPixelPosTopLeft() + this->GetHalfTilePixelSize();
+	}
+	
+	[[nodiscard]]
+	const Vec2i &GetTilePos() const
+	{
+		return this->TilePos;
+	}
+	
+	[[nodiscard]]
+	const Vec2i &GetTileSize() const
+	{
+		return this->Type->GetTileSize();
+	}
+	
+	[[nodiscard]]
+	Vec2i GetHalfTileSize() const
+	{
+		return this->GetTileSize() / 2;
+	}
+	
+	[[nodiscard]]
 	PixelSize GetTilePixelSize() const;
-	PixelSize GetHalfTilePixelSize() const;
-	Vec2i GetTileCenterPos() const;
+	
+	[[nodiscard]]
+	PixelSize GetHalfTilePixelSize() const
+	{
+		return this->GetTilePixelSize() / 2;
+	}
+	
+	[[nodiscard]]
+	Vec2i GetTileCenterPos() const
+	{
+		return this->GetTilePos() + this->Type->GetTileCenterPosOffset();
+	}
 	
 	CUnit *GetFirstContainer() const;
 
+	//Wyrmgus start
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
@@ -444,10 +519,13 @@ public:
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	const CLanguage *GetLanguage() const;
-	
-	bool IsDiurnal() const;
-	bool IsNocturnal() const;
 	//Wyrmgus end
+	
+	[[nodiscard]]
+	bool IsDiurnal() const;
+	
+	[[nodiscard]]
+	bool IsNocturnal() const;
 	
 	void IncreaseVariable(const int index);
 	void HandleBuffsEachCycle();
@@ -491,7 +569,9 @@ public:
 	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit
 	//Wyrmgus end
 	
-	Vec2i tilePos = Vec2i(-1, -1);	/// Map position X
+private:
+	Vec2i TilePos = Vec2i(-1, -1);	/// Map position X
+public:
 	//Wyrmgus start
 	Vec2i RallyPointPos = Vec2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
 	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
@@ -500,8 +580,10 @@ public:
 
 	unsigned int Offset;	/// Map position as flat index offset (x + y * w)
 
+private:
 	const CUnitType *Type = nullptr;	/// Pointer to unit-type (peon,...)
 	CPlayer *Player = nullptr;			/// Owner of this unit
+public:
 	const CUnitStats *Stats = nullptr;	/// Current unit stats
 	int CurrentSightRange; /// Unit's Current Sight Range
 
@@ -574,7 +656,7 @@ public:
 		const CConstructionFrame *CFrame = nullptr;	/// Seen construction frame
 		int Frame;							/// last seen frame/stage of buildings
 		const CUnitType *Type = nullptr;	/// Pointer to last seen unit-type
-		Vec2i tilePos = Vec2i(-1, -1);		/// Last unit->tilePos Seen
+		Vec2i TilePos = Vec2i(-1, -1);		/// Last unit->TilePos Seen
 		signed char IX;						/// Seen X image displacement to map position
 		signed char IY;						/// seen Y image displacement to map position
 		bool UnderConstruction = false;		/// Unit seen construction
@@ -612,6 +694,22 @@ public:
 	std::map<const CSpell *, int> SpellCoolDownTimers;	/// how much time the unit needs to wait before a spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
+	
+	friend class COrder_Die;
+	friend class COrder_Follow;
+	friend class COrder_PickUp;
+	friend class COrder_Trade;
+	friend class COrder_Use;
+	friend class CPlayer;
+	friend class Spell_Summon;
+	friend class Spell_Teleport;
+	friend int CclCreateBuildingAtRandomLocationNear(lua_State *l);
+	friend int CclCreateUnitInTransporter(lua_State *l);
+	friend int CclMoveUnit(lua_State *l);
+	friend int CclShowMapLocation(lua_State *l);
+	friend int CclUnit(lua_State *l);
+	friend int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype);
+	friend void UnitInXY(CUnit &unit, const Vec2i &pos, const int z);
 	
 protected:
 	static void _bind_methods();

@@ -10,7 +10,7 @@
 //
 /**@name selection.cpp - The units' selection. */
 //
-//      (c) Copyright 1999-2015 by Patrice Fortier, Lutz Sammer,
+//      (c) Copyright 1999-2019 by Patrice Fortier, Lutz Sammer,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -133,7 +133,7 @@ static void HandleSuicideClick(CUnit &unit)
 {
 	static int NumClicks = 0;
 
-	Assert(unit.Type->ClicksToExplode);
+	Assert(unit.GetType()->ClicksToExplode);
 	if (GameObserve || GameEstablishing) {
 		return;
 	}
@@ -142,7 +142,7 @@ static void HandleSuicideClick(CUnit &unit)
 	} else {
 		NumClicks = 1;
 	}
-	if (NumClicks == unit.Type->ClicksToExplode) {
+	if (NumClicks == unit.GetType()->ClicksToExplode) {
 		SendCommandDismiss(unit);
 		NumClicks = 0;
 	}
@@ -158,8 +158,8 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 {
 	Assert(count <= MaxSelectable);
 
-	if (count == 1 && units[0]->Type->ClicksToExplode &&
-		!units[0]->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+	if (count == 1 && units[0]->GetType()->ClicksToExplode &&
+		!units[0]->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		HandleSuicideClick(*units[0]);
 		if (!units[0]->IsAlive()) {
 			NetworkSendSelection(units, count);
@@ -170,7 +170,7 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 	bool suitable_selectee = false;
 	for (unsigned int i = 0; i < count; ++i) {
 		CUnit &unit = *units[i];
-		if (!unit.Removed && !unit.TeamSelected && !unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
+		if (!unit.Removed && !unit.TeamSelected && !unit.GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 			suitable_selectee = true;
 		}
 	}
@@ -182,7 +182,7 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 	NetworkSendSelection(units, count);
 	for (unsigned int i = 0; i < count; ++i) {
 		CUnit &unit = *units[i];
-		if (!unit.Removed && !unit.TeamSelected && !unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
+		if (!unit.Removed && !unit.TeamSelected && !unit.GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 			Selected.push_back(&unit);
 			unit.Selected = 1;
 			if (count > 1) {
@@ -210,7 +210,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit &unit = *units[i];
 		Assert(!unit.Removed);
-		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
+		if (!unit.GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 			TeamSelected[player.GetIndex()].push_back(&unit);
 			unit.TeamSelected |= 1 << player.GetIndex();
 		}
@@ -229,7 +229,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 */
 int SelectUnit(CUnit &unit)
 {
-	if (unit.Type->BoolFlag[REVEALER_INDEX].value) { // Revealers cannot be selected
+	if (unit.GetType()->BoolFlag[REVEALER_INDEX].value) { // Revealers cannot be selected
 		DebugPrint("Selecting revealer?\n");
 		return 0;
 	}
@@ -247,7 +247,7 @@ int SelectUnit(CUnit &unit)
 		return 0;
 	}
 
-	if (unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && GameRunning) {
+	if (unit.GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value && GameRunning) {
 		return 0;
 	}
 
@@ -327,12 +327,12 @@ void UnSelectUnit(CUnit &unit)
 //Wyrmgus start
 bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit)
 {
-	if (first_unit.Type->BoolFlag[BUILDING_INDEX].value != second_unit.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (first_unit.GetType()->BoolFlag[BUILDING_INDEX].value != second_unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 		return false;
 	}
 
-	if (first_unit.Type->BoolFlag[BUILDING_INDEX].value) {
-		if (second_unit.Type != first_unit.Type) {
+	if (first_unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
+		if (second_unit.GetType() != first_unit.GetType()) {
 			return false;
 		}
 	}
@@ -381,7 +381,7 @@ int ToggleSelectUnit(CUnit &unit)
 int SelectUnitsByType(CUnit &base, bool only_visible)
 //Wyrmgus end
 {
-	const CUnitType &type = *base.Type;
+	const CUnitType &type = *base.GetType();
 	const CViewport *vp = UI.MouseViewport;
 
 	Assert(UI.MouseViewport);
@@ -415,7 +415,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 
 	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(*base.Player) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+	if (!CanSelectMultipleUnits(*base.GetPlayer()) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 		return Selected.size();
 	}
 
@@ -455,7 +455,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 	//   different type... idem for tankers
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player)) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer())) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -497,7 +497,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 */
 int ToggleUnitsByType(CUnit &base)
 {
-	const CUnitType &type = *base.Type;
+	const CUnitType &type = *base.GetType();
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -506,7 +506,7 @@ int ToggleUnitsByType(CUnit &base)
 	}
 	// if unit isn't belonging to the player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(*base.Player) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+	if (!CanSelectMultipleUnits(*base.GetPlayer()) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 		return 0;
 	}
 
@@ -544,7 +544,7 @@ int ToggleUnitsByType(CUnit &base)
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player)) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer())) {
 			continue;
 		}
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
@@ -592,7 +592,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	std::vector<CUnit *> table;
 
 	for (size_t i = 0; i != units.size(); ++i) {
-		const CUnitType *type = units[i]->Type;
+		const CUnitType *type = units[i]->GetType();
 		if (type && type->CanSelect(mode)) {
 			table.push_back(units[i]);
 		}
@@ -682,7 +682,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			
-			if (!unit.Type->BoolFlag[BUILDING_INDEX].value) {
+			if (!unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
 				hasNonBuilding = true;
 			}
 		}
@@ -692,7 +692,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer()) || !unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -703,7 +703,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		}
 		//Wyrmgus start
 		//only select buildings if another building of the same type is already selected
-		if (added_table == false && unit.Type->BoolFlag[BUILDING_INDEX].value && ((i != 0 && !UnitCanBeSelectedWith(*table[0], unit)) || hasNonBuilding)) {
+		if (added_table == false && unit.GetType()->BoolFlag[BUILDING_INDEX].value && ((i != 0 && !UnitCanBeSelectedWith(*table[0], unit)) || hasNonBuilding)) {
 			continue;
 		}
 		//Wyrmgus end
@@ -738,7 +738,7 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		const CUnitType &type = *unit.Type;
+		const CUnitType &type = *unit.GetType();
 		PixelPos spritePos = unit.GetMapPixelPosCenter();
 
 		spritePos.x += type.OffsetX - (type.BoxWidth + type.BoxOffsetX) / 2;
@@ -794,7 +794,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player)) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer())) {
 			continue;
 		}
 		// FIXME: Can we get this?
@@ -811,7 +811,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
 			continue;
 		}
-		const CUnitType &type = *unit.Type;
+		const CUnitType &type = *unit.GetType();
 		// Buildings are visible but not selectable
 		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;
@@ -830,7 +830,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 			continue;
 		}
 		// Buildings are visible but not selectable
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
 		if (unit.IsAliveOnMap()) {
@@ -863,22 +863,22 @@ int SelectArmy()
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer()) || !unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeNaval || unit.Type->UnitType == UnitTypeFly) {
+		if (unit.GetType()->UnitType == UnitTypeNaval || unit.GetType()->UnitType == UnitTypeFly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else on team has this unit
 			continue;
 		}
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) { //this selection mode is not for workers
+		if (unit.GetType()->BoolFlag[HARVESTER_INDEX].value) { //this selection mode is not for workers
 			continue;
 		}
 		table[n++] = &unit;
@@ -907,8 +907,8 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
 	if (Selected.size() == 1
-		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+		&& (!CanSelectMultipleUnits(*Selected[0]->GetPlayer())
+			|| !Selected[0]->GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
 		return Selected.empty();
 	}
 	// If there is no selected unit yet, do a simple selection.
@@ -975,20 +975,20 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer()) || !unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.GetType()->UnitType == UnitTypeFly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
@@ -1026,20 +1026,20 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 	unsigned int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer()) || !unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.GetType()->UnitType != UnitTypeFly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
@@ -1069,15 +1069,15 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
 	if (Selected.size() == 1
-		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+		&& (!CanSelectMultipleUnits(*Selected[0]->GetPlayer())
+			|| !Selected[0]->GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
 		return Selected.size();
 	}
 
 	// If there is no selected unit yet, do a simple selection.
 	//Wyrmgus start
 //	if (Selected.empty()) {
-	if (Selected.empty() || (Selected.size() && Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)) {
+	if (Selected.empty() || (Selected.size() && Selected[0]->GetType()->BoolFlag[BUILDING_INDEX].value)) {
 	//Wyrmgus end
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
@@ -1097,21 +1097,21 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) ||
-			!unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer()) ||
+			!unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.GetType()->UnitType == UnitTypeFly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
@@ -1142,15 +1142,15 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
 	if (Selected.size() == 1
-		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+		&& (!CanSelectMultipleUnits(*Selected[0]->GetPlayer())
+			|| !Selected[0]->GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
 		return Selected.size();
 	}
 
 	// If there is no selected unit yet, do a simple selection.
 	//Wyrmgus start
 //	if (Selected.empty()) {
-	if (Selected.empty() || (Selected.size() && Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)) {
+	if (Selected.empty() || (Selected.size() && Selected[0]->GetType()->BoolFlag[BUILDING_INDEX].value)) {
 	//Wyrmgus end
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
@@ -1168,21 +1168,21 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	unsigned int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player) ||
-			!unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		if (!CanSelectMultipleUnits(*unit.GetPlayer()) ||
+			!unit.GetType()->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.GetType()->UnitType != UnitTypeFly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end

@@ -80,7 +80,7 @@ constexpr int CANCEL_UPGRADE_COSTS_FACTOR = 100;
 	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
 	// FIXME: if you give quick an other order, the resources are lost!
-	unit.Player->SubUnitType(type);
+	unit.GetPlayer()->SubUnitType(type);
 	order->Type = &type;
 	return order;
 }
@@ -98,11 +98,11 @@ constexpr int CANCEL_UPGRADE_COSTS_FACTOR = 100;
 int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 //Wyrmgus end
 {
-	const CUnitType &oldtype = *unit.Type;
+	const CUnitType &oldtype = *unit.GetType();
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
+	const Vec2i pos = unit.GetTilePos() + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
 	CUnit *container = unit.Container;
 
 	//Wyrmgus start
@@ -113,7 +113,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		SaveSelection();
 		unit.Remove(nullptr);
 		if (!UnitTypeCanBeAt(newtype, pos)) {
-			unit.Place(unit.tilePos);
+			unit.Place(unit.GetTilePos());
 			RestoreSelection();
 			// FIXME unit is not modified, try later ?
 			return 0;
@@ -129,7 +129,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			//Wyrmgus start
 			/*
 			if (!UnitTypeCanBeAt(newtype, pos)) {
-				unit.Place(unit.tilePos);
+				unit.Place(unit.GetTilePos());
 				RestoreSelection();
 				// FIXME unit is not modified, try later ?
 				return 0;
@@ -140,7 +140,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 
-	CPlayer &player = *unit.Player;
+	CPlayer &player = *unit.GetPlayer();
 	if (!unit.UnderConstruction) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
@@ -230,7 +230,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		for (int i = unit.InsideCount; i && unit.BoardCount > newtype.MaxOnBoard; --i, uins = uins->NextContained) {
 			if (uins->Boarded) {
 				uins->Boarded = 0;
-				unit.BoardCount -= uins->Type->GetBoardSize();
+				unit.BoardCount -= uins->GetType()->GetBoardSize();
 				DropOutOnSide(*uins, LookingW, &unit);
 			}
 		}
@@ -245,7 +245,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus end
 	
 	unit.Type = &newtype;
-	unit.Stats = &unit.Type->Stats[player.GetIndex()];
+	unit.Stats = &unit.GetType()->Stats[player.GetIndex()];
 	
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
@@ -435,7 +435,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 //Wyrmgus start
 void COrder_TransformInto::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 {
-	const CPlayer &player = *unit.Player;
+	const CPlayer &player = *unit.GetPlayer();
 	this->Type = &newType;
 }
 //Wyrmgus end
@@ -483,7 +483,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, const CUnitType &n
 static void AnimateActionUpgradeTo(CUnit &unit)
 {
 	//Wyrmgus start
-//	CAnimations &animations = *unit.Type->Animations;
+//	CAnimations &animations = *unit.GetType()->Animations;
 //	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
 	CAnimations &animations = *unit.GetAnimations();
 	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
@@ -497,7 +497,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 		unit.Wait--;
 		return ;
 	}
-	CPlayer &player = *unit.Player;
+	CPlayer &player = *unit.GetPlayer();
 	const CUnitType &newtype = *this->Type;
 	const CUnitStats &newstats = newtype.Stats[player.GetIndex()];
 
@@ -518,14 +518,14 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		//Wyrmgus start
 		//I think it is too much to notify the player whenever an individual upgrade is cancelled
-//		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
+//		player.Notify(NotifyYellow, unit.GetTilePos(), _("Upgrade to %s canceled"), newtype.Name.c_str());
 		//Wyrmgus end
 		this->Finished = true;
 		return ;
 	}
 	//Wyrmgus start
 	//I think it is too much to notify the player whenever an individual upgrade is completed
-//	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->GetName().c_str());
+//	player.Notify(NotifyGreen, unit.GetTilePos(), _("Upgrade to %s complete"), unit.GetType()->GetName().c_str());
 	//Wyrmgus end
 
 	//  Warn AI.
@@ -535,7 +535,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	this->Finished = true;
 	
 	//Wyrmgus start
-	if (newtype.BoolFlag[BUILDING_INDEX].value && !unit.Player->AiEnabled) { //if the unit is a building, remove it from its group (if any) when upgraded (buildings can only be selected together if they are of the same type
+	if (newtype.BoolFlag[BUILDING_INDEX].value && !unit.GetPlayer()->AiEnabled) { //if the unit is a building, remove it from its group (if any) when upgraded (buildings can only be selected together if they are of the same type
 		if (unit.GroupId) {
 			RemoveUnitFromNonSingleGroups(unit);
 		}
@@ -545,7 +545,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 
 /* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)
 {
-	CPlayer &player = *unit.Player;
+	CPlayer &player = *unit.GetPlayer();
 	
 	int type_costs[MaxCosts];
 	player.GetUnitTypeCosts(this->Type, type_costs);
@@ -558,13 +558,13 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
-	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->GetIndex()].Costs[TimeCost];
+	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost];
 }
 
 //Wyrmgus start
 void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, const CUnitType &newType)
 {
-	const CPlayer &player = *unit.Player;
+	const CPlayer &player = *unit.GetPlayer();
 	const int oldCost = this->Type->Stats[player.GetIndex()].Costs[TimeCost];
 	const int newCost = newType.Stats[player.GetIndex()].Costs[TimeCost];
 

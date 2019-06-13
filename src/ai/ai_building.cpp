@@ -45,10 +45,6 @@
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -168,7 +164,7 @@ public:
 	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, const bool ignore_exploration, const int z, const int landmass, const CSite *settlement) :
 	//Wyrmgus end
 		worker(worker), type(type),
-			movemask(worker.Type->MovementMask 
+			movemask(worker.GetType()->MovementMask 
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		checkSurround(checkSurround),
@@ -209,11 +205,11 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 	
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.GetPlayer()->GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.GetPlayer()->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
 		return VisitResult_DeadEnd;
 	}
 	
@@ -221,8 +217,8 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	if (
 		(!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)
 		&& CanBuildUnitType(&worker, type, pos, 1, IgnoreExploration, z)
-		&& !AiEnemyUnitsInDistance(*worker.Player, nullptr, pos, 8, z)
-		&& (!settlement || settlement == worker.Player->GetNearestSettlement(pos, z, type.TileSize))
+		&& !AiEnemyUnitsInDistance(*worker.GetPlayer(), nullptr, pos, 8, z)
+		&& (!settlement || settlement == worker.GetPlayer()->GetNearestSettlement(pos, z, type.TileSize))
 	) {
 		//Wyrmgus end
 		bool backupok;
@@ -294,7 +290,7 @@ public:
 	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 	//Wyrmgus end
 		worker(worker), type(type),
-		movemask(worker.Type->MovementMask
+		movemask(worker.GetType()->MovementMask
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		resource(resource),
@@ -323,16 +319,16 @@ private:
 bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 {
 	//Wyrmgus start
-	if (!mine.Type->BoolFlag[BUILDING_INDEX].value || !mine.Type->GivesResource) {
+	if (!mine.GetType()->BoolFlag[BUILDING_INDEX].value || !mine.GetType()->GivesResource) {
 		return false; //if isn't a building, then it isn't a mine, but a metal rock/resource pile, which is not attractive enough to build a hall nearby; if its type doesn't give a resource, then it isn't a mine but an industrial building, which should already be in a settlement
 	}
 	//Wyrmgus end
 	
 	// Check units around mine
 	const Vec2i offset(5, 5);
-	const Vec2i minpos = mine.tilePos - offset;
-	const Vec2i typeSize(mine.Type->TileSize - 1);
-	const Vec2i maxpos = mine.tilePos + typeSize + offset;
+	const Vec2i minpos = mine.GetTilePos() - offset;
+	const Vec2i typeSize(mine.GetType()->TileSize - 1);
+	const Vec2i maxpos = mine.GetTilePos() + typeSize + offset;
 	std::vector<CUnit *> units;
 
 	Select(minpos, maxpos, units, mine.MapLayer->ID);
@@ -344,23 +340,23 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 		const CUnit &unit = *units[j];
 		// Enemy near mine
 		//Wyrmgus start
-//		if (AiPlayer->Player->IsEnemy(*unit.Player)) {
-		if (worker.Player->IsEnemy(*unit.Player)) {
+//		if (AiPlayer->Player->IsEnemy(*unit.GetPlayer())) {
+		if (worker.GetPlayer()->IsEnemy(*unit.GetPlayer())) {
 		//Wyrmgus end
 			return false;
 		}
 		// Town hall near mine
 		//Wyrmgus start
-//		if (unit.Type->CanStore[resource]) {
-		if (unit.Type->CanStore[mine.GivesResource]) {
+//		if (unit.GetType()->CanStore[resource]) {
+		if (unit.GetType()->CanStore[mine.GivesResource]) {
 		//Wyrmgus end
 			return false;
 		}
 		// Town hall may not be near but we may be using it, check
 		// for 2 buildings near it and assume it's been used
 		//Wyrmgus start
-//		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->GivesResource) {
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.GivesResource) {
+//		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.GetType()->GivesResource) {
+		if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.GivesResource) {
 		//Wyrmgus end
 			++buildings;
 			if (buildings == 2) {
@@ -381,12 +377,12 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.GetPlayer()->GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.GetPlayer()->HasNeutralFactionType()) {
 		return VisitResult_DeadEnd;
 	}
 	
@@ -487,7 +483,7 @@ public:
 	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 	//Wyrmgus end
 		worker(worker), type(type),
-		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(worker.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resource(resource),
 		//Wyrmgus start
 //		resultPos(resultPos)
@@ -519,12 +515,12 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.GetPlayer()->GetIndex() && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.GetPlayer()->HasNeutralFactionType()) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -541,7 +537,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 //	if (CanMoveToMask(pos, movemask)
 	if (CanMoveToMask(pos, movemask, z)
 	//Wyrmgus end
-		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
+		|| (worker.GetType()->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -622,11 +618,11 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 	// Find a good place for a new hall
 	//Wyrmgus start
 //	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->GetIndex()
-	DebugPrint("%d: Want to build a %s(%s)\n" _C_ worker.Player->GetIndex()
+	DebugPrint("%d: Want to build a %s(%s)\n" _C_ worker.GetPlayer()->GetIndex()
    //Wyrmgus end
 			   //Wyrmgus start
 //			   _C_ type.Ident.c_str() _C_ type.Name.c_str());
-			   _C_ type.Ident.c_str() _C_ type.GetDefaultName(worker.Player).c_str());
+			   _C_ type.Ident.c_str() _C_ type.GetDefaultName(worker.GetPlayer()).c_str());
 			   //Wyrmgus end
 
 	//Wyrmgus start
@@ -636,11 +632,11 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 	}
 	//Wyrmgus end
 
-	const Vec2i &startPos = CMap::Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
+	const Vec2i &startPos = CMap::Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.GetTilePos();
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
-		ResourceInfo *resinfo = worker.Type->ResInfo[i];
+		ResourceInfo *resinfo = worker.GetType()->ResInfo[i];
 		//Depots
 		if (type.CanStore[i]) {
 			//Wyrmgus start

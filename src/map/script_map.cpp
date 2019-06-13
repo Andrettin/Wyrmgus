@@ -430,8 +430,8 @@ static int CclShowMapLocation(lua_State *l)
 	CUnit *target = MakeUnit(*unitType, CPlayer::GetThisPlayer());
 	if (target != nullptr) {
 		target->Variable[HP_INDEX].Value = 0;
-		target->tilePos.x = LuaToNumber(l, 1);
-		target->tilePos.y = LuaToNumber(l, 2);
+		target->TilePos.x = LuaToNumber(l, 1);
+		target->TilePos.y = LuaToNumber(l, 2);
 		target->TTL = GameCycle + LuaToNumber(l, 4);
 		target->CurrentSightRange = LuaToNumber(l, 3);
 		//Wyrmgus start

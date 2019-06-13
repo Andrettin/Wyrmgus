@@ -66,7 +66,7 @@ bool CUpgradeDependency::CheckInternal(const CPlayer *player, const bool ignore_
 
 bool CUpgradeDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
-	return this->CheckInternal(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->Upgrade);
+	return this->CheckInternal(unit->GetPlayer(), ignore_units) || unit->GetIndividualUpgrade(this->Upgrade);
 }
 
 std::string CUpgradeDependency::GetString(const std::string &prefix) const

@@ -72,7 +72,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 	}
 	order->UpdateConstructionFrame(unit);
 
-	if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
+	if (unit.GetType()->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
 		order->Worker = &builder;
 	}
 	return order;
@@ -86,7 +86,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 		file.printf(" \"finished\", ");
 	}
 	//Wyrmgus start
-//	CConstructionFrame *cframe = unit.Type->Construction->Frames;
+//	CConstructionFrame *cframe = unit.GetType()->Construction->Frames;
 	CConstructionFrame *cframe = unit.GetConstruction()->Frames;
 	//Wyrmgus end
 	int frame = 0;
@@ -120,7 +120,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
 		//Wyrmgus start
-//		CConstructionFrame *cframe = unit.Type->Construction->Frames;
+//		CConstructionFrame *cframe = unit.GetType()->Construction->Frames;
 		CConstructionFrame *cframe = unit.GetConstruction()->Frames;
 		//Wyrmgus end
 		while (frame-- && cframe->Next != nullptr) {
@@ -157,16 +157,16 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	}
 	// Player gets back 75% of the original cost for a building.
 	int type_costs[MaxCosts];
-	unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
-	unit.Player->AddCostsFactor(type_costs, CANCEL_BUILDING_COSTS_FACTOR);
+	unit.GetPlayer()->GetUnitTypeCosts(unit.GetType(), type_costs, false, true);
+	unit.GetPlayer()->AddCostsFactor(type_costs, CANCEL_BUILDING_COSTS_FACTOR);
 	// Cancel building
 	LetUnitDie(unit);
 }
 
 static void Finish(COrder_Built &order, CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
-	CPlayer &player = *unit.Player;
+	const CUnitType &type = *unit.GetType();
+	CPlayer &player = *unit.GetPlayer();
 
 	//Wyrmgus start
 //	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.GetIndex() _C_ type.Ident.c_str() _C_ type.Name.c_str());
@@ -214,7 +214,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 			// If we can harvest from the new building, do it.
-			if (table[i]->Type->ResInfo[type.GivesResource]) {
+			if (table[i]->GetType()->ResInfo[type.GivesResource]) {
 				CommandResource(*table[i], unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
@@ -229,7 +229,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	
 	//give builders experience for the construction of the structure
-	int xp_gained = type.Stats[unit.Player->GetIndex()].Costs[TimeCost] / 10;
+	int xp_gained = type.Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] / 10;
 	//Wyrmgus end
 
 	if (worker != nullptr) {
@@ -247,7 +247,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			DropOutOnSide(*worker, LookingW, &unit);
 
 			// If we can harvest from the new building, do it.
-			if (worker->Type->ResInfo[type.GivesResource]) {
+			if (worker->GetType()->ResInfo[type.GivesResource]) {
 				CommandResource(*worker, unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
@@ -287,7 +287,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	//Wyrmgus start
 	//we don't need to notify the player for every building constructed
-//	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
+//	player.Notify(NotifyGreen, unit.GetTilePos(), _("New %s done"), type.Name.c_str());
 	//Wyrmgus end
 	if (&player == CPlayer::GetThisPlayer()) {
 		//Wyrmgus start
@@ -334,11 +334,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (type.TerrainType) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		CMap::Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-		if (type.TerrainType->Overlay && CMap::Map.GetTileTerrain(unit.tilePos, type.TerrainType->Overlay, unit.MapLayer->ID) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
-			CMap::Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
+//		CMap::Map.SetWall(unit.GetTilePos(), &type == UnitTypeHumanWall);
+		if (type.TerrainType->Overlay && CMap::Map.GetTileTerrain(unit.GetTilePos(), type.TerrainType->Overlay, unit.MapLayer->ID) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
+			CMap::Map.RemoveTileOverlayTerrain(unit.GetTilePos(), unit.MapLayer->ID);
 		}
-		CMap::Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
+		CMap::Map.SetTileTerrain(unit.GetTilePos(), type.TerrainType, unit.MapLayer->ID);
 		//Wyrmgus end
 		unit.Remove(nullptr);
 		UnitLost(unit);
@@ -379,7 +379,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 /* virtual */ void COrder_Built::Execute(CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 
 	int amount;
 	if (type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
@@ -390,7 +390,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		amount = 100;
 	}
 	//Wyrmgus start
-	if (!amount && unit.Player->HasNeutralFactionType()) { //trading companies and etc. get their buildings constructed automatically, since they aren't supposed to have workers
+	if (!amount && unit.GetPlayer()->HasNeutralFactionType()) { //trading companies and etc. get their buildings constructed automatically, since they aren't supposed to have workers
 		amount = 100;
 	}
 	//Wyrmgus end
@@ -399,15 +399,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// Check if construction should be canceled...
 	if (this->IsCancelled || this->ProgressCounter < 0) {
 		//Wyrmgus start
-//		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->GetIndex() _C_ unit.Type->Name.c_str());
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->GetIndex() _C_ unit.GetTypeName().c_str());
+//		DebugPrint("%d: %s canceled.\n" _C_ unit.GetPlayer()->GetIndex() _C_ unit.GetType()->Name.c_str());
+		DebugPrint("%d: %s canceled.\n" _C_ unit.GetPlayer()->GetIndex() _C_ unit.GetTypeName().c_str());
 		//Wyrmgus end
 
 		CancelBuilt(*this, unit);
 		return ;
 	}
 
-	const int maxProgress = type.Stats[unit.Player->GetIndex()].Costs[TimeCost] * 600;
+	const int maxProgress = type.Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] * 600;
 
 	// Check if building ready. Note we can both build and repair.
 	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
@@ -425,7 +425,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[BUILD_INDEX].Value = this->ProgressCounter;
-	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->GetIndex()].Costs[TimeCost] * 600;
+	unit.Variable[BUILD_INDEX].Max = unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] * 600;
 
 	// This should happen when building unit with several peons
 	// Maybe also with only one.
@@ -445,10 +445,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 void COrder_Built::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-			   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str());
 	//Wyrmgus start
-//	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID), unit.Settlement);
+//	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *unit.GetType());
+	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *unit.GetType(), CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID), unit.Settlement);
 	//Wyrmgus end
 }
 
@@ -473,8 +473,8 @@ static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cfr
 */
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
-	const int percent = this->ProgressCounter / (type.Stats[unit.Player->GetIndex()].Costs[TimeCost] * 6);
+	const CUnitType &type = *unit.GetType();
+	const int percent = this->ProgressCounter / (type.Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] * 6);
 	//Wyrmgus start
 //	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
 	const CConstructionFrame *cframe = FindCFramePercent(*unit.GetConstruction()->Frames, percent);
@@ -499,8 +499,8 @@ void COrder_Built::Progress(CUnit &unit, int amount)
 	Boost(unit, amount, SHIELD_INDEX);
 
 	//Wyrmgus start
-//	this->ProgressCounter += std::max(1, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
-	this->ProgressCounter += std::max(0, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
+//	this->ProgressCounter += std::max(1, amount * unit.GetPlayer()->SpeedBuild / SPEEDUP_FACTOR);
+	this->ProgressCounter += std::max(0, amount * unit.GetPlayer()->SpeedBuild / SPEEDUP_FACTOR);
 	//Wyrmgus end
 	UpdateConstructionFrame(unit);
 }
@@ -510,8 +510,8 @@ void COrder_Built::ProgressHp(CUnit &unit, int amount)
 	Boost(unit, amount, HP_INDEX);
 
 	//Wyrmgus start
-//	this->ProgressCounter += std::max(1, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
-	this->ProgressCounter += std::max(0, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
+//	this->ProgressCounter += std::max(1, amount * unit.GetPlayer()->SpeedBuild / SPEEDUP_FACTOR);
+	this->ProgressCounter += std::max(0, amount * unit.GetPlayer()->SpeedBuild / SPEEDUP_FACTOR);
 	//Wyrmgus end
 	UpdateConstructionFrame(unit);
 }
@@ -524,8 +524,8 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 	const int costs = building.Stats->Costs[TimeCost] * 600;
 	const int progress = this->ProgressCounter;
 	//Wyrmgus start
-//	const int newProgress = progress + std::max(1, amount * building.Player->SpeedBuild / SPEEDUP_FACTOR);
-	const int newProgress = progress + std::max(0, amount * building.Player->SpeedBuild / SPEEDUP_FACTOR);
+//	const int newProgress = progress + std::max(1, amount * building.GetPlayer()->SpeedBuild / SPEEDUP_FACTOR);
+	const int newProgress = progress + std::max(0, amount * building.GetPlayer()->SpeedBuild / SPEEDUP_FACTOR);
 	//Wyrmgus end
 	const int maxValue = building.Variable[varIndex].Max;
 

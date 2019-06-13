@@ -97,7 +97,7 @@ bool CSiteDependency::CheckInternal(const CPlayer *player, const bool ignore_uni
 bool CSiteDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
 	if (this->Faction != nullptr || this->Enemy) {
-		return this->CheckInternal(unit->Player, ignore_units);
+		return this->CheckInternal(unit->GetPlayer(), ignore_units);
 	}
 	
 	return unit->Settlement == this->Site;

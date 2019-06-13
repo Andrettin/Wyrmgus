@@ -115,7 +115,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(input.GetUnit()->tilePos, tileSize, input.GetUnit()->MapLayer->ID);
+	input.SetGoal(input.GetUnit()->GetTilePos(), tileSize, input.GetUnit()->MapLayer->ID);
 }
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
@@ -145,8 +145,8 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 			break;
 		default:
 			DebugPrint("FIXME: %i: %d(%s) killed, with order %d!\n" _C_
-					   unit.Player->GetIndex() _C_ UnitNumber(unit) _C_
-					   unit.Type->Ident.c_str() _C_ Action);
+					   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_
+					   unit.GetType()->Ident.c_str() _C_ Action);
 			break;
 	}
 }
@@ -157,7 +157,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 /* virtual */ void COrder::OnAnimationAttack(CUnit &unit)
 {
 	//Wyrmgus start
-//	if (unit.Type->CanAttack == false) {
+//	if (unit.GetType()->CanAttack == false) {
 	if (unit.CanAttack(false) == false) {
 	//Wyrmgus end
 		return;
@@ -181,7 +181,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 {
 	const Vec2i invalidPos(-1, -1);
 	if (this->HasGoal()) {
-		return this->GetGoal()->tilePos;
+		return this->GetGoal()->GetTilePos();
 	}
 	return invalidPos;
 }
@@ -294,10 +294,10 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		// OnEachSecond callback
-		if (unit.Type->OnEachSecond  && unit.IsUnusable(false) == false) {
-			unit.Type->OnEachSecond->pushPreamble();
-			unit.Type->OnEachSecond->pushInteger(UnitNumber(unit));
-			unit.Type->OnEachSecond->run();
+		if (unit.GetType()->OnEachSecond  && unit.IsUnusable(false) == false) {
+			unit.GetType()->OnEachSecond->pushPreamble();
+			unit.GetType()->OnEachSecond->pushInteger(UnitNumber(unit));
+			unit.GetType()->OnEachSecond->run();
 		}
 
 		// 1) Blink flag.
@@ -320,7 +320,7 @@ static void UnitActionsEachFiveSeconds(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		//if the unit is garrisoned within a building that provides garrison training, increase its XP
-		if (unit.Container && unit.Container->Type->BoolFlag[GARRISONTRAINING_INDEX].value) {
+		if (unit.Container && unit.Container->GetType()->BoolFlag[GARRISONTRAINING_INDEX].value) {
 			unit.ChangeExperience(1);
 		}
 	}
@@ -349,10 +349,10 @@ static void DumpUnitInfo(CUnit &unit)
 
 	fprintf(logf, "%lu: ", GameCycle);
 	fprintf(logf, "%d %s %d P%i Refs %d: %llX %d,%d %d,%d\n",
-			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
+			UnitNumber(unit), unit.GetType() ? unit.GetType()->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
-			unit.Player ? unit.Player->GetIndex() : -1, unit.Refs, RNG->get_seed(),
-			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
+			unit.GetPlayer() ? unit.GetPlayer()->GetIndex() : -1, unit.Refs, RNG->get_seed(),
+			unit.GetTilePos().x, unit.GetTilePos().y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);
 #endif
@@ -410,14 +410,14 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		unit.UpdateSoldUnits();
 		
-		for (size_t i = 0; i < unit.Type->SpawnUnits.size(); ++i) {
-			CUnitType *spawned_type = unit.Type->SpawnUnits[i];
-			int spawned_type_demand = spawned_type->Stats[unit.Player->GetIndex()].Variables[DEMAND_INDEX].Value;
+		for (size_t i = 0; i < unit.GetType()->SpawnUnits.size(); ++i) {
+			CUnitType *spawned_type = unit.GetType()->SpawnUnits[i];
+			int spawned_type_demand = spawned_type->Stats[unit.GetPlayer()->GetIndex()].Variables[DEMAND_INDEX].Value;
 			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
-				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached
+				if ((unit.GetPlayer()->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.GetPlayer()->GetUnitTypeCount(unit.GetType()) * 5)) { //max limit reached
 					continue;
 				}
-				CUnit *spawned_unit = MakeUnit(*spawned_type, unit.Player);
+				CUnit *spawned_unit = MakeUnit(*spawned_type, unit.GetPlayer());
 				DropOutOnSide(*spawned_unit, spawned_unit->Direction, &unit);
 			}
 		}

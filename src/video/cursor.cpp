@@ -339,7 +339,7 @@ void DrawBuildingCursor()
 
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*CPlayer::GetThisPlayer(), posIt,
-														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
+														  mask & ((!Selected.empty() && Selected[0]->GetTilePos() == posIt) ?
 																  //Wyrmgus start
 //																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
 																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID))

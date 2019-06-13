@@ -156,12 +156,12 @@
 int DoActionMove(CUnit &unit)
 {
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft, don't move if any unit over it is still moving
+	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
+	if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft, don't move if any unit over it is still moving
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 				if (table[i]->Moving) {
 					unit.Wait = 1;
 					unit.Moving = 0;
@@ -170,11 +170,11 @@ int DoActionMove(CUnit &unit)
 				}
 			}
 		}
-	} else if ((mf.GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft, don't move if the raft is still moving
+	} else if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft, don't move if the raft is still moving
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->Moving) {
 					unit.Wait = 1;
 					unit.Moving = 0;
@@ -192,7 +192,7 @@ int DoActionMove(CUnit &unit)
 	Assert(unit.CanMove());
 	
 	//Wyrmgus start
-//	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+//	if (!unit.Moving && (unit.GetType()->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 	if (!unit.Moving && (unit.GetAnimations()->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 	//Wyrmgus end
 		Assert(!unit.Anim.Unbreakable);
@@ -201,11 +201,11 @@ int DoActionMove(CUnit &unit)
 		unit.IX = 0;
 		unit.IY = 0;
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
+		if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 					table[i]->IX = 0;
 					table[i]->IY = 0;
 				}
@@ -218,7 +218,7 @@ int DoActionMove(CUnit &unit)
 		MarkUnitFieldFlags(unit);
 		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop
-				if (unit.Player->AiEnabled) {
+				if (unit.GetPlayer()->AiEnabled) {
 					AiCanNotMove(unit);
 				}
 				unit.Moving = 0;
@@ -238,9 +238,9 @@ int DoActionMove(CUnit &unit)
 				break;
 		}
 		
-		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
+		if (unit.GetType()->UnitType == UnitTypeNaval) { // Boat (un)docking?
 			const CMapField &mf_cur = *unit.MapLayer->Field(unit.Offset);
-			const CMapField &mf_next = *unit.MapLayer->Field(unit.tilePos + posd);
+			const CMapField &mf_next = *unit.MapLayer->Field(unit.GetTilePos() + posd);
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
 				PlayUnitSound(unit, VoiceDocking);
@@ -248,13 +248,13 @@ int DoActionMove(CUnit &unit)
 				PlayUnitSound(unit, VoiceDocking); // undocking
 			}
 		}
-		Vec2i pos = unit.tilePos + posd;
+		Vec2i pos = unit.GetTilePos() + posd;
 		//Wyrmgus start
-		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
+		if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
 					table[i]->IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
 					table[i]->IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
@@ -286,7 +286,7 @@ int DoActionMove(CUnit &unit)
 
 		unit.IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
 		unit.IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
-		unit.Frame = unit.Type->StillFrame;
+		unit.Frame = unit.GetType()->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
 		posd.x = Heading2X[unit.Direction / NextDirection];
@@ -296,7 +296,7 @@ int DoActionMove(CUnit &unit)
 	
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
-//	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, CMap::Map.Field(unit.Offset)->getCost());
+//	int move = UnitShowAnimationScaled(unit, unit.GetType()->Animations->Move, CMap::Map.Field(unit.Offset)->getCost());
 	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
 	//Wyrmgus end
 	
@@ -304,11 +304,11 @@ int DoActionMove(CUnit &unit)
 	unit.IY += posd.y * move;
 	
 	//Wyrmgus start
-	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
+	if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 				table[i]->IX += posd.x * move;
 				table[i]->IY += posd.y * move;
 			}
@@ -324,11 +324,11 @@ int DoActionMove(CUnit &unit)
 		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
 #endif
 		
-		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
+		if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 					table[i]->IX = 0;
 					table[i]->IY = 0;
 				}
@@ -358,7 +358,7 @@ int DoActionMove(CUnit &unit)
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
@@ -378,11 +378,11 @@ int DoActionMove(CUnit &unit)
 		case PF_REACHED:
 			//Wyrmgus start
 			if (this->Range >= 1) {
-				if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
+				if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+					Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
 								CommandStopUnit(*table[i]);
 								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
@@ -390,11 +390,11 @@ int DoActionMove(CUnit &unit)
 							return;
 						}
 					}
-				} else if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft
+				} else if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft
 					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+					Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
+						if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
 								CommandStopUnit(*table[i]);
 								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);

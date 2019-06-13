@@ -201,7 +201,7 @@ class BestDepotFinder
 	inline void operator()(CUnit *const dest)
 	{
 		/* Only resource depots */
-		if (dest->Type->CanStore[resource]
+		if (dest->GetType()->CanStore[resource]
 			//Wyrmgus start
 			&& (NEARLOCATION || u_near.worker->CanReturnGoodsTo(dest, resource))
 			//Wyrmgus end
@@ -310,7 +310,7 @@ class BestHomeMarketFinder
 	{
 		/* Only markets */
 		if (
-			dest->Type->BoolFlag[MARKET_INDEX].value
+			dest->GetType()->BoolFlag[MARKET_INDEX].value
 			&& dest->IsAliveOnMap()
 			&& dest->CurrentAction() != UnitActionBuilt) {
 			// Unit in range?
@@ -431,7 +431,7 @@ public:
 	//Wyrmgus end
 	bool operator()(const CUnit *const unit) const
 	{
-		const CUnitType &type = *unit->Type;
+		const CUnitType &type = *unit->GetType();
 		//Wyrmgus start
 //		return (type.GivesResource == resource
 		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && CResource::GetAll()[unit->GivesResource]->FinalResource == resource) || (include_luxury && CResource::GetAll()[unit->GivesResource]->LuxuryResource))
@@ -462,9 +462,9 @@ public:
 	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable, bool from_outside_container) :
 	//Wyrmgus end
 		worker(worker),
-		resinfo(*worker.Type->ResInfo[resource]),
+		resinfo(*worker.GetType()->ResInfo[resource]),
 		deposit(deposit),
-		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(worker.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		maxRange(maxRange),
 		check_usage(check_usage),
 		//Wyrmgus start
@@ -544,14 +544,14 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 		}
 	}
 	
-//	return mine.Type->BoolFlag[CANHARVEST_INDEX].value && mine.ResourcesHeld
+//	return mine.GetType()->BoolFlag[CANHARVEST_INDEX].value && mine.ResourcesHeld
 	return mine.ResourcesHeld
 	//Wyrmgus end
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
 //		   && (resinfo.HarvestFromOutside
-//			   || mine.Player->GetIndex() == PlayerMax - 1
-//			   || mine.Player == worker.Player
+//			   || mine.GetPlayer()->GetIndex() == PlayerMax - 1
+//			   || mine.GetPlayer() == worker.GetPlayer()
 //			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
 		   && worker.CanHarvest(&mine, only_harvestable);
 			//Wyrmgus end
@@ -569,19 +569,19 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 	distance = distance * 100 / resource->FinalResourceConversionRate;
 	
 	//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
-	int price_modifier = worker.Player->GetResourcePrice(resource->FinalResource) * resource->FinalResourceConversionRate / 100;
+	int price_modifier = worker.GetPlayer()->GetResourcePrice(resource->FinalResource) * resource->FinalResourceConversionRate / 100;
 	if (resource->InputResource) {
-		price_modifier -= worker.Player->GetResourcePrice(resource->InputResource);
+		price_modifier -= worker.GetPlayer()->GetResourcePrice(resource->InputResource);
 	}
 	price_modifier = std::max(price_modifier, 1);
 	distance = distance * 100 / price_modifier;
 
-	if (!mine.Type->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, multiply the distance score
+	if (!mine.GetType()->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, multiply the distance score
 		distance *= 8;
 	}
 	//Wyrmgus end
 	if (check_usage) {
-		assigned = mine.Resource.Assigned - mine.Type->MaxOnBoard;
+		assigned = mine.Resource.Assigned - mine.GetType()->MaxOnBoard;
 		waiting = GetNumWaitingWorkers(mine);
 	} else {
 		assigned = 0;
@@ -592,8 +592,8 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	//Wyrmgus start
-//	if (!worker.Player->AiEnabled && !CMap::Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
-	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
+//	if (!worker.GetPlayer()->AiEnabled && !CMap::Map.Field(pos)->playerInfo.IsExplored(*worker.GetPlayer())) {
+	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.GetPlayer()) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
@@ -602,7 +602,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	CUnit *mine = CMap::Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
-	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->GetIndex() && !CPlayer::Players[worker.MapLayer->Field(pos)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
+	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.GetPlayer()->GetIndex() && !CPlayer::Players[worker.MapLayer->Field(pos)->Owner]->HasNeutralFactionType() && !worker.GetPlayer()->HasNeutralFactionType() && (!mine || mine->GetType()->GivesResource != TradeCost)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -611,7 +611,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 	if (
 		mine && mine != *resultMine && MineIsUsable(*mine)
-		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->Owner == -1 || worker.MapLayer->Field(pos)->Owner == worker.Player->GetIndex()) //this is needed to prevent neutral factions from trying to build mines in others' territory
+		&& (mine->GetType()->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->Owner == -1 || worker.MapLayer->Field(pos)->Owner == worker.GetPlayer()->GetIndex()) //this is needed to prevent neutral factions from trying to build mines in others' territory
 	) {
 	//Wyrmgus end
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -660,7 +660,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
-		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, startUnit.MapLayer->ID);
+		deposit = FindDepositNearLoc(*unit.GetPlayer(), startUnit.GetTilePos(), range, resource, startUnit.MapLayer->ID);
 	}
 
 	TerrainTraversal terrainTraversal;
@@ -668,7 +668,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 	//Wyrmgus start
 //	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 	terrainTraversal.SetSize(startUnit.MapLayer->GetWidth(), startUnit.MapLayer->GetHeight());
-	if (unit.Type->BoolFlag[RAIL_INDEX].value) {
+	if (unit.GetType()->BoolFlag[RAIL_INDEX].value) {
 		terrainTraversal.SetDiagonalAllowed(false);
 	}
 	//Wyrmgus end
@@ -702,11 +702,11 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
 	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
+	for (std::vector<CUnit *>::iterator it = unit.GetPlayer()->UnitBegin(); it != unit.GetPlayer()->UnitEnd(); ++it) {
 		table.push_back(*it);
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->IsAllied(*unit.Player) && unit.Player->IsAllied(*CPlayer::Players[i])) {
+		if (CPlayer::Players[i]->IsAllied(*unit.GetPlayer()) && unit.GetPlayer()->IsAllied(*CPlayer::Players[i])) {
 			for (std::vector<CUnit *>::iterator it = CPlayer::Players[i]->UnitBegin(); it != CPlayer::Players[i]->UnitEnd(); ++it) {
 				table.push_back(*it);
 			}
@@ -730,7 +730,7 @@ CUnit *FindHomeMarket(const CUnit &unit, int range)
 {
 	BestHomeMarketFinder<false> finder(unit, range);
 	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
+	for (std::vector<CUnit *>::iterator it = unit.GetPlayer()->UnitBegin(); it != unit.GetPlayer()->UnitEnd(); ++it) {
 		table.push_back(*it);
 	}
 	return finder.Find(table.begin(), table.end());
@@ -753,7 +753,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = player.GetUnit(i);
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
+		if (unit.GetType()->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
 			if (unit.CurrentAction() == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;
@@ -786,8 +786,8 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 		CUnit &unit = **it;
 
 		//Wyrmgus start
-//		if (unit.Type == &type && !unit.IsUnusable(everybody)) {
-		if (unit.Type == &type && (!unit.IsUnusable(everybody) || (everybody && unit.IsAlive()))) {
+//		if (unit.GetType() == &type && !unit.IsUnusable(everybody)) {
+		if (unit.GetType() == &type && (!unit.IsUnusable(everybody) || (everybody && unit.IsAlive()))) {
 		//Wyrmgus end
 			units.push_back(&unit);
 		}
@@ -875,10 +875,10 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, in
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!unit.IsVisibleAsGoal(*source.Player)) {
+		if (!unit.IsVisibleAsGoal(*source.GetPlayer())) {
 			continue;
 		}
-		if (!CanTarget(*source.Type, *unit.Type)) {
+		if (!CanTarget(*source.GetType(), *unit.GetType())) {
 			continue;
 		}
 
@@ -920,7 +920,7 @@ public:
 	explicit IsADepositForResource(const int r) : resource(r) {}
 	bool operator()(const CUnit *const unit) const
 	{
-		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+		return (unit->GetType()->CanStore[resource] && !unit->IsUnusable());
 	}
 private:
 	const int resource;
@@ -989,9 +989,9 @@ private:
 
 	int ComputeCost(CUnit *const dest) const
 	{
-		const CPlayer &player = *attacker->Player;
-		const CUnitType &type = *attacker->Type;
-		const CUnitType &dtype = *dest->Type;
+		const CPlayer &player = *attacker->GetPlayer();
+		const CUnitType &type = *attacker->GetType();
+		const CUnitType &dtype = *dest->GetType();
 		int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
 
 		//Wyrmgus start
@@ -999,7 +999,7 @@ private:
 		if (
 			(
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->GetPlayer()->Type == PlayerNeutral || attacker->GetPlayer() == dest->GetPlayer())
 			)
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
@@ -1012,7 +1012,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
+		if (CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->GetTilePos(), dest->GetTilePos(), MapFieldAirUnpassable, attacker->MapLayer->ID)) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1151,15 +1151,15 @@ public:
 
 		void Compute(CUnit *const dest)
 		{
-			const CPlayer &player = *attacker->Player;
+			const CPlayer &player = *attacker->GetPlayer();
 
 			if (!dest->IsVisibleAsGoal(player)) {
 				dest->CacheLock = 1;
 				return;
 			}
 
-			const CUnitType &type =  *attacker->Type;
-			const CUnitType &dtype = *dest->Type;
+			const CUnitType &type =  *attacker->GetType();
+			const CUnitType &dtype = *dest->GetType();
 			// won't be a target...
 			if (!CanTarget(type, dtype)) { // can't be attacked.
 				dest->CacheLock = 1;
@@ -1186,7 +1186,7 @@ public:
 //			if (!player.IsEnemy(*dest)) { // a friend or neutral
 			if (
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->GetPlayer()->Type == PlayerNeutral || attacker->GetPlayer() == dest->GetPlayer())
 			) {
 			//Wyrmgus end
 				dest->CacheLock = 1;
@@ -1258,7 +1258,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->GetTilePos(), dest->GetTilePos(), MapFieldAirUnpassable, attacker->MapLayer->ID))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {
@@ -1271,10 +1271,10 @@ public:
 			}
 
 			//Wyrmgus start
-//			const int x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
-//			const int y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
-			const int x = abs(dest->tilePos.x - attacker->tilePos.x) + (size / 2);
-			const int y = abs(dest->tilePos.y - attacker->tilePos.y) + (size / 2);
+//			const int x = dest->GetTilePos().x - attacker->GetTilePos().x + (size / 2);
+//			const int y = dest->GetTilePos().y - attacker->GetTilePos().y + (size / 2);
+			const int x = abs(dest->GetTilePos().x - attacker->GetTilePos().x) + (size / 2);
+			const int y = abs(dest->GetTilePos().y - attacker->GetTilePos().y) + (size / 2);
 			//Wyrmgus end
 			Assert(x >= 0 && y >= 0);
 
@@ -1346,29 +1346,29 @@ private:
 			dest->CacheLock = 0;
 			return;
 		}
-		const CUnitType &type = *attacker->Type;
-		const CUnitType &dtype = *dest->Type;
+		const CUnitType &type = *attacker->GetType();
+		const CUnitType &dtype = *dest->GetType();
 		//Wyrmgus start
 //		const int missile_range = type.Missile.Missile->Range + range - 1;
 		const int missile_range = attacker->GetMissile().Missile->Range + range - 1;
 		//Wyrmgus end
-		int x = attacker->tilePos.x;
-		int y = attacker->tilePos.y;
+		int x = attacker->GetTilePos().x;
+		int y = attacker->GetTilePos().y;
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileSize.x > 1)
-		x = std::clamp<int>(x, dest->tilePos.x, dest->tilePos.x + dtype.TileSize.x - 1);
-		y = std::clamp<int>(y, dest->tilePos.y, dest->tilePos.y + dtype.TileSize.y - 1);
+		x = std::clamp<int>(x, dest->GetTilePos().x, dest->GetTilePos().x + dtype.TileSize.x - 1);
+		y = std::clamp<int>(y, dest->GetTilePos().y, dest->GetTilePos().y + dtype.TileSize.y - 1);
 
 		int sbad = 0;
 		int sgood = 0;
 		
 		// cost map is relative to attacker position
 		//Wyrmgus start
-//		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
-//		y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
-		x = abs(dest->tilePos.x - attacker->tilePos.x) + (size / 2);
-		y = abs(dest->tilePos.y - attacker->tilePos.y) + (size / 2);
+//		x = dest->GetTilePos().x - attacker->GetTilePos().x + (size / 2);
+//		y = dest->GetTilePos().y - attacker->GetTilePos().y + (size / 2);
+		x = abs(dest->GetTilePos().x - attacker->GetTilePos().x) + (size / 2);
+		y = abs(dest->GetTilePos().y - attacker->GetTilePos().y) + (size / 2);
 		//Wyrmgus end
 		Assert(x >= 0 && y >= 0);
 		
@@ -1395,7 +1395,7 @@ private:
 			}
 		}
 
-		if (sgood > 0 && attacker->Type->BoolFlag[NOFRIENDLYFIRE_INDEX].value) {
+		if (sgood > 0 && attacker->GetType()->BoolFlag[NOFRIENDLYFIRE_INDEX].value) {
 			return;
 		}
 		
@@ -1511,8 +1511,8 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 {
 	// if necessary, take possible damage on allied units into account...
 	//Wyrmgus start
-//	if (unit.Type->Missile.Missile->Range > 1
-//		&& (range + unit.Type->Missile.Missile->Range < 15)) {
+//	if (unit.GetType()->Missile.Missile->Range > 1
+//		&& (range + unit.GetType()->Missile.Missile->Range < 15)) {
 	if (unit.GetMissile().Missile->Range > 1
 		&& (range + unit.GetMissile().Missile->Range < 15)) {
 	//Wyrmgus end
@@ -1520,7 +1520,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 		//   FIXME : make it configurable
 
 		//Wyrmgus start
-//		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
+//		int missile_range = unit.GetType()->Missile.Missile->Range + range - 1;
 		int missile_range = unit.GetMissile().Missile->Range + range - 1;
 		//Wyrmgus end
 
@@ -1605,9 +1605,9 @@ CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	Assert(unit.Type->CanAttack);
+//	Assert(unit.GetType()->CanAttack);
 	Assert(unit.CanAttack());
-//	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
+//	const int range = unit.GetPlayer()->Type == PlayerPerson ? unit.GetType()->ReactRangePerson : unit.GetType()->ReactRangeComputer;
 //	return AttackUnitsInDistance(unit, range, pred);
 	const int range = unit.GetReactionRange();
 	return AttackUnitsInDistance(unit, range, pred, true, include_neutral);
@@ -1643,7 +1643,7 @@ private:
 
 VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (pos.x >= dst_unit.tilePos.x && pos.x <= (dst_unit.tilePos.x + dst_unit.Type->TileSize.x - 1) && pos.y >= dst_unit.tilePos.y && pos.y <= (dst_unit.tilePos.y + dst_unit.Type->TileSize.y - 1)) {
+	if (pos.x >= dst_unit.GetTilePos().x && pos.x <= (dst_unit.GetTilePos().x + dst_unit.GetType()->TileSize.x - 1) && pos.y >= dst_unit.GetTilePos().y && pos.y <= (dst_unit.GetTilePos().y + dst_unit.GetType()->TileSize.y - 1)) {
 		*result = true;
 		return VisitResult_Finished;
 	}

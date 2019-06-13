@@ -211,7 +211,7 @@ void CMap::Reveal(bool only_person_players)
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 		//  Reveal neutral buildings. Gold mines:)
-		if (unit.Player->Type == PlayerNeutral) {
+		if (unit.GetPlayer()->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
 				//Wyrmgus start
 //				if (CPlayer::Players[p]->Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
@@ -692,7 +692,7 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainT
 	const CUnitCache &cache = mf.UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		const CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && (terrain_type->GetFlags() & unit.Type->MovementMask) != 0) {
+		if (unit.IsAliveOnMap() && (terrain_type->GetFlags() & unit.GetType()->MovementMask) != 0) {
 			return true;
 		}
 	}
@@ -1095,13 +1095,13 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(unit.Type);
-	if (unit.Type->BoolFlag[NONSOLID_INDEX].value) {
+	Assert(unit.GetType());
+	if (unit.GetType()->BoolFlag[NONSOLID_INDEX].value) {
 		return true;
 	}
 	//Wyrmgus start
-//	return UnitTypeCanBeAt(*unit.Type, pos);
-	return UnitTypeCanBeAt(*unit.Type, pos, z);
+//	return UnitTypeCanBeAt(*unit.GetType(), pos);
+	return UnitTypeCanBeAt(*unit.GetType(), pos, z);
 	//Wyrmgus end
 }
 
@@ -1672,7 +1672,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
 		std::vector<CUnit *> table;
 		Select(pos, pos, table, z);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+			if (table[i] && table[i]->IsAlive() && table[i]->GetType()->UnitType == UnitTypeLand && table[i]->GetType()->BoolFlag[DECORATION_INDEX].value) {
 				if (Editor.Running == EditorNotRunning) {
 					LetUnitDie(*table[i]);
 				} else {
@@ -2258,11 +2258,11 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 			if (!unit) {
 				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
 			}
-			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
-				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->GetIndex() != PlayerNumNeutral) {
-					new_owner = unit->Player->GetIndex();
+			if (unit->IsAliveOnMap() && unit->GetType()->BoolFlag[BUILDING_INDEX].value) {
+				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->GetPlayer()->GetIndex() != PlayerNumNeutral) {
+					new_owner = unit->GetPlayer()->GetIndex();
 					break;
-				} else if (unit->Player->GetIndex() == PlayerNumNeutral && (unit->Type == SettlementSiteUnitType || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
+				} else if (unit->GetPlayer()->GetIndex() == PlayerNumNeutral && (unit->GetType() == SettlementSiteUnitType || (unit->GetType()->GivesResource && !unit->GetType()->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
 					must_have_no_owner = true;
 					break;
 				}
@@ -2286,9 +2286,9 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				bool obstacle_check = true;
 				for (size_t j = 0; j < obstacle_flags.size(); ++j) {
 					bool obstacle_subcheck = false;
-					for (int x = 0; x < unit->Type->TileSize.x; ++x) {
-						for (int y = 0; y < unit->Type->TileSize.y; ++y) {
-							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->Player->GetIndex())) { //the obstacle must be avoidable from at least one of the unit's tiles
+					for (int x = 0; x < unit->GetType()->TileSize.x; ++x) {
+						for (int y = 0; y < unit->GetType()->TileSize.y; ++y) {
+							if (CheckObstaclesBetweenTiles(unit->GetTilePos() + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->GetPlayer()->GetIndex())) { //the obstacle must be avoidable from at least one of the unit's tiles
 								obstacle_subcheck = true;
 								break;
 							}
@@ -2305,7 +2305,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				if (!obstacle_check) {
 					continue;
 				}
-				new_owner = unit->Player->GetIndex();
+				new_owner = unit->GetPlayer()->GetIndex();
 				break;
 			}
 		}
@@ -3158,7 +3158,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	std::vector<CUnit *> table;
 	Select(pos, pos, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+		if (table[i]->GetType()->UnitType == UnitTypeLand && table[i]->GetType()->BoolFlag[DECORATION_INDEX].value) {
 			if (Editor.Running == EditorNotRunning) {
 				LetUnitDie(*table[i]);			
 			} else {

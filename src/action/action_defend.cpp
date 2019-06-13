@@ -68,7 +68,7 @@ enum {
 	COrder_Defend *order = new COrder_Defend();
 
 	if (dest.Destroyed) {
-		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
+		order->goalPos = dest.GetTilePos() + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer->ID;
 	} else {
 		order->SetGoal(&dest);
@@ -168,7 +168,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -185,7 +185,7 @@ enum {
 			unit.WaitBackup = unit.Anim;
 		}
 		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+//		UnitShowAnimation(unit, unit.GetType()->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
@@ -198,13 +198,13 @@ enum {
 	CUnit *goal = this->GetGoal();
 
 	if (this->State == State_Init) {
-		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
+		if (!goal || !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 			this->Finished = true;
 			return;
 		}
 		this->State = State_MovingToTarget;
 	} else if (this->State == State_Defending) {
-		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
+		if (!goal || !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 			this->Finished = true;
 			return;
 		}
@@ -220,14 +220,14 @@ enum {
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-			if ((unit.MapLayer->Field(unit.tilePos)->GetFlags() & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return;
 					}
@@ -238,13 +238,13 @@ enum {
 			this->Range++;
 			break;
 		case PF_REACHED: {
-			if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) { // goal has died
+			if (!goal || !goal->IsVisibleAsGoal(*unit.GetPlayer())) { // goal has died
 				this->Finished = true;
 				return;
 			}
 
 			// Now defend the goal
-			this->goalPos = goal->tilePos;
+			this->goalPos = goal->GetTilePos();
 			this->MapLayer = goal->MapLayer->ID;
 			this->State = State_Defending;
 		}
@@ -253,9 +253,9 @@ enum {
 	}
 
 	// Target destroyed?
-	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+	if (goal && !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 		DebugPrint("Goal gone\n");
-		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
+		this->goalPos = goal->GetTilePos() + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer->ID;
 		this->ClearGoal();
 		goal = nullptr;

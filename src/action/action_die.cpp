@@ -78,7 +78,7 @@
 static bool AnimateActionDie(CUnit &unit)
 {
 	//Wyrmgus start
-//	const CAnimations *animations = unit.Type->Animations;
+//	const CAnimations *animations = unit.GetType()->Animations;
 	const CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
@@ -106,7 +106,7 @@ static bool AnimateActionDie(CUnit &unit)
 	if (unit.Anim.Unbreakable) {
 		return ;
 	}
-	const CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.GetType();
 
 	// Die sequence terminated, generate corpse.
 	if (type.CorpseType == nullptr) {
@@ -131,14 +131,14 @@ static bool AnimateActionDie(CUnit &unit)
 	//Wyrmgus end
 	unit.ChooseVariation(&corpseType);
 	unit.Type = &corpseType;
-	unit.Stats = &corpseType.Stats[unit.Player->GetIndex()];
+	unit.Stats = &corpseType.Stats[unit.GetPlayer()->GetIndex()];
 	//Wyrmgus start
 	const unsigned int var_size = UnitTypeVar.GetNumberVariable();
-	std::copy(corpseType.Stats[unit.Player->GetIndex()].Variables, corpseType.Stats[unit.Player->GetIndex()].Variables + var_size, unit.Variable);
+	std::copy(corpseType.Stats[unit.GetPlayer()->GetIndex()].Variables, corpseType.Stats[unit.GetPlayer()->GetIndex()].Variables + var_size, unit.Variable);
 	//Wyrmgus end
 	UpdateUnitSightRange(unit);
 	//Wyrmgus start
-//	unit.Place(unit.tilePos);
+//	unit.Place(unit.GetTilePos());
 	MapMarkUnitSight(unit);
 	//Wyrmgus end
 
