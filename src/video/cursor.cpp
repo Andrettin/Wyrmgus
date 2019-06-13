@@ -298,7 +298,7 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
+		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize());
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * CMap::Map.GetCurrentPixelTileSize().x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}

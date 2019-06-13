@@ -867,7 +867,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
-		const PixelPos center(screenPos + type.GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
+		const PixelPos center(screenPos + type.GetHalfTilePixelSize());
 
 		if (Preference.ShowSightRange) {
 			//Wyrmgus start
@@ -1264,7 +1264,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	if (state == 1) {
 		if (under_construction && cframe) {
-			const PixelPos pos(screenPos + type->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
+			const PixelPos pos(screenPos + type->GetHalfTilePixelSize());
 			DrawConstruction(player, cframe, *this, *type, frame, pos);
 		} else {
 			DrawUnitType(*type, sprite, player, frame, screenPos);

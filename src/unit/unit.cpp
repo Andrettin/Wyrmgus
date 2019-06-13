@@ -4283,7 +4283,7 @@ void CUnit::Remove(CUnit *host)
 		UnitUnderCursor = nullptr;
 	}
 	
-	Wyrmgus::GetInstance()->emit_signal("unit_removed", this);
+	this->emit_signal("removed");
 }
 
 /**
@@ -5641,7 +5641,7 @@ PixelPos CUnit::GetMapPixelPosTopLeft() const
 //Wyrmgus start
 PixelSize CUnit::GetTilePixelSize() const
 {
-	return PixelSize(this->GetTileSize()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID);
+	return PixelSize(this->GetTileSize()) * CMap::PixelTileSize;
 }
 
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
@@ -8541,6 +8541,10 @@ void CUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_icon"), +[](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
 	ClassDB::bind_method(D_METHOD("get_type"), +[](const CUnit *unit){ return const_cast<CUnitType *>(unit->GetType()); });
 	ClassDB::bind_method(D_METHOD("get_tile_pos"), +[](const CUnit *unit){ return Vector2(unit->GetTilePos()); });
+	ClassDB::bind_method(D_METHOD("get_tile_pixel_size"), +[](const CUnit *unit){ return Vector2(unit->GetTilePixelSize()); });
+	
+	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
+	ADD_SIGNAL(MethodInfo("removed"));
 }
 
 /*----------------------------------------------------------------------------

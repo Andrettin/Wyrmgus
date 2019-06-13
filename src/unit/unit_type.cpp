@@ -1321,9 +1321,9 @@ void CUnitType::Initialize()
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
-PixelSize CUnitType::GetTilePixelSize(const int map_layer) const
+PixelSize CUnitType::GetTilePixelSize() const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * CMap::Map.GetMapLayerPixelTileSize(map_layer));
+	return PixelSize(PixelSize(this->GetTileSize()) * CMap::PixelTileSize);
 }
 
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
@@ -2086,6 +2086,10 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CUnitType *unit_type, const String &ident){ unit_type->Image = PaletteImage::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_image"), +[](const CUnitType *unit_type){ return const_cast<PaletteImage *>(unit_type->GetImage()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
+	
+	ClassDB::bind_method(D_METHOD("get_tile_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetTileSize()); });
+	ClassDB::bind_method(D_METHOD("get_tile_pixel_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetTilePixelSize()); });
+	ClassDB::bind_method(D_METHOD("get_half_tile_pixel_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetHalfTilePixelSize()); });
 	
 	ClassDB::bind_method(D_METHOD("get_stat_strings"), +[](const CUnitType *unit_type){ return VectorToGodotArray(unit_type->GetStatStrings()); });
 	

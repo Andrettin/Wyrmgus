@@ -524,12 +524,12 @@ public:
 		return this->GetTileSize() / 2;
 	}
 	
-	PixelSize GetHalfTilePixelSize(const int map_layer) const
+	PixelSize GetHalfTilePixelSize() const
 	{
-		return GetTilePixelSize(map_layer) / 2;
+		return GetTilePixelSize() / 2;
 	}
 	
-	PixelSize GetTilePixelSize(const int map_layer) const;
+	PixelSize GetTilePixelSize() const;
 	
 	Vec2i GetTileCenterPosOffset() const
 	{
