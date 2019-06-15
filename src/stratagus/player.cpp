@@ -1281,12 +1281,14 @@ void CPlayer::SetFaction(const CFaction *faction)
 			this->Color = PlayerColors[player_color_index][0];
 			this->UnitColors.Colors = PlayerColorsRGB[player_color_index];
 		}
+		this->emit_signal("primary_color_changed", this->PrimaryColor);
 		
 		if (faction->GetSecondaryColor() != nullptr) {
 			this->SecondaryColor = faction->GetSecondaryColor();
 		} else {
 			this->SecondaryColor = CPlayerColor::GetAll()[SyncRand(CPlayerColor::GetAll().size())]; //pick a random secondary color if the faction has none
 		}
+		this->emit_signal("secondary_color_changed", this->SecondaryColor);
 	
 		const CUpgrade *faction_upgrade = this->Faction->GetUpgrade();
 		if (faction_upgrade != nullptr) {
@@ -4431,13 +4433,18 @@ void CPlayer::ApplyHistoricalDiplomacyStates()
 void CPlayer::_bind_methods()
 {	
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
-	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CPlayer *player){ return const_cast<CFaction *>(player->GetFaction()); });
-	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
-	ClassDB::bind_method(D_METHOD("get_primary_color"), +[](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetPrimaryColor()); });
-	ClassDB::bind_method(D_METHOD("get_secondary_color"), +[](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetSecondaryColor()); });
-	
 	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));
+
+	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CPlayer *player){ return const_cast<CFaction *>(player->GetFaction()); });
+
+	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
+
+	ClassDB::bind_method(D_METHOD("get_primary_color"), +[](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetPrimaryColor()); });
+	ADD_SIGNAL(MethodInfo("primary_color_changed", PropertyInfo(Variant::OBJECT, "player_color")));
+	
+	ClassDB::bind_method(D_METHOD("get_secondary_color"), +[](const CPlayer *player){ return const_cast<CPlayerColor *>(player->GetSecondaryColor()); });
+	ADD_SIGNAL(MethodInfo("secondary_color_changed", PropertyInfo(Variant::OBJECT, "player_color")));
 }
 
 void NetworkSetFaction(int player, const std::string &faction_name)
