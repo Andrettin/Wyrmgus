@@ -261,5 +261,5 @@ void CDeity::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_cultural_name", "civilization"), +[](const CDeity *deity, Object *civilization){ return deity->GetCulturalName(static_cast<CCivilization *>(civilization)); });
 	ClassDB::bind_method(D_METHOD("is_major"), &CDeity::IsMajor);
 	ClassDB::bind_method(D_METHOD("get_gender"), +[](const CDeity *deity){ return const_cast<CGender *>(deity->GetGender()); });
-	ClassDB::bind_method(D_METHOD("get_domains"), +[](const CDeity *deity){ return VectorToGodotArray(deity->GetDomains()); });
+	ClassDB::bind_method(D_METHOD("get_domains"), +[](const CDeity *deity){ return ContainerToGodotArray(deity->GetDomains()); });
 }

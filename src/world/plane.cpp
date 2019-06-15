@@ -115,5 +115,5 @@ void CPlane::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_season_schedule"), +[](const CPlane *plane){ return const_cast<CSeasonSchedule *>(plane->GetSeasonSchedule()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "season_schedule"), "set_season_schedule", "get_season_schedule");
 
-	ClassDB::bind_method(D_METHOD("get_species"), +[](const CPlane *plane){ return SetToGodotArray(plane->Species); });
+	ClassDB::bind_method(D_METHOD("get_species"), +[](const CPlane *plane){ return ContainerToGodotArray(plane->Species); });
 }

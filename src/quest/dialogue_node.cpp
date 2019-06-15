@@ -200,5 +200,5 @@ void CDialogueNode::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_faction"), +[](const CDialogueNode *node){ return const_cast<CFaction *>(node->Faction); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "faction"), "set_faction", "get_faction");
 	
-	ClassDB::bind_method(D_METHOD("get_options"), +[](const CDialogueNode *node){ return VectorToGodotArray(node->Options); });
+	ClassDB::bind_method(D_METHOD("get_options"), +[](const CDialogueNode *node){ return ContainerToGodotArray(node->Options); });
 }

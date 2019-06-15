@@ -627,7 +627,7 @@ void CFaction::_bind_methods()
 			other_faction->DevelopsTo.erase(std::remove(other_faction->DevelopsTo.begin(), other_faction->DevelopsTo.end(), faction), other_faction->DevelopsTo.end());
 		}
 	});
-	ClassDB::bind_method(D_METHOD("get_develops_from"), +[](const CFaction *faction){ return VectorToGodotArray(faction->DevelopsFrom); });
+	ClassDB::bind_method(D_METHOD("get_develops_from"), +[](const CFaction *faction){ return ContainerToGodotArray(faction->DevelopsFrom); });
 
 	ClassDB::bind_method(D_METHOD("add_to_develops_to", "ident"), +[](CFaction *faction, const String &ident){
 		CFaction *other_faction = CFaction::Get(ident);
@@ -643,5 +643,5 @@ void CFaction::_bind_methods()
 			other_faction->DevelopsFrom.erase(std::remove(other_faction->DevelopsFrom.begin(), other_faction->DevelopsFrom.end(), faction), other_faction->DevelopsFrom.end());
 		}
 	});
-	ClassDB::bind_method(D_METHOD("get_develops_to"), +[](const CFaction *faction){ return VectorToGodotArray(faction->DevelopsTo); });
+	ClassDB::bind_method(D_METHOD("get_develops_to"), +[](const CFaction *faction){ return ContainerToGodotArray(faction->DevelopsTo); });
 }

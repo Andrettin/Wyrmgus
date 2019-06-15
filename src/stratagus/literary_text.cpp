@@ -192,5 +192,5 @@ void CLiteraryText::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("add_to_sections", "section"), +[](CLiteraryText *text, const String &ident){ text->Sections.push_back(CLiteraryText::Get(ident)); });
 	ClassDB::bind_method(D_METHOD("remove_from_sections", "section"), +[](CLiteraryText *text, const String &ident){ text->Sections.erase(std::remove(text->Sections.begin(), text->Sections.end(), CLiteraryText::Get(ident)), text->Sections.end()); });
-	ClassDB::bind_method(D_METHOD("get_sections"), +[](const CLiteraryText *text){ return VectorToGodotArray(text->Sections); });
+	ClassDB::bind_method(D_METHOD("get_sections"), +[](const CLiteraryText *text){ return ContainerToGodotArray(text->Sections); });
 }

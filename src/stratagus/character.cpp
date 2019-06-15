@@ -868,11 +868,11 @@ void CCharacter::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_level"), &CCharacter::GetLevel);
 	ClassDB::bind_method(D_METHOD("get_father"), &CCharacter::GetFather);
 	ClassDB::bind_method(D_METHOD("get_mother"), &CCharacter::GetMother);
-	ClassDB::bind_method(D_METHOD("get_children"), +[](const CCharacter *character){ return VectorToGodotArray(character->GetChildren()); });
-	ClassDB::bind_method(D_METHOD("get_siblings"), +[](const CCharacter *character){ return VectorToGodotArray(character->GetSiblings()); });
+	ClassDB::bind_method(D_METHOD("get_children"), +[](const CCharacter *character){ return ContainerToGodotArray(character->GetChildren()); });
+	ClassDB::bind_method(D_METHOD("get_siblings"), +[](const CCharacter *character){ return ContainerToGodotArray(character->GetSiblings()); });
 	ClassDB::bind_method(D_METHOD("get_home_site"), +[](const CCharacter *character){ return const_cast<CSite *>(character->GetHomeSite()); });
-	ClassDB::bind_method(D_METHOD("get_deities"), +[](const CCharacter *character){ return VectorToGodotArray(character->Deities); });
-	ClassDB::bind_method(D_METHOD("get_abilities"), +[](const CCharacter *character){ return VectorToGodotArray(character->Abilities); });
+	ClassDB::bind_method(D_METHOD("get_deities"), +[](const CCharacter *character){ return ContainerToGodotArray(character->Deities); });
+	ClassDB::bind_method(D_METHOD("get_abilities"), +[](const CCharacter *character){ return ContainerToGodotArray(character->Abilities); });
 }
 
 int GetAttributeVariableIndex(int attribute)

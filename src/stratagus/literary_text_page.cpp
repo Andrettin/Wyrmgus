@@ -45,11 +45,12 @@ void CLiteraryTextPage::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_text", "text"), +[](CLiteraryTextPage *page, const String &text){ page->Text = text; });
 	ClassDB::bind_method(D_METHOD("get_text"), &CLiteraryTextPage::GetText);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "text"), "set_text", "get_text");
+
 	ClassDB::bind_method(D_METHOD("set_number", "number"), +[](CLiteraryTextPage *page, const int number){ page->Number = number; });
 	ClassDB::bind_method(D_METHOD("get_number"), &CLiteraryTextPage::GetNumber);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "number"), "set_number", "get_number");
+
 	ClassDB::bind_method(D_METHOD("get_previous_page"), &CLiteraryTextPage::GetPreviousPage);
 	ClassDB::bind_method(D_METHOD("get_next_page"), &CLiteraryTextPage::GetNextPage);
-	
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "text"), "set_text", "get_text");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "number"), "set_number", "get_number");
 }

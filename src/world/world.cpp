@@ -87,5 +87,5 @@ void CWorld::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_season_schedule"), +[](const CWorld *world){ return const_cast<CSeasonSchedule *>(world->GetSeasonSchedule()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "season_schedule"), "set_season_schedule", "get_season_schedule");
 	
-	ClassDB::bind_method(D_METHOD("get_species"), +[](const CWorld *world){ return SetToGodotArray(world->Species); });
+	ClassDB::bind_method(D_METHOD("get_species"), +[](const CWorld *world){ return ContainerToGodotArray(world->Species); });
 }

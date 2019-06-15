@@ -514,15 +514,15 @@ void CWord::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_derives_from"), &CWord::GetDerivesFrom);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "derives_from"), "set_derives_from", "get_derives_from");
 	
-	ClassDB::bind_method(D_METHOD("get_derives_to"), +[](const CWord *word){ return VectorToGodotArray(word->DerivesTo); });
+	ClassDB::bind_method(D_METHOD("get_derives_to"), +[](const CWord *word){ return ContainerToGodotArray(word->DerivesTo); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_meanings", "meaning"), +[](CWord *word, const String &meaning){ word->Meanings.push_back(meaning); });
 	ClassDB::bind_method(D_METHOD("remove_from_meanings", "meaning"), +[](CWord *word, const String &meaning){ word->Meanings.erase(std::remove(word->Meanings.begin(), word->Meanings.end(), meaning), word->Meanings.end()); });
-	ClassDB::bind_method(D_METHOD("get_meanings"), +[](const CWord *word){ return VectorToGodotArray(word->Meanings); });
+	ClassDB::bind_method(D_METHOD("get_meanings"), +[](const CWord *word){ return ContainerToGodotArray(word->Meanings); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_compound_elements", "compound_element"), +[](CWord *word, const String &compound_element){ word->CompoundElements.push_back(CWord::Get(compound_element)); });
 	ClassDB::bind_method(D_METHOD("remove_from_compound_elements", "compound_element"), +[](CWord *word, const String &compound_element){ word->CompoundElements.erase(std::remove(word->CompoundElements.begin(), word->CompoundElements.end(), CWord::Get(compound_element)), word->CompoundElements.end()); });
-	ClassDB::bind_method(D_METHOD("get_compound_elements"), +[](const CWord *word){ return VectorToGodotArray(word->CompoundElements); });
+	ClassDB::bind_method(D_METHOD("get_compound_elements"), +[](const CWord *word){ return ContainerToGodotArray(word->CompoundElements); });
 	
 	ClassDB::bind_method(D_METHOD("get_personal_name_genders"), +[](const CWord *word){
 		Array genders;

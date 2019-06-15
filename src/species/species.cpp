@@ -224,7 +224,7 @@ void CSpecies::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_category", "category_ident"), +[](CSpecies *species, const String &category_ident){ species->Category = CSpeciesCategory::Get(category_ident); });
 	ClassDB::bind_method(D_METHOD("get_category"), +[](const CSpecies *species){ return const_cast<CSpeciesCategory *>(species->GetCategory()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "category"), "set_category", "get_category");
-	ClassDB::bind_method(D_METHOD("get_all_categories"), +[](const CSpecies *species){ return VectorToGodotArray(species->GetAllCategories()); });
+	ClassDB::bind_method(D_METHOD("get_all_categories"), +[](const CSpecies *species){ return ContainerToGodotArray(species->GetAllCategories()); });
 	
 	ClassDB::bind_method(D_METHOD("set_sapient", "sapient"), +[](CSpecies *species, const bool sapient){ species->Sapient = sapient; });
 	ClassDB::bind_method(D_METHOD("is_sapient"), &CSpecies::IsSapient);
@@ -236,11 +236,11 @@ void CSpecies::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("add_to_genders", "ident"), +[](CSpecies *species, const String &ident){ species->Genders.push_back(CGender::Get(ident)); });
 	ClassDB::bind_method(D_METHOD("remove_from_genders", "ident"), +[](CSpecies *species, const String &ident){ species->Genders.erase(std::remove(species->Genders.begin(), species->Genders.end(), CGender::Get(ident)), species->Genders.end()); });
-	ClassDB::bind_method(D_METHOD("get_genders"), +[](const CSpecies *species){ return VectorToGodotArray(species->Genders); });
+	ClassDB::bind_method(D_METHOD("get_genders"), +[](const CSpecies *species){ return ContainerToGodotArray(species->Genders); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_native_terrain_types", "ident"), +[](CSpecies *species, const String &ident){ species->NativeTerrainTypes.insert(CTerrainType::Get(ident)); });
 	ClassDB::bind_method(D_METHOD("remove_from_native_terrain_types", "ident"), +[](CSpecies *species, const String &ident){ species->NativeTerrainTypes.erase(CTerrainType::Get(ident)); });
-	ClassDB::bind_method(D_METHOD("get_native_terrain_types"), +[](const CSpecies *species){ return SetToGodotArray(species->NativeTerrainTypes); });
+	ClassDB::bind_method(D_METHOD("get_native_terrain_types"), +[](const CSpecies *species){ return ContainerToGodotArray(species->NativeTerrainTypes); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_evolves_from", "ident"), +[](CSpecies *species, const String &ident){
 		CSpecies *evolves_from = CSpecies::Get(ident);
@@ -252,7 +252,7 @@ void CSpecies::_bind_methods()
 		species->EvolvesFrom.erase(std::remove(species->EvolvesFrom.begin(), species->EvolvesFrom.end(), evolves_from), species->EvolvesFrom.end());
 		evolves_from->EvolvesTo.erase(std::remove(species->EvolvesTo.begin(), species->EvolvesTo.end(), species), species->EvolvesTo.end());
 	});
-	ClassDB::bind_method(D_METHOD("get_evolves_from"), +[](const CSpecies *species){ return VectorToGodotArray(species->EvolvesFrom); });
+	ClassDB::bind_method(D_METHOD("get_evolves_from"), +[](const CSpecies *species){ return ContainerToGodotArray(species->EvolvesFrom); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_evolves_to", "ident"), +[](CSpecies *species, const String &ident){
 		CSpecies *evolves_to = CSpecies::Get(ident);
@@ -264,5 +264,5 @@ void CSpecies::_bind_methods()
 		species->EvolvesTo.erase(std::remove(species->EvolvesTo.begin(), species->EvolvesTo.end(), evolves_to), species->EvolvesTo.end());
 		evolves_to->EvolvesFrom.erase(std::remove(species->EvolvesFrom.begin(), species->EvolvesFrom.end(), species), species->EvolvesFrom.end());
 	});
-	ClassDB::bind_method(D_METHOD("get_evolves_to"), +[](const CSpecies *species){ return VectorToGodotArray(species->EvolvesTo); });
+	ClassDB::bind_method(D_METHOD("get_evolves_to"), +[](const CSpecies *species){ return ContainerToGodotArray(species->EvolvesTo); });
 }

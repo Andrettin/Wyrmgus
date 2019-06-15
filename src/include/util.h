@@ -115,23 +115,11 @@ extern bool IsStringNumber(const std::string &str);
 extern bool IsStringBool(const String &str);
 
 template <typename T>
-inline Array VectorToGodotArray(const std::vector<T> &vector)
+inline Array ContainerToGodotArray(const T &container)
 {
 	Array array;
 	
-	for (const T &element : vector) {
-		array.push_back(element);
-	}
-	
-	return array;
-}
-
-template <typename T>
-inline Array SetToGodotArray(const std::set<T> &set)
-{
-	Array array;
-	
-	for (const T &element : set) {
+	for (const typename T::value_type &element : container) {
 		array.push_back(element);
 	}
 	

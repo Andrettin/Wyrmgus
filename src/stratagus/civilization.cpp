@@ -462,7 +462,7 @@ void CCivilization::_bind_methods()
 		civilization->DevelopsFrom.erase(std::remove(civilization->DevelopsFrom.begin(), civilization->DevelopsFrom.end(), develops_from), civilization->DevelopsFrom.end());
 		develops_from->DevelopsTo.erase(std::remove(develops_from->DevelopsTo.begin(), develops_from->DevelopsTo.end(), civilization), develops_from->DevelopsTo.end());
 	});
-	ClassDB::bind_method(D_METHOD("get_develops_from"), +[](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsFrom); });
+	ClassDB::bind_method(D_METHOD("get_develops_from"), +[](const CCivilization *civilization){ return ContainerToGodotArray(civilization->DevelopsFrom); });
 	
 	ClassDB::bind_method(D_METHOD("add_to_develops_to", "civilization_ident"), +[](CCivilization *civilization, const String &civilization_ident){
 		CCivilization *develops_to = CCivilization::Get(civilization_ident);
@@ -474,5 +474,5 @@ void CCivilization::_bind_methods()
 		civilization->DevelopsTo.erase(std::remove(civilization->DevelopsTo.begin(), civilization->DevelopsTo.end(), develops_to), civilization->DevelopsTo.end());
 		develops_to->DevelopsFrom.erase(std::remove(develops_to->DevelopsFrom.begin(), develops_to->DevelopsFrom.end(), civilization), develops_to->DevelopsFrom.end());
 	});
-	ClassDB::bind_method(D_METHOD("get_develops_to"), +[](const CCivilization *civilization){ return VectorToGodotArray(civilization->DevelopsTo); });
+	ClassDB::bind_method(D_METHOD("get_develops_to"), +[](const CCivilization *civilization){ return ContainerToGodotArray(civilization->DevelopsTo); });
 }

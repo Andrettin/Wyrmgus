@@ -405,7 +405,7 @@ void CUpgrade::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("add_to_epithets", "epithet"), +[](CUpgrade *upgrade, const String &epithet){ upgrade->Epithets.push_back(epithet); });
 	ClassDB::bind_method(D_METHOD("remove_from_epithets", "epithet"), +[](CUpgrade *upgrade, const String &epithet){ upgrade->Epithets.erase(std::remove(upgrade->Epithets.begin(), upgrade->Epithets.end(), epithet), upgrade->Epithets.end()); });
-	ClassDB::bind_method(D_METHOD("get_epithets"), +[](const CUpgrade *upgrade){ return VectorToGodotArray(upgrade->GetEpithets()); });
+	ClassDB::bind_method(D_METHOD("get_epithets"), +[](const CUpgrade *upgrade){ return ContainerToGodotArray(upgrade->GetEpithets()); });
 }
 
 /**
