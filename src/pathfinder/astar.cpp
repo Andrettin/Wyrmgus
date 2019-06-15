@@ -789,8 +789,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				(mf->GetTerrain(false)->IsDesert())
 				&& mf->Owner != unit.GetPlayer()->GetIndex()
 				&& unit.GetType()->BoolFlag[ORGANIC_INDEX].value
-				&& unit.MapLayer->GetTimeOfDay() != nullptr
-				&& unit.MapLayer->GetTimeOfDay()->IsDay()
+				&& unit.GetMapLayer()->GetTimeOfDay() != nullptr
+				&& unit.GetMapLayer()->GetTimeOfDay()->IsDay()
 				&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 			) {
 				cost += 32; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that
@@ -1308,7 +1308,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
 	
 	//Wyrmgus start
-	if (unit.MapLayer->ID != z) {
+	if (unit.GetMapLayer()->GetIndex() != z) {
 		return PF_UNREACHABLE;
 	}
 	

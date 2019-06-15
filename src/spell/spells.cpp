@@ -89,7 +89,7 @@ std::map<std::string, CSpell *> CSpell::SpellsByIdent;
 */
 static Target *NewTargetUnit(CUnit &unit)
 {
-	return new Target(TargetUnit, &unit, unit.GetTilePos(), unit.MapLayer->ID);
+	return new Target(TargetUnit, &unit, unit.GetTilePos(), unit.GetMapLayer()->GetIndex());
 }
 
 // ****************************************************************************
@@ -612,13 +612,13 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 	}
 	//Wyrmgus end
 	
-	if (!PassCondition(caster, *this, target, caster.GetTilePos(), this->Condition, target->MapLayer) || !PassCondition(caster, *this, target, caster.GetTilePos(), autocast->Condition, target->MapLayer)) {
+	if (!PassCondition(caster, *this, target, caster.GetTilePos(), this->Condition, target->GetMapLayer()) || !PassCondition(caster, *this, target, caster.GetTilePos(), autocast->Condition, target->GetMapLayer())) {
 		return false;
 	}
 
 	//Wyrmgus start
 	int range = this->Range;
-	if (CMap::Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.GetTilePos(), target->GetTilePos(), MapFieldAirUnpassable, target->MapLayer->ID)) {
+	if (CMap::Map.IsLayerUnderground(target->GetMapLayer()->GetIndex()) && !CheckObstaclesBetweenTiles(caster.GetTilePos(), target->GetTilePos(), MapFieldAirUnpassable, target->GetMapLayer()->GetIndex())) {
 		range = 1; //if there are e.g. dungeon walls between the caster and the target, the unit reachable check must see if the target is reachable with a range of 1 instead of the spell's normal range (to make sure the spell can be cast; spells can't be cast through dungeon walls)
 	}
 
@@ -655,7 +655,7 @@ std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, co
 	}
 	
 	//select all units around the caster
-	SelectAroundUnit(caster, range, potential_targets, OutOfMinRange(min_range, caster.GetTilePos(), caster.MapLayer->ID));
+	SelectAroundUnit(caster, range, potential_targets, OutOfMinRange(min_range, caster.GetTilePos(), caster.GetMapLayer()->GetIndex()));
 	
 	//check each unit to see if it is a possible target
 	int n = 0;
@@ -690,7 +690,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 	}
 	
 	const Vec2i &pos = caster.GetTilePos();
-	CMapLayer *map_layer = caster.MapLayer;
+	CMapLayer *map_layer = caster.GetMapLayer();
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
 
@@ -700,7 +700,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 
 	// Select all units around the caster
 	std::vector<CUnit *> table;
-	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.GetTilePos(), caster.MapLayer->ID));
+	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.GetTilePos(), caster.GetMapLayer()->GetIndex()));
 
 	if (spell.Target == TargetSelf) {
 		if (PassCondition(caster, spell, &caster, caster.GetTilePos(), spell.Condition, map_layer) && PassCondition(caster, spell, &caster, caster.GetTilePos(), autocast->Condition, map_layer)) {
@@ -727,7 +727,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 			autocast->PositionAutoCast->run(2);
 			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
 			if (CMap::Map.Info.IsPointOnMap(resPos, map_layer)) {
-				Target *target = new Target(TargetPosition, nullptr, resPos, map_layer->ID);
+				Target *target = new Target(TargetPosition, nullptr, resPos, map_layer->GetIndex());
 				return target;
 			}
 		}
@@ -856,19 +856,19 @@ int AutoCastSpell(CUnit &caster, const CSpell &spell)
 int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer)
 {
 	Vec2i pos = goalPos;
-	int z = map_layer ? map_layer->ID : 0;
+	int z = map_layer ? map_layer->GetIndex() : 0;
 
 	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		pos = target->GetTilePos();
-		map_layer = target->MapLayer;
+		map_layer = target->GetMapLayer();
 	}
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
 	if (spell.Target == TargetSelf) {
 		pos = caster.GetTilePos();
-		map_layer = caster.MapLayer;
+		map_layer = caster.GetMapLayer();
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_

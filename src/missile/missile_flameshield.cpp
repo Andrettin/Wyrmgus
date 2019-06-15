@@ -74,8 +74,8 @@ void MissileFlameShield::Action()
 	const int iy = unit->IY;
 	const int uw = unit->GetType()->TileSize.x;
 	const int uh = unit->GetType()->TileSize.y;
-	this->position.x = upos.x * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
-	this->position.y = upos.y * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
+	this->position.x = upos.x * CMap::Map.GetMapLayerPixelTileSize(unit->GetMapLayer()->GetIndex()).x + ix + uw * CMap::Map.GetMapLayerPixelTileSize(unit->GetMapLayer()->GetIndex()).x / 2 + dx - 16;
+	this->position.y = upos.y * CMap::Map.GetMapLayerPixelTileSize(unit->GetMapLayer()->GetIndex()).y + iy + uh * CMap::Map.GetMapLayerPixelTileSize(unit->GetMapLayer()->GetIndex()).y / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitActionDie) {
 		this->TTL = index;
 	}

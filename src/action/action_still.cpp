@@ -172,7 +172,7 @@ private:
 		return;
 	}
 
-	FireMissile(unit, goal, goal->GetTilePos(), goal->MapLayer->ID);
+	FireMissile(unit, goal, goal->GetTilePos(), goal->GetMapLayer()->GetIndex());
 	UnHideUnit(unit);
 	unit.StepCount = 0;
 }
@@ -204,13 +204,13 @@ static bool MoveRandomly(CUnit &unit)
 	pos.y += SyncRand(unit.GetType()->RandomMovementDistance * 2 + 1) - unit.GetType()->RandomMovementDistance;
 
 	// restrict to map
-	CMap::Map.Clamp(pos, unit.MapLayer->ID);
+	CMap::Map.Clamp(pos, unit.GetMapLayer()->GetIndex());
 
 	// move if possible
 	if (pos != unit.GetTilePos()) {
 		// if the tile the unit is moving to happens to have a layer connector, use it, if appropriate for the unit
 		bool found_connector = false;
-		CUnitCache &unitcache = CMap::Map.Field(pos, unit.MapLayer->ID)->UnitCache;
+		CUnitCache &unitcache = CMap::Map.Field(pos, unit.GetMapLayer()->GetIndex())->UnitCache;
 		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 			CUnit *connector = *it;
 
@@ -218,7 +218,7 @@ static bool MoveRandomly(CUnit &unit)
 				continue;
 			}
 			
-			const CMapLayer *destination_map_layer = connector->ConnectingDestination->MapLayer;
+			const CMapLayer *destination_map_layer = connector->ConnectingDestination->GetMapLayer();
 			
 			if (unit.IsDiurnal() && destination_map_layer->IsUnderground()) {
 				continue;
@@ -231,8 +231,8 @@ static bool MoveRandomly(CUnit &unit)
 			}
 			
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.GetType()->GetSpecies() != nullptr && unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.GetTilePos(), false, unit.MapLayer->ID))) {
-				if (!unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(connector->ConnectingDestination->GetTileCenterPos(), false, connector->ConnectingDestination->MapLayer->ID))) {
+			if (unit.GetType()->GetSpecies() != nullptr && unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.GetTilePos(), false, unit.GetMapLayer()->GetIndex()))) {
+				if (!unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(connector->ConnectingDestination->GetTileCenterPos(), false, connector->ConnectingDestination->GetMapLayer()->GetIndex()))) {
 					continue;
 				}
 			}
@@ -246,12 +246,12 @@ static bool MoveRandomly(CUnit &unit)
 		}
 		
 		UnmarkUnitFieldFlags(unit);
-		if (UnitCanBeAt(unit, pos, unit.MapLayer->ID)) {
+		if (UnitCanBeAt(unit, pos, unit.GetMapLayer()->GetIndex())) {
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.GetType()->GetSpecies() != nullptr && unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.GetTilePos(), false, unit.MapLayer->ID))) {
-				if (!unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
+			if (unit.GetType()->GetSpecies() != nullptr && unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.GetTilePos(), false, unit.GetMapLayer()->GetIndex()))) {
+				if (!unit.GetType()->GetSpecies()->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(pos, false, unit.GetMapLayer()->GetIndex()))) {
 					return false;
 				}
 			}
@@ -268,7 +268,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + std::max(6, unit.GetType()->RandomMovementDistance);
 					maxpos.y = pos.y + std::max(6, unit.GetType()->RandomMovementDistance);
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.GetPlayer()));
+					Select(minpos, maxpos, second_table, unit.GetMapLayer()->GetIndex(), HasNotSamePlayerAs(*unit.GetPlayer()));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -281,7 +281,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + 1;
 					maxpos.y = pos.y + 1;
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.GetPlayer()));
+					Select(minpos, maxpos, second_table, unit.GetMapLayer()->GetIndex(), HasNotSamePlayerAs(*unit.GetPlayer()));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -289,11 +289,11 @@ static bool MoveRandomly(CUnit &unit)
 				}
 			}
 			
-			if (!PlaceReachable(unit, pos, 1, 1, 0, 1, unit.GetReactionRange() * 8, unit.MapLayer->GetIndex())) {
+			if (!PlaceReachable(unit, pos, 1, 1, 0, 1, unit.GetReactionRange() * 8, unit.GetMapLayer()->GetIndex())) {
 				return false;
 			}
 			
-			CommandMove(unit, pos, FlushCommands, unit.MapLayer->ID);
+			CommandMove(unit, pos, FlushCommands, unit.GetMapLayer()->GetIndex());
 			return true;
 		} else {
 			MarkUnitFieldFlags(unit);
@@ -329,7 +329,7 @@ static bool LeaveShelter(CUnit &unit)
 	}
 
 	if (table.size() > 0) {
-		CommandUnload(*unit.Container, unit.Container->GetTilePos(), &unit, FlushCommands, unit.Container->MapLayer->ID);
+		CommandUnload(*unit.Container, unit.Container->GetTilePos(), &unit, FlushCommands, unit.Container->GetMapLayer()->GetIndex());
 		return true;
 	}
 
@@ -384,11 +384,11 @@ static bool MoveUnderground(CUnit &unit)
 		return false; //must be a nocturnal animal
 	}
 	
-	if (unit.MapLayer->IsUnderground()) {
+	if (unit.GetMapLayer()->IsUnderground()) {
 		return false; //already underground
 	}
 	
-	if (unit.MapLayer->GetTimeOfDay() != nullptr && unit.MapLayer->GetTimeOfDay()->IsNight()) {
+	if (unit.GetMapLayer()->GetTimeOfDay() != nullptr && unit.GetMapLayer()->GetTimeOfDay()->IsNight()) {
 		return false; //should only move underground if it is not night in the map layer where the unit currently is
 	}
 	
@@ -401,7 +401,7 @@ static bool MoveUnderground(CUnit &unit)
 			continue;
 		}
 		
-		const CMapLayer *destination_map_layer = table[i]->ConnectingDestination->MapLayer;
+		const CMapLayer *destination_map_layer = table[i]->ConnectingDestination->GetMapLayer();
 		
 		if (!destination_map_layer->IsUnderground()) {
 			if (destination_map_layer->GetTimeOfDay() == nullptr || !destination_map_layer->GetTimeOfDay()->IsNight()) {
@@ -474,7 +474,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
 	const Vec2i offset(range, range);
 
-	return FindUnit_If(unit.GetTilePos() - offset, unit.GetTilePos() + offset, unit.MapLayer->ID, IsAReparableUnitBy(unit));
+	return FindUnit_If(unit.GetTilePos() - offset, unit.GetTilePos() + offset, unit.GetMapLayer()->GetIndex(), IsAReparableUnitBy(unit));
 }
 
 /**
@@ -504,7 +504,7 @@ bool AutoRepair(CUnit &unit)
 	}
 
 	//Command* will clear unit.SavedOrder
-	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->MapLayer->ID);
+	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->GetMapLayer()->GetIndex());
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
 	}
@@ -534,14 +534,14 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 		return false;
 	}
-	if (CMap::Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.GetTilePos(), autoAttackUnit->GetTilePos(), MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
+	if (CMap::Map.IsLayerUnderground(autoAttackUnit->GetMapLayer()->GetIndex()) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.GetTilePos(), autoAttackUnit->GetTilePos(), MapFieldAirUnpassable, autoAttackUnit->GetMapLayer()->GetIndex()) == false) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->GetTilePos() + autoAttackUnit->GetType()->GetHalfTileSize() - unit.GetTilePos());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->GetMapLayer()->GetIndex())) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }
@@ -584,13 +584,13 @@ bool AutoAttack(CUnit &unit)
 	if (unit.CurrentAction() == UnitActionStill) {
 		//Wyrmgus start
 //		savedOrder = COrder::NewActionAttack(unit, unit.GetTilePos());
-		savedOrder = COrder::NewActionAttack(unit, unit.GetTilePos(), unit.MapLayer->ID);
+		savedOrder = COrder::NewActionAttack(unit, unit.GetTilePos(), unit.GetMapLayer()->GetIndex());
 		//Wyrmgus end
 	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	CommandAttack(unit, goal->GetTilePos(), nullptr, FlushCommands, goal->MapLayer->ID);
+	CommandAttack(unit, goal->GetTilePos(), nullptr, FlushCommands, goal->GetMapLayer()->GetIndex());
 
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;

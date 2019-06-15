@@ -1336,7 +1336,7 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 */
 //Wyrmgus start
 //static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
-static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, CTimeOfDay *time_of_day)
+static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const CTimeOfDay *time_of_day)
 //Wyrmgus end
 {
 	int tw = (g->GraphicWidth - 1) / GLMaxTextureSize + 1;
@@ -1391,7 +1391,7 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, CTimeOfDa
 */
 //Wyrmgus start
 //void MakeTexture(CGraphic *g)
-void MakeTexture(CGraphic *g, CTimeOfDay *time_of_day)
+void MakeTexture(CGraphic *g, const CTimeOfDay *time_of_day)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1422,8 +1422,8 @@ void MakeTexture(CGraphic *g, CTimeOfDay *time_of_day)
 **  @param player  Player number to make textures for.
 */
 //Wyrmgus start
-//void MakePlayerColorTexture(CPlayerColorGraphic *g, int player)
-void MakePlayerColorTexture(CPlayerColorGraphic *g, int player, CTimeOfDay *time_of_day)
+//void MakePlayerColorTexture(CPlayerColorGraphic *g, const int player)
+void MakePlayerColorTexture(CPlayerColorGraphic *g, const int player, const CTimeOfDay *time_of_day)
 //Wyrmgus end
 {
 	//Wyrmgus start

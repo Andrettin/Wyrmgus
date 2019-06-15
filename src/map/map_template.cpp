@@ -583,8 +583,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 			height = current_campaign->GetMapSize(z).y;
 		}
 	
-		CMapLayer *map_layer = new CMapLayer(width, height, this->Plane, this->World, this->SurfaceLayer);
-		map_layer->ID = CMap::Map.MapLayers.size();
+		CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), width, height, this->Plane, this->World, this->SurfaceLayer);
 		CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
 		CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
 		map_layer->PixelTileSize = this->PixelTileSize;
@@ -867,7 +866,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 						if (!town_hall_unit->GetType()->BoolFlag[TOWNHALL_INDEX].value) {
 							continue;
 						}
-						if (town_hall_unit->MapLayer->ID != z) {
+						if (town_hall_unit->GetMapLayer()->GetIndex() != z) {
 							continue;
 						}
 						worker_pos = town_hall_unit->GetTilePos();
@@ -1283,15 +1282,15 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (pathway_type) {
 					for (int x = unit->GetTilePos().x - 1; x < unit->GetTilePos().x + unit->GetType()->TileSize.x + 1; ++x) {
 						for (int y = unit->GetTilePos().y - 1; y < unit->GetTilePos().y + unit->GetType()->TileSize.y + 1; ++y) {
-							if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
+							if (!CMap::Map.Info.IsPointOnMap(x, y, unit->GetMapLayer())) {
 								continue;
 							}
-							CMapField &mf = *unit->MapLayer->Field(x, y);
+							CMapField &mf = *unit->GetMapLayer()->Field(x, y);
 							if (mf.GetFlags() & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 								continue;
 							}
 							Vec2i pathway_pos(x, y);
-							if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer->ID)) {
+							if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->GetMapLayer()->GetIndex())) {
 								continue;
 							}
 							
@@ -1459,7 +1458,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
 			std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
 			for (const CUnit *connector : other_layer_connectors) {
-				if (connector->GetType() == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->GetPlane() == this->Plane && connector->ConnectingDestination->MapLayer->GetWorld() == this->World && connector->ConnectingDestination->MapLayer->GetSurfaceLayer() == this->SurfaceLayer) {
+				if (connector->GetType() == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->GetMapLayer()->GetPlane() == this->Plane && connector->ConnectingDestination->GetMapLayer()->GetWorld() == this->World && connector->ConnectingDestination->GetMapLayer()->GetSurfaceLayer() == this->SurfaceLayer) {
 					already_implemented = true;
 					break;
 				}
@@ -1503,7 +1502,7 @@ void CMapTemplate::ApplyConnectors(const Vec2i &template_start_pos, const Vec2i 
 		int best_distance = -1;
 		for (CUnit *potential_connector : other_layer_connectors) {
 			if (potential_connector->GetType() == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-				int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
+				int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->GetMapLayer()->GetIndex());
 				if (best_distance == -1 || distance < best_distance) {
 					best_layer_connector = potential_connector;
 					best_distance = distance;
@@ -1743,7 +1742,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 					int best_distance = -1;
 					for (CUnit *potential_connector : other_layer_connectors) {
 						if (potential_connector->GetType() == unit_type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-							int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
+							int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->GetMapLayer()->GetIndex());
 							if (best_distance == -1 || distance < best_distance) {
 								best_layer_connector = potential_connector;
 								best_distance = distance;

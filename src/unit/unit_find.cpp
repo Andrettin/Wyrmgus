@@ -593,16 +593,16 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 {
 	//Wyrmgus start
 //	if (!worker.GetPlayer()->AiEnabled && !CMap::Map.Field(pos)->playerInfo.IsExplored(*worker.GetPlayer())) {
-	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.GetPlayer()) && !ignore_exploration) {
+	if (!worker.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*worker.GetPlayer()) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 
 	//Wyrmgus start
 //	CUnit *mine = CMap::Map.Field(pos)->UnitCache.find(res_finder);
-	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
+	CUnit *mine = worker.GetMapLayer()->Field(pos)->UnitCache.find(res_finder);
 	
-	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.GetPlayer()->GetIndex() && !CPlayer::Players[worker.MapLayer->Field(pos)->Owner]->HasNeutralFactionType() && !worker.GetPlayer()->HasNeutralFactionType() && (!mine || mine->GetType()->GivesResource != TradeCost)) {
+	if (worker.GetMapLayer()->Field(pos)->Owner != -1 && worker.GetMapLayer()->Field(pos)->Owner != worker.GetPlayer()->GetIndex() && !CPlayer::Players[worker.GetMapLayer()->Field(pos)->Owner]->HasNeutralFactionType() && !worker.GetPlayer()->HasNeutralFactionType() && (!mine || mine->GetType()->GivesResource != TradeCost)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -611,7 +611,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 	if (
 		mine && mine != *resultMine && MineIsUsable(*mine)
-		&& (mine->GetType()->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->Owner == -1 || worker.MapLayer->Field(pos)->Owner == worker.GetPlayer()->GetIndex()) //this is needed to prevent neutral factions from trying to build mines in others' territory
+		&& (mine->GetType()->BoolFlag[CANHARVEST_INDEX].value || worker.GetMapLayer()->Field(pos)->Owner == -1 || worker.GetMapLayer()->Field(pos)->Owner == worker.GetPlayer()->GetIndex()) //this is needed to prevent neutral factions from trying to build mines in others' territory
 	) {
 	//Wyrmgus end
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -629,7 +629,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			bestCost = cost;
 		}
 	}
-	if (CanMoveToMask(pos, movemask, worker.MapLayer->ID)) { // reachable
+	if (CanMoveToMask(pos, movemask, worker.GetMapLayer()->GetIndex())) { // reachable
 		if (terrainTraversal.Get(pos) < maxRange) {
 			return VisitResult_Ok;
 		} else {
@@ -660,14 +660,14 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
-		deposit = FindDepositNearLoc(*unit.GetPlayer(), startUnit.GetTilePos(), range, resource, startUnit.MapLayer->ID);
+		deposit = FindDepositNearLoc(*unit.GetPlayer(), startUnit.GetTilePos(), range, resource, startUnit.GetMapLayer()->GetIndex());
 	}
 
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-	terrainTraversal.SetSize(startUnit.MapLayer->GetWidth(), startUnit.MapLayer->GetHeight());
+	terrainTraversal.SetSize(startUnit.GetMapLayer()->GetWidth(), startUnit.GetMapLayer()->GetHeight());
 	if (unit.GetType()->BoolFlag[RAIL_INDEX].value) {
 		terrainTraversal.SetDiagonalAllowed(false);
 	}
@@ -1012,7 +1012,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->GetTilePos(), dest->GetTilePos(), MapFieldAirUnpassable, attacker->MapLayer->ID)) {
+		if (CMap::Map.IsLayerUnderground(attacker->GetMapLayer()->GetIndex()) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->GetTilePos(), dest->GetTilePos(), MapFieldAirUnpassable, attacker->GetMapLayer()->GetIndex())) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1258,7 +1258,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->GetTilePos(), dest->GetTilePos(), MapFieldAirUnpassable, attacker->MapLayer->ID))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!CMap::Map.IsLayerUnderground(attacker->GetMapLayer()->GetIndex()) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->GetTilePos(), dest->GetTilePos(), MapFieldAirUnpassable, attacker->GetMapLayer()->GetIndex()))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {
@@ -1648,7 +1648,7 @@ VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, c
 		return VisitResult_Finished;
 	}
 	
-	if (!src_unit.MapLayer->Field(pos)->CheckMask(flags)) {
+	if (!src_unit.GetMapLayer()->Field(pos)->CheckMask(flags)) {
 		return VisitResult_DeadEnd;
 	}
 	
@@ -1659,7 +1659,7 @@ bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsign
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(src_unit.MapLayer->GetWidth(), src_unit.MapLayer->GetHeight());
+	terrainTraversal.SetSize(src_unit.GetMapLayer()->GetWidth(), src_unit.GetMapLayer()->GetHeight());
 	terrainTraversal.SetDiagonalAllowed(false);
 	terrainTraversal.Init();
 

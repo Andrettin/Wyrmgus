@@ -70,11 +70,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
-		start.y = goal->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
+		start.x = goal->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x + goal->IX + moff.x + startx;
+		start.y = goal->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->GetTilePos().x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
-		start.y = (goal->GetTilePos().y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
+		start.x = (goal->GetTilePos().x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x + CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x / 2 + moff.x;
+		start.y = (goal->GetTilePos().y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y + CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -89,24 +89,24 @@
 				return;
 			} else if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->GetMapLayer());
 			} else if (goal->CurrentAction() == UnitActionSpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->GetMapLayer());
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
 				dest.y += desty;
 			} else {
-				dest.x += destx * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-				dest.y += desty * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+				dest.x += destx * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x;
+				dest.y += desty * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y;
 			}
 		} else if (flags & SM_Pixel) {
 			dest.x = target->GetMapPixelPosCenter().x + destx;
 			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (target->GetTilePos().x + destx) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
-			dest.y = (target->GetTilePos().y + desty) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
+			dest.x = (target->GetTilePos().x + destx) * CMap::Map.GetMapLayerPixelTileSize(target->GetMapLayer()->GetIndex()).x;
+			dest.y = (target->GetTilePos().y + desty) * CMap::Map.GetMapLayerPixelTileSize(target->GetMapLayer()->GetIndex()).y;
 			dest += target->GetTilePixelSize() / 2;
 		}
 	} else {
@@ -114,18 +114,18 @@
 			dest.x = goal->GetMapPixelPosCenter().x + destx;
 			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (goal->GetTilePos().x + destx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-			dest.y = (goal->GetTilePos().y + desty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+			dest.x = (goal->GetTilePos().x + destx) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x;
+			dest.y = (goal->GetTilePos().y + desty) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y;
 			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
-	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest, unit.MapLayer->ID);
-	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
+	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest, unit.GetMapLayer()->GetIndex());
+	const int dist = goal->MapDistanceTo(destTilePos, unit.GetMapLayer()->GetIndex());
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)
 		&& dist < goal->GetType()->MinAttackRange) {
 	} else {
-		Missile *missile = MakeMissile(*mtype, start, dest, unit.MapLayer->ID);
+		Missile *missile = MakeMissile(*mtype, start, dest, unit.GetMapLayer()->GetIndex());
 		if (flags & SM_SetDirection) {
 			PixelPos posd;
 			posd.x = Heading2X[goal->Direction / NextDirection];

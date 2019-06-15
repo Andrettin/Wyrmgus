@@ -137,8 +137,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("\"player\", %d,\n  ", unit.GetPlayer()->GetIndex());
 
-	if (unit.MapLayer) {
-		file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
+	if (unit.GetMapLayer() != nullptr) {
+		file.printf("\"map-layer\", %d, ", unit.GetMapLayer()->GetIndex());
 	}
 	file.printf("\"tile\", {%d, %d}, ", unit.GetTilePos().x, unit.GetTilePos().y);
 	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.TilePos.x, unit.Seen.TilePos.y);
@@ -262,7 +262,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	// SEE unit loading code.
 	if (unit.Container && unit.Removed) {
 		file.printf(" \"host-info\", {%d, %d, %d, %d, %d}, ",
-					unit.Container->MapLayer->ID,
+					unit.Container->GetMapLayer()->GetIndex(),
 					unit.Container->GetTilePos().x, unit.Container->GetTilePos().y,
 					unit.Container->GetType()->TileSize.x,
 					unit.Container->GetType()->TileSize.y);
@@ -428,7 +428,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer) {
 		file.printf(",\n  \"rally-point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
-		file.printf(",\n  \"rally-point-map-layer\", %d, ", unit.RallyPointMapLayer->ID);
+		file.printf(",\n  \"rally-point-map-layer\", %d, ", unit.RallyPointMapLayer->GetIndex());
 	}
 	if (unit.Character != nullptr && unit.CurrentAction() != UnitActionDie && !unit.Destroyed) {
 		if (!unit.Character->Custom) {

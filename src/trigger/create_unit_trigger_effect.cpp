@@ -124,7 +124,7 @@ void CCreateUnitTriggerEffect::Do(CPlayer *player) const
 		const CUnit *site_unit = this->Site->SiteUnit;
 		if (site_unit != nullptr) {
 			tile_pos = site_unit->GetTilePos();
-			z = site_unit->MapLayer->GetIndex();
+			z = site_unit->GetMapLayer()->GetIndex();
 		} else {
 			fprintf(stderr, "Unit site \"%s\" has no site unit.\n", this->Site->GetIdent().utf8().get_data());
 		}

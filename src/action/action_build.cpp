@@ -178,7 +178,7 @@ enum {
 /* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	//Wyrmgus start
-	if (this->MapLayer != UI.CurrentMapLayer->ID) {
+	if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 		return lastScreenPos;
 	}
 	//Wyrmgus end
@@ -244,9 +244,9 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			//Wyrmgus start
-			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+			if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
@@ -268,7 +268,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 
 			//Wyrmgus start
 //			unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), "%s", _("You cannot reach building place"));
-			unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, _("%s cannot reach building place"), unit.GetMessageName().c_str());
+			unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("%s cannot reach building place"), unit.GetMessageName().c_str());
 			//Wyrmgus end
 			if (unit.GetPlayer()->AiEnabled) {
 				//Wyrmgus start
@@ -298,7 +298,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landm
 		// FIXME: Better tell what is missing?
 		player.Notify(NotifyYellow, unit.GetTilePos(),
 					  //Wyrmgus start
-					  unit.MapLayer->ID,
+					  unit.GetMapLayer()->GetIndex(),
 //					  _("Not enough resources to build %s"), type.Name.c_str());
 					  _("Not enough resources to build %s"), type.GetDefaultName(CPlayer::Players[player.GetIndex()]).c_str());
 					  //Wyrmgus end
@@ -309,7 +309,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, const int landm
 	if (player.CheckLimits(type) < 0) {
 		player.Notify(NotifyYellow, unit.GetTilePos(),
 					  //Wyrmgus start
-					  unit.MapLayer->ID,
+					  unit.GetMapLayer()->GetIndex(),
 //					  _("Can't build more units %s"), type.Name.c_str());
 					  _("Can't build more units %s"), type.GetDefaultName(CPlayer::Players[player.GetIndex()]).c_str());
 					  //Wyrmgus end
@@ -422,7 +422,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		// FIXME: Should we retry this?
 		unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 							//Wyrmgus start
-							unit.MapLayer->ID,
+							unit.GetMapLayer()->GetIndex(),
 //							_("Unable to create building %s"), type.Name.c_str());
 							_("Unable to create building %s"), type.GetDefaultName(unit.GetPlayer()).c_str());
 							//Wyrmgus end
@@ -484,7 +484,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->GetTilePos() - unit.GetTilePos());
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = PixelSize(PixelSize(build->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+		const Vec2i dir = PixelSize(PixelSize(build->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->GetMapLayer()->GetIndex())) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}
@@ -612,7 +612,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	if (this->State == State_StartBuilding_Failed) {
 		unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 							//Wyrmgus start
-							unit.MapLayer->ID,
+							unit.GetMapLayer()->GetIndex(),
 //							_("You cannot build %s here"), type.Name.c_str());
 							_("You cannot build a %s here"), type.GetDefaultName(unit.GetPlayer()).c_str());
 							//Wyrmgus end

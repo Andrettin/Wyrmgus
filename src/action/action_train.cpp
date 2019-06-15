@@ -293,7 +293,7 @@ static void AnimateActionTrain(CUnit &unit)
 	//Wyrmgus start
 	if (nType.BoolFlag[RAIL_INDEX].value && !unit.HasAdjacentRailForUnitType(&nType)) {
 		if (&player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), "%s", _("The unit requires railroads to be placed on"));
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		}
 		unit.Wait = CYCLES_PER_SECOND * 10;
@@ -382,7 +382,7 @@ static void AnimateActionTrain(CUnit &unit)
 		if (newUnit == nullptr) { // No more memory :/
 			//Wyrmgus start
 	//		player.Notify(NotifyYellow, unit.GetTilePos(), _("Unable to train %s"), nType.Name.c_str());
-			player.Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
+			player.Notify(NotifyYellow, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return ;
@@ -445,21 +445,21 @@ static void AnimateActionTrain(CUnit &unit)
 		if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer && newUnit->CanMove()) {
 			bool command_found = false;
 			std::vector<CUnit *> table;
-			Select(unit.RallyPointPos, unit.RallyPointPos, table, unit.RallyPointMapLayer->ID);
+			Select(unit.RallyPointPos, unit.RallyPointPos, table, unit.RallyPointMapLayer->GetIndex());
 			for (size_t j = 0; j != table.size(); ++j) {
 				if (!table[j]->IsAliveOnMap() || table[j]->GetType()->BoolFlag[DECORATION_INDEX].value) {
 					continue;
 				}
 				if (newUnit->GetType()->RepairRange && table[j]->GetType()->GetRepairHP() && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableMax) && (table[j]->GetPlayer() == newUnit->GetPlayer() || newUnit->IsAllied(*table[j]))) { //see if can repair
-					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands, unit.RallyPointMapLayer->ID);
+					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands, unit.RallyPointMapLayer->GetIndex());
 					command_found = true;
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->GetType()->BoolFlag[HARVESTER_INDEX].value && table[j]->GetType()->GivesResource && newUnit->GetType()->ResInfo[table[j]->GetType()->GivesResource] && !table[j]->GetType()->BoolFlag[CANHARVEST_INDEX].value && (table[j]->GetPlayer() == newUnit->GetPlayer() || table[j]->GetPlayer()->GetIndex() == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
-						if (unit_type && unit_type->GivesResource == table[j]->GetType()->GivesResource && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *unit_type, table[j]->GetTilePos(), 1, false, table[j]->MapLayer->ID)) {
-							CommandBuildBuilding(*newUnit, table[j]->GetTilePos(), *unit_type, FlushCommands, table[j]->MapLayer->ID);
+						if (unit_type && unit_type->GivesResource == table[j]->GetType()->GivesResource && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *unit_type, table[j]->GetTilePos(), 1, false, table[j]->GetMapLayer()->GetIndex())) {
+							CommandBuildBuilding(*newUnit, table[j]->GetTilePos(), *unit_type, FlushCommands, table[j]->GetMapLayer()->GetIndex());
 							command_found = true;
 							break;
 						}
@@ -473,8 +473,8 @@ static void AnimateActionTrain(CUnit &unit)
 			
 			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->playerInfo.IsTeamExplored(*newUnit->GetPlayer())) { // see if can harvest terrain
 				for (size_t res = 0; res < CResource::GetAll().size(); ++res) {
-					if (newUnit->GetType()->ResInfo[res] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->IsTerrainResourceOnMap(res)) {
-						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
+					if (newUnit->GetType()->ResInfo[res] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->GetIndex())->IsTerrainResourceOnMap(res)) {
+						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->GetIndex());
 						command_found = true;
 						break;
 					}
@@ -482,7 +482,7 @@ static void AnimateActionTrain(CUnit &unit)
 			}
 			
 			if (!command_found) {
-				CommandMove(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
+				CommandMove(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->GetIndex());
 			}
 		}
 	}

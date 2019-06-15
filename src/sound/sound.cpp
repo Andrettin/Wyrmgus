@@ -168,7 +168,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 */
 static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
-	const CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
+	const CMapField &mf = *unit.GetMapLayer()->Field(unit.GetTilePos());
 	
 	std::map<const CTerrainType *, SoundConfig>::const_iterator find_iterator;
 
@@ -432,7 +432,7 @@ static char CalculateStereo(const CUnit &unit)
 */
 void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 {
-	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer) {
+	if (!UI.CurrentMapLayer || unit.GetMapLayer() != UI.CurrentMapLayer) {
 		return;
 	}
 	
@@ -489,7 +489,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 	//Wyrmgus start
-	if (unit.MapLayer != UI.CurrentMapLayer) {
+	if (unit.GetMapLayer() != UI.CurrentMapLayer) {
 		return;
 	}
 	//Wyrmgus end

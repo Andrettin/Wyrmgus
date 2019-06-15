@@ -676,16 +676,16 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 //	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.GetTilePos().x];
 //	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.GetTilePos().y];
 //	int w = Map2MinimapX[type->TileSize.x];
-	int mx = 1 + UI.Minimap.XOffset[UI.CurrentMapLayer->ID] + Map2MinimapX[UI.CurrentMapLayer->ID][unit.GetTilePos().x];
-	int my = 1 + UI.Minimap.YOffset[UI.CurrentMapLayer->ID] + Map2MinimapY[UI.CurrentMapLayer->ID][unit.GetTilePos().y];
-	int w = Map2MinimapX[UI.CurrentMapLayer->ID][type->TileSize.x];
+	int mx = 1 + UI.Minimap.XOffset[UI.CurrentMapLayer->GetIndex()] + Map2MinimapX[UI.CurrentMapLayer->GetIndex()][unit.GetTilePos().x];
+	int my = 1 + UI.Minimap.YOffset[UI.CurrentMapLayer->GetIndex()] + Map2MinimapY[UI.CurrentMapLayer->GetIndex()][unit.GetTilePos().y];
+	int w = Map2MinimapX[UI.CurrentMapLayer->GetIndex()][type->TileSize.x];
 	//Wyrmgus end
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
 	}
 	//Wyrmgus start
 //	int h0 = Map2MinimapY[type->TileSize.y];
-	int h0 = Map2MinimapY[UI.CurrentMapLayer->ID][type->TileSize.y];
+	int h0 = Map2MinimapY[UI.CurrentMapLayer->GetIndex()][type->TileSize.y];
 	//Wyrmgus end
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;
@@ -696,7 +696,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		while (h-- >= 0) {
 			//Wyrmgus start
 //			*(Uint32 *)&(MinimapSurfaceGL[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
-			*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->ID][((mx + w) + (my + h) * MinimapTextureWidth[UI.CurrentMapLayer->ID]) * 4]) = color;
+			*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()][((mx + w) + (my + h) * MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()]) * 4]) = color;
 			//Wyrmgus end
 		}
 	}
@@ -718,7 +718,7 @@ void CMinimap::Update()
 	if (!Transparent) {
 		//Wyrmgus start
 //		memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
-		memset(MinimapSurfaceGL[UI.CurrentMapLayer->ID], 0, MinimapTextureWidth[UI.CurrentMapLayer->ID] * MinimapTextureHeight[UI.CurrentMapLayer->ID] * 4);
+		memset(MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()], 0, MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()] * MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()] * 4);
 		//Wyrmgus end
 	}
 
@@ -731,15 +731,15 @@ void CMinimap::Update()
 	if (WithTerrain) {
 		//Wyrmgus start
 //		memcpy(MinimapSurfaceGL, MinimapTerrainSurfaceGL, MinimapTextureWidth * MinimapTextureHeight * 4);
-		memcpy(MinimapSurfaceGL[UI.CurrentMapLayer->ID], MinimapTerrainSurfaceGL[UI.CurrentMapLayer->ID], MinimapTextureWidth[UI.CurrentMapLayer->ID] * MinimapTextureHeight[UI.CurrentMapLayer->ID] * 4);
+		memcpy(MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()], MinimapTerrainSurfaceGL[UI.CurrentMapLayer->GetIndex()], MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()] * MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()] * 4);
 		//Wyrmgus end
 	}
 
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
 			//Wyrmgus start
-			if (mx < XOffset[UI.CurrentMapLayer->ID] || mx >= W - XOffset[UI.CurrentMapLayer->ID] || my < YOffset[UI.CurrentMapLayer->ID] || my >= H - YOffset[UI.CurrentMapLayer->ID]) {
-				*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->ID][(mx + my * MinimapTextureWidth[UI.CurrentMapLayer->ID]) * 4]) = Video.MapRGB(0, 0, 0, 0);
+			if (mx < XOffset[UI.CurrentMapLayer->GetIndex()] || mx >= W - XOffset[UI.CurrentMapLayer->GetIndex()] || my < YOffset[UI.CurrentMapLayer->GetIndex()] || my >= H - YOffset[UI.CurrentMapLayer->GetIndex()]) {
+				*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()][(mx + my * MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()]) * 4]) = Video.MapRGB(0, 0, 0, 0);
 
 				continue;
 			}
@@ -753,15 +753,15 @@ void CMinimap::Update()
 				//Wyrmgus start
 //				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / CMap::Map.Info.MapWidth);
 //				visiontype = CMap::Map.Field(tilePos)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
-				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->GetWidth());
-				visiontype = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
+				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->GetIndex()][mx], Minimap2MapY[UI.CurrentMapLayer->GetIndex()][my] / UI.CurrentMapLayer->GetWidth());
+				visiontype = CMap::Map.Field(tilePos, UI.CurrentMapLayer->GetIndex())->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
 				//Wyrmgus end
 			}
 
 			if (visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1)))) {
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
-				*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->ID][(mx + my * MinimapTextureWidth[UI.CurrentMapLayer->ID]) * 4]) = Video.MapRGB(0, 0, 0, 0);
+				*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()][(mx + my * MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()]) * 4]) = Video.MapRGB(0, 0, 0, 0);
 				//Wyrmgus end
 			}
 		}
@@ -804,13 +804,13 @@ void CMinimap::Draw() const
 {
 	//Wyrmgus start
 //	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
-	glBindTexture(GL_TEXTURE_2D, MinimapTexture[UI.CurrentMapLayer->ID]);
+	glBindTexture(GL_TEXTURE_2D, MinimapTexture[UI.CurrentMapLayer->GetIndex()]);
 	//Wyrmgus end
 	//Wyrmgus start
 //	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
 //					GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth[UI.CurrentMapLayer->ID], MinimapTextureHeight[UI.CurrentMapLayer->ID],
-					GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL[UI.CurrentMapLayer->ID]);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()], MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()],
+					GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()]);
 
 #ifdef USE_GLES
 	float texCoord[] = {
@@ -819,9 +819,9 @@ void CMinimap::Draw() const
 //		(float)W / MinimapTextureWidth, 0.0f,
 //		0.0f, (float)H / MinimapTextureHeight,
 //		(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight
-		(float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], 0.0f,
-		0.0f, (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID],
-		(float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID]
+		(float)W / MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()], 0.0f,
+		0.0f, (float)H / MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()],
+		(float)W / MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()], (float)H / MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()]
 		//Wyrmgus end
 	};
 
@@ -848,17 +848,17 @@ void CMinimap::Draw() const
 	glVertex2i(X, Y);
 	//Wyrmgus start
 //	glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
-	glTexCoord2f(0.0f, (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID]);
+	glTexCoord2f(0.0f, (float)H / MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()]);
 	//Wyrmgus end
 	glVertex2i(X, Y + H);
 	//Wyrmgus start
 //	glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
-	glTexCoord2f((float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID]);
+	glTexCoord2f((float)W / MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()], (float)H / MinimapTextureHeight[UI.CurrentMapLayer->GetIndex()]);
 	//Wyrmgus end
 	glVertex2i(X + W, Y + H);
 	//Wyrmgus start
 //	glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
-	glTexCoord2f((float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], 0.0f);
+	glTexCoord2f((float)W / MinimapTextureWidth[UI.CurrentMapLayer->GetIndex()], 0.0f);
 	//Wyrmgus end
 	glVertex2i(X + W, Y);
 	glEnd();
@@ -878,11 +878,11 @@ Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 	//Wyrmgus start
 //	Vec2i tilePos((((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
 //				  (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY));
-	Vec2i tilePos((((screenPos.x - X - XOffset[UI.CurrentMapLayer->ID]) * MINIMAP_FAC) / MinimapScaleX[UI.CurrentMapLayer->ID]),
-				  (((screenPos.y - Y - YOffset[UI.CurrentMapLayer->ID]) * MINIMAP_FAC) / MinimapScaleY[UI.CurrentMapLayer->ID]));
+	Vec2i tilePos((((screenPos.x - X - XOffset[UI.CurrentMapLayer->GetIndex()]) * MINIMAP_FAC) / MinimapScaleX[UI.CurrentMapLayer->GetIndex()]),
+				  (((screenPos.y - Y - YOffset[UI.CurrentMapLayer->GetIndex()]) * MINIMAP_FAC) / MinimapScaleY[UI.CurrentMapLayer->GetIndex()]));
 	//Wyrmgus end
 
-	CMap::Map.Clamp(tilePos, UI.CurrentMapLayer->ID);
+	CMap::Map.Clamp(tilePos, UI.CurrentMapLayer->GetIndex());
 	return tilePos;
 }
 
@@ -898,8 +898,8 @@ PixelPos CMinimap::TilePosToScreenPos(const Vec2i &tilePos) const
 	//Wyrmgus start
 //	const PixelPos screenPos(X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
 //							 Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC);
-	const PixelPos screenPos(X + XOffset[UI.CurrentMapLayer->ID] + (tilePos.x * MinimapScaleX[UI.CurrentMapLayer->ID]) / MINIMAP_FAC,
-							 Y + YOffset[UI.CurrentMapLayer->ID] + (tilePos.y * MinimapScaleY[UI.CurrentMapLayer->ID]) / MINIMAP_FAC);
+	const PixelPos screenPos(X + XOffset[UI.CurrentMapLayer->GetIndex()] + (tilePos.x * MinimapScaleX[UI.CurrentMapLayer->GetIndex()]) / MINIMAP_FAC,
+							 Y + YOffset[UI.CurrentMapLayer->GetIndex()] + (tilePos.y * MinimapScaleY[UI.CurrentMapLayer->GetIndex()]) / MINIMAP_FAC);
 	//Wyrmgus end
 	return screenPos;
 }
@@ -978,8 +978,8 @@ void CMinimap::DrawViewportArea(const CViewport &viewport) const
 	//Wyrmgus start
 //	int w = (viewport.MapWidth * MinimapScaleX) / MINIMAP_FAC;
 //	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
-	int w = (viewport.MapWidth * MinimapScaleX[UI.CurrentMapLayer->ID]) / MINIMAP_FAC;
-	int h = (viewport.MapHeight * MinimapScaleY[UI.CurrentMapLayer->ID]) / MINIMAP_FAC;
+	int w = (viewport.MapWidth * MinimapScaleX[UI.CurrentMapLayer->GetIndex()]) / MINIMAP_FAC;
+	int h = (viewport.MapHeight * MinimapScaleY[UI.CurrentMapLayer->GetIndex()]) / MINIMAP_FAC;
 	//Wyrmgus end
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
@@ -1002,7 +1002,7 @@ void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
 	}
-	if (z == UI.CurrentMapLayer->ID) {
+	if (z == UI.CurrentMapLayer->GetIndex()) {
 		MinimapEvents[NumMinimapEvents].pos = TilePosToScreenPos(pos);
 		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
 		MinimapEvents[NumMinimapEvents].Color = color;

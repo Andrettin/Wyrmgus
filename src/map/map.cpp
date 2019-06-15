@@ -239,14 +239,14 @@ Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) co
 
 PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const
 {
-	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1).x, tilePos.y * GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1).y);
+	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1).x, tilePos.y * GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1).y);
 
 	return mapPixelPos;
 }
 
 PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const
 {
-	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1) / 2;
+	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1) / 2;
 }
 
 //Wyrmgus start
@@ -1205,7 +1205,7 @@ void ChangeToPreviousMapLayer()
 		return;
 	}
 	
-	ChangeCurrentMapLayer(UI.PreviousMapLayer->ID);
+	ChangeCurrentMapLayer(UI.PreviousMapLayer->GetIndex());
 }
 
 /**
@@ -1215,7 +1215,7 @@ void ChangeToPreviousMapLayer()
 */
 void ChangeCurrentMapLayer(const int z)
 {
-	if (z < 0 || z >= (int) CMap::Map.MapLayers.size() || UI.CurrentMapLayer->ID == z) {
+	if (z < 0 || z >= (int) CMap::Map.MapLayers.size() || UI.CurrentMapLayer->GetIndex() == z) {
 		return;
 	}
 	
@@ -1457,8 +1457,7 @@ void CMap::Create()
 {
 	Assert(this->MapLayers.size() == 0);
 
-	CMapLayer *map_layer = new CMapLayer(this->Info.MapWidth, this->Info.MapHeight);
-	map_layer->ID = this->MapLayers.size();
+	CMapLayer *map_layer = new CMapLayer(this->MapLayers.size(), this->Info.MapWidth, this->Info.MapHeight);
 	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);

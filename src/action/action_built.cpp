@@ -335,10 +335,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		CMap::Map.SetWall(unit.GetTilePos(), &type == UnitTypeHumanWall);
-		if (type.TerrainType->Overlay && CMap::Map.GetTileTerrain(unit.GetTilePos(), type.TerrainType->Overlay, unit.MapLayer->ID) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
-			CMap::Map.RemoveTileOverlayTerrain(unit.GetTilePos(), unit.MapLayer->ID);
+		if (type.TerrainType->Overlay && CMap::Map.GetTileTerrain(unit.GetTilePos(), type.TerrainType->Overlay, unit.GetMapLayer()->GetIndex()) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
+			CMap::Map.RemoveTileOverlayTerrain(unit.GetTilePos(), unit.GetMapLayer()->GetIndex());
 		}
-		CMap::Map.SetTileTerrain(unit.GetTilePos(), type.TerrainType, unit.MapLayer->ID);
+		CMap::Map.SetTileTerrain(unit.GetTilePos(), type.TerrainType, unit.GetMapLayer()->GetIndex());
 		//Wyrmgus end
 		unit.Remove(nullptr);
 		UnitLost(unit);
@@ -448,7 +448,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 			   unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetType()->Ident.c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *unit.GetType());
-	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *unit.GetType(), CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID), unit.Settlement);
+	AiReduceMadeInBuilt(*unit.GetPlayer()->Ai, *unit.GetType(), CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.GetMapLayer()->GetIndex()), unit.Settlement);
 	//Wyrmgus end
 }
 

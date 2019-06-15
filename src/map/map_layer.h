@@ -34,10 +34,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "vec2i.h"
+
+#include <core/object.h>
+
 #include <tuple>
 #include <vector>
-
-#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -56,10 +58,12 @@ class CUnit;
 class CWorld;
 struct lua_State;
 
-class CMapLayer
+class CMapLayer : public Object
 {
+	GDCLASS(CMapLayer, Object)
+	
 public:
-	CMapLayer(const int width, const int height, CPlane *plane = nullptr, CWorld *world = nullptr, const int surface_layer = 0);
+	CMapLayer(const int index = -1, const int width = 0, const int height = 0, CPlane *plane = nullptr, CWorld *world = nullptr, const int surface_layer = 0);
 	~CMapLayer();
 	
 	/**
@@ -104,6 +108,11 @@ public:
 		return pos;
 	}
 	
+	int GetIndex() const
+	{
+		return this->Index;
+	}
+	
 	int GetWidth() const
 	{
 		return this->Width;
@@ -117,11 +126,6 @@ public:
 	Vec2i GetSize() const
 	{
 		return Vec2i(this->Width, this->Height);
-	}
-	
-	int GetIndex() const
-	{
-		return this->ID;
 	}
 	
 	CPlane *GetPlane() const
@@ -155,14 +159,14 @@ private:
 public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
 	void SetTimeOfDay(const CScheduledTimeOfDay *time_of_day);
-	CTimeOfDay *GetTimeOfDay() const;
+	const CTimeOfDay *GetTimeOfDay() const;
 private:
 	void DecrementRemainingSeasonHours();
 	void IncrementSeason();
 public:
 	void SetSeasonByHours(const unsigned long long hours);
 	void SetSeason(const CScheduledSeason *season);
-	CSeason *GetSeason() const;
+	const CSeason *GetSeason() const;
 	
 	bool IsUnderground() const
 	{
@@ -179,8 +183,8 @@ public:
 		return this->LayerConnectors;
 	}
 	
-	int ID = -1;
 private:
+	int Index = -1;
 	CMapField *Fields = nullptr;				/// fields on the map layer
 	int Width = 0;								/// the width in tiles of the map layer
 	int Height = 0;								/// the height in tiles of the map layer
@@ -203,6 +207,9 @@ public:
 	
 	friend int CclStratagusMap(lua_State *l);
 	friend CMapTemplate;
+	
+protected:
+	static void _bind_methods();
 };
 
 #endif

@@ -53,7 +53,6 @@ class CCharacter;
 class CConstructionFrame;
 class CFile;
 class CLanguage;
-class CMapField;
 class CMapLayer;
 class COrder;
 class CPlayer;
@@ -458,6 +457,13 @@ public:
 		return this->GetTilePos() + this->Type->GetTileCenterPosOffset();
 	}
 	
+	[[nodiscard]]
+	CMapLayer *GetMapLayer() const
+	{
+		return this->MapLayer;
+	}
+	
+	[[nodiscard]]
 	CUnit *GetFirstContainer() const;
 
 	//Wyrmgus start
@@ -572,11 +578,11 @@ public:
 private:
 	Vec2i TilePos = Vec2i(-1, -1);	/// Map position X
 public:
-	//Wyrmgus start
 	Vec2i RallyPointPos = Vec2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
+private:
 	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
+public:
 	CMapLayer *RallyPointMapLayer = nullptr;	/// in which map layer the unit's rally point is
-	//Wyrmgus end
 
 	unsigned int Offset;	/// Map position as flat index offset (x + y * w)
 

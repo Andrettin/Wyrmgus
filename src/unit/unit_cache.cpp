@@ -59,14 +59,14 @@ void CMap::Insert(CUnit &unit)
 	int j, i = h;
 
 	do {
-		CMapField *mf = unit.MapLayer->Field(index);
+		CMapField *mf = unit.GetMapLayer()->Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Insert(&unit);
 			++mf;
-		} while (--j && unit.GetTilePos().x + (j - w) < unit.MapLayer->GetWidth());
-		index += unit.MapLayer->GetWidth();
-	} while (--i && unit.GetTilePos().y + (i - h) < unit.MapLayer->GetHeight());
+		} while (--j && unit.GetTilePos().x + (j - w) < unit.GetMapLayer()->GetWidth());
+		index += unit.GetMapLayer()->GetWidth();
+	} while (--i && unit.GetTilePos().y + (i - h) < unit.GetMapLayer()->GetHeight());
 }
 
 /**
@@ -83,14 +83,14 @@ void CMap::Remove(CUnit &unit)
 	int j, i = h;
 
 	do {
-		CMapField *mf = unit.MapLayer->Field(index);
+		CMapField *mf = unit.GetMapLayer()->Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Remove(&unit);
 			++mf;
-		} while (--j && unit.GetTilePos().x + (j - w) < unit.MapLayer->GetWidth());
-		index += unit.MapLayer->GetWidth();
-	} while (--i && unit.GetTilePos().y + (i - h) < unit.MapLayer->GetHeight());
+		} while (--j && unit.GetTilePos().x + (j - w) < unit.GetMapLayer()->GetWidth());
+		index += unit.GetMapLayer()->GetWidth();
+	} while (--i && unit.GetTilePos().y + (i - h) < unit.GetMapLayer()->GetHeight());
 }
 
 //Wyrmgus start

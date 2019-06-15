@@ -56,8 +56,8 @@
 /**
 **	@brief	Constructor
 */
-CMapLayer::CMapLayer(const int width, const int height, CPlane *plane, CWorld *world, const int surface_layer)
-	: Width(width), Height(height), Plane(plane), World(world), SurfaceLayer(surface_layer)
+CMapLayer::CMapLayer(const int index, const int width, const int height, CPlane *plane, CWorld *world, const int surface_layer)
+	: Index(index), Width(width), Height(height), Plane(plane), World(world), SurfaceLayer(surface_layer)
 {
 	const int max_tile_index = this->Width * this->Height;
 
@@ -121,7 +121,7 @@ void CMapLayer::RegenerateForest()
 */
 void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, this->GetIndex()));
 	
 	CMapField &mf = *this->Field(pos);
 
@@ -162,18 +162,18 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
-				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
-				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
-				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
+				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->GetIndex())
+				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->GetIndex())
+				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->GetIndex())
 				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.GetFlags() & occupied_flag)) || verticalMf.ForestOnMap())
 				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.GetFlags() & occupied_flag)) || diagonalMf.ForestOnMap())
 				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.GetFlags() & occupied_flag)) || horizontalMf.ForestOnMap())
 			) {
 				DebugPrint("Real place wood\n");
-				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
-				CMap::Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
-				CMap::Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
-				CMap::Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->GetIndex());
+				CMap::Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->GetIndex());
+				CMap::Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->GetIndex());
+				CMap::Map.SetOverlayTerrainDestroyed(pos, false, this->GetIndex());
 				
 				return;
 			}
@@ -190,7 +190,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 */
 bool CMapLayer::WallOnMap(const Vec2i &pos) const
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, this->GetIndex()));
 	return this->Field(pos)->isAWall();
 }
 
@@ -209,7 +209,7 @@ bool CMapLayer::TileBlockHasTree(const Vec2i &pos, const Vec2i &size) const
 		for (int y = pos.y; y <= max_pos.y; ++y) {
 			const Vec2i tile_pos(x, y);
 			
-			if (!CMap::Map.Info.IsPointOnMap(tile_pos, this->ID)) {
+			if (!CMap::Map.Info.IsPointOnMap(tile_pos, this->GetIndex())) {
 				continue;
 			}
 			
@@ -302,7 +302,7 @@ void CMapLayer::SetTimeOfDay(const CScheduledTimeOfDay *time_of_day)
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			CUnit *unit = *it;
 			if (
-				unit && unit->IsAlive() && unit->MapLayer == this &&
+				unit && unit->IsAlive() && unit->GetMapLayer() == this &&
 				(
 					(is_day_changed && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
 					|| (is_night_changed && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
@@ -321,7 +321,7 @@ void CMapLayer::SetTimeOfDay(const CScheduledTimeOfDay *time_of_day)
 **
 **	@return	The map layer's current time of day
 */
-CTimeOfDay *CMapLayer::GetTimeOfDay() const
+const CTimeOfDay *CMapLayer::GetTimeOfDay() const
 {
 	if (this->TimeOfDay == nullptr) {
 		return nullptr;
@@ -403,7 +403,7 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 				(mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(old_season) != mf.playerInfo.SeenTerrain->GetGraphics(new_season))
 				|| (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->GetGraphics(old_season) != mf.playerInfo.SeenOverlayTerrain->GetGraphics(new_season))
 			) {
-				UI.Minimap.UpdateXY(Vec2i(x, y), this->ID);
+				UI.Minimap.UpdateXY(Vec2i(x, y), this->GetIndex());
 			}
 		}
 	}
@@ -412,7 +412,7 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit *unit = *it;
 		if (
-			unit && unit->IsAlive() && unit->MapLayer == this
+			unit && unit->IsAlive() && unit->GetMapLayer() == this
 		) {
 			const CUnitTypeVariation *variation = unit->GetVariation();
 			if (variation && !unit->CheckSeasonForVariation(variation)) {
@@ -427,11 +427,16 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 **
 **	@return	The map layer's current season
 */
-CSeason *CMapLayer::GetSeason() const
+const CSeason *CMapLayer::GetSeason() const
 {
 	if (!this->Season) {
 		return nullptr;
 	}
 	
 	return this->Season->Season;
+}
+
+void CMapLayer::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_index"), &CMapLayer::GetIndex);
 }

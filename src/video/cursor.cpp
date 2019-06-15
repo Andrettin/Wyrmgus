@@ -312,13 +312,13 @@ void DrawBuildingCursor()
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
 			//Wyrmgus start
 //			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != nullptr);
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != nullptr);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, UI.CurrentMapLayer->GetIndex())) != nullptr);
 			//Wyrmgus end
 			// Assign ontop or null
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != nullptr);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, UI.CurrentMapLayer->GetIndex())) != nullptr);
 		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = nullptr;
 		}
@@ -342,7 +342,7 @@ void DrawBuildingCursor()
 														  mask & ((!Selected.empty() && Selected[0]->GetTilePos() == posIt) ?
 																  //Wyrmgus start
 //																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
-																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID))
+																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), UI.CurrentMapLayer->GetIndex()), UI.CurrentMapLayer->GetIndex()))
 																  //Wyrmgus end
 				&& UI.CurrentMapLayer->Field(posIt)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				color = ColorGreen;

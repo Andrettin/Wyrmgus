@@ -315,7 +315,7 @@ Vec2i CSite::GetMapPos() const
 CMapLayer *CSite::GetMapLayer() const
 {
 	if (this->SiteUnit != nullptr) {
-		return this->SiteUnit->MapLayer;
+		return this->SiteUnit->GetMapLayer();
 	}
 	
 	if (this->MapTemplate != nullptr) {

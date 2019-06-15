@@ -82,7 +82,7 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 	unsigned int index = Offset;
 	int j = Type->TileSize.y;
 	do {
-		const CMapField *mf = this->MapLayer->Field(index);
+		const CMapField *mf = this->GetMapLayer()->Field(index);
 
 		int i = x_max;
 		do {
@@ -91,7 +91,7 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 			}
 			++mf;
 		} while (--i);
-		index += this->MapLayer->GetWidth();
+		index += this->GetMapLayer()->GetWidth();
 	} while (--j);
 
 	// Can't exit till the end, as we might be be able to see a different tile

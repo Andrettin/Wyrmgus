@@ -142,18 +142,18 @@ private:
 
 VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
+	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
-	if (unit.MapLayer->WallOnMap(pos)) {
+	if (unit.GetMapLayer()->WallOnMap(pos)) {
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
 		if (resultPos) {
 			*resultPos = from;
 		}
 		return VisitResult_Finished;
 	}
-	if (unit.MapLayer->Field(pos)->CheckMask(movemask)) { // reachable
+	if (unit.GetMapLayer()->Field(pos)->CheckMask(movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -168,7 +168,7 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(unit.MapLayer->GetWidth(), unit.MapLayer->GetHeight());
+	terrainTraversal.SetSize(unit.GetMapLayer()->GetWidth(), unit.GetMapLayer()->GetHeight());
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighbor(unit);
@@ -213,9 +213,9 @@ int AiFindWall(AiForce *force)
 //			if (aiunit.GetType()->CanAttack) {
 			if (aiunit.CanAttack()) {
 			//Wyrmgus end
-				CommandAttack(aiunit, wallPos, nullptr, FlushCommands, aiunit.MapLayer->ID);
+				CommandAttack(aiunit, wallPos, nullptr, FlushCommands, aiunit.GetMapLayer()->GetIndex());
 			} else {
-				CommandMove(aiunit, wallPos, FlushCommands, aiunit.MapLayer->ID);
+				CommandMove(aiunit, wallPos, FlushCommands, aiunit.GetMapLayer()->GetIndex());
 			}
 		}
 		return 1;
@@ -242,11 +242,11 @@ private:
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
+	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
-	if (CanMoveToMask(pos, movemask, unit.MapLayer->ID)) { // reachable
+	if (CanMoveToMask(pos, movemask, unit.GetMapLayer()->GetIndex())) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -288,17 +288,17 @@ bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) co
 
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
+	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
 	}
 
-	if (EnemyOnMapTile(unit, pos, unit.MapLayer->ID) && CanMoveToMask(from, movemask, unit.MapLayer->ID)) {
+	if (EnemyOnMapTile(unit, pos, unit.GetMapLayer()->GetIndex()) && CanMoveToMask(from, movemask, unit.GetMapLayer()->GetIndex())) {
 		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
 		*resultPos = pos;
 		return VisitResult_Finished;
 	}
 
-	if (CanMoveToMask(pos, movemask, unit.MapLayer->ID) || IsAccessibleForTransporter(pos)) { // reachable
+	if (CanMoveToMask(pos, movemask, unit.GetMapLayer()->GetIndex()) || IsAccessibleForTransporter(pos)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -314,7 +314,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-	terrainTraversal.SetSize(unit.MapLayer->GetWidth(), unit.MapLayer->GetHeight());
+	terrainTraversal.SetSize(unit.GetMapLayer()->GetWidth(), unit.GetMapLayer()->GetHeight());
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -716,7 +716,7 @@ void AiCheckTransporters()
 			CUnit *uins = ai_transporter.UnitInside;
 			for (int j = 0; j < ai_transporter.InsideCount; ++j, uins = uins->NextContained) {
 				if (uins->GroupId == 0) { //if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
-					CommandUnload(ai_transporter, ai_transporter.GetTilePos(), uins, 0, ai_transporter.MapLayer->ID);
+					CommandUnload(ai_transporter, ai_transporter.GetTilePos(), uins, 0, ai_transporter.GetMapLayer()->GetIndex());
 				}
 			}
 		}
@@ -746,7 +746,7 @@ void AiCheckTransporters()
 			continue;
 		}
 		
-		int landmass = CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID);
+		int landmass = CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.GetMapLayer()->GetIndex());
 		
 		AiPlayer->Transporters[landmass].push_back(&unit);
 	}

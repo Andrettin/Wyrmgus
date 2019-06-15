@@ -165,10 +165,10 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 //Wyrmgus start
 static void StopRaft(CUnit &unit)
 {
-	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
+	CMapField &mf = *unit.GetMapLayer()->Field(unit.GetTilePos());
 	if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
-		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
@@ -186,10 +186,10 @@ static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int ne
 			connector_path.push_back(connector);
 			checked_connectors.push_back(connector);
 			checked_connectors.push_back(connector_destination);
-			if (connector_destination->MapLayer->ID == new_z) {
+			if (connector_destination->GetMapLayer()->GetIndex() == new_z) {
 				return connector_path;
 			} else {
-				std::vector<CUnit *> next_connector_path = GetLayerConnectorPath(unit, connector_destination->MapLayer->ID, new_z, checked_connectors);
+				std::vector<CUnit *> next_connector_path = GetLayerConnectorPath(unit, connector_destination->GetMapLayer()->GetIndex(), new_z, checked_connectors);
 				if (next_connector_path.size() > 0) {
 					for (size_t j = 0; j != next_connector_path.size(); ++j) {
 						connector_path.push_back(next_connector_path[j]);
@@ -206,12 +206,12 @@ static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int ne
 
 static void ReachGoalLayer(CUnit &unit, int new_z, int &flush)
 {
-	if (unit.MapLayer->ID == new_z) { // already on the correct layer
+	if (unit.GetMapLayer()->GetIndex() == new_z) { // already on the correct layer
 		return;
 	}
 	
 	std::vector<CUnit *> checked_connectors;
-	std::vector<CUnit *> connector_path = GetLayerConnectorPath(unit, unit.MapLayer->ID, new_z, checked_connectors);
+	std::vector<CUnit *> connector_path = GetLayerConnectorPath(unit, unit.GetMapLayer()->GetIndex(), new_z, checked_connectors);
 	if (connector_path.size() > 0) {
 		for (size_t i = 0; i < connector_path.size(); ++i) {
 			CommandUse(unit, *connector_path[i], flush, false);
@@ -279,7 +279,7 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 	}
 	//Wyrmgus start
 	StopRaft(unit);
-	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+	ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	//Wyrmgus end
 	COrderPtr *order;
 
@@ -310,7 +310,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 	}
 	//Wyrmgus start
 	StopRaft(unit);
-	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+	ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	//Wyrmgus end
 	COrderPtr *order;
 
@@ -342,12 +342,12 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
+	CMapField &mf = *unit.GetMapLayer()->Field(unit.GetTilePos());
 	CMapField &new_mf = *CMap::Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
 	if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
-		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
@@ -412,7 +412,7 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 	}
 	//Wyrmgus start
 	StopRaft(unit);
-	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+	ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	//Wyrmgus end
 	COrderPtr *order;
 
@@ -572,11 +572,11 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.GetTilePos());
+	CMapField &mf = *unit.GetMapLayer()->Field(unit.GetTilePos());
 	CMapField &new_mf = *CMap::Map.Field(pos, z);
 	if ((mf.GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
-		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
@@ -667,7 +667,7 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 	//Wyrmgus start
 	StopRaft(unit);
 	if (reach_layer) {
-		ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+		ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	}
 	//Wyrmgus end
 	COrderPtr *order;
@@ -706,7 +706,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 	
 	StopRaft(unit);
 	if (reach_layer) {
-		ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+		ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	}
 	
 	COrderPtr *order;
@@ -759,7 +759,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 	}
 	//Wyrmgus start
 //	*order = COrder::NewActionPatrol(unit.GetTilePos(), pos);
-	*order = COrder::NewActionPatrol(unit.GetTilePos(), pos, unit.MapLayer->ID, z);
+	*order = COrder::NewActionPatrol(unit.GetTilePos(), pos, unit.GetMapLayer()->GetIndex(), z);
 	//Wyrmgus end
 
 	ClearSavedAction(unit);
@@ -782,7 +782,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 	}
 	//Wyrmgus start
 	StopRaft(unit);
-	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+	ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	//Wyrmgus end
 	COrderPtr *order;
 
@@ -894,7 +894,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					&& table[i]->CurrentOrder()->GetGoal() == &unit
 				) {
 					if (unit.GetPlayer()->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()) {
-						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.GetTilePos(), unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
+						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
 				}
@@ -971,7 +971,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	}
 	//Wyrmgus start
 	StopRaft(unit);
-	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
+	ReachGoalLayer(unit, dest.GetMapLayer()->GetIndex(), flush);
 	//Wyrmgus end
 	COrderPtr *order;
 
@@ -1008,7 +1008,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	
 	//Wyrmgus start
 	if (depot) {
-		ReachGoalLayer(unit, depot->MapLayer->ID, flush);
+		ReachGoalLayer(unit, depot->GetMapLayer()->GetIndex(), flush);
 	}
 	//Wyrmgus end
 	
@@ -1055,7 +1055,7 @@ void CommandTrainUnit(CUnit &unit, const CUnitType &type, const int player, cons
 	//Wyrmgus start
 	if (unit.GetType()->Stats[unit.GetPlayer()->GetIndex()].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
 		if (player == CPlayer::GetThisPlayer()->GetIndex()) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), "%s", _("The stock is empty, wait until it is replenished."));
 		}
 		return;
 	}

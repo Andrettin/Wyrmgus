@@ -636,7 +636,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (unit.GetMissile().Missile->AlwaysFire) {
 			//Wyrmgus end
 				newgoalPos = goal->GetTilePos();
-				new_z = goal->MapLayer->ID;
+				new_z = goal->GetMapLayer()->GetIndex();
 				goal = nullptr;
 			} else {
 				return;
@@ -717,7 +717,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	// If Firing from inside a Bunker
 	CUnit *from = unit.GetFirstContainer();
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	const PixelPos startPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(from->GetTilePos(), from->MapLayer) + PixelSize(from->GetType()->GetHalfTilePixelSize().x, from->GetType()->GetHalfTilePixelSize().y) + unit.GetType()->MissileOffsets[dir][0];
+	const PixelPos startPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(from->GetTilePos(), from->GetMapLayer()) + PixelSize(from->GetType()->GetHalfTilePixelSize().x, from->GetType()->GetHalfTilePixelSize().y) + unit.GetType()->MissileOffsets[dir][0];
 
 	Vec2i dpos;
 	if (goal) {
@@ -736,7 +736,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			NearestOfUnit(*goal, unit.GetFirstContainer()->GetTilePos(), &dpos);
 		} else {
 			dpos = goal->GetTilePos() + goal->GetHalfTileSize();
-			z = goal->MapLayer->ID;
+			z = goal->GetMapLayer()->GetIndex();
 		}
 	} else {
 		dpos = newgoalPos;
@@ -870,7 +870,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		Missile &missile = *(*i);
 		//Wyrmgus start
 //		if (missile.Delay || missile.Hidden) {
-		if (missile.Delay || missile.Hidden || missile.MapLayer != UI.CurrentMapLayer->ID) {
+		if (missile.Delay || missile.Hidden || missile.MapLayer != UI.CurrentMapLayer->GetIndex()) {
 		//Wyrmgus end
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -884,7 +884,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		Missile &missile = *(*i);
 		//Wyrmgus start
 //		if (missile.Delay || missile.Hidden) {
-		if (missile.Delay || missile.Hidden || missile.MapLayer != UI.CurrentMapLayer->ID) {
+		if (missile.Delay || missile.Hidden || missile.MapLayer != UI.CurrentMapLayer->GetIndex()) {
 		//Wyrmgus end
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -1008,7 +1008,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
 								if (unit.GetType()->TileSize.x == 1 || unit.GetType()->TileSize.y == 1) {
-									missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.GetTilePos(), unit.MapLayer);
+									missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.GetTilePos(), unit.GetMapLayer());
 								}
 							} else {
 								missile.position = position;
@@ -1030,7 +1030,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
 						if (unit.GetType()->TileSize.x == 1 || unit.GetType()->TileSize.y == 1) {
-							missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.GetTilePos(), unit.MapLayer);
+							missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.GetTilePos(), unit.GetMapLayer());
 						}
 						missile.DestroyMissile = 1;
 						return true;

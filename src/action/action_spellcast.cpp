@@ -82,7 +82,7 @@
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
 			const Vec2i diag(order->Range, order->Range);
 			order->goalPos = target->GetTilePos() /* + target->GetHalfTileSize() */ - diag;
-			order->MapLayer = target->MapLayer->ID;
+			order->MapLayer = target->GetMapLayer()->GetIndex();
 			order->Range <<= 1;
 		} else {
 			order->SetGoal(target);
@@ -160,13 +160,13 @@
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 			return lastScreenPos;
 		}
 
@@ -200,7 +200,7 @@
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->GetMapLayer()->GetIndex());
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -248,7 +248,7 @@
 		return MapLayer;
 	}
 	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer->ID;
+		return this->GetGoal()->GetMapLayer()->GetIndex();
 	}
 	return 0;
 }
@@ -302,7 +302,7 @@ bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
 	this->goalPos = goal->GetTilePos();
-	this->MapLayer = goal->MapLayer->ID;
+	this->MapLayer = goal->GetMapLayer()->GetIndex();
 	this->Range = 0;
 	this->ClearGoal();
 
@@ -344,7 +344,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos());
-		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize());
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
@@ -359,14 +359,14 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+		if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 			std::vector<CUnit *> table;
-			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 					if (table[i]->CurrentAction() == UnitActionStill) {
 						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->GetMapLayer()->GetIndex() : this->MapLayer);
 					}
 					return false;
 				}
@@ -409,7 +409,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
-										unit.MapLayer->ID,
+										unit.GetMapLayer()->GetIndex(),
 //										_("%s: not enough mana for spell: %s"),
 										_("%s does not have enough mana to use the %s ability."),
 //										unit.GetType()->Name.c_str(), spell.Name.c_str());
@@ -418,7 +418,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				} else if (unit.SpellCoolDownTimers.find(&spell) != unit.SpellCoolDownTimers.end()) {
 					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
-										unit.MapLayer->ID,
+										unit.GetMapLayer()->GetIndex(),
 //										_("%s: spell is not ready yet: %s"),
 										_("%s's ability %s is not ready yet."),
 //										unit.GetType()->Name.c_str(), spell.Name.c_str());
@@ -427,7 +427,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				} else if (unit.GetPlayer()->CheckCosts(spell.Costs, false)) {
 					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
-										unit.MapLayer->ID,
+										unit.GetMapLayer()->GetIndex(),
 //										_("%s: not enough resources to cast spell: %s"),
 										_("You do not have enough resources for %s to use the %s ability."),
 //										unit.GetType()->Name.c_str(), spell.Name.c_str());
@@ -435,14 +435,14 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 										//Wyrmgus end
 				//Wyrmgus start
 				} else if (spell.Target == TargetUnit && order.GetGoal() == nullptr) {
-					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.MapLayer->ID,
+					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(),
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.GetName().utf8().get_data());
 				//Wyrmgus end
 				} else {
 					unit.GetPlayer()->Notify(NotifyYellow, unit.GetTilePos(),
 										//Wyrmgus start
-										unit.MapLayer->ID,
+										unit.GetMapLayer()->GetIndex(),
 //										_("%s: can't cast spell: %s"),
 										_("%s cannot use the %s ability."),
 //										unit.GetType()->Name.c_str(), spell.Name.c_str());
@@ -514,10 +514,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (this->isAutocast) {
 					//Wyrmgus start
 //					if (order.GetGoal() && order.GetGoal()->GetTilePos() != order.goalPos) {
-					if (order.GetGoal() && (order.GetGoal()->GetTilePos() != order.goalPos || order.GetGoal()->MapLayer->ID != order.MapLayer)) {
+					if (order.GetGoal() && (order.GetGoal()->GetTilePos() != order.goalPos || order.GetGoal()->GetMapLayer()->GetIndex() != order.MapLayer)) {
 					//Wyrmgus end
 						order.goalPos = order.GetGoal()->GetTilePos();
-						order.MapLayer = order.GetGoal()->MapLayer->ID;
+						order.MapLayer = order.GetGoal()->GetMapLayer()->GetIndex();
 					}
 					if (unit.GetPlayer()->AiEnabled) {
 						if (!unit.RestoreOrder()) {

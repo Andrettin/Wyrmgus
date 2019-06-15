@@ -124,14 +124,14 @@ enum {
 
 	if (this->HasGoal()) {
 		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
 		//Wyrmgus start
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
@@ -159,7 +159,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->GetMapLayer()->GetIndex());
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -317,14 +317,14 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 					if (pathRet == PF_UNREACHABLE) {
 						//Wyrmgus start
 						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+						if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
-							Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+							Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 							for (size_t i = 0; i != table.size(); ++i) {
 								if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->GetMapLayer()->GetIndex() : this->MapLayer);
 									}
 									return;
 								}

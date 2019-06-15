@@ -138,16 +138,16 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CMap::Map.CalculateTileTransitions(pos, false, UI.CurrentMapLayer->ID);
-	CMap::Map.CalculateTileTransitions(pos, true, UI.CurrentMapLayer->ID);
+	CMap::Map.CalculateTileTransitions(pos, false, UI.CurrentMapLayer->GetIndex());
+	CMap::Map.CalculateTileTransitions(pos, true, UI.CurrentMapLayer->GetIndex());
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-					CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
-					CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
+					CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->GetIndex());
+					CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->GetIndex());
 				}
 			}
 		}
@@ -161,7 +161,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (!CanBuildUnitType(unit, *unit->GetType(), pos, 1, true, UI.CurrentMapLayer->ID)) {
+		if (!CanBuildUnitType(unit, *unit->GetType(), pos, 1, true, UI.CurrentMapLayer->GetIndex())) {
 			units_to_remove.push_back(unit);
 		}
 	}
@@ -172,7 +172,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	//Wyrmgus end
 
 	UI.Minimap.UpdateSeenXY(pos);
-	UI.Minimap.UpdateXY(pos, UI.CurrentMapLayer->ID);
+	UI.Minimap.UpdateXY(pos, UI.CurrentMapLayer->GetIndex());
 
 	EditorChangeSurrounding(pos, tile);
 }
@@ -193,7 +193,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
-	const CTerrainType *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
+	const CTerrainType *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->GetIndex());
 	bool overlay = mf.OverlayTerrain ? true : false;
 	if (!terrain->AllowSingle) {
 		std::vector<int> transition_directions;
@@ -205,7 +205,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 							
-						const CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
+						const CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->GetIndex());
 						if (overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 							adjacent_terrain = nullptr;
 						}
@@ -334,7 +334,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i ipos = pos - diag;
 	Vec2i apos = pos + diag;
 
-	CMap::Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->ID);
+	CMap::Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->GetIndex());
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
@@ -412,14 +412,14 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		TileFill(mirror, tile, z * 2);
 
 		// FIXME: can overlap units
-		CUnit *unit = MakeUnitAndPlace(rpos, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		CUnit *unit = MakeUnitAndPlace(rpos, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->GetIndex());
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->SetResourcesHeld(value);
 		}
 
-		unit = MakeUnitAndPlace(tmirrorh, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		unit = MakeUnitAndPlace(tmirrorh, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->GetIndex());
 
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
@@ -430,7 +430,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 			//Wyrmgus end
 		}
 
-		unit = MakeUnitAndPlace(tmirrorv, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		unit = MakeUnitAndPlace(tmirrorv, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->GetIndex());
 
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
@@ -438,7 +438,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 			unit->SetResourcesHeld(value);
 		}
 
-		unit = MakeUnitAndPlace(tmirror, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		unit = MakeUnitAndPlace(tmirror, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->GetIndex());
 
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");

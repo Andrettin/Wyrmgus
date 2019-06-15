@@ -162,10 +162,10 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 		if (upgrade.GetName().empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.GetTilePos(), _("%s: research complete"), type.Name.c_str());
-			player.Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
+			player.Notify(NotifyGreen, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("%s: research complete"), type.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 		} else {
-			player.Notify(NotifyGreen, unit.GetTilePos(), unit.MapLayer->ID, _("%s: research complete"), upgrade.GetName().utf8().get_data());
+			player.Notify(NotifyGreen, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("%s: research complete"), upgrade.GetName().utf8().get_data());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start

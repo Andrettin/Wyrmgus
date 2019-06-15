@@ -341,7 +341,7 @@ static void AiCheckUnits()
 							if (
 								mercenary_type->GetClass() == queue.Type->GetClass()
 								&& queue.Want > queue.Made
-								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->GetTilePos(), mercenary_building->MapLayer->ID))
+								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->GetTilePos(), mercenary_building->GetMapLayer()->GetIndex()))
 								&& (!queue.Settlement || queue.Settlement == mercenary_building->Settlement)
 							) {
 								queue.Made++;
@@ -1143,7 +1143,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 
 				if (shouldAttack) {
-					CommandAttack(aiunit, attacker->GetTilePos(), const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer->ID);
+					CommandAttack(aiunit, attacker->GetTilePos(), const_cast<CUnit *>(attacker), FlushCommands, attacker->GetMapLayer()->GetIndex());
 					has_helper = true;
 				}
 			}
@@ -1204,7 +1204,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	Assert(what.GetPlayer()->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType());
-	AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType(), CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID), what.Settlement);
+	AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType(), CMap::Map.GetTileLandmass(what.GetTilePos(), what.GetMapLayer()->GetIndex()), what.Settlement);
 	//Wyrmgus end
 }
 
@@ -1336,14 +1336,14 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.GetTilePos() + blocker.GetType()->TileSize * dirs[r];
 
 			// Out of the map => no !
-			if (!CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer)) {
+			if (!CMap::Map.Info.IsPointOnMap(pos, unit.GetMapLayer())) {
 				continue;
 			}
 			// move to blocker ? => no !
 			if (pos == u0) {
 				continue;
 			}
-			if (unit.MapLayer->Field(pos)->UnitCache.size() > 0) {
+			if (unit.GetMapLayer()->Field(pos)->UnitCache.size() > 0) {
 				continue;
 			}
 
@@ -1367,7 +1367,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 				savedOrder = unit.CurrentOrder()->Clone();
 			}
 		}
-		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->MapLayer->ID);
+		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->GetMapLayer()->GetIndex());
 		if (savedOrder != nullptr) {
 			unit.SavedOrder = savedOrder;
 		}
@@ -1387,7 +1387,7 @@ void AiCanNotMove(CUnit &unit)
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
 	AiPlayer = unit.GetPlayer()->Ai;
-	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.MapLayer->ID)) {
+	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.GetMapLayer()->GetIndex())) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		//Wyrmgus start
@@ -1429,11 +1429,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.GetPlayer()->Ai, *what.GetType());
 	if (unit.GetPlayer() == what.GetPlayer()) {
-		AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType(), CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID), what.Settlement);
+		AiRemoveFromBuilt(what.GetPlayer()->Ai, *what.GetType(), CMap::Map.GetTileLandmass(what.GetTilePos(), what.GetMapLayer()->GetIndex()), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
 		const CUnitType *requested_unit_type = CFaction::GetFactionClassUnitType(what.GetPlayer()->GetFaction(), what.GetType()->GetClass());
 		if (requested_unit_type != nullptr) {
-			AiRemoveFromBuilt(what.GetPlayer()->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID), what.Settlement);
+			AiRemoveFromBuilt(what.GetPlayer()->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.GetTilePos(), what.GetMapLayer()->GetIndex()), what.Settlement);
 		}
 	}
 	//Wyrmgus end
@@ -1444,7 +1444,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	
 	if (what.GetPlayer()->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
 		if (what.GetType()->CanTransport() && what.CanMove() && (what.GetType()->UnitType == UnitTypeNaval || what.GetType()->UnitType == UnitTypeFly || what.GetType()->UnitType == UnitTypeFlyLow)) {
-			int landmass = CMap::Map.GetTileLandmass(what.GetTilePos(), what.MapLayer->ID);
+			int landmass = CMap::Map.GetTileLandmass(what.GetTilePos(), what.GetMapLayer()->GetIndex());
 			
 			what.GetPlayer()->Ai->Transporters[landmass].push_back(&what);
 		}
@@ -1602,7 +1602,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int lan
 		for (size_t i = 0; i < table.size(); ++i) {
 			CUnit &unit = *table[i];
 					
-			if (CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.MapLayer->ID) == landmass) {
+			if (CMap::Map.GetTileLandmass(unit.GetTilePos(), unit.GetMapLayer()->GetIndex()) == landmass) {
 				count++;
 			}
 		}

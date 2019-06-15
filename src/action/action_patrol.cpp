@@ -142,7 +142,7 @@
 
 /* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
-	if (this->MapLayer != UI.CurrentMapLayer->ID) {
+	if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 		return lastScreenPos;
 	}
 
@@ -193,9 +193,9 @@
 			break;
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+			if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {

@@ -214,7 +214,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 //Wyrmgus end
 {
 	//Wyrmgus start
-	if (src.MapLayer->ID != z) {
+	if (src.GetMapLayer()->GetIndex() != z) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -234,7 +234,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		int temp_i = PF_FAILED;
 		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
 			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
-				if (!CMap::Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
+				if (!CMap::Map.Info.IsPointOnMap(it, src.Container->GetMapLayer())) {
 					continue;
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
@@ -291,7 +291,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 	const int depth = PlaceReachable(src, dst.GetTilePos(),
 									 //Wyrmgus start
 //									 dst.GetType()->TileSize.x, dst.GetType()->TileSize.y, 0, range);
-									 dst.GetType()->TileSize.x, dst.GetType()->TileSize.y, 0, range, max_length, dst.MapLayer->ID, from_outside_container);
+									 dst.GetType()->TileSize.x, dst.GetType()->TileSize.y, 0, range, max_length, dst.GetMapLayer()->GetIndex(), from_outside_container);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
@@ -304,7 +304,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 ----------------------------------------------------------------------------*/
 
 const Vec2i &PathFinderInput::GetUnitPos() const { return unit->GetTilePos(); }
-const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer->ID; }
+const int PathFinderInput::GetUnitMapLayer() const { return unit->GetMapLayer()->GetIndex(); }
 Vec2i PathFinderInput::GetUnitSize() const
 {
 	return unit->GetType()->TileSize;
@@ -454,7 +454,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	const Vec2i dir(*pxd, *pyd);
 	int result = output.Length;
 	output.Length--;
-	if (!UnitCanBeAt(unit, unit.GetTilePos() + dir, unit.MapLayer->ID)) {
+	if (!UnitCanBeAt(unit, unit.GetTilePos() + dir, unit.GetMapLayer()->GetIndex())) {
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
@@ -471,7 +471,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			if (result > 0) {
 				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
 				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-				if (!UnitCanBeAt(unit, unit.GetTilePos() + dir, unit.MapLayer->ID)) {
+				if (!UnitCanBeAt(unit, unit.GetTilePos() + dir, unit.GetMapLayer()->GetIndex())) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;

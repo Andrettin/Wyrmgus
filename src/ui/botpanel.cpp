@@ -1935,9 +1935,9 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  Unload on coast valid only for sea units
 	//
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitActionStill
-		 && Selected[0]->GetType()->UnitType == UnitTypeNaval && Selected[0]->MapLayer->Field(Selected[0]->GetTilePos())->CoastOnMap())
+		 && Selected[0]->GetType()->UnitType == UnitTypeNaval && Selected[0]->GetMapLayer()->Field(Selected[0]->GetTilePos())->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
-		SendCommandUnload(*Selected[0], Selected[0]->GetTilePos(), NoUnitP, flush, Selected[0]->MapLayer->ID);
+		SendCommandUnload(*Selected[0], Selected[0]->GetTilePos(), NoUnitP, flush, Selected[0]->GetMapLayer()->GetIndex());
 		return ;
 	}
 	DoClicked_SelectTarget(button);
@@ -1987,7 +1987,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit &unit = *Selected[i];
 			// CursorValue here holds the spell type id
-			SendCommandSpellCast(unit, unit.GetTilePos(), &unit, spellId, flush, unit.MapLayer->ID);
+			SendCommandSpellCast(unit, unit.GetTilePos(), &unit, spellId, flush, unit.GetMapLayer()->GetIndex());
 		}
 		return;
 	}
@@ -2159,7 +2159,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	if (type.BoolFlag[RAIL_INDEX].value) {
 		bool has_adjacent_rail = best_training_place->HasAdjacentRailForUnitType(&type);
 		if (!has_adjacent_rail) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, best_training_place->GetTilePos(), best_training_place->MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, best_training_place->GetTilePos(), best_training_place->GetMapLayer()->GetIndex(), "%s", _("The unit requires railroads to be placed on"));
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			return;
 		}
@@ -2172,7 +2172,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	
 	for (int i = 0; i < unit_count; ++i) {
 		if (best_training_place->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, best_training_place->GetTilePos(), best_training_place->MapLayer->ID, "%s", _("Unit training queue is full"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, best_training_place->GetTilePos(), best_training_place->GetMapLayer()->GetIndex(), "%s", _("Unit training queue is full"));
 			return;
 		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type, best_training_place->GetType()->Stats[best_training_place->GetPlayer()->GetIndex()].GetUnitStock(&type) != 0)) {
 			SendCommandTrainUnit(*best_training_place, type, CPlayer::GetThisPlayer()->GetIndex(), FlushCommands);
@@ -2389,7 +2389,7 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 				SelectUnit(*connection_destination);
 			}
 			SelectionChanged();
-			ChangeCurrentMapLayer(connection_destination->MapLayer->ID);
+			ChangeCurrentMapLayer(connection_destination->GetMapLayer()->GetIndex());
 			UI.SelectedViewport->Center(connection_destination->GetMapPixelPosCenter());
 			break;
 		}
@@ -2428,18 +2428,18 @@ void CButtonPanel::DoClicked(int button)
 			(CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), CurrentButtons[button].ValueStr) == 'R')
 			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
 		) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->GetMapLayer()->GetIndex(), "%s", _("The upgrade has already been acquired"));
 		} else if (CurrentButtons[button].Action == ButtonBuy && CPlayer::GetThisPlayer()->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != nullptr) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The hero limit has been reached"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->GetMapLayer()->GetIndex(), "%s", _("The hero limit has been reached"));
 		} else {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->GetMapLayer()->GetIndex(), "%s", _("The requirements have not been fulfilled"));
 		}
 		PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		return;
 	}
 
 	if (GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
-		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->MapLayer->ID, "%s", _("The cooldown is active"));
+		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->GetTilePos(), Selected[0]->GetMapLayer()->GetIndex(), "%s", _("The cooldown is active"));
 		PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		return;
 	}

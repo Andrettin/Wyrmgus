@@ -162,14 +162,14 @@ static void UiUnselectAll()
 
 static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 {
-	int best_map_layer = UI.CurrentMapLayer->ID;
+	int best_map_layer = UI.CurrentMapLayer->GetIndex();
 	
 	std::vector<int> map_layer_count;
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		map_layer_count.push_back(0);
 	}
 	for (size_t i = 0; i != unit_group.size(); ++i) {
-		map_layer_count[unit_group[i]->MapLayer->ID] += 1;
+		map_layer_count[unit_group[i]->GetMapLayer()->GetIndex()] += 1;
 	}
 	for (size_t i = 0; i < map_layer_count.size(); ++i) {
 		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
@@ -177,7 +177,7 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 		}
 	}
 	
-	if (best_map_layer != UI.CurrentMapLayer->ID) {
+	if (best_map_layer != UI.CurrentMapLayer->GetIndex()) {
 		ChangeCurrentMapLayer(best_map_layer);
 	}
 }
@@ -188,7 +188,7 @@ static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_g
 	
 	int map_layer_units = 0;
 	for (size_t i = 0; i != unit_group.size(); ++i) {
-		if (unit_group[i]->MapLayer != UI.CurrentMapLayer) {
+		if (unit_group[i]->GetMapLayer() != UI.CurrentMapLayer) {
 			continue;
 		}
 		pos += unit_group[i]->GetMapPixelPosCenter();
@@ -535,8 +535,8 @@ void UiFindIdleWorker()
 		CurrentButtonLevel = nullptr;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		if (unit->MapLayer != UI.CurrentMapLayer) {
-			ChangeCurrentMapLayer(unit->MapLayer->ID);
+		if (unit->GetMapLayer() != UI.CurrentMapLayer) {
+			ChangeCurrentMapLayer(unit->GetMapLayer()->GetIndex());
 		}
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
@@ -572,8 +572,8 @@ void UiFindLevelUpUnit()
 		CurrentButtonLevel = nullptr;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		if (unit->MapLayer != UI.CurrentMapLayer) {
-			ChangeCurrentMapLayer(unit->MapLayer->ID);
+		if (unit->GetMapLayer() != UI.CurrentMapLayer) {
+			ChangeCurrentMapLayer(unit->GetMapLayer()->GetIndex());
 		}
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
@@ -595,8 +595,8 @@ void UiFindHeroUnit(int hero_index)
 	CurrentButtonLevel = nullptr;
 	PlayUnitSound(*Selected[0], VoiceSelected);
 	SelectionChanged();
-	if (unit->MapLayer != UI.CurrentMapLayer) {
-		ChangeCurrentMapLayer(unit->MapLayer->ID);
+	if (unit->GetMapLayer() != UI.CurrentMapLayer) {
+		ChangeCurrentMapLayer(unit->GetMapLayer()->GetIndex());
 	}
 	UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 }

@@ -450,7 +450,7 @@ extern int LoadGraphicPNG(CGraphic *g);
 /// Make an OpenGL texture
 //Wyrmgus start
 //extern void MakeTexture(CGraphic *graphic);
-extern void MakeTexture(CGraphic *graphic, CTimeOfDay *time_of_day = nullptr);
+extern void MakeTexture(CGraphic *graphic, const CTimeOfDay *time_of_day = nullptr);
 //Wyrmgus end
 //Wyrmgus start
 extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, const int ow, const int oh, const CTimeOfDay *time_of_day = nullptr);
@@ -458,7 +458,7 @@ extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, cons
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
 //extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, CTimeOfDay *time_of_day = nullptr);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const int player, const CTimeOfDay *time_of_day = nullptr);
 //Wyrmgus end
 
 /// Regenerate Window screen if needed

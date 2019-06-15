@@ -109,7 +109,7 @@ public:
 
 		if (unit != nullptr) { //  Found a corpse. eliminate it and proceed to summoning.
 			pos = unit->GetTilePos();
-			z = unit->MapLayer->ID;
+			z = unit->GetMapLayer()->GetIndex();
 			unit->Remove(nullptr);
 			unit->Release();
 			cansummon = true;

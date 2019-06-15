@@ -115,7 +115,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	order->goalPos = target.GetTilePos() + target.GetHalfTileSize();
 	//Wyrmgus start
-	order->MapLayer = target.MapLayer->ID;
+	order->MapLayer = target.GetMapLayer()->GetIndex();
 	//Wyrmgus end
 	// Removed, Dying handled by action routine.
 	order->SetGoal(&target);
@@ -253,12 +253,12 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -279,7 +279,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		tileSize = goal->GetTileSize();
 		//Wyrmgus start
 //		input.SetGoal(goal->GetTilePos(), tileSize);
-		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->GetMapLayer()->GetIndex());
 		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
@@ -325,7 +325,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		if (goal->IsAlive() == false) {
 			this->ClearGoal();
 			this->goalPos = goal->GetTilePos();
-			this->MapLayer = goal->MapLayer->ID;
+			this->MapLayer = goal->GetMapLayer()->GetIndex();
 			return false;
 		}
 		if (goal == attacker) {
@@ -376,7 +376,7 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
 	this->goalPos = goal->GetTilePos();
-	this->MapLayer = goal->MapLayer->ID;
+	this->MapLayer = goal->GetMapLayer()->GetIndex();
 	this->MinRange = 0;
 	this->Range = 0;
 	this->ClearGoal();
@@ -427,7 +427,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			}
 			this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 			this->goalPos = goal->GetTilePos();
-			this->MapLayer = goal->MapLayer->ID;
+			this->MapLayer = goal->GetMapLayer()->GetIndex();
 			this->State |= WEAK_TARGET; // weak target
 		}
 		// Have a weak target, try a better target.
@@ -445,7 +445,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			}
 			this->SetGoal(newTarget);
 			this->goalPos = newTarget->GetTilePos();
-			this->MapLayer = newTarget->MapLayer->ID;
+			this->MapLayer = newTarget->GetMapLayer()->GetIndex();
 			
 			//set the MinRange here as well, so that hit-and-run attacks will be conducted properly
 			this->MinRange = unit.GetType()->MinAttackRange;
@@ -473,9 +473,9 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
-	if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+	if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 		std::vector<CUnit *> table;
-		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitActionMove) {
@@ -566,14 +566,14 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == PF_UNREACHABLE) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-		if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+		if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 			std::vector<CUnit *> table;
-			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 					if (table[i]->CurrentAction() == UnitActionStill) {
 						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->GetMapLayer()->GetIndex() : this->MapLayer);
 					}
 					return;
 				}
@@ -648,7 +648,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		}
 		this->SetGoal(goal);
 		this->goalPos = goal->GetTilePos();
-		this->MapLayer = goal->MapLayer->ID;
+		this->MapLayer = goal->GetMapLayer()->GetIndex();
 		this->MinRange = unit.GetType()->MinAttackRange;
 		if (unit.GetPlayer()->AiEnabled && unit.GetVariableValue(SPEED_INDEX) > goal->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 			this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -668,7 +668,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				goal = newTarget;
 				this->SetGoal(newTarget);
 				this->goalPos = newTarget->GetTilePos();
-				this->MapLayer = newTarget->MapLayer->ID;
+				this->MapLayer = newTarget->GetMapLayer()->GetIndex();
 				this->MinRange = unit.GetType()->MinAttackRange;
 				if (unit.GetPlayer()->AiEnabled && unit.GetVariableValue(SPEED_INDEX) > newTarget->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 					this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -791,7 +791,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.GetTilePos(), goalPos, MapFieldAirUnpassable, MapLayer)) {
 						//Wyrmgus start
 //						const Vec2i dir = goal.GetTilePos() + goal.GetType()->GetHalfTileSize() - unit.GetTilePos();
-						const Vec2i dir = PixelSize(PixelSize(goal.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal.MapLayer->ID)) + goal.GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID)) - unit.GetHalfTilePixelSize();
+						const Vec2i dir = PixelSize(PixelSize(goal.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal.GetMapLayer()->GetIndex())) + goal.GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
 						//Wyrmgus end
 						unsigned char oldDir = unit.Direction;
 						UnitHeadingFromDeltaXY(unit, dir);

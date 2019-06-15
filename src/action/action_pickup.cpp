@@ -78,7 +78,7 @@ enum {
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.GetTilePos() + dest.GetHalfTileSize();
-		order->MapLayer = dest.MapLayer->ID;
+		order->MapLayer = dest.GetMapLayer()->GetIndex();
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -141,12 +141,12 @@ enum {
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -170,7 +170,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->GetTilePos(), tileSize, goal->MapLayer->ID);
+		input.SetGoal(goal->GetTilePos(), tileSize, goal->GetMapLayer()->GetIndex());
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -273,14 +273,14 @@ enum {
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if ((unit.MapLayer->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
+			if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.MapLayer->ID);
+				Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->GetTilePos() : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->GetMapLayer()->GetIndex() : this->MapLayer);
 						}
 						return;
 					}
@@ -338,7 +338,7 @@ enum {
 				}
 			}
 			this->goalPos = goal->GetTilePos();
-			this->MapLayer = goal->MapLayer->ID;
+			this->MapLayer = goal->GetMapLayer()->GetIndex();
 			this->State = State_TargetReached;
 		}
 		// FALL THROUGH
@@ -350,7 +350,7 @@ enum {
 	if (goal && !goal->IsVisibleAsGoal(*unit.GetPlayer())) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->GetTilePos() + goal->GetHalfTileSize();
-		this->MapLayer = goal->MapLayer->ID;
+		this->MapLayer = goal->GetMapLayer()->GetIndex();
 		this->ClearGoal();
 		goal = nullptr;
 	}

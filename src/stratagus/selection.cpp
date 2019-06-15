@@ -448,7 +448,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 	//Wyrmgus end
 	//Wyrmgus start
 //	Select(minPos, maxPos, table, HasSameTypeAs(type));
-	Select(minPos, maxPos, table, UI.CurrentMapLayer->ID, HasSameTypeAs(type));
+	Select(minPos, maxPos, table, UI.CurrentMapLayer->GetIndex(), HasSameTypeAs(type));
 	//Wyrmgus end
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
@@ -536,7 +536,7 @@ int ToggleUnitsByType(CUnit &base)
 
 	//Wyrmgus start
 //	Select(minPos, maxPos, table, HasSameTypeAs(type));
-	Select(minPos, maxPos, table, UI.CurrentMapLayer->ID, HasSameTypeAs(type));
+	Select(minPos, maxPos, table, UI.CurrentMapLayer->GetIndex(), HasSameTypeAs(type));
 	//Wyrmgus end
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
@@ -769,14 +769,14 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 */
 int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->GetIndex());
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->GetIndex());
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(t0 - range, t1 + range, table);
-	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->ID);
+	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
@@ -856,7 +856,7 @@ int SelectArmy()
 
 	//Wyrmgus start
 //	Select(minPos, maxPos, table);
-	Select(minPos, maxPos, table, UI.CurrentMapLayer->ID);
+	Select(minPos, maxPos, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 
 	unsigned int n = 0;
@@ -915,14 +915,14 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	if (Selected.empty()) {
 		return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
-	const Vec2i tilePos0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i tilePos1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i tilePos0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->GetIndex());
+	const Vec2i tilePos1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->GetIndex());
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(tilePos0 - range, tilePos1 + range, table);
-	Select(tilePos0 - range, tilePos1 + range, table, UI.CurrentMapLayer->ID);
+	Select(tilePos0 - range, tilePos1 + range, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	// If no unit in rectangle area... do nothing
@@ -960,14 +960,14 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 */
 int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->GetIndex());
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->GetIndex());
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(t0 - range, t1 + range, table);
-	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->ID);
+	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
@@ -1013,14 +1013,14 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 */
 int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->GetIndex());
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->GetIndex());
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(t0 - range, t1 + range, table);
-	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->ID);
+	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	unsigned int n = 0;
@@ -1082,14 +1082,14 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->GetIndex());
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->GetIndex());
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(t0 - range, t1 + range, table);
-	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->ID);
+	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
@@ -1155,14 +1155,14 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->GetIndex());
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->GetIndex());
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(t0 - range, t1 + range, table);
-	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->ID);
+	Select(t0 - range, t1 + range, table, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	unsigned int n = 0;

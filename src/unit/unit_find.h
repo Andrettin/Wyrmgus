@@ -372,7 +372,7 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 	Select(unit.GetTilePos() - offset,
 		   unit.GetTilePos() + typeSize + offset, around,
 		   //Wyrmgus start
-		   unit.MapLayer->ID,
+		   unit.GetMapLayer()->GetIndex(),
 //		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
 		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred), circle);
 		   //Wyrmgus end

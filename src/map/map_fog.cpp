@@ -663,7 +663,7 @@ void UpdateFogOfWarChange()
 			for (unsigned int index = 0; index != w; ++index) {
 				CMapField &mf = *map_layer->Field(index);
 				if (mf.playerInfo.IsExplored(*CPlayer::GetThisPlayer())) {
-					CMap::Map.MarkSeenTile(mf, map_layer->ID);
+					CMap::Map.MarkSeenTile(mf, map_layer->GetIndex());
 				}
 			}
 		}
@@ -915,7 +915,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	//Wyrmgus start
 //	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
-	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile, UI.CurrentMapLayer->ID);
+	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile, UI.CurrentMapLayer->GetIndex());
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -923,7 +923,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	CGraphic *alpha_fog_graphic = AlphaFogGraphics[CMap::Map.GetCurrentPixelTileSize()];
 	
 //	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
-	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->ID) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
+	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->GetIndex()) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
 			fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
@@ -962,7 +962,7 @@ void CViewport::DrawMapFogOfWar() const
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
 //			VisibleTable[my_index + mx] = CMap::Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
-			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
+			VisibleTable[UI.CurrentMapLayer->GetIndex()][my_index + mx] = CMap::Map.Field(mx + my_index, UI.CurrentMapLayer->GetIndex())->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
 			//Wyrmgus end
 		}
 		my_index += UI.CurrentMapLayer->GetWidth();
@@ -978,7 +978,7 @@ void CViewport::DrawMapFogOfWar() const
 		while (dx <= ex) {
 			//Wyrmgus start
 //			if (VisibleTable[sx]) {
-			if (VisibleTable[UI.CurrentMapLayer->ID][sx]) {
+			if (VisibleTable[UI.CurrentMapLayer->GetIndex()][sx]) {
 			//Wyrmgus end
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {

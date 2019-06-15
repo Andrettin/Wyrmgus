@@ -63,7 +63,7 @@ bool CSeasonDependency::CheckInternal(const CPlayer *player, const bool ignore_u
 
 bool CSeasonDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
-	return unit->MapLayer->GetSeason() == this->Season;
+	return unit->GetMapLayer()->GetSeason() == this->Season;
 }
 
 std::string CSeasonDependency::GetString(const std::string &prefix) const

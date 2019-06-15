@@ -126,8 +126,7 @@ static int CclStratagusMap(lua_State *l)
 //					delete[] CMap::Map.Fields;
 //					CMap::Map.Fields = new CMapField[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
 					CMap::Map.ClearMapLayers();
-					CMapLayer *map_layer = new CMapLayer(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-					map_layer->ID = CMap::Map.MapLayers.size();
+					CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 					CMap::Map.MapLayers.push_back(map_layer);
 					CMap::Map.Info.MapWidths.clear();
 					CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
@@ -157,10 +156,9 @@ static int CclStratagusMap(lua_State *l)
 						}
 						const int width = LuaToNumber(l, -1, 1);
 						const int height = LuaToNumber(l, -1, 2);
-						CMapLayer *map_layer = new CMapLayer(width, height);
+						CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), width, height);
 						CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
 						CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
-						map_layer->ID = CMap::Map.MapLayers.size();
 						CMap::Map.MapLayers.push_back(map_layer);
 						lua_pop(l, 1);
 					}
@@ -2120,7 +2118,7 @@ static int CclGetMapTemplateData(lua_State *l)
 	} else if (!strcmp(data, "MapLayer")) {
 		const CMapLayer *map_layer = CMap::Map.GetSubtemplateMapLayer(map_template);
 		if (map_layer) {
-			lua_pushnumber(l, map_layer->ID);
+			lua_pushnumber(l, map_layer->GetIndex());
 		} else {
 			lua_pushnumber(l, -1);
 		}
@@ -2181,7 +2179,7 @@ static int CclGetSiteData(lua_State *l)
 	} else if (!strcmp(data, "MapLayer")) {
 		const CMapLayer *map_layer = site->GetMapLayer();
 		if (map_layer != nullptr) {
-			lua_pushnumber(l, map_layer->ID);
+			lua_pushnumber(l, map_layer->GetIndex());
 		} else {
 			lua_pushnumber(l, -1);
 		}

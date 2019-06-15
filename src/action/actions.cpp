@@ -115,7 +115,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(input.GetUnit()->GetTilePos(), tileSize, input.GetUnit()->MapLayer->ID);
+	input.SetGoal(input.GetUnit()->GetTilePos(), tileSize, input.GetUnit()->GetMapLayer()->GetIndex());
 }
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
@@ -167,7 +167,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	if (goal != nullptr) {
 		const Vec2i invalidPos(-1, -1);
 
-		FireMissile(unit, goal, invalidPos, goal->MapLayer->ID);
+		FireMissile(unit, goal, invalidPos, goal->GetMapLayer()->GetIndex());
 		UnHideUnit(unit); // unit is invisible until attacks
 	}
 	unit.StepCount = 0;
@@ -193,7 +193,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 /* virtual */ const int COrder::GetGoalMapLayer() const
 {
 	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer->ID;
+		return this->GetGoal()->GetMapLayer()->GetIndex();
 	}
 	return 0;
 }

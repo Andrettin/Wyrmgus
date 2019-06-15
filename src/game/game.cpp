@@ -364,7 +364,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	// Copy GL map surface to pixel array
 	for (int i = 0; i < UI.Minimap.H; ++i) {
 		for (int j = 0; j < UI.Minimap.W; ++j) {
-			Uint32 c = ((Uint32 *)MinimapSurfaceGL[UI.CurrentMapLayer->ID])[j + i * UI.Minimap.W];
+			Uint32 c = ((Uint32 *)MinimapSurfaceGL[UI.CurrentMapLayer->GetIndex()])[j + i * UI.Minimap.W];
 
 			const int offset = (i * UI.Minimap.W + j) * 3;
 			pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
@@ -376,7 +376,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		//Wyrmgus start
 //		if (CPlayer::Players[i]->Type != PlayerNobody) {
-		if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
+		if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->GetIndex()) {
 		//Wyrmgus end
 			for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 				for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
@@ -803,9 +803,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						const int value = mf.Value;
 						//Wyrmgus start
 	//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
-						f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.Terrain->Ident.c_str(), x, y, 0, map_layer->ID);
+						f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.Terrain->Ident.c_str(), x, y, 0, map_layer->GetIndex());
 						if (mf.OverlayTerrain) {
-							f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.OverlayTerrain->Ident.c_str(), x, y, value, map_layer->ID);
+							f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.OverlayTerrain->Ident.c_str(), x, y, value, map_layer->GetIndex());
 						}
 						//Wyrmgus end
 					}

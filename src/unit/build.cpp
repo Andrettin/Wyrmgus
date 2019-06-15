@@ -201,23 +201,23 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			switch (this->DistanceType) {
 				case GreaterThan :
 				case GreaterThanEqual :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) <= distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) <= distance) {
 						return Diagonal ? false : !(pos.x != table[i]->GetTilePos().x || pos.y != table[i]->GetTilePos().y);
 					}
 					break;
 				case LessThan :
 				case LessThanEqual :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) <= distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) <= distance) {
 						return Diagonal || pos.x == table[i]->GetTilePos().x || pos.y == table[i]->GetTilePos().y;
 					}
 					break;
 				case Equal :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) == distance) {
 						return Diagonal || pos.x == table[i]->GetTilePos().x || pos.y == table[i]->GetTilePos().y;
 					}
 					break;
 				case NotEqual :
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) == distance) {
 						return Diagonal ? false : !(pos.x != table[i]->GetTilePos().x || pos.y != table[i]->GetTilePos().y);
 					}
 					break;
@@ -328,17 +328,17 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 				break;
 			case LessThan:
 			case LessThanEqual:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) <= distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) <= distance) {
 					count++;
 				}
 				break;
 			case Equal:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) == distance) {
 					count++;
 				}
 				break;
 			case NotEqual:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->MapLayer->ID) == distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->GetType(), table[i]->GetTilePos(), table[i]->GetMapLayer()->GetIndex()) == distance) {
 					count++;
 				}
 				break;
@@ -427,7 +427,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
 		Vec2i endPos(found.GetTilePos() + found.GetType()->TileSize - 1);
-		Select(found.GetTilePos(), endPos, table, found.MapLayer->ID);
+		Select(found.GetTilePos(), endPos, table, found.GetMapLayer()->GetIndex());
 		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
 			if (*it == *it2) {
 				continue;

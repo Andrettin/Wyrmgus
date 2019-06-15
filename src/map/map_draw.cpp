@@ -120,7 +120,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
+	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->GetIndex());
 
 	return tilePos;
 }
@@ -235,7 +235,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int map_max = UI.CurrentMapLayer->GetWidth() * UI.CurrentMapLayer->GetHeight();
-	const CSeason *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
+	const CSeason *season = CMap::Map.MapLayers[UI.CurrentMapLayer->GetIndex()]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
@@ -513,7 +513,7 @@ void CViewport::Draw() const
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		//Wyrmgus start
 //		const bool isMapFieldVisile = CMap::Map.Field(tilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
-		const bool isMapFieldVisile = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
+		const bool isMapFieldVisile = CMap::Map.Field(tilePos, UI.CurrentMapLayer->GetIndex())->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
 		//Wyrmgus end
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
@@ -521,7 +521,7 @@ void CViewport::Draw() const
 //			&& ((isMapFieldVisile && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			&& ((isMapFieldVisile && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->GetTilePos(), UnitUnderCursor->MapLayer);
+			PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->GetTilePos(), UnitUnderCursor->GetMapLayer());
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {

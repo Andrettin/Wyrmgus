@@ -191,8 +191,8 @@ void DrawMapArea()
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = nullptr;
 			} else {
-				if (UI.CurrentMapLayer != vp->Unit->MapLayer) {
-					ChangeCurrentMapLayer(vp->Unit->MapLayer->ID);
+				if (UI.CurrentMapLayer != vp->Unit->GetMapLayer()) {
+					ChangeCurrentMapLayer(vp->Unit->GetMapLayer()->GetIndex());
 				}
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}
