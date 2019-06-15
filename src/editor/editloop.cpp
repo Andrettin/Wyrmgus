@@ -69,7 +69,7 @@
 #include "unit/unit_type.h"
 #include "video/font.h"
 #include "video/video.h"
-
+#include "wyrmgus.h"
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
@@ -2481,6 +2481,8 @@ void CEditor::Init()
 		CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
 		CMap::Map.Info.MapHeights.clear();
 		CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
+		
+		Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
 		//Wyrmgus end
 
 		const int defaultTile = CMap::Map.Tileset->getDefaultTileIndex();

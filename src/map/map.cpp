@@ -1230,6 +1230,10 @@ void ChangeCurrentMapLayer(const int z)
 	if (GameRunning && (!UI.PreviousMapLayer || UI.PreviousMapLayer->GetTimeOfDay() != UI.CurrentMapLayer->GetTimeOfDay())) {
 		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", UI.PreviousMapLayer->GetTimeOfDay(), UI.CurrentMapLayer->GetTimeOfDay());
 	}
+	
+	const int old_index = UI.PreviousMapLayer ? UI.PreviousMapLayer->GetIndex() : -1;
+	const int new_index = UI.CurrentMapLayer ? UI.CurrentMapLayer->GetIndex() : -1;
+	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", old_index, new_index);
 }
 
 /**
@@ -1474,6 +1478,8 @@ void CMap::Create()
 			map_layer->SetTimeOfDay(nullptr); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 		}
 	}
+	
+	Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
 }
 
 /**
@@ -1492,8 +1498,11 @@ void CMap::Init()
 */
 void CMap::Clean()
 {
+	const int map_layer_index = UI.CurrentMapLayer ? UI.CurrentMapLayer->GetIndex() : -1;
 	UI.CurrentMapLayer = nullptr;
 	UI.PreviousMapLayer = nullptr;
+	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", map_layer_index, -1);
+	
 	this->Landmasses = 0;
 
 	//Wyrmgus start

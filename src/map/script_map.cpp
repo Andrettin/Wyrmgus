@@ -73,6 +73,7 @@
 #include "world/province.h"
 //Wyrmgus end
 #include "world/world.h"
+#include "wyrmgus.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -132,6 +133,7 @@ static int CclStratagusMap(lua_State *l)
 					CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
 					CMap::Map.Info.MapHeights.clear();
 					CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
+					Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
 					//Wyrmgus end
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
@@ -160,6 +162,7 @@ static int CclStratagusMap(lua_State *l)
 						CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
 						CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
 						CMap::Map.MapLayers.push_back(map_layer);
+						Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);

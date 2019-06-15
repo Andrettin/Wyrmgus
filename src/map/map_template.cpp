@@ -67,6 +67,7 @@
 #include "video/video.h"
 #include "world/plane.h"
 #include "world/world.h"
+#include "wyrmgus.h"
 
 #include <fstream>
 
@@ -588,6 +589,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
 		map_layer->PixelTileSize = this->PixelTileSize;
 		CMap::Map.MapLayers.push_back(map_layer);
+		Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			CMap::Map.MapLayers[z]->Plane = this->Plane;
