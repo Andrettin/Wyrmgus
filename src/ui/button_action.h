@@ -37,6 +37,8 @@
 #include "sound/unit_sound.h"
 #include "ui/icon_config.h"
 
+#include <core/object.h>
+
 #include <string>
 #include <vector>
 
@@ -46,6 +48,13 @@
 
 class CButtonLevel;
 class CUnit;
+class UnitClass;
+struct lua_State;
+
+template <typename T>
+class Vec2T;
+
+typedef Vec2T<int> PixelPos;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -92,19 +101,44 @@ class ButtonAction;
 typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 
 /// Action of button
-class ButtonAction
+class ButtonAction : public Object
 {
+	GDCLASS(ButtonAction, Object)
+	
 public:
 	static void ProcessConfigData(const CConfigData *config_data);
+	
+private:
+	void Initialize();
+
+public:	
+	int GetPos() const
+	{
+		return this->Pos;
+	}
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;
+	
+	const CButtonLevel *GetLevel() const
+	{
+		return this->Level;
+	}
+	
 	int GetLevelIndex() const;
+	
 	int GetKey() const;
 	std::string GetHint() const;
+	
+	bool IsAvailableForUnitClass(const UnitClass *unit_class) const
+	{
+		return this->ForUnitClasses.find(unit_class) != this->ForUnitClasses.end();
+	}
 
+private:
 	int Pos = 0;					/// button position in the grid
-	CButtonLevel *Level = nullptr;	/// requires button level
+	const CButtonLevel *Level = nullptr;	/// requires button level
+public:
 	bool AlwaysShow = false;		/// button is always shown but drawn grayscale if not available
 	ButtonCmd Action = ButtonMove;	/// command on button press
 	int Value = 0;					/// extra value for command
@@ -112,7 +146,10 @@ public:
 
 	ButtonCheckFunc Allowed = nullptr;	/// Check if this button is allowed
 	std::string AllowStr;		/// argument for allowed
-	std::string UnitMask;		/// for which units is it available
+	std::string UnitMask;		/// for which units this button is available
+private:
+	std::set<const UnitClass *> ForUnitClasses;	/// for which unit classes this button is available
+public:
 	IconConfig Icon;			/// icon to display
 	int Key = 0;				/// alternative on keyboard
 	std::string Hint;			/// tip texts
@@ -121,6 +158,16 @@ public:
 	std::string ButtonCursor;	/// Custom cursor for button action (for example, to set spell target)
 	std::string Popup;			/// Popup screen used for button
 	std::string Mod;			/// Mod to which this button belongs to
+	
+	friend class CButtonPanel;
+	friend bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos);
+	friend int CclDefineButton(lua_State *l);
+	friend void DrawPopups();
+	friend void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActions);
+	friend void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAction> *buttonActions);
+	
+protected:
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------
@@ -140,15 +187,7 @@ extern std::vector<ButtonAction *> UnitButtonTable;
 extern void InitButtons();
 /// Free memory for buttons
 extern void CleanButtons();
-/// Make a new button
-extern int AddButton(int pos, CButtonLevel *level, const std::string &IconIdent,
-					 ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
-					 const std::string &sound, const std::string &cursor, const std::string &umask,
-					 //Wyrmgus start
-//					 const std::string &popup, bool alwaysShow);
-					 const std::string &popup, bool alwaysShow, const std::string &mod_file);
-					 //Wyrmgus end
+
 // Check if the button is allowed for the unit.
 extern bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction);
 

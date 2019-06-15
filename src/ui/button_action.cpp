@@ -38,11 +38,13 @@
 #include "config.h"
 #include "config_operator.h"
 #include "faction.h"
+#include "spell/spells.h"
 #include "trigger/trigger.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "ui/widgets.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 #include "video/video.h"
@@ -58,9 +60,13 @@
 */
 void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 {
-	ButtonAction ba;
+	ButtonAction *button_action = new ButtonAction;
 	
 	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.ProcessForObject(*button_action)) {
+			continue;
+		}
+		
 		if (property.Operator != CConfigOperator::Assignment) {
 			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
@@ -69,111 +75,181 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 		String key = property.Key;
 		String value = property.Value;
 		
-		if (key == "pos") {
-			ba.Pos = value.to_int();
-		} else if (key == "level") {
+		if (key == "level") {
 			value = value.replace("_", "-");
-			ba.Level = CButtonLevel::GetButtonLevel(value.utf8().get_data());
+			button_action->Level = CButtonLevel::GetButtonLevel(value.utf8().get_data());
 		} else if (key == "always_show") {
-			ba.AlwaysShow = StringToBool(value);
+			button_action->AlwaysShow = StringToBool(value);
 		} else if (key == "icon") {
 			value = value.replace("_", "-");
-			ba.Icon.Name = value.utf8().get_data();
+			button_action->Icon.Name = value.utf8().get_data();
 		} else if (key == "action") {
 			value = value.replace("_", "-");
 			const int button_action_id = GetButtonActionIdByName(value.utf8().get_data());
 			if (button_action_id != -1) {
-				ba.Action = ButtonCmd(button_action_id);
+				button_action->Action = ButtonCmd(button_action_id);
 			} else {
 				fprintf(stderr, "Invalid button action: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "value") {
 			value = value.replace("_", "-");
-			ba.ValueStr = value.utf8().get_data();
+			button_action->ValueStr = value.utf8().get_data();
 		} else if (key == "allowed") {
 			if (value == "check_true") {
-				ba.Allowed = ButtonCheckTrue;
+				button_action->Allowed = ButtonCheckTrue;
 			} else if (value == "check_false") {
-				ba.Allowed = ButtonCheckFalse;
+				button_action->Allowed = ButtonCheckFalse;
 			} else if (value == "check_upgrade") {
-				ba.Allowed = ButtonCheckUpgrade;
+				button_action->Allowed = ButtonCheckUpgrade;
 			} else if (value == "check_upgrade_not") {
-				ba.Allowed = ButtonCheckUpgradeNot;
+				button_action->Allowed = ButtonCheckUpgradeNot;
 			} else if (value == "check_upgrade_or") {
-				ba.Allowed = ButtonCheckUpgradeOr;
+				button_action->Allowed = ButtonCheckUpgradeOr;
 			} else if (value == "check_individual_upgrade") {
-				ba.Allowed = ButtonCheckIndividualUpgrade;
+				button_action->Allowed = ButtonCheckIndividualUpgrade;
 			} else if (value == "check_individual_upgrade_or") {
-				ba.Allowed = ButtonCheckIndividualUpgradeOr;
+				button_action->Allowed = ButtonCheckIndividualUpgradeOr;
 			} else if (value == "check_unit_variable") {
-				ba.Allowed = ButtonCheckUnitVariable;
+				button_action->Allowed = ButtonCheckUnitVariable;
 			} else if (value == "check_units_or") {
-				ba.Allowed = ButtonCheckUnitsOr;
+				button_action->Allowed = ButtonCheckUnitsOr;
 			} else if (value == "check_units_and") {
-				ba.Allowed = ButtonCheckUnitsAnd;
+				button_action->Allowed = ButtonCheckUnitsAnd;
 			} else if (value == "check_units_not") {
-				ba.Allowed = ButtonCheckUnitsNot;
+				button_action->Allowed = ButtonCheckUnitsNot;
 			} else if (value == "check_network") {
-				ba.Allowed = ButtonCheckNetwork;
+				button_action->Allowed = ButtonCheckNetwork;
 			} else if (value == "check_no_network") {
-				ba.Allowed = ButtonCheckNoNetwork;
+				button_action->Allowed = ButtonCheckNoNetwork;
 			} else if (value == "check_no_work") {
-				ba.Allowed = ButtonCheckNoWork;
+				button_action->Allowed = ButtonCheckNoWork;
 			} else if (value == "check_no_research") {
-				ba.Allowed = ButtonCheckNoResearch;
+				button_action->Allowed = ButtonCheckNoResearch;
 			} else if (value == "check_attack") {
-				ba.Allowed = ButtonCheckAttack;
+				button_action->Allowed = ButtonCheckAttack;
 			} else if (value == "check_upgrade_to") {
-				ba.Allowed = ButtonCheckUpgradeTo;
+				button_action->Allowed = ButtonCheckUpgradeTo;
 			} else if (value == "check_research") {
-				ba.Allowed = ButtonCheckResearch;
+				button_action->Allowed = ButtonCheckResearch;
 			} else if (value == "check_single_research") {
-				ba.Allowed = ButtonCheckSingleResearch;
+				button_action->Allowed = ButtonCheckSingleResearch;
 			} else if (value == "check_has_inventory") {
-				ba.Allowed = ButtonCheckHasInventory;
+				button_action->Allowed = ButtonCheckHasInventory;
 			} else if (value == "check_has_sub_buttons") {
-				ba.Allowed = ButtonCheckHasSubButtons;
+				button_action->Allowed = ButtonCheckHasSubButtons;
 			} else {
 				fprintf(stderr, "Invalid button check: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "allow_arg") {
 			value = value.replace("_", "-");
-			if (!ba.AllowStr.empty()) {
-				ba.AllowStr += ",";
+			if (!button_action->AllowStr.empty()) {
+				button_action->AllowStr += ",";
 			}
-			ba.AllowStr += value.utf8().get_data();
+			button_action->AllowStr += value.utf8().get_data();
 		} else if (key == "key") {
-			ba.Key = GetHotKey(value.utf8().get_data());
+			button_action->Key = GetHotKey(value.utf8().get_data());
 		} else if (key == "hint") {
-			ba.Hint = value.utf8().get_data();
+			button_action->Hint = value.utf8().get_data();
 		} else if (key == "description") {
-			ba.Description = value.utf8().get_data();
+			button_action->Description = value.utf8().get_data();
 		} else if (key == "comment_sound") {
 			value = value.replace("_", "-");
-			ba.CommentSound.Name = value.utf8().get_data();
+			button_action->CommentSound.Name = value.utf8().get_data();
 		} else if (key == "button_cursor") {
 			value = value.replace("_", "-");
-			ba.ButtonCursor = value.utf8().get_data();
+			button_action->ButtonCursor = value.utf8().get_data();
 		} else if (key == "popup") {
 			value = value.replace("_", "-");
-			ba.Popup = value.utf8().get_data();
-		} else if (key == "for_unit") {
-			if (value == "*") {
-				ba.UnitMask = value.utf8().get_data();
-			} else {
-				value = value.replace("_", "-");
-				if (ba.UnitMask.empty()) {
-					ba.UnitMask += ",";
-				}
-				ba.UnitMask += value.utf8().get_data();
-				ba.UnitMask += ",";
-			}
+			button_action->Popup = value.utf8().get_data();
 		} else {
 			fprintf(stderr, "Invalid button property: \"%s\".\n", key.utf8().get_data());
 		}
 	}
 	
-	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name, ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow, ba.Mod);
+	button_action->Initialize();
+}
+
+void ButtonAction::Initialize()
+{
+	if (!this->ValueStr.empty()) {
+		switch (this->Action) {
+			case ButtonSpellCast:
+				this->Value = CSpell::GetSpell(this->ValueStr)->Slot;
+#ifdef DEBUG
+				if (this->Value < 0) {
+					DebugPrint("Spell %s does not exist?\n" _C_ this->ValueStr.c_str());
+					Assert(this->Value >= 0);
+				}
+#endif
+				break;
+			case ButtonTrain:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+			case ButtonResearch:
+				this->Value = CUpgrade::Get(this->ValueStr)->GetIndex();
+				break;
+			//Wyrmgus start
+			case ButtonLearnAbility:
+				this->Value = CUpgrade::Get(this->ValueStr)->GetIndex();
+				break;
+			case ButtonExperienceUpgradeTo:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+			//Wyrmgus end
+			case ButtonUpgradeTo:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+			case ButtonBuild:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+			//Wyrmgus start
+			case ButtonProduceResource:
+				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				break;
+			case ButtonSellResource:
+				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				break;
+			case ButtonBuyResource:
+				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				break;
+			//Wyrmgus end
+			case ButtonButton:
+				if (CButtonLevel::GetButtonLevel(this->ValueStr)) {
+					this->Value = CButtonLevel::GetButtonLevel(this->ValueStr)->GetIndex();
+				} else {
+					this->Value = 0;
+				}
+				break;
+			default:
+				this->Value = atoi(this->ValueStr.c_str());
+				break;
+		}
+	} else {
+		this->ValueStr.clear();
+		this->Value = 0;
+	}
+
+	if (!this->CommentSound.Name.empty()) {
+		this->CommentSound.MapSound();
+	}
+	
+	if (!this->Popup.empty()) {
+		CPopup *popup = PopupByIdent(this->Popup);
+		if (!popup) {
+			fprintf(stderr, "Popup \"%s\" hasn't been defined.\n ", this->Popup.c_str());
+		}
+	}
+	
+	// FIXME: here should be added costs to the hint
+	// FIXME: johns: show should be nice done?
+	if (this->UnitMask[0] != '*') {
+		this->UnitMask = "," + this->UnitMask + ",";
+	}
+	
+	UnitButtonTable.push_back(this);
+	
+	// FIXME: check if already initialized
+	//Assert(this->Icon.Icon != nullptr);// just checks, that's why at the end
 }
 
 void ButtonAction::SetTriggerData() const
@@ -205,7 +281,7 @@ void ButtonAction::CleanTriggerData() const
 
 int ButtonAction::GetLevelIndex() const
 {
-	if (this->Level) {
+	if (this->Level != nullptr) {
 		return this->Level->GetIndex();
 	} else {
 		return 0;
@@ -282,6 +358,30 @@ std::string ButtonAction::GetHint() const
 	}
 	
 	return this->Hint;
+}
+
+void ButtonAction::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_pos", "pos"), +[](ButtonAction *button_action, const int pos){ button_action->Pos = pos; });
+	ClassDB::bind_method(D_METHOD("get_pos"), &ButtonAction::GetPos);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "pos"), "set_pos", "get_pos");
+	
+	ClassDB::bind_method(D_METHOD("add_to_for_units", "value"), +[](ButtonAction *button_action, const String &value){
+		if (value == "*") {
+			button_action->UnitMask = value.utf8().get_data();
+		} else {
+			String unit_mask = value.replace("_", "-");
+			if (button_action->UnitMask.empty()) {
+				button_action->UnitMask += ",";
+			}
+			button_action->UnitMask += unit_mask.utf8().get_data();
+			button_action->UnitMask += ",";
+		}
+	});
+	
+	ClassDB::bind_method(D_METHOD("add_to_for_unit_classes", "ident"), +[](ButtonAction *button_action, const String &ident){ button_action->ForUnitClasses.insert(UnitClass::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_for_unit_classes", "ident"), +[](ButtonAction *button_action, const String &ident){ button_action->ForUnitClasses.erase(UnitClass::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("get_for_unit_classes"), +[](const ButtonAction *button_action){ return ContainerToGodotArray(button_action->ForUnitClasses); });
 }
 
 std::string GetButtonActionNameById(const int button_action)

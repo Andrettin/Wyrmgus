@@ -1134,7 +1134,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	for (unsigned int j = 0; j < buttonCount; ++j) {
 		if (UI.ButtonPanel.Buttons[j].Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
-			if (!CurrentButtons.empty() && CurrentButtons[j].Pos != -1) {
+			if (!CurrentButtons.empty() && CurrentButtons[j].GetPos() != -1) {
 				ButtonUnderCursor = j;
 				CursorOn = CursorOnButton;
 				return;
@@ -3291,7 +3291,7 @@ void DrawPieMenu()
 									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2);
 	}
 	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 9; ++i) {
-		if (buttons[i].Pos != -1) {
+		if (buttons[i].GetPos() != -1) {
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 			const PixelPos pos(x, y);
@@ -3334,7 +3334,7 @@ void DrawPieMenu()
 	PopClipping();
 
 	int i = GetPieUnderCursor();
-	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
+	if (i != -1 && KeyState != KeyStateInput && buttons[i].GetPos() != -1) {
 		if (!Preference.NoStatusLineTooltips) {
 			UpdateStatusLineForButton(buttons[i]);
 		}

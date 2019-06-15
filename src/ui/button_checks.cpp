@@ -506,7 +506,10 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button)
 
 		char unit_ident[128];
 		sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
-		if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
+		if (
+			UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)
+			&& (unit.GetType()->GetClass() == nullptr || !UnitButtonTable[i]->IsAvailableForUnitClass(unit.GetType()->GetClass()))
+		) {
 			continue;
 		}
 		

@@ -121,11 +121,11 @@ std::vector<ButtonAction> CurrentButtons;
 void InitButtons()
 {
 	// Resolve the icon names.
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
+	for (ButtonAction *button_action : UnitButtonTable) {
 		//Wyrmgus start
-//		UnitButtonTable[i]->Icon.Load();
-		if (!UnitButtonTable[i]->Icon.Name.empty()) {
-			UnitButtonTable[i]->Icon.Load();
+//		button_action->Icon.Load();
+		if (!button_action->Icon.Name.empty()) {
+			button_action->Icon.Load();
 		}
 		//Wyrmgus end
 	}
@@ -137,131 +137,13 @@ void InitButtons()
 ----------------------------------------------------------------------------*/
 
 /**
-**  FIXME: docu
-*/
-int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
-			  ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
-			  const std::string &sound, const std::string &cursor, const std::string &umask,
-			  //Wyrmgus start
-//			  const std::string &popup, bool alwaysShow)
-			  const std::string &popup, bool alwaysShow, const std::string &mod_file)
-			  //Wyrmgus end
-{
-	std::string buf;
-	ButtonAction *ba = new ButtonAction;
-	Assert(ba);
-
-	ba->Pos = pos;
-	ba->Level = level;
-	ba->AlwaysShow = alwaysShow;
-	ba->Icon.Name = icon_ident;
-	// FIXME: check if already initialized
-	//ba->Icon.Load();
-	ba->Action = action;
-	if (!value.empty()) {
-		ba->ValueStr = value;
-		switch (action) {
-			case ButtonSpellCast:
-				ba->Value = CSpell::GetSpell(value)->Slot;
-#ifdef DEBUG
-				if (ba->Value < 0) {
-					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
-					Assert(ba->Value >= 0);
-				}
-#endif
-				break;
-			case ButtonTrain:
-				ba->Value = UnitTypeIdByIdent(value);
-				break;
-			case ButtonResearch:
-				ba->Value = CUpgrade::Get(value)->GetIndex();
-				break;
-			//Wyrmgus start
-			case ButtonLearnAbility:
-				ba->Value = CUpgrade::Get(value)->GetIndex();
-				break;
-			case ButtonExperienceUpgradeTo:
-				ba->Value = UnitTypeIdByIdent(value);
-				break;
-			//Wyrmgus end
-			case ButtonUpgradeTo:
-				ba->Value = UnitTypeIdByIdent(value);
-				break;
-			case ButtonBuild:
-				ba->Value = UnitTypeIdByIdent(value);
-				break;
-			//Wyrmgus start
-			case ButtonProduceResource:
-				ba->Value = GetResourceIdByName(value.c_str());
-				break;
-			case ButtonSellResource:
-				ba->Value = GetResourceIdByName(value.c_str());
-				break;
-			case ButtonBuyResource:
-				ba->Value = GetResourceIdByName(value.c_str());
-				break;
-			//Wyrmgus end
-			case ButtonButton:
-				if (CButtonLevel::GetButtonLevel(value)) {
-					ba->Value = CButtonLevel::GetButtonLevel(value)->GetIndex();
-				} else {
-					ba->Value = 0;
-				}
-				break;
-			default:
-				ba->Value = atoi(value.c_str());
-				break;
-		}
-	} else {
-		ba->ValueStr.clear();
-		ba->Value = 0;
-	}
-
-	ba->Allowed = func;
-	ba->AllowStr = allow;
-	ba->Key = key;
-	ba->Hint = hint;
-	ba->Description = descr;
-	ba->CommentSound.Name = sound;
-	if (!ba->CommentSound.Name.empty()) {
-		ba->CommentSound.MapSound();
-	}
-	if (!ba->Popup.empty()) {
-		CPopup *popup = PopupByIdent(ba->Popup);
-		if (!popup) {
-			fprintf(stderr, "Popup \"%s\" hasn't defined.\n ", ba->Popup.c_str());
-			Exit(1);
-		}
-	}
-	ba->ButtonCursor = cursor;
-	ba->Popup = popup;
-	// FIXME: here should be added costs to the hint
-	// FIXME: johns: show should be nice done?
-	if (umask[0] == '*') {
-		buf = umask;
-	} else {
-		buf = "," + umask + ",";
-	}
-	ba->UnitMask = buf;
-	//Wyrmgus start
-	ba->Mod = mod_file;
-	//Wyrmgus end
-	UnitButtonTable.push_back(ba);
-	// FIXME: check if already initited
-	//Assert(ba->Icon.Icon != nullptr);// just checks, that's why at the end
-	return 1;
-}
-
-
-/**
 **  Cleanup buttons.
 */
 void CleanButtons()
 {
 	// Free the allocated buttons.
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		delete UnitButtonTable[i];
+	for (ButtonAction *button_action : UnitButtonTable) {
+		delete button_action;
 	}
 	UnitButtonTable.clear();
 
@@ -292,7 +174,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	}
 
 	// cursor is on that button
-	if (ButtonAreaUnderCursor == ButtonAreaButton && UnderCursor == button.Pos - 1) {
+	if (ButtonAreaUnderCursor == ButtonAreaButton && UnderCursor == button.GetPos() - 1) {
 		res |= IconActive;
 		if (MouseButtons & LeftButton) {
 			// Overwrite IconActive.
@@ -1108,10 +990,10 @@ void CButtonPanel::Draw()
 
 	//  Draw all buttons.
 	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
-		if (buttons[i].Pos == -1) {
+		if (buttons[i].GetPos() == -1) {
 			continue;
 		}
-		Assert(buttons[i].Pos == i + 1);
+		Assert(buttons[i].GetPos() == i + 1);
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
 		if (
@@ -1687,15 +1569,18 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 	}
 	//Wyrmgus end
 
-	for (size_t z = 0; z < UnitButtonTable.size(); ++z) {
-		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
+	for (const ButtonAction *button_action : UnitButtonTable) {
+		if (button_action->GetLevel() != CurrentButtonLevel) {
 			continue;
 		}
 
 		//Wyrmgus start
 		bool used_by_all = true;
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (!strstr(UnitButtonTable[z]->UnitMask.c_str(), individual_unit_ident[i])) {
+			if (
+				!strstr(button_action->UnitMask.c_str(), individual_unit_ident[i])
+				&& (Selected[i]->GetType()->GetClass() == nullptr || !button_action->IsAvailableForUnitClass(Selected[i]->GetType()->GetClass()))
+			) {
 				used_by_all = false;
 				break;
 			}
@@ -1703,31 +1588,31 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 		//Wyrmgus end
 		
 		// any unit or unit in list
-		if (UnitButtonTable[z]->UnitMask[0] != '*'
+		if (button_action->UnitMask[0] != '*'
 			//Wyrmgus start
-//			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
-			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident) && !used_by_all) {
+//			&& !strstr(button_action->UnitMask.c_str(), unit_ident)) {
+			&& !strstr(button_action->UnitMask.c_str(), unit_ident) && !used_by_all) {
 			//Wyrmgus end
 			continue;
 		}
 
 		bool allow = true;
-		if (UnitButtonTable[z]->AlwaysShow == false) {
+		if (button_action->AlwaysShow == false) {
 			for (size_t i = 0; i != Selected.size(); ++i) {
-				if (!IsButtonAllowed(*Selected[i], *UnitButtonTable[z])) {
+				if (!IsButtonAllowed(*Selected[i], *button_action)) {
 					allow = false;
 					break;
 				}
 			}
 		}
 
-		Assert(1 <= UnitButtonTable[z]->Pos);
-		Assert(UnitButtonTable[z]->Pos <= (int)UI.ButtonPanel.Buttons.size());
+		Assert(1 <= button_action->GetPos());
+		Assert(button_action->GetPos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// is button allowed after all?
 		if (allow) {
 			// OverWrite, So take last valid button.
-			(*buttonActions)[UnitButtonTable[z]->Pos - 1] = *UnitButtonTable[z];
+			(*buttonActions)[button_action->Pos - 1] = *button_action;
 		}
 	}
 }
@@ -1766,48 +1651,50 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 	} else {
 		sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
 	}
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		ButtonAction &buttonaction = *UnitButtonTable[i];
-		Assert(0 < buttonaction.Pos && buttonaction.Pos <= (int)UI.ButtonPanel.Buttons.size());
+	for (const ButtonAction *button_action : UnitButtonTable) {
+		Assert(0 < button_action->GetPos() && button_action->GetPos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
-		if (buttonaction.Level != CurrentButtonLevel) {
+		if (button_action->GetLevel() != CurrentButtonLevel) {
 			continue;
 		}
 
 		// any unit or unit in list
-		if (buttonaction.UnitMask[0] != '*'
-			&& !strstr(buttonaction.UnitMask.c_str(), unit_ident)) {
+		if (
+			button_action->UnitMask[0] != '*'
+			&& !strstr(button_action->UnitMask.c_str(), unit_ident)
+			&& (unit.GetType()->GetClass() == nullptr || !button_action->IsAvailableForUnitClass(unit.GetType()->GetClass()))
+		) {
 			continue;
 		}
 		//Wyrmgus start
 //		int allow = IsButtonAllowed(unit, buttonaction);
 		bool allow = true; // check all selected units, as different units of the same type may have different allowed buttons
-		if (UnitButtonTable[i]->AlwaysShow == false) {
+		if (button_action->AlwaysShow == false) {
 			for (size_t j = 0; j != Selected.size(); ++j) {
-				if (!IsButtonAllowed(*Selected[j], *UnitButtonTable[i])) {
+				if (!IsButtonAllowed(*Selected[j], *button_action)) {
 					allow = false;
 					break;
 				}
 			}
 		}
 		//Wyrmgus end
-		int pos = buttonaction.Pos;
+		int pos = button_action->GetPos();
 
 		// Special case for researches
 		int researchCheck = true;
-		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonResearch
+		if (button_action->AlwaysShow && !allow && button_action->Action == ButtonResearch
 			//Wyrmgus start
-//			&& UpgradeIdentAllowed(*unit.GetPlayer(), buttonaction.ValueStr) == 'R') {
-			&& UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'R') {
+//			&& UpgradeIdentAllowed(*unit.GetPlayer(), button_action->ValueStr) == 'R') {
+			&& UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), button_action->ValueStr) == 'R') {
 			//Wyrmgus end
 			researchCheck = false;
 		}
 		
 		// is button allowed after all?
-		if ((buttonaction.AlwaysShow && (*buttonActions)[pos - 1].Pos == -1 && researchCheck) || allow) {
+		if ((button_action->AlwaysShow && (*buttonActions)[pos - 1].GetPos() == -1 && researchCheck) || allow) {
 			// OverWrite, So take last valid button.
-			(*buttonActions)[pos - 1] = buttonaction;
+			(*buttonActions)[pos - 1] = *button_action;
 		}
 	}
 }
@@ -1842,45 +1729,48 @@ void CButtonPanel::Update()
 	if (GameRunning || GameEstablishing) {
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
-		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-			if (UnitButtonTable[i]->Action != ButtonFaction && UnitButtonTable[i]->Action != ButtonBuy) {
+		for (ButtonAction *button_action : UnitButtonTable) {
+			if (button_action->Action != ButtonFaction && button_action->Action != ButtonBuy) {
 				continue;
 			}
 			char unit_ident[128];
 			sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
-			if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
+			if (
+				button_action->UnitMask[0] != '*' && !strstr(button_action->UnitMask.c_str(), unit_ident)
+				&& (unit.GetType()->GetClass() == nullptr || !button_action->IsAvailableForUnitClass(unit.GetType()->GetClass()))
+			) {
 				continue;
 			}
 
-			if (UnitButtonTable[i]->Action == ButtonFaction) {
+			if (button_action->Action == ButtonFaction) {
 				if (CPlayer::GetThisPlayer()->GetFaction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo.size()) {
-					UnitButtonTable[i]->Value = -1;
+					button_action->Value = -1;
 				} else {
-					UnitButtonTable[i]->Value = potential_faction_count;
-					UnitButtonTable[i]->Hint = "Found ";
+					button_action->Value = potential_faction_count;
+					button_action->Hint = "Found ";
 					if (CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->DefiniteArticle) {
-						UnitButtonTable[i]->Hint += "the ";
+						button_action->Hint += "the ";
 					}
-					UnitButtonTable[i]->Hint += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->GetName().utf8().get_data();
-					UnitButtonTable[i]->Description = "Changes your faction to ";
+					button_action->Hint += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->GetName().utf8().get_data();
+					button_action->Description = "Changes your faction to ";
 					if (CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->DefiniteArticle) {
-						UnitButtonTable[i]->Description += "the ";
+						button_action->Description += "the ";
 					}
-					UnitButtonTable[i]->Description += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->GetName().utf8().get_data();
+					button_action->Description += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->GetName().utf8().get_data();
 				}
 				potential_faction_count += 1;
-			} else if (UnitButtonTable[i]->Action == ButtonBuy) {
+			} else if (button_action->Action == ButtonBuy) {
 				if (sold_unit_count >= unit.SoldUnits.size()) {
-					UnitButtonTable[i]->Value = -1;
+					button_action->Value = -1;
 				} else {
-					UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
+					button_action->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
 					if (unit.SoldUnits[sold_unit_count]->Character != nullptr) {
-						UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
+						button_action->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
 					} else {
 						if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
-							UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+							button_action->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
 						} else {
-							UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+							button_action->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
 						}
 					}
 				}
@@ -2416,8 +2306,12 @@ void CButtonPanel::DoClicked(int button)
 	//  or Not Teamed
 	//
 	//Wyrmgus start
-//	if (CurrentButtons[button].Pos == -1 || !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), CurrentButtons[button].Action)) || (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
+//	if (CurrentButtons[button].GetPos() == -1 || !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
+	if (
+		CurrentButtons[button].GetPos() == -1
+		|| (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), CurrentButtons[button].Action))
+		|| (!CurrentButtons[button].AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action)) //allow neutral units to be used (but only for training or as transporters)
+	) {
 	//Wyrmgus end
 		return;
 	}

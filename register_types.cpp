@@ -87,6 +87,7 @@
 #include "time/time_of_day_schedule.h"
 #include "time/time_period_schedule.h"
 #include "trigger/trigger.h"
+#include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/icon.h"
 #include "unit/historical_unit.h"
@@ -111,6 +112,7 @@ void register_wyrmgus_types()
 	ClassDB::register_virtual_class<DataElement>();
 	ClassDB::register_virtual_class<DetailedDataElement>();
 	
+	ClassDB::register_class<ButtonAction>();
 	ClassDB::register_class<CAchievement>();
 	ClassDB::register_class<CAge>();
 	ClassDB::register_class<CAnimations>();
