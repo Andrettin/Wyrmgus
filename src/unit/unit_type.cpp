@@ -1369,7 +1369,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	}
 	this->Class = parent_type->Class;
 	if (this->Class != nullptr) {
-		this->Class->UnitTypes.insert(this);
+		this->Class->AddUnitType(this);
 	}
 	this->DrawLevel = parent_type->DrawLevel;
 	this->Image = parent_type->Image;
@@ -2063,13 +2063,13 @@ void CUnitType::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_unit_class", "unit_class"), +[](CUnitType *unit_type, const String &unit_class_ident){
 		if (unit_type->Class != nullptr) {
-			unit_type->Class->UnitTypes.erase(unit_type);
+			unit_type->Class->RemoveUnitType(unit_type);
 		}
 		
 		unit_type->Class = UnitClass::Get(unit_class_ident);
 		
 		if (unit_type->Class != nullptr) {
-			unit_type->Class->UnitTypes.insert(unit_type);
+			unit_type->Class->AddUnitType(unit_type);
 		}
 	});
 	ClassDB::bind_method(D_METHOD("get_unit_class"), +[](const CUnitType *unit_type){ return unit_type->Class; });

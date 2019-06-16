@@ -228,7 +228,7 @@ static void AiCheckUnits()
 			}
 		}
 		if (unit_class != nullptr) {
-			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
+			for (const CUnitType *class_unit_type : unit_class->GetUnitTypes()) {
 				if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 				}

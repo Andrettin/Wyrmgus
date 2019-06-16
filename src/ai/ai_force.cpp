@@ -408,7 +408,7 @@ public:
 		
 		const UnitClass *unit_class = unit->GetType()->GetClass();
 		if (unit_class != nullptr) {
-			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
+			for (const CUnitType *class_unit_type : unit_class->GetUnitTypes()) {
 				if (class_unit_type != unit->GetType()) {
 					data[UnitTypeEquivs[class_unit_type->GetIndex()]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
@@ -1170,7 +1170,7 @@ void AiForceManager::CheckUnits(int *counter)
 				}
 			}
 			if (unit_class != nullptr) {
-				for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
+				for (const CUnitType *class_unit_type : unit_class->GetUnitTypes()) {
 					if (class_unit_type != aiut.Type) {
 						e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 					}

@@ -46,6 +46,7 @@
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
@@ -351,7 +352,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
 		const ButtonAction &button = *UnitButtonTable[i];
-		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button.UnitMask);
+		std::vector<CUnitType *> unitmask = getUnitTypeFromString(button.UnitMask);
+		
+		//add the unit types belonging to the unit classes to which the button is available for as well
+		for (const UnitClass *unit_class : button.GetForUnitClasses()) {
+			for (CUnitType *unit_type : unit_class->GetUnitTypes()) {
+				unitmask.push_back(unit_type);
+			}
+		}
 
 		switch (button.Action) {
 			case ButtonRepair :

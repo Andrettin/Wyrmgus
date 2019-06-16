@@ -56,6 +56,22 @@ class UnitClass : public DataElement, public DataType<UnitClass>
 public:
 	static constexpr const char *ClassIdentifier = "unit_class";
 	
+	const std::set<CUnitType *> &GetUnitTypes() const
+	{
+		return this->UnitTypes;
+	}
+	
+	void AddUnitType(CUnitType *unit_type)
+	{
+		this->UnitTypes.insert(unit_type);
+	}
+	
+	void RemoveUnitType(CUnitType *unit_type)
+	{
+		this->UnitTypes.erase(unit_type);
+	}
+	
+private:
 	std::set<CUnitType *> UnitTypes;
 	
 protected:

@@ -1750,13 +1750,13 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
 			if (type->Class != nullptr)  {
-				type->Class->UnitTypes.erase(type);
+				type->Class->RemoveUnitType(type);
 			}
 			
 			type->Class = UnitClass::Get(LuaToString(l, -1));
 			
 			if (type->Class != nullptr) {
-				type->Class->UnitTypes.insert(type);
+				type->Class->AddUnitType(type);
 			}
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);

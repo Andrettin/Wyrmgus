@@ -134,6 +134,11 @@ public:
 	{
 		return this->ForUnitClasses.find(unit_class) != this->ForUnitClasses.end();
 	}
+	
+	const std::set<const UnitClass *> &GetForUnitClasses() const
+	{
+		return this->ForUnitClasses;
+	}
 
 private:
 	int Pos = 0;					/// button position in the grid
