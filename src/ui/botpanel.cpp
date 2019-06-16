@@ -1612,7 +1612,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 		// is button allowed after all?
 		if (allow) {
 			// OverWrite, So take last valid button.
-			(*buttonActions)[button_action->Pos - 1] = *button_action;
+			(*buttonActions)[button_action->Pos - 1].Copy(*button_action);
 		}
 	}
 }
@@ -1694,7 +1694,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 		// is button allowed after all?
 		if ((button_action->AlwaysShow && (*buttonActions)[pos - 1].GetPos() == -1 && researchCheck) || allow) {
 			// OverWrite, So take last valid button.
-			(*buttonActions)[pos - 1] = *button_action;
+			(*buttonActions)[pos - 1].Copy(*button_action);
 		}
 	}
 }

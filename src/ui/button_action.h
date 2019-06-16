@@ -111,7 +111,29 @@ public:
 private:
 	void Initialize();
 
-public:	
+public:	   
+	void Copy(const ButtonAction &button_action)
+	{
+		this->Pos = button_action.Pos;
+		this->Level = button_action.Level;
+		this->AlwaysShow = button_action.AlwaysShow;
+		this->Action = button_action.Action;
+		this->Value = button_action.Value;
+		this->ValueStr = button_action.ValueStr;
+		this->Allowed = button_action.Allowed;
+		this->AllowStr = button_action.AllowStr;
+		this->UnitMask = button_action.UnitMask;
+		this->ForUnitClasses = button_action.ForUnitClasses;
+		this->Icon = button_action.Icon;
+		this->Key = button_action.Key;
+		this->Hint = button_action.Hint;
+		this->Description = button_action.Description;
+		this->CommentSound = button_action.CommentSound;
+		this->ButtonCursor = button_action.ButtonCursor;
+		this->Popup = button_action.Popup;
+		this->Mod = button_action.Mod;
+	}
+	
 	int GetPos() const
 	{
 		return this->Pos;

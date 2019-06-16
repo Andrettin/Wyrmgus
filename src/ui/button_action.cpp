@@ -233,13 +233,6 @@ void ButtonAction::Initialize()
 		this->CommentSound.MapSound();
 	}
 	
-	if (!this->Popup.empty()) {
-		CPopup *popup = PopupByIdent(this->Popup);
-		if (!popup) {
-			fprintf(stderr, "Popup \"%s\" hasn't been defined.\n ", this->Popup.c_str());
-		}
-	}
-	
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (this->UnitMask[0] != '*') {
