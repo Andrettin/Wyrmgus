@@ -570,17 +570,6 @@ CUnitType::~CUnitType()
 		delete this->OnInit;
 	}
 
-	//Wyrmgus start
-	this->SoldUnits.clear();
-	this->SpawnUnits.clear();
-	this->Drops.clear();
-	this->AiDrops.clear();
-	this->DropSpells.clear();
-	this->Affixes.clear();
-	this->Traits.clear();
-	this->StartingAbilities.clear();
-	//Wyrmgus end
-
 	this->BoolFlag.clear();
 
 	// Free Building Restrictions if there are any
@@ -588,14 +577,11 @@ CUnitType::~CUnitType()
 		 b != this->BuildingRules.end(); ++b) {
 		delete *b;
 	}
-	this->BuildingRules.clear();
+
 	for (std::vector<CBuildRestriction *>::iterator b = this->AiBuildingRules.begin();
 		 b != this->AiBuildingRules.end(); ++b) {
 		delete *b;
 	}
-	this->AiBuildingRules.clear();
-
-	this->AutoCastActiveSpells.clear();
 
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->ResInfo[res]) {
@@ -1614,6 +1600,14 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	}
 	this->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
 	this->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
+	
+	for (CBuildRestriction *build_restriction : parent_type->BuildingRules) {
+		this->BuildingRules.push_back(build_restriction->Duplicate());
+	}
+	
+	for (CBuildRestriction *build_restriction : parent_type->AiBuildingRules) {
+		this->AiBuildingRules.push_back(build_restriction->Duplicate());
+	}
 }
 
 void CUnitType::UpdateDefaultBoolFlags()

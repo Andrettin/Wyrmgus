@@ -829,6 +829,8 @@ public:
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
 	//Wyrmgus end
+	
+	virtual CBuildRestriction *Duplicate() = 0;
 };
 
 class CBuildRestrictionAnd : public CBuildRestriction
@@ -853,6 +855,17 @@ public:
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionAnd *duplicate = new CBuildRestrictionAnd;
+		
+		for (CBuildRestriction *build_restriction : this->_or_list) {
+			duplicate->push_back(build_restriction->Duplicate());
+		}
+		
+		return duplicate;
+	}
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
@@ -879,6 +892,17 @@ public:
 		}
 	}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionOr *duplicate = new CBuildRestrictionOr;
+		
+		for (CBuildRestriction *build_restriction : this->_or_list) {
+			duplicate->push_back(build_restriction->Duplicate());
+		}
+		
+		return duplicate;
+	}
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
@@ -904,9 +928,18 @@ public:
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionAddOn *duplicate = new CBuildRestrictionAddOn;
+		duplicate->Offset = this->Offset;
+		duplicate->ParentName = this->ParentName;
+		duplicate->Parent = this->Parent;
+		return duplicate;
+	}
 
-	Vec2i Offset = Vec2i(0, 0);	/// offset from the main building to place this
-	std::string ParentName;	/// building that is unit is an addon too.
+	Vec2i Offset = Vec2i(0, 0);		/// offset from the main building to place this
+	std::string ParentName;			/// building that is unit is an addon too.
 	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
 };
 
@@ -929,6 +962,16 @@ public:
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionOnTop *duplicate = new CBuildRestrictionOnTop;
+		duplicate->ParentName = this->ParentName;
+		duplicate->Parent = this->Parent;
+		duplicate->ReplaceOnDie = this->ReplaceOnDie;
+		duplicate->ReplaceOnBuild = this->ReplaceOnBuild;
+		return duplicate;
+	}
 
 	std::string ParentName;	/// building that is unit is an addon too.
 	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
@@ -945,6 +988,21 @@ public:
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionDistance *duplicate = new CBuildRestrictionDistance;
+		duplicate->Distance = this->Distance;
+		duplicate->DistanceType = this->DistanceType;
+		duplicate->RestrictTypeName = this->RestrictTypeName;
+		duplicate->RestrictTypeOwner = this->RestrictTypeOwner;
+		duplicate->RestrictType = this->RestrictType;
+		duplicate->RestrictClassName = this->RestrictClassName;
+		duplicate->RestrictClass = this->RestrictClass;
+		duplicate->CheckBuilder = this->CheckBuilder;
+		duplicate->Diagonal = this->Diagonal;
+		return duplicate;
+	}
 
 	int Distance = 0;	/// distance to build (circle)
 	DistanceTypeType DistanceType;
@@ -967,11 +1025,22 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionHasUnit *duplicate = new CBuildRestrictionHasUnit;
+		duplicate->Count = this->Count;
+		duplicate->CountType = this->CountType;
+		duplicate->RestrictTypeName = this->RestrictTypeName;
+		duplicate->RestrictTypeOwner = this->RestrictTypeOwner;
+		duplicate->RestrictType = this->RestrictType;
+		return duplicate;
+	}
+	
 	int Count = 0;
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
-	CUnitType *RestrictType = nullptr;
 	std::string RestrictTypeOwner;
+	CUnitType *RestrictType = nullptr;
 };
 
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
@@ -983,6 +1052,20 @@ public:
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionSurroundedBy *duplicate = new CBuildRestrictionSurroundedBy;
+		duplicate->Distance = this->Distance;
+		duplicate->DistanceType = this->DistanceType;
+		duplicate->Count = this->Count;
+		duplicate->CountType = this->CountType;
+		duplicate->RestrictTypeName = this->RestrictTypeName;
+		duplicate->RestrictTypeOwner = this->RestrictTypeOwner;
+		duplicate->RestrictType = this->RestrictType;
+		duplicate->CheckBuilder = this->CheckBuilder;
+		return duplicate;
+	}
 	
 	int Distance = 0;
 	DistanceTypeType DistanceType = Equal;
@@ -1001,6 +1084,14 @@ public:
 	virtual ~CBuildRestrictionTerrain() {}
 	virtual void Init();
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	
+	virtual CBuildRestriction *Duplicate() override
+	{
+		CBuildRestrictionTerrain *duplicate = new CBuildRestrictionTerrain;
+		duplicate->RestrictTerrainTypeName = this->RestrictTerrainTypeName;
+		duplicate->RestrictTerrainType = this->RestrictTerrainType;
+		return duplicate;
+	}
 
 	std::string RestrictTerrainTypeName;
 	const CTerrainType *RestrictTerrainType = nullptr;
