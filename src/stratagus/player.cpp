@@ -1691,8 +1691,10 @@ bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 	}
 	
 	const FactionType *faction_type = faction->GetType();
-	if (faction_type->GetUpgrade() != nullptr && !CheckDependencies(faction_type->GetUpgrade(), this)) {
-		return false;
+	if (this->GetFaction()->GetType() != faction_type) {
+		if (faction_type->GetUpgrade() != nullptr && !CheckDependencies(faction_type->GetUpgrade(), this)) {
+			return false;
+		}
 	}
 	
 	const CUpgrade *faction_upgrade = faction->GetUpgrade();
