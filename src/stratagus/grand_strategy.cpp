@@ -663,10 +663,7 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	//add military score bonuses
 	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 		for (const CUnitType *unit_type : CUnitType::GetAll()) {
-				
-			Assert(upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == '?' || upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X');
-
-			if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+			if (upgrade->UpgradeModifiers[z]->AppliesToUnitType(unit_type)) {
 				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
 					this->MilitaryScoreBonus[unit_type->GetIndex()] += upgrade->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
 				}

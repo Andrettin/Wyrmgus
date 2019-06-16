@@ -855,7 +855,7 @@ static int CclDefineModifier(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
+			um->ApplyToUnitTypes.insert(CUnitType::Get(value));
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = CUnitType::Get(value);
@@ -1240,7 +1240,7 @@ static int CclGetUpgradeData(lua_State *l)
 					continue;
 				}
 				
-				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X' || std::find(unit_type->Affixes.begin(), unit_type->Affixes.end(), upgrade) != unit_type->Affixes.end()) {
+				if (upgrade->UpgradeModifiers[z]->AppliesToUnitType(unit_type) || std::find(unit_type->Affixes.begin(), unit_type->Affixes.end(), upgrade) != unit_type->Affixes.end()) {
 					applies_to.push_back(unit_type->Ident);
 				}
 			}
@@ -1490,10 +1490,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 		player.Allow.Units[unit_type->GetIndex()] += um->ChangeUnits[unit_type->GetIndex()];
 
-		Assert(um->ApplyTo[unit_type->GetIndex()] == '?' || um->ApplyTo[unit_type->GetIndex()] == 'X');
-
 		// this modifier should be applied to unittype id == unit_type->GetIndex()
-		if (um->ApplyTo[unit_type->GetIndex()] == 'X') {
+		if (um->AppliesToUnitType(unit_type)) {
 
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
@@ -1780,10 +1778,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 		player.Allow.Units[unit_type->GetIndex()] -= um->ChangeUnits[unit_type->GetIndex()];
 
-		Assert(um->ApplyTo[unit_type->GetIndex()] == '?' || um->ApplyTo[unit_type->GetIndex()] == 'X');
-
 		// this modifier should be applied to unittype id == unit_type->GetIndex()
-		if (um->ApplyTo[unit_type->GetIndex()] == 'X') {
+		if (um->AppliesToUnitType(unit_type)) {
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
@@ -2453,7 +2449,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
 			for (CUnitType *unit_type : CUnitType::GetAll()) {
-				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+				if (upgrade->UpgradeModifiers[z]->AppliesToUnitType(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type->GetIndex() == unit.GetType()->GetIndex()) {
 						applies_to_this = true;
@@ -2507,7 +2503,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
 			for (CUnitType *unit_type : CUnitType::GetAll()) {
-				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+				if (upgrade->UpgradeModifiers[z]->AppliesToUnitType(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type->GetIndex() == unit.GetType()->GetIndex()) {
 						applies_to_this = true;
@@ -2674,7 +2670,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident)
 						
 					bool first_unit_type = true;
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
-						if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+						if (upgrade->UpgradeModifiers[z]->AppliesToUnitType(unit_type)) {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
 							} else {
@@ -2724,7 +2720,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident)
 						
 					bool first_unit_type = true;
 					for (CUnitType *unit_type : CUnitType::GetAll()) {
-						if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->GetIndex()] == 'X') {
+						if (upgrade->UpgradeModifiers[z]->AppliesToUnitType(unit_type)) {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
 							} else {

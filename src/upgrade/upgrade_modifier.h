@@ -37,7 +37,10 @@
 
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
+#include <core/object.h>
+
 #include <map>
+#include <set>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -49,14 +52,22 @@ class CDynasty;
 class CFaction;
 class CUnitType;
 class CUpgrade;
+class UnitClass;
+struct lua_State;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 /**
 **  This is the modifier of an upgrade.
 **  This does the real action of an upgrade, and an upgrade can have multiple
 **  modifiers.
 */
-class CUpgradeModifier
+class CUpgradeModifier : public Object
 {
+	GDCLASS(CUpgradeModifier, Object)
+	
 public:
 	CUpgradeModifier();
 	~CUpgradeModifier()
@@ -69,6 +80,13 @@ public:
 	static std::vector<CUpgradeModifier *> UpgradeModifiers;
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	
+	bool AppliesToUnitType(const CUnitType *unit_type) const;
+	
+	bool AppliesToUnitClass(const UnitClass *unit_class) const
+	{
+		return this->ApplyToUnitClasses.find(unit_class) != this->ApplyToUnitClasses.end();
+	}
 	
 	int GetUnitStock(const CUnitType *unit_type) const;
 	void SetUnitStock(const CUnitType *unit_type, const int quantity);
@@ -87,7 +105,10 @@ public:
 	// TODO: pointers or ids would be faster and less memory use
 	int  ChangeUnits[UnitTypeMax];			/// add/remove allowed units
 	char ChangeUpgrades[UpgradeMax];		/// allow/forbid upgrades
-	char ApplyTo[UnitTypeMax];				/// which unit types are affected
+private:
+	std::set<const CUnitType *> ApplyToUnitTypes;	/// which unit types are affected
+	std::set<const UnitClass *> ApplyToUnitClasses;	/// which unit classes are affected
+public:
 
 	CUnitType *ConvertTo = nullptr;			/// convert to this unit-type.
 
@@ -98,6 +119,11 @@ public:
 	
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end
+	
+	friend int CclDefineModifier(lua_State *l);
+	
+protected:
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------

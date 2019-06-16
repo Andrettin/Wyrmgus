@@ -96,6 +96,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_modifier.h"
 #include "video/palette_image.h"
 #include "world/plane.h"
 #include "world/world.h"
@@ -159,6 +160,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CUnit>();
 	ClassDB::register_class<CUnitType>();
 	ClassDB::register_class<CUpgrade>();
+	ClassDB::register_class<CUpgradeModifier>();
 	ClassDB::register_class<CWord>();
 	ClassDB::register_class<CWordType>();
 	ClassDB::register_class<CWorld>();

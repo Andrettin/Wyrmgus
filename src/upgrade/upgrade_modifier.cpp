@@ -38,6 +38,7 @@
 
 #include "config.h"
 #include "config_operator.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
@@ -60,7 +61,6 @@ CUpgradeModifier::CUpgradeModifier()
 	memset(this->ChangeUnits, 0, sizeof(this->ChangeUnits));
 	
 	memset(this->ChangeUpgrades, '?', sizeof(this->ChangeUpgrades));
-	memset(this->ApplyTo, '?', sizeof(this->ApplyTo));
 	this->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 	this->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
 	memset(this->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
@@ -74,6 +74,10 @@ CUpgradeModifier::CUpgradeModifier()
 void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.ProcessForObject(*this)) {
+			continue;
+		}
+		
 		if (property.Operator != CConfigOperator::Assignment) {
 			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
@@ -82,14 +86,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 		String key = property.Key;
 		String value = property.Value;
 		
-		if (key == "apply_to") {
-			const CUnitType *unit_type = CUnitType::Get(value);
-			if (unit_type != nullptr) {
-				this->ApplyTo[unit_type->GetIndex()] = 'X';
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.utf8().get_data());
-			}
-		} else if (key == "remove_upgrade") {
+		if (key == "remove_upgrade") {
 			value = value.replace("_", "-");
 			CUpgrade *removed_upgrade = CUpgrade::Get(value.utf8().get_data());
 			if (removed_upgrade) {
@@ -114,8 +111,64 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 			}
 		}
 	}
+	
+	for (const CConfigData *section : config_data->Sections) {
+		String tag = SnakeCaseToPascalCase(section->Tag);
+		
+		const int index = UnitTypeVar.VariableNameLookup[tag.utf8().get_data()]; // variable index
+		
+		if (index != -1) { // valid index
+			int var_value = 0;
+			bool percent = false;
+			bool increase = false;
+			
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+					continue;
+				}
+				
+				String key = property.Key;
+				String value = property.Value;
+				
+				if (key == "value") {
+					var_value = value.to_int();
+				} else if (key == "percent") {
+					percent = StringToBool(value);
+				} else if (key == "increase") {
+					increase = StringToBool(value);
+				} else {
+					fprintf(stderr, "Invalid upgrade modifier variable property: \"%s\".\n", key.utf8().get_data());
+				}
+			}
+			
+			if (percent) {
+				this->ModifyPercent[index] = var_value;
+			} else if (increase) {
+				this->Modifier.Variables[index].Increase = var_value;
+			} else {
+				this->Modifier.Variables[index].Enable = 1;
+				this->Modifier.Variables[index].Value = var_value;
+				this->Modifier.Variables[index].Max = var_value;
+			}
+		} else {
+			fprintf(stderr, "Invalid upgrade modifier section: \"%s\".\n", section->Tag.utf8().get_data());
+		}
+	}
 }
 
+bool CUpgradeModifier::AppliesToUnitType(const CUnitType *unit_type) const
+{
+	if (this->ApplyToUnitTypes.find(unit_type) != this->ApplyToUnitTypes.end()) {
+		return true;
+	}
+	
+	if (unit_type->GetClass() != nullptr && this->AppliesToUnitClass(unit_type->GetClass())) {
+		return true;
+	}
+	
+	return false;
+}
 int CUpgradeModifier::GetUnitStock(const CUnitType *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
@@ -143,4 +196,15 @@ void CUpgradeModifier::SetUnitStock(const CUnitType *unit_type, const int quanti
 void CUpgradeModifier::ChangeUnitStock(const CUnitType *unit_type, const int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
+}
+
+void CUpgradeModifier::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("add_to_apply_to_unit_types", "ident"), +[](CUpgradeModifier *modifier, const String &ident){ modifier->ApplyToUnitTypes.insert(CUnitType::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_apply_to_unit_types", "ident"), +[](CUpgradeModifier *modifier, const String &ident){ modifier->ApplyToUnitTypes.erase(CUnitType::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("get_apply_to_unit_types"), +[](const CUpgradeModifier *modifier){ return ContainerToGodotArray(modifier->ApplyToUnitTypes); });
+	
+	ClassDB::bind_method(D_METHOD("add_to_apply_to_unit_classes", "ident"), +[](CUpgradeModifier *modifier, const String &ident){ modifier->ApplyToUnitClasses.insert(UnitClass::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("remove_from_apply_to_unit_classes", "ident"), +[](CUpgradeModifier *modifier, const String &ident){ modifier->ApplyToUnitClasses.erase(UnitClass::Get(ident)); });
+	ClassDB::bind_method(D_METHOD("get_apply_to_unit_classes"), +[](const CUpgradeModifier *modifier){ return ContainerToGodotArray(modifier->ApplyToUnitClasses); });
 }
