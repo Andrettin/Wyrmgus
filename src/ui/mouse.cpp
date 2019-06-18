@@ -3353,7 +3353,7 @@ static void HandlePieMenuMouseSelection()
 
 	int pie = GetPieUnderCursor();
 	if (pie != -1) {
-		const ButtonCmd action = CurrentButtons[pie].Action;
+		const ButtonCmd action = CurrentButtons[pie].GetAction();
 		UI.ButtonPanel.DoClicked(pie);
 		if (action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode

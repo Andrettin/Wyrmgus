@@ -62,24 +62,24 @@ typedef Vec2T<int> PixelPos;
 
 /// Button Commands that need target selection
 enum ButtonCmd {
-	ButtonMove,           /// order move
-	ButtonAttack,         /// order attack
-	ButtonRepair,         /// order repair
-	ButtonHarvest,        /// order harvest
-	ButtonBuild,          /// order build
-	ButtonPatrol,         /// order patrol
-	ButtonAttackGround,   /// order attack ground
-	ButtonSpellCast,      /// order cast spell
-	ButtonUnload,         /// order unload unit
-	ButtonStop,           /// order stop
-	ButtonButton,         /// choose other button set
-	ButtonTrain,          /// order train
-	ButtonStandGround,    /// order stand ground
-	ButtonReturn,         /// order return goods
-	ButtonResearch,       /// order reseach
-	ButtonLearnAbility,   /// order learn ability
-	ButtonExperienceUpgradeTo,   /// order upgrade (experience)
-	ButtonUpgradeTo,      /// order upgrade
+	ButtonMove,				/// order move
+	ButtonAttack,			/// order attack
+	ButtonRepair,			/// order repair
+	ButtonHarvest,			/// order harvest
+	ButtonBuild,			/// order build
+	ButtonPatrol,			/// order patrol
+	ButtonAttackGround,		/// order attack ground
+	ButtonSpellCast,		/// order cast spell
+	ButtonUnload,			/// order unload unit
+	ButtonStop,				/// order stop
+	ButtonButton,			/// choose other button set
+	ButtonTrain,			/// order train
+	ButtonStandGround,		/// order stand ground
+	ButtonReturn,			/// order return goods
+	ButtonResearch,			/// order reseach
+	ButtonLearnAbility,		/// order learn ability
+	ButtonExperienceUpgradeTo,	/// order upgrade (experience)
+	ButtonUpgradeTo,		/// order upgrade
 	ButtonRallyPoint,		/// set rally point
 	ButtonFaction,			/// change faction
 	ButtonQuest,			/// receive quest
@@ -91,10 +91,10 @@ enum ButtonCmd {
 	ButtonEnterMapLayer,	/// enter a map layer
 	ButtonUnit,				/// used to display popups for inventory items and for units in transporters
 	ButtonEditorUnit,		/// used to display popups for editor unit type buttons
-	ButtonCancel,         /// cancel
-	ButtonCancelUpgrade,  /// cancel upgrade
-	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild    /// cancel building
+	ButtonCancel,			/// cancel
+	ButtonCancelUpgrade,	/// cancel upgrade
+	ButtonCancelTrain,		/// cancel training
+	ButtonCancelBuild		/// cancel building
 };
 
 class ButtonAction;
@@ -138,6 +138,11 @@ public:
 	{
 		return this->Pos;
 	}
+	
+	ButtonCmd GetAction() const
+	{
+		return this->Action;
+	}
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;
@@ -167,7 +172,9 @@ private:
 	const CButtonLevel *Level = nullptr;	/// requires button level
 public:
 	bool AlwaysShow = false;		/// button is always shown but drawn grayscale if not available
+private:
 	ButtonCmd Action = ButtonMove;	/// command on button press
+public:
 	int Value = 0;					/// extra value for command
 	std::string ValueStr;			/// keep original value string
 

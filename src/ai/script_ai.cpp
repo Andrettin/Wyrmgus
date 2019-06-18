@@ -361,7 +361,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			}
 		}
 
-		switch (button.Action) {
+		switch (button.GetAction()) {
 			case ButtonRepair :
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					for (std::vector<CUnitType *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {

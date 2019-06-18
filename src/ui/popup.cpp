@@ -193,7 +193,7 @@
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.GetAction() == ButtonProduceResource || button.GetAction() == ButtonSellResource || button.GetAction() == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -233,7 +233,7 @@
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.GetAction() == ButtonProduceResource || button.GetAction() == ButtonSellResource || button.GetAction() == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -256,7 +256,7 @@
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.GetAction() == ButtonProduceResource || button.GetAction() == ButtonSellResource || button.GetAction() == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -469,7 +469,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 //	TriggerData.Type = CUnitType::Get(button.Value);
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.GetAction() == ButtonProduceResource || button.GetAction() == ButtonSellResource || button.GetAction() == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	//Wyrmgus end
@@ -501,7 +501,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 //		TriggerData.Type = CUnitType::Get(button.Value);
 		button.SetTriggerData();
 		int resource = button.Value;
-		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		if (button.GetAction() == ButtonProduceResource || button.GetAction() == ButtonSellResource || button.GetAction() == ButtonBuyResource) {
 			TriggerData.Resource = &resource;
 		}
 		//Wyrmgus end
@@ -533,7 +533,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 		}
 		*/
 		int value;
-		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
+		if (button.GetAction() != ButtonUnit && button.GetAction() != ButtonBuy) {
 			value = CUnitType::Get(button.Value)->Stats[CPlayer::GetThisPlayer()->GetIndex()].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
@@ -557,7 +557,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 			} else {
 				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
 				if (
-					(UnitManager.GetSlotUnit(button.Value).GetType()->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy)
+					(UnitManager.GetSlotUnit(button.Value).GetType()->BoolFlag[ITEM_INDEX].value && button.GetAction() == ButtonBuy)
 					|| IsBonusVariable(this->Index)
 				) {
 					if (value >= 0) {

@@ -2408,7 +2408,7 @@ void CPlayer::AvailableQuestsChanged()
 {
 	if (this == CPlayer::GetThisPlayer()) {
 		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-			if (UnitButtonTable[i]->Action != ButtonQuest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
+			if (UnitButtonTable[i]->GetAction() != ButtonQuest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
 				continue;
 			}
 			

@@ -185,7 +185,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	//Wyrmgus start
 	res |= IconCommandButton;
 	
-	if (button.Action == ButtonProduceResource) {
+	if (button.GetAction() == ButtonProduceResource) {
 		size_t i;
 		for (i = 0; i < Selected.size(); ++i) {
 			if (Selected[i]->GivesResource != button.Value) {
@@ -199,7 +199,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	//Wyrmgus end
 	
 	unsigned int action = UnitActionNone;
-	switch (button.Action) {
+	switch (button.GetAction()) {
 		case ButtonStop:
 			action = UnitActionStill;
 			break;
@@ -234,7 +234,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	}
 	// other cases : manage AutoCast and different possible action.
 	size_t i;
-	switch (button.Action) {
+	switch (button.GetAction()) {
 		case ButtonMove:
 			for (i = 0; i < Selected.size(); ++i) {
 				int saction = Selected[i]->CurrentAction();
@@ -363,7 +363,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
-		if (button.Action == ButtonProduceResource) {
+		if (button.GetAction() == ButtonProduceResource) {
 			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > CResource::GetAll()[button.Value]->DefaultIncome) {
 				improve_incomes = true;
 			}
@@ -393,7 +393,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->GetQuote().empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->GetQuote().empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->GetQuote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->GetQuote().empty())) {
+	if (condition->Quote && type && type->GetQuote().empty() && !((button.GetAction() == ButtonUnit || button.GetAction() == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->GetQuote().empty()) && !((button.GetAction() == ButtonUnit || button.GetAction() == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->GetQuote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->GetQuote().empty())) {
 		return false;
 	}
 	
@@ -401,35 +401,35 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->SettlementName && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Settlement)) {
+	if (condition->SettlementName && !(button.GetAction() == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Settlement)) {
 		return false;
 	}
 	
-	if (condition->CanActiveHarvest && !(button.Action == ButtonUnit && Selected.size() > 0 && Selected[0]->CanHarvest(&UnitManager.GetSlotUnit(button.Value), false))) {
+	if (condition->CanActiveHarvest && !(button.GetAction() == ButtonUnit && Selected.size() > 0 && Selected[0]->CanHarvest(&UnitManager.GetSlotUnit(button.Value), false))) {
 		return false;
 	}
 
 	if (condition->FactionUpgrade != CONDITION_TRUE) {
-		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ (button.Action == ButtonFaction)) {
+		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ (button.GetAction() == ButtonFaction)) {
 			return false;
 		}
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CCampaign::GetCurrentCampaign() != nullptr && button.Action == ButtonFaction && button.Value != -1 && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CCampaign::GetCurrentCampaign() != nullptr && button.GetAction() == ButtonFaction && button.Value != -1 && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
 	
 	const CUpgrade *upgrade = nullptr;
-	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+	if (button.GetAction() == ButtonResearch || button.GetAction() == ButtonLearnAbility) {
 		upgrade = CUpgrade::Get(button.Value);
-	} else if (button.Action == ButtonFaction && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade() != nullptr) {
+	} else if (button.GetAction() == ButtonFaction && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade() != nullptr) {
 		upgrade = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[button.Value]->GetUpgrade();
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
-		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->GetIndex()) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.GetAction() == ButtonResearch || button.GetAction() == ButtonFaction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->GetIndex()) == 'R') || (button.GetAction() == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
 			return false;
 		}
 	}
@@ -453,31 +453,31 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && CResource::GetAll()[button.Value]->LuxuryResource)) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.GetAction() == ButtonProduceResource && CResource::GetAll()[button.Value]->LuxuryResource)) {
 			return false;
 		}
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->GetRequirementsString().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.GetAction() == ButtonResearch || button.GetAction() == ButtonLearnAbility || button.GetAction() == ButtonFaction || button.GetAction() == ButtonTrain || button.GetAction() == ButtonBuild || button.GetAction() == ButtonUpgradeTo || button.GetAction() == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.GetAction() == ButtonResearch || button.GetAction() == ButtonLearnAbility || button.GetAction() == ButtonFaction) && !upgrade->GetRequirementsString().empty())))) {
 			return false;
 		}
 	}
 	
 	if (condition->ExperienceRequirementsString != CONDITION_TRUE) {
-		if ((condition->ExperienceRequirementsString == CONDITION_ONLY) ^ (button.Action == ButtonExperienceUpgradeTo && !IsButtonUsable(*Selected[0], button) && type && !type->ExperienceRequirementsString.empty())) {
+		if ((condition->ExperienceRequirementsString == CONDITION_ONLY) ^ (button.GetAction() == ButtonExperienceUpgradeTo && !IsButtonUsable(*Selected[0], button) && type && !type->ExperienceRequirementsString.empty())) {
 			return false;
 		}
 	}
 	
 	if (condition->BuildingRulesString != CONDITION_TRUE) {
-		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ (button.Action == ButtonBuild && type && !type->BuildingRulesString.empty())) {
+		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ (button.GetAction() == ButtonBuild && type && !type->BuildingRulesString.empty())) {
 			return false;
 		}
 	}
 	//Wyrmgus end
 
-	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {
+	if (condition->ButtonAction != -1 && button.GetAction() != condition->ButtonAction) {
 		return false;
 	}
 
@@ -491,7 +491,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 
 	//Wyrmgus start
 //	if (condition->Variables && type) {
-	if (condition->Variables && type && button.Action != ButtonUnit && button.Action != ButtonBuy) {
+	if (condition->Variables && type && button.GetAction() != ButtonUnit && button.GetAction() != ButtonBuy) {
 	//Wyrmgus end
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
@@ -501,7 +501,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 	//Wyrmgus start
-	} else if (condition->Variables && (button.Action == ButtonUnit || button.Action == ButtonBuy)) {
+	} else if (condition->Variables && (button.GetAction() == ButtonUnit || button.GetAction() == ButtonBuy)) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
@@ -543,7 +543,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (button.Action == ButtonSpellCast) {
+	if (button.GetAction() == ButtonSpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
 			if ((condition->AutoCast == CONDITION_ONLY) ^ (CSpell::Spells[button.Value]->AutoCast != nullptr)) {
 				return false;
@@ -551,7 +551,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 		
-	if (button.Action == ButtonUnit || button.Action == ButtonBuy) {
+	if (button.GetAction() == ButtonUnit || button.GetAction() == ButtonBuy) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
 		if (unit.GetType()->BoolFlag[ITEM_INDEX].value) {
 			if (condition->Equipped != CONDITION_TRUE) {
@@ -651,12 +651,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		
-		if (!(button.Action == ButtonBuy && unit.Character) && condition->Opponent != CONDITION_TRUE) {
+		if (!(button.GetAction() == ButtonBuy && unit.Character) && condition->Opponent != CONDITION_TRUE) {
 			if ((condition->Opponent == CONDITION_ONLY) ^ CPlayer::GetThisPlayer()->IsEnemy(unit)) {
 				return false;
 			}
 		}
-		if (!(button.Action == ButtonBuy && unit.Character) && condition->Neutral != CONDITION_TRUE) {
+		if (!(button.GetAction() == ButtonBuy && unit.Character) && condition->Neutral != CONDITION_TRUE) {
 			if ((condition->Neutral == CONDITION_ONLY) ^ (!CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && CPlayer::GetThisPlayer() != unit.GetPlayer() && (unit.Container == nullptr || (!CPlayer::GetThisPlayer()->IsEnemy(*unit.Container) && !CPlayer::GetThisPlayer()->IsAllied(*unit.Container) && CPlayer::GetThisPlayer() != unit.Container->GetPlayer())))) {
 				return false;
 			}
@@ -712,8 +712,8 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value))) {
 		if (
-			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value)))
-			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).GetType()->GetIndex())))
+			(button.GetAction() != ButtonUnit && button.GetAction() != ButtonBuy && CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value)))
+			|| ((button.GetAction() == ButtonUnit || button.GetAction() == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).GetType()->GetIndex())))
 		) {
 		//Wyrmgus end
 			// Automatically write the calculated coordinates.
@@ -762,7 +762,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 	int Costs[ManaResCost + 1];
 	memset(Costs, 0, sizeof(Costs));
 
-	switch (button.Action) {
+	switch (button.GetAction()) {
 		case ButtonResearch:
 			//Wyrmgus start
 //			memcpy(Costs, CUpgrade::Get(button.Value)->Costs, sizeof(CUpgrade::Get(button.Value)->Costs));
@@ -828,8 +828,8 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value))) {
 		if (
-			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value)))
-			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).GetType()->GetIndex())))
+			(button.GetAction() != ButtonUnit && button.GetAction() != ButtonBuy && CanShowPopupContent(content.Condition, button, CUnitType::Get(button.Value)))
+			|| ((button.GetAction() == ButtonUnit || button.GetAction() == ButtonBuy) && CanShowPopupContent(content.Condition, button, CUnitType::Get(UnitManager.GetSlotUnit(button.Value).GetType()->GetIndex())))
 		) {
 		//Wyrmgus end
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
@@ -1204,7 +1204,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 //	UI.StatusLine.Set(button.Hint);
 	UI.StatusLine.Set(button.GetHint());
 	//Wyrmgus end
-	switch (button.Action) {
+	switch (button.GetAction()) {
 		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo: {
@@ -1261,13 +1261,13 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 	}
 	
 	//Wyrmgus start
-	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
+	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->GetPlayer(), buttonaction.GetAction()) || !IsNeutralUsableButtonAction(buttonaction.GetAction()))) {
 		return false;
 	}
 	//Wyrmgus end
 
 	// Check button-specific cases
-	switch (buttonaction.Action) {
+	switch (buttonaction.GetAction()) {
 		case ButtonStop:
 		case ButtonStandGround:
 		case ButtonButton:
@@ -1332,7 +1332,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			if (buttonaction.Action == ButtonResearch) {
+			if (buttonaction.GetAction() == ButtonResearch) {
 				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.GetPlayer(), false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 				if (res) {
 					//Wyrmgus start
@@ -1428,7 +1428,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 	}
 
 	// Check button-specific cases
-	switch (buttonaction.Action) {
+	switch (buttonaction.GetAction()) {
 		case ButtonStop:
 		case ButtonStandGround:
 		case ButtonButton:
@@ -1450,7 +1450,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			if (buttonaction.Action == ButtonResearch) {
+			if (buttonaction.GetAction() == ButtonResearch) {
 				res = CheckDependencies(CUpgrade::Get(buttonaction.Value), unit.GetPlayer(), false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 				if (res) {
 					res = UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' && CheckDependencies(CUpgrade::Get(buttonaction.Value), CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
@@ -1506,7 +1506,7 @@ int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction)
 	int cooldown = 0;
 
 	// Check button-specific cases
-	switch (buttonaction.Action) {
+	switch (buttonaction.GetAction()) {
 		case ButtonBuy:
 			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = CPlayer::GetThisPlayer()->HeroCooldownTimer;
@@ -1530,7 +1530,7 @@ int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction
 	int cooldown = 0;
 
 	// Check button-specific cases
-	switch (buttonaction.Action) {
+	switch (buttonaction.GetAction()) {
 		case ButtonBuy:
 			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = CPlayer::GetThisPlayer()->HeroCooldownTimer * 100 / HeroCooldownCycles;
@@ -1634,28 +1634,31 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 	for (size_t i = 0; i != UI.ButtonPanel.Buttons.size(); ++i) {
 		(*buttonActions)[i].Pos = -1;
 	}
-	char unit_ident[128];
 
-	//
-	//  FIXME: johns: some hacks for cancel buttons
-	//
+	char unit_ident[128];
+	sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
+
+	bool cancel_build = false;
+	bool cancel_upgrade = false;
 	if (unit.CurrentAction() == UnitActionBuilt) {
-		// Trick 17 to get the cancel-build button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
-	} else if (unit.CurrentAction() == UnitActionUpgradeTo) {
-		// Trick 17 to get the cancel-upgrade button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else if (unit.CurrentAction() == UnitActionResearch) {
-		// Trick 17 to get the cancel-upgrade button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else {
-		sprintf(unit_ident, ",%s,", unit.GetType()->Ident.c_str());
+		cancel_build = true;
+	} else if (unit.CurrentAction() == UnitActionUpgradeTo || unit.CurrentAction() == UnitActionResearch) {
+		cancel_upgrade = true;
 	}
+	
 	for (const ButtonAction *button_action : UnitButtonTable) {
 		Assert(0 < button_action->GetPos() && button_action->GetPos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
 		if (button_action->GetLevel() != CurrentButtonLevel) {
+			continue;
+		}
+		
+		if ((button_action->GetAction() == ButtonCancelBuild) != cancel_build) {
+			continue;
+		}
+
+		if ((button_action->GetAction() == ButtonCancelUpgrade) != cancel_upgrade) {
 			continue;
 		}
 
