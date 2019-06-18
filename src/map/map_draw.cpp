@@ -447,7 +447,7 @@ void CViewport::Draw() const
 
 
 		while ((i < nunits && j < nmissiles)) {
-			if (unittable[i]->GetType()->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+			if (unittable[i]->GetType()->GetDrawLevel() <= missiletable[j]->Type->DrawLevel) {
 				unittable[i]->Draw(*this);
 				++i;
 			} else {

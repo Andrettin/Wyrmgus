@@ -584,6 +584,21 @@ public:
 	
 	const Vector2i &GetFrameSize() const;
 	
+	int GetOffsetX() const
+	{
+		return this->OffsetX;
+	}
+	
+	int GetOffsetY() const
+	{
+		return this->OffsetY;
+	}
+	
+	int GetDrawLevel() const
+	{
+		return this->DrawLevel;
+	}
+	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();
@@ -650,9 +665,11 @@ public:
 	std::map<const ItemSlot *, CUnitType *> DefaultEquipment;	/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
+private:
 	int OffsetX = 0;									/// Sprite horizontal offset
 	int OffsetY = 0;									/// Sprite vertical offset
 	int DrawLevel = 0;									/// Level to Draw UnitType at
+public:
 	int ShadowWidth = 0;								/// Shadow sprite width
 	int ShadowHeight = 0;								/// Shadow sprite height
 	int ShadowOffsetX = 0;								/// Shadow horizontal offset

@@ -2826,9 +2826,9 @@ bool CUnit::IsAlive() const
 
 int CUnit::GetDrawLevel() const
 {
-	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-		Type->CorpseType->DrawLevel :
-	((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));
+	return ((this->Type->CorpseType && CurrentAction() == UnitActionDie) ?
+		this->Type->CorpseType->GetDrawLevel() :
+	((CurrentAction() == UnitActionDie) ? this->Type->GetDrawLevel() - 10 : this->Type->GetDrawLevel()));
 }
 
 /**
@@ -4865,8 +4865,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 	//Wyrmgus start
-//	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (Type->Width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + Type->OffsetX;
-//	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (Type->Height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
+//	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (Type->Width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + this->Type->GetOffsetX();
+//	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (Type->Height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + this->Type->GetOffsetY();
 
 	int frame_width = this->GetType()->GetFrameSize().width;
 	int frame_height = this->GetType()->GetFrameSize().height;
@@ -4876,8 +4876,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_height = variation->FrameHeight;
 	}
 
-	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + IX - (frame_width - this->Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x) / 2 + Type->OffsetX;
-	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + IY - (frame_height - this->Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y) / 2 + Type->OffsetY;
+	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + IX - (frame_width - this->Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x) / 2 + this->Type->GetOffsetX();
+	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + IY - (frame_height - this->Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y) / 2 + this->Type->GetOffsetY();
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;

@@ -738,8 +738,6 @@ bool CUnitType::ProcessConfigDataProperty(const String &key, String value)
 		this->BoxWidth = value.to_int();
 	} else if (key == "box_height") {
 		this->BoxHeight = value.to_int();
-	} else if (key == "draw_level") {
-		this->DrawLevel = value.to_int();
 	} else if (key == "type") {
 		if (value == "land") {
 			this->UnitType = UnitTypeLand;
@@ -2080,6 +2078,18 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_image"), +[](const CUnitType *unit_type){ return const_cast<PaletteImage *>(unit_type->GetImage()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
 	
+	ClassDB::bind_method(D_METHOD("set_offset_x", "offset"), +[](CUnitType *unit_type, const int offset){ unit_type->OffsetX = offset; });
+	ClassDB::bind_method(D_METHOD("get_offset_x"), &CUnitType::GetOffsetX);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "offset_x"), "set_offset_x", "get_offset_x");
+	
+	ClassDB::bind_method(D_METHOD("set_offset_y", "offset"), +[](CUnitType *unit_type, const int offset){ unit_type->OffsetY = offset; });
+	ClassDB::bind_method(D_METHOD("get_offset_y"), &CUnitType::GetOffsetY);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "offset_y"), "set_offset_y", "get_offset_y");
+	
+	ClassDB::bind_method(D_METHOD("set_draw_level", "draw_level"), +[](CUnitType *unit_type, const int draw_level){ unit_type->DrawLevel = draw_level; });
+	ClassDB::bind_method(D_METHOD("get_draw_level"), &CUnitType::GetDrawLevel);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "draw_level"), "set_draw_level", "get_draw_level");
+	
 	ClassDB::bind_method(D_METHOD("get_tile_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetTileSize()); });
 	ClassDB::bind_method(D_METHOD("get_tile_pixel_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetTilePixelSize()); });
 	ClassDB::bind_method(D_METHOD("get_half_tile_pixel_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetHalfTilePixelSize()); });
@@ -2598,8 +2608,8 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	//Wyrmgus end
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos.x += type.GetOffsetX();
+	pos.y += type.GetOffsetY();
 
 	//Wyrmgus start
 	/*

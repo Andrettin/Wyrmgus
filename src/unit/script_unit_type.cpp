@@ -2504,7 +2504,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "DrawLevel")) {
-		lua_pushnumber(l, type->DrawLevel);
+		lua_pushnumber(l, type->GetDrawLevel());
 		return 1;
 	} else if (!strcmp(data, "TileWidth")) {
 		lua_pushnumber(l, type->TileSize.x);

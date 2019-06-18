@@ -682,8 +682,8 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 	PixelPos pos = screenPos;
 	pos.x -= (type.ShadowWidth - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 	pos.y -= (type.ShadowHeight - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-	pos.x += type.OffsetX + type.ShadowOffsetX;
-	pos.y += type.OffsetY + type.ShadowOffsetY;
+	pos.x += type.GetOffsetX() + type.ShadowOffsetX;
+	pos.y += type.GetOffsetY() + type.ShadowOffsetY;
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -721,8 +721,8 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	// FIXME: move this calculation to high level.
 	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos.x += type.GetOffsetX();
+	pos.y += type.GetOffsetY();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -763,8 +763,8 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 	// FIXME: move this calculation to high level.
 	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos.x += type.GetOffsetX();
+	pos.y += type.GetOffsetY();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -952,9 +952,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
 				pos.x -= (variation->Construction->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-				pos.x += type.OffsetX;
+				pos.x += type.GetOffsetX();
 				pos.y -= (variation->Construction->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-				pos.y += type.OffsetY;
+				pos.y += type.GetOffsetY();
 				if (frame < 0) {
 					variation->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
@@ -964,9 +964,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 		} else {
 			if (type.Construction->ShadowSprite) {
 				pos.x -= (type.Construction->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-				pos.x += type.OffsetX;
+				pos.x += type.GetOffsetX();
 				pos.y -= (type.Construction->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-				pos.y += type.OffsetY;
+				pos.y += type.GetOffsetY();
 				if (frame < 0) {
 					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
@@ -977,9 +977,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 	} else {
 		if (variation && variation->ShadowSprite) {
 			pos.x -= (type.ShadowWidth - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-			pos.x += type.ShadowOffsetX + type.OffsetX;
+			pos.x += type.ShadowOffsetX + type.GetOffsetX();
 			pos.y -= (type.ShadowHeight - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-			pos.y += type.ShadowOffsetY + type.OffsetY;
+			pos.y += type.ShadowOffsetY + type.GetOffsetY();
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -987,9 +987,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 			}
 		} else if (type.ShadowSprite) {
 			pos.x -= (type.ShadowWidth - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-			pos.x += type.ShadowOffsetX + type.OffsetX;
+			pos.x += type.ShadowOffsetX + type.GetOffsetX();
 			pos.y -= (type.ShadowHeight - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-			pos.y += type.ShadowOffsetY + type.OffsetY;
+			pos.y += type.ShadowOffsetY + type.GetOffsetY();
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -1039,8 +1039,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		pos.x += type.OffsetX - type.GetFrameSize().x / 2;
-//		pos.y += type.OffsetY - type.GetFrameSize().y / 2;
+//		pos.x += type.GetOffsetX() - type.GetFrameSize().x / 2;
+//		pos.y += type.GetOffsetY() - type.GetFrameSize().y / 2;
 		int frame_width = type.GetFrameSize().x;
 		int frame_height = type.GetFrameSize().y;
 		const CUnitTypeVariation *variation = unit.GetVariation();
@@ -1048,8 +1048,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
 		}
-		pos.x += type.OffsetX - frame_width / 2;
-		pos.y += type.OffsetY - frame_height / 2;
+		pos.x += type.GetOffsetX() - frame_width / 2;
+		pos.y += type.GetOffsetY() - frame_height / 2;
 		//Wyrmgus end
 		if (frame < 0) {
 			frame = -frame - 1;
