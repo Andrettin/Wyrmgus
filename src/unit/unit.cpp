@@ -5275,30 +5275,26 @@ int DirectionToHeading(const PixelDiff &delta)
 */
 void UnitUpdateHeading(CUnit &unit)
 {
-	//Wyrmgus start
 	//fix direction if it does not correspond to one of the defined directions
 	int num_dir = std::max<int>(8, unit.GetType()->NumDirections);
 	if (unit.Direction % (256 / num_dir) != 0) {
-		unit.Direction = unit.Direction - (unit.Direction % (256 / num_dir));
+		unit.Direction -= unit.Direction % (256 / num_dir);
 	}
-	//Wyrmgus end
 	
-	int dir;
-	int nextdir;
 	bool neg;
-
 	if (unit.GetFrame() < 0) {
 		unit.SetFrame(-unit.GetFrame() - 1);
 		neg = true;
 	} else {
 		neg = false;
 	}
+	
 	unit.SetFrame(unit.GetFrame() / (unit.GetType()->NumDirections / 2 + 1));
 	unit.SetFrame(unit.GetFrame() * (unit.GetType()->NumDirections / 2 + 1));
 	// Remove heading, keep animation frame
 
-	nextdir = 256 / unit.GetType()->NumDirections;
-	dir = ((unit.Direction + nextdir / 2) & 0xFF) / nextdir;
+	const int nextdir = 256 / unit.GetType()->NumDirections;
+	const int dir = ((unit.Direction + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
 		unit.ChangeFrame(dir);
 	} else {
@@ -5665,7 +5661,7 @@ void CUnit::SetFrame(const int frame)
 	this->Frame = frame;
 	
 	if (!this->Removed) {
-		this->emit_signal("frame_changed", std::abs(this->Frame));
+		this->emit_signal("frame_changed", this->GetSpriteFrame());
 	}
 }
 
@@ -8576,7 +8572,7 @@ void CUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_map_layer"), +[](const CUnit *unit){ return unit->GetMapLayer(); });
 	ADD_SIGNAL(MethodInfo("map_layer_changed", PropertyInfo(Variant::INT, "index")));
 	
-	ClassDB::bind_method(D_METHOD("get_frame"), +[](const CUnit *unit){ return std::abs(unit->GetFrame()); });
+	ClassDB::bind_method(D_METHOD("get_frame"), &CUnit::GetSpriteFrame);
 	ADD_SIGNAL(MethodInfo("frame_changed", PropertyInfo(Variant::INT, "frame")));
 	
 	ClassDB::bind_method(D_METHOD("is_flipped"), +[](const CUnit *unit){ return (unit->GetFrame() < 0); });

@@ -476,6 +476,22 @@ public:
 		return this->Frame;
 	}
 	
+	/**
+	**	@brief	Get the unit's frame as appropriate for being displayed by a Godot sprite
+	**
+	**	@return	The frame for the Godot sprite
+	*/
+	[[nodiscard]]
+	int GetSpriteFrame() const
+	{
+		if (this->GetFrame() < 0) {
+			//if the frame is negative, we need to make it absolute and remove one to get the correct frame for Godot
+			return std::abs(this->GetFrame()) - 1;
+		} else {
+			return this->GetFrame();
+		}
+	}
+	
 	[[nodiscard]]
 	CUnit *GetFirstContainer() const;
 
