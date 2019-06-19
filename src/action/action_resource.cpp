@@ -470,7 +470,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 
 	// Wood gone, look somewhere else.
 	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->IsTerrainResourceOnMap(CurrentResource) == false)
-		&& (!unit.IX) && (!unit.IY)) {
+		&& (!unit.GetPixelOffset().x) && (!unit.GetPixelOffset().y)) {
 		if (!FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 16, *unit.GetPlayer(), this->goalPos, &pos, this->MapLayer)) {
 			// no wood in range
 			return -1;
@@ -623,8 +623,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 {
 	CUnit *goal;
 	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
-	Assert(!unit.IX);
-	Assert(!unit.IY);
+	Assert(!unit.GetPixelOffset().x);
+	Assert(!unit.GetPixelOffset().y);
 
 	//Wyrmgus start
 	const int input_resource = CResource::GetAll()[this->CurrentResource]->InputResource;

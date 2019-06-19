@@ -160,7 +160,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 #else
 	file.printf("\"stats\", %d,\n  ", unit.GetPlayer()->GetIndex());
 #endif
-	file.printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
+	file.printf("\"pixel\", {%d, %d}, ", unit.GetPixelOffset().x, unit.GetPixelOffset().y);
 	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
 	file.printf("\"frame\", %d, ", unit.GetFrame());
 	if (unit.Seen.Frame != UnitNotSeen) {

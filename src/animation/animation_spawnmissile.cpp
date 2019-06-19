@@ -70,8 +70,8 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x + goal->IX + moff.x + startx;
-		start.y = goal->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y + goal->IY + moff.y + starty;
+		start.x = goal->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x + goal->GetPixelOffset().x + moff.x + startx;
+		start.y = goal->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y + goal->GetPixelOffset().y + moff.y + starty;
 	} else {
 		start.x = (goal->GetTilePos().x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x + CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).x / 2 + moff.x;
 		start.y = (goal->GetTilePos().y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y + CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex()).y / 2 + moff.y;

@@ -70,8 +70,8 @@ void MissileFlameShield::Action()
 		unit = unit->Container;
 	}
 	const Vec2i upos = unit->GetTilePos();
-	const int ix = unit->IX;
-	const int iy = unit->IY;
+	const int ix = unit->GetPixelOffset().x;
+	const int iy = unit->GetPixelOffset().y;
 	const int uw = unit->GetType()->TileSize.x;
 	const int uh = unit->GetType()->TileSize.y;
 	this->position.x = upos.x * CMap::Map.GetMapLayerPixelTileSize(unit->GetMapLayer()->GetIndex()).x + ix + uw * CMap::Map.GetMapLayerPixelTileSize(unit->GetMapLayer()->GetIndex()).x / 2 + dx - 16;

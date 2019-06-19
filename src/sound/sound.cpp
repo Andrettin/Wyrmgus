@@ -416,7 +416,7 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 static char CalculateStereo(const CUnit &unit)
 {
 	int stereo = ((unit.GetTilePos().x * CMap::Map.GetCurrentPixelTileSize().x + unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 2 +
-				   unit.IX - UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
+				   unit.GetPixelOffset().x - UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
 	stereo = std::clamp(stereo, -128, 127);
 	return stereo;

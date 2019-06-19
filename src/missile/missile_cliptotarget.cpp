@@ -48,8 +48,8 @@ void MissileClipToTarget::Action()
 	this->Wait = this->Type->Sleep;
 
 	if (this->TargetUnit != nullptr) {
-		this->position.x = this->TargetUnit->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->GetMapLayer()->GetIndex()).x + this->TargetUnit->IX;
-		this->position.y = this->TargetUnit->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->GetMapLayer()->GetIndex()).y + this->TargetUnit->IY;
+		this->position.x = this->TargetUnit->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->GetMapLayer()->GetIndex()).x + this->TargetUnit->GetPixelOffset().x;
+		this->position.y = this->TargetUnit->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->GetMapLayer()->GetIndex()).y + this->TargetUnit->GetPixelOffset().y;
 	}
 
 	if (this->NextMissileFrame(1, 0)) {

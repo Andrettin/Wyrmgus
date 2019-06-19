@@ -227,7 +227,7 @@
 **  (#208 is brightest shade, #211 is darkest shade) .... these
 **  numbers are NOT red=#208, blue=#209, etc
 **
-**  CUnit::IX CUnit::IY
+**  CUnit::PixelOffset
 **
 **  Coordinate displacement in pixels or coordinates inside a tile.
 **  Currently only !=0, if the unit is moving from one tile to
@@ -500,8 +500,7 @@ void CUnit::Init()
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
-	IX = 0;
-	IY = 0;
+	this->PixelOffset = Vector2i(0, 0);
 	this->Frame = 0;
 	Direction = 0;
 	DamagedType = ANIMATIONS_DEATHTYPES;
@@ -4575,8 +4574,8 @@ static void UnitFillSeenValues(CUnit &unit)
 {
 	// Seen values are undefined for visible units.
 	unit.Seen.TilePos = unit.GetTilePos();
-	unit.Seen.IY = unit.IY;
-	unit.Seen.IX = unit.IX;
+	unit.Seen.IY = unit.GetPixelOffset().y;
+	unit.Seen.IX = unit.GetPixelOffset().x;
 	unit.Seen.Frame = unit.GetFrame();
 	unit.Seen.Type = unit.GetType();
 	unit.Seen.UnderConstruction = unit.UnderConstruction;
@@ -4872,8 +4871,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 	//Wyrmgus start
-//	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (Type->Width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + this->Type->GetOffsetX();
-//	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (Type->Height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + this->Type->GetOffsetY();
+//	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + this->GetPixelOffset().x - (Type->Width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + this->Type->GetOffsetX();
+//	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + this->GetPixelOffset().y - (Type->Height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + this->Type->GetOffsetY();
 
 	int frame_width = this->GetType()->GetFrameSize().width;
 	int frame_height = this->GetType()->GetFrameSize().height;
@@ -4883,8 +4882,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_height = variation->FrameHeight;
 	}
 
-	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + IX - (frame_width - this->Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x) / 2 + this->Type->GetOffsetX();
-	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + IY - (frame_height - this->Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y) / 2 + this->Type->GetOffsetY();
+	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + this->GetPixelOffset().x - (frame_width - this->Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x) / 2 + this->Type->GetOffsetX();
+	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + this->GetPixelOffset().y - (frame_height - this->Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y) / 2 + this->Type->GetOffsetY();
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;
@@ -5637,7 +5636,7 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::GetMapPixelPosTopLeft() const
 {
-	const PixelPos pos(this->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + IX, this->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + IY);
+	const PixelPos pos(this->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + this->GetPixelOffset().x, this->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + this->GetPixelOffset().y);
 	return pos;
 }
 
@@ -5662,6 +5661,19 @@ void CUnit::SetFrame(const int frame)
 	
 	if (!this->Removed) {
 		this->emit_signal("frame_changed", this->GetSpriteFrame());
+	}
+}
+
+void CUnit::SetPixelOffset(const Vector2i &offset)
+{
+	if (offset == this->PixelOffset) {
+		return;
+	}
+	
+	this->PixelOffset = offset;
+	
+	if (!this->Removed) {
+		this->emit_signal("pixel_offset_changed", Vector2(this->GetPixelOffset()));
 	}
 }
 
@@ -7110,8 +7122,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit.IX = (type->CorpseType->GetFrameSize().x - type->CorpseType->Sprite->Width) / 2;
-		unit.IY = (type->CorpseType->GetFrameSize().y - type->CorpseType->Sprite->Height) / 2;
+		unit.SetPixelOffset((type->CorpseType->GetFrameSize().x - type->CorpseType->Sprite->Width) / 2, (type->CorpseType->GetFrameSize().y - type->CorpseType->Sprite->Height) / 2);
 
 		unit.CurrentSightRange = type->CorpseType->Stats[unit.GetPlayer()->GetIndex()].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
@@ -8577,6 +8588,9 @@ void CUnit::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("is_flipped"), +[](const CUnit *unit){ return (unit->GetFrame() < 0); });
 	ADD_SIGNAL(MethodInfo("flipped_changed", PropertyInfo(Variant::BOOL, "flipped")));
+	
+	ClassDB::bind_method(D_METHOD("get_pixel_offset"), +[](const CUnit *unit){ return Vector2(unit->GetPixelOffset()); });
+	ADD_SIGNAL(MethodInfo("pixel_offset_changed", PropertyInfo(Variant::VECTOR2, "pixel_offset")));
 	
 	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
 	ADD_SIGNAL(MethodInfo("removed"));

@@ -1391,8 +1391,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->GetTilePos().y + c1->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c1->IY;
-		const int pos2 = (c2->GetTilePos().y + c2->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c2->IY;
+		const int pos1 = (c1->GetTilePos().y + c1->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c1->GetPixelOffset().y;
+		const int pos2 = (c2->GetTilePos().y + c2->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c2->GetPixelOffset().y;
 		return pos1 == pos2 ?
 			   (c1->GetTilePos().x != c2->GetTilePos().x ? c1->GetTilePos().x < c2->GetTilePos().x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

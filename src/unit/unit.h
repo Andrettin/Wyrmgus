@@ -492,6 +492,29 @@ public:
 		}
 	}
 	
+	void SetPixelOffset(const Vector2i &offset);
+	
+	void SetPixelOffset(const int offset_x, const int offset_y)
+	{
+		this->SetPixelOffset(Vector2i(offset_x, offset_y));
+	}
+	
+	void ChangePixelOffset(const Vector2i &change)
+	{
+		this->SetPixelOffset(this->GetPixelOffset() + change);
+	}
+	
+	void ChangePixelOffset(const int change_x, const int change_y)
+	{
+		this->ChangePixelOffset(Vector2(change_x, change_y));
+	}
+	
+	[[nodiscard]]
+	const Vector2i &GetPixelOffset() const
+	{
+		return this->PixelOffset;
+	}
+	
 	[[nodiscard]]
 	CUnit *GetFirstContainer() const;
 
@@ -652,8 +675,9 @@ public:
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
 
-	signed char IX;         /// X image displacement to map position
-	signed char IY;         /// Y image displacement to map position
+private:
+	Vector2i PixelOffset = Vector2i(0, 0);	/// image displacement to map position
+public:
 	unsigned char Direction; //: 8; /// angle (0-255) unit looking
 	//Wyrmgus start
 	unsigned char GivesResource;	/// The resource currently given by the unit

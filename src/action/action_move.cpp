@@ -198,16 +198,14 @@ int DoActionMove(CUnit &unit)
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
-		unit.IX = 0;
-		unit.IY = 0;
+		unit.SetPixelOffset(0, 0);
 		//Wyrmgus start
 		if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
 			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
-					table[i]->IX = 0;
-					table[i]->IY = 0;
+					table[i]->SetPixelOffset(0, 0);
 				}
 			}
 		}
@@ -256,8 +254,7 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
 					table[i]->MoveToXY(pos, table[i]->GetMapLayer()->GetIndex());
-					table[i]->IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x;
-					table[i]->IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y;
+					table[i]->SetPixelOffset(-posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x, -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y);
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -284,8 +281,7 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x;
-		unit.IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y;
+		unit.SetPixelOffset(-posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x, -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y);
 		unit.SetFrame(unit.GetType()->StillFrame);
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -300,8 +296,7 @@ int DoActionMove(CUnit &unit)
 	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
 	//Wyrmgus end
 	
-	unit.IX += posd.x * move;
-	unit.IY += posd.y * move;
+	unit.ChangePixelOffset(posd.x * move, posd.y * move);
 	
 	//Wyrmgus start
 	if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
@@ -309,17 +304,15 @@ int DoActionMove(CUnit &unit)
 		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
-				table[i]->IX += posd.x * move;
-				table[i]->IY += posd.y * move;
+				table[i]->ChangePixelOffset(posd.x * move, posd.y * move);
 			}
 		}
 	}
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x * 2) || abs(unit.IY) > (CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y * 2)) {
-		unit.IX = 0;
-		unit.IY = 0;
+	if (abs(unit.GetPixelOffset().x) > (CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x * 2) || abs(unit.GetPixelOffset().y) > (CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y * 2)) {
+		unit.SetPixelOffset(0, 0);
 #ifdef DEBUG
 		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
 #endif
@@ -329,8 +322,7 @@ int DoActionMove(CUnit &unit)
 			Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->GetType()->UnitType == UnitTypeLand) {
-					table[i]->IX = 0;
-					table[i]->IY = 0;
+					table[i]->SetPixelOffset(0, 0);
 				}
 			}
 		}
@@ -340,7 +332,7 @@ int DoActionMove(CUnit &unit)
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
 	// FIXME: this is broken for subtile movement
-	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
+	if (!unit.Anim.Unbreakable && !unit.GetPixelOffset().x && !unit.GetPixelOffset().y) {
 		unit.Moving = 0;
 	}
 	

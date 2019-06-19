@@ -352,7 +352,7 @@ static void DumpUnitInfo(CUnit &unit)
 			UnitNumber(unit), unit.GetType() ? unit.GetType()->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
 			unit.GetPlayer() ? unit.GetPlayer()->GetIndex() : -1, unit.Refs, RNG->get_seed(),
-			unit.GetTilePos().x, unit.GetTilePos().y, unit.IX, unit.IY);
+			unit.GetTilePos().x, unit.GetTilePos().y, unit.GetPixelOffset().x, unit.GetPixelOffset().y);
 #if 0
 	SaveUnit(unit, logf);
 #endif

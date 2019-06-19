@@ -1357,8 +1357,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	}
 	this->DrawLevel = parent_type->DrawLevel;
 	this->Image = parent_type->Image;
-	this->OffsetX = parent_type->OffsetX;
-	this->OffsetY = parent_type->OffsetY;
+	this->Offset = parent_type->Offset;
 	this->ShadowFile = parent_type->ShadowFile;
 	this->ShadowWidth = parent_type->ShadowWidth;
 	this->ShadowHeight = parent_type->ShadowHeight;
@@ -2078,11 +2077,13 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_image"), +[](const CUnitType *unit_type){ return const_cast<PaletteImage *>(unit_type->GetImage()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
 	
-	ClassDB::bind_method(D_METHOD("set_offset_x", "offset"), +[](CUnitType *unit_type, const int offset){ unit_type->OffsetX = offset; });
+	ClassDB::bind_method(D_METHOD("get_offset"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetOffset()); });
+	
+	ClassDB::bind_method(D_METHOD("set_offset_x", "offset"), +[](CUnitType *unit_type, const int offset){ unit_type->Offset.x = offset; });
 	ClassDB::bind_method(D_METHOD("get_offset_x"), &CUnitType::GetOffsetX);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "offset_x"), "set_offset_x", "get_offset_x");
 	
-	ClassDB::bind_method(D_METHOD("set_offset_y", "offset"), +[](CUnitType *unit_type, const int offset){ unit_type->OffsetY = offset; });
+	ClassDB::bind_method(D_METHOD("set_offset_y", "offset"), +[](CUnitType *unit_type, const int offset){ unit_type->Offset.y = offset; });
 	ClassDB::bind_method(D_METHOD("get_offset_y"), &CUnitType::GetOffsetY);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "offset_y"), "set_offset_y", "get_offset_y");
 	

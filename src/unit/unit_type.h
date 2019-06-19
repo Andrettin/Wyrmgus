@@ -584,14 +584,19 @@ public:
 	
 	const Vector2i &GetFrameSize() const;
 	
+	const Vector2i &GetOffset() const
+	{
+		return this->Offset;
+	}
+	
 	int GetOffsetX() const
 	{
-		return this->OffsetX;
+		return this->GetOffset().x;
 	}
 	
 	int GetOffsetY() const
 	{
-		return this->OffsetY;
+		return this->GetOffset().y;
 	}
 	
 	int GetDrawLevel() const
@@ -666,8 +671,7 @@ public:
 	//Wyrmgus end
 
 private:
-	int OffsetX = 0;									/// Sprite horizontal offset
-	int OffsetY = 0;									/// Sprite vertical offset
+	Vector2i Offset = Vector2i(0, 0);					/// Sprite offset
 	int DrawLevel = 0;									/// Level to Draw UnitType at
 public:
 	int ShadowWidth = 0;								/// Shadow sprite width
