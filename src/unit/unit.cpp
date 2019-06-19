@@ -502,7 +502,7 @@ void CUnit::Init()
 	//Wyrmgus end
 	IX = 0;
 	IY = 0;
-	Frame = 0;
+	this->Frame = 0;
 	Direction = 0;
 	DamagedType = ANIMATIONS_DEATHTYPES;
 	Attacked = 0;
@@ -1291,7 +1291,7 @@ void CUnit::SetVariation(CUnitTypeVariation *new_variation, const CUnitType *new
 			(this->GetVariation() && this->GetVariation()->Animations)
 			|| (new_variation && new_variation->Animations)
 		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
-			this->Frame = this->Type->StillFrame;
+			this->SetFrame(this->Type->StillFrame);
 		}
 		this->Variation = new_variation ? new_variation->ID : 0;
 	} else {
@@ -2849,7 +2849,7 @@ void CUnit::Init(const CUnitType &type)
 
 	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
-	Frame = type.StillFrame;
+	this->Frame = type.StillFrame;
 
 	if (UnitTypeVar.GetNumberVariable()) {
 		Assert(!Variable);
@@ -3133,7 +3133,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.BoolFlag[BUILDING_INDEX].value && FancyBuildings
 		&& unit->GetType()->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
-		unit->Frame = -unit->Frame - 1;
+		unit->SetFrame(-unit->GetFrame() - 1);
 	}
 	
 	return unit;
@@ -3882,13 +3882,20 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	unit.MapLayer = CMap::Map.MapLayers[z];
 	
 	//Wyrmgus start
-	if (!SaveGameLoading && old_map_layer != unit.GetMapLayer()) {
+	if (!SaveGameLoading && unit.GetMapLayer() != old_map_layer) {
 		UpdateUnitSightRange(unit);
 	}
 	//Wyrmgus end
 
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		UnitInXY(*unit_inside, pos, z);
+	}
+	
+	if (!unit.Removed) {
+		if (unit.MapLayer != old_map_layer) {
+			unit.emit_signal("map_layer_changed", unit.GetMapLayer()->GetIndex());
+		}
+		unit.emit_signal("tile_pos_changed", Vector2(unit.GetTilePos()));
 	}
 }
 
@@ -4570,7 +4577,7 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.Seen.TilePos = unit.GetTilePos();
 	unit.Seen.IY = unit.IY;
 	unit.Seen.IX = unit.IX;
-	unit.Seen.Frame = unit.Frame;
+	unit.Seen.Frame = unit.GetFrame();
 	unit.Seen.Type = unit.GetType();
 	unit.Seen.UnderConstruction = unit.UnderConstruction;
 
@@ -5280,26 +5287,26 @@ void UnitUpdateHeading(CUnit &unit)
 	int nextdir;
 	bool neg;
 
-	if (unit.Frame < 0) {
-		unit.Frame = -unit.Frame - 1;
+	if (unit.GetFrame() < 0) {
+		unit.SetFrame(-unit.GetFrame() - 1);
 		neg = true;
 	} else {
 		neg = false;
 	}
-	unit.Frame /= unit.GetType()->NumDirections / 2 + 1;
-	unit.Frame *= unit.GetType()->NumDirections / 2 + 1;
+	unit.SetFrame(unit.GetFrame() / (unit.GetType()->NumDirections / 2 + 1));
+	unit.SetFrame(unit.GetFrame() * (unit.GetType()->NumDirections / 2 + 1));
 	// Remove heading, keep animation frame
 
 	nextdir = 256 / unit.GetType()->NumDirections;
 	dir = ((unit.Direction + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
-		unit.Frame += dir;
+		unit.ChangeFrame(dir);
 	} else {
-		unit.Frame += 256 / nextdir - dir;
-		unit.Frame = -unit.Frame - 1;
+		unit.ChangeFrame(256 / nextdir - dir);
+		unit.SetFrame(-unit.GetFrame() - 1);
 	}
-	if (neg && !unit.Frame && unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
-		unit.Frame = -1;
+	if (neg && !unit.GetFrame() && unit.GetType()->BoolFlag[BUILDING_INDEX].value) {
+		unit.SetFrame(-1);
 	}
 }
 
@@ -5638,12 +5645,31 @@ PixelPos CUnit::GetMapPixelPosTopLeft() const
 	return pos;
 }
 
-//Wyrmgus start
 PixelSize CUnit::GetTilePixelSize() const
 {
 	return PixelSize(this->GetTileSize()) * CMap::PixelTileSize;
 }
 
+void CUnit::SetFrame(const int frame)
+{
+	if (frame == this->Frame) {
+		return;
+	}
+	
+	if ((frame < 0) != (this->Frame < 0)) {
+		if (!this->Removed) {
+			this->emit_signal("flipped_changed", (frame < 0));
+		}
+	}
+	
+	this->Frame = frame;
+	
+	if (!this->Removed) {
+		this->emit_signal("frame_changed", std::abs(this->Frame));
+	}
+}
+
+//Wyrmgus start
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
 {
 	if (!upgrade) {
@@ -8540,11 +8566,21 @@ void CUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_player"), &CUnit::GetPlayer);
 	ClassDB::bind_method(D_METHOD("get_icon"), +[](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
 	ClassDB::bind_method(D_METHOD("get_type"), +[](const CUnit *unit){ return const_cast<CUnitType *>(unit->GetType()); });
+	
 	ClassDB::bind_method(D_METHOD("get_tile_pos"), +[](const CUnit *unit){ return Vector2(unit->GetTilePos()); });
+	ADD_SIGNAL(MethodInfo("tile_pos_changed", PropertyInfo(Variant::VECTOR2, "tile_pos")));
+	
 	ClassDB::bind_method(D_METHOD("get_tile_pixel_size"), +[](const CUnit *unit){ return Vector2(unit->GetTilePixelSize()); });
 	ClassDB::bind_method(D_METHOD("get_half_tile_pixel_size"), +[](const CUnit *unit){ return Vector2(unit->GetHalfTilePixelSize()); });
 	
 	ClassDB::bind_method(D_METHOD("get_map_layer"), +[](const CUnit *unit){ return unit->GetMapLayer(); });
+	ADD_SIGNAL(MethodInfo("map_layer_changed", PropertyInfo(Variant::INT, "index")));
+	
+	ClassDB::bind_method(D_METHOD("get_frame"), +[](const CUnit *unit){ return std::abs(unit->GetFrame()); });
+	ADD_SIGNAL(MethodInfo("frame_changed", PropertyInfo(Variant::INT, "frame")));
+	
+	ClassDB::bind_method(D_METHOD("is_flipped"), +[](const CUnit *unit){ return (unit->GetFrame() < 0); });
+	ADD_SIGNAL(MethodInfo("flipped_changed", PropertyInfo(Variant::BOOL, "flipped")));
 	
 	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
 	ADD_SIGNAL(MethodInfo("removed"));

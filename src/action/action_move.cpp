@@ -286,7 +286,7 @@ int DoActionMove(CUnit &unit)
 
 		unit.IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x;
 		unit.IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y;
-		unit.Frame = unit.GetType()->StillFrame;
+		unit.SetFrame(unit.GetType()->StillFrame);
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
 		posd.x = Heading2X[unit.Direction / NextDirection];

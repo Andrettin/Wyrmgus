@@ -41,9 +41,9 @@
 /* virtual */ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && unit.GetType()->NumDirections == 1 && FancyBuildings && unit.GetType()->BoolFlag[NORANDOMPLACING_INDEX].value == false && unit.Frame < 0) {
+	if (unit.GetType()->BoolFlag[BUILDING_INDEX].value && unit.GetType()->NumDirections == 1 && FancyBuildings && unit.GetType()->BoolFlag[NORANDOMPLACING_INDEX].value == false && unit.GetFrame() < 0) {
 	} else {
-		unit.Frame = this->Frame;
+		unit.SetFrame(this->Frame);
 	}
 	UnitUpdateHeading(unit);
 }

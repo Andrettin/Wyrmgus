@@ -463,6 +463,19 @@ public:
 		return this->MapLayer;
 	}
 	
+	void SetFrame(const int frame);
+	
+	void ChangeFrame(const int change)
+	{
+		this->SetFrame(this->GetFrame() + change);
+	}
+	
+	[[nodiscard]]
+	int GetFrame() const
+	{
+		return this->Frame;
+	}
+	
 	[[nodiscard]]
 	CUnit *GetFirstContainer() const;
 
@@ -597,7 +610,9 @@ public:
 	PathFinderData *pathFinderData = nullptr;
 
 	// DISPLAY:
-	int Frame;				/// Image frame: <0 is mirrored
+private:
+	int Frame = 0;			/// Image frame: <0 is mirrored
+public:
 	CUnitColors *Colors = nullptr;	/// Player colors
 	//Wyrmgus start
 	std::string Name;		/// Unit's personal/proper name (if any)

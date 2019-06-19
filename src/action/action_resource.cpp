@@ -912,7 +912,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			this->State = SUB_MOVE_TO_RESOURCE;
 			// Give it some reasonable look while searching.
 			// FIXME: which frame?
-			unit.Frame = 0;
+			unit.SetFrame(0);
 		}
 		return 0;
 		// No wood? Freeze!!!

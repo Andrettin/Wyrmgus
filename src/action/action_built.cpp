@@ -199,10 +199,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 	
 	unit.UnderConstruction = false;
-	if (unit.Frame < 0) {
-		unit.Frame = -1;
+	if (unit.GetFrame() < 0) {
+		unit.SetFrame(-1);
 	} else {
-		unit.Frame = 0;
+		unit.SetFrame(0);
 	}
 	CUnit *worker = order.GetWorkerPtr();
 	
@@ -484,10 +484,10 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 
 	if (cframe != this->Frame) {
 		this->Frame = cframe;
-		if (unit.Frame < 0) {
-			unit.Frame = -cframe->Frame - 1;
+		if (unit.GetFrame() < 0) {
+			unit.SetFrame(-cframe->Frame - 1);
 		} else {
-			unit.Frame = cframe->Frame;
+			unit.SetFrame(cframe->Frame);
 		}
 	}
 }

@@ -162,7 +162,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 #endif
 	file.printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
 	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
-	file.printf("\"frame\", %d, ", unit.Frame);
+	file.printf("\"frame\", %d, ", unit.GetFrame());
 	if (unit.Seen.Frame != UnitNotSeen) {
 		file.printf("\"seen\", %d, ", unit.Seen.Frame);
 	} else {

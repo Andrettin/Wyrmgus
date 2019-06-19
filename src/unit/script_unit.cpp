@@ -476,7 +476,7 @@ static int CclUnit(lua_State *l)
 			CclGetPos(l, &unit->Seen.IX , &unit->Seen.IY, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "frame")) {
-			unit->Frame = LuaToNumber(l, 2, j + 1);
+			unit->SetFrame(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "seen")) {
 			unit->Seen.Frame = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "not-seen")) {

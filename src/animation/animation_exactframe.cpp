@@ -40,7 +40,7 @@
 /* virtual */ void CAnimation_ExactFrame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	unit.Frame = this->Frame;
+	unit.SetFrame(this->Frame);
 }
 
 /* virtual */ void CAnimation_ExactFrame::Init(const char *s, lua_State *)

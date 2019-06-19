@@ -699,7 +699,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		}
 		*/
 		//Wyrmgus end
-		unit.Frame = 0;
+		unit.SetFrame(0);
 		this->State &= WEAK_TARGET;
 		this->State |= MOVE_TO_TARGET;
 	}

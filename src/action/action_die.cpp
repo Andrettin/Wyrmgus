@@ -142,7 +142,7 @@ static bool AnimateActionDie(CUnit &unit)
 	MapMarkUnitSight(unit);
 	//Wyrmgus end
 
-	unit.Frame = 0;
+	unit.SetFrame(0);
 	UnitUpdateHeading(unit);
 	AnimateActionDie(unit); // with new corpse.
 }
