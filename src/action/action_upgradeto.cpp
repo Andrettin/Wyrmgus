@@ -244,7 +244,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 	
-	unit.Type = &newtype;
+	unit.SetType(&newtype);
 	unit.Stats = &unit.GetType()->Stats[player.GetIndex()];
 	
 	//Wyrmgus start
@@ -280,7 +280,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//deequip the current equipment if they are incompatible with the new unit type
 	for (std::map<const ItemSlot *, std::vector<CUnit *>>::iterator iterator = unit.EquippedItems.begin(); iterator != unit.EquippedItems.end(); ++iterator) {
 		for (CUnit *equipped_item : iterator->second) {
-			if (!unit.CanEquipItemClass(equipped_item->Type->ItemClass)) {
+			if (!unit.CanEquipItemClass(equipped_item->GetType()->ItemClass)) {
 				unit.DeequipItem(equipped_item);
 			}
 		}

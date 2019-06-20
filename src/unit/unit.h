@@ -195,6 +195,8 @@ public:
 	/// Release a unit
 	void Release(bool final = false);
 	
+	void SetType(const CUnitType *new_type);
+	
 	[[nodiscard]]
 	const CUnitType *GetType() const
 	{
@@ -766,7 +768,6 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 	
-	friend class COrder_Die;
 	friend class COrder_Follow;
 	friend class COrder_PickUp;
 	friend class COrder_Trade;
@@ -779,7 +780,6 @@ public:
 	friend int CclMoveUnit(lua_State *l);
 	friend int CclShowMapLocation(lua_State *l);
 	friend int CclUnit(lua_State *l);
-	friend int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype);
 	friend void UnitInXY(CUnit &unit, const Vec2i &pos, const int z);
 	
 protected:

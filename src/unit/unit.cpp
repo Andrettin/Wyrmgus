@@ -636,6 +636,23 @@ void CUnit::Release(bool final)
 	UnitManager.ReleaseUnit(this);
 }
 
+void CUnit::SetType(const CUnitType *new_type)
+{
+	if (new_type == this->Type) {
+		return;
+	}
+	
+	const PaletteImage *old_image = this->GetImage();
+	
+	this->Type = new_type;
+	
+	const PaletteImage *new_image = this->GetImage();
+	
+	if (old_image != new_image) {
+		this->emit_signal("image_changed", new_image);
+	}
+}
+
 //Wyrmgus start
 void CUnit::SetResourcesHeld(int quantity)
 {
@@ -1286,6 +1303,8 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 void CUnit::SetVariation(const UnitTypeVariation *new_variation, const CUnitType *new_type, int image_layer)
 {
 	if (image_layer == -1) {
+		const PaletteImage *old_image = this->GetImage();
+		
 		if (
 			(this->GetVariation() && this->GetVariation()->Animations)
 			|| (new_variation && new_variation->Animations)
@@ -1293,6 +1312,14 @@ void CUnit::SetVariation(const UnitTypeVariation *new_variation, const CUnitType
 			this->SetFrame(this->Type->StillFrame);
 		}
 		this->Variation = new_variation;
+		
+		if (new_type == this->GetType()) {
+			//emit a signal if the image has changed, but only if the variation's type is the same as the current type of the unit, as otherwise it means the variation is being chosen in advance of changing the unit type
+			const PaletteImage *new_image = this->GetImage();
+			if (old_image != new_image) {
+				this->emit_signal("image_changed", new_image);
+			}
+		}
 	} else {
 		this->LayerVariation[image_layer] = new_variation ? new_variation->GetIndex() : -1;
 	}

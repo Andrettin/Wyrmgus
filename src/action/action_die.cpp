@@ -130,7 +130,7 @@ static bool AnimateActionDie(CUnit &unit)
 	MapUnmarkUnitSight(unit);
 	//Wyrmgus end
 	unit.ChooseVariation(&corpseType);
-	unit.Type = &corpseType;
+	unit.SetType(&corpseType);
 	unit.Stats = &corpseType.Stats[unit.GetPlayer()->GetIndex()];
 	//Wyrmgus start
 	const unsigned int var_size = UnitTypeVar.GetNumberVariable();

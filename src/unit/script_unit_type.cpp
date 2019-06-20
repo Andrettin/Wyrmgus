@@ -2135,11 +2135,24 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	// make units allowed by default
+	//make units allowed by default
 	for (int i = 0; i < PlayerMax; ++i) {
 		AllowUnitId(*CPlayer::Players[i], type->GetIndex(), 65536);
 	}
 	//Wyrmgus end
+	
+	//set the frame size of the unit type's image for the images of variations that have no frame size
+	for (UnitTypeVariation *variation : type->Variations) {
+		if (variation->GetImage() == nullptr || type->GetImage() == nullptr) {
+			continue;
+		}
+		
+		if (variation->GetImage()->GetFrameSize().x != 0 || variation->GetImage()->GetFrameSize().y != 0) {
+			continue;
+		}
+		
+		variation->Image->FrameSize = type->GetImage()->GetFrameSize();
+	}
 	
 	type->Initialized = true;
 	
