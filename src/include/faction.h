@@ -121,7 +121,7 @@ public:
 	
 	const CPlayerColor *GetSecondaryColor() const;
 	
-	virtual CIcon *GetIcon() const override;
+	virtual const CIcon *GetIcon() const override;
 
 	const CUpgrade *GetUpgrade() const;
 	

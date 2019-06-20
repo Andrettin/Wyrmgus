@@ -1168,7 +1168,7 @@ static void DrawEditorPanel_StartIcon()
 	int y = UI.InfoPanel.Y + 5;
 
 	if (Editor.StartUnit) {
-		CIcon *icon = Editor.StartUnit->GetIcon();
+		const CIcon *icon = Editor.StartUnit->GetIcon();
 		Assert(icon);
 		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
 		unsigned int flag = 0;

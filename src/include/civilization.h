@@ -88,7 +88,7 @@ public:
 	**
 	**	@return	The civilization's icon
 	*/
-	virtual CIcon *GetIcon() const override
+	virtual const CIcon *GetIcon() const override
 	{
 		if (this->Icon != nullptr) {
 			return this->Icon;

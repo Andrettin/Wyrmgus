@@ -49,6 +49,7 @@
 #include "player.h"
 #include "spell/spells.h"
 #include "unit/unit_type.h"
+#include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 
 #include <iomanip>
@@ -401,7 +402,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"spell-cooldown\", \"%s\", %d", spell->Ident.c_str(), element.second);
 	}
 	//Wyrmgus start
-	file.printf(",\n  \"variation\", %d", unit.Variation);
+	if (unit.GetVariation() != nullptr) {
+		file.printf(",\n  \"variation\", %d", unit.GetVariation()->GetIndex());
+	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (unit.LayerVariation[i] != -1) {
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);

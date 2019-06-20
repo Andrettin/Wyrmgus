@@ -62,7 +62,6 @@ class CUnitColors;
 class CUnitPtr;
 class CUnitStats;
 class CUnitType;
-class CUnitTypeVariation;
 class CUpgrade;
 class CVariable;
 class CViewport;
@@ -71,7 +70,9 @@ class ItemClass;
 class ItemSlot;
 class Missile;
 class PathFinderData;
+class PaletteImage;
 class UniqueItem;
+class UnitTypeVariation;
 struct lua_State;
 
 typedef COrder *COrderPtr;
@@ -215,12 +216,17 @@ public:
 	void Retrain();
 	void HealingItemAutoUse();
 	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
-	bool CheckTerrainForVariation(const CUnitTypeVariation *variation) const;
-	bool CheckSeasonForVariation(const CUnitTypeVariation *variation) const;
+	bool CheckTerrainForVariation(const UnitTypeVariation *variation) const;
+	bool CheckSeasonForVariation(const UnitTypeVariation *variation) const;
 	void ChooseVariation(const CUnitType *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(CUnitTypeVariation *new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
-	const CUnitTypeVariation *GetVariation() const;
-	const CUnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
+	void SetVariation(const UnitTypeVariation *new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
+	
+	const UnitTypeVariation *GetVariation() const
+	{
+		return this->Variation;
+	}
+	
+	const UnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
 	void ChooseButtonIcon(const int button_action);
 	void EquipItem(CUnit *item, const bool affect_character = true);
@@ -463,6 +469,8 @@ public:
 		return this->MapLayer;
 	}
 	
+	const PaletteImage *GetImage() const;
+	
 	void SetFrame(const int frame);
 	
 	void ChangeFrame(const int change)
@@ -660,7 +668,9 @@ public:
 	CCharacter *Character;	/// Pointer to the character represented by this unit
 	CSite *Settlement = nullptr;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
 	CUpgrade *Trait = nullptr;	/// Unit's trait
-	int Variation;      /// Which of the variations of its unit type this unit has
+private:
+	const UnitTypeVariation *Variation = nullptr;	/// Which of the variations of its unit type this unit has
+public:
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
 	const CUpgrade *Prefix = nullptr;	/// Item unit's prefix
 	const CUpgrade *Suffix = nullptr;	/// Item unit's suffix

@@ -79,7 +79,7 @@ public:
 		return this->Background;
 	}
 	
-	virtual CIcon *GetIcon() const
+	virtual const CIcon *GetIcon() const
 	{
 		return this->Icon;
 	}
@@ -92,7 +92,7 @@ protected: //these are protected because lua functions still use them
 	String Description;		/// the description of the data element from an in-game universe perspective
 	String Quote;			/// a quote relating to the data element
 	String Background;		/// the background of the data element, a description from a perspective outside of the game's universe
-	CIcon *Icon = nullptr;	/// the icon of the data element
+	const CIcon *Icon = nullptr;	/// the icon of the data element
 	
 protected:
 	static void _bind_methods();

@@ -46,13 +46,14 @@
 #include "ui/button_action.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CUnitTypeVariation::~CUnitTypeVariation()
+UnitTypeVariation::~UnitTypeVariation()
 {
 	if (this->Sprite) {
 		CGraphic::Free(this->Sprite);
@@ -83,9 +84,13 @@ CUnitTypeVariation::~CUnitTypeVariation()
 **
 **	@param	config_data	The configuration data
 */
-void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
+void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.ProcessForObject(*this)) {
+			continue;
+		}
+		
 		if (property.Operator != CConfigOperator::Assignment) {
 			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
 			continue;
@@ -94,9 +99,9 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 		String key = property.Key;
 		String value = property.Value;
 		
-		if (key == "variation_id") {
+		if (key == "ident") {
 			value = value.replace("_", "-");
-			this->VariationId = value.utf8().get_data();
+			this->Ident = value;
 		} else if (key == "layer") {
 			value = value.replace("_", "-");
 			this->ImageLayer = GetImageLayerIdByName(value.utf8().get_data());
@@ -105,22 +110,10 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "type_name") {
 			this->TypeName = value.utf8().get_data();
-		} else if (key == "file") {
-			this->File = CModule::GetCurrentPath() + value.utf8().get_data();
 		} else if (key == "shadow_file") {
 			this->ShadowFile = CModule::GetCurrentPath() + value.utf8().get_data();
 		} else if (key == "light_file") {
 			this->LightFile = CModule::GetCurrentPath() + value.utf8().get_data();
-		} else if (key == "frame_width") {
-			this->FrameWidth = value.to_int();
-		} else if (key == "frame_height") {
-			this->FrameHeight = value.to_int();
-		} else if (key == "icon") {
-			value = value.replace("_", "-");
-			this->Icon.Name = value.utf8().get_data();
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
-			this->Icon.Icon->Load();
 		} else if (key == "animations") {
 			value = value.replace("_", "-");
 			this->Animations = AnimationsByIdent(value.utf8().get_data());
@@ -205,7 +198,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "file_when_loaded") {
+		if (section->Tag == "image") {
+			String image_ident = this->Type->GetIdent() + "_" + this->GetIdent();
+			image_ident = image_ident.replace("_", "-");
+			PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+			image->ProcessConfigData(section);
+			this->Image = image;
+		} else if (section->Tag == "file_when_loaded") {
 			std::string file;
 			int resource = -1;
 				
@@ -349,4 +348,31 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
 	}
+}
+
+const Vector2i &UnitTypeVariation::GetFrameSize() const
+{
+	if (this->GetImage() != nullptr) {
+		return this->GetImage()->GetFrameSize();
+	}
+	
+	return PaletteImage::EmptyFrameSize;
+}
+
+void UnitTypeVariation::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](UnitTypeVariation *variation, const String &ident){ variation->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const UnitTypeVariation *variation){ return const_cast<PaletteImage *>(variation->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
+	
+	ClassDB::bind_method(D_METHOD("set_icon", "ident"), +[](UnitTypeVariation *variation, const String &ident){
+		CIcon *icon = CIcon::Get(ident);
+		variation->Icon = icon;
+		
+		if (icon != nullptr) {
+			icon->Load();
+		}
+	});
+	ClassDB::bind_method(D_METHOD("get_icon"), +[](const UnitTypeVariation *variation){ return const_cast<CIcon *>(variation->GetIcon()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "icon"), "set_icon", "get_icon");
 }

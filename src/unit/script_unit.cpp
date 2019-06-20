@@ -693,7 +693,10 @@ static int CclUnit(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "variation")) {
-			unit->Variation = LuaToNumber(l, 2, j + 1);
+			const int variation_index = LuaToNumber(l, 2, j + 1);
+			if (variation_index >= 0 && variation_index < static_cast<int>(unit->Type->Variations.size())) {
+				unit->Variation = unit->Type->Variations[variation_index];
+			}
 		} else if (!strcmp(value, "layer-variation")) {
 			std::string image_layer_name = LuaToString(l, 2, j + 1);
 			int image_layer = GetImageLayerIdByName(image_layer_name);
@@ -1970,17 +1973,17 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "CustomHero")) {
 		unit->SetCharacter(LuaToString(l, 3), true);
 	} else if (!strcmp(name, "Variation")) {
-		size_t variation_index = LuaToNumber(l, 3);
-		if (variation_index >= 0 && variation_index < unit->GetType()->Variations.size()) {
+		const int variation_index = LuaToNumber(l, 3);
+		if (variation_index >= 0 && variation_index < static_cast<int>(unit->GetType()->Variations.size())) {
 			unit->SetVariation(unit->GetType()->Variations[variation_index]);
-			unit->Variable[VARIATION_INDEX].Value = unit->Variation;
+			unit->Variable[VARIATION_INDEX].Value = variation_index;
 		}
 	} else if (!strcmp(name, "LayerVariation")) {
 		LuaCheckArgs(l, 4);
 		std::string image_layer_name = LuaToString(l, 3);
-		int image_layer = GetImageLayerIdByName(image_layer_name);
+		const int image_layer = GetImageLayerIdByName(image_layer_name);
 		if (image_layer != -1) {
-			size_t variation_index = LuaToNumber(l, 4);
+			const size_t variation_index = LuaToNumber(l, 4);
 			if (variation_index >= 0 && variation_index < unit->GetType()->LayerVariations[image_layer].size()) {
 				unit->SetVariation(unit->GetType()->LayerVariations[image_layer][variation_index], nullptr, image_layer);
 			}

@@ -198,7 +198,7 @@ public:
 	bool CanWorship() const;
 	bool HasMajorDeity() const;
 	String GetFullName() const;
-	virtual CIcon *GetIcon() const override;
+	virtual const CIcon *GetIcon() const override;
 	CPersistentItem *GetItem(const CUnit *item) const;
 	void UpdateAttributes();
 	void SaveHistory(CFile &file);		/// Save generated history data for the character

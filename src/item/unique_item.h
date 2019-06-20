@@ -60,9 +60,9 @@ public:
 	
 	bool CanDrop() const;				/// Check whether this unique item can drop
 	int GetMagicLevel() const;			/// Get this unique item's magic level
-	virtual CIcon *GetIcon() const override;
+	virtual const CIcon *GetIcon() const override;
 	
-	CIcon *GetSpecificIcon() const
+	const CIcon *GetSpecificIcon() const
 	{
 		return this->Icon;
 	}

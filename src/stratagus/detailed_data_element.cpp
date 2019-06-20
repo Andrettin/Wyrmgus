@@ -43,10 +43,12 @@
 
 void DetailedDataElement::SetIcon(const String &icon_ident)
 {
-	this->Icon = CIcon::Get(icon_ident);
+	CIcon *icon = CIcon::Get(icon_ident);
 	
-	if (this->Icon != nullptr) {
-		this->Icon->Load();
+	this->Icon = icon;
+	
+	if (icon != nullptr) {
+		icon->Load();
 	}
 }
 
@@ -69,6 +71,6 @@ void DetailedDataElement::_bind_methods()
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "background"), "set_background", "get_background");
 	
 	ClassDB::bind_method(D_METHOD("set_icon", "icon_ident"), &DetailedDataElement::SetIcon);
-	ClassDB::bind_method(D_METHOD("get_icon"), &DetailedDataElement::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_icon"), +[](const DetailedDataElement *detailed_data_element){ return const_cast<CIcon *>(detailed_data_element->GetIcon()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "icon"), "set_icon", "get_icon");
 }

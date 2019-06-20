@@ -294,11 +294,6 @@ void CUpgrade::Initialize()
 		}
 	}
 	
-	//load icon here
-	if (this->Icon != nullptr && !this->Icon->Loaded) {
-		this->Icon->Load();
-	}
-	
 	this->Initialized = true;
 	
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
@@ -499,10 +494,9 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			CIcon *icon = CIcon::Get(LuaToString(l, -1));
+			upgrade->Icon = icon;
 			if (icon != nullptr) {
-				upgrade->Icon = icon;
-			} else {
-				LuaError(l, "Icon doesn't exist.");
+				icon->Load();
 			}
 		} else if (!strcmp(value, "Class")) {
 			std::string class_name = LuaToString(l, -1);
@@ -741,11 +735,6 @@ static int CclDefineUpgrade(lua_State *l)
 		if (upgrade->IncompatibleAffixes[other_upgrade->GetIndex()]) {
 			other_upgrade->IncompatibleAffixes[upgrade->GetIndex()] = true;
 		}
-	}
-	
-	//load icon here
-	if (upgrade->Icon != nullptr && !upgrade->Icon->Loaded) {
-		upgrade->Icon->Load();
 	}
 	
 	upgrade->Initialized = true;
@@ -1686,7 +1675,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				
 				//change variation if current one becomes forbidden
-				const CUnitTypeVariation *current_variation = unit.GetVariation();
+				const UnitTypeVariation *current_variation = unit.GetVariation();
 				if (current_variation) {
 					bool upgrade_forbidden = false;
 					for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
@@ -1700,7 +1689,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+					const UnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
 					if (current_layer_variation) {
 						bool upgrade_forbidden = false;
 						for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
@@ -1979,7 +1968,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				
 				//change variation if current one becomes forbidden
-				const CUnitTypeVariation *current_variation = unit.GetVariation();
+				const UnitTypeVariation *current_variation = unit.GetVariation();
 				if (current_variation) {
 					bool upgrade_required = false;
 					for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
@@ -1993,7 +1982,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+					const UnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
 					if (current_layer_variation) {
 						bool upgrade_required = false;
 						for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
@@ -2085,7 +2074,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	const CUnitTypeVariation *current_variation = unit.GetVariation();
+	const UnitTypeVariation *current_variation = unit.GetVariation();
 	if (current_variation) {
 		bool upgrade_forbidden = false;
 		for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
@@ -2099,7 +2088,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+		const UnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
 		if (current_layer_variation) {
 			bool upgrade_forbidden = false;
 			for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
@@ -2184,7 +2173,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	const CUnitTypeVariation *current_variation = unit.GetVariation();
+	const UnitTypeVariation *current_variation = unit.GetVariation();
 	if (current_variation) {
 		bool upgrade_required = false;
 		for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
@@ -2198,7 +2187,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+		const UnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
 		if (current_layer_variation) {
 			bool upgrade_required = false;
 			for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {

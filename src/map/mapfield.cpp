@@ -193,7 +193,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 				this->Flags |= MapFieldUnpassable;
 				this->Flags |= MapFieldAirUnpassable;
 			}
-			const CUnitTypeVariation *variation = unit.GetVariation();
+			const UnitTypeVariation *variation = unit.GetVariation();
 			if (variation && !unit.CheckTerrainForVariation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 				unit.ChooseVariation();
 			}

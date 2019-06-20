@@ -142,10 +142,10 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int frame_height = type.GetFrameSize().y;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
-	const CUnitTypeVariation *variation = unit.GetVariation();
-	if (variation && variation->FrameWidth && variation->FrameHeight) {
-		frame_width = variation->FrameWidth;
-		frame_height = variation->FrameHeight;
+	const UnitTypeVariation *variation = unit.GetVariation();
+	if (variation && variation->GetFrameSize().x != 0 && variation->GetFrameSize().y != 0) {
+		frame_width = variation->GetFrameSize().x;
+		frame_height = variation->GetFrameSize().y;
 		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
 		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
 	}
@@ -947,7 +947,7 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 								   int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	const CUnitTypeVariation *variation = unit.GetVariation();
+	const UnitTypeVariation *variation = unit.GetVariation();
 	if (cframe->File == ConstructionFileConstruction) {
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
@@ -1016,7 +1016,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 {
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
-		const CUnitTypeVariation *variation = unit.GetVariation();
+		const UnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->Construction) {
 			const CConstruction &construction = *variation->Construction;
 			pos.x -= construction.Width / 2;
@@ -1043,10 +1043,10 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 //		pos.y += type.GetOffsetY() - type.GetFrameSize().y / 2;
 		int frame_width = type.GetFrameSize().x;
 		int frame_height = type.GetFrameSize().y;
-		const CUnitTypeVariation *variation = unit.GetVariation();
-		if (variation && variation->FrameWidth && variation->FrameHeight) {
-			frame_width = variation->FrameWidth;
-			frame_height = variation->FrameHeight;
+		const UnitTypeVariation *variation = unit.GetVariation();
+		if (variation && variation->GetFrameSize().x != 0 && variation->GetFrameSize().y != 0) {
+			frame_width = variation->GetFrameSize().x;
+			frame_height = variation->GetFrameSize().y;
 		}
 		pos.x += type.GetOffsetX() - frame_width / 2;
 		pos.y += type.GetOffsetY() - frame_height / 2;
@@ -1144,7 +1144,7 @@ void CUnit::Draw(const CViewport &vp) const
 	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
 
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const UnitTypeVariation *variation = this->GetVariation();
 
 	if (state == 1 && under_construction && cframe) {
 		//Wyrmgus start

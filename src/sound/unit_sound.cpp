@@ -125,7 +125,7 @@ static void MapAnimSounds(CUnitType &type)
 		MapAnimSounds2(type.Animations->Harvest[i]);
 	}
 	//Wyrmgus start
-	for (CUnitTypeVariation *variation : type.Variations) {
+	for (UnitTypeVariation *variation : type.Variations) {
 		if (!variation) {
 			continue;
 		}

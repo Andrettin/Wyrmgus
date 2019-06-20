@@ -463,7 +463,7 @@ const CPlayerColor *CFaction::GetSecondaryColor() const
 **
 **	@return	The faction's icon
 */
-CIcon *CFaction::GetIcon() const
+const CIcon *CFaction::GetIcon() const
 {
 	if (this->Icon != nullptr) {
 		return this->Icon;

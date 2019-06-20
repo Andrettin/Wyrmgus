@@ -255,7 +255,7 @@ void CAchievement::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_difficulty"), &CAchievement::GetDifficulty);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "difficulty"), "set_difficulty", "get_difficulty");
 
-	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_icon"), +[](const CAchievement *achievement){ return const_cast<CIcon *>(achievement->GetIcon()); });
 	
 	ClassDB::bind_method(D_METHOD("set_primary_player_color", "ident"), +[](CAchievement *achievement, const String &ident){
 		achievement->PrimaryPlayerColor = CPlayerColor::Get(ident);

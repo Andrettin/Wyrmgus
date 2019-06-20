@@ -783,14 +783,14 @@ String CCharacter::GetFullName() const
 	return full_name;
 }
 
-CIcon *CCharacter::GetIcon() const
+const CIcon *CCharacter::GetIcon() const
 {
 	if (this->Level >= 3 && this->HeroicIcon.Icon) {
 		return this->HeroicIcon.Icon;
 	} else if (this->Icon.Icon) {
 		return this->Icon.Icon;
-	} else if (!this->HairVariation.empty() && this->UnitType->GetVariation(this->HairVariation) != nullptr && !this->UnitType->GetVariation(this->HairVariation)->Icon.Name.empty()) {
-		return this->UnitType->GetVariation(this->HairVariation)->Icon.Icon;
+	} else if (!this->HairVariation.empty() && this->UnitType->GetVariation(this->HairVariation.c_str()) != nullptr && this->UnitType->GetVariation(this->HairVariation.c_str())->GetIcon() != nullptr) {
+		return this->UnitType->GetVariation(this->HairVariation.c_str())->GetIcon();
 	} else {
 		return this->UnitType->GetIcon();
 	}

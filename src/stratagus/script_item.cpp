@@ -43,10 +43,6 @@
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -80,8 +76,11 @@ static int CclDefineUniqueItem(lua_State *l)
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
 		} else if (!strcmp(value, "Icon")) {
-			item->Icon = CIcon::Get(LuaToString(l, -1));
-			item->Icon->Load();
+			CIcon *icon = CIcon::Get(LuaToString(l, -1));
+			item->Icon = icon;
+			if (icon != nullptr) {
+				icon->Load();
+			}
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			const CUpgrade *upgrade = CUpgrade::Get(affix_ident);

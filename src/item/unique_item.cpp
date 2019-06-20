@@ -82,7 +82,7 @@ bool UniqueItem::CanDrop() const
 	return true;
 }
 
-CIcon *UniqueItem::GetIcon() const
+const CIcon *UniqueItem::GetIcon() const
 {
 	if (this->Icon != nullptr) {
 		return this->Icon;

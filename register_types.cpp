@@ -94,6 +94,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
@@ -171,6 +172,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<PaletteImage>();
 	ClassDB::register_class<UniqueItem>();
 	ClassDB::register_class<UnitClass>();
+	ClassDB::register_class<UnitTypeVariation>();
 	ClassDB::register_class<UpgradeClass>();
 	
 	ClassDB::register_virtual_class<CConversibleColor>();

@@ -71,7 +71,6 @@ class CGraphic;
 class CPlayer;
 class CPlayerColorGraphic;
 class CSpell;
-class CUnitTypeVariation;
 class CUpgrade;
 class CWord;
 class MissileType;
@@ -89,6 +88,7 @@ class ItemSlot;
 class LuaCallback;
 class PaletteImage;
 class UnitClass;
+class UnitTypeVariation;
 struct lua_State;
 
 constexpr int UnitSides = 8;
@@ -609,8 +609,8 @@ public:
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
-	CUnitTypeVariation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
-	CUnitTypeVariation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
+	UnitTypeVariation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
+	UnitTypeVariation *GetVariation(const String &variation_ident, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(const CPlayer *player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
@@ -799,9 +799,9 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
 	//Wyrmgus end
 	ResourceInfo *ResInfo[MaxCosts];	/// Resource information.
-	std::vector<CUnitTypeVariation *> Variations;				/// Variation information
+	std::vector<UnitTypeVariation *> Variations;				/// Variation information
 	//Wyrmgus start
-	std::vector<CUnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information
+	std::vector<UnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
 	std::vector<CBuildRestriction *> BuildingRules;		/// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules;	/// Rules list for for AI to build a building.

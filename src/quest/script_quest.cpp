@@ -140,8 +140,11 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Unfailable")) {
 			quest->Unfailable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			quest->Icon = CIcon::Get(LuaToString(l, -1));
-			quest->Icon->Load();
+			CIcon *icon = CIcon::Get(LuaToString(l, -1));
+			quest->Icon = icon;
+			if (icon != nullptr) {
+				icon->Load();
+			}
 		} else if (!strcmp(value, "QuestGiver")) {
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
 			CCharacter *quest_giver = CCharacter::Get(quest_giver_name);

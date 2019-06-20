@@ -100,7 +100,7 @@ public:
 		return this->Unobtainable;
 	}
 	
-	CIcon *GetIcon() const
+	const CIcon *GetIcon() const
 	{
 		return this->Icon.Icon;
 	}
