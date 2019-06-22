@@ -777,18 +777,7 @@ static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 			SDL_SetColors(Surface, &colors[0], 0, 256);
 			break;
 		}
-		case 4: {
-			Uint32 *p;
-			for (int i = 0; i < Height; ++i) {
-				for (int j = 0; j < Width; ++j) {
-					p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
-					const Uint32 gray = ((Uint8)((*p) * redGray) >> f->Rshift) +
-										((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
-										((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
-										((Uint8)(*(p + 3)) >> f->Ashift);
-					*p = gray;
-				}
-			}
+		default: {
 			break;
 		}
 	}
@@ -818,23 +807,7 @@ static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
 			SDL_SetColors(Surface, &colors[0], 0, 256);
 			break;
 		}
-		case 4: {
-			Uint32 *p;
-			for (int i = 0; i < Height; ++i) {
-				for (int j = 0; j < Width; ++j) {
-					p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
-					
-					int input_red = (*p);
-					int input_green = *(p + 1);
-					int input_blue = *(p + 2);
-					
-					const Uint32 sepia = ((Uint8)(std::min<int>(255, (input_red * .393) + (input_green *.769) + (input_blue * .189))) >> f->Rshift) +
-										((Uint8)(std::min<int>(255, (input_red * .349) + (input_green *.686) + (input_blue * .168))) >> f->Gshift) +
-										((Uint8)(std::min<int>(255, (input_red * .272) + (input_green *.534) + (input_blue * .131))) >> f->Bshift) +
-										((Uint8)(*(p + 3)) >> f->Ashift);
-					*p = sepia;
-				}
-			}
+		default: {
 			break;
 		}
 	}
