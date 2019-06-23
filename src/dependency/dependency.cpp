@@ -43,6 +43,7 @@
 #include "dependency/character_dependency.h"
 #include "dependency/not_dependency.h"
 #include "dependency/or_dependency.h"
+#include "dependency/resource_dependency.h"
 #include "dependency/season_dependency.h"
 #include "dependency/site_dependency.h"
 #include "dependency/trigger_dependency.h"
@@ -90,6 +91,8 @@ CDependency *CDependency::FromConfigData(const CConfigData *config_data)
 		dependency = new CAgeDependency;
 	} else if (config_data->Tag == "character") {
 		dependency = new CCharacterDependency;
+	} else if (config_data->Tag == "resource") {
+		dependency = new CResourceDependency;
 	} else if (config_data->Tag == "season") {
 		dependency = new CSeasonDependency;
 	} else if (config_data->Tag == "site") {
