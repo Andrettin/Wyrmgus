@@ -50,6 +50,7 @@
 
 class CAnimations;
 class CConstruction;
+class CDependency;
 class CGraphic;
 class CPlayerColorGraphic;
 class CSeason;
@@ -143,6 +144,8 @@ public:
 	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];		/// The graphic corresponding to FileWhenEmpty
 	
 	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
+	CDependency *Predependency = nullptr;
+	CDependency *Dependency = nullptr;
 	
 	friend class CUnitType;
 	friend int CclDefineUnitType(lua_State *l);

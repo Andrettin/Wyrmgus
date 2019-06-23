@@ -1189,6 +1189,10 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	
 	bool found_similar = false;
 	for (UnitTypeVariation *variation : variation_list) {
+		if (!CheckDependencies(variation, this)) {
+			continue;
+		}
+		
 		if (variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin) {
 			continue;
 		}
@@ -1620,7 +1624,7 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 			|| std::find(variation->ItemsNotEquipped.begin(), variation->ItemsNotEquipped.end(), item->Type) != variation->ItemsNotEquipped.end()
 		)
 	) {
-		ChooseVariation(); //choose a new variation now
+		this->ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		const UnitTypeVariation *layer_variation = this->GetLayerVariation(i);
@@ -1812,7 +1816,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 			|| std::find(variation->ItemsEquipped.begin(), variation->ItemsEquipped.end(), item->Type) != variation->ItemsEquipped.end()
 		)
 	) {
-		ChooseVariation(); //choose a new variation now
+		this->ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		const UnitTypeVariation *layer_variation = this->GetLayerVariation(i);

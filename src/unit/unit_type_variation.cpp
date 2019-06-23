@@ -39,6 +39,8 @@
 #include "config.h"
 #include "config_operator.h"
 #include "construct.h"
+#include "dependency/and_dependency.h"
+#include "dependency/dependency.h"
 #include "item/item_class.h"
 #include "map/terrain_type.h"
 #include "module.h"
@@ -343,6 +345,12 @@ void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->ButtonIcons[button_action].Icon = nullptr;
 			this->ButtonIcons[button_action].Load();
 			this->ButtonIcons[button_action].Icon->Load();
+		} else if (section->Tag == "predependencies") {
+			this->Predependency = new CAndDependency;
+			this->Predependency->ProcessConfigData(section);
+		} else if (section->Tag == "dependencies") {
+			this->Dependency = new CAndDependency;
+			this->Dependency->ProcessConfigData(section);
 		} else {
 			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", section->Tag.utf8().get_data());
 		}
