@@ -1700,7 +1700,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 
 						if (upgrade_forbidden == true) {
-							unit.ChooseVariation(nullptr, false, i);
+							unit.ChooseVariation(nullptr, i);
 						}
 					}
 				}
@@ -1992,7 +1992,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 						if (upgrade_required == true) {
-							unit.ChooseVariation(nullptr, false, i);
+							unit.ChooseVariation(nullptr, i);
 						}
 					}
 				}
@@ -2098,7 +2098,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 				}
 			}
 			if (upgrade_forbidden == true) {
-				unit.ChooseVariation(nullptr, false, i);
+				unit.ChooseVariation(nullptr, i);
 			}
 		}
 	}
@@ -2197,7 +2197,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 				}
 			}
 			if (upgrade_required == true) {
-				unit.ChooseVariation(nullptr, false, i);
+				unit.ChooseVariation(nullptr, i);
 			}
 		}
 	}
