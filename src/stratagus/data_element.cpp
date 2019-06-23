@@ -56,7 +56,7 @@ std::vector<std::function<void()>> ClassClearFunctions;
 void DataElement::ProcessConfigData(const CConfigData *config_data)
 {
 	if (this->Initialized && !config_data->Modification) {
-		fprintf(stderr, "Data element \"%s\" is being redefined.\n", this->Ident.c_str());
+		print_error("Data element \"" + this->GetIdent() + "\" is being redefined.");
 	}
 	
 	for (const CConfigProperty &config_property : config_data->Properties) {

@@ -1330,6 +1330,21 @@ void CUnit::ChooseVariation(const CUnitType *new_type, int image_layer)
 			continue;
 		}
 		
+		if (hair_color != nullptr) {
+			//give priority to variations with the same hair color as the current one
+			if (hair_color == variation->GetHairColor()) {
+				if (!found_same_hair_color) {
+					found_same_hair_color = true;
+					type_variations.clear();
+					found_similar_ident = false;
+				}
+			} else {
+				if (found_same_hair_color) {
+					continue;
+				}
+			}
+		}
+		
 		if (!old_variation_ident.empty() && (variation->GetIdent().find(old_variation_ident) != -1 || old_variation_ident.find(variation->GetIdent()) != -1)) { // if the old variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
 			if (!found_similar_ident) {
 				found_similar_ident = true;
@@ -1338,20 +1353,6 @@ void CUnit::ChooseVariation(const CUnitType *new_type, int image_layer)
 		} else {
 			if (found_similar_ident) {
 				continue;
-			}
-		}
-		
-		if (hair_color != nullptr) {
-			//give priority to variations with the same hair color as the current one
-			if (hair_color == variation->GetHairColor()) {
-				if (!found_same_hair_color) {
-					found_same_hair_color = true;
-					type_variations.clear();
-				}
-			} else {
-				if (found_same_hair_color) {
-					continue;
-				}
 			}
 		}
 	
