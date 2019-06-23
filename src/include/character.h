@@ -53,6 +53,7 @@ class CDependency;
 class CFaction;
 class CFile;
 class CGender;
+class CHairColor;
 class CHistoricalLocation;
 class CMapTemplate;
 class CLanguage;
@@ -163,6 +164,11 @@ public:
 		return this->Level;
 	}
 	
+	const CHairColor *GetHairColor() const
+	{
+		return this->HairColor;
+	}
+	
 	CCharacter *GetFather() const
 	{
 		return this->Father;
@@ -227,8 +233,8 @@ private:
 	String ExtraName;			/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	String FamilyName;			/// Name of the character's family
 	CWord *FamilyNameWord = nullptr;	/// the word for the character's family name
+	const CHairColor *HairColor = nullptr;	/// the character's hair color
 public:
-	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;			/// Character's icon
 	IconConfig HeroicIcon;		/// Character's heroic icon (level 3 and upper)
 	const CUnitType *UnitType = nullptr;

@@ -41,6 +41,7 @@
 #include "config_operator.h"
 #include "faction.h"
 #include "game/game.h"
+#include "hair_color.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/item.h"
@@ -204,9 +205,8 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "home_site") {
 			this->HomeSite = CSite::Get(value);
-		} else if (key == "hair_variation") {
-			value = value.replace("_", "-");
-			this->HairVariation = value.utf8().get_data();
+		} else if (key == "hair_color") {
+			this->HairColor = CHairColor::Get(value);
 		} else if (key == "trait") {
 			value = value.replace("_", "-");
 			CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());
@@ -789,8 +789,8 @@ const CIcon *CCharacter::GetIcon() const
 		return this->HeroicIcon.Icon;
 	} else if (this->Icon.Icon) {
 		return this->Icon.Icon;
-	} else if (!this->HairVariation.empty() && this->UnitType->GetVariation(this->HairVariation.c_str()) != nullptr && this->UnitType->GetVariation(this->HairVariation.c_str())->GetIcon() != nullptr) {
-		return this->UnitType->GetVariation(this->HairVariation.c_str())->GetIcon();
+	} else if (this->GetHairColor() != nullptr && this->UnitType->GetVariation(this->GetHairColor()) != nullptr && this->UnitType->GetVariation(this->GetHairColor())->GetIcon() != nullptr) {
+		return this->UnitType->GetVariation(this->GetHairColor())->GetIcon();
 	} else {
 		return this->UnitType->GetIcon();
 	}
@@ -993,8 +993,8 @@ void SaveHero(CCharacter *hero)
 		if (hero->Trait != nullptr) {
 			fprintf(fd, "\tTrait = \"%s\",\n", hero->Trait->Ident.c_str());
 		}
-		if (!hero->HairVariation.empty()) {
-			fprintf(fd, "\tHairVariation = \"%s\",\n", hero->HairVariation.c_str());
+		if (hero->GetHairColor() != nullptr) {
+			fprintf(fd, "\tHairColor = \"%s\",\n", hero->GetHairColor()->GetIdent().utf8().get_data());
 		}
 	}
 	if (hero->Level != 0) {

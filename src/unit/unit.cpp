@@ -1088,7 +1088,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	this->ChooseVariation(); //choose a new variation now
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		ChooseVariation(nullptr, false, i);
+		ChooseVariation(nullptr, i);
 	}
 	this->UpdateButtonIcons();
 	this->UpdateXPRequired();
@@ -1167,27 +1167,37 @@ bool CUnit::CheckSeasonForVariation(const UnitTypeVariation *variation) const
 	return true;
 }
 
-void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation, int image_layer)
+void CUnit::ChooseVariation(const CUnitType *new_type, int image_layer)
 {
-	std::string priority_variation;
+	String old_variation_ident;
+	const CHairColor *hair_color = nullptr;
 	if (image_layer == -1) {
-		if (this->Character != nullptr && !this->Character->HairVariation.empty()) {
-			priority_variation = this->Character->HairVariation;
+		if (this->Character != nullptr && this->Character->GetHairColor() != nullptr) {
+			hair_color = this->Character->GetHairColor();
 		} else if (this->GetVariation() != nullptr) {
-			priority_variation = this->GetVariation()->GetIdent().utf8().get_data();
+			hair_color = this->GetVariation()->GetHairColor();
+		}
+		
+		if (this->GetVariation() != nullptr) {
+			old_variation_ident = this->GetVariation()->GetIdent();
 		}
 	} else {
-		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->HairVariation.empty()) {
-			priority_variation = this->Character->HairVariation;
-		} else if (this->GetLayerVariation(image_layer)) {
-			priority_variation = this->GetLayerVariation(image_layer)->GetIdent().utf8().get_data();
+		if (image_layer == HairImageLayer && this->Character != nullptr && this->Character->GetHairColor() != nullptr) {
+			hair_color = this->Character->GetHairColor();
+		} else if (this->GetLayerVariation(image_layer) != nullptr) {
+			hair_color = this->GetLayerVariation(image_layer)->GetHairColor();
+		}
+		
+		if (this->GetLayerVariation(image_layer) != nullptr) {
+			old_variation_ident = this->GetLayerVariation(image_layer)->GetIdent();
 		}
 	}
 	
 	std::vector<UnitTypeVariation *> type_variations;
 	const std::vector<UnitTypeVariation *> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->Variations : this->Type->Variations) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
 	
-	bool found_similar = false;
+	bool found_similar_ident = false;
+	bool found_same_hair_color = false;
 	for (UnitTypeVariation *variation : variation_list) {
 		if (!CheckDependencies(variation, this)) {
 			continue;
@@ -1283,16 +1293,32 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
 			continue;
 		}
-		if (!ignore_old_variation && !priority_variation.empty() && (std::string(variation->GetIdent().utf8().get_data()).find(priority_variation) != std::string::npos || priority_variation.find(variation->GetIdent().utf8().get_data()) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
-			if (!found_similar) {
-				found_similar = true;
+		
+		if (!old_variation_ident.empty() && (variation->GetIdent().find(old_variation_ident) != -1 || old_variation_ident.find(variation->GetIdent()) != -1)) { // if the old variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
+			if (!found_similar_ident) {
+				found_similar_ident = true;
 				type_variations.clear();
 			}
 		} else {
-			if (found_similar) {
+			if (found_similar_ident) {
 				continue;
 			}
 		}
+		
+		if (hair_color != nullptr) {
+			//give priority to variations with the same hair color as the current one
+			if (hair_color == variation->GetHairColor()) {
+				if (!found_same_hair_color) {
+					found_same_hair_color = true;
+					type_variations.clear();
+				}
+			} else {
+				if (found_same_hair_color) {
+					continue;
+				}
+			}
+		}
+	
 		for (int j = 0; j < variation->Weight; ++j) {
 			type_variations.push_back(variation);
 		}
@@ -1315,6 +1341,7 @@ void CUnit::SetVariation(const UnitTypeVariation *new_variation, const CUnitType
 		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 			this->SetFrame(this->Type->StillFrame);
 		}
+		
 		this->Variation = new_variation;
 		
 		//emit a signal if the image has changed
@@ -1633,7 +1660,7 @@ void CUnit::EquipItem(CUnit *item, const bool affect_character)
 				|| std::find(layer_variation->ItemsNotEquipped.begin(), layer_variation->ItemsNotEquipped.end(), item->Type) != layer_variation->ItemsNotEquipped.end()
 			)
 		) {
-			ChooseVariation(nullptr, false, i);
+			this->ChooseVariation(nullptr, i);
 		}
 	}
 	
@@ -1826,7 +1853,7 @@ void CUnit::DeequipItem(CUnit *item, const bool affect_character)
 				|| std::find(layer_variation->ItemsEquipped.begin(), layer_variation->ItemsEquipped.end(), item->Type) != layer_variation->ItemsEquipped.end()
 			)
 		) {
-			ChooseVariation(nullptr, false, i);
+			this->ChooseVariation(nullptr, i);
 		}
 	}
 	
@@ -3101,9 +3128,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(*player);
 
 		//Wyrmgus start
-		unit->ChooseVariation(nullptr, true);
+		unit->ChooseVariation(nullptr);
 		for (int i = 0; i < MaxImageLayers; ++i) {
-			unit->ChooseVariation(nullptr, true, i);
+			unit->ChooseVariation(nullptr, i);
 		}
 		unit->UpdateButtonIcons();
 		unit->UpdateXPRequired();

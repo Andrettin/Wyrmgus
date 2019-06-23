@@ -1516,6 +1516,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		variation->ResourceMax = parent_variation->ResourceMax;
 		variation->Weight = parent_variation->Weight;
 		variation->Icon = parent_variation->Icon;
+		variation->SkinColor = parent_variation->SkinColor;
+		variation->HairColor = parent_variation->HairColor;
 		if (parent_variation->Animations) {
 			variation->Animations = parent_variation->Animations;
 		}
@@ -1561,6 +1563,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 				
 			variation->Ident = parent_variation->GetIdent();
 			variation->Image = parent_variation->Image;
+			variation->SkinColor = parent_variation->SkinColor;
+			variation->HairColor = parent_variation->HairColor;
 			variation->UpgradesRequired = parent_variation->UpgradesRequired;
 			variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
 			for (const ::ItemClass *item_class : parent_variation->ItemClassesEquipped) {
@@ -1743,6 +1747,17 @@ UnitTypeVariation *CUnitType::GetVariation(const String &variation_ident, int im
 	const std::vector<UnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
 	for (UnitTypeVariation *variation : variation_list) {
 		if (variation->GetIdent() == variation_ident) {
+			return variation;
+		}
+	}
+	return nullptr;
+}
+
+UnitTypeVariation *CUnitType::GetVariation(const CHairColor *hair_color) const
+{
+	const std::vector<UnitTypeVariation *> &variation_list = this->Variations;
+	for (UnitTypeVariation *variation : variation_list) {
+		if (variation->GetHairColor() == hair_color) {
 			return variation;
 		}
 	}

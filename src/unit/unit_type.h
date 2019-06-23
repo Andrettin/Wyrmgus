@@ -68,6 +68,7 @@ class CDependency;
 class CFile;
 class CGender;
 class CGraphic;
+class CHairColor;
 class CPlayer;
 class CPlayerColorGraphic;
 class CSpell;
@@ -611,6 +612,7 @@ public:
 	int GetResourceStep(const int resource, const int player) const;
 	UnitTypeVariation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
 	UnitTypeVariation *GetVariation(const String &variation_ident, int image_layer = -1) const;
+	UnitTypeVariation *GetVariation(const CHairColor *hair_color) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(const CPlayer *player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;

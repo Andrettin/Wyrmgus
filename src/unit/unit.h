@@ -220,7 +220,7 @@ public:
 	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
 	bool CheckTerrainForVariation(const UnitTypeVariation *variation) const;
 	bool CheckSeasonForVariation(const UnitTypeVariation *variation) const;
-	void ChooseVariation(const CUnitType *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
+	void ChooseVariation(const CUnitType *new_type = nullptr, int image_layer = -1);
 	void SetVariation(const UnitTypeVariation *new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
 	
 	const UnitTypeVariation *GetVariation() const

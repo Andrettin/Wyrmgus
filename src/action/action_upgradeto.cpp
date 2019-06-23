@@ -240,7 +240,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//change variation if upgrading (new unit type may have different variations)
 	unit.ChooseVariation(&newtype);
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		unit.ChooseVariation(&newtype, false, i);
+		unit.ChooseVariation(&newtype, i);
 	}
 	//Wyrmgus end
 	

@@ -39,6 +39,7 @@
 #include "civilization.h"
 #include "faction.h"
 #include "grand_strategy.h"
+#include "hair_color.h"
 #include "item/item.h"
 #include "item/item_class.h"
 #include "item/unique_item.h"
@@ -116,10 +117,13 @@ static int CclDefineCharacter(lua_State *l)
 			character->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			character->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
-			character->HairVariation = LuaToString(l, -1);
-		} else if (!strcmp(value, "HairVariation")) {
-			character->HairVariation = LuaToString(l, -1);
+		} else if (
+			!strcmp(value, "Variation") //to keep backwards compatibility
+			|| !strcmp(value, "HairVariation") //to keep backwards compatibility
+		) {
+			String hair_variation = LuaToString(l, -1);
+			hair_variation = hair_variation.replace("-hair", "");
+			character->HairColor = CHairColor::Get(hair_variation);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::Get(unit_type_ident);
@@ -608,10 +612,13 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->FamilyName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			hero->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
-			hero->HairVariation = LuaToString(l, -1);
-		} else if (!strcmp(value, "HairVariation")) {
-			hero->HairVariation = LuaToString(l, -1);
+		} else if (
+			!strcmp(value, "Variation") //to keep backwards compatibility
+			|| !strcmp(value, "HairVariation") //to keep backwards compatibility
+		) {
+			String hair_variation = LuaToString(l, -1);
+			hair_variation = hair_variation.replace("-hair", "");
+			hero->HairColor = CHairColor::Get(hair_variation);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::Get(unit_type_ident);
@@ -1014,7 +1021,11 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "HairVariation")) {
-		lua_pushstring(l, character->HairVariation.c_str());
+		if (character->GetHairColor() != nullptr) {
+			lua_pushstring(l, character->GetHairColor()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "IsUsable")) {
 		lua_pushboolean(l, character->IsUsable());
