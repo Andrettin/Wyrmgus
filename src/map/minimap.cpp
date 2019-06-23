@@ -663,7 +663,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
-		} else if (UI.Minimap.ShowSelected && unit.Selected) {
+		} else if (UI.Minimap.ShowSelected && unit.IsSelected()) {
 			color = ColorWhite;
 		} else {
 			color = ColorGreen;

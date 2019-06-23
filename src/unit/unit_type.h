@@ -605,6 +605,36 @@ public:
 		return this->DrawLevel;
 	}
 	
+	const Vector2i &GetBoxSize() const
+	{
+		return this->BoxSize;
+	}
+	
+	int GetBoxWidth() const
+	{
+		return this->GetBoxSize().x;
+	}
+	
+	int GetBoxHeight() const
+	{
+		return this->GetBoxSize().y;
+	}
+	
+	const Vector2i &GetBoxOffset() const
+	{
+		return this->BoxOffset;
+	}
+	
+	int GetBoxOffsetX() const
+	{
+		return this->GetBoxOffset().x;
+	}
+	
+	int GetBoxOffsetY() const
+	{
+		return this->GetBoxOffset().y;
+	}
+	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();
@@ -722,10 +752,10 @@ public:
 	int RepairCosts[MaxCosts];		/// How much it costs to repair
 
 	Vec2i TileSize = Vec2i(0, 0);	/// Tile size
-	int BoxWidth = 0;				/// Selected box size width
-	int BoxHeight = 0;				/// Selected box size height
-	int BoxOffsetX = 0;				/// Selected box size horizontal offset
-	int BoxOffsetY = 0;				/// Selected box size vertical offset
+private:
+	Vector2i BoxSize = Vector2i(0, 0);		/// Selected box size width
+	Vector2i BoxOffset = Vector2i(0, 0);	/// Selected box size horizontal offset
+public:
 	int NumDirections = 0;			/// Number of directions unit can face
 	int MinAttackRange = 0;			/// Minimal attack range
 	int BurnPercent = 0;			/// Burning percent.

@@ -541,8 +541,15 @@ public:
 	
 	[[nodiscard]]
 	CUnit *GetFirstContainer() const;
+	
+	void SetSelected(const bool selected);
+	
+	[[nodiscard]]
+	bool IsSelected() const
+	{
+		return this->Selected;
+	}
 
-	//Wyrmgus start
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
@@ -602,7 +609,6 @@ public:
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	const CLanguage *GetLanguage() const;
-	//Wyrmgus end
 	
 	[[nodiscard]]
 	bool IsDiurnal() const;
@@ -726,8 +732,10 @@ public:
 	unsigned Burning : 1;        /// unit is burning
 	unsigned Destroyed : 1;      /// unit is destroyed pending reference
 	unsigned Removed : 1;        /// unit is removed (not on map)
-	unsigned Selected : 1;       /// unit is selected
+private:
+	bool Selected = false;       /// unit is selected
 
+public:
 	bool UnderConstruction = false;	/// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
@@ -737,7 +745,7 @@ public:
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 	
-	unsigned TeamSelected;	/// unit is selected by a team member.
+	unsigned TeamSelected;		/// unit is selected by a team member.
 	CPlayer *RescuedFrom = nullptr;	/// The original owner of a rescued unit.
 	/// null if the unit was not rescued.
 	/* Seen stuff. */

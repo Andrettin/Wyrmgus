@@ -504,7 +504,7 @@ static int CclUnit(lua_State *l)
 			unit->Removed = 1;
 			--j;
 		} else if (!strcmp(value, "selected")) {
-			unit->Selected = 1;
+			unit->SetSelected(true);
 			--j;
 		} else if (!strcmp(value, "summoned")) {
 			unit->Summoned = 1;

@@ -149,13 +149,13 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
 		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
 	}
-	int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
-	int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
+	int x = screenPos.x - type.GetBoxWidth() / 2 - (frame_width - sprite_width) / 2;
+	int y = screenPos.y - type.GetBoxHeight() / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
 	if (Preference.PlayerColorCircle && unit.GetPlayer()->GetIndex() != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
-		DrawSelectionCircleWithTrans(unit.GetPlayer()->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
-//		DrawSelectionRectangle(unit.GetPlayer()->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
+		DrawSelectionCircleWithTrans(unit.GetPlayer()->Color, x + type.GetBoxOffsetX() + 1, y + type.GetBoxOffsetY() + 1, x + type.GetBoxWidth() + type.GetBoxOffsetX() - 1, y + type.GetBoxHeight() + type.GetBoxOffsetY() - 1);
+//		DrawSelectionRectangle(unit.GetPlayer()->Color, x + type.GetBoxOffsetX(), y + type.GetBoxOffsetY(), x + type.GetBoxWidth() + type.GetBoxOffsetX() + 1, y + type.GetBoxHeight() + type.GetBoxOffsetY() + 1);
 	}
 	//Wyrmgus end
 	
@@ -163,10 +163,10 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
 		color = ColorWhite;
-	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
+	} else if (unit.IsSelected() || unit.TeamSelected || (unit.Blink & 1)) {
 		if (unit.GetPlayer()->GetIndex() == PlayerNumNeutral) {
 			color = ColorYellow;
-		} else if ((unit.Selected || (unit.Blink & 1))
+		} else if ((unit.IsSelected() || (unit.Blink & 1))
 				   && (unit.GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 			color = ColorGreen;
 		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
@@ -193,29 +193,29 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	/*
 //	const CUnitType &type = *unit.GetType();
 //	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
-//	const int x = screenPos.x - type.BoxWidth / 2 - (type.GetFrameSize().x - (type.Sprite ? type.Sprite->Width : 0)) / 2;
-//	const int y = screenPos.y - type.BoxHeight / 2 - (type.GetFrameSize().y - (type.Sprite ? type.Sprite->Height : 0)) / 2;
+//	const int x = screenPos.x - type.GetBoxWidth() / 2 - (type.GetFrameSize().x - (type.Sprite ? type.Sprite->Width : 0)) / 2;
+//	const int y = screenPos.y - type.GetBoxHeight() / 2 - (type.GetFrameSize().y - (type.Sprite ? type.Sprite->Height : 0)) / 2;
 	*/
 	//Wyrmgus end
 
 	//Wyrmgus start
-	int box_width = type.BoxWidth;
-	int box_height = type.BoxHeight;
+	int box_width = type.GetBoxWidth();
+	int box_height = type.GetBoxHeight();
 	if ((unit.GetMapLayer()->Field(unit.GetTilePos())->GetFlags() & MapFieldBridge) && !unit.GetType()->BoolFlag[BRIDGE_INDEX].value && unit.GetType()->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
 		Select(unit.GetTilePos(), unit.GetTilePos(), table, unit.GetMapLayer()->GetIndex());
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->GetType()->BoxWidth > box_width && table[i]->GetType()->BoxHeight > box_height) {
-				box_width = table[i]->GetType()->BoxWidth;
-				box_height = table[i]->GetType()->BoxHeight;
+			if (!table[i]->Removed && table[i]->GetType()->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->GetType()->GetBoxWidth() > box_width && table[i]->GetType()->GetBoxHeight() > box_height) {
+				box_width = table[i]->GetType()->GetBoxWidth();
+				box_height = table[i]->GetType()->GetBoxHeight();
 			}
 		}
 	}
 	x = screenPos.x - box_width / 2 - (frame_width - sprite_width) / 2;
 	y = screenPos.y - box_height / 2 - (frame_height - sprite_height) / 2;
 	
-//	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
-	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + box_width + type.BoxOffsetX, y + box_height + type.BoxOffsetY);
+//	DrawSelection(color, x + type.GetBoxOffsetX(), y + type.GetBoxOffsetY(), x + type.GetBoxWidth() + type.GetBoxOffsetX(), y + type.GetBoxHeight() + type.GetBoxOffsetY());
+	DrawSelection(color, x + type.GetBoxOffsetX(), y + type.GetBoxOffsetY(), x + box_width + type.GetBoxOffsetX(), y + box_height + type.GetBoxOffsetY());
 	//Wyrmgus end
 }
 
@@ -452,11 +452,11 @@ void CDecoVarBar::Draw(int x, int y,
 
 	int height = this->Height;
 	if (height == 0) { // Default value
-		height = type.BoxHeight; // Better size ? {,Box, Tile}
+		height = type.GetBoxHeight(); // Better size ? {,Box, Tile}
 	}
 	int width = this->Width;
 	if (width == 0) { // Default value
-		width = type.BoxWidth; // Better size ? {,Box, Tile}
+		width = type.GetBoxWidth(); // Better size ? {,Box, Tile}
 	}
 	int h;
 	int w;
@@ -615,7 +615,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 		if (!((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
 			  || (var.HideHalf && value != 0 && value != max)
 			  || (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
-			  || (var.ShowOnlySelected && !unit.Selected)
+			  || (var.ShowOnlySelected && !unit.IsSelected())
 			  || (unit.GetPlayer()->Type == PlayerNeutral && var.HideNeutral)
 			  //Wyrmgus start
 			  || (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
@@ -637,7 +637,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 	}
 
 	// Draw group number
-	if (unit.Selected && unit.GroupId != 0
+	if (unit.IsSelected() && unit.GroupId != 0
 #ifndef DEBUG
 		&& unit.GetPlayer() == CPlayer::GetThisPlayer()
 #endif
@@ -651,9 +651,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x + unit.GetType()->BoxWidth) / 2 - width;
+		x += (unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x + unit.GetType()->GetBoxWidth()) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.GetType()->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y + unit.GetType()->BoxHeight) / 2 - height;
+		y += (unit.GetType()->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y + unit.GetType()->GetBoxHeight()) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }

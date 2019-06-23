@@ -1115,7 +1115,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 			unit.CurrentOrder()->Cancel(unit);
 			RemoveOrder(unit, 0);
 		}
-		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && unit.Selected) {
+		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && unit.IsSelected()) {
 			SelectedUnitChanged();
 		}
 	} else if (unit.Orders.size() <= static_cast<size_t>(slot)) {
@@ -1135,7 +1135,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		RemoveOrder(unit, slot);
 
 		// Update interface.
-		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && unit.Selected) {
+		if (unit.GetPlayer() == CPlayer::GetThisPlayer() && unit.IsSelected()) {
 			SelectedUnitChanged();
 		}
 	}

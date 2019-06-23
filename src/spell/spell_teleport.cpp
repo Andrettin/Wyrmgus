@@ -57,7 +57,7 @@
 /* virtual */ int Spell_Teleport::Cast(CUnit &caster, const CSpell &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
 {
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z)) {
-		unsigned int selected = caster.Selected;
+		unsigned int selected = caster.IsSelected();
 		caster.Remove(nullptr);
 		caster.TilePos = goalPos;
 		caster.MapLayer = CMap::Map.MapLayers[z];

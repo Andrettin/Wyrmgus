@@ -369,7 +369,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			continue;
 		}
 
-		if (!ReplayRevealMap && unit.Selected && !unit.IsVisible(*CPlayer::GetThisPlayer())) {
+		if (!ReplayRevealMap && unit.IsSelected() && !unit.IsVisible(*CPlayer::GetThisPlayer())) {
 			UnSelectUnit(unit);
 			SelectionChanged();
 		}

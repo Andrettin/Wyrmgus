@@ -734,10 +734,6 @@ bool CUnitType::ProcessConfigDataProperty(const String &key, String value)
 		this->TileSize.y = value.to_int();
 	} else if (key == "neutral_minimap_color") {
 		this->NeutralMinimapColorRGB = CColor::FromString(value.utf8().get_data());
-	} else if (key == "box_width") {
-		this->BoxWidth = value.to_int();
-	} else if (key == "box_height") {
-		this->BoxHeight = value.to_int();
 	} else if (key == "type") {
 		if (value == "land") {
 			this->UnitType = UnitTypeLand;
@@ -1422,10 +1418,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->ShadowOffsetY = parent_type->ShadowOffsetY;
 	this->LightFile = parent_type->LightFile;
 	this->TileSize = parent_type->TileSize;
-	this->BoxWidth = parent_type->BoxWidth;
-	this->BoxHeight = parent_type->BoxHeight;
-	this->BoxOffsetX = parent_type->BoxOffsetX;
-	this->BoxOffsetY = parent_type->BoxOffsetY;
+	this->BoxSize = parent_type->BoxSize;
+	this->BoxOffset = parent_type->BoxOffset;
 	this->Construction = parent_type->Construction;
 	this->UnitType = parent_type->UnitType;
 	this->Missile.Name = parent_type->Missile.Name;
@@ -2155,12 +2149,32 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_draw_level"), &CUnitType::GetDrawLevel);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "draw_level"), "set_draw_level", "get_draw_level");
 	
+	ClassDB::bind_method(D_METHOD("get_box_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetBoxSize()); });
+	
+	ClassDB::bind_method(D_METHOD("set_box_width", "box_width"), +[](CUnitType *unit_type, const int box_width){ unit_type->BoxSize.x = box_width; });
+	ClassDB::bind_method(D_METHOD("get_box_width"), &CUnitType::GetBoxWidth);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "box_width"), "set_box_width", "get_box_width");
+	
+	ClassDB::bind_method(D_METHOD("set_box_height", "box_height"), +[](CUnitType *unit_type, const int box_height){ unit_type->BoxSize.y = box_height; });
+	ClassDB::bind_method(D_METHOD("get_box_height"), &CUnitType::GetBoxHeight);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "box_height"), "set_box_height", "get_box_height");
+	
+	ClassDB::bind_method(D_METHOD("get_box_offset"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetBoxOffset()); });
+	
+	ClassDB::bind_method(D_METHOD("set_box_offset_x", "box_offset_x"), +[](CUnitType *unit_type, const int box_offset_x){ unit_type->BoxOffset.x = box_offset_x; });
+	ClassDB::bind_method(D_METHOD("get_box_offset_x"), &CUnitType::GetBoxOffsetX);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "box_offset_x"), "set_box_offset_x", "get_box_offset_x");
+
+	ClassDB::bind_method(D_METHOD("set_box_offset_y", "box_offset_y"), +[](CUnitType *unit_type, const int box_offset_y){ unit_type->BoxOffset.y = box_offset_y; });
+	ClassDB::bind_method(D_METHOD("get_box_offset_y"), &CUnitType::GetBoxOffsetY);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "box_offset_y"), "set_box_offset_y", "get_box_offset_y");
+
 	ClassDB::bind_method(D_METHOD("get_tile_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetTileSize()); });
 	ClassDB::bind_method(D_METHOD("get_tile_pixel_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetTilePixelSize()); });
 	ClassDB::bind_method(D_METHOD("get_half_tile_pixel_size"), +[](const CUnitType *unit_type){ return Vector2(unit_type->GetHalfTilePixelSize()); });
 	
 	ClassDB::bind_method(D_METHOD("get_stat_strings"), +[](const CUnitType *unit_type){ return ContainerToGodotArray(unit_type->GetStatStrings()); });
-	
+		
 	ClassDB::bind_method(D_METHOD("set_repair_hp", "repair_hp"), +[](CUnitType *unit_type, const int repair_hp){ unit_type->RepairHP = repair_hp; });
 	ClassDB::bind_method(D_METHOD("get_repair_hp"), &CUnitType::GetRepairHP);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "repair_hp"), "set_repair_hp", "get_repair_hp");

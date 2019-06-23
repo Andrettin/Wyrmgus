@@ -719,7 +719,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->Resource.Active) {
 		//Wyrmgus end
 			this->ClearGoal();
-			int selected = unit.Selected;
+			const bool selected = unit.IsSelected();
 			unit.Remove(goal);
 			if (selected && !Preference.DeselectInMine) {
 				unit.Removed = 0;
@@ -1316,7 +1316,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Place unit inside the depot
 	if (unit.Wait) {
-		int selected = unit.Selected;
+		const bool selected = unit.IsSelected();
 		unit.Remove(&goal);
 		if (selected && !Preference.DeselectInMine) {
 			unit.Removed = 0;

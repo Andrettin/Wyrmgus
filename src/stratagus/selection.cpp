@@ -103,7 +103,7 @@ void RestoreSelection()
 	}
 	Selected = _Selected;
 	for (size_t i = 0; i != _Selected.size(); ++i) {
-		Selected[i]->Selected = 1;
+		Selected[i]->SetSelected(true);
 	}
 	UI.SelectedViewport->Unit = _TrackUnit;
 }
@@ -117,7 +117,7 @@ void UnSelectAll()
 	}
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		Selected[i]->Selected = 0;
+		Selected[i]->SetSelected(false);
 	}
 	Selected.clear();
 	UI.SelectedViewport->Unit = nullptr;
@@ -184,7 +184,7 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 		CUnit &unit = *units[i];
 		if (!unit.Removed && !unit.TeamSelected && !unit.GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 			Selected.push_back(&unit);
-			unit.Selected = 1;
+			unit.SetSelected(true);
 			if (count > 1) {
 				unit.LastGroup = GroupId;
 			}
@@ -243,7 +243,7 @@ int SelectUnit(CUnit &unit)
 		return 0;
 	}
 
-	if (unit.Selected) {
+	if (unit.IsSelected()) {
 		return 0;
 	}
 
@@ -258,7 +258,7 @@ int SelectUnit(CUnit &unit)
 	//Wyrmgus end
 	
 	Selected.push_back(&unit);
-	unit.Selected = 1;
+	unit.SetSelected(true);
 	if (Selected.size() > 1) {
 		Selected[0]->LastGroup = unit.LastGroup = GroupId;
 	}
@@ -300,8 +300,8 @@ void UnSelectUnit(CUnit &unit)
 		}
 	}
 	//Wyrmgus start
-//	if (!unit.Selected) {
-	if (!unit.Selected || SaveGameLoading) { //loaded characters are unselected if their unit type is different than that of the unit, but the Selected vector hasn't been loaded yet
+//	if (!unit.IsSelected()) {
+	if (!unit.IsSelected() || SaveGameLoading) { //loaded characters are unselected if their unit type is different than that of the unit, but the Selected vector hasn't been loaded yet
 	//Wyrmgus end
 		return;
 	}
@@ -318,7 +318,7 @@ void UnSelectUnit(CUnit &unit)
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
-	unit.Selected = 0;
+	unit.SetSelected(false);
 
 	//Turn track unit mode off
 	UI.SelectedViewport->Unit = nullptr;
@@ -349,7 +349,7 @@ bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit)
 */
 int ToggleSelectUnit(CUnit &unit)
 {
-	if (unit.Selected) {
+	if (unit.IsSelected()) {
 		UnSelectUnit(unit);
 		return 0;
 	}
@@ -411,7 +411,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 
 	UnSelectAll();
 	Selected.push_back(&base);
-	base.Selected = 1;
+	base.SetSelected(true);
 
 	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
@@ -468,7 +468,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 			continue;
 		}
 		Selected.push_back(&unit);
-		unit.Selected = 1;
+		unit.SetSelected(true);
 		if (Selected.size() == MaxSelectable) {
 			break;
 		}
@@ -741,11 +741,11 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 		const CUnitType &type = *unit.GetType();
 		PixelPos spritePos = unit.GetMapPixelPosCenter();
 
-		spritePos.x += type.GetOffsetX() - (type.BoxWidth + type.BoxOffsetX) / 2;
-		spritePos.y += type.GetOffsetY() - (type.BoxHeight + type.BoxOffsetY) / 2;
-		if (spritePos.x + type.BoxWidth + type.BoxOffsetX < corner_topleft.x
+		spritePos.x += type.GetOffsetX() - (type.GetBoxWidth() + type.GetBoxOffsetX()) / 2;
+		spritePos.y += type.GetOffsetY() - (type.GetBoxHeight() + type.GetBoxOffsetY()) / 2;
+		if (spritePos.x + type.GetBoxWidth() + type.GetBoxOffsetX() < corner_topleft.x
 			|| spritePos.x > corner_bottomright.x
-			|| spritePos.y + type.BoxHeight + type.BoxOffsetY < corner_topleft.y
+			|| spritePos.y + type.GetBoxHeight() + type.GetBoxOffsetY() < corner_topleft.y
 			|| spritePos.y > corner_bottomright.y) {
 			continue;
 		}

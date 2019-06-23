@@ -230,7 +230,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Removed) {
 		file.printf(" \"removed\",");
 	}
-	if (unit.Selected) {
+	if (unit.IsSelected()) {
 		file.printf(" \"selected\",");
 	}
 	if (unit.Summoned) {

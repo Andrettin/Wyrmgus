@@ -186,8 +186,8 @@ enum {
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer) / 2;
 
-	const int w = this->GetUnitType().BoxWidth;
-	const int h = this->GetUnitType().BoxHeight;
+	const int w = this->GetUnitType().GetBoxWidth();
+	const int h = this->GetUnitType().GetBoxHeight();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
 	//Wyrmgus start
 //	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
@@ -475,7 +475,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus end
 		unit.Remove(build);
 		this->State = State_BuildFromInside;
-		if (unit.Selected) {
+		if (unit.IsSelected()) {
 			SelectedUnitChanged();
 		}
 	} else {

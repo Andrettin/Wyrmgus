@@ -441,20 +441,20 @@ void CUnit::RefsDecrease()
 
 void CUnit::Init()
 {
-	Refs = 0;
-	ReleaseCycle = 0;
-	PlayerSlot = static_cast<size_t>(-1);
-	InsideCount = 0;
-	BoardCount = 0;
-	UnitInside = nullptr;
-	Container = nullptr;
-	NextContained = nullptr;
-	PrevContained = nullptr;
-	NextWorker = nullptr;
+	this->Refs = 0;
+	this->ReleaseCycle = 0;
+	this->PlayerSlot = static_cast<size_t>(-1);
+	this->InsideCount = 0;
+	this->BoardCount = 0;
+	this->UnitInside = nullptr;
+	this->Container = nullptr;
+	this->NextContained = nullptr;
+	this->PrevContained = nullptr;
+	this->NextWorker = nullptr;
 
-	Resource.Workers = nullptr;
-	Resource.Assigned = 0;
-	Resource.Active = 0;
+	this->Resource.Workers = nullptr;
+	this->Resource.Assigned = 0;
+	this->Resource.Active = 0;
 	
 	//Wyrmgus start
 	this->EquippedItems.clear();
@@ -464,89 +464,89 @@ void CUnit::Init()
 	this->TilePos.x = 0;
 	this->TilePos.y = 0;
 	//Wyrmgus start
-	RallyPointPos.x = -1;
-	RallyPointPos.y = -1;
-	MapLayer = nullptr;
-	RallyPointMapLayer = nullptr;
+	this->RallyPointPos.x = -1;
+	this->RallyPointPos.y = -1;
+	this->MapLayer = nullptr;
+	this->RallyPointMapLayer = nullptr;
 	//Wyrmgus end
-	Offset = 0;
-	Type = nullptr;
-	Player = nullptr;
-	Stats = nullptr;
+	this->Offset = 0;
+	this->Type = nullptr;
+	this->Player = nullptr;
+	this->Stats = nullptr;
 	//Wyrmgus start
-	Character = nullptr;
-	Settlement = nullptr;
-	Trait = nullptr;
-	Prefix = nullptr;
-	Suffix = nullptr;
-	Spell = nullptr;
-	Work = nullptr;
-	Elixir = nullptr;
-	Unique = nullptr;
-	Bound = false;
-	Identified = true;
-	ConnectingDestination = nullptr;
+	this->Character = nullptr;
+	this->Settlement = nullptr;
+	this->Trait = nullptr;
+	this->Prefix = nullptr;
+	this->Suffix = nullptr;
+	this->Spell = nullptr;
+	this->Work = nullptr;
+	this->Elixir = nullptr;
+	this->Unique = nullptr;
+	this->Bound = false;
+	this->Identified = true;
+	this->ConnectingDestination = nullptr;
 	//Wyrmgus end
-	CurrentSightRange = 0;
+	this->CurrentSightRange = 0;
 
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
 	Colors = nullptr;
 	//Wyrmgus start
-	Name.clear();
-	ExtraName.clear();
-	FamilyName.clear();
+	this->Name.clear();
+	this->ExtraName.clear();
+	this->FamilyName.clear();
 	this->Variation = nullptr;
-	memset(LayerVariation, -1, sizeof(LayerVariation));
+	memset(this->LayerVariation, -1, sizeof(this->LayerVariation));
 	//Wyrmgus end
 	this->PixelOffset = Vector2i(0, 0);
 	this->Frame = 0;
-	Direction = 0;
-	DamagedType = ANIMATIONS_DEATHTYPES;
-	Attacked = 0;
-	Burning = 0;
-	Destroyed = 0;
-	Removed = 0;
-	Selected = 0;
-	TeamSelected = 0;
-	UnderConstruction = false;
-	Active = 0;
-	Boarded = 0;
-	RescuedFrom = nullptr;
-	memset(VisCount, 0, sizeof(VisCount));
-	memset(&Seen, 0, sizeof(Seen));
-	Variable = nullptr;
-	TTL = 0;
-	Threshold = 0;
-	GroupId = 0;
-	LastGroup = 0;
-	ResourcesHeld = 0;
-	Wait = 0;
-	Blink = 0;
-	Moving = 0;
-	ReCast = 0;
-	CacheLock = 0;
-	Summoned = 0;
-	Waiting = 0;
-	MineLow = 0;
-	memset(&Anim, 0, sizeof(Anim));
-	memset(&WaitBackup, 0, sizeof(WaitBackup));
+	this->Direction = 0;
+	this->DamagedType = ANIMATIONS_DEATHTYPES;
+	this->Attacked = 0;
+	this->Burning = 0;
+	this->Destroyed = 0;
+	this->Removed = 0;
+	this->Selected = false;
+	this->TeamSelected = 0;
+	this->UnderConstruction = false;
+	this->Active = 0;
+	this->Boarded = 0;
+	this->RescuedFrom = nullptr;
+	memset(this->VisCount, 0, sizeof(this->VisCount));
+	memset(&this->Seen, 0, sizeof(this->Seen));
+	this->Variable = nullptr;
+	this->TTL = 0;
+	this->Threshold = 0;
+	this->GroupId = 0;
+	this->LastGroup = 0;
+	this->ResourcesHeld = 0;
+	this->Wait = 0;
+	this->Blink = 0;
+	this->Moving = 0;
+	this->ReCast = 0;
+	this->CacheLock = 0;
+	this->Summoned = 0;
+	this->Waiting = 0;
+	this->MineLow = 0;
+	memset(&this->Anim, 0, sizeof(this->Anim));
+	memset(&this->WaitBackup, 0, sizeof(this->WaitBackup));
 	this->GivesResource = 0;
 	this->CurrentResource = 0;
-	StepCount = 0;
-	Orders.clear();
-	delete SavedOrder;
-	SavedOrder = nullptr;
-	delete NewOrder;
-	NewOrder = nullptr;
-	delete CriticalOrder;
-	CriticalOrder = nullptr;
+	this->StepCount = 0;
+	this->Orders.clear();
+	delete this->SavedOrder;
+	this->SavedOrder = nullptr;
+	delete this->NewOrder;
+	this->NewOrder = nullptr;
+	delete this->CriticalOrder;
+	this->CriticalOrder = nullptr;
 	this->AutoCastSpells.clear();
 	this->SpellCoolDownTimers.clear();
-	AutoRepair = 0;
-	Goal = nullptr;
-	IndividualUpgrades.clear();
+	this->AutoRepair = 0;
+	this->Goal = nullptr;
+	this->IndividualUpgrades.clear();
 }
 
 /**
@@ -3292,6 +3292,17 @@ CUnit *CUnit::GetFirstContainer() const
 	return const_cast<CUnit *>(container);
 }
 
+void CUnit::SetSelected(const bool selected)
+{
+	if (selected == this->IsSelected()) {
+		return;
+	}
+	
+	this->Selected = selected;
+	
+	this->emit_signal("selected_changed", selected);
+}
+
 /**
 **  Mark on vision table the Sight of the unit
 **  (and units inside for transporter)
@@ -4351,7 +4362,7 @@ void CUnit::Remove(CUnit *host)
 	}
 
 	//  Remove unit from the current selection
-	if (this->Selected) {
+	if (this->IsSelected()) {
 		if (::Selected.size() == 1) { //  Remove building cursor
 			CancelBuildingMode();
 		}
@@ -5675,25 +5686,25 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
 		//Wyrmgus start
-//		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-//						  (type.GetFrameSize().x - type.Sprite->Width) / 2 + type.BoxOffsetX;
-//		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-//						  (type.GetFrameSize().y - type.Sprite->Height) / 2 + type.BoxOffsetY;
+//		unitSpritePos.x = unitSpritePos.x - type.GetBoxWidth() / 2 -
+//						  (type.GetFrameSize().x - type.Sprite->Width) / 2 + type.GetBoxOffsetX();
+//		unitSpritePos.y = unitSpritePos.y - type.GetBoxHeight() / 2 -
+//						  (type.GetFrameSize().y - type.Sprite->Height) / 2 + type.GetBoxOffsetY();
 		const UnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->GetFrameSize().x != 0 && variation->GetFrameSize().y != 0 && variation->GetImage() != nullptr) {
-			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-							  (variation->GetFrameSize().x - variation->Sprite->Width) / 2 + type.BoxOffsetX;
-			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-							  (variation->GetFrameSize().y - variation->Sprite->Height) / 2 + type.BoxOffsetY;
+			unitSpritePos.x = unitSpritePos.x - type.GetBoxWidth() / 2 -
+							  (variation->GetFrameSize().x - variation->Sprite->Width) / 2 + type.GetBoxOffsetX();
+			unitSpritePos.y = unitSpritePos.y - type.GetBoxHeight() / 2 -
+							  (variation->GetFrameSize().y - variation->Sprite->Height) / 2 + type.GetBoxOffsetY();
 		} else {
-			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-							  (type.GetFrameSize().x - type.Sprite->Width) / 2 + type.BoxOffsetX;
-			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-							  (type.GetFrameSize().y - type.Sprite->Height) / 2 + type.BoxOffsetY;
+			unitSpritePos.x = unitSpritePos.x - type.GetBoxWidth() / 2 -
+							  (type.GetFrameSize().x - type.Sprite->Width) / 2 + type.GetBoxOffsetX();
+			unitSpritePos.y = unitSpritePos.y - type.GetBoxHeight() / 2 -
+							  (type.GetFrameSize().y - type.Sprite->Height) / 2 + type.GetBoxOffsetY();
 		}
 		//Wyrmgus end
-		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
-			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
+		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.GetBoxWidth()
+			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.GetBoxHeight()) {
 			// Check if there are other units on this place
 			candidate = &unit;
 			//Wyrmgus start
@@ -8711,6 +8722,9 @@ void CUnit::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_pixel_offset"), +[](const CUnit *unit){ return Vector2(unit->GetPixelOffset()); });
 	ADD_SIGNAL(MethodInfo("pixel_offset_changed", PropertyInfo(Variant::VECTOR2, "pixel_offset")));
+	
+	ClassDB::bind_method(D_METHOD("is_selected"), &CUnit::IsSelected);
+	ADD_SIGNAL(MethodInfo("selected_changed", PropertyInfo(Variant::BOOL, "selected")));
 	
 	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
 	ADD_SIGNAL(MethodInfo("removed"));

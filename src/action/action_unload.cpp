@@ -444,7 +444,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 		return 0;
 	}
 	const bool isTransporterRemoved = transporter.Removed;
-	const bool selected = transporter.Selected;
+	const bool selected = transporter.IsSelected();
 
 	if (!isTransporterRemoved) {
 		// Remove transporter to avoid "collision" with itself.

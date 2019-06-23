@@ -292,7 +292,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	if (!condition) {
 		return true;
 	}
-	if ((condition->ShowOnlySelected && !unit.Selected)
+	if ((condition->ShowOnlySelected && !unit.IsSelected())
 		|| (unit.GetPlayer()->Type == PlayerNeutral && condition->HideNeutral)
 		|| (unit.GetPlayer() != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && condition->HideNeutral)
 		|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !condition->ShowOpponent)

@@ -1242,9 +1242,9 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "BoxSize")) {
-			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
+			CclGetPos(l, &type->BoxSize.x, &type->BoxSize.y);
 		} else if (!strcmp(value, "BoxOffset")) {
-			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
+			CclGetPos(l, &type->BoxOffset.x, &type->BoxOffset.y);
 		} else if (!strcmp(value, "NumDirections")) {
 			type->NumDirections = LuaToNumber(l, -1);
 		//Wyrmgus start
