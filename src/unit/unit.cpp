@@ -676,7 +676,7 @@ void CUnit::SetResourcesHeld(const int quantity)
 		return;
 	}
 	
-	const bool resource_loaded_changed = (this->GetResourcesHeld() > 0) == (quantity > 0);
+	const bool resource_loaded_changed = (this->GetResourcesHeld() > 0) != (quantity > 0);
 	
 	const PaletteImage *old_image = nullptr;
 	if (resource_loaded_changed) {
