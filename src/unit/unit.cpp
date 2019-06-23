@@ -1317,12 +1317,10 @@ void CUnit::SetVariation(const UnitTypeVariation *new_variation, const CUnitType
 		}
 		this->Variation = new_variation;
 		
-		if (new_type == this->GetType()) {
-			//emit a signal if the image has changed, but only if the variation's type is the same as the current type of the unit, as otherwise it means the variation is being chosen in advance of changing the unit type
-			const PaletteImage *new_image = this->GetImage();
-			if (old_image != new_image) {
-				this->emit_signal("image_changed", new_image);
-			}
+		//emit a signal if the image has changed
+		const PaletteImage *new_image = this->GetImage();
+		if (old_image != new_image) {
+			this->emit_signal("image_changed", new_image);
 		}
 	} else {
 		this->LayerVariation[image_layer] = new_variation ? new_variation->GetIndex() : -1;
