@@ -41,6 +41,7 @@
 #include "construct.h"
 #include "dependency/and_dependency.h"
 #include "dependency/dependency.h"
+#include "economy/resource.h"
 #include "hair_color.h"
 #include "item/item_class.h"
 #include "map/terrain_type.h"
@@ -195,6 +196,14 @@ void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->ResourceMax = value.to_int();
 		} else if (key == "weight") {
 			this->Weight = value.to_int();
+		} else if (key.find("_loaded_image") != -1) {
+			String resource_ident = key.replace("_loaded_image", "");
+			const CResource *resource = CResource::Get(resource_ident);
+			this->ResourceLoadedImages[resource] = PaletteImage::Get(value);
+		} else if (key.find("_empty_image") != -1) {
+			String resource_ident = key.replace("_empty_image", "");
+			const CResource *resource = CResource::Get(resource_ident);
+			this->ResourceEmptyImages[resource] = PaletteImage::Get(value);
 		} else {
 			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", key.utf8().get_data());
 		}
@@ -207,74 +216,34 @@ void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
 			image->ProcessConfigData(section);
 			this->Image = image;
-		} else if (section->Tag == "file_when_loaded") {
-			std::string file;
-			int resource = -1;
-				
-			for (const CConfigProperty &property : section->Properties) {
-				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
-					continue;
-				}
-				
-				String key = property.Key;
-				String value = property.Value;
-				
-				if (key == "file") {
-					file = CModule::GetCurrentPath() + value.utf8().get_data();
-				} else if (key == "resource") {
-					value = value.replace("_", "-");
-					resource = GetResourceIdByName(value.utf8().get_data());
-				} else {
-					fprintf(stderr, "Invalid unit type variation file when loaded property: \"%s\".\n", key.utf8().get_data());
-				}
-			}
+		} else if (section->Tag.find("_loaded_image") != -1) {
+			String resource_ident = section->Tag.replace("_loaded_image", "");
+			const CResource *resource = CResource::Get(resource_ident);
 			
-			if (file.empty()) {
-				fprintf(stderr, "Unit type variation file when loaded has no file.\n");
+			if (resource == nullptr) {
+				print_error("Unit type variation file when loaded has no resource.");
 				continue;
 			}
 			
-			if (resource == -1) {
-				fprintf(stderr, "Unit type variation file when loaded has no resource.\n");
+			String image_ident = this->Type->GetIdent() + "_" + this->GetIdent() + "_" + resource->GetIdent() + "_loaded";
+			image_ident = image_ident.replace("_", "-");
+			PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+			image->ProcessConfigData(section);
+			this->ResourceLoadedImages[resource] = image;
+		} else if (section->Tag.find("_empty_image") != -1) {
+			String resource_ident = section->Tag.replace("_empty_image", "");
+			const CResource *resource = CResource::Get(resource_ident);
+			
+			if (resource == nullptr) {
+				print_error("Unit type variation file when loaded has no resource.");
 				continue;
 			}
 			
-			this->FileWhenLoaded[resource] = file;
-		} else if (section->Tag == "file_when_empty") {
-			std::string file;
-			int resource = -1;
-				
-			for (const CConfigProperty &property : section->Properties) {
-				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
-					continue;
-				}
-				
-				String key = property.Key;
-				String value = property.Value;
-				
-				if (key == "file") {
-					file = CModule::GetCurrentPath() + value.utf8().get_data();
-				} else if (key == "resource") {
-					value = value.replace("_", "-");
-					resource = GetResourceIdByName(value.utf8().get_data());
-				} else {
-					fprintf(stderr, "Invalid unit type variation file when empty property: \"%s\".\n", key.utf8().get_data());
-				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Unit type variation file when empty has no file.\n");
-				continue;
-			}
-			
-			if (resource == -1) {
-				fprintf(stderr, "Unit type variation file when empty has no resource.\n");
-				continue;
-			}
-			
-			this->FileWhenEmpty[resource] = file;
+			String image_ident = this->Type->GetIdent() + "_" + this->GetIdent() + "_" + resource->GetIdent() + "_empty";
+			image_ident = image_ident.replace("_", "-");
+			PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+			image->ProcessConfigData(section);
+			this->ResourceEmptyImages[resource] = image;
 		} else if (section->Tag == "layer_file") {
 			std::string file;
 			int image_layer = -1;

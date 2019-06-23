@@ -792,13 +792,25 @@ static int CclDefineUnitType(lua_State *l)
 						image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
 						image->File = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
-						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						const CResource *resource = CResource::Get(LuaToString(l, -1, k + 1));
 						++k;
-						variation->FileWhenLoaded[res] = LuaToString(l, -1, k + 1);
+						String image_ident = type->GetIdent() + "_" + variation->GetIdent() + "_" + resource->GetIdent() + "_loaded";
+						image_ident = image_ident.replace("_", "-");
+						PaletteImage *resource_image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+						resource_image->File = LuaToString(l, -1, k + 1);
+						resource_image->Initialize();
+						
+						variation->ResourceLoadedImages[resource] = resource_image;
 					} else if (!strcmp(value, "file-when-empty")) {
-						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						const CResource *resource = CResource::Get(LuaToString(l, -1, k + 1));
 						++k;
-						variation->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
+						String image_ident = type->GetIdent() + "_" + variation->GetIdent() + "_" + resource->GetIdent() + "_empty";
+						image_ident = image_ident.replace("_", "-");
+						PaletteImage *resource_image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+						resource_image->File = LuaToString(l, -1, k + 1);
+						resource_image->Initialize();
+						
+						variation->ResourceEmptyImages[resource] = resource_image;
 					} else if (!strcmp(value, "shadow-file")) {
 						variation->ShadowFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "light-file")) {
@@ -1573,9 +1585,21 @@ static int CclDefineUnitType(lua_State *l)
 						res->RefineryHarvester = 1;
 						--k;
 					} else if (!strcmp(value, "file-when-empty")) {
-						res->FileWhenEmpty = LuaToString(l, -1, k + 1);
+						const CResource *resource = CResource::Get(res->ResourceId);
+						String image_ident = type->GetIdent() + "_" + resource->GetIdent() + "_empty";
+						image_ident = image_ident.replace("_", "-");
+						PaletteImage *resource_image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+						resource_image->File = LuaToString(l, -1, k + 1);
+						res->ResourceEmptyImage = resource_image;
+						resource_image->Initialize();
 					} else if (!strcmp(value, "file-when-loaded")) {
-						res->FileWhenLoaded = LuaToString(l, -1, k + 1);
+						const CResource *resource = CResource::Get(res->ResourceId);
+						String image_ident = type->GetIdent() + "_" + resource->GetIdent() + "_loaded";
+						image_ident = image_ident.replace("_", "-");
+						PaletteImage *resource_image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+						resource_image->File = LuaToString(l, -1, k + 1);
+						res->ResourceLoadedImage = resource_image;
+						resource_image->Initialize();
 					} else {
 						printf("\n%s\n", type->GetName().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2147,15 +2171,54 @@ static int CclDefineUnitType(lua_State *l)
 	
 	//set the frame size of the unit type's image for the images of variations that have no frame size
 	for (UnitTypeVariation *variation : type->Variations) {
-		if (variation->GetImage() == nullptr || type->GetImage() == nullptr) {
-			continue;
+		if (variation->GetImage() != nullptr && type->GetImage() != nullptr) {
+			if (variation->GetImage()->GetFrameSize().x == 0 && variation->GetImage()->GetFrameSize().y == 0) {
+				variation->Image->FrameSize = type->GetImage()->GetFrameSize();
+			}
 		}
 		
-		if (variation->GetImage()->GetFrameSize().x != 0 || variation->GetImage()->GetFrameSize().y != 0) {
-			continue;
+		for (const auto &element : variation->ResourceLoadedImages) {
+			PaletteImage *image = element.second;
+			
+			if (image->GetFrameSize().x == 0 && image->GetFrameSize().y == 0) {
+				if (variation->GetImage() != nullptr) {
+					image->FrameSize = variation->GetImage()->GetFrameSize();
+				} else if (type->GetImage() != nullptr) {
+					image->FrameSize = type->GetImage()->GetFrameSize();
+				}
+			}
 		}
 		
-		variation->Image->FrameSize = type->GetImage()->GetFrameSize();
+		for (const auto &element : variation->ResourceEmptyImages) {
+			PaletteImage *image = element.second;
+			
+			if (image->GetFrameSize().x == 0 && image->GetFrameSize().y == 0) {
+				if (variation->GetImage() != nullptr) {
+					image->FrameSize = variation->GetImage()->GetFrameSize();
+				} else if (type->GetImage() != nullptr) {
+					image->FrameSize = type->GetImage()->GetFrameSize();
+				}
+			}
+		}
+	}
+	
+	if (type->GetImage() != nullptr) {
+		for (int res = 0; res < MaxCosts; ++res) {
+			ResourceInfo *res_info = type->ResInfo[res];
+			if (res_info != nullptr) {
+				if (res_info->ResourceLoadedImage != nullptr) {
+					if (res_info->ResourceLoadedImage->GetFrameSize().x == 0 && res_info->ResourceLoadedImage->GetFrameSize().y == 0) {
+						res_info->ResourceLoadedImage->FrameSize = type->GetImage()->GetFrameSize();
+					}
+				}
+				
+				if (res_info->ResourceEmptyImage != nullptr) {
+					if (res_info->ResourceEmptyImage->GetFrameSize().x == 0 && res_info->ResourceEmptyImage->GetFrameSize().y == 0) {
+						res_info->ResourceEmptyImage->FrameSize = type->GetImage()->GetFrameSize();
+					}
+				}
+			}
+		}
 	}
 	
 	type->Initialized = true;

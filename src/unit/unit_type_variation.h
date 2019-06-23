@@ -54,6 +54,7 @@ class CDependency;
 class CGraphic;
 class CHairColor;
 class CPlayerColorGraphic;
+class CResource;
 class CSeason;
 class CSkinColor;
 class CTerrainType;
@@ -141,8 +142,8 @@ public:
 	CAnimations *Animations = nullptr;		/// animation scripts
 	CConstruction *Construction = nullptr;	/// what is shown in construction phase
 
-	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation
-	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
+	std::vector<const CUpgrade *> UpgradesRequired;		/// upgrades required by variation
+	std::vector<const CUpgrade *> UpgradesForbidden;	/// if the player has one of these upgrades, the unit can't have this variation
 	std::vector<const ItemClass *> ItemClassesEquipped;
 	std::vector<const ItemClass *> ItemClassesNotEquipped;
 	std::vector<const CUnitType *> ItemsEquipped;
@@ -152,12 +153,12 @@ public:
 	std::vector<const CSeason *> Seasons;
 	std::vector<const CSeason *> ForbiddenSeasons;
 
-	std::string LayerFiles[MaxImageLayers];		/// Variation's layer graphics.
-	std::string FileWhenLoaded[MaxCosts];		/// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty[MaxCosts];		/// Change the graphic when the unit is empty.
-	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
-	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts];	/// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];		/// The graphic corresponding to FileWhenEmpty
+	std::string LayerFiles[MaxImageLayers];				/// the variation's layer graphics
+	std::map<const CResource *, PaletteImage *> ResourceLoadedImages;	/// change the graphic when the unit is loaded with a given resource
+	std::map<const CResource *, PaletteImage *> ResourceEmptyImages;	/// change the graphic when the unit is harvesting a given resource but is empty
+	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// the graphics corresponding to LayerFiles
+	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts];	/// the graphic corresponding to FileWhenLoaded
+	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];		/// the graphic corresponding to FileWhenEmpty
 	
 	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
 	CDependency *Predependency = nullptr;

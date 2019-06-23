@@ -1100,6 +1100,7 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 		this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
 	} else if (section->Tag == "resource_gathering") {
 		ResourceInfo *res_info = nullptr;
+		const CResource *resource = nullptr;
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
@@ -1108,7 +1109,7 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			}
 			
 			if (property.Key == "resource") {
-				const CResource *resource = CResource::Get(property.Value);
+				resource = CResource::Get(property.Value);
 				
 				res_info = this->ResInfo[resource->GetIndex()];
 				if (!res_info) {
@@ -1128,8 +1129,26 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 				res_info->LoseResources = StringToBool(property.Value);
 			} else if (property.Key == "refinery_harvester") {
 				res_info->RefineryHarvester = StringToBool(property.Value);
+			} else if (property.Key == "resource_loaded_image") {
+				res_info->ResourceLoadedImage = PaletteImage::Get(property.Value);
+			} else if (property.Key == "resource_empty_image") {
+				res_info->ResourceEmptyImage = PaletteImage::Get(property.Value);
 			} else {
 				print_error("Invalid resource gathering property: " + property.Key + ".");
+			}
+		}
+		
+		for (const CConfigData *sub_section : section->Sections) {
+			if (sub_section->Tag == "resource_loaded_image") {
+				PaletteImage *image = PaletteImage::GetOrAdd((this->GetIdent() + "_" + resource->GetIdent() + "_loaded").utf8().get_data());
+				image->ProcessConfigData(sub_section);
+				res_info->ResourceLoadedImage = image;
+			} else if (sub_section->Tag == "resource_empty_image") {
+				PaletteImage *image = PaletteImage::GetOrAdd((this->GetIdent() + "_" + resource->GetIdent() + "_empty").utf8().get_data());
+				image->ProcessConfigData(sub_section);
+				res_info->ResourceEmptyImage = image;
+			} else {
+				print_error("Invalid \"" + section->Tag + "\" sub-section: \"" + sub_section->Tag + "\".");
 			}
 		}
 	} else {
@@ -1479,8 +1498,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
 			res->LoseResources = parent_type->ResInfo[i]->LoseResources;
 			res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
-			res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
-			res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
+			res->ResourceEmptyImage = parent_type->ResInfo[i]->ResourceEmptyImage;
+			res->ResourceLoadedImage = parent_type->ResInfo[i]->ResourceLoadedImage;
 		}
 	}
 	
@@ -1544,10 +1563,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		variation->Ident = parent_variation->Ident;
 		variation->TypeName = parent_variation->TypeName;
 		variation->Image = parent_variation->Image;
-		for (unsigned int i = 0; i < MaxCosts; ++i) {
-			variation->FileWhenLoaded[i] = parent_variation->FileWhenLoaded[i];
-			variation->FileWhenEmpty[i] = parent_variation->FileWhenEmpty[i];
-		}
+		variation->ResourceLoadedImages = parent_variation->ResourceLoadedImages;
+		variation->ResourceEmptyImages = parent_variation->ResourceEmptyImages;
 		variation->ShadowFile = parent_variation->ShadowFile;
 		variation->LightFile = parent_variation->LightFile;
 		variation->ResourceMin = parent_variation->ResourceMin;
@@ -2814,14 +2831,12 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (!resinfo) {
 				continue;
 			}
-			if (!resinfo->FileWhenLoaded.empty()) {
-				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-																	 type.GetFrameSize().x, type.GetFrameSize().y);
+			if (resinfo->ResourceLoadedImage != nullptr) {
+				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->ResourceLoadedImage->GetFile().utf8().get_data(), resinfo->ResourceLoadedImage->GetFrameSize().x, resinfo->ResourceLoadedImage->GetFrameSize().y);
 				resinfo->SpriteWhenLoaded->Load();
 			}
-			if (!resinfo->FileWhenEmpty.empty()) {
-				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-																	type.GetFrameSize().x, type.GetFrameSize().y);
+			if (resinfo->ResourceEmptyImage != nullptr) {
+				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->ResourceEmptyImage->GetFile().utf8().get_data(), resinfo->ResourceEmptyImage->GetFrameSize().x, resinfo->ResourceEmptyImage->GetFrameSize().y);
 				resinfo->SpriteWhenEmpty->Load();
 			}
 		}
@@ -2875,15 +2890,18 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 		}
 	
-		for (int j = 0; j < MaxCosts; ++j) {
-			if (!variation->FileWhenLoaded[j].empty()) {
-				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], frame_width, frame_height);
-				variation->SpriteWhenLoaded[j]->Load();
-			}
-			if (!variation->FileWhenEmpty[j].empty()) {
-				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], frame_width, frame_height);
-				variation->SpriteWhenEmpty[j]->Load();
-			}
+		for (const auto &element : variation->ResourceLoadedImages) {
+			const CResource *resource = element.first;
+			const PaletteImage *image = element.second;
+			variation->SpriteWhenLoaded[resource->GetIndex()] = CPlayerColorGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().x, image->GetFrameSize().y);
+			variation->SpriteWhenLoaded[resource->GetIndex()]->Load();
+		}
+	
+		for (const auto &element : variation->ResourceEmptyImages) {
+			const CResource *resource = element.first;
+			const PaletteImage *image = element.second;
+			variation->SpriteWhenEmpty[resource->GetIndex()] = CPlayerColorGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().x, image->GetFrameSize().y);
+			variation->SpriteWhenEmpty[resource->GetIndex()]->Load();
 		}
 	}
 	

@@ -125,18 +125,18 @@ enum ImageLayers {
 class ResourceInfo
 {
 public:
-	std::string FileWhenLoaded;		/// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty;		/// Change the graphic when the unit is empty.
-	unsigned WaitAtResource = 0;	/// Cycles the unit waits while mining.
-	unsigned ResourceStep = 0;		/// Resources the unit gains per mining cycle.
-	int ResourceCapacity = 0;		/// Max amount of resources to carry.
-	unsigned WaitAtDepot = 0;		/// Cycles the unit waits while returning.
+	PaletteImage *ResourceLoadedImage = nullptr;	/// change the graphic when the unit is loaded with the resource
+	PaletteImage *ResourceEmptyImage = nullptr;		/// change the graphic when the unit is harvesting the resource but is empty
+	unsigned WaitAtResource = 0;	/// cycles the unit waits while mining
+	unsigned ResourceStep = 0;		/// resources the unit gains per mining cycle
+	int ResourceCapacity = 0;		/// max amount of resources to carry
+	unsigned WaitAtDepot = 0;		/// cycles the unit waits while returning
 	unsigned ResourceId = 0;		/// Id of the resource harvested. Redundant.
-	bool LoseResources = false;		/// the unit will lose its resource when distracted.
-	unsigned char RefineryHarvester = 0;	/// Unit have to build Refinery buildings for harvesting.
+	bool LoseResources = false;		/// the unit will lose its resource when distracted
+	unsigned char RefineryHarvester = 0;	/// Unit have to build Refinery buildings for harvesting
 	//  Runtime info:
-	CPlayerColorGraphic *SpriteWhenLoaded = nullptr;	/// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;	/// The graphic corresponding to FileWhenEmpty
+	CPlayerColorGraphic *SpriteWhenLoaded = nullptr;	/// the graphic corresponding to FileWhenLoaded
+	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;		/// the graphic corresponding to FileWhenEmpty
 };
 
 // Index for boolflag already defined
