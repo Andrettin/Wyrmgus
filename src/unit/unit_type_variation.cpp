@@ -41,9 +41,11 @@
 #include "construct.h"
 #include "dependency/and_dependency.h"
 #include "dependency/dependency.h"
+#include "hair_color.h"
 #include "item/item_class.h"
 #include "map/terrain_type.h"
 #include "module.h"
+#include "skin_color.h"
 #include "time/season.h"
 #include "ui/button_action.h"
 #include "ui/icon.h"
@@ -382,4 +384,12 @@ void UnitTypeVariation::_bind_methods()
 	});
 	ClassDB::bind_method(D_METHOD("get_icon"), +[](const UnitTypeVariation *variation){ return const_cast<CIcon *>(variation->GetIcon()); });
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "icon"), "set_icon", "get_icon");
+	
+	ClassDB::bind_method(D_METHOD("set_skin_color", "ident"), +[](UnitTypeVariation *variation, const String &ident){ variation->SkinColor = CSkinColor::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_skin_color"), +[](const UnitTypeVariation *variation){ return const_cast<CSkinColor *>(variation->GetSkinColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skin_color"), "set_skin_color", "get_skin_color");
+	
+	ClassDB::bind_method(D_METHOD("set_hair_color", "ident"), +[](UnitTypeVariation *variation, const String &ident){ variation->HairColor = CHairColor::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_hair_color"), +[](const UnitTypeVariation *variation){ return const_cast<CHairColor *>(variation->GetHairColor()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "hair_color"), "set_hair_color", "get_hair_color");
 }

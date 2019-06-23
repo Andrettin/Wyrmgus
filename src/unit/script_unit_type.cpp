@@ -824,6 +824,9 @@ static int CclDefineUnitType(lua_State *l)
 						variation->ButtonIcons[button_action].Icon = nullptr;
 						variation->ButtonIcons[button_action].Load();
 						variation->ButtonIcons[button_action].Icon->Load();
+					} else if (!strcmp(value, "hair-color")) {
+						const CHairColor *hair_color = CHairColor::Get(LuaToString(l, -1, k + 1));
+						variation->HairColor = hair_color;
 					} else if (!strcmp(value, "animations")) {
 						variation->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
 						if (!variation->Animations) {

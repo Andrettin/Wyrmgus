@@ -52,8 +52,10 @@ class CAnimations;
 class CConstruction;
 class CDependency;
 class CGraphic;
+class CHairColor;
 class CPlayerColorGraphic;
 class CSeason;
+class CSkinColor;
 class CTerrainType;
 class CUnitType;
 class ItemClass;
@@ -101,6 +103,16 @@ public:
 		return this->Icon;
 	}
 	
+	const CSkinColor *GetSkinColor() const
+	{
+		return this->SkinColor;
+	}
+	
+	const CHairColor *GetHairColor() const
+	{
+		return this->HairColor;
+	}
+	
 private:
 	int Index = -1;					/// the variation's index within the appropriate variation vector of its unit type
 	String Ident;					/// the variation's string identifier
@@ -113,6 +125,10 @@ private:
 public:
 	std::string ShadowFile;			/// variation's shadow graphics.
 	std::string LightFile;			/// variation's light graphics.
+private:
+	const CSkinColor *SkinColor = nullptr;	/// the skin color of the variation
+	const CHairColor *HairColor = nullptr;	/// the hair color of the variation
+public:
 	int ResourceMin = 0;
 	int ResourceMax = 0;
 	int Weight = 1;							/// the weight for when randomly choosing a variation
