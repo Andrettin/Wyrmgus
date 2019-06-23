@@ -51,15 +51,15 @@
 void PaletteImage::Initialize()
 {
 	if (this->GetFile().empty()) {
-		print_error("Palette image \"" + this->GetIdent() + "\" has no file.\n");
+		print_error("Palette image \"" + this->GetIdent() + "\" has no file.");
 	}
 	
 	if (this->GetFrameSize().width == 0) {
-		print_error("Palette image \"" + this->GetIdent() + "\" has no frame width.\n");
+		print_error("Palette image \"" + this->GetIdent() + "\" has no frame width.");
 	}
 	
 	if (this->GetFrameSize().height == 0) {
-		print_error("Palette image \"" + this->GetIdent() + "\" has no frame height.\n");
+		print_error("Palette image \"" + this->GetIdent() + "\" has no frame height.");
 	}
 	
 	String filepath = this->GetFile();

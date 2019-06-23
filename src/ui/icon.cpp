@@ -86,7 +86,7 @@ bool CIcon::ProcessConfigDataSection(const CConfigData *section)
 void CIcon::Initialize()
 {
 	if (this->Image == nullptr) {
-		print_error("Icon \"" + this->GetIdent() + "\" has no palette image.\n");
+		print_error("Icon \"" + this->GetIdent() + "\" has no palette image.");
 	}
 	
 	this->Initialized = true;
