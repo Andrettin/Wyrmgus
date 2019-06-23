@@ -209,11 +209,11 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	if (depot && depot->Destroyed) {
 		depot = nullptr;
 	}
-	order->CurrentResource = harvester.CurrentResource;
+	order->CurrentResource = harvester.GetCurrentResource();
 	order->DoneHarvesting = true;
 
 	if (depot == nullptr) {
-		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
+		depot = FindDeposit(harvester, 1000, harvester.GetCurrentResource());
 	}
 	if (depot) {
 		order->Depot = depot;
@@ -446,7 +446,7 @@ COrder_Resource::~COrder_Resource()
 		// Normal return to depot
 		return true;
 	}
-	if (this->IsGatheringStarted()  && unit.ResourcesHeld > 0) {
+	if (this->IsGatheringStarted()  && unit.GetResourcesHeld() > 0) {
 		// escape to Depot with what you have
 		this->DoneHarvesting = true;
 		return true;
@@ -658,9 +658,9 @@ int COrder_Resource::StartGathering(CUnit &unit)
 			this->TimeToHarvest = 1;
 		}
 		this->DoneHarvesting = 0;
-		if (this->CurrentResource != unit.CurrentResource) {
+		if (this->CurrentResource != unit.GetCurrentResource()) {
 			DropResource(unit);
-			unit.CurrentResource = this->CurrentResource;
+			unit.SetCurrentResource(this->CurrentResource);
 		}
 		return 1;
 	}
@@ -737,9 +737,9 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		}
 	}
 
-	if (this->CurrentResource != unit.CurrentResource) {
+	if (this->CurrentResource != unit.GetCurrentResource()) {
 		DropResource(unit);
-		unit.CurrentResource = this->CurrentResource;
+		unit.SetCurrentResource(this->CurrentResource);
 	}
 
 	// Activate the resource
@@ -769,10 +769,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 static void AnimateActionHarvest(CUnit &unit)
 {
 	//Wyrmgus start
-//	Assert(unit.GetType()->Animations->Harvest[unit.CurrentResource]);
-//	UnitShowAnimation(unit, unit.GetType()->Animations->Harvest[unit.CurrentResource]);
-	Assert(unit.GetAnimations()->Harvest[unit.CurrentResource]);
-	UnitShowAnimation(unit, unit.GetAnimations()->Harvest[unit.CurrentResource]);
+//	Assert(unit.GetType()->Animations->Harvest[unit.GetCurrentResource()]);
+//	UnitShowAnimation(unit, unit.GetType()->Animations->Harvest[unit.GetCurrentResource()]);
+	Assert(unit.GetAnimations()->Harvest[unit.GetCurrentResource()]);
+	UnitShowAnimation(unit, unit.GetAnimations()->Harvest[unit.GetCurrentResource()]);
 	//Wyrmgus end
 }
 
@@ -807,8 +807,8 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 
 	// Continue to harvest if we aren't fully loaded
 	//Wyrmgus start
-//	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity) {
-	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.ResourcesHeld < resinfo.ResourceCapacity) {
+//	if (resinfo.HarvestFromOutside && unit.GetResourcesHeld() < resinfo.ResourceCapacity) {
+	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.GetResourcesHeld() < resinfo.ResourceCapacity) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
@@ -825,7 +825,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	}
 
 	// If we are fully loaded first search for a depot.
-	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.CurrentResource))) {
+	if (unit.GetResourcesHeld() && (depot = FindDeposit(unit, 1000, unit.GetCurrentResource()))) {
 		if (unit.Container) {
 			DropOutNearest(unit, depot->GetTilePos() + depot->GetHalfTileSize(), &source);
 		}
@@ -878,7 +878,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 */
 int COrder_Resource::GatherResource(CUnit &unit)
 {
-	CUnit *source = 0;
+	CUnit *source = nullptr;
 	const ResourceInfo &resinfo = *unit.GetType()->ResInfo[this->CurrentResource];
 	int addload;
 
@@ -952,8 +952,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			//Wyrmgus end
 		}
 		// Make sure we don't bite more than we can chew.
-		if (unit.ResourcesHeld + addload > resinfo.ResourceCapacity) {
-			addload = resinfo.ResourceCapacity - unit.ResourcesHeld;
+		if (unit.GetResourcesHeld() + addload > resinfo.ResourceCapacity) {
+			addload = resinfo.ResourceCapacity - unit.GetResourcesHeld();
 		}
 
 		//Wyrmgus start
@@ -967,13 +967,11 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			}
 			mf.Value -= addload;
 			//Wyrmgus end
-			//Wyrmgus start
-//			unit.ResourcesHeld += addload;
+
 			unit.ChangeResourcesHeld(addload);
-			//Wyrmgus end
 			
 			//Wyrmgus start
-//			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
+//			if (addload && unit.GetResourcesHeld() == resinfo.ResourceCapacity) {
 			if (mf.Value <= 0) {
 			//Wyrmgus end
 				//Wyrmgus start
@@ -992,7 +990,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			}
 
 			Assert(source);
-			Assert(source->ResourcesHeld <= 655350);
+			Assert(source->GetResourcesHeld() <= 655350);
 			//Wyrmgus start
 			UpdateUnitVariables(*source); //update resource source's variables
 			//Wyrmgus end
@@ -1000,7 +998,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			// Target is not dead, getting resources.
 			if (is_visible) {
 				// Don't load more that there is.
-				addload = std::min(source->ResourcesHeld, addload);
+				addload = std::min(source->GetResourcesHeld(), addload);
 				//Wyrmgus start
 //				unit.ResourcesHeld += addload;
 //				source->ResourcesHeld -= addload;
@@ -1034,7 +1032,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 			// End of resource: destroy the resource.
 			// FIXME: implement depleted resources.
-			if ((!is_visible) || (source->ResourcesHeld == 0)) {
+			if ((!is_visible) || (source->GetResourcesHeld() == 0)) {
 				if (unit.Anim.Unbreakable) {
 					return 0;
 				}
@@ -1071,7 +1069,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //		if (resinfo.TerrainHarvester) {
 		if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
-			if (unit.ResourcesHeld == resinfo.ResourceCapacity) {
+			if (unit.GetResourcesHeld() == resinfo.ResourceCapacity) {
 				// Mark as complete.
 				this->DoneHarvesting = true;
 			}
@@ -1081,13 +1079,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			if (resinfo.HarvestFromOutside) {
 			if (harvest_from_outside) {
 			//Wyrmgus end
-				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == nullptr)) {
+				if ((unit.GetResourcesHeld() == resinfo.ResourceCapacity) || (source == nullptr)) {
 					// Mark as complete.
 					this->DoneHarvesting = true;
 				}
 				return 0;
 			} else {
-				return unit.ResourcesHeld == resinfo.ResourceCapacity && source;
+				return unit.GetResourcesHeld() == resinfo.ResourceCapacity && source;
 			}
 		}
 	}
@@ -1144,7 +1142,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		if (Preference.MineNotifications && unit.GetPlayer()->GetIndex() == CPlayer::GetThisPlayer()->GetIndex()
 			&& source->IsAlive()
 			&& !source->MineLow
-			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
+			&& (source->GetResourcesHeld() * 100 / source->Variable[GIVERESOURCE_INDEX].Max) <= 10
 			&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::GetAll()[this->CurrentResource]->DefaultIncome * 10)) {
 				unit.GetPlayer()->Notify(NotifyYellow, source->GetTilePos(), source->GetMapLayer()->GetIndex(), _("Our %s is nearing depletion!"), source->GetType()->GetName().utf8().get_data());
 				source->MineLow = 1;
@@ -1190,14 +1188,14 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	}
 
 #ifdef DEBUG
-	if (!unit.ResourcesHeld) {
+	if (!unit.GetResourcesHeld()) {
 		DebugPrint("Unit %d is empty???\n" _C_ UnitNumber(unit));
 	}
 #endif
 
 	// Find and send to resource deposit.
-	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
-	if (!depot || !unit.ResourcesHeld || this->Finished) {
+	CUnit *depot = FindDeposit(unit, 1000, unit.GetCurrentResource());
+	if (!depot || !unit.GetResourcesHeld() || this->Finished) {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
 		if (!((source && source->GetType()->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
@@ -1213,7 +1211,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
-				   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.CurrentResource);
+				   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit) _C_ unit.GetCurrentResource());
 		this->Finished = true;
 		return 0;
 	} else {
@@ -1292,7 +1290,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 		unit.CurrentOrder()->ClearGoal();
 
-		CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+		CUnit *depot = FindDeposit(unit, 1000, unit.GetCurrentResource());
 
 		if (depot) {
 			UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
@@ -1331,7 +1329,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Update resource.
 	const int rindex = CResource::GetAll()[this->CurrentResource]->FinalResource;
-	int resource_change = unit.ResourcesHeld * CResource::GetAll()[this->CurrentResource]->FinalResourceConversionRate / 100;
+	int resource_change = unit.GetResourcesHeld() * CResource::GetAll()[this->CurrentResource]->FinalResourceConversionRate / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
 	if (player.AiEnabled) {
@@ -1356,7 +1354,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
-	int xp_gained = unit.ResourcesHeld;
+	int xp_gained = unit.GetResourcesHeld();
 	xp_gained /= 20;
 	unit.ChangeExperience(xp_gained);
 	
@@ -1366,16 +1364,13 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 			if (player.QuestObjectives[i]->Resource == rindex) {
 				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + processed_resource_change, player.QuestObjectives[i]->Quantity);
 			} else if (player.QuestObjectives[i]->Resource == this->CurrentResource) {
-				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + unit.ResourcesHeld, player.QuestObjectives[i]->Quantity);
+				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + unit.GetResourcesHeld(), player.QuestObjectives[i]->Quantity);
 			}
 		}
 	}
 	
-	//Wyrmgus start
-//	unit.ResourcesHeld = 0;
 	unit.SetResourcesHeld(0);
-	//Wyrmgus end
-	unit.CurrentResource = 0;
+	unit.SetCurrentResource(0);
 
 	if (unit.Wait) {
 		//Wyrmgus start
@@ -1500,8 +1495,8 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 void COrder_Resource::DropResource(CUnit &unit)
 {
-	if (unit.CurrentResource) {
-		const ResourceInfo &resinfo = *unit.GetType()->ResInfo[unit.CurrentResource];
+	if (unit.GetCurrentResource()) {
+		const ResourceInfo &resinfo = *unit.GetType()->ResInfo[unit.GetCurrentResource()];
 
 		//Wyrmgus start
 //		if (!resinfo.TerrainHarvester) {
@@ -1514,11 +1509,8 @@ void COrder_Resource::DropResource(CUnit &unit)
 		}
 		//fast clean both resource data: pos and mine
 		this->Resource.Mine = nullptr;
-		unit.CurrentResource = 0;
-		//Wyrmgus start
-//		unit.ResourcesHeld = 0;
+		unit.SetCurrentResource(0);
 		unit.SetResourcesHeld(0);
-		//Wyrmgus end
 	}
 }
 

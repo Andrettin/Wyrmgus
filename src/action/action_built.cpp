@@ -219,8 +219,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			}
 			// If we can reurn goods to a new depot, do it.
 			//Wyrmgus start
-//			if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
-			if (table[i]->CanReturnGoodsTo(&unit) && table[i]->ResourcesHeld > 0) {
+//			if (table[i]->GetCurrentResource() && table[i]->GetResourcesHeld() > 0 && type.CanStore[table[i]->GetCurrentResource()]) {
+			if (table[i]->CanReturnGoodsTo(&unit) && table[i]->GetResourcesHeld() > 0) {
 			//Wyrmgus end
 				CommandReturnGoods(*table[i], &unit, 0);
 			}
@@ -252,8 +252,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			}
 			// If we can reurn goods to a new depot, do it.
 			//Wyrmgus start
-//			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
-			if (worker->CanReturnGoodsTo(&unit) && worker->ResourcesHeld > 0) {
+//			if (worker->GetCurrentResource() && worker->GetResourcesHeld() > 0 && type.CanStore[worker->GetCurrentResource()]) {
+			if (worker->CanReturnGoodsTo(&unit) && worker->GetResourcesHeld() > 0) {
 			//Wyrmgus end
 				CommandReturnGoods(*worker, &unit, 0);
 			}
@@ -275,14 +275,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 //	if (type.GivesResource && type.StartingResources != 0) {
 	if (type.GivesResource) {
 	//Wyrmgus end
-		// Has StartingResources, Use those
-		//Wyrmgus start
-//		unit.ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
+		// if it has StartingResources, use those
 		if (type.StartingResources.size() > 0) {
 			unit.SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
 		}
+		
 		unit.GivesResource = type.GivesResource;
-		//Wyrmgus end
 	}
 
 	//Wyrmgus start

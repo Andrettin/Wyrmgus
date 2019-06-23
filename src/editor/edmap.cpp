@@ -424,10 +424,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			//Wyrmgus start
-//			unit->ResourcesHeld = value;
 			unit->SetResourcesHeld(value);
-			//Wyrmgus end
 		}
 
 		unit = MakeUnitAndPlace(tmirrorv, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->GetIndex());
@@ -443,10 +440,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			//Wyrmgus start
-//			unit->ResourcesHeld = value;
 			unit->SetResourcesHeld(value);
-			//Wyrmgus end
 		}
 	}
 }

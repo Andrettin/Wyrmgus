@@ -518,7 +518,7 @@ void AiNewDepotRequest(CUnit &worker)
 #if 0
 	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n"
 			   _C_ worker->GetPlayer()->GetIndex() _C_ worker->Slot
-			   _C_ worker->CurrentResource
+			   _C_ worker->GetCurrentResource()
 			   _C_ worker->Data.Move.Cycles);
 #endif
 	Assert(worker.CurrentAction() == UnitActionResource);
@@ -1404,7 +1404,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 
 static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
 {
-	return lhs->ResourcesHeld < rhs->ResourcesHeld;
+	return lhs->GetResourcesHeld() < rhs->GetResourcesHeld();
 }
 
 //Wyrmgus start
@@ -1543,8 +1543,8 @@ static void AiCollectResources()
 		//Wyrmgus end
 
 		// Send workers with resources back home.
-		if (unit.ResourcesHeld) {
-			const int c = unit.CurrentResource;
+		if (unit.GetResourcesHeld()) {
+			const int c = unit.GetCurrentResource();
 
 			num_units_with_resource[c]++;
 			CommandReturnGoods(unit, 0, FlushCommands);

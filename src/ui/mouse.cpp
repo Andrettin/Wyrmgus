@@ -157,11 +157,11 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 //	if (res
 //		&& dest->GetType()->BoolFlag[HARVESTER_INDEX].value
 //		&& dest->GetType()->ResInfo[res]
-//		&& dest->ResourcesHeld < dest->GetType()->ResInfo[res]->ResourceCapacity
+//		&& dest->GetResourcesHeld() < dest->GetType()->ResInfo[res]->ResourceCapacity
 //		&& unit.GetType()->BoolFlag[CANHARVEST_INDEX].value) {
 	if (
 		dest->CanHarvest(&unit)
-		&& dest->ResourcesHeld < dest->GetType()->ResInfo[res]->ResourceCapacity
+		&& dest->GetResourcesHeld() < dest->GetType()->ResInfo[res]->ResourceCapacity
 	) {
 	//Wyrmgus end
 		unit.Blink = 4;
@@ -278,9 +278,9 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
 	// Return a loaded harvester to deposit
-	if (unit.ResourcesHeld > 0
+	if (unit.GetResourcesHeld() > 0
 	//Wyrmgus start
-//		&& dest.GetType()->CanStore[unit.CurrentResource]
+//		&& dest.GetType()->CanStore[unit.GetCurrentResource()]
 //		&& (dest.GetPlayer() == unit.GetPlayer()
 //			|| (dest.GetPlayer()->IsAllied(*unit.GetPlayer()) && unit.GetPlayer()->IsAllied(*dest.GetPlayer())))) {
 		&& unit.CanReturnGoodsTo(&dest)) {
@@ -304,10 +304,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //		&& (dest.GetPlayer() == unit.GetPlayer() || dest.GetPlayer()->GetIndex() == PlayerNumNeutral)) {
 	if (unit.CanHarvest(&dest)) {
 	//Wyrmgus end
-			//Wyrmgus start
-//			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			//Wyrmgus end
+			if (unit.GetCurrentResource() != res || unit.GetResourcesHeld() < type.ResInfo[res]->ResourceCapacity) {
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
 				if (!acknowledged) {
@@ -316,7 +313,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				}
 				return true;
 			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				CUnit *depot = FindDeposit(unit, 1000, unit.GetCurrentResource());
 				if (depot) {
 					dest.Blink = 4;
 					if (!acknowledged) {
@@ -334,10 +331,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// make unit build harvesting building on top if right-clicked
 	} else if (res && type.ResInfo[res] && !dest.GetType()->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.GetPlayer() == unit.GetPlayer() || dest.GetPlayer()->GetIndex() == PlayerNumNeutral)) {
-			//Wyrmgus start
-//			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			//Wyrmgus end
+			if (unit.GetCurrentResource() != res || unit.GetResourcesHeld() < type.ResInfo[res]->ResourceCapacity) {
 				for (CUnitType *unit_type : CUnitType::GetAll()) {
 					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.GetTilePos(), 1, false, dest.GetMapLayer()->GetIndex())) {
 						if (CheckDependencies(unit_type, unit.GetPlayer())) {
@@ -358,7 +352,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				}
 				return true;
 			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				CUnit *depot = FindDeposit(unit, 1000, unit.GetCurrentResource());
 				if (depot) {
 					dest.Blink = 4;
 					if (!acknowledged) {
@@ -401,8 +395,8 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 			&& UI.CurrentMapLayer->Field(pos)->IsTerrainResourceOnMap(res)
 			//Wyrmgus end
 			//Wyrmgus start
-//			&& ((unit.CurrentResource != res)
-//				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+//			&& ((unit.GetCurrentResource() != res)
+//				|| (unit.GetResourcesHeld() < type.ResInfo[res]->ResourceCapacity))) {
 			) {
 			//Wyrmgus end
 			//Wyrmgus start
@@ -413,14 +407,14 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				acknowledged = 1;
 			}
 			*/
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.GetCurrentResource() != res || unit.GetResourcesHeld() < type.ResInfo[res]->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->GetIndex());
 				if (!acknowledged) {
 					PlayUnitSound(unit, VoiceHarvesting);
 					acknowledged = 1;
 				}
 			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				CUnit *depot = FindDeposit(unit, 1000, unit.GetCurrentResource());
 				if (depot) {
 					if (!acknowledged) {
 						PlayUnitSound(unit, VoiceAcknowledging);
@@ -759,9 +753,9 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	const CUnitType &type = *unit.GetType();
 
 	// tell to return a loaded harvester to deposit
-	if (dest.ResourcesHeld > 0
+	if (dest.GetResourcesHeld() > 0
 	//Wyrmgus start
-//		&& type.CanStore[dest.CurrentResource]
+//		&& type.CanStore[dest.GetCurrentResource()]
 		&& dest.CanReturnGoodsTo(&unit)
 	//Wyrmgus end
 		&& dest.GetPlayer() == unit.GetPlayer()) {
@@ -781,11 +775,11 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	//Wyrmgus start
 //	if (res
 //		&& dest.GetType()->ResInfo[res]
-//		&& dest.ResourcesHeld < dest.GetType()->ResInfo[res]->ResourceCapacity
+//		&& dest.GetResourcesHeld() < dest.GetType()->ResInfo[res]->ResourceCapacity
 //		&& type.BoolFlag[CANHARVEST_INDEX].value
 	if (
 		dest.CanHarvest(&unit)
-		&& dest.ResourcesHeld < dest.GetType()->ResInfo[res]->ResourceCapacity
+		&& dest.GetResourcesHeld() < dest.GetType()->ResInfo[res]->ResourceCapacity
 	//Wyrmgus end
 		&& dest.GetPlayer() == unit.GetPlayer()) {
 		unit.Blink = 4;
@@ -1619,7 +1613,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				Selected.size() >= 1 && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer() &&
 				(
 					Selected[0]->CanHarvest(UnitUnderCursor, false)
-					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->GetType()->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->GetPlayer() != CPlayer::GetThisPlayer()))
+					&& (!Selected[0]->GetCurrentResource() || !UnitUnderCursor->GetType()->CanStore[Selected[0]->GetCurrentResource()] || (Selected[0]->GetCurrentResource() == TradeCost && UnitUnderCursor->GetPlayer() != CPlayer::GetThisPlayer()))
 				)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
@@ -1917,7 +1911,7 @@ static int SendResource(const Vec2i &pos, int flush)
 //				&& unit.GetType()->ResInfo[res]
 				&& unit.CanHarvest(dest)
 				//Wyrmgus end
-				&& unit.ResourcesHeld < unit.GetType()->ResInfo[res]->ResourceCapacity
+				&& unit.GetResourcesHeld() < unit.GetType()->ResInfo[res]->ResourceCapacity
 				//Wyrmgus start
 //				&& dest->GetType()->BoolFlag[CANHARVEST_INDEX].value
 //				&& (dest->GetPlayer() == unit.GetPlayer() || dest->GetPlayer()->GetIndex() == PlayerMax - 1)) {
@@ -1936,8 +1930,8 @@ static int SendResource(const Vec2i &pos, int flush)
 						&& mf.playerInfo.IsTeamExplored(*unit.GetPlayer())
 						//Wyrmgus end
 						&& mf.IsTerrainResourceOnMap(res)
-						&& unit.ResourcesHeld < unit.GetType()->ResInfo[res]->ResourceCapacity
-						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.GetType()->ResInfo[res]->ResourceCapacity)) {
+						&& unit.GetResourcesHeld() < unit.GetType()->ResInfo[res]->ResourceCapacity
+						&& (unit.GetCurrentResource() != res || unit.GetResourcesHeld() < unit.GetType()->ResInfo[res]->ResourceCapacity)) {
 						//Wyrmgus start
 //						SendCommandResourceLoc(unit, pos, flush);
 						SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->GetIndex());

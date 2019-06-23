@@ -1000,7 +1000,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	if ((unit.GetType()->BoolFlag[HARVESTER_INDEX].value && unit.ResourcesHeld == 0)
+	if ((unit.GetType()->BoolFlag[HARVESTER_INDEX].value && unit.GetResourcesHeld() == 0)
 		|| (!unit.GetType()->BoolFlag[BUILDING_INDEX].value && !unit.GetType()->BoolFlag[HARVESTER_INDEX].value)) {
 		ClearSavedAction(unit);
 		return ;

@@ -142,7 +142,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		const int index = UnitTypeVar.VariableNameLookup[cur];// User variables
 		if (index == -1) {
 			if (!strcmp(cur, "ResourcesHeld")) {
-				return goal->ResourcesHeld;
+				return goal->GetResourcesHeld();
 			} else if (!strcmp(cur, "ResourceActive")) {
 				return goal->Resource.Active;
 			} else if (!strcmp(cur, "InsideCount")) {

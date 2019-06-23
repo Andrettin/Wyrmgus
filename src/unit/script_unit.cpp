@@ -1179,10 +1179,7 @@ static int CclSetResourcesHeld(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const int value = LuaToNumber(l, 2);
-	//Wyrmgus start
-//	unit->ResourcesHeld = value;
 	unit->SetResourcesHeld(value);
-	//Wyrmgus end
 	unit->Variable[GIVERESOURCE_INDEX].Value = value;
 	unit->Variable[GIVERESOURCE_INDEX].Max = value;
 	unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
@@ -1730,14 +1727,14 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Ident")) {
 		lua_pushstring(l, unit->GetType()->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
-		lua_pushnumber(l, unit->ResourcesHeld);
+		lua_pushnumber(l, unit->GetResourcesHeld());
 	} else if (!strcmp(value, "GiveResourceType")) {
 		//Wyrmgus start
 //		lua_pushnumber(l, unit->GetType()->GivesResource);
 		lua_pushnumber(l, unit->GivesResource);
 		//Wyrmgus end
 	} else if (!strcmp(value, "CurrentResource")) {
-		lua_pushnumber(l, unit->CurrentResource);
+		lua_pushnumber(l, unit->GetCurrentResource());
 	} else if (!strcmp(value, "Name")) {
 	//Wyrmgus start
 //		lua_pushstring(l, unit->GetType()->Name.c_str());
@@ -1766,7 +1763,7 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, DefaultResourceNames[unit->GivesResource].c_str());
 		//Wyrmgus end
 	} else if (!strcmp(value, "CurrentResourceName")) {
-		lua_pushstring(l, DefaultResourceNames[unit->CurrentResource].c_str());
+		lua_pushstring(l, DefaultResourceNames[unit->GetCurrentResource()].c_str());
 	} else if (!strcmp(value, "TypeName")) {
 		lua_pushstring(l, unit->GetTypeName().c_str());
 	} else if (!strcmp(value, "Trait")) {

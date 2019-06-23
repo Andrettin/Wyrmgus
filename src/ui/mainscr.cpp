@@ -407,8 +407,8 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 				//Wyrmgus end
 			} else if (index == CARRYRESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.i = unit.CurrentResource;
-				val.s = DefaultResourceNames[unit.CurrentResource].c_str();
+				val.i = unit.GetCurrentResource();
+				val.s = DefaultResourceNames[unit.GetCurrentResource()].c_str();
 			} else {
 				val.type = USTRINT_STR;
 				val.i = index;

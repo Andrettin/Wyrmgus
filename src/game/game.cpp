@@ -920,7 +920,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					  unit.GetPlayer()->GetIndex(),
 					  unit.GetTilePos().x, unit.GetTilePos().y);
 			if (unit.GetType()->GivesResource) {
-				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
+				f->printf("SetResourcesHeld(unit, %d)\n", unit.GetResourcesHeld());
 			}
 			if (!unit.Active) { //Active is true by default
 				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
@@ -947,7 +947,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  unit.GetPlayer()->GetIndex(),
 						  unit.GetTilePos().x, unit.GetTilePos().y);
 				if (unit.GetType()->GivesResource) {
-					f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
+					f->printf("SetResourcesHeld(unit, %d)\n", unit.GetResourcesHeld());
 				}
 				if (!unit.Active) { //Active is true by default
 					f->printf("SetUnitVariable(unit, \"Active\", false)\n");

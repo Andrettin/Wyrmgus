@@ -236,12 +236,12 @@ enum {
 					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
 						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->Ident).c_str());
 					}
-				} else if (goal->GetType()->GivesResource && goal->ResourcesHeld > 0) {
+				} else if (goal->GetType()->GivesResource && goal->GetResourcesHeld() > 0) {
 					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {
-						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->GetType()->GivesResource].c_str());
+						unit.GetPlayer()->Notify(NotifyGreen, unit.GetTilePos(), unit.GetMapLayer()->GetIndex(), _("Gained %d %s"), goal->GetResourcesHeld(), DefaultResourceNames[goal->GetType()->GivesResource].c_str());
 					}
-					unit.GetPlayer()->ChangeResource(goal->GetType()->GivesResource, goal->ResourcesHeld);
-					unit.GetPlayer()->TotalResources[goal->GetType()->GivesResource] += (goal->ResourcesHeld * unit.GetPlayer()->Incomes[goal->GetType()->GivesResource]) / 100;
+					unit.GetPlayer()->ChangeResource(goal->GetType()->GivesResource, goal->GetResourcesHeld());
+					unit.GetPlayer()->TotalResources[goal->GetType()->GivesResource] += (goal->GetResourcesHeld() * unit.GetPlayer()->Incomes[goal->GetType()->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
 					if (unit.GetPlayer() == CPlayer::GetThisPlayer()) {

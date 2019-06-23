@@ -209,10 +209,24 @@ public:
 		return this->Player;
 	}
 	
-	//Wyrmgus start
-	void SetResourcesHeld(int quantity);
-	void ChangeResourcesHeld(int quantity);
+	void SetCurrentResource(const unsigned char resource_index);
+	
+	unsigned char GetCurrentResource() const
+	{
+		return this->CurrentResource;
+	}
+	
+	void SetResourcesHeld(const int quantity);
+	void ChangeResourcesHeld(const int quantity);
+	
+	int GetResourcesHeld() const
+	{
+		return this->ResourcesHeld;
+	}
+	
 	void ReplaceOnTop(CUnit &replaced_unit);
+
+	//Wyrmgus start
 	void ChangeExperience(int amount, int around_range = 0); //around_range is the range around the unit that other units of the same player will receive experience
 	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
@@ -550,6 +564,7 @@ public:
 	void SetUnitStockReplenishmentTimer(const CUnitType *unit_type, const int quantity);
 	void ChangeUnitStockReplenishmentTimer(const CUnitType *unit_type, const int quantity);
 	int GetResourceStep(const int resource) const;
+	
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const CUnitType *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
@@ -694,8 +709,10 @@ public:
 	//Wyrmgus start
 	unsigned char GivesResource;	/// The resource currently given by the unit
 	//Wyrmgus end
-	unsigned char CurrentResource;
-	int ResourcesHeld;      /// Resources Held by a unit
+private:
+	unsigned char CurrentResource = 0;
+public:
+	int ResourcesHeld = 0;		/// resources held by the unit
 	std::map<const CUnitType *, int> UnitStock; 						/// How many of each unit type this unit has stocked
 	std::map<const CUnitType *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 

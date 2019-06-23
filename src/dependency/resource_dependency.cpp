@@ -62,8 +62,8 @@ bool CResourceDependency::CheckInternal(const CPlayer *player, const bool ignore
 
 bool CResourceDependency::Check(const CUnit *unit, const bool ignore_units) const
 {
-	if (unit->CurrentResource == this->Resource->GetIndex() || unit->GivesResource == this->Resource->GetIndex()) {
-		if (unit->ResourcesHeld > 0) {
+	if (unit->GetCurrentResource() == this->Resource->GetIndex() || unit->GivesResource == this->Resource->GetIndex()) {
+		if (unit->GetResourcesHeld() > 0) {
 			return true;
 		}
 	}

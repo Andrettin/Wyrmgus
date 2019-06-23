@@ -1226,9 +1226,9 @@ void CUnit::Draw(const CViewport &vp) const
 	// Adjust sprite for Harvesters.
 	//
 	CPlayerColorGraphic *sprite = type->Sprite;
-	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
-		ResourceInfo *resinfo = type->ResInfo[this->CurrentResource];
-		if (this->ResourcesHeld) {
+	if (type->BoolFlag[HARVESTER_INDEX].value && this->GetCurrentResource()) {
+		ResourceInfo *resinfo = type->ResInfo[this->GetCurrentResource()];
+		if (this->GetResourcesHeld()) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;
 			}
@@ -1244,14 +1244,14 @@ void CUnit::Draw(const CViewport &vp) const
 		if (variation->Sprite) {
 			sprite = variation->Sprite;
 		}
-		if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
-			if (this->ResourcesHeld) {
-				if (variation->SpriteWhenLoaded[this->CurrentResource]) {
-					sprite = variation->SpriteWhenLoaded[this->CurrentResource];
+		if (type->BoolFlag[HARVESTER_INDEX].value && this->GetCurrentResource()) {
+			if (this->GetResourcesHeld()) {
+				if (variation->SpriteWhenLoaded[this->GetCurrentResource()]) {
+					sprite = variation->SpriteWhenLoaded[this->GetCurrentResource()];
 				}
 			} else {
-				if (variation->SpriteWhenEmpty[this->CurrentResource]) {
-					sprite = variation->SpriteWhenEmpty[this->CurrentResource];
+				if (variation->SpriteWhenEmpty[this->GetCurrentResource()]) {
+					sprite = variation->SpriteWhenEmpty[this->GetCurrentResource()];
 				}
 			}
 		}

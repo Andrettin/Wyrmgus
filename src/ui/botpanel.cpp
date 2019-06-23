@@ -1291,10 +1291,10 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.CanMove();
 			break;
 		case ButtonHarvest:
-			if (!unit.CurrentResource
-				|| !(unit.ResourcesHeld > 0 && !unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources)
-				|| (unit.ResourcesHeld != unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity
-					&& unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources)) {
+			if (!unit.GetCurrentResource()
+				|| !(unit.GetResourcesHeld() > 0 && !unit.GetType()->ResInfo[unit.GetCurrentResource()]->LoseResources)
+				|| (unit.GetResourcesHeld() != unit.GetType()->ResInfo[unit.GetCurrentResource()]->ResourceCapacity
+					&& unit.GetType()->ResInfo[unit.GetCurrentResource()]->LoseResources)) {
 				res = true;
 			}
 			//Wyrmgus start
@@ -1305,9 +1305,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		case ButtonReturn:
 			if (
-				unit.CurrentResource
-				&& unit.ResourcesHeld > 0
-				&& (!unit.GetType()->ResInfo[unit.CurrentResource]->LoseResources || unit.ResourcesHeld == unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity)
+				unit.GetCurrentResource()
+				&& unit.GetResourcesHeld() > 0
+				&& (!unit.GetType()->ResInfo[unit.GetCurrentResource()]->LoseResources || unit.GetResourcesHeld() == unit.GetType()->ResInfo[unit.GetCurrentResource()]->ResourceCapacity)
 			) {
 				res = true;
 			}

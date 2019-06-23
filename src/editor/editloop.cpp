@@ -510,18 +510,10 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	}
 	if (unit != nullptr) {
 		if (type.GivesResource) {
-			//Wyrmgus start
-//			if (type.StartingResources != 0) {
 			if (type.StartingResources.size() > 0) {
-			//Wyrmgus end
-				//Wyrmgus start
-//				unit->ResourcesHeld = type.StartingResources;
-//				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
-//				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
 				unit->SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
-				unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
-				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
-				//Wyrmgus end
+				unit->Variable[GIVERESOURCE_INDEX].Value = unit->GetResourcesHeld();
+				unit->Variable[GIVERESOURCE_INDEX].Max = unit->GetResourcesHeld();
 			} else {
 				unit->SetResourcesHeld(CResource::GetAll()[type.GivesResource]->DefaultAmount);
 				unit->Variable[GIVERESOURCE_INDEX].Value = CResource::GetAll()[type.GivesResource]->DefaultAmount;
@@ -1454,7 +1446,7 @@ static void ShowUnitInfo(const CUnit &unit)
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
 	if (unit.GetType()->GivesResource) {
-		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
+		sprintf(buf + n, _(" Amount %d"), unit.GetResourcesHeld());
 	}
 	UI.StatusLine.Set(buf);
 }

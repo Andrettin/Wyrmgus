@@ -3543,15 +3543,15 @@ void UpdateUnitVariables(CUnit &unit)
 //	if (unit.GetType()->GivesResource) {
 	if (unit.GivesResource) {
 	//Wyrmgus end
-		unit.Variable[GIVERESOURCE_INDEX].Value = unit.ResourcesHeld;
-		unit.Variable[GIVERESOURCE_INDEX].Max = unit.ResourcesHeld > unit.Variable[GIVERESOURCE_INDEX].Max ? unit.ResourcesHeld : unit.Variable[GIVERESOURCE_INDEX].Max;
+		unit.Variable[GIVERESOURCE_INDEX].Value = unit.GetResourcesHeld();
+		unit.Variable[GIVERESOURCE_INDEX].Max = unit.GetResourcesHeld() > unit.Variable[GIVERESOURCE_INDEX].Max ? unit.GetResourcesHeld() : unit.Variable[GIVERESOURCE_INDEX].Max;
 		//Wyrmgus start
 		unit.Variable[GIVERESOURCE_INDEX].Enable = 1;
 		//Wyrmgus end
 	}
-	if (unit.GetType()->BoolFlag[HARVESTER_INDEX].value && unit.CurrentResource) {
-		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
-		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.GetType()->ResInfo[unit.CurrentResource]->ResourceCapacity;
+	if (unit.GetType()->BoolFlag[HARVESTER_INDEX].value && unit.GetCurrentResource()) {
+		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.GetResourcesHeld();
+		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.GetType()->ResInfo[unit.GetCurrentResource()]->ResourceCapacity;
 	}
 
 	//Wyrmgus start

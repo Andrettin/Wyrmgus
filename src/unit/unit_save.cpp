@@ -305,10 +305,10 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"group-id\", %d,\n  ", unit.GroupId);
 	file.printf("\"last-group\", %d,\n  ", unit.LastGroup);
 
-	file.printf("\"resources-held\", %d,\n  ", unit.ResourcesHeld);
-	if (unit.CurrentResource) {
+	file.printf("\"resources-held\", %d,\n  ", unit.GetResourcesHeld());
+	if (unit.GetCurrentResource()) {
 		file.printf("\"current-resource\", \"%s\",\n  ",
-					DefaultResourceNames[unit.CurrentResource].c_str());
+					DefaultResourceNames[unit.GetCurrentResource()].c_str());
 	}
 	
 	//Wyrmgus start

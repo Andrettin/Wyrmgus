@@ -532,8 +532,8 @@ void CUnit::Init()
 	MineLow = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
-	GivesResource = 0;
-	CurrentResource = 0;
+	this->GivesResource = 0;
+	this->CurrentResource = 0;
 	StepCount = 0;
 	Orders.clear();
 	delete SavedOrder;
@@ -653,26 +653,61 @@ void CUnit::SetType(const CUnitType *new_type)
 	}
 }
 
-//Wyrmgus start
-void CUnit::SetResourcesHeld(int quantity)
+void CUnit::SetCurrentResource(const unsigned char resource_index)
 {
+	if (resource_index == this->GetCurrentResource()) {
+		return;
+	}
+	
+	const PaletteImage *old_image = this->GetImage();
+	
+	this->CurrentResource = resource_index;
+	
+	//emit a signal if the image has changed
+	const PaletteImage *new_image = this->GetImage();
+	if (old_image != new_image) {
+		this->emit_signal("image_changed", new_image);
+	}
+}
+
+void CUnit::SetResourcesHeld(const int quantity)
+{
+	if (quantity == this->GetResourcesHeld()) {
+		return;
+	}
+	
+	const bool resource_loaded_changed = (this->GetResourcesHeld() > 0) == (quantity > 0);
+	
+	const PaletteImage *old_image = nullptr;
+	if (resource_loaded_changed) {
+		old_image = this->GetImage();
+	}
+	
 	this->ResourcesHeld = quantity;
+	
+	if (resource_loaded_changed) {
+		//emit a signal if the image has changed
+		const PaletteImage *new_image = this->GetImage();
+		if (old_image != new_image) {
+			this->emit_signal("image_changed", new_image);
+		}
+	}
 	
 	const UnitTypeVariation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
-			(variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin)
-			|| (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax)
+			(variation->ResourceMin && this->GetResourcesHeld() < variation->ResourceMin)
+			|| (variation->ResourceMax && this->GetResourcesHeld() > variation->ResourceMax)
 		)
 	) {
 		this->ChooseVariation();
 	}
 }
 
-void CUnit::ChangeResourcesHeld(int quantity)
+void CUnit::ChangeResourcesHeld(const int quantity)
 {
-	this->SetResourcesHeld(this->ResourcesHeld + quantity);
+	this->SetResourcesHeld(this->GetResourcesHeld() + quantity);
 }
 
 void CUnit::ReplaceOnTop(CUnit &replaced_unit)
@@ -699,7 +734,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 		}
 	}
 	
-	this->SetResourcesHeld(replaced_unit.ResourcesHeld); // We capture the value of what is beneath.
+	this->SetResourcesHeld(replaced_unit.GetResourcesHeld()); // We capture the value of what is beneath.
 	this->Variable[GIVERESOURCE_INDEX].Value = replaced_unit.Variable[GIVERESOURCE_INDEX].Value;
 	this->Variable[GIVERESOURCE_INDEX].Max = replaced_unit.Variable[GIVERESOURCE_INDEX].Max;
 	this->Variable[GIVERESOURCE_INDEX].Enable = replaced_unit.Variable[GIVERESOURCE_INDEX].Enable;
@@ -710,6 +745,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	replaced_unit.Release();
 }
 
+//Wyrmgus start
 void CUnit::ChangeExperience(int amount, int around_range)
 {
 	std::vector<CUnit *> table;
@@ -768,17 +804,17 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Type->GetIndex()) {
 			std::vector<CUnitType *> potential_upgrades;
 			
-			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size() > 1) {
+			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->GetCurrentResource() && AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Type->GetIndex()].size(); ++i) {
 					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[this->Type->GetIndex()][i];
 					if (CheckDependencies(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
-							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
+							if (!experience_upgrade_type->ResInfo[this->GetCurrentResource()]) {
 								continue;
 							}
-							unsigned int gathering_rate = experience_upgrade_type->GetResourceStep(this->CurrentResource, this->Player->GetIndex());
+							unsigned int gathering_rate = experience_upgrade_type->GetResourceStep(this->GetCurrentResource(), this->Player->GetIndex());
 							if (gathering_rate >= best_gathering_rate) {
 								if (gathering_rate > best_gathering_rate) {
 									best_gathering_rate = gathering_rate;
@@ -1203,10 +1239,10 @@ void CUnit::ChooseVariation(const CUnitType *new_type, int image_layer)
 			continue;
 		}
 		
-		if (variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin) {
+		if (variation->ResourceMin && this->GetResourcesHeld() < variation->ResourceMin) {
 			continue;
 		}
-		if (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax) {
+		if (variation->ResourceMax && this->GetResourcesHeld() > variation->ResourceMax) {
 			continue;
 		}
 		
@@ -4482,16 +4518,13 @@ void UnitLost(CUnit &unit)
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit.GetType(), nullptr);
 	//Wyrmgus end
 	if (b != nullptr) {
-		//Wyrmgus start
-//		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
-		if (b->ReplaceOnDie && (!type.GivesResource || unit.ResourcesHeld != 0)) {
-		//Wyrmgus end
+		if (b->ReplaceOnDie && (!type.GivesResource || unit.GetResourcesHeld() != 0)) {
 			CUnit *temp = MakeUnitAndPlace(unit.GetTilePos(), *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.GetMapLayer()->GetIndex());
 			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
 				//Wyrmgus start
-//				temp->ResourcesHeld = unit.ResourcesHeld;
+//				temp->ResourcesHeld = unit.GetResourcesHeld();
 //				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 //				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
 //				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
@@ -4518,8 +4551,8 @@ void UnitLost(CUnit &unit)
 						CMap::Map.SiteUnits.push_back(temp);
 					}
 				}
-				if (type.GivesResource && unit.ResourcesHeld != 0) {
-					temp->SetResourcesHeld(unit.ResourcesHeld);
+				if (type.GivesResource && unit.GetResourcesHeld() != 0) {
+					temp->SetResourcesHeld(unit.GetResourcesHeld());
 					temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 					temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
 					temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
@@ -5693,11 +5726,39 @@ PixelSize CUnit::GetTilePixelSize() const
 const PaletteImage *CUnit::GetImage() const
 {
 	const UnitTypeVariation *variation = this->GetVariation();
+
+	if (this->GetType()->BoolFlag[HARVESTER_INDEX].value && this->GetCurrentResource()) {
+		const CResource *resource = CResource::Get(this->GetCurrentResource());
+		if (this->GetResourcesHeld() > 0) {
+			if (variation != nullptr) {
+				auto find_iterator = variation->ResourceLoadedImages.find(resource);
+				if (find_iterator != variation->ResourceLoadedImages.end()) {
+					return find_iterator->second;
+				}
+			}
+			
+			if (this->GetType()->ResInfo[this->GetCurrentResource()]->ResourceLoadedImage != nullptr) {
+				return this->GetType()->ResInfo[this->GetCurrentResource()]->ResourceLoadedImage;
+			}
+		} else {
+			if (variation != nullptr) {
+				auto find_iterator = variation->ResourceEmptyImages.find(resource);
+				if (find_iterator != variation->ResourceEmptyImages.end()) {
+					return find_iterator->second;
+				}
+			}
+			
+			if (this->GetType()->ResInfo[this->GetCurrentResource()]->ResourceEmptyImage != nullptr) {
+				return this->GetType()->ResInfo[this->GetCurrentResource()]->ResourceEmptyImage;
+			}
+		}
+	}
+	
 	if (variation != nullptr && variation->GetImage() != nullptr) {
 		return variation->GetImage();
-	} else {
-		return this->GetType()->GetImage();
 	}
+	
+	return this->GetType()->GetImage();
 }
 
 void CUnit::SetFrame(const int frame)
@@ -6300,14 +6361,14 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 	}
 	
 	if (!resource) {
-		resource = this->CurrentResource;
+		resource = this->GetCurrentResource();
 	}
 	
 	if (!resource) {
 		return false;
 	}
 	
-	if (!dest->GetType()->CanStore[this->CurrentResource]) {
+	if (!dest->GetType()->CanStore[this->GetCurrentResource()]) {
 		return false;
 	}
 	
@@ -8070,7 +8131,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	*/
 	
-	if (transporter.ResourcesHeld > 0 && transporter.CurrentResource) { //cannot transport units if already has cargo
+	if (transporter.GetResourcesHeld() > 0 && transporter.GetCurrentResource()) { //cannot transport units if already has cargo
 		return 0;
 	}
 	//Wyrmgus end

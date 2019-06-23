@@ -436,7 +436,7 @@ public:
 //		return (type.GivesResource == resource
 		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && CResource::GetAll()[unit->GivesResource]->FinalResource == resource) || (include_luxury && CResource::GetAll()[unit->GivesResource]->LuxuryResource))
 		//Wyrmgus end
-				&& unit->ResourcesHeld != 0
+				&& unit->GetResourcesHeld() != 0
 				//Wyrmgus start
 //				&& (mine_on_top ? type.BoolFlag[CANHARVEST_INDEX].value : !type.BoolFlag[CANHARVEST_INDEX].value)
 				&& (type.BoolFlag[CANHARVEST_INDEX].value || !only_harvestable)
@@ -544,8 +544,8 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 		}
 	}
 	
-//	return mine.GetType()->BoolFlag[CANHARVEST_INDEX].value && mine.ResourcesHeld
-	return mine.ResourcesHeld
+//	return mine.GetType()->BoolFlag[CANHARVEST_INDEX].value && mine.GetResourcesHeld()
+	return mine.GetResourcesHeld()
 	//Wyrmgus end
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
