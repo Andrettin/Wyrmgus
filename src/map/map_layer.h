@@ -66,6 +66,26 @@ public:
 	CMapLayer(const int index = -1, const int width = 0, const int height = 0, CPlane *plane = nullptr, CWorld *world = nullptr, const int surface_layer = 0);
 	~CMapLayer();
 	
+	int GetIndex() const
+	{
+		return this->Index;
+	}
+	
+	int GetWidth() const
+	{
+		return this->Width;
+	}
+	
+	int GetHeight() const
+	{
+		return this->Height;
+	}
+	
+	Vec2i GetSize() const
+	{
+		return Vec2i(this->Width, this->Height);
+	}
+	
 	/**
 	**	@brief	Get the map field at a given location
 	**
@@ -108,24 +128,14 @@ public:
 		return pos;
 	}
 	
-	int GetIndex() const
+	int GetTileIndex(const int x, const int y) const
 	{
-		return this->Index;
+		return x + y * this->Width;
 	}
 	
-	int GetWidth() const
+	int GetTileIndex(const Vector2i &tile_pos) const
 	{
-		return this->Width;
-	}
-	
-	int GetHeight() const
-	{
-		return this->Height;
-	}
-	
-	Vec2i GetSize() const
-	{
-		return Vec2i(this->Width, this->Height);
+		return this->GetTileIndex(tile_pos.x, tile_pos.y);
 	}
 	
 	CPlane *GetPlane() const
