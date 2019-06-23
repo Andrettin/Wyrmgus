@@ -885,6 +885,10 @@ bool CUnitType::ProcessConfigDataProperty(const String &key, String value)
 				this->DefaultStat.Variables[GENDER_INDEX].Max = this->DefaultStat.Variables[GENDER_INDEX].Value;
 			}
 		}
+	} else if (key == "button_key") {
+		this->ButtonKey = value.utf8().get_data();
+	} else if (key == "button_hint") {
+		this->ButtonHint = value.utf8().get_data();
 	} else {
 		String key_pascal_case = SnakeCaseToPascalCase(key);
 		
