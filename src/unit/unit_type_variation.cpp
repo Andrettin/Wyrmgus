@@ -86,6 +86,8 @@ UnitTypeVariation::~UnitTypeVariation()
 */
 void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 {
+	this->Ident = config_data->Ident;
+	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.ProcessForObject(*this)) {
 			continue;
@@ -99,10 +101,7 @@ void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 		String key = property.Key;
 		String value = property.Value;
 		
-		if (key == "ident") {
-			value = value.replace("_", "-");
-			this->Ident = value;
-		} else if (key == "layer") {
+		if (key == "layer") {
 			value = value.replace("_", "-");
 			this->ImageLayer = GetImageLayerIdByName(value.utf8().get_data());
 			if (this->ImageLayer == -1) {
