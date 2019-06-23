@@ -1098,6 +1098,40 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 		}
 		
 		this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
+	} else if (section->Tag == "resource_gathering") {
+		ResourceInfo *res_info = nullptr;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				continue;
+			}
+			
+			if (property.Key == "resource") {
+				const CResource *resource = CResource::Get(property.Value);
+				
+				res_info = this->ResInfo[resource->GetIndex()];
+				if (!res_info) {
+					res_info = new ResourceInfo;
+					this->ResInfo[resource->GetIndex()] = res_info;
+				}
+				res_info->ResourceId = resource->GetIndex();
+			} else if (property.Key == "resource_step") {
+				res_info->ResourceStep = property.Value.to_int();
+			} else if (property.Key == "wait_at_resource") {
+				res_info->WaitAtResource = property.Value.to_int();
+			} else if (property.Key == "wait_at_depot") {
+				res_info->WaitAtDepot = property.Value.to_int();
+			} else if (property.Key == "resource_capacity") {
+				res_info->ResourceCapacity = property.Value.to_int();
+			} else if (property.Key == "lose_resources") {
+				res_info->LoseResources = StringToBool(property.Value);
+			} else if (property.Key == "refinery_harvester") {
+				res_info->RefineryHarvester = StringToBool(property.Value);
+			} else {
+				print_error("Invalid resource gathering property: " + property.Key + ".");
+			}
+		}
 	} else {
 		String tag = SnakeCaseToPascalCase(section->Tag);
 		
