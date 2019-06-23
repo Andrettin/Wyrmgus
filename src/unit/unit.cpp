@@ -3987,7 +3987,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	
 	if (!unit.Removed) {
 		if (unit.MapLayer != old_map_layer) {
-			unit.emit_signal("map_layer_changed", unit.GetMapLayer()->GetIndex());
+			unit.emit_signal("map_layer_changed", unit.GetMapLayer());
 		}
 		unit.emit_signal("tile_pos_changed", Vector2(unit.GetTilePos()));
 	}
@@ -8709,7 +8709,7 @@ void CUnit::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_half_tile_pixel_size"), +[](const CUnit *unit){ return Vector2(unit->GetHalfTilePixelSize()); });
 	
 	ClassDB::bind_method(D_METHOD("get_map_layer"), +[](const CUnit *unit){ return unit->GetMapLayer(); });
-	ADD_SIGNAL(MethodInfo("map_layer_changed", PropertyInfo(Variant::INT, "index")));
+	ADD_SIGNAL(MethodInfo("map_layer_changed", PropertyInfo(Variant::OBJECT, "map_layer")));
 	
 	ClassDB::bind_method(D_METHOD("get_image"), +[](const CUnit *unit){ return const_cast<PaletteImage *>(unit->GetImage()); });
 	ADD_SIGNAL(MethodInfo("image_changed", PropertyInfo(Variant::OBJECT, "image")));
