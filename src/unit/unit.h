@@ -621,6 +621,8 @@ public:
 	void HandleBuffsEachSecond();
 	bool HandleBurnAndPoison();
 	void HandleUnitAction();
+	
+	IntColor GetSelectionColor() const;
 
 public:
 	class CUnitManagerData

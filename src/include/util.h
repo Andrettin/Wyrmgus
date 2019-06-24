@@ -36,6 +36,10 @@
 #endif
 #endif
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include <cstdlib>
 #include <memory>
 #include <set>
@@ -130,6 +134,24 @@ extern String NumberToRomanNumeral(unsigned number);
 extern std::string FormatNumber(const int number);
 extern std::string PascalCaseToSnakeCase(const std::string &str);
 extern String SnakeCaseToPascalCase(const String &str);
+
+/*----------------------------------------------------------------------------
+--  Color
+----------------------------------------------------------------------------*/
+
+#include <core/color.h>
+
+inline Color IntColorToColor(const IntColor int_color)
+{
+	const Color inverted_color = Color::hex(int_color);
+	Color color;
+	color.r = inverted_color.a
+	color.g = inverted_color.b
+	color.b = inverted_color.g
+	color.a = inverted_color.r
+	
+	return inverted_color;
+}
 
 /*----------------------------------------------------------------------------
 --  Getopt

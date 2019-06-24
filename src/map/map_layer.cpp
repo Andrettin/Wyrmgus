@@ -411,9 +411,7 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 	//update units which may have had their variation become invalid due to the season change
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit *unit = *it;
-		if (
-			unit && unit->IsAlive() && unit->GetMapLayer() == this
-		) {
+		if (unit && unit->IsAlive() && unit->GetMapLayer() == this) {
 			const UnitTypeVariation *variation = unit->GetVariation();
 			if (variation && !unit->CheckSeasonForVariation(variation)) {
 				unit->ChooseVariation(); //choose a new variation, as the old one has become invalid due to the season change

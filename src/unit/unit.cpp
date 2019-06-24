@@ -99,9 +99,7 @@
 #include "unit/variable.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
-//Wyrmgus start
 #include "util.h"
-//Wyrmgus end
 #include "video/palette_image.h"
 #include "video/video.h"
 #include "world/plane.h"
@@ -3300,7 +3298,13 @@ void CUnit::SetSelected(const bool selected)
 	
 	this->Selected = selected;
 	
-	this->emit_signal("selected_changed", selected);
+	Color selection_color;
+	
+	if (selected) {
+		selection_color = IntColorToColor(this->GetSelectionColor());
+	}
+	
+	this->emit_signal("selected_changed", selected, selection_color);
 }
 
 /**
@@ -8695,6 +8699,43 @@ void CUnit::HandleUnitAction()
 	this->Orders[0]->Execute(*this);
 }
 
+IntColor CUnit::GetSelectionColor() const
+{
+	if (Editor.Running && UnitUnderCursor == this && Editor.State == EditorSelecting) {
+		return ColorWhite;
+	} else if (this->IsSelected() || this->TeamSelected || (this->Blink & 1)) {
+		if (this->GetPlayer()->GetIndex() == PlayerNumNeutral) {
+			return ColorYellow;
+		} else if (
+			(this->IsSelected() || (this->Blink & 1))
+			&& (this->GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*this))
+		) {
+			return ColorGreen;
+		} else if (CPlayer::GetThisPlayer()->IsEnemy(*this)) {
+			return ColorRed;
+		} else {
+			IntColor color = this->GetPlayer()->Color;
+
+			for (int i = 0; i < PlayerMax; ++i) {
+				if (this->TeamSelected & (1 << i)) {
+					color = CPlayer::Players[i]->Color;
+				}
+			}
+			
+			return color;
+		}
+	} else if (
+		CursorBuilding && this->GetType()->BoolFlag[BUILDING_INDEX].value
+		&& this->CurrentAction() != UnitActionDie
+		&& (this->GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*this))
+	) {
+		//if building mark all own buildings
+		return ColorGray;
+	}
+	
+	return 0;
+}
+
 void CUnit::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), +[](const CUnit *unit){ return String(unit->GetName().c_str()); });
@@ -8724,7 +8765,9 @@ void CUnit::_bind_methods()
 	ADD_SIGNAL(MethodInfo("pixel_offset_changed", PropertyInfo(Variant::VECTOR2, "pixel_offset")));
 	
 	ClassDB::bind_method(D_METHOD("is_selected"), &CUnit::IsSelected);
-	ADD_SIGNAL(MethodInfo("selected_changed", PropertyInfo(Variant::BOOL, "selected")));
+	ADD_SIGNAL(MethodInfo("selected_changed", PropertyInfo(Variant::BOOL, "selected"), PropertyInfo(Variant::COLOR, "selection_color")));
+	
+	ClassDB::bind_method(D_METHOD("get_selection_color"), +[](const CUnit *unit){ return IntColorToColor(unit->GetSelectionColor()); });
 	
 	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
 	ADD_SIGNAL(MethodInfo("removed"));

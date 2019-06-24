@@ -133,8 +133,6 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 */
 void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 {
-	IntColor color;
-
 	//Wyrmgus start
 	const CUnitType &type = *unit.GetType();
 	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
@@ -159,33 +157,8 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	}
 	//Wyrmgus end
 	
-	// FIXME: make these colors customizable with scripts.
-
-	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
-		color = ColorWhite;
-	} else if (unit.IsSelected() || unit.TeamSelected || (unit.Blink & 1)) {
-		if (unit.GetPlayer()->GetIndex() == PlayerNumNeutral) {
-			color = ColorYellow;
-		} else if ((unit.IsSelected() || (unit.Blink & 1))
-				   && (unit.GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
-			color = ColorGreen;
-		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
-			color = ColorRed;
-		} else {
-			color = unit.GetPlayer()->Color;
-
-			for (int i = 0; i < PlayerMax; ++i) {
-				if (unit.TeamSelected & (1 << i)) {
-					color = CPlayer::Players[i]->Color;
-				}
-			}
-		}
-	} else if (CursorBuilding && unit.GetType()->BoolFlag[BUILDING_INDEX].value
-			   && unit.CurrentAction() != UnitActionDie
-			   && (unit.GetPlayer() == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
-		// If building mark all own buildings
-		color = ColorGray;
-	} else {
+	IntColor color = unit.GetSelectionColor();
+	if (color == 0) {
 		return;
 	}
 
