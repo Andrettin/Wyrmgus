@@ -4348,6 +4348,9 @@ void CUnit::Remove(CUnit *host)
 		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ UnitNumber(*this));
 		return;
 	}
+	
+	this->emit_signal("removed");
+	
 	CMap::Map.Remove(*this);
 	MapUnmarkUnitSight(*this);
 	UnmarkUnitFieldFlags(*this);
@@ -4387,8 +4390,6 @@ void CUnit::Remove(CUnit *host)
 	if (UnitUnderCursor == this) {
 		UnitUnderCursor = nullptr;
 	}
-	
-	this->emit_signal("removed");
 }
 
 /**
