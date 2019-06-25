@@ -141,16 +141,18 @@ extern String SnakeCaseToPascalCase(const String &str);
 
 #include <core/color.h>
 
+typedef uint32_t IntColor; // Uint32 in SDL
+
 inline Color IntColorToColor(const IntColor int_color)
 {
 	const Color inverted_color = Color::hex(int_color);
 	Color color;
-	color.r = inverted_color.a
-	color.g = inverted_color.b
-	color.b = inverted_color.g
-	color.a = inverted_color.r
+	color.r = inverted_color.a;
+	color.g = inverted_color.b;
+	color.b = inverted_color.g;
+	color.a = inverted_color.r;
 	
-	return inverted_color;
+	return color;
 }
 
 /*----------------------------------------------------------------------------
