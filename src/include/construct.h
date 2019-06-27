@@ -95,9 +95,9 @@ struct lua_State;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-enum ConstructionFileType {
-	ConstructionFileConstruction,
-	ConstructionFileMain
+enum class ConstructionFileType {
+	Construction,
+	Main
 };
 
 /// Construction frame
@@ -105,7 +105,7 @@ class CConstructionFrame
 {
 public:
 	int Percent = 0;											/// Percent complete
-	ConstructionFileType File = ConstructionFileConstruction;	/// Graphic to use
+	ConstructionFileType File = ConstructionFileType::Construction;	/// Graphic to use
 	int Frame = 0;												/// Frame number
 	CConstructionFrame *Next = nullptr;							/// Next pointer
 };
