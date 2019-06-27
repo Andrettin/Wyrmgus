@@ -63,6 +63,7 @@ public:
 
 private:
 	void Boost(CUnit &building, int amount, int varIndex) const;
+	void SetFrame(CUnit &unit, const CConstructionFrame *frame);
 	void UpdateConstructionFrame(CUnit &unit);
 
 private:

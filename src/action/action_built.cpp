@@ -51,6 +51,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "video/palette_image.h"
 
 /// How many resources the player gets back if canceling building
 constexpr int CANCEL_BUILDING_COSTS_FACTOR = 75;
@@ -120,7 +121,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 		while (frame-- && cframe->Next != nullptr) {
 			cframe = cframe->Next;
 		}
-		this->Frame = cframe;
+		this->SetFrame(unit, cframe);
 	} else {
 		return false;
 	}
@@ -458,6 +459,19 @@ static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cfr
 	return prev;
 }
 
+void COrder_Built::SetFrame(CUnit &unit, const CConstructionFrame *frame)
+{
+	const PaletteImage *old_image = unit.GetImage();
+	
+	this->Frame = frame;
+	
+	const PaletteImage *new_image = unit.GetImage();
+	
+	if (old_image != new_image) {
+		unit.emit_signal("image_changed", new_image);
+	}
+}
+
 /**
 **  Update construction frame
 **
@@ -472,7 +486,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 	Assert(cframe != nullptr);
 
 	if (cframe != this->Frame) {
-		this->Frame = cframe;
+		this->SetFrame(unit, cframe);
 		if (unit.GetFrame() < 0) {
 			unit.SetFrame(-cframe->Frame - 1);
 		} else {

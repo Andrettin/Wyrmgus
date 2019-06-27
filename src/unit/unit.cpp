@@ -36,6 +36,7 @@
 #include "unit/unit.h"
 
 #include "action/action_attack.h"
+#include "action/action_built.h"
 //Wyrmgus start
 #include "action/action_resource.h"
 #include "action/action_upgradeto.h"
@@ -5743,6 +5744,18 @@ PixelSize CUnit::GetTilePixelSize() const
 const PaletteImage *CUnit::GetImage() const
 {
 	const UnitTypeVariation *variation = this->GetVariation();
+	
+	if (this->IsUnderConstruction()) {
+		const CConstructionFrame *construction_frame = nullptr;
+		if (this->CurrentAction() == UnitActionBuilt) {
+			COrder_Built &order = *static_cast<COrder_Built *>(this->CurrentOrder());
+			const CConstructionFrame *construction_frame = &order.GetFrame();
+			
+			if (construction_frame->File == ConstructionFileType::Construction) {
+				return this->GetConstruction()->GetImage();
+			}
+		}
+	}
 
 	if (this->GetType()->BoolFlag[HARVESTER_INDEX].value && this->GetCurrentResource()) {
 		const CResource *resource = CResource::Get(this->GetCurrentResource());

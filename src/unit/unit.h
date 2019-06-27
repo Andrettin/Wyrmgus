@@ -55,6 +55,7 @@ class CFile;
 class CLanguage;
 class CMapLayer;
 class COrder;
+class COrder_Built;
 class CPlayer;
 class CSpell;
 class CUnit;
@@ -801,6 +802,7 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 	
+	friend class COrder_Build;
 	friend class COrder_Follow;
 	friend class COrder_PickUp;
 	friend class COrder_Trade;
