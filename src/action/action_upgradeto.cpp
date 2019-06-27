@@ -141,7 +141,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus end
 
 	CPlayer &player = *unit.GetPlayer();
-	if (!unit.UnderConstruction) {
+	if (!unit.IsUnderConstruction()) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
 		player.Demand += newtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value;
@@ -308,7 +308,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 
-	if (!unit.UnderConstruction) {
+	if (!unit.IsUnderConstruction()) {
 		UpdateForNewUnit(unit, 1);
 		player.IncreaseCountsForUnit(&unit, true);
 	}
@@ -370,7 +370,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			SelectedUnitChanged();
 		}
 		
-		if (!unit.UnderConstruction) {
+		if (!unit.IsUnderConstruction()) {
 			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 				if (
 					objective->ObjectiveType == BuildUnitsObjectiveType

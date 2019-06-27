@@ -611,6 +611,12 @@ public:
 	const CLanguage *GetLanguage() const;
 	
 	[[nodiscard]]
+	bool IsUnderConstruction() const
+	{
+		return this->UnderConstruction;
+	}
+	
+	[[nodiscard]]
 	bool IsDiurnal() const;
 	
 	[[nodiscard]]
@@ -724,12 +730,12 @@ public:
 	std::map<const CUnitType *, int> UnitStock; 						/// How many of each unit type this unit has stocked
 	std::map<const CUnitType *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 
-	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
+	unsigned char DamagedType;   /// index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked
-	unsigned Blink : 3;          /// Let selection rectangle blink
-	unsigned Moving : 1;         /// The unit is moving
-	unsigned ReCast : 1;         /// Recast again next cycle
-	unsigned AutoRepair : 1;     /// True if unit tries to repair on still action.
+	unsigned Blink : 3;          /// let selection rectangle blink
+	unsigned Moving : 1;         /// the unit is moving
+	unsigned ReCast : 1;         /// recast again next cycle
+	unsigned AutoRepair : 1;     /// true if unit tries to repair on still action.
 
 	unsigned Burning : 1;        /// unit is burning
 	unsigned Destroyed : 1;      /// unit is destroyed pending reference
@@ -737,15 +743,15 @@ public:
 private:
 	bool Selected = false;       /// unit is selected
 
+	bool UnderConstruction = false;	/// unit is in construction
 public:
-	bool UnderConstruction = false;	/// Unit is in construction
-	unsigned Active : 1;         /// Unit is active for AI
-	unsigned Boarded : 1;        /// Unit is on board a transporter.
-	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
+	unsigned Active : 1;         /// unit is active for AI
+	unsigned Boarded : 1;        /// unit is on board a transporter.
+	unsigned CacheLock : 1;      /// unit is on lock by unitcache operations.
 
-	unsigned Summoned : 1;       /// Unit is summoned using spells.
-	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
-	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
+	unsigned Summoned : 1;       /// unit is summoned using spells.
+	unsigned Waiting : 1;        /// unit is waiting and playing its still animation
+	unsigned MineLow : 1;        /// rhis mine got a notification about its resources being low
 	
 	unsigned TeamSelected;		/// unit is selected by a team member.
 	CPlayer *RescuedFrom = nullptr;	/// The original owner of a rescued unit.
@@ -807,6 +813,7 @@ public:
 	friend int CclMoveUnit(lua_State *l);
 	friend int CclShowMapLocation(lua_State *l);
 	friend int CclUnit(lua_State *l);
+	friend void Finish(COrder_Built &order, CUnit &unit);
 	friend void UnitInXY(CUnit &unit, const Vec2i &pos, const int z);
 	
 protected:

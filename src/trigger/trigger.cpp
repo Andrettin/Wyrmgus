@@ -225,7 +225,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 		if (unittype == ANY_UNIT
 			|| (unittype == ALL_FOODUNITS && !unit.GetType()->BoolFlag[BUILDING_INDEX].value)
 			|| (unittype == ALL_BUILDINGS && unit.GetType()->BoolFlag[BUILDING_INDEX].value)
-			|| (unittype == unit.GetType() && !unit.UnderConstruction)) {
+			|| (unittype == unit.GetType() && !unit.IsUnderConstruction())) {
 
 			// Check the player
 			//Wyrmgus start

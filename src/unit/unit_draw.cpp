@@ -921,10 +921,10 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 {
 	PixelPos pos = screenPos;
 	const UnitTypeVariation *variation = unit.GetVariation();
-	if (cframe->File == ConstructionFileConstruction) {
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
 				pos.x -= (variation->Construction->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+	if (cframe->File == ConstructionFileType::Construction) {
 				pos.x += type.GetOffsetX();
 				pos.y -= (variation->Construction->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.GetOffsetY();
@@ -988,7 +988,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 							//Wyrmgus end
 {
 	PixelPos pos = screenPos;
-	if (cframe->File == ConstructionFileConstruction) {
+	if (cframe->File == ConstructionFileType::Construction) {
 		const UnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->Construction) {
 			const CConstruction &construction = *variation->Construction;
@@ -1070,7 +1070,7 @@ void CUnit::Draw(const CViewport &vp) const
 		type = this->Type;
 		frame = this->Frame;
 		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
-		under_construction = this->UnderConstruction;
+		under_construction = this->IsUnderConstruction();
 		// Reset Type to the type being upgraded to
 		if (action == UnitActionUpgradeTo) {
 			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(this->CurrentOrder());

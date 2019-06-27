@@ -278,7 +278,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("%c", (unit.Seen.Destroyed & (1 << i)) ? 'X' : '_');
 	}
 	file.printf("\",\n ");
-	if (unit.UnderConstruction) {
+	if (unit.IsUnderConstruction()) {
 		file.printf(" \"under-construction\",");
 	}
 	if (unit.Seen.UnderConstruction) {

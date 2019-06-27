@@ -1558,7 +1558,7 @@ bool CPlayer::HasSettlement(const CSite *settlement) const
 		return false;
 	}
 	
-	if (settlement->SiteUnit && settlement->SiteUnit->GetPlayer() == this && settlement->SiteUnit->UnderConstruction == false) {
+	if (settlement->SiteUnit && settlement->SiteUnit->GetPlayer() == this && settlement->SiteUnit->IsUnderConstruction() == false) {
 		return true;
 	}
 

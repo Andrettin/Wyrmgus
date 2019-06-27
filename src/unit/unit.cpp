@@ -2632,7 +2632,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->UnderConstruction == true || !CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->IsUnderConstruction() || !CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -3423,7 +3423,7 @@ void UpdateUnitSightRange(CUnit &unit)
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);
 	//Wyrmgus end
-	if (unit.UnderConstruction) { // Units under construction have no sight range.
+	if (unit.IsUnderConstruction()) { // Units under construction have no sight range.
 		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.
 		//Wyrmgus start
@@ -4675,7 +4675,7 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.Seen.IX = unit.GetPixelOffset().x;
 	unit.Seen.Frame = unit.GetFrame();
 	unit.Seen.Type = unit.GetType();
-	unit.Seen.UnderConstruction = unit.UnderConstruction;
+	unit.Seen.UnderConstruction = unit.IsUnderConstruction();
 
 	unit.CurrentOrder()->FillSeenValues(unit);
 }
@@ -7896,7 +7896,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 //	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning) {
-	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.UnderConstruction && target.GetType()->TileSize.x != 1 && target.GetType()->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.IsUnderConstruction() && target.GetType()->TileSize.x != 1 && target.GetType()->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
