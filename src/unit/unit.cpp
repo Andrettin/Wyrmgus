@@ -6947,13 +6947,13 @@ CAnimations *CUnit::GetAnimations() const
 	}
 }
 
-CConstruction *CUnit::GetConstruction() const
+const CConstruction *CUnit::GetConstruction() const
 {
 	const UnitTypeVariation *variation = this->GetVariation();
-	if (variation && variation->Construction) {
-		return variation->Construction;
+	if (variation != nullptr && variation->GetConstruction() != nullptr) {
+		return variation->GetConstruction();
 	} else {
-		return this->Type->Construction;
+		return this->GetType()->GetConstruction();
 	}
 }
 

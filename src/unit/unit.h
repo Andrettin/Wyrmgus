@@ -600,7 +600,7 @@ public:
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
-	CConstruction *GetConstruction() const;
+	const CConstruction *GetConstruction() const;
 	const CIcon *GetIcon() const;
 	const CIcon *GetButtonIcon(int button_action) const;
 	MissileConfig GetMissile() const;

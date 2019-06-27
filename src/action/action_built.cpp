@@ -85,10 +85,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	//Wyrmgus start
-//	CConstructionFrame *cframe = unit.GetType()->Construction->Frames;
 	CConstructionFrame *cframe = unit.GetConstruction()->Frames;
-	//Wyrmgus end
 	int frame = 0;
 	while (cframe != this->Frame) {
 		cframe = cframe->Next;
@@ -119,10 +116,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 	} else if (!strcmp(value, "frame")) {
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
-		//Wyrmgus start
-//		CConstructionFrame *cframe = unit.GetType()->Construction->Frames;
 		CConstructionFrame *cframe = unit.GetConstruction()->Frames;
-		//Wyrmgus end
 		while (frame-- && cframe->Next != nullptr) {
 			cframe = cframe->Next;
 		}
@@ -473,10 +467,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const CUnitType &type = *unit.GetType();
 	const int percent = this->ProgressCounter / (type.Stats[unit.GetPlayer()->GetIndex()].Costs[TimeCost] * 6);
-	//Wyrmgus start
-//	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
 	const CConstructionFrame *cframe = FindCFramePercent(*unit.GetConstruction()->Frames, percent);
-	//Wyrmgus end
 
 	Assert(cframe != nullptr);
 

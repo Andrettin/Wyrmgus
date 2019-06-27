@@ -921,29 +921,29 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 {
 	PixelPos pos = screenPos;
 	const UnitTypeVariation *variation = unit.GetVariation();
-		if (variation && variation->Construction) {
-			if (variation->Construction->ShadowSprite) {
-				pos.x -= (variation->Construction->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 	if (cframe->File == ConstructionFileType::Construction) {
+		if (variation && variation->GetConstruction()) {
+			if (variation->GetConstruction()->ShadowSprite) {
+				pos.x -= (variation->GetConstruction()->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.GetOffsetX();
-				pos.y -= (variation->Construction->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (variation->GetConstruction()->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.GetOffsetY();
 				if (frame < 0) {
-					variation->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+					variation->GetConstruction()->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
-					variation->Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+					variation->GetConstruction()->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 				}
 			}
 		} else {
-			if (type.Construction->ShadowSprite) {
-				pos.x -= (type.Construction->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+			if (type.GetConstruction()->ShadowSprite) {
+				pos.x -= (type.GetConstruction()->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.GetOffsetX();
-				pos.y -= (type.Construction->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (type.GetConstruction()->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.GetOffsetY();
 				if (frame < 0) {
-					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+					type.GetConstruction()->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
-					type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+					type.GetConstruction()->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 				}
 			}
 		}
@@ -990,8 +990,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileType::Construction) {
 		const UnitTypeVariation *variation = unit.GetVariation();
-		if (variation && variation->Construction) {
-			const CConstruction &construction = *variation->Construction;
+		if (variation && variation->GetConstruction()) {
+			const CConstruction &construction = *variation->GetConstruction();
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
@@ -1000,7 +1000,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 			}
 		} else {
-			const CConstruction &construction = *type.Construction;
+			const CConstruction &construction = *type.GetConstruction();
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {

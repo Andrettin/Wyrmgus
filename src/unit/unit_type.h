@@ -635,6 +635,11 @@ public:
 		return this->GetBoxOffset().y;
 	}
 	
+	const CConstruction *GetConstruction() const
+	{
+		return this->Construction;
+	}
+	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();
@@ -744,9 +749,9 @@ public:
 	std::string CorpseName;				/// Corpse type name
 	CUnitType *CorpseType = nullptr;	/// Corpse unit-type
 
-	CConstruction *Construction = nullptr;	/// What is shown in construction phase
-
 private:
+	const CConstruction *Construction = nullptr;	/// What is shown in construction phase
+
 	int RepairHP = 0;				/// Amount of HP per repair
 public:
 	int RepairCosts[MaxCosts];		/// How much it costs to repair

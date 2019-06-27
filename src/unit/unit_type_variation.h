@@ -114,6 +114,11 @@ public:
 		return this->HairColor;
 	}
 	
+	const CConstruction *GetConstruction() const
+	{
+		return this->Construction;
+	}
+	
 private:
 	int Index = -1;					/// the variation's index within the appropriate variation vector of its unit type
 	String Ident;					/// the variation's string identifier
@@ -140,8 +145,10 @@ public:
 	CGraphic *ShadowSprite = nullptr;		/// the graphic corresponding to ShadowFile.
 	CGraphic *LightSprite = nullptr;		/// the graphic corresponding to LightFile.
 	CAnimations *Animations = nullptr;		/// animation scripts
+private:
 	CConstruction *Construction = nullptr;	/// what is shown in construction phase
 
+public:
 	std::vector<const CUpgrade *> UpgradesRequired;		/// upgrades required by variation
 	std::vector<const CUpgrade *> UpgradesForbidden;	/// if the player has one of these upgrades, the unit can't have this variation
 	std::vector<const ItemClass *> ItemClassesEquipped;
