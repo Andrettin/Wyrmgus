@@ -207,7 +207,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 
-/* virtual */ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	if (!strcmp(value, "state")) {
 		++j;

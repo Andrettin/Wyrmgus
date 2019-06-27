@@ -104,7 +104,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Built::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_Built::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	if (!strcmp(value, "worker")) {
 		++j;
@@ -489,7 +489,6 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 		}
 	}
 }
-
 
 void COrder_Built::Progress(CUnit &unit, int amount)
 {

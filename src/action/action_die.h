@@ -40,7 +40,7 @@ public:
 	virtual COrder_Die *Clone() const { return new COrder_Die(*this); }
 
 	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual bool IsValid() const;
 

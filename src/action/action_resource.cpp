@@ -326,7 +326,7 @@ COrder_Resource::~COrder_Resource()
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	if (!strcmp(value, "current-res")) {
 		++j;

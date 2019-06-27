@@ -403,7 +403,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	if (!strcmp(value, "type")) {
 		++j;
@@ -455,7 +455,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, const CUnitType &n
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	if (!strcmp(value, "type")) {
 		++j;

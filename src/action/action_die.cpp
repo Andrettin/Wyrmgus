@@ -59,7 +59,7 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	return false;
 }

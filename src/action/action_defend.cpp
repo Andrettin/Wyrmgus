@@ -98,7 +98,7 @@ enum {
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+/* virtual */ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit)
 {
 	if (!strcmp(value, "state")) {
 		++j;
