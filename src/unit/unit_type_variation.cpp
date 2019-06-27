@@ -125,11 +125,7 @@ void UnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid animations: \"%s\".\n", value.utf8().get_data());
 			}
 		} else if (key == "construction") {
-			value = value.replace("_", "-");
-			this->Construction = ConstructionByIdent(value.utf8().get_data());
-			if (!this->Construction) {
-				fprintf(stderr, "Invalid construction: \"%s\".\n", value.utf8().get_data());
-			}
+			this->Construction = CConstruction::Get(value);
 		} else if (key == "required_upgrade") {
 			value = value.replace("_", "-");
 			const CUpgrade *upgrade = CUpgrade::Get(value.utf8().get_data());

@@ -846,7 +846,7 @@ static int CclDefineUnitType(lua_State *l)
 							DebugPrint("Warning animation '%s' not found\n" _C_ LuaToString(l, -1, k + 1));
 						}
 					} else if (!strcmp(value, "construction")) {
-						variation->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
+						variation->Construction = CConstruction::Get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {
 						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
 						const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
@@ -1165,7 +1165,7 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
-			type->Construction = ConstructionByIdent(LuaToString(l, -1));
+			type->Construction = CConstruction::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DrawLevel")) {
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {

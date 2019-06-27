@@ -46,18 +46,6 @@
 **
 **  The construction structure members:
 **
-**  CConstruction::Ident
-**
-**    Unique identifier of the construction, used to reference it in
-**    the config files and during startup. As convention they start
-**    with "construction-" fe. "construction-land".
-**    @note Don't use this member in game, use instead the pointer
-**      to this structure. See ConstructionByIdent().
-**
-**  CConstruction::File
-**
-**    Path file name of the sprite file.
-**
 **  CConstruction::ShadowFile
 **
 **    Path file name of shadow sprite file.
@@ -85,13 +73,14 @@
 **    Size of a shadow sprite frame in pixels. All frames of a sprite
 **    have the same size. Also all sprites (tilesets) must have the
 **    same size.
-**
-**    @todo
-**      Need ::TilesetByName, ...
-**      Only fixed number of constructions supported, more than
-**      a single construction frame is not supported, animated
-**      constructions aren't supported.
 */
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+#include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -99,7 +88,12 @@
 
 class CGraphic;
 class CPlayerColorGraphic;
+class PaletteImage;
+struct lua_State;
 
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
 
 enum ConstructionFileType {
 	ConstructionFileConstruction,
@@ -117,28 +111,34 @@ public:
 };
 
 /// Construction shown during construction of a building
-class CConstruction
+class CConstruction : public DataElement, public DataType<CConstruction>
 {
-public:
-	CConstruction()
-	{
-		File.Width = 0;
-		File.Height = 0;
-		ShadowFile.Width = 0;
-		ShadowFile.Height = 0;
-	}
-	~CConstruction();
-	void Clean();
-	void Load();
+	GDCLASS(CConstruction, DataElement)
 
 public:
-	std::string Ident;		/// construction identifier
+	~CConstruction();
 	
+	static constexpr const char *ClassIdentifier = "construction";
+	
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	
+	void Clean();
+	void Load();
+	
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
+	}
+
+private:
+	const PaletteImage *Image = nullptr;
+	
+public:
 	struct {
 		std::string File;	/// sprite file
-		int Width;			/// sprite width
-		int Height;			/// sprite height
-	} File, ShadowFile;
+		int Width = 0;		/// sprite width
+		int Height = 0;		/// sprite height
+	} ShadowFile;
 	
 	CConstructionFrame *Frames = nullptr;	/// construction frames
 
@@ -150,30 +150,21 @@ public:
 	CGraphic *ShadowSprite = nullptr;	/// construction shadow sprite image
 	int ShadowWidth = 0;				/// shadow sprite width
 	int ShadowHeight = 0;				/// shadow sprite height
+	
+	friend int CclDefineConstruction(lua_State *l);
+
+protected:
+	static void _bind_methods();
 };
-
-/*----------------------------------------------------------------------------
---  Macros
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Initialize the constructions module
-extern void InitConstructions();
 /// Load the graphics for constructions
 extern void LoadConstructions();
 /// Count the amount of constructions to load
 extern int GetConstructionsCount();
-/// Clean up the constructions module
-extern void CleanConstructions();
-/// Get construction by identifier
-extern CConstruction *ConstructionByIdent(const std::string &ident);
 
 /// Register ccl features
 extern void ConstructionCclRegister();

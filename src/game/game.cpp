@@ -1694,7 +1694,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
 #endif
-	InitConstructions();
 	LoadConstructions();
 	LoadUnitTypes();
 	LoadDecorations();

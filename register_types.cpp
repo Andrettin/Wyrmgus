@@ -38,6 +38,7 @@
 #include "animation/animation.h"
 #include "character.h"
 #include "civilization.h"
+#include "construct.h"
 #include "conversible_color.h"
 #include "dynasty.h"
 #include "economy/currency.h"
@@ -123,6 +124,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CCampaign>();
 	ClassDB::register_class<CCharacter>();
 	ClassDB::register_class<CCivilization>();
+	ClassDB::register_class<CConstruction>();
 	ClassDB::register_class<Currency>();
 	ClassDB::register_class<CDeity>();
 	ClassDB::register_class<CDeityDomain>();

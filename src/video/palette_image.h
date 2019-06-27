@@ -83,6 +83,7 @@ private:
 	const CHairColor *SourceHairColor = nullptr;				/// the source hair color for the image
 	Ref<Texture> Texture;										/// the image's texture
 
+	friend int CclDefineConstruction(lua_State *l);
 	friend int CclDefineIcon(lua_State *l);
 	friend int CclDefineUnitType(lua_State *l);
 	

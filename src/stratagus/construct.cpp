@@ -38,6 +38,7 @@
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 #include <vector>
@@ -57,7 +58,7 @@ static std::vector<CConstruction *> Constructions;
 
 CConstruction::~CConstruction()
 {
-	Clean();
+	this->Clean();
 }
 
 void CConstruction::Clean()
@@ -77,28 +78,25 @@ void CConstruction::Clean()
 	this->Height = 0;
 	this->ShadowWidth = 0;
 	this->ShadowHeight = 0;
-	this->File.Width = 0;
-	this->File.Height = 0;
 	this->ShadowFile.Width = 0;
 	this->ShadowFile.Height = 0;
 }
 
 void CConstruction::Load()
 {
-	if (this->Ident.empty()) {
+	if (this->GetIdent().empty()) {
 		return;
 	}
-	std::string file = this->File.File;
-
-	this->Width = this->File.Width;
-	this->Height = this->File.Height;
-	if (!file.empty()) {
+	
+	if (this->GetImage() != nullptr) {
+		this->Width = this->GetImage()->GetFrameSize().width;
+		this->Height = this->GetImage()->GetFrameSize().height;
 		UpdateLoadProgress();
-		this->Sprite = CPlayerColorGraphic::New(file, this->Width, this->Height);
+		this->Sprite = CPlayerColorGraphic::New(this->GetImage()->GetFile().utf8().get_data(), this->Width, this->Height);
 		this->Sprite->Load();
 		IncItemsLoaded();
 	}
-	file = this->ShadowFile.File;
+	std::string file = this->ShadowFile.File;
 	this->ShadowWidth = this->ShadowFile.Width;
 	this->ShadowHeight = this->ShadowFile.Height;
 	if (!file.empty()) {
@@ -112,12 +110,31 @@ void CConstruction::Load()
 
 
 /**
-**  Initialize  the constructions.
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
 */
-void InitConstructions()
+bool CConstruction::ProcessConfigDataSection(const CConfigData *section)
 {
+	if (section->Tag == "image") {
+		PaletteImage *image = PaletteImage::GetOrAdd(this->Ident);
+		image->ProcessConfigData(section);
+		this->Image = image;
+	} else {
+		return false;
+	}
+	
+	return true;
 }
 
+void CConstruction::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CConstruction *construction, const String &ident){ construction->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const CConstruction *construction){ return const_cast<PaletteImage *>(construction->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
+}
 
 /**
 **  Return the amount of constructions.
@@ -125,18 +142,14 @@ void InitConstructions()
 int GetConstructionsCount()
 {
 	int count = 0;
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		 CConstruction *c = *it;
-		if (c->Ident.empty()) {
+	for (const CConstruction *construction : CConstruction::GetAll()) {
+		if (construction->GetIdent().empty()) {
 			continue;
 		}
 
-		std::string file = c->File.File;
-		if (!file.empty()) count++;
+		if (construction->GetImage() != nullptr) count++;
 
-		file = c->ShadowFile.File;
+		std::string file = construction->ShadowFile.File.c_str();
 		if (!file.empty()) count++;
 
 	}
@@ -153,44 +166,9 @@ void LoadConstructions()
 {
 	ShowLoadProgress("%s", _("Loading Construction Graphics"));
 		
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		(*it)->Load();
+	for (CConstruction *construction : CConstruction::GetAll()) {
+		construction->Load();
 	}
-}
-
-/**
-**  Cleanup the constructions.
-*/
-void CleanConstructions()
-{
-	//  Free the construction table.
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		delete *it;
-	}
-	Constructions.clear();
-}
-
-/**
-**  Get construction by identifier.
-**
-**  @param ident  Identfier of the construction
-**
-**  @return       Construction structure pointer
-*/
-CConstruction *ConstructionByIdent(const std::string &name)
-{
-	for (std::vector<CConstruction *>::const_iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		if ((*it)->Ident == name) {
-			return *it;
-		}
-	}
-	return nullptr;
 }
 
 /**
@@ -209,16 +187,8 @@ static int CclDefineConstruction(lua_State *l)
 
 	// Slot identifier
 	const std::string str = LuaToString(l, 1);
-	CConstruction *construction = ConstructionByIdent(str);
-	std::vector<CConstruction *>::iterator i;
-
-	if (construction == nullptr) {
-		construction = new CConstruction;
-		Constructions.push_back(construction);
-	} else { // redefine completely.
-		construction->Clean();
-	}
-	construction->Ident = str;
+	CConstruction *construction = CConstruction::GetOrAdd(str);
+	construction->Clean();
 
 	//  Parse the arguments, in tagged format.
 	lua_pushnil(l);
@@ -248,9 +218,12 @@ static int CclDefineConstruction(lua_State *l)
 				lua_pop(l, 1);
 			}
 			if (files) {
-				construction->File.File = file;
-				construction->File.Width = w;
-				construction->File.Height = h;
+				String image_ident = construction->GetIdent();
+				PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+				image->File = file.c_str();
+				image->FrameSize = Vector2i(w, h);
+				construction->Image = image;
+				image->Initialize();
 			} else {
 				construction->ShadowFile.File = file;
 				construction->ShadowFile.Width = w;
