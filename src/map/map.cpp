@@ -1231,9 +1231,7 @@ void ChangeCurrentMapLayer(const int z)
 		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", UI.PreviousMapLayer->GetTimeOfDay(), UI.CurrentMapLayer->GetTimeOfDay());
 	}
 	
-	const int old_index = UI.PreviousMapLayer ? UI.PreviousMapLayer->GetIndex() : -1;
-	const int new_index = UI.CurrentMapLayer ? UI.CurrentMapLayer->GetIndex() : -1;
-	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", old_index, new_index);
+	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", UI.PreviousMapLayer, UI.CurrentMapLayer);
 }
 
 /**
@@ -1479,7 +1477,7 @@ void CMap::Create()
 		}
 	}
 	
-	Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
+	Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer);
 }
 
 /**
@@ -1498,10 +1496,10 @@ void CMap::Init()
 */
 void CMap::Clean()
 {
-	const int map_layer_index = UI.CurrentMapLayer ? UI.CurrentMapLayer->GetIndex() : -1;
+	const CMapLayer *map_layer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = nullptr;
 	UI.PreviousMapLayer = nullptr;
-	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", map_layer_index, -1);
+	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", map_layer, static_cast<CMapLayer *>(nullptr));
 	
 	this->Landmasses = 0;
 

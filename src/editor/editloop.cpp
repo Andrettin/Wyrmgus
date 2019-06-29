@@ -2474,7 +2474,7 @@ void CEditor::Init()
 		CMap::Map.Info.MapHeights.clear();
 		CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
 		
-		Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer->GetIndex());
+		Wyrmgus::GetInstance()->emit_signal("map_layer_created", map_layer);
 		//Wyrmgus end
 
 		const int defaultTile = CMap::Map.Tileset->getDefaultTileIndex();

@@ -147,8 +147,8 @@ void Wyrmgus::_bind_methods()
 	//this signal occurs when the time of day of the map layer being currently seen by the player has changed
 	ADD_SIGNAL(MethodInfo("time_of_day_changed", PropertyInfo(Variant::OBJECT, "old_time_of_day"), PropertyInfo(Variant::OBJECT, "new_time_of_day")));
 	
-	ADD_SIGNAL(MethodInfo("map_layer_created", PropertyInfo(Variant::INT, "index")));
-	ADD_SIGNAL(MethodInfo("current_map_layer_changed", PropertyInfo(Variant::INT, "old_index"), PropertyInfo(Variant::INT, "new_index")));
+	ADD_SIGNAL(MethodInfo("map_layer_created", PropertyInfo(Variant::OBJECT, "map_layer")));
+	ADD_SIGNAL(MethodInfo("current_map_layer_changed", PropertyInfo(Variant::OBJECT, "old_map_layer"), PropertyInfo(Variant::OBJECT, "new_map_layer")));
 	ADD_SIGNAL(MethodInfo("map_loaded"));
 
 	//this signal is triggered when any unit is placed on the map, so that its graphics can be depicted

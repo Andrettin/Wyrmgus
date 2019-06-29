@@ -211,7 +211,7 @@ void StartMap(const std::string &filename, bool clean)
 	
 	if (CPlayer::GetThisPlayer()->StartMapLayer < (int) CMap::Map.MapLayers.size()) {
 		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
-		Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", -1, UI.CurrentMapLayer->GetIndex());
+		Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", static_cast<CMapLayer *>(nullptr), UI.CurrentMapLayer);
 	}
 	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
 
@@ -1763,7 +1763,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 #endif
 	if (CPlayer::GetThisPlayer()->StartMapLayer < (int) CMap::Map.MapLayers.size()) {
 		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
-		Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", -1, UI.CurrentMapLayer->GetIndex());
+		Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", static_cast<CMapLayer *>(nullptr), UI.CurrentMapLayer);
 	}
 	UpdateSurfaceLayerButtons();
 	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
