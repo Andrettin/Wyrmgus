@@ -111,7 +111,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "cultural_names") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			
@@ -124,7 +124,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "cultural_name_words") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			
@@ -146,7 +146,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			
@@ -170,7 +170,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			
@@ -207,7 +207,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "historical_population") {
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			

@@ -294,7 +294,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	}
 
 	if (LcmPreventRecurse) {
-		fprintf(stderr, "recursive use of load map!\n");
+		print_error("Recursive use of load map!");
 		ExitFatal(-1);
 	}
 	CPlayer::InitPlayers();
@@ -359,7 +359,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	const int rectSize = 5; // size of rectange used for player start spots
 	unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
 	if (!pixels) {
-		fprintf(stderr, "Out of memory\n");
+		print_error("Out of memory.");
 		exit(1);
 	}
 	// Copy GL map surface to pixel array
@@ -484,7 +484,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 		*/
 		//Wyrmgus end
 	} catch (const FileException &) {
-		fprintf(stderr, "ERROR: cannot write the map presentation\n");
+		print_error("Could not write the map presentation.");
 		delete f;
 		return -1;
 	}

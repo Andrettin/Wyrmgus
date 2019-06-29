@@ -83,11 +83,7 @@ bool CAchievement::ProcessConfigDataProperty(const String &key, String value)
 		}
 	} else if (key == "character_type") {
 		const CUnitType *unit_type = CUnitType::Get(value);
-		if (unit_type) {
-			this->CharacterType = unit_type;
-		} else {
-			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.utf8().get_data());
-		}
+		this->CharacterType = unit_type;
 	} else if (key == "required_quest") {
 		value = value.replace("_", "-");
 		const CQuest *required_quest = CQuest::Get(value);
@@ -107,15 +103,15 @@ bool CAchievement::ProcessConfigDataProperty(const String &key, String value)
 void CAchievement::Initialize()
 {
 	if (this->GetIcon() == nullptr) {
-		fprintf(stderr, "Achievement \"%s\" has no icon.\n", this->Ident.c_str());
+		print_error("Achievement \"" + this->GetIdent() + "\" has no icon.");
 	}
 	
 	if (this->GetPrimaryPlayerColor() == nullptr) {
-		fprintf(stderr, "Achievement \"%s\" has no primary player color.\n", this->Ident.c_str());
+		print_error("Achievement \"" + this->GetIdent() + "\" has no primary player color.");
 	}
 	
 	if (this->GetSecondaryPlayerColor() == nullptr) {
-		fprintf(stderr, "Achievement \"%s\" has no secondary player color.\n", this->Ident.c_str());
+		print_error("Achievement \"" + this->GetIdent() + "\" has no secondary player color.");
 	}
 	
 	this->Initialized = true;

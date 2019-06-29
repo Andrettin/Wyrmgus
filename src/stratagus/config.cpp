@@ -72,7 +72,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	std::vector<CConfigData *> config_data_elements;
 	
 	if (!CanAccessFile(filepath.c_str())) {
-		fprintf(stderr, "File \"%s\" not found.\n", filepath.c_str());
+		print_error("File \"" + String(filepath.c_str()) + "\" not found.");
 	}
 	
 	FileAccess *file = FileAccess::open(filepath.c_str(), FileAccess::READ);
@@ -94,7 +94,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 			std::vector<String> tokens = CConfigData::ParseLine(line);
 			CConfigData::ParseTokens(tokens, &current_config_data, config_data_elements);
 		} catch (std::exception &exception) {
-			fprintf(stderr, "Error parsing config file \"%s\", line %i: %s.\n", filepath.c_str(), line_index, exception.what());
+			print_error("Error parsing config file \"" + String(filepath.c_str()) + "\", line " + String::num_int64(line_index) + ": " + exception.what() + ".");
 		}
 		++line_index;
 	}
@@ -103,7 +103,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	memdelete(file);
 	
 	if (config_data_elements.empty()) {
-		fprintf(stderr, "Could not parse output for config file \"%s\".\n", filepath.c_str());
+		print_error("Could not parse output for config file \"" + String(filepath.c_str()) + "\".");
 		return;
 	}
 	
@@ -298,7 +298,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		ident = ident.replace("_", "-"); //for backwards compatibility with the Lua code
 		
 		if (ident.empty() && config_data->Tag != "button") {
-			fprintf(stderr, "String identifier is empty for config data belonging to tag \"%s\".\n", config_data->Tag.utf8().get_data());
+			print_error("String identifier is empty for config data belonging to tag \"" + config_data->Tag + "\".");
 			continue;
 		}
 		
@@ -375,7 +375,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				trigger->ProcessConfigData(config_data);
 			}
 		} else {
-			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.utf8().get_data());
+			print_error("Invalid data type: \"" + config_data->Tag + "\".");
 		}
 	}
 }
@@ -391,7 +391,7 @@ Color CConfigData::ProcessColor() const
 	
 	for (const CConfigProperty &property : this->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+			print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 			continue;
 		}
 		
@@ -404,7 +404,7 @@ Color CConfigData::ProcessColor() const
 		} else if (property.Key == "alpha") {
 			color.a = property.Value.to_int() / 255.0;
 		} else {
-			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.utf8().get_data());
+			print_error("Invalid color property: \"" + property.Key + "\".");
 		}
 	}
 	

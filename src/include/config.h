@@ -37,6 +37,7 @@
 #include "config_property.h"
 
 #include <core/color.h>
+#include <core/ustring.h>
 
 #include <functional>
 #include <map>
@@ -80,10 +81,10 @@ public:
 		for (const CConfigProperty &config_property : this->Properties) {
 			try {
 				if (!config_property.ProcessForObject(data_element)) {
-					fprintf(stderr, "Invalid %s property: \"%s\".\n", this->Tag.utf8().get_data(), config_property.Key.utf8().get_data());
+					print_error("Invalid " + this->Tag + " property: \"" + config_property.Key + "\".");
 				}
 			} catch (std::exception &exception) {
-				fprintf(stderr, "%s\n", exception.what());
+				print_error(exception.what());
 			}
 		}
 	}

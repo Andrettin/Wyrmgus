@@ -314,7 +314,7 @@ int DoActionMove(CUnit &unit)
 	if (abs(unit.GetPixelOffset().x) > (CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).x * 2) || abs(unit.GetPixelOffset().y) > (CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex()).y * 2)) {
 		unit.SetPixelOffset(0, 0);
 #ifdef DEBUG
-		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
+		print_error("Error in DoActionMove: unit's pixel movement was too big.");
 #endif
 		
 		if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves

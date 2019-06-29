@@ -133,7 +133,7 @@ bool CCivilization::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			
@@ -148,12 +148,12 @@ bool CCivilization::ProcessConfigDataSection(const CConfigData *section)
 			} else if (key == "has_upgrade") {
 				has_upgrade = StringToBool(value);
 			} else {
-				fprintf(stderr, "Invalid historical upgrade property: \"%s\".\n", key.utf8().get_data());
+				print_error("Invalid historical upgrade property: \"" + key + "\".");
 			}
 		}
 		
 		if (upgrade == nullptr) {
-			fprintf(stderr, "Historical upgrade has no upgrade.\n");
+			print_error("Historical upgrade has no upgrade.");
 			return true;
 		}
 		
@@ -172,7 +172,7 @@ void CCivilization::Initialize()
 {
 	if (this->ParentCivilization != nullptr) {
 		if (!this->ParentCivilization->IsInitialized()) {
-			fprintf(stderr, "Civilization \"%s\" is inheriting features from a non-initialized parent (\"%s\").\n", this->Ident.c_str(), this->ParentCivilization->Ident.c_str());
+			print_error("Civilization \"" + this->GetIdent() + "\" is inheriting features from a non-initialized parent (\"" + this->ParentCivilization->GetIdent() + "\").");
 		}
 		
 		//inherit button icons from the parent civilization, for button actions which none are specified
@@ -305,15 +305,15 @@ void CCivilization::Initialize()
 	}
 	
 	if (this->GetIcon() == nullptr) {
-		fprintf(stderr, "Civilization \"%s\" has no icon.\n", this->Ident.c_str());
+		print_error("Civilization \"" + this->GetIdent() + "\" has no icon.");
 	}
 	
 	if (this->GetDefaultPrimaryPlayerColor() == nullptr) {
-		fprintf(stderr, "Civilization \"%s\" has no primary player color.\n", this->Ident.c_str());
+		print_error("Civilization \"" + this->GetIdent() + "\" has no primary player color.");
 	}
 	
 	if (this->GetDefaultSecondaryPlayerColor() == nullptr) {
-		fprintf(stderr, "Civilization \"%s\" has no secondary player color.\n", this->Ident.c_str());
+		print_error("Civilization \"" + this->GetIdent() + "\" has no secondary player color.");
 	}
 	
 	this->Initialized = true;
@@ -339,8 +339,8 @@ const CUpgrade *CCivilization::GetUpgrade() const
 	
 int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
-	if (!upgrade) {
-		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is null.\n");
+	if (upgrade == nullptr) {
+		print_error("Error in CCivilization::GetUpgradePriority: the upgrade is null.");
 	}
 	
 	std::map<const CUpgrade *, int>::const_iterator find_iterator = this->UpgradePriorities.find(upgrade);
@@ -354,7 +354,7 @@ int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 int CCivilization::GetForceTypeWeight(const int force_type) const
 {
 	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTypeWeight: the force_type is -1.\n");
+		print_error("Error in CCivilization::GetForceTypeWeight: the force_type is -1.");
 	}
 	
 	std::map<int, int>::const_iterator find_iterator = this->ForceTypeWeights.find(force_type);
@@ -390,7 +390,7 @@ CCalendar *CCivilization::GetCalendar() const
 std::vector<CForceTemplate *> CCivilization::GetForceTemplates(const int force_type) const
 {
 	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTemplates: the force_type is -1.\n");
+		print_error("Error in CCivilization::GetForceTemplates: the force_type is -1.");
 	}
 	
 	std::map<int, std::vector<CForceTemplate *>>::const_iterator find_iterator = this->ForceTemplates.find(force_type);

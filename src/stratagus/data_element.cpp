@@ -65,17 +65,17 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 		} catch (std::exception &exception) {
-			fprintf(stderr, "%s\n", exception.what());
+			print_error(exception.what());
 		}
 		
 		if (!this->ProcessConfigDataProperty(config_property.Key, config_property.Value)) {
-			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.utf8().get_data(), config_property.Key.utf8().get_data());
+			print_error("Invalid " + config_data->Tag + " property: \"" + config_property.Key + "\".");
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
 		if (!this->ProcessConfigDataSection(section)) {
-			fprintf(stderr, "Invalid %s section: \"%s\".\n", config_data->Tag.utf8().get_data(), section->Tag.utf8().get_data());
+			print_error("Invalid " + config_data->Tag + " section: \"" + section->Tag + "\".");
 		}
 	}
 	

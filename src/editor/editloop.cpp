@@ -2621,7 +2621,7 @@ int EditorSaveMap(const std::string &file, bool is_mod)
 //	if (SaveStratagusMap(fullName, CMap::Map, Editor.TerrainEditable) == -1) {
 	if (SaveStratagusMap(fullName, CMap::Map, Editor.TerrainEditable && !is_mod, is_mod) == -1) {
 	//Wyrmgus end
-		fprintf(stderr, "Cannot save map\n");
+		print_error("Cannot save map.");
 		return -1;
 	}
 	return 0;

@@ -622,7 +622,7 @@ void AiInit(CPlayer &player)
 	PlayerAi *pai = new PlayerAi;
 
 	if (!pai) {
-		fprintf(stderr, "Out of memory.\n");
+		print_error("Out of memory.");
 		exit(0);
 	}
 

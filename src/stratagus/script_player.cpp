@@ -1206,10 +1206,10 @@ static int CclDefineLanguageWord(lua_State *l)
 					word->DerivesFrom = derives_from;
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
-					fprintf(stderr, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist.\n", word->GetIdent().utf8().get_data(), derives_from_word.utf8().get_data(), derives_from_language->GetIdent().utf8().get_data(), derives_from_word_type->GetIdent().utf8().get_data());
+					print_error("Word \"" + word->GetIdent() + "\" is set to derive from \"" + derives_from_word + "\" (" + derives_from_language->GetIdent() + ", " + derives_from_word_type->GetIdent() + "), but the latter doesn't exist.");
 				}
 			} else {
-				fprintf(stderr, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect.\n", word->GetIdent().utf8().get_data());
+				print_error("Word \"" + word->GetIdent() + "\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect.");
 			}
 		} else if (!strcmp(value, "Replaces")) {
 			if (!lua_istable(l, -1)) {

@@ -481,7 +481,7 @@ bool CSpell::ProcessConfigDataSection(const CConfigData *section)
 			
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
-				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 				continue;
 			}
 			
@@ -977,7 +977,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+			print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 			continue;
 		}
 		
@@ -1023,7 +1023,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+					print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 					continue;
 				}
 				
@@ -1064,7 +1064,7 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 {
 	for (const CConfigProperty &property : config_data->Properties) {
 		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+			print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 			continue;
 		}
 		
@@ -1087,7 +1087,7 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 		if (section->Tag == "priority") {
 			for (const CConfigProperty &property : section->Properties) {
 				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.utf8().get_data(), property.Operator);
+					print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
 					continue;
 				}
 				
