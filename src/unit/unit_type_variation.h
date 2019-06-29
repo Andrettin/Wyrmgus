@@ -127,7 +127,7 @@ public:
 	std::string TypeName;			/// type name.
 private:
 	const CUnitType *Type = nullptr;	/// the unit type to which the variation belongs
-	PaletteImage *Image = nullptr;	/// the variation's sprite
+	PaletteImage *Image = nullptr;		/// the variation's image
 public:
 	std::string ShadowFile;			/// variation's shadow graphics.
 	std::string LightFile;			/// variation's light graphics.

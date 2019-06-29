@@ -49,6 +49,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 class CSeason;
 class CUnitType;
+class PaletteImage;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -86,6 +87,11 @@ public:
 	uint16_t GetFlags() const
 	{
 		return this->Flags;
+	}
+	
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
 	}
 	
 	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
@@ -145,6 +151,7 @@ public:
 	PixelSize PixelTileSize = PixelSize(32, 32);
 	CUnitType *UnitType = nullptr;
 private:
+	const PaletteImage *Image = nullptr;						/// the terrain type's image
 	CGraphic *Graphics = nullptr;
 	std::map<const CSeason *, CGraphic *> SeasonGraphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 public:

@@ -67,6 +67,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "include/version.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 #include "world/plane.h"
 //Wyrmgus start
@@ -1564,17 +1565,23 @@ static int CclDefineTerrainType(lua_State *l)
 	
 	//save the graphics here, so that we can take the pixel tile size into account
 	if (!graphics_file.empty()) {
-		if (CGraphic::Get(graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
-		}
-		terrain->Graphics = CGraphic::Get(graphics_file);
+		String image_ident = "terrain_" + terrain->GetIdent();
+		image_ident = image_ident.replace("_", "-");
+		PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+		image->File = graphics_file.c_str();
+		image->FrameSize.x = CMap::Map.PixelTileSize.x;
+		image->FrameSize.y = CMap::Map.PixelTileSize.y;
+		image->Initialize();
+		terrain->Image = image;
 	}
+	
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(elevation_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
+	
 	if (!player_color_graphics_file.empty()) {
 		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
 			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);

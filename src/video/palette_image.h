@@ -85,6 +85,7 @@ private:
 
 	friend int CclDefineConstruction(lua_State *l);
 	friend int CclDefineIcon(lua_State *l);
+	friend int CclDefineTerrainType(lua_State *l);
 	friend int CclDefineUnitType(lua_State *l);
 	
 protected:

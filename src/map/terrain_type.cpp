@@ -42,6 +42,7 @@
 #include "map/tileset.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 #include <algorithm>
@@ -63,15 +64,25 @@ std::map<std::tuple<int, int, int>, CTerrainType *> CTerrainType::TerrainTypesBy
 void CTerrainType::LoadTerrainTypeGraphics()
 {
 	for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
-		if (terrain_type->Graphics) {
-			terrain_type->Graphics->Load();
+		if (terrain_type->Graphics == nullptr) {
+			if (terrain_type->GetImage() != nullptr) {
+				CGraphic *graphics = CGraphic::Get(terrain_type->GetImage()->GetFile().utf8().get_data());
+				if (graphics == nullptr) {
+					graphics = CGraphic::New(terrain_type->GetImage()->GetFile().utf8().get_data(), CMap::PixelTileSize.x, CMap::PixelTileSize.y);
+				}
+				terrain_type->Graphics = graphics;
+				terrain_type->Graphics->Load();
+			}
 		}
+		
 		for (std::map<const CSeason *, CGraphic *>::iterator sub_it = terrain_type->SeasonGraphics.begin(); sub_it != terrain_type->SeasonGraphics.end(); ++sub_it) {
 			sub_it->second->Load();
 		}
+		
 		if (terrain_type->ElevationGraphics) {
 			terrain_type->ElevationGraphics->Load();
 		}
+		
 		if (terrain_type->PlayerColorGraphics) {
 			terrain_type->PlayerColorGraphics->Load();
 		}
@@ -188,18 +199,6 @@ bool CTerrainType::ProcessConfigDataProperty(const String &key, String value)
 		if (flag) {
 			this->Flags |= flag;
 		}
-	} else if (key == "graphics") {
-		std::string graphics_file = value.utf8().get_data();
-		if (CanAccessFile(graphics_file.c_str())) {
-			if (!graphics_file.empty()) {
-				if (CGraphic::Get(graphics_file) == nullptr) {
-					CGraphic *graphics = CGraphic::New(graphics_file, CMap::PixelTileSize.x, CMap::PixelTileSize.y);
-				}
-				this->Graphics = CGraphic::Get(graphics_file);
-			}
-		} else {
-			fprintf(stderr, "File \"%s\" doesn't exist.\n", value.utf8().get_data());
-		}
 	} else if (key == "elevation_graphics") {
 		std::string elevation_graphics_file = value.utf8().get_data();
 		if (CanAccessFile(elevation_graphics_file.c_str())) {
@@ -265,7 +264,13 @@ bool CTerrainType::ProcessConfigDataProperty(const String &key, String value)
 */
 bool CTerrainType::ProcessConfigDataSection(const CConfigData *section)
 {
-	if (section->Tag == "season_graphics") {
+	if (section->Tag == "image") {
+		String image_ident = "terrain_" + this->GetIdent();
+		image_ident = image_ident.replace("_", "-");
+		PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+		image->ProcessConfigData(section);
+		this->Image = image;
+	} else if (section->Tag == "season_graphics") {
 		std::string season_graphics_file;
 		CSeason *season = nullptr;
 		
@@ -366,6 +371,10 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 
 void CTerrainType::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CTerrainType *terrain_type, const String &ident){ terrain_type->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const CTerrainType *terrain_type){ return const_cast<PaletteImage *>(terrain_type->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
+	
 	ClassDB::bind_method(D_METHOD("set_tree", "tree"), +[](CTerrainType *terrain_type, const bool tree){ terrain_type->Tree = tree; });
 	ClassDB::bind_method(D_METHOD("is_tree"), &CTerrainType::IsTree);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "tree"), "set_tree", "is_tree");
