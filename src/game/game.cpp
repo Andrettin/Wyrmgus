@@ -1607,7 +1607,9 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		ApplyUpgrades();
 	}
 	CclCommand("if (MapLoaded ~= nil) then MapLoaded() end");
-
+	
+	Wyrmgus::GetInstance()->emit_signal("map_loaded");
+	
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	SyncHash = 0;

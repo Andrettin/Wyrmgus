@@ -146,6 +146,7 @@ void Wyrmgus::_bind_methods()
 	
 	ADD_SIGNAL(MethodInfo("map_layer_created", PropertyInfo(Variant::INT, "index")));
 	ADD_SIGNAL(MethodInfo("current_map_layer_changed", PropertyInfo(Variant::INT, "old_index"), PropertyInfo(Variant::INT, "new_index")));
+	ADD_SIGNAL(MethodInfo("map_loaded"));
 
 	//this signal is triggered when any unit is placed on the map, so that its graphics can be depicted
 	ADD_SIGNAL(MethodInfo("unit_placed", PropertyInfo(Variant::OBJECT, "unit")));
