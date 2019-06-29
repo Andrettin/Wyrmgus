@@ -652,6 +652,25 @@ void CUnit::SetType(const CUnitType *new_type)
 	}
 }
 
+void CUnit::SetPlayer(CPlayer *player)
+{
+	if (player == this->Player) {
+		return;
+	}
+	
+	Color old_selection_color = IntColorToColor(this->GetSelectionColor());
+	
+	this->Player = player;
+	
+	Color new_selection_color = IntColorToColor(this->GetSelectionColor());
+	
+	this->emit_signal("player_changed", player);
+	
+	if (this->IsSelected() && old_selection_color != new_selection_color) {
+		this->emit_signal("selection_color_changed", new_selection_color);
+	}
+}
+
 void CUnit::SetCurrentResource(const unsigned char resource_index)
 {
 	if (resource_index == this->GetCurrentResource()) {
@@ -3086,9 +3105,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 //		}
 		//Wyrmgus end
 	}
-	Player = &player;
-	Stats = &type.Stats[Player->GetIndex()];
-	Colors = &player.UnitColors;
+	this->SetPlayer(&player);
+	this->Stats = &type.Stats[Player->GetIndex()];
+	this->Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(Variable);
@@ -8753,7 +8772,10 @@ IntColor CUnit::GetSelectionColor() const
 void CUnit::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), +[](const CUnit *unit){ return String(unit->GetName().c_str()); });
+	
 	ClassDB::bind_method(D_METHOD("get_player"), &CUnit::GetPlayer);
+	ADD_SIGNAL(MethodInfo("player_changed", PropertyInfo(Variant::OBJECT, "player")));
+	
 	ClassDB::bind_method(D_METHOD("get_icon"), +[](const CUnit *unit){ return const_cast<CIcon *>(unit->GetIcon()); });
 	ClassDB::bind_method(D_METHOD("get_type"), +[](const CUnit *unit){ return const_cast<CUnitType *>(unit->GetType()); });
 	
@@ -8782,7 +8804,8 @@ void CUnit::_bind_methods()
 	ADD_SIGNAL(MethodInfo("selected_changed", PropertyInfo(Variant::BOOL, "selected"), PropertyInfo(Variant::COLOR, "selection_color")));
 	
 	ClassDB::bind_method(D_METHOD("get_selection_color"), +[](const CUnit *unit){ return IntColorToColor(unit->GetSelectionColor()); });
-	
+	ADD_SIGNAL(MethodInfo("selection_color_changed", PropertyInfo(Variant::COLOR, "color")));
+
 	//this signal is triggered when a unit is removed from the map, so that it is no longer displayed
 	ADD_SIGNAL(MethodInfo("removed"));
 }

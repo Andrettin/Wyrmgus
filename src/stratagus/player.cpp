@@ -2191,7 +2191,7 @@ void CPlayer::AddUnit(CUnit &unit)
 	Assert(unit.PlayerSlot == static_cast<size_t>(-1));
 	unit.PlayerSlot = this->Units.size();
 	this->Units.push_back(&unit);
-	unit.Player = this;
+	unit.SetPlayer(this);
 	Assert(this->Units[unit.PlayerSlot] == &unit);
 }
 
@@ -4116,7 +4116,7 @@ bool CPlayer::IsEnemy(const CPlayer &player) const
 {
 	//Wyrmgus start
 //	return IsEnemy(player.GetIndex());
-	return IsEnemy(player.GetIndex()) || player.IsEnemy(this->GetIndex()); // be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
+	return this->IsEnemy(player.GetIndex()) || player.IsEnemy(this->GetIndex()); // be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
 	//Wyrmgus end
 }
 
@@ -4150,7 +4150,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 	}
 	//Wyrmgus end
 	
-	return IsEnemy(*unit.GetPlayer());
+	return this->IsEnemy(*unit.GetPlayer());
 }
 
 /**

@@ -204,6 +204,8 @@ public:
 		return this->Type;
 	}
 	
+	void SetPlayer(CPlayer *player);
+
 	[[nodiscard]]
 	CPlayer *GetPlayer() const
 	{
@@ -220,6 +222,7 @@ public:
 	void SetResourcesHeld(const int quantity);
 	void ChangeResourcesHeld(const int quantity);
 	
+	[[nodiscard]]
 	int GetResourcesHeld() const
 	{
 		return this->ResourcesHeld;
@@ -238,12 +241,15 @@ public:
 	void ChooseVariation(const CUnitType *new_type = nullptr, int image_layer = -1);
 	void SetVariation(const UnitTypeVariation *new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
 	
+	[[nodiscard]]
 	const UnitTypeVariation *GetVariation() const
 	{
 		return this->Variation;
 	}
 	
+	[[nodiscard]]
 	const UnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
+	
 	void UpdateButtonIcons();
 	void ChooseButtonIcon(const int button_action);
 	void EquipItem(CUnit *item, const bool affect_character = true);
@@ -486,6 +492,7 @@ public:
 		return this->MapLayer;
 	}
 	
+	[[nodiscard]]
 	const PaletteImage *GetImage() const;
 	
 	void SetFrame(const int frame);
@@ -629,6 +636,7 @@ public:
 	bool HandleBurnAndPoison();
 	void HandleUnitAction();
 	
+	[[nodiscard]]
 	IntColor GetSelectionColor() const;
 
 public:
