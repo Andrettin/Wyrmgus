@@ -14,6 +14,7 @@
 #include "map/map.h"
 #include "language/word.h"
 #include "literary_text.h"
+#include "map/terrain_type.h"
 #include "player.h"
 #include "player_color.h"
 #include "quest/achievement.h"
@@ -107,6 +108,8 @@ void Wyrmgus::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_achievements"), +[](const Wyrmgus *wyrmgus){ return ContainerToGodotArray(CAchievement::GetAll()); });
 	
+	ClassDB::bind_method(D_METHOD("get_terrain_types"), +[](const Wyrmgus *wyrmgus){ return ContainerToGodotArray(CTerrainType::GetAll()); });
+
 	ClassDB::bind_method(D_METHOD("get_unit_type", "ident"), +[](const Wyrmgus *wyrmgus, const String &ident){ return CUnitType::Get(ident); });
 	ClassDB::bind_method(D_METHOD("get_unit_unit_types"), +[](const Wyrmgus *wyrmgus){ return ContainerToGodotArray(CUnitType::GetUnitUnitTypes()); });
 	ClassDB::bind_method(D_METHOD("get_building_unit_types"), +[](const Wyrmgus *wyrmgus){ return ContainerToGodotArray(CUnitType::GetBuildingUnitTypes()); });
