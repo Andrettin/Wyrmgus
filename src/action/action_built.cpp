@@ -328,7 +328,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		CMap::Map.SetWall(unit.GetTilePos(), &type == UnitTypeHumanWall);
-		if (type.TerrainType->Overlay && CMap::Map.GetTileTerrain(unit.GetTilePos(), type.TerrainType->Overlay, unit.GetMapLayer()->GetIndex()) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
+		if (type.TerrainType->IsOverlay() && CMap::Map.GetTileTerrain(unit.GetTilePos(), type.TerrainType->IsOverlay(), unit.GetMapLayer()->GetIndex()) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
 			CMap::Map.RemoveTileOverlayTerrain(unit.GetTilePos(), unit.GetMapLayer()->GetIndex());
 		}
 		CMap::Map.SetTileTerrain(unit.GetTilePos(), type.TerrainType, unit.GetMapLayer()->GetIndex());

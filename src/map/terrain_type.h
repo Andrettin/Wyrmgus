@@ -39,7 +39,6 @@
 #include "vec2i.h"
 #include "video/color.h"
 
-#include <map>
 #include <tuple>
 
 /*----------------------------------------------------------------------------
@@ -91,6 +90,21 @@ public:
 	
 	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
 	
+	bool IsOverlay() const
+	{
+		return this->Overlay;
+	}
+
+	bool IsBuildable() const
+	{
+		return this->Buildable;
+	}
+
+	bool IsHidden() const
+	{
+		return this->Hidden;
+	}
+
 	bool IsTree() const
 	{
 		return this->Tree;
@@ -117,15 +131,17 @@ public:
 	int Resource = -1;
 private:
 	uint16_t Flags = 0;
-public:
 	bool Overlay = false;										/// Whether this terrain type belongs to the overlay layer
 	bool Buildable = false;										/// Whether structures can be built upon this terrain type
+public:
 	bool AllowSingle = false;									/// Whether this terrain type has transitions for single tiles
+private:
 	bool Hidden = false;
 	bool Tree = false;
 	bool Rock = false;
 	bool Desert = false;
 	bool Swamp = false;
+public:
 	PixelSize PixelTileSize = PixelSize(32, 32);
 	CUnitType *UnitType = nullptr;
 private:

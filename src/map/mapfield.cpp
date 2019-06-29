@@ -140,7 +140,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 	}
 	
 	//remove the flags of the old terrain type
-	if (terrain_type->Overlay) {
+	if (terrain_type->IsOverlay()) {
 		if (this->OverlayTerrain == terrain_type) {
 			return;
 		}
@@ -156,7 +156,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 		}
 	}
 	
-	if (terrain_type->Overlay) {
+	if (terrain_type->IsOverlay()) {
 		if (!this->Terrain || std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), this->Terrain) == terrain_type->BaseTerrainTypes.end()) {
 			this->SetTerrain(terrain_type->BaseTerrainTypes[0]);
 		}
@@ -215,7 +215,7 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 	}
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (terrain_type->Overlay && terrain_type->Resource != -1) {
+	if (terrain_type->IsOverlay() && terrain_type->Resource != -1) {
 		this->Value = CResource::GetAll()[terrain_type->Resource]->DefaultAmount;
 	} else if ((terrain_type->GetFlags() & MapFieldWall) && terrain_type->UnitType) {
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
@@ -341,7 +341,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 		fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", tileset.getTerrainName(tile.tileinfo.BaseTerrain).c_str());
 		return;
 	}
-	if (terrain->Overlay) {
+	if (terrain->IsOverlay()) {
 		if (terrain->IsTree()) {
 			this->SetTerrain(CTerrainType::Get(tileset.solidTerrainTypes[3].TerrainName));
 		} else if (terrain->IsRock() || terrain->GetFlags() & MapFieldWaterAllowed) {
@@ -370,7 +370,7 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, %2d", (TerrainFeature && !TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, Owner);
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, %2d", (TerrainFeature && !TerrainFeature->TerrainType->IsOverlay()) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->IsOverlay()) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, Owner);
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);

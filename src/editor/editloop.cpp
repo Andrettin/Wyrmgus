@@ -211,7 +211,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
-	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
+	if (!terrain->IsOverlay() && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
 		mf.RemoveOverlayTerrain();
 	}
 	mf.Value = value;
@@ -289,12 +289,12 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		const CTerrainType *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, UI.CurrentMapLayer->GetIndex());
+		const CTerrainType *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->IsOverlay(), UI.CurrentMapLayer->GetIndex());
 		
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->GetIndex());
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->GetIndex());
 
-		bool has_transitions = terrain->Overlay ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
+		bool has_transitions = terrain->IsOverlay() ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
 		if (tile_terrain && !tile_terrain->AllowSingle) {
@@ -305,8 +305,8 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 									
-							const CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->GetIndex());
-							if (tile_terrain->Overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
+							const CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->IsOverlay(), UI.CurrentMapLayer->GetIndex());
+							if (tile_terrain->IsOverlay() && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
 							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -374,7 +374,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (CMap::Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
 												const CTerrainType *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->GetIndex());
-												if (adjacent_terrain->Overlay && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
+												if (adjacent_terrain->IsOverlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
 												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -2543,7 +2543,7 @@ void CEditor::Init()
 //	CMap::Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
-		if (!terrain_type->Hidden && terrain_type->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
+		if (!terrain_type->IsHidden() && terrain_type->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
 			Editor.ShownTileTypes.push_back(terrain_type);
 		}
 	}

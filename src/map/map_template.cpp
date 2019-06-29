@@ -695,7 +695,7 @@ void CMapTemplate::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 						}
 						
 						if (historical_terrain) {
-							if (historical_terrain->Overlay && ((historical_terrain->GetFlags() & MapFieldRoad) || (historical_terrain->GetFlags() & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->GetFlags() & MapFieldLandAllowed)) {
+							if (historical_terrain->IsOverlay() && ((historical_terrain->GetFlags() & MapFieldRoad) || (historical_terrain->GetFlags() & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->GetFlags() & MapFieldLandAllowed)) {
 								continue;
 							}
 							CMap::Map.Field(real_pos, z)->SetTerrain(historical_terrain);
@@ -2000,8 +2000,8 @@ bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
 */
 bool CGeneratedTerrain::CanGenerateOnTile(const CMapField *tile) const
 {
-	if (this->TerrainType->Overlay) {
 		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
+	if (this->TerrainType->IsOverlay()) {
 			return false;
 		}
 	} else {
@@ -2045,7 +2045,7 @@ bool CGeneratedTerrain::CanTileBePartOfExpansion(const CMapField *tile) const
 		return true;
 	}
 	
-	if (!this->TerrainType->Overlay) {
+	if (!this->TerrainType->IsOverlay()) {
 		if (this->TerrainType == tile->Terrain) {
 			return true;
 		}

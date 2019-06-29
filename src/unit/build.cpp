@@ -470,7 +470,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 				continue;
 			}
 			Vec2i tile_pos(x, y);
-			const CTerrainType *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->Overlay, z);
+			const CTerrainType *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->IsOverlay(), z);
 			if (this->RestrictTerrainType == terrain) {
 				return true;
 			}
