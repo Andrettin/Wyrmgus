@@ -86,6 +86,11 @@ CMapField *CMapLayer::Field(const unsigned int index) const
 	return &this->Fields[index];
 }
 
+const CTerrainType *CMapLayer::GetTileTerrainType(const Vector2i &pos, const bool overlay) const
+{
+	return this->Field(pos)->GetTerrainType(overlay);
+}
+
 /**
 **	@brief	Perform the map layer's per-hour loop
 */
@@ -438,4 +443,6 @@ void CMapLayer::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_index"), &CMapLayer::GetIndex);
 	ClassDB::bind_method(D_METHOD("get_tile_index", "tile_pos"), +[](const CMapLayer *map_layer, const Vector2 &tile_pos){ return map_layer->GetTileIndex(Vector2i(tile_pos)); });
+	
+	ClassDB::bind_method(D_METHOD("get_tile_terrain_type", "tile_pos", "overlay"), +[](const CMapLayer *map_layer, const Vector2 &tile_pos, const bool overlay){ return const_cast<CTerrainType *>(map_layer->GetTileTerrainType(Vector2i(tile_pos), overlay)); });
 }

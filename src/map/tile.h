@@ -237,9 +237,23 @@ public:
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
 	
-	const CTerrainType *GetTerrain(const bool overlay) const;
+	/**
+	**	@brief	Get the terrain of the tile
+	**
+	**	@param	overlay		Whether it is the overlay terrain that should be obtained
+	**
+	**	@return	The terrain of the tile for the given overlay parameter
+	*/
+	const CTerrainType *GetTerrainType(const bool overlay) const
+	{
+		if (overlay) {
+			return this->OverlayTerrain;
+		} else {
+			return this->Terrain;
+		}
+	}
 
-	const CTerrainType *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
+	const CTerrainType *GetTopTerrainType(const bool seen = false, const bool ignore_destroyed = false) const;
 
 	/// Returns true, if water on the map tile field
 	bool WaterOnMap() const;

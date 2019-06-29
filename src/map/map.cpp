@@ -256,9 +256,7 @@ const CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, c
 		return nullptr;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
-	
-	return mf.GetTerrain(overlay);
+	return this->MapLayers[z]->GetTileTerrainType(pos, overlay);
 }
 
 const CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
@@ -269,7 +267,7 @@ const CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, c
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	return mf.GetTopTerrain();
+	return mf.GetTopTerrainType();
 }
 
 int CMap::GetTileLandmass(const Vec2i &pos, int z) const
@@ -2586,7 +2584,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				const Vec2i tile_pos(x, y);
 				const CMapField *tile = this->Field(x, y, z);
 				
-				if (max_tile_quantity != 0 && tile->GetTopTerrain() == terrain_type) {
+				if (max_tile_quantity != 0 && tile->GetTopTerrainType() == terrain_type) {
 					tile_quantity++;
 				}
 				
@@ -2896,7 +2894,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 
 bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type) const
 {
-	if (tile->GetTopTerrain() == nullptr) {
+	if (tile->GetTopTerrainType() == nullptr) {
 		return true;
 	}
 	
@@ -2938,7 +2936,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 			
 			const CMapField *tile = this->Field(x, y, z);
 
-			if (tile->GetTopTerrain() == nullptr) {
+			if (tile->GetTopTerrainType() == nullptr) {
 				has_tile_with_missing_terrain = true;
 				continue;
 			}
@@ -3072,7 +3070,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 			
 			CMapField *tile = this->Field(x, y, z);
 
-			if (tile->GetTopTerrain() != nullptr) {
+			if (tile->GetTopTerrainType() != nullptr) {
 				continue;
 			}
 			
@@ -3091,8 +3089,8 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 					}
 					
 					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
-					const CTerrainType *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
-					const CTerrainType *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
+					const CTerrainType *adjacent_terrain_type = adjacent_tile->GetTerrainType(false);
+					const CTerrainType *adjacent_overlay_terrain_type = adjacent_tile->GetTerrainType(true);
 					
 					if (adjacent_terrain_type == nullptr) {
 						continue;

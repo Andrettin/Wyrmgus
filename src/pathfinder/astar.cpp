@@ -786,7 +786,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			
 			//Wyrmgus start
 			if (
-				(mf->GetTerrain(false)->IsDesert())
+				(mf->GetTerrainType(false)->IsDesert())
 				&& mf->Owner != unit.GetPlayer()->GetIndex()
 				&& unit.GetType()->BoolFlag[ORGANIC_INDEX].value
 				&& unit.GetMapLayer()->GetTimeOfDay() != nullptr

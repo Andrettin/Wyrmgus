@@ -52,6 +52,7 @@ class CScheduledSeason;
 class CScheduledTimeOfDay;
 class CSeason;
 class CSeasonSchedule;
+class CTerrainType;
 class CTimeOfDay;
 class CTimeOfDaySchedule;
 class CUnit;
@@ -86,6 +87,8 @@ public:
 		return Vec2i(this->Width, this->Height);
 	}
 	
+	const CTerrainType *GetTileTerrainType(const Vector2i &pos, const bool overlay) const;
+	
 	/**
 	**	@brief	Get the map field at a given location
 	**
@@ -115,7 +118,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	CMapField *Field(const Vec2i &pos) const
+	CMapField *Field(const Vector2i &pos) const
 	{
 		return this->Field(pos.x, pos.y);
 	}

@@ -53,22 +53,6 @@ CMapField::CMapField() : UnitCache()
 }
 
 /**
-**	@brief	Get the terrain of the tile
-**
-**	@param	overlay		Whether it is the overlay terrain that should be obtained
-**
-**	@return	The terrain of the tile for the given overlay parameter
-*/
-const CTerrainType *CMapField::GetTerrain(const bool overlay) const
-{
-	if (overlay) {
-		return this->OverlayTerrain;
-	} else {
-		return this->Terrain;
-	}
-}
-
-/**
 **	@brief	Get the top terrain of the tile
 **
 **	@param	seen				Whether the seen tile terrain that should be obtained
@@ -76,7 +60,7 @@ const CTerrainType *CMapField::GetTerrain(const bool overlay) const
 **
 **	@return	The topmost terrain of the tile
 */
-const CTerrainType *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+const CTerrainType *CMapField::GetTopTerrainType(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
 		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
@@ -630,13 +614,13 @@ bool CMapField::CoastOnMap() const
 /// Returns true, if water on the map tile field
 bool CMapField::ForestOnMap() const
 {
-	return this->GetTopTerrain(false, true)->IsTree();
+	return this->GetTopTerrainType(false, true)->IsTree();
 }
 
 /// Returns true, if coast on the map tile field
 bool CMapField::RockOnMap() const
 {
-	return this->GetTopTerrain(false, true)->IsRock();
+	return this->GetTopTerrainType(false, true)->IsRock();
 }
 
 bool CMapField::isAWall() const

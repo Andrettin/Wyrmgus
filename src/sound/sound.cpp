@@ -223,7 +223,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceFireMissile:
 			return unit.GetType()->MapSound.FireMissile.Sound;
 		case VoiceStep:
-			find_iterator = unit.GetType()->MapSound.TerrainTypeStep.find(mf.GetTopTerrain(false, true));
+			find_iterator = unit.GetType()->MapSound.TerrainTypeStep.find(mf.GetTopTerrainType(false, true));
 			if (find_iterator != unit.GetType()->MapSound.TerrainTypeStep.end() && find_iterator->second.Sound) {
 				return find_iterator->second.Sound;
 			} else {

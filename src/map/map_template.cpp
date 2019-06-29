@@ -1978,7 +1978,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 */
 bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
 {
-	const CTerrainType *top_terrain = tile->GetTopTerrain();
+	const CTerrainType *top_terrain = tile->GetTopTerrainType();
 	
 	if (top_terrain == this->TerrainType) { //top terrain is the same as the one for the generation, so the tile can be used as a seed
 		return true;
@@ -2000,13 +2000,13 @@ bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
 */
 bool CGeneratedTerrain::CanGenerateOnTile(const CMapField *tile) const
 {
-		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
 	if (this->TerrainType->IsOverlay()) {
+		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrainType()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
 			return false;
 		}
 	} else {
 		if (
-			std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()
+			std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrainType()) == this->TargetTerrainTypes.end()
 			&& std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->Terrain) == this->TargetTerrainTypes.end()
 		) {
 			return false;
@@ -2041,7 +2041,7 @@ bool CGeneratedTerrain::CanTileBePartOfExpansion(const CMapField *tile) const
 		return true;
 	}
 	
-	if (this->TerrainType == tile->GetTopTerrain()) {
+	if (this->TerrainType == tile->GetTopTerrainType()) {
 		return true;
 	}
 	
