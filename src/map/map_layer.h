@@ -36,8 +36,10 @@
 
 #include "vec2i.h"
 
+#pragma warning(push, 0)
 #include <core/math/vector2.h>
 #include <core/object.h>
+#pragma warning(pop)
 
 #include <tuple>
 #include <vector>

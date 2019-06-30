@@ -52,7 +52,9 @@
 #include "unit/unit_type.h"
 #include "util.h"
 
+#pragma warning(push, 0)
 #include <core/os/file_access.h>
+#pragma warning(pop)
 
 #include <stdexcept>
 

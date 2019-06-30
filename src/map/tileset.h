@@ -172,7 +172,7 @@ class CTileset
 public:
 	void clear();
 
-	unsigned int getTileCount() const { return tiles.size(); }
+	unsigned int getTileCount() const { return static_cast<unsigned int>(tiles.size()); }
 
 	unsigned int getDefaultTileIndex() const;
 

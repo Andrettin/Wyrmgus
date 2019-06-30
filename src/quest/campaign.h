@@ -39,8 +39,6 @@
 #include "time/date.h"
 #include "vec2i.h"
 
-#include <core/object.h>
-
 #include <shared_mutex>
 
 /*----------------------------------------------------------------------------

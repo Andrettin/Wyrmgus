@@ -36,7 +36,9 @@
 
 #include "data_element.h"
 
+#pragma warning(push, 0)
 #include <core/color.h>
+#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Definition

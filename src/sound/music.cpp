@@ -38,7 +38,9 @@
 #include "iolib.h"
 #include "wyrmgus.h"
 
+#pragma warning(push, 0)
 #include <oamlGodotModule/oamlGodotModule.h>
+#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 -- Functions

@@ -37,8 +37,6 @@
 #include "data_type.h"
 #include "detailed_data_element.h"
 
-#include <core/object.h>
-
 #include <tuple>
 
 /*----------------------------------------------------------------------------

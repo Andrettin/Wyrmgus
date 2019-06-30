@@ -37,7 +37,9 @@
 #include "config.h"
 #include "util.h"
 
+#pragma warning(push, 0)
 #include <core/ustring.h>
+#pragma warning(pop)
 
 #include <functional>
 #include <map>
@@ -181,7 +183,7 @@ public:
 		
 		T *instance = new T;
 		instance->Ident = processed_ident;
-		instance->Index = DataType<T>::Instances.size();
+		instance->Index = static_cast<int>(DataType<T>::Instances.size());
 		DataType<T>::Instances.push_back(instance);
 		DataType<T>::InstancesByIdent[processed_ident] = instance;
 		

@@ -37,7 +37,9 @@
 
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
+#pragma warning(push, 0)
 #include <core/object.h>
+#pragma warning(pop)
 
 #include <map>
 #include <set>

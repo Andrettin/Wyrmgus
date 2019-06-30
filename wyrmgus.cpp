@@ -29,7 +29,9 @@
 #include "world/plane.h"
 #include "world/world.h"
 
+#pragma warning(push, 0)
 #include <oamlGodotModule/oamlGodotModule.h>
+#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Variables

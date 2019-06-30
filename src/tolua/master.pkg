@@ -15,7 +15,7 @@ public:
 	int Send(const std::string cmd);
 	int Recv();
 	int GetLastRecvState() { return lastRecvState; }
-	int GetLogSize() { return events.size(); }
+	int GetLogSize() { return static_cast<int>(events.size()); }
 	CClientLog* GetLastMessage() { return events.back(); }
 };
 

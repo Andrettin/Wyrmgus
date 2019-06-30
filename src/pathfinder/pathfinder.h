@@ -40,7 +40,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#pragma warning(push, 0)
 #include <core/math/vector2.h>
+#pragma warning(pop)
 
 #include <queue>
 

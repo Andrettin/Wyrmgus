@@ -37,7 +37,9 @@
 #include "sound/unit_sound.h"
 #include "ui/icon_config.h"
 
+#pragma warning(push, 0)
 #include <core/object.h>
+#pragma warning(pop)
 
 #include <string>
 #include <vector>

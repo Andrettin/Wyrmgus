@@ -80,7 +80,9 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 
+#pragma warning(push, 0)
 #include <core/math/random_number_generator.h>
+#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Variables

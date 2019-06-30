@@ -110,7 +110,9 @@ extern char *strcasestr(const char *str, const char *substr);
 extern size_t strnlen(const char *str, size_t strsize);
 #endif
 
+#pragma warning(push, 0)
 #include <core/ustring.h>
+#pragma warning(pop)
 
 extern std::vector<std::string> SplitString(const std::string &str, const char *separators);
 extern bool StringToBool(const std::string &str);
@@ -139,7 +141,9 @@ extern String SnakeCaseToPascalCase(const String &str);
 --  Color
 ----------------------------------------------------------------------------*/
 
+#pragma warning(push, 0)
 #include <core/color.h>
+#pragma warning(pop)
 
 typedef uint32_t IntColor; // Uint32 in SDL
 

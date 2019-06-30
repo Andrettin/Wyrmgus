@@ -49,7 +49,9 @@
 
 #include "SDL.h"
 
+#pragma warning(push, 0)
 #include <oamlGodotModule/oamlGodotModule.h>
+#pragma warning(pop)
 
 #include <algorithm>
 

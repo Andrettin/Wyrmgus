@@ -44,7 +44,9 @@
 #include "video/color.h"
 //Wyrmgus end
 
+#pragma warning(push, 0)
 #include <core/object.h>
+#pragma warning(pop)
 
 #include <map>
 #include <shared_mutex>

@@ -346,7 +346,7 @@ public:
 	LuaListModel() {}
 
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual int getNumberOfElements() {return list.size();}
+	virtual int getNumberOfElements() {return static_cast<int>(list.size());}
 	virtual std::string getElementAt(int i) {return list[i];}
 };
 

@@ -44,9 +44,6 @@
 #include "vec2i.h"
 #include "video/color.h"
 
-#include <core/object.h>
-#include <core/ustring.h>
-
 #include <algorithm>
 #include <climits>
 #include <cstring>

@@ -37,8 +37,10 @@
 #include "data_element.h"
 #include "data_type.h"
 
+#pragma warning(push, 0)
 #include <core/math/vector2.h>
 #include <scene/resources/texture.h>
+#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Declarations
