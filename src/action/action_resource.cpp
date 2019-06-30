@@ -83,9 +83,9 @@ constexpr int SUB_RETURN_RESOURCE = 120;
 class NearReachableTerrainFinder
 {
 public:
-	NearReachableTerrainFinder(const CPlayer &player, const int maxDist, const int movemask, const int resource, Vec2i *resPos, const int z) :
+	NearReachableTerrainFinder(const CPlayer &player, const int maxDist, const int movemask, const int resource, Vector2i *resPos, const int z) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z) {}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
@@ -95,10 +95,10 @@ private:
 	int resource;
 	int z;
 	//Wyrmgus end
-	Vec2i *resPos;
+	Vector2i *resPos;
 };
 
-VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult_DeadEnd;
@@ -139,8 +139,8 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 static bool FindNearestReachableTerrainType(int movemask, int resource, int range,
 //Wyrmgus end
 											//Wyrmgus start
-//											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
-											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z)
+//											const CPlayer &player, const Vector2i &startPos, Vector2i *terrainPos)
+											const CPlayer &player, const Vector2i &startPos, Vector2i *terrainPos, int z)
 											//Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -168,22 +168,22 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
-/* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z)
+///* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vector2i &pos)
+/* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	COrder_Resource *order = new COrder_Resource(harvester);
-	Vec2i ressourceLoc;
+	Vector2i resourceLoc;
 
 	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->GetResource() != -1) {
 		order->CurrentResource = CMap::Map.Field(pos, z)->GetResource();
 		//  Find the closest resource tile next to a tile where the unit can move
-		if (!FindNearestReachableTerrainType(harvester.GetType()->MovementMask, CMap::Map.Field(pos, z)->GetResource(), 20, *harvester.GetPlayer(), pos, &ressourceLoc, z)) {
+		if (!FindNearestReachableTerrainType(harvester.GetType()->MovementMask, CMap::Map.Field(pos, z)->GetResource(), 20, *harvester.GetPlayer(), pos, &resourceLoc, z)) {
 			DebugPrint("FIXME: Give up???\n");
-			ressourceLoc = pos;
+			resourceLoc = pos;
 		}
 	}
-	order->goalPos = ressourceLoc;
+	order->goalPos = resourceLoc;
 	order->MapLayer = z;
 		
 	return order;
@@ -227,7 +227,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 }
 
 
-Vec2i COrder_Resource::GetHarvestLocation() const
+Vector2i COrder_Resource::GetHarvestLocation() const
 {
 	//Wyrmgus start
 //	if (this->Resource.Mine != nullptr) {
@@ -390,9 +390,9 @@ COrder_Resource::~COrder_Resource()
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Resource::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
-	PixelPos targetPos;
+	Vector2i targetPos;
 
 	if (this->HasGoal()) {
 		//Wyrmgus start
@@ -427,7 +427,7 @@ COrder_Resource::~COrder_Resource()
 	input.SetMinRange(0);
 	input.SetMaxRange(1);
 
-	Vec2i tileSize;
+	Vector2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
@@ -463,7 +463,7 @@ COrder_Resource::~COrder_Resource()
 */
 int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 {
-	Vec2i pos = this->goalPos;
+	Vector2i pos = this->goalPos;
 	//Wyrmgus start
 	int z = this->MapLayer;
 	//Wyrmgus end
@@ -695,7 +695,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, goal->GetTilePos() - unit.GetTilePos() + goal->GetType()->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, (goal->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!
@@ -1403,7 +1403,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 //	if (resinfo.TerrainHarvester) {
 	if (!this->Resource.Mine || this->Resource.Mine->GetType() == nullptr) {
 	//Wyrmgus end
-		Vec2i pos = this->Resource.Pos;
+		Vector2i pos = this->Resource.Pos;
 		int z = this->Resource.MapLayer = unit.GetMapLayer()->GetIndex();
 
 		if (FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 10, *unit.GetPlayer(), pos, &pos, z)) {
@@ -1473,7 +1473,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
 #ifdef DEBUG
-			const Vec2i &pos = mine ? mine->GetTilePos() : unit.GetTilePos();
+			const Vector2i &pos = mine ? mine->GetTilePos() : unit.GetTilePos();
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
 					   _C_ unit.GetPlayer()->GetIndex() _C_ UnitNumber(unit)
 					   _C_ unit.GetTilePos().x _C_ unit.GetTilePos().y
@@ -1563,7 +1563,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 					return true;
 				}
 			} else {
-				Vec2i resPos;
+				Vector2i resPos;
 				if (FindTerrainType(unit.GetType()->MovementMask, this->CurrentResource, 8, *unit.GetPlayer(), unit.GetTilePos(), &resPos, unit.GetMapLayer()->GetIndex())) {
 					this->goalPos = resPos;
 					this->MapLayer = unit.GetMapLayer()->GetIndex();

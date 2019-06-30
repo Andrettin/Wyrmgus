@@ -116,7 +116,7 @@ constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Train::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	return lastScreenPos;
 }

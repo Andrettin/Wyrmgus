@@ -155,14 +155,14 @@ public:
 	void Draw(const CViewport &vp) const;
 	/// Place a unit on map
 	//Wyrmgus start
-//	void Place(const Vec2i &pos);
-	void Place(const Vec2i &pos, int z);
+//	void Place(const Vector2i &pos);
+	void Place(const Vector2i &pos, const int z);
 	//Wyrmgus end
 
 	/// Move unit to tile(pos). (Do special stuff : vision, cachelist, pathfinding)
 	//Wyrmgus start
-//	void MoveToXY(const Vec2i &pos);
-	void MoveToXY(const Vec2i &pos, int z);
+//	void MoveToXY(const Vector2i &pos);
+	void MoveToXY(const Vector2i &pos, const int z);
 	//Wyrmgus end
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);
@@ -427,7 +427,7 @@ public:
 	int MapDistanceTo(const CUnit &dst) const;
 
 	[[nodiscard]]
-	int MapDistanceTo(const Vec2i &pos, int z) const;
+	int MapDistanceTo(const Vector2i &pos, int z) const;
 
 	/**
 	**  Test if unit can move.
@@ -442,46 +442,46 @@ public:
 	int GetDrawLevel() const;
 
 	[[nodiscard]]
-	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z);
+	bool IsAttackRanged(const CUnit *goal, const Vector2i &goalPos, const int z) const;
 
 	[[nodiscard]]
-	PixelPos GetMapPixelPosTopLeft() const;
+	Vector2i GetMapPixelPosTopLeft() const;
 	
 	[[nodiscard]]
-	PixelPos GetMapPixelPosCenter() const
+	Vector2i GetMapPixelPosCenter() const
 	{
 		return this->GetMapPixelPosTopLeft() + this->GetHalfTilePixelSize();
 	}
 	
 	[[nodiscard]]
-	const Vec2i &GetTilePos() const
+	const Vector2i &GetTilePos() const
 	{
 		return this->TilePos;
 	}
 	
 	[[nodiscard]]
-	const Vec2i &GetTileSize() const
+	const Vector2i &GetTileSize() const
 	{
 		return this->Type->GetTileSize();
 	}
 	
 	[[nodiscard]]
-	Vec2i GetHalfTileSize() const
+	Vector2i GetHalfTileSize() const
 	{
 		return this->GetTileSize() / 2;
 	}
 	
 	[[nodiscard]]
-	PixelSize GetTilePixelSize() const;
+	Vector2i GetTilePixelSize() const;
 	
 	[[nodiscard]]
-	PixelSize GetHalfTilePixelSize() const
+	Vector2i GetHalfTilePixelSize() const
 	{
 		return this->GetTilePixelSize() / 2;
 	}
 	
 	[[nodiscard]]
-	Vec2i GetTileCenterPos() const
+	Vector2i GetTileCenterPos() const
 	{
 		return this->GetTilePos() + this->Type->GetTileCenterPosOffset();
 	}
@@ -676,9 +676,9 @@ public:
 	//Wyrmgus end
 	
 private:
-	Vec2i TilePos = Vec2i(-1, -1);	/// Map position X
+	Vector2i TilePos = Vec2i(-1, -1);	/// Map position X
 public:
-	Vec2i RallyPointPos = Vec2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
+	Vector2i RallyPointPos = Vec2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
 private:
 	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
 public:
@@ -771,7 +771,7 @@ public:
 		const CConstructionFrame *CFrame = nullptr;	/// Seen construction frame
 		int Frame;							/// last seen frame/stage of buildings
 		const CUnitType *Type = nullptr;	/// Pointer to last seen unit-type
-		Vec2i TilePos = Vec2i(-1, -1);		/// Last unit->TilePos Seen
+		Vector2i TilePos = Vector2i(-1, -1);	/// Last unit->TilePos Seen
 		signed char IX;						/// Seen X image displacement to map position
 		signed char IY;						/// seen Y image displacement to map position
 		bool UnderConstruction = false;		/// Unit seen construction
@@ -916,8 +916,8 @@ void UpdateUnitSightRange(CUnit &unit);
 extern CUnit *MakeUnit(const CUnitType &type, CPlayer *player);
 /// Create a new unit and place on map
 //Wyrmgus start
-//extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
-extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z);
+//extern CUnit *MakeUnitAndPlace(const Vector2i &pos, const CUnitType &type, CPlayer *player);
+extern CUnit *MakeUnitAndPlace(const Vector2i &pos, const CUnitType &type, CPlayer *player, int z);
 //Wyrmgus end
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
@@ -936,7 +936,7 @@ extern void UnitClearOrders(CUnit &unit);
 /// @todo more docu
 extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 /// @todo more docu
-extern void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos);
+extern void NearestOfUnit(const CUnit &unit, const Vector2i &pos, Vector2i *dpos);
 
 /// Call when an Unit goes under fog.
 extern void UnitGoesUnderFog(CUnit &unit, const CPlayer &player);
@@ -950,9 +950,7 @@ extern void UnitCountSeen(CUnit &unit);
 extern void RescueUnits();
 
 /// Convert direction (dx,dy) to heading (0-255)
-extern int DirectionToHeading(const Vec2i &dir);
-/// Convert direction (dx,dy) to heading (0-255)
-extern int DirectionToHeading(const PixelDiff &dir);
+extern int DirectionToHeading(const Vector2i &dir);
 
 ///Correct directions for placed wall.
 extern void CorrectWallDirections(CUnit &unit);
@@ -962,12 +960,12 @@ extern void CorrectWallNeighBours(CUnit &unit);
 /// Update frame from heading
 extern void UnitUpdateHeading(CUnit &unit);
 /// Heading and frame from delta direction
-extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
+extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vector2i &delta);
 
 /// @todo more docu
 extern void DropOutOnSide(CUnit &unit, int heading, const CUnit *container);
 /// @todo more docu
-extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container);
+extern void DropOutNearest(CUnit &unit, const Vector2i &goalPos, const CUnit *container);
 
 /// Drop out all units in the unit
 extern void DropOutAll(const CUnit &unit);
@@ -979,18 +977,18 @@ extern CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitTy
 //Wyrmgus end
 /// @todo more docu
 //Wyrmgus start
-//extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z, bool no_bordering_building = false);
+//extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vector2i &pos);
+extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vector2i &pos, int z, bool no_bordering_building = false);
 //Wyrmgus end
 /// @todo more docu
 //Wyrmgus start
-//extern bool CanBuildOn(const Vec2i &pos, int mask);
-extern bool CanBuildOn(const Vec2i &pos, int mask, int z);
+//extern bool CanBuildOn(const Vector2i &pos, int mask);
+extern bool CanBuildOn(const Vector2i &pos, int mask, int z);
 //Wyrmgus end
 /// FIXME: more docu
 //Wyrmgus start
-//extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration, int z);
+//extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vector2i &pos, int real);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vector2i &pos, int real, bool ignore_exploration, int z);
 //Wyrmgus end
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);

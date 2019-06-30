@@ -515,24 +515,24 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	const Vec2i &GetTileSize() const
+	const Vector2i &GetTileSize() const
 	{
 		return this->TileSize;
 	}
 	
-	Vec2i GetHalfTileSize() const
+	Vector2i GetHalfTileSize() const
 	{
 		return this->GetTileSize() / 2;
 	}
 	
-	PixelSize GetHalfTilePixelSize() const
+	Vector2i GetHalfTilePixelSize() const
 	{
-		return GetTilePixelSize() / 2;
+		return this->GetTilePixelSize() / 2;
 	}
 	
-	PixelSize GetTilePixelSize() const;
+	Vector2i GetTilePixelSize() const;
 	
-	Vec2i GetTileCenterPosOffset() const
+	Vector2i GetTileCenterPosOffset() const
 	{
 		return (this->GetTileSize() - 1) / 2;
 	}
@@ -756,8 +756,8 @@ private:
 public:
 	int RepairCosts[MaxCosts];		/// How much it costs to repair
 
-	Vec2i TileSize = Vec2i(0, 0);	/// Tile size
 private:
+	Vector2i TileSize = Vector2i(0, 0);	/// Tile size
 	Vector2i BoxSize = Vector2i(0, 0);		/// Selected box size width
 	Vector2i BoxOffset = Vector2i(0, 0);	/// Selected box size horizontal offset
 public:
@@ -1311,7 +1311,7 @@ extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-						 int player, int frame, const PixelPos &screenPos);
+						 int player, int frame, const Vector2i &screenPos);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 //Wyrmgus start

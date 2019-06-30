@@ -178,8 +178,8 @@ public:
 	virtual ~Missile();
 
 	//Wyrmgus start
-//	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
-	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+//	static Missile *Init(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos);
+	static Missile *Init(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos, int z);
 	//Wyrmgus end
 
 	virtual void Action() = 0;
@@ -189,13 +189,13 @@ public:
 	void MissileHit(CUnit *unit = nullptr);
 	bool NextMissileFrame(char sign, char longAnimation);
 	void NextMissileFrameCycle();
-	void MissileNewHeadingFromXY(const PixelPos &delta);
+	void MissileNewHeadingFromXY(const Vector2i &delta);
 
 
 	//private:
-	PixelPos source = PixelPos(0, 0); 	/// Missile source position
-	PixelPos position = PixelPos(0, 0);	/// missile pixel position
-	PixelPos destination = PixelPos(0, 0);	/// missile pixel destination
+	Vector2i source = Vector2i(0, 0); 	/// Missile source position
+	Vector2i position = Vector2i(0, 0);	/// missile pixel position
+	Vector2i destination = Vector2i(0, 0);	/// missile pixel destination
 	const MissileType *Type = nullptr;	/// missile-type pointer
 	int SpriteFrame = 0;	/// sprite frame counter
 	int State = 0;			/// state
@@ -347,8 +347,8 @@ extern void MissileCclRegister();
 
 /// create a missile
 //Wyrmgus start
-//extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
-extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+//extern Missile *MakeMissile(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos);
+extern Missile *MakeMissile(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos, int z);
 //Wyrmgus end
 /// create a local missile
 //Wyrmgus start
@@ -363,8 +363,8 @@ extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const Numbe
 //Wyrmgus end
 /// fire a missile
 //Wyrmgus start
-//extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
-extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z);
+//extern void FireMissile(CUnit &unit, CUnit *goal, const Vector2i &goalPos);
+extern void FireMissile(CUnit &unit, CUnit *goal, const Vector2i &goalPos, int z);
 //Wyrmgus end
 
 extern void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table);

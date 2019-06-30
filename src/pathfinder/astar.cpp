@@ -59,7 +59,7 @@ struct AStarNode {
 };
 
 struct Open {
-	Vec2i pos;
+	Vector2i pos;
 	short int Costs; /// complete costs to goal
 	//Wyrmgus start
 //	unsigned short int O;     /// Offset into matrix
@@ -71,9 +71,9 @@ struct Open {
 inline int MyAbs(int x) { return (x ^ (x >> 31)) - (x >> 31); }
 
 /// heuristic cost function for a*
-static inline int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
+static inline int AStarCosts(const Vector2i &pos, const Vector2i &goalPos)
 {
-	const Vec2i diff = pos - goalPos;
+	const Vector2i diff = pos - goalPos;
 	return std::max<int>(MyAbs(diff.x), MyAbs(diff.y));
 }
 
@@ -529,8 +529,8 @@ static void AStarRemoveMinimum(int pos, int z)
 **  @return  0 or PF_FAILED
 */
 //Wyrmgus start
-//static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
-static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
+//static inline int AStarAddNode(const Vector2i &pos, int o, int costs)
+static inline int AStarAddNode(const Vector2i &pos, int o, int costs, int z)
 //Wyrmgus end
 {
 	ProfileBegin("AStarAddNode");
@@ -714,7 +714,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 {
 #ifdef DEBUG
 	{
-		Vec2i pos;
+		Vector2i pos;
 		pos.y = index / CMap::Map.Info.MapWidths[z];
 		pos.x = index - pos.y * CMap::Map.Info.MapWidths[z];
 		Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -725,8 +725,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	const CUnitTypeFinder unit_finder(static_cast<UnitTypeType>(unit.GetType()->UnitType));
 
 	// verify each tile of the unit.
-	int h = unit.GetType()->TileSize.y;
-	const int w = unit.GetType()->TileSize.x;
+	int h = unit.GetType()->GetTileSize().y;
+	const int w = unit.GetType()->GetTileSize().x;
 	do {
 		const CMapField *mf = CMap::Map.Field(index, z);
 		int i = w;
@@ -890,8 +890,8 @@ public:
 	explicit MinMaxRangeVisitor(const T &func) : func(func) {}
 
 	//Wyrmgus start
-//	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight)
-	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight, int z)
+//	void SetGoal(Vector2i goalTopLeft, Vector2i goalBottomRight)
+	void SetGoal(Vector2i goalTopLeft, Vector2i goalBottomRight, int z)
 	//Wyrmgus end
 	{
 		this->goalTopLeft = goalTopLeft;
@@ -907,7 +907,7 @@ public:
 		this->maxrange = maxrange;
 	}
 
-	void SetUnitSize(const Vec2i &tileSize)
+	void SetUnitSize(const Vector2i &tileSize)
 	{
 		this->unitExtraTileSize.x = tileSize.x - 1;
 		this->unitExtraTileSize.y = tileSize.y - 1;
@@ -940,7 +940,7 @@ private:
 //			const int maxx = std::min(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
 			const int maxx = std::min(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
 			//Wyrmgus end
-			Vec2i mpos(minx, y);
+			Vector2i mpos(minx, y);
 			//Wyrmgus start
 //			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
 			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
@@ -962,7 +962,7 @@ private:
 //		const int maxx = std::min(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
 		//Wyrmgus end
-		Vec2i mpos(minx, y);
+		Vector2i mpos(minx, y);
 		//Wyrmgus start
 //		const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
 		const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
@@ -1009,7 +1009,7 @@ private:
 
 		if (minrange == 0) {
 			for (int y = miny; y <= maxy; ++y) {
-				Vec2i mpos(minx, y);
+				Vector2i mpos(minx, y);
 				//Wyrmgus start
 //				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
 				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
@@ -1024,7 +1024,7 @@ private:
 			}
 		} else {
 			for (int y = miny; y <= maxy; ++y) {
-				Vec2i mpos(minx, y);
+				Vector2i mpos(minx, y);
 				//Wyrmgus start
 //				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
 				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
@@ -1076,7 +1076,7 @@ private:
 //			const int maxx = std::min(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
 			const int maxx = std::min(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
 			//WYrmgus end
-			Vec2i mpos(minx, y);
+			Vector2i mpos(minx, y);
 			//Wyrmgus start
 //			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
 			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
@@ -1093,9 +1093,9 @@ private:
 
 private:
 	T func;
-	Vec2i goalTopLeft;
-	Vec2i goalBottomRight;
-	Vec2i unitExtraTileSize;
+	Vector2i goalTopLeft;
+	Vector2i goalBottomRight;
+	Vector2i unitExtraTileSize;
 	int minrange = 0;
 	int maxrange = 0;
 	//Wyrmgus start
@@ -1108,7 +1108,7 @@ private:
 /**
 **  MarkAStarGoal
 */
-static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
+static int AStarMarkGoal(const Vector2i &goal, int gw, int gh,
 						 //Wyrmgus start
 //						 int tilesizex, int tilesizey, int minrange, int maxrange, const CUnit &unit)
 						 int tilesizex, int tilesizey, int minrange, int maxrange, const CUnit &unit, int z)
@@ -1150,16 +1150,16 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 	AStarGoalMarker aStarGoalMarker(unit, &goal_reachable);
 	MinMaxRangeVisitor<AStarGoalMarker> visitor(aStarGoalMarker);
 
-	const Vec2i goalBottomRigth(goal.x + gw - 1, goal.y + gh - 1);
+	const Vector2i goalBottomRigth(goal.x + gw - 1, goal.y + gh - 1);
 	//Wyrmgus start
 //	visitor.SetGoal(goal, goalBottomRigth);
 	visitor.SetGoal(goal, goalBottomRigth, z);
 	//Wyrmgus end
 	visitor.SetRange(minrange, maxrange);
-	const Vec2i tileSize(tilesizex, tilesizey);
+	const Vector2i tileSize(tilesizex, tilesizey);
 	visitor.SetUnitSize(tileSize);
 
-	const Vec2i extratilesize(tilesizex - 1, tilesizey - 1);
+	const Vector2i extratilesize(tilesizex - 1, tilesizey - 1);
 
 	visitor.Visit();
 
@@ -1173,8 +1173,8 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 **  @return  The length of the path
 */
 //Wyrmgus start
-//static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path, int pathLen)
-static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path, int pathLen, int z)
+//static int AStarSavePath(const Vector2i &startPos, const Vector2i &endPos, char *path, int pathLen)
+static int AStarSavePath(const Vector2i &startPos, const Vector2i &endPos, char *path, int pathLen, int z)
 //Wyrmgus end
 {
 	ProfileBegin("AStarSavePath");
@@ -1185,7 +1185,7 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 
 	// Figure out the full path length
 	fullPathLength = 0;
-	Vec2i curr = endPos;
+	Vector2i curr = endPos;
 	//Wyrmgus start
 //	int currO = curr.y * AStarMapWidth;
 	int currO = curr.y * AStarMapWidth[z];
@@ -1239,7 +1239,7 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 **  Optimization to find a simple path
 **  Check if we're at the goal or if it's 1 tile away
 */
-static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
+static int AStarFindSimplePath(const Vector2i &startPos, const Vector2i &goal, int gw, int gh,
 							   int, int, int minrange, int maxrange,
 							   //Wyrmgus start
 //							   char *path, const CUnit &unit)
@@ -1262,7 +1262,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 		return PF_FAILED;
 	}
 
-	const Vec2i diff = goal - startPos;
+	const Vector2i diff = goal - startPos;
 	const int distance = isqrt(square(diff.x) + square(diff.y));
 
 	// Within range of destination
@@ -1298,7 +1298,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 /**
 **  Find path.
 */
-int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
+int AStarFindPath(const Vector2i &startPos, const Vector2i &goalPos, int gw, int gh,
 				  int tilesizex, int tilesizey, int minrange, int maxrange,
 				  //Wyrmgus start
 //				  char *path, int pathlen, const CUnit &unit)
@@ -1394,7 +1394,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		ProfileEnd("AStarFindPath");
 		return ret;
 	}
-	Vec2i endPos;
+	Vector2i endPos;
 	
 	//Wyrmgus start
 	int length = 0;

@@ -1938,7 +1938,7 @@ void CVideo::DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigne
 	linedraw_gl::DrawTransLine(color, sx, sy, dx, dy, alpha);
 }
 
-void CVideo::DrawLineClip(Uint32 color, const PixelPos &pos1, const PixelPos &pos2)
+void CVideo::DrawLineClip(Uint32 color, const Vector2i &pos1, const Vector2i &pos2)
 {
 	linedraw_gl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
 }
@@ -2018,7 +2018,7 @@ void CVideo::FillTransCircle(Uint32 color, int x, int y, int r, unsigned char al
 	linedraw_gl::FillTransCircle(color, x, y, r, alpha);
 }
 
-void CVideo::FillCircleClip(Uint32 color, const PixelPos &screenPos, int r)
+void CVideo::FillCircleClip(Uint32 color, const Vector2i &screenPos, int r)
 {
 	linedraw_gl::FillCircleClip(color, screenPos.x, screenPos.y, r);
 }

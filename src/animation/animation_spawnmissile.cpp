@@ -58,9 +58,9 @@
 	const int offsetnum = this->OffsetNum;
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	const PixelPos moff = goal->GetType()->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
-	PixelPos start;
-	PixelPos dest;
+	const Vector2i moff = goal->GetType()->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
+	Vector2i start;
+	Vector2i dest;
 	MissileType *mtype = MissileTypeByIdent(this->missileTypeStr);
 	if (mtype == nullptr) {
 		return;
@@ -119,7 +119,7 @@
 			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
-	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest, unit.GetMapLayer()->GetIndex());
+	Vector2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest, unit.GetMapLayer()->GetIndex());
 	const int dist = goal->MapDistanceTo(destTilePos, unit.GetMapLayer()->GetIndex());
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)
@@ -127,7 +127,7 @@
 	} else {
 		Missile *missile = MakeMissile(*mtype, start, dest, unit.GetMapLayer()->GetIndex());
 		if (flags & SM_SetDirection) {
-			PixelPos posd;
+			Vector2i posd;
 			posd.x = Heading2X[goal->Direction / NextDirection];
 			posd.y = Heading2Y[goal->Direction / NextDirection];
 			missile->MissileNewHeadingFromXY(posd);

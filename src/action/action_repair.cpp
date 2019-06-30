@@ -75,7 +75,7 @@
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionRepair(const Vec2i &pos, int z)
+/* static */ COrder *COrder::NewActionRepair(const Vector2i &pos, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -145,9 +145,9 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Repair::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
-	PixelPos targetPos;
+	Vector2i targetPos;
 
 	if (this->ReparableTarget != nullptr) {
 		if (this->ReparableTarget->GetMapLayer() != UI.CurrentMapLayer) {
@@ -177,7 +177,7 @@
 	input.SetMinRange(0);
 	input.SetMaxRange(ReparableTarget != nullptr ? unit.GetType()->RepairRange : 0);
 
-	Vec2i tileSize;
+	Vector2i tileSize;
 	if (ReparableTarget != nullptr) {
 		tileSize = ReparableTarget->GetTileSize();
 		input.SetGoal(ReparableTarget->GetTilePos(), tileSize, ReparableTarget->GetMapLayer()->GetIndex());
@@ -315,8 +315,8 @@ static void AnimateActionRepair(CUnit &unit)
 					this->State = 2;
 					this->RepairCycle = 0;
 					//Wyrmgus start
-//					const Vec2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
-					const Vec2i dir = PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
+//					const Vector2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
+					const Vector2i dir = (goal->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {

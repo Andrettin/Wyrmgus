@@ -115,7 +115,7 @@ enum {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Still::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	//Wyrmgus start
 	/*
@@ -198,7 +198,7 @@ static bool MoveRandomly(CUnit &unit)
 		return false;
 	}
 	// pick random location
-	Vec2i pos = unit.GetTilePos();
+	Vector2i pos = unit.GetTilePos();
 
 	pos.x += SyncRand(unit.GetType()->RandomMovementDistance * 2 + 1) - unit.GetType()->RandomMovementDistance;
 	pos.y += SyncRand(unit.GetType()->RandomMovementDistance * 2 + 1) - unit.GetType()->RandomMovementDistance;
@@ -261,8 +261,8 @@ static bool MoveRandomly(CUnit &unit)
 				SelectAroundUnit(unit, std::max(6, unit.GetType()->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.GetPlayer()));
 				if (!table.size()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
 					//don't go near settled areas
-					Vec2i minpos = pos;
-					Vec2i maxpos = pos;
+					Vector2i minpos = pos;
+					Vector2i maxpos = pos;
 					minpos.x = pos.x - std::max(6, unit.GetType()->RandomMovementDistance);
 					minpos.y = pos.y - std::max(6, unit.GetType()->RandomMovementDistance);
 					maxpos.x = pos.x + std::max(6, unit.GetType()->RandomMovementDistance);
@@ -274,8 +274,8 @@ static bool MoveRandomly(CUnit &unit)
 						return false;
 					}
 				} else { //even if is already in a settled area, don't go to places adjacent to units owned by players other than the neutral player
-					Vec2i minpos = pos;
-					Vec2i maxpos = pos;
+					Vector2i minpos = pos;
+					Vector2i maxpos = pos;
 					minpos.x = pos.x - 1;
 					minpos.y = pos.y - 1;
 					maxpos.x = pos.x + 1;
@@ -472,7 +472,7 @@ private:
 */
 static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
-	const Vec2i offset(range, range);
+	const Vector2i offset(range, range);
 
 	return FindUnit_If(unit.GetTilePos() - offset, unit.GetTilePos() + offset, unit.GetMapLayer()->GetIndex(), IsAReparableUnitBy(unit));
 }
@@ -497,7 +497,7 @@ bool AutoRepair(CUnit &unit)
 	if (repairedUnit == nullptr) {
 		return false;
 	}
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 	COrder *savedOrder = nullptr;
 	if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
@@ -541,7 +541,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->GetTilePos() + autoAttackUnit->GetType()->GetHalfTileSize() - unit.GetTilePos());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->GetMapLayer()->GetIndex())) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, (autoAttackUnit->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->GetMapLayer()->GetIndex())) + autoAttackUnit->GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }

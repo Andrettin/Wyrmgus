@@ -68,7 +68,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
+/* static */ COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vector2i &pos, CUnit *target, int z, bool isAutocast)
 {
 	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
@@ -80,7 +80,7 @@
 		if (target->Destroyed) {
 			// FIXME: where check if spell needs a unit as destination?
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
-			const Vec2i diag(order->Range, order->Range);
+			const Vector2i diag(order->Range, order->Range);
 			order->goalPos = target->GetTilePos() /* + target->GetHalfTileSize() */ - diag;
 			order->MapLayer = target->GetMapLayer()->GetIndex();
 			order->Range <<= 1;
@@ -155,9 +155,9 @@
 	}
 }
 
-/* virtual */ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_SpellCast::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
-	PixelPos targetPos;
+	Vector2i targetPos;
 
 	if (this->HasGoal()) {
 		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
@@ -196,7 +196,7 @@
 	input.SetMaxRange(distance);
 	//Wyrmgus end
 
-	Vec2i tileSize;
+	Vector2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
@@ -225,9 +225,9 @@
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_SpellCast::GetGoalPos() const
+/* virtual */ const Vector2i COrder_SpellCast::GetGoalPos() const
 {
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {
 		return goalPos;
 	}
@@ -243,7 +243,7 @@
 */
 /* virtual */ const int COrder_SpellCast::GetGoalMapLayer() const
 {
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {
 		return MapLayer;
 	}
@@ -344,7 +344,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos());
-		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize());
+		UnitHeadingFromDeltaXY(unit, (goal->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) + goal->GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize());
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;

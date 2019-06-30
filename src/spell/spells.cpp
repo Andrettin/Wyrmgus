@@ -109,7 +109,7 @@ static Target *NewTargetUnit(CUnit &unit)
 **	@return	True if passed, or false otherwise.
 */
 static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit *target,
-						  const Vec2i &goalPos, const ConditionInfo *condition, const CMapLayer *map_layer)
+						  const Vector2i &goalPos, const ConditionInfo *condition, const CMapLayer *map_layer)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
 		return false;
@@ -802,7 +802,7 @@ bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 **	@note	caster must know the spell, and spell must be researched.
 */
 bool CanCastSpell(const CUnit &caster, const CSpell &spell,
-				  const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer)
+				  const CUnit *target, const Vector2i &goalPos, const CMapLayer *map_layer)
 {
 	if (spell.Target == TargetUnit && target == nullptr) {
 		return false;
@@ -853,9 +853,9 @@ int AutoCastSpell(CUnit &caster, const CSpell &spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer)
+int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vector2i &goalPos, CMapLayer *map_layer)
 {
-	Vec2i pos = goalPos;
+	Vector2i pos = goalPos;
 	int z = map_layer ? map_layer->GetIndex() : 0;
 
 	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable

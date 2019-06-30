@@ -37,8 +37,8 @@ class CSite;
 class COrder_Build : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building, const int z, const CSite *settlement);
+//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vector2i &pos, const CUnitType &building);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vector2i &pos, const CUnitType &building, const int z, const CSite *settlement);
 	//Wyrmgus end
 public:
 	COrder_Build() : COrder(UnitActionBuild)
@@ -53,7 +53,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	
 	//Wyrmgus start
@@ -63,7 +63,7 @@ public:
 	virtual void AiUnitKilled(CUnit &unit);
 
 	const CUnitType &GetUnitType() const { return *Type; }
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	virtual const Vector2i GetGoalPos() const { return goalPos; }
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const { return MapLayer; }
 	//Wyrmgus end
@@ -79,7 +79,7 @@ private:
 	CUnitPtr BuildingUnit;		/// unit builded.
 	int State = 0;
 	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	const CSite *Settlement = nullptr;

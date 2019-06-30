@@ -35,8 +35,8 @@
 class COrder_Patrol : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
-	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
+//	friend COrder *COrder::NewActionPatrol(const Vector2i &currentPos, const Vector2i &dest);
+	friend COrder *COrder::NewActionPatrol(const Vector2i &currentPos, const Vector2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
 public:
 	COrder_Patrol() : COrder(UnitActionPatrol)
@@ -51,15 +51,15 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
-	const Vec2i &GetWayPoint() const { return WayPoint; }
+	const Vector2i &GetWayPoint() const { return WayPoint; }
 private:
-	Vec2i WayPoint = Vec2i(-1, -1);	/// position for patroling.
+	Vector2i WayPoint = Vector2i(-1, -1);	/// position for patroling.
 	unsigned int WaitingCycle = 0;	/// number of cycle pathfinder wait.
 	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	int WayPointMapLayer = 0;

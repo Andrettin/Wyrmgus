@@ -293,10 +293,6 @@ protected:
 };
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -308,11 +304,11 @@ extern void InitSpells();
 
 /// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const CSpell &spell,
-						 const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer);
+						 const CUnit *target, const Vector2i &goalPos, const CMapLayer *map_layer);
 
 /// cast spell on target unit or place at x,y
 extern int SpellCast(CUnit &caster, const CSpell &spell,
-					 CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer);
+					 CUnit *target, const Vector2i &goalPos, CMapLayer *map_layer);
 
 /// auto cast the spell if possible
 extern int AutoCastSpell(CUnit &caster, const CSpell &spell);

@@ -50,6 +50,8 @@ public:
 	template <typename T2>
 	Vec2T(Vec2T<T2> v) : x(v.x), y(v.y) {}
 	
+	Vec2T(const Vector2i &v) : x(v.x), y(v.y) {}
+	
 	operator Vector2i() const
 	{
 		return Vector2i(this->x, this->y);
@@ -259,8 +261,20 @@ inline int SquareDistance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
 	return diff.x * diff.x + diff.y * diff.y;
 }
 
+inline int SquareDistance(const Vector2i &pos1, const Vector2i &pos2)
+{
+	const Vector2i diff = pos2 - pos1;
+
+	return diff.x * diff.x + diff.y * diff.y;
+}
+
 template <typename T>
 inline int Distance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
+{
+	return isqrt(SquareDistance(pos1, pos2));
+}
+
+inline int Distance(const Vector2i &pos1, const Vector2i &pos2)
 {
 	return isqrt(SquareDistance(pos1, pos2));
 }

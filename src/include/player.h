@@ -183,7 +183,7 @@ public:
 	// friend enemy detection
 	int Team = 0;		/// team of player
 
-	Vec2i StartPos = Vec2i(0, 0);	/// map tile start position
+	Vector2i StartPos = Vector2i(0, 0);	/// map tile start position
 	//Wyrmgus start
 	int StartMapLayer = 0;			/// map tile start map layer
 	
@@ -192,8 +192,8 @@ public:
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
-	inline void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
+//	inline void SetStartView(const Vector2i &pos) { this->StartPos = pos; }
+	inline void SetStartView(const Vector2i &pos, const int z) { this->StartPos = pos; this->StartMapLayer = z; }
 	//Wyrmgus end
 
 	int Resources[MaxCosts];      /// resources in overall store
@@ -295,7 +295,7 @@ public:
 	bool HasUpgradeClass(const UpgradeClass *upgrade_class) const;
 	bool HasSettlement(const CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
-	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	CSite *GetNearestSettlement(const Vector2i &pos, const int z, const Vector2i &size) const;
 	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(const CFaction *faction, bool pre = false);
@@ -434,8 +434,8 @@ public:
 
 	/// Notify player about a problem
 	//Wyrmgus start
-//	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
-	void Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(5, 6); // Don't forget to count this
+//	void Notify(int type, const Vector2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
+	void Notify(int type, const Vector2i &pos, int z, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(5, 6); // Don't forget to count this
 	//Wyrmgus end
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this

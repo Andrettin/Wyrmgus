@@ -142,11 +142,11 @@ class CMapInfo
 public:
 	bool IsPointOnMap(const int x, const int y, const int z) const;
 
-	bool IsPointOnMap(const Vec2i &pos, const int z) const;
+	bool IsPointOnMap(const Vector2i &pos, const int z) const;
 
 	bool IsPointOnMap(const int x, const int y, const CMapLayer *map_layer) const;
 
-	bool IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const;
+	bool IsPointOnMap(const Vector2i &pos, const CMapLayer *map_layer) const;
 
 	void Clear();
 
@@ -176,7 +176,7 @@ public:
 	~CMap();
 
 	static CMap Map;	/// The current map
-	static PixelSize PixelTileSize;
+	static Vector2i PixelTileSize;
 
 	unsigned int getIndex(int x, int y, int z) const;
 	unsigned int getIndex(const Vec2i &pos, int z) const;
@@ -193,7 +193,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	CMapField *Field(const Vec2i &pos, const int z) const
+	CMapField *Field(const Vector2i &pos, const int z) const
 	{
 		return this->Field(pos.x, pos.y, z);
 	}
@@ -210,15 +210,15 @@ public:
 	void ClearMapLayers();
 	
 	//Wyrmgus start
-	void SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z);
-	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
-	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
-	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
-	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
-	void CalculateTileLandmass(const Vec2i &pos, int z);
-	void CalculateTileTerrainFeature(const Vec2i &pos, int z);
-	void CalculateTileOwnership(const Vec2i &pos, int z);
-	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
+	void SetTileTerrain(const Vector2i &pos, const CTerrainType *terrain, const int z);
+	void RemoveTileOverlayTerrain(const Vector2i &pos, const int z);
+	void SetOverlayTerrainDestroyed(const Vector2i &pos, bool destroyed, int z);
+	void SetOverlayTerrainDamaged(const Vector2i &pos, bool damaged, int z);
+	void CalculateTileTransitions(const Vector2i &pos, bool overlay, int z);
+	void CalculateTileLandmass(const Vector2i &pos, int z);
+	void CalculateTileTerrainFeature(const Vector2i &pos, int z);
+	void CalculateTileOwnership(const Vector2i &pos, int z);
+	void CalculateTileOwnershipTransition(const Vector2i &pos, int z);
 	void AdjustMap();
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
@@ -228,19 +228,19 @@ public:
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
-	void ClearOverlayTile(const Vec2i &pos, int z);
+	void ClearOverlayTile(const Vector2i &pos, const int z);
 
 	/// convert map pixelpos coordinates into tilepos
-	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const;
+	Vector2i MapPixelPosToTilePos(const Vector2i &mapPos, const int map_layer) const;
 	/// convert tilepos coordinates into map pixel pos (take the top left of the tile)
-	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const;
+	Vector2i TilePosToMapPixelPos_TopLeft(const Vector2i &tilePos, const CMapLayer *map_layer) const;
 	/// convert tilepos coordinates into map pixel pos (take the center of the tile)
-	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const;
+	Vector2i TilePosToMapPixelPos_Center(const Vector2i &tilePos, const CMapLayer *map_layer) const;
 	
 	//Wyrmgus start
-	const CTerrainType *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
-	const CTerrainType *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
-	int GetTileLandmass(const Vec2i &pos, int z) const;
+	const CTerrainType *GetTileTerrain(const Vector2i &pos, const bool overlay, const int z) const;
+	const CTerrainType *GetTileTopTerrain(const Vector2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
+	int GetTileLandmass(const Vector2i &pos, const int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end
 
@@ -265,25 +265,25 @@ public:
 	void HitWall(const Vec2i &pos, unsigned damage, int z);
 
 	//Wyrmgus start
-	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
-	bool TileBordersTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const;
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain_type, const int z) const;
-	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
-	bool TileBordersBuilding(const Vec2i &pos, int z);
-	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
-	bool TileBordersUnit(const Vec2i &pos, int z);
-	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const;
-	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const;
-	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *overlay_terrain, const int z);
-	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
-	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate = nullptr) const;
-	std::pair<Vec2i, Vec2i> GetSubtemplateRect(const CMapTemplate *subtemplate) const;
-	Vec2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
-	Vec2i GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const;
-	Vec2i GetSubtemplateEndPos(const CMapTemplate *subtemplate) const;
+	bool CurrentTerrainCanBeAt(const Vector2i &pos, bool overlay, int z);
+	bool TileBordersTerrain(const Vector2i &pos, const CTerrainType *terrain_type, const int z) const;
+	bool TileBordersOnlySameTerrain(const Vector2i &pos, const CTerrainType *new_terrain_type, const int z) const;
+	bool TileBordersFlag(const Vector2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
+	bool TileBordersBuilding(const Vector2i &pos, int z);
+	bool TileBordersPathway(const Vector2i &pos, int z, bool only_railroad);
+	bool TileBordersUnit(const Vector2i &pos, int z);
+	bool TileBordersTerrainIncompatibleWithTerrain(const Vector2i &pos, const CTerrainType *terrain_type, const int z) const;
+	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vector2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const;
+	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vector2i &pos, const CTerrainType *overlay_terrain, const int z);
+	bool TileHasUnitsIncompatibleWithTerrain(const Vector2i &pos, const CTerrainType *terrain, const int z);
+	bool IsPointInASubtemplateArea(const Vector2i &pos, const int z, const CMapTemplate *subtemplate = nullptr) const;
+	std::pair<Vector2i, Vector2i> GetSubtemplateRect(const CMapTemplate *subtemplate) const;
+	Vector2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
+	Vector2i GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const;
+	Vector2i GetSubtemplateEndPos(const CMapTemplate *subtemplate) const;
 	CMapLayer *GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const;
 	std::vector<CUnit *> GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const;
-	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
+	bool IsPointAdjacentToNonSubtemplateArea(const Vector2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
 	
 	void SetCurrentPlane(const CPlane *plane);
@@ -310,21 +310,21 @@ public:
 	void Remove(CUnit &unit);
 
 	//Wyrmgus start
-//	void Clamp(Vec2i &pos) const;
-	void Clamp(Vec2i &pos, int z) const;
+//	void Clamp(Vector2i &pos) const;
+	void Clamp(Vector2i &pos, const int z) const;
 	//Wyrmgus end
 
 	//Warning: we expect typical usage as xmin = x - range
-	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
+	void FixSelectionArea(Vector2i &minpos, Vector2i &maxpos, int z)
 	{
-		minpos.x = std::max<short>(0, minpos.x);
-		minpos.y = std::max<short>(0, minpos.y);
+		minpos.x = std::max<int>(0, minpos.x);
+		minpos.y = std::max<int>(0, minpos.y);
 
 		//Wyrmgus start
-//		maxpos.x = std::min<short>(maxpos.x, Info.MapWidth - 1);
-//		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
-		maxpos.x = std::min<short>(maxpos.x, Info.MapWidths[z] - 1);
-		maxpos.y = std::min<short>(maxpos.y, Info.MapHeights[z] - 1);
+//		maxpos.x = std::min<int>(maxpos.x, Info.MapWidth - 1);
+//		maxpos.y = std::min<int>(maxpos.y, Info.MapHeight - 1);
+		maxpos.x = std::min<int>(maxpos.x, Info.MapWidths[z] - 1);
+		maxpos.y = std::min<int>(maxpos.y, Info.MapHeights[z] - 1);
 		//Wyrmgus end
 	}
 
@@ -505,9 +505,9 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z);
 /// Returns true, if the unit-type can enter the field
-extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z);
+extern bool UnitTypeCanBeAt(const CUnitType &type, const Vector2i &pos, int z);
 /// Returns true, if the unit can enter the field
-extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
+extern bool UnitCanBeAt(const CUnit &unit, const Vector2i &pos, int z);
 
 /// Preprocess map, for internal use.
 extern void PreprocessMap();
@@ -536,7 +536,7 @@ void MapUnmarkUnitSight(CUnit &unit);
 ----------------------------------------------------------------------------*/
 
 /// Can a unit with 'mask' enter the field
-inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
+inline bool CanMoveToMask(const Vector2i &pos, int mask, int z)
 {
 	return !CMap::Map.Field(pos, z)->CheckMask(mask);
 }

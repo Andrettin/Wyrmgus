@@ -60,7 +60,7 @@ bool IsBuiltUnit::operator()(const CUnit *unit) const
 	return unit->CurrentAction() != UnitActionBuilt;
 }
 
-CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
+CUnit *UnitFinder::FindUnitAtPos(const Vector2i &pos) const
 {
 	CUnitCache &cache = CMap::Map.Field(pos, z)->UnitCache;
 
@@ -74,7 +74,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 	return nullptr;
 }
 
-VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult_DeadEnd;
@@ -103,12 +103,12 @@ class TerrainFinder
 {
 public:
 	//Wyrmgus start
-//	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
+//	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vector2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vec2i *resPos, int z, int landmass) :
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vector2i *resPos, int z, int landmass) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass) {}
 	//Wyrmgus end
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
@@ -119,10 +119,10 @@ private:
 	int z;
 	int landmass;
 	//Wyrmgus end
-	Vec2i *resPos;
+	Vector2i *resPos;
 };
 
-VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult_DeadEnd;
@@ -175,8 +175,8 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 */
 bool FindTerrainType(int movemask, int resource, int range,
 					 //Wyrmgus start
-//					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
-					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, int landmass)
+//					 const CPlayer &player, const Vector2i &startPos, Vector2i *terrainPos)
+					 const CPlayer &player, const Vector2i &startPos, Vector2i *terrainPos, int z, int landmass)
 					 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -265,8 +265,8 @@ public:
 	}
 
 	//Wyrmgus start
-//	BestDepotFinder(const Vec2i &pos, int res, int ran) :
-	BestDepotFinder(const Vec2i &pos, int res, int ran, int z) :
+//	BestDepotFinder(const Vector2i &pos, int res, int ran) :
+	BestDepotFinder(const Vector2i &pos, int res, int ran, int z) :
 	//Wyrmgus end
 		resource(res), range(ran),
 		best_dist(INT_MAX), best_depot(0)
@@ -292,7 +292,7 @@ public:
 private:
 	struct {
 		const CUnit *worker;
-		Vec2i loc;
+		Vector2i loc;
 		int layer;
 	} u_near;
 	const int resource;
@@ -370,7 +370,7 @@ public:
 		u_near.worker = &w;
 	}
 
-	BestHomeMarketFinder(const Vec2i &pos, int ran, int z) :
+	BestHomeMarketFinder(const Vector2i &pos, int ran, int z) :
 		range(ran),
 		best_dist(INT_MAX), best_market(0)
 	{
@@ -395,7 +395,7 @@ public:
 private:
 	struct {
 		const CUnit *worker;
-		Vec2i loc;
+		Vector2i loc;
 		int layer;
 	} u_near;
 	const int range;
@@ -405,7 +405,7 @@ public:
 };
 //Wyrmgus end
 
-CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z)
+CUnit *FindDepositNearLoc(CPlayer &p, const Vector2i &pos, int range, int resource, int z)
 {
 	BestDepotFinder<true> finder(pos, resource, range, z);
 	std::vector<CUnit *> table;
@@ -483,7 +483,7 @@ public:
 		bestCost.SetToMax();
 		*resultMine = nullptr;
 	}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	bool MineIsUsable(const CUnit &mine) const;
 
@@ -589,7 +589,7 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 	}
 }
 
-VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	//Wyrmgus start
 //	if (!worker.GetPlayer()->AiEnabled && !CMap::Map.Field(pos)->playerInfo.IsExplored(*worker.GetPlayer())) {
@@ -849,8 +849,8 @@ CUnit *UnitOnMapTile(const unsigned int index, unsigned int type, int z)
 **  @return      Returns first found unit on tile.
 */
 //Wyrmgus start
-//CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
-CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z)
+//CUnit *UnitOnMapTile(const Vector2i &pos, unsigned int type)
+CUnit *UnitOnMapTile(const Vector2i &pos, unsigned int type, int z)
 //Wyrmgus end
 {
 	return UnitOnMapTile(CMap::Map.getIndex(pos, z), type, z);
@@ -865,7 +865,7 @@ CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z)
 **
 **  @return        Returns ideal target on map tile.
 */
-CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, int z)
+CUnit *TargetOnMap(const CUnit &source, const Vector2i &pos1, const Vector2i &pos2, int z)
 {
 	std::vector<CUnit *> table;
 
@@ -904,8 +904,8 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, in
 **  @return          Returns the deposit if found, or null.
 */
 //Wyrmgus start
-//CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
-CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable, bool only_same)
+//CUnit *ResourceOnMap(const Vector2i &pos, int resource, bool mine_on_top)
+CUnit *ResourceOnMap(const Vector2i &pos, int resource, int z, bool only_harvestable, bool only_same)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -935,8 +935,8 @@ private:
 **  @return          Returns the deposit if found, or null.
 */
 //Wyrmgus start
-//CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
-CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z)
+//CUnit *ResourceDepositOnMap(const Vector2i &pos, int resource)
+CUnit *ResourceDepositOnMap(const Vector2i &pos, int resource, int z)
 //Wyrmgus end
 {
 	return CMap::Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
@@ -1199,7 +1199,7 @@ public:
 				// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
 				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
 										dest->Variable[HP_INDEX].Value) /
-					   (dtype.TileSize.x * dtype.TileSize.x);
+					   (dtype.GetTileSize().x * dtype.GetTileSize().x);
 				cost = std::max(cost, 1);
 				cost = -cost;
 			} else {
@@ -1241,7 +1241,7 @@ public:
 				}
 
 				// the cost may be divided across multiple cells
-				cost = cost / (dtype.TileSize.x * dtype.TileSize.x);
+				cost = cost / (dtype.GetTileSize().x * dtype.GetTileSize().x);
 				cost = std::max(cost, 1);
 
 				// Removed Unit's are in bunkers
@@ -1279,8 +1279,8 @@ public:
 			Assert(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
-			for (int yy = 0; yy < dtype.TileSize.y; ++yy) {
-				for (int xx = 0; xx < dtype.TileSize.x; ++xx) {
+			for (int yy = 0; yy < dtype.GetTileSize().y; ++yy) {
+				for (int xx = 0; xx < dtype.GetTileSize().x; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos >= (int) good->size()) {
 						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
@@ -1356,9 +1356,9 @@ private:
 		int y = attacker->GetTilePos().y;
 
 		// put in x-y the real point which will be hit...
-		// (only meaningful when dtype->TileSize.x > 1)
-		x = std::clamp<int>(x, dest->GetTilePos().x, dest->GetTilePos().x + dtype.TileSize.x - 1);
-		y = std::clamp<int>(y, dest->GetTilePos().y, dest->GetTilePos().y + dtype.TileSize.y - 1);
+		// (only meaningful when dtype->GetTileSize().x > 1)
+		x = std::clamp<int>(x, dest->GetTilePos().x, dest->GetTilePos().x + dtype.GetTileSize().x - 1);
+		y = std::clamp<int>(y, dest->GetTilePos().y, dest->GetTilePos().y + dtype.GetTileSize().y - 1);
 
 		int sbad = 0;
 		int sgood = 0;
@@ -1448,14 +1448,14 @@ struct CompareUnitDistance {
 **  @return         true, if an obstacle was found, false otherwise
 */
 //Wyrmgus start
-//bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, uint16_t flags, int *distance)
-bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, uint16_t flags, int z, int max_difference, int *distance, int player)
+//bool CheckObstaclesBetweenTiles(const Vector2i &unitPos, const Vector2i &goalPos, uint16_t flags, int *distance)
+bool CheckObstaclesBetweenTiles(const Vector2i &unitPos, const Vector2i &goalPos, uint16_t flags, int z, int max_difference, int *distance, int player)
 //Wyrmgus end
 {
-	const Vec2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));
-	const Vec2i sign(unitPos.x < goalPos.x ? 1 : -1, unitPos.y < goalPos.y ? 1 : -1);
+	const Vector2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));
+	const Vector2i sign(unitPos.x < goalPos.x ? 1 : -1, unitPos.y < goalPos.y ? 1 : -1);
 	int error = delta.x - delta.y;
-	Vec2i pos(unitPos), oldPos(unitPos);
+	Vector2i pos(unitPos), oldPos(unitPos);
 
 	while (pos.x != goalPos.x || pos.y != goalPos.y) {
 		const int error2 = error * 2;
@@ -1633,7 +1633,7 @@ public:
 		result(result)
 	{
 	}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	const CUnit &src_unit;
 	const CUnit &dst_unit;
@@ -1641,9 +1641,9 @@ private:
 	bool *result;
 };
 
-VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
-	if (pos.x >= dst_unit.GetTilePos().x && pos.x <= (dst_unit.GetTilePos().x + dst_unit.GetType()->TileSize.x - 1) && pos.y >= dst_unit.GetTilePos().y && pos.y <= (dst_unit.GetTilePos().y + dst_unit.GetType()->TileSize.y - 1)) {
+	if (pos.x >= dst_unit.GetTilePos().x && pos.x <= (dst_unit.GetTilePos().x + dst_unit.GetType()->GetTileSize().x - 1) && pos.y >= dst_unit.GetTilePos().y && pos.y <= (dst_unit.GetTilePos().y + dst_unit.GetType()->GetTileSize().y - 1)) {
 		*result = true;
 		return VisitResult_Finished;
 	}

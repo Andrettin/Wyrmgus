@@ -328,7 +328,7 @@ void CUserInterface::Load()
 }
 
 
-bool CMapArea::Contains(const PixelPos &screenPos) const
+bool CMapArea::Contains(const Vector2i &screenPos) const
 {
 	return this->X <= screenPos.x && screenPos.x <= this->EndX
 		   && this->Y <= screenPos.y && screenPos.y <= this->EndY;
@@ -495,7 +495,7 @@ void FreeButtonStyles()
 **  @note This functions only works with rectangular viewports, when
 **  we support shaped map window, this must be rewritten.
 */
-CViewport *GetViewport(const PixelPos &screenPos)
+CViewport *GetViewport(const Vector2i &screenPos)
 {
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (vp->Contains(screenPos)) {
@@ -524,7 +524,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 		new_vps[i].MapPos.y = 0;
 		const CViewport *vp = GetViewport(new_vps[i].GetTopLeftPos());
 		if (vp) {
-			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
+			const Vector2i relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
 
 			new_vps[i].Offset = relDiff + CMap::Map.TilePosToMapPixelPos_TopLeft(vp->MapPos, UI.CurrentMapLayer) + vp->Offset;
 		} else {

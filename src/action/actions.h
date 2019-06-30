@@ -31,7 +31,8 @@
 #define __ACTIONS_H__
 
 #include "unit/unit_ptr.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -108,7 +109,7 @@ public:
 	virtual void Cancel(CUnit &unit) {}
 	virtual bool IsValid() const = 0;
 
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const = 0;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const = 0;
 
 	virtual void OnAnimationAttack(CUnit &unit);
 
@@ -126,7 +127,7 @@ public:
 	CUnit *GetGoal() const { return Goal; };
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
-	virtual const Vec2i GetGoalPos() const;
+	virtual const Vector2i GetGoalPos() const;
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const;
 	//Wyrmgus end
@@ -135,42 +136,42 @@ public:
 
 	static COrder *NewActionAttack(const CUnit &attacker, CUnit &target);
 	//Wyrmgus start
-//	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-//	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
-	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
-	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
+//	static COrder *NewActionAttack(const CUnit &attacker, const Vector2i &dest);
+//	static COrder *NewActionAttackGround(const CUnit &attacker, const Vector2i &dest);
+	static COrder *NewActionAttack(const CUnit &attacker, const Vector2i &dest, int z);
+	static COrder *NewActionAttackGround(const CUnit &attacker, const Vector2i &dest, int z);
 	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
 	//Wyrmgus start
-//	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building, const int z, const CSite *settlement);
+//	static COrder *NewActionBuild(const CUnit &builder, const Vector2i &pos, const CUnitType &building);
+	static COrder *NewActionBuild(const CUnit &builder, const Vector2i &pos, const CUnitType &building, const int z, const CSite *settlement);
 	//Wyrmgus end
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();
 	static COrder *NewActionFollow(CUnit &dest);
 	//Wyrmgus start
-//	static COrder *NewActionMove(const Vec2i &pos);
-//	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
-	static COrder *NewActionMove(const Vec2i &pos, int z);
-	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
+//	static COrder *NewActionMove(const Vector2i &pos);
+//	static COrder *NewActionPatrol(const Vector2i &currentPos, const Vector2i &dest);
+	static COrder *NewActionMove(const Vector2i &pos, int z);
+	static COrder *NewActionPatrol(const Vector2i &currentPos, const Vector2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
 	//Wyrmgus start
 	static COrder *NewActionPickUp(CUnit &dest);
 	//Wyrmgus end
 	static COrder *NewActionRepair(CUnit &unit, CUnit &target);
 	//Wyrmgus start
-//	static COrder *NewActionRepair(const Vec2i &pos);
-	static COrder *NewActionRepair(const Vec2i &pos, int z);
+//	static COrder *NewActionRepair(const Vector2i &pos);
+	static COrder *NewActionRepair(const Vector2i &pos, int z);
 	//Wyrmgus end
 	//Wyrmgus start
 //	static COrder *NewActionResearch(CUnit &unit, const CUpgrade &upgrade);
 	static COrder *NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player);
 	//Wyrmgus end
-	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+	static COrder *NewActionResource(CUnit &harvester, const Vector2i &pos, int z);
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
 	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder *NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
+	static COrder *NewActionSpellCast(const CSpell &spell, const Vector2i &pos, CUnit *target, int z, bool isAutocast = false);
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
 	//Wyrmgus start
@@ -179,8 +180,8 @@ public:
 	//Wyrmgus end
 	static COrder *NewActionTransformInto(const CUnitType &type);
 	//Wyrmgus start
-//	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
-	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
+//	static COrder *NewActionUnload(const Vector2i &pos, CUnit *what);
+	static COrder *NewActionUnload(const Vector2i &pos, CUnit *what, int z, int landmass);
 	//Wyrmgus end
 	static COrder *NewActionUpgradeTo(CUnit &unit, const CUnitType &type);
 	//Wyrmgus start

@@ -1156,8 +1156,8 @@ bool CUnit::CheckTerrainForVariation(const UnitTypeVariation *variation) const
 			return false;
 		}
 		bool terrain_check = true;
-		for (int x = 0; x < this->Type->TileSize.x; ++x) {
-			for (int y = 0; y < this->Type->TileSize.y; ++y) {
+		for (int x = 0; x < this->Type->GetTileSize().x; ++x) {
+			for (int y = 0; y < this->Type->GetTileSize().y; ++y) {
 				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vec2i(x, y), this->MapLayer)) {
 					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vec2i(x, y), false, this->GetMapLayer()->GetIndex(), true)) == variation->Terrains.end()) {
 						terrain_check = false;
@@ -1180,8 +1180,8 @@ bool CUnit::CheckTerrainForVariation(const UnitTypeVariation *variation) const
 			return false;
 		}
 		bool terrain_check = true;
-		for (int x = 0; x < this->Type->TileSize.x; ++x) {
-			for (int y = 0; y < this->Type->TileSize.y; ++y) {
+		for (int x = 0; x < this->Type->GetTileSize().x; ++x) {
+			for (int y = 0; y < this->Type->GetTileSize().y; ++y) {
 				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vec2i(x, y), this->MapLayer)) {
 					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vec2i(x, y), false, this->GetMapLayer()->GetIndex(), true)) == variation->TerrainsForbidden.end()) {
 						terrain_check = false;
@@ -1970,7 +1970,7 @@ void CUnit::ApplyAura(int aura_index)
 	this->ApplyAuraEffect(aura_index);
 			
 	//apply aura to all appropriate nearby units
-	int aura_range = AuraRange - (this->Type->TileSize.x - 1);
+	int aura_range = AuraRange - (this->Type->GetTileSize().x - 1);
 	std::vector<CUnit *> table;
 	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), true);
 	for (size_t i = 0; i != table.size(); ++i) {
@@ -2279,8 +2279,8 @@ void CUnit::GenerateDrop()
 	}
 	
 	Vec2i drop_pos = this->GetTilePos();
-	drop_pos.x += SyncRand(this->Type->TileSize.x);
-	drop_pos.y += SyncRand(this->Type->TileSize.y);
+	drop_pos.x += SyncRand(this->Type->GetTileSize().x);
+	drop_pos.y += SyncRand(this->Type->GetTileSize().y);
 	CUnit *droppedUnit = nullptr;
 	CUnitType *chosen_drop = nullptr;
 	std::vector<CUnitType *> potential_drops;
@@ -2854,7 +2854,7 @@ void CUnit::Scout()
 {
 	int scout_range = std::max(16, this->CurrentSightRange * 2);
 			
-	Vec2i target_pos = this->GetTilePos();
+	Vector2i target_pos = this->GetTilePos();
 
 	target_pos.x += SyncRand(scout_range * 2 + 1) - scout_range;
 	target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
@@ -3339,7 +3339,7 @@ void MapMarkUnitSight(CUnit &unit)
 	CUnit *container = unit.GetFirstContainer();// First container of the unit.
 	Assert(container->GetType());
 
-	MapMarkUnitSightRec(unit, container->GetTilePos(), container->GetType()->TileSize.x, container->GetType()->TileSize.y,
+	MapMarkUnitSightRec(unit, container->GetTilePos(), container->GetType()->GetTileSize().x, container->GetType()->GetTileSize().y,
 						//Wyrmgus start
 //						MapMarkTileSight, MapMarkTileDetectCloak);
 						MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal);
@@ -3348,19 +3348,19 @@ void MapMarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
-						 unit.GetType()->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.GetMapLayer()->GetIndex());
+			MapMarkRadar(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->GetTileSize().x,
+						 unit.GetType()->GetTileSize().y, unit.Stats->Variables[RADAR_INDEX].Value, unit.GetMapLayer()->GetIndex());
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
-							   unit.GetType()->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.GetMapLayer()->GetIndex());
+			MapMarkRadarJammer(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->GetTileSize().x,
+							   unit.GetType()->GetTileSize().y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.GetMapLayer()->GetIndex());
 		}
 	}
 
 	//Wyrmgus start
 	if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-		MapMarkOwnership(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
-						   unit.GetType()->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.GetMapLayer()->GetIndex());
+		MapMarkOwnership(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->GetTileSize().x,
+						   unit.GetType()->GetTileSize().y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.GetMapLayer()->GetIndex());
 	}
 	//Wyrmgus end
 }
@@ -3379,7 +3379,7 @@ void MapUnmarkUnitSight(CUnit &unit)
 	CUnit *container = unit.GetFirstContainer();
 	Assert(container->GetType());
 	MapMarkUnitSightRec(unit,
-						container->GetTilePos(), container->GetType()->TileSize.x, container->GetType()->TileSize.y,
+						container->GetTilePos(), container->GetType()->GetTileSize().x, container->GetType()->GetTileSize().y,
 						//Wyrmgus start
 //						MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 						MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal);
@@ -3388,20 +3388,20 @@ void MapUnmarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
-						   unit.GetType()->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.GetMapLayer()->GetIndex());
+			MapUnmarkRadar(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->GetTileSize().x,
+						   unit.GetType()->GetTileSize().y, unit.Stats->Variables[RADAR_INDEX].Value, unit.GetMapLayer()->GetIndex());
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
-								 unit.GetType()->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.GetMapLayer()->GetIndex());
+			MapUnmarkRadarJammer(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->GetTileSize().x,
+								 unit.GetType()->GetTileSize().y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.GetMapLayer()->GetIndex());
 		}
 		
 	}
 	
 	//Wyrmgus start
 	if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-		MapUnmarkOwnership(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->TileSize.x,
-							 unit.GetType()->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.GetMapLayer()->GetIndex());
+		MapUnmarkOwnership(*unit.GetPlayer(), unit.GetTilePos(), unit.GetType()->GetTileSize().x,
+							 unit.GetType()->GetTileSize().y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.GetMapLayer()->GetIndex());
 	}
 	//Wyrmgus end
 }
@@ -3476,8 +3476,8 @@ void UpdateUnitSightRange(CUnit &unit)
 void MarkUnitFieldFlags(const CUnit &unit)
 {
 	const unsigned int flags = unit.GetType()->FieldFlags;
-	int h = unit.GetType()->TileSize.y;          // Tile height of the unit.
-	const int width = unit.GetType()->TileSize.x; // Tile width of the unit.
+	int h = unit.GetType()->GetTileSize().y;          // Tile height of the unit.
+	const int width = unit.GetType()->GetTileSize().x; // Tile width of the unit.
 	unsigned int index = unit.Offset;
 
 	//Wyrmgus start
@@ -3523,8 +3523,8 @@ private:
 void UnmarkUnitFieldFlags(const CUnit &unit)
 {
 	const unsigned int flags = ~unit.GetType()->FieldFlags;
-	const int width = unit.GetType()->TileSize.x;
-	int h = unit.GetType()->TileSize.y;
+	const int width = unit.GetType()->GetTileSize().x;
+	int h = unit.GetType()->GetTileSize().y;
 	unsigned int index = unit.Offset;
 
 	if (unit.GetType()->BoolFlag[VANISHES_INDEX].value) {
@@ -3922,7 +3922,7 @@ void CUnit::UpdateSettlement()
 			return;
 		}
 		
-		this->Settlement = this->Player->GetNearestSettlement(this->GetTilePos(), this->GetMapLayer()->GetIndex(), this->Type->TileSize);
+		this->Settlement = this->Player->GetNearestSettlement(this->GetTilePos(), this->GetMapLayer()->GetIndex(), this->Type->GetTileSize());
 	}
 }
 
@@ -4025,8 +4025,8 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 **
 */
 //Wyrmgus start
-//void CUnit::MoveToXY(const Vec2i &pos)
-void CUnit::MoveToXY(const Vec2i &pos, int z)
+//void CUnit::MoveToXY(const Vector2i &pos)
+void CUnit::MoveToXY(const Vector2i &pos, const int z)
 //Wyrmgus end
 {
 	MapUnmarkUnitSight(*this);
@@ -4072,7 +4072,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 **
 **  @param pos  map tile position.
 */
-void CUnit::Place(const Vec2i &pos, int z)
+void CUnit::Place(const Vector2i &pos, const int z)
 {
 	Assert(Removed);
 	
@@ -4111,8 +4111,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		
 		//remove pathways, destroyed walls and decoration units under buildings
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
-			for (int x = this->GetTilePos().x; x < this->GetTilePos().x + this->Type->TileSize.x; ++x) {
-				for (int y = this->GetTilePos().y; y < this->GetTilePos().y + this->Type->TileSize.y; ++y) {
+			for (int x = this->GetTilePos().x; x < this->GetTilePos().x + this->Type->GetTileSize().x; ++x) {
+				for (int y = this->GetTilePos().y; y < this->GetTilePos().y + this->Type->GetTileSize().y; ++y) {
 					if (!CMap::Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
@@ -4160,8 +4160,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 **  @return        Pointer to created unit.
 */
 //Wyrmgus start
-//CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player)
-CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z)
+//CUnit *MakeUnitAndPlace(const Vector2i &pos, const CUnitType &type, CPlayer *player)
+CUnit *MakeUnitAndPlace(const Vector2i &pos, const CUnitType &type, CPlayer *player, int z)
 //Wyrmgus end
 {
 	CUnit *unit = MakeUnit(type, player);
@@ -4232,7 +4232,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 		metal_rock_type = CUnitType::Get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
-		Vec2i metal_rock_offset((type.TileSize - 1) / 2);
+		Vec2i metal_rock_offset((type.GetTileSize() - 1) / 2);
 		for (int i = 0; i < 9; ++i) {
 			CUnit *metal_rock_unit = CreateUnit(unit->GetTilePos() + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
@@ -4671,14 +4671,14 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 **  @param pos   tile map position.
 **  @param dpos  Out: nearest point tile map position to (tx,ty).
 */
-void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
+void NearestOfUnit(const CUnit &unit, const Vector2i &pos, Vector2i *dpos)
 {
 	const int x = unit.GetTilePos().x;
 	const int y = unit.GetTilePos().y;
 
 	*dpos = pos;
-	dpos->x = std::clamp<short int>(dpos->x, x, x + unit.GetType()->TileSize.x - 1);
-	dpos->y = std::clamp<short int>(dpos->y, y, y + unit.GetType()->TileSize.y - 1);
+	dpos->x = std::clamp<int>(dpos->x, x, x + unit.GetType()->GetTileSize().x - 1);
+	dpos->y = std::clamp<int>(dpos->y, y, y + unit.GetType()->GetTileSize().y - 1);
 }
 
 /**
@@ -4860,8 +4860,8 @@ void UnitCountSeen(CUnit &unit)
 	}
 
 	//  Calculate new VisCount values.
-	const int height = unit.GetType()->TileSize.y;
-	const int width = unit.GetType()->TileSize.x;
+	const int height = unit.GetType()->GetTileSize().y;
+	const int width = unit.GetType()->GetTileSize().x;
 
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (CPlayer::Players[p]->Type != PlayerNobody) {
@@ -4986,8 +4986,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 	//Wyrmgus start
-//	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + this->GetPixelOffset().x - (Type->Width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + this->Type->GetOffsetX();
-//	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + this->GetPixelOffset().y - (Type->Height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + this->Type->GetOffsetY();
+//	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + this->GetPixelOffset().x - (Type->Width - Type->GetTileSize().x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + this->Type->GetOffsetX();
+//	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y + this->GetPixelOffset().y - (Type->Height - Type->GetTileSize().y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + this->Type->GetOffsetY();
 
 	int frame_width = this->GetType()->GetFrameSize().width;
 	int frame_height = this->GetType()->GetFrameSize().height;
@@ -4997,12 +4997,12 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_height = variation->GetFrameSize().height;
 	}
 
-	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + this->GetPixelOffset().x - (frame_width - this->Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x) / 2 + this->Type->GetOffsetX();
-	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + this->GetPixelOffset().y - (frame_height - this->Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y) / 2 + this->Type->GetOffsetY();
+	int x = this->TilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + this->GetPixelOffset().x - (frame_width - this->Type->GetTileSize().x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x) / 2 + this->Type->GetOffsetX();
+	int y = this->TilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + this->GetPixelOffset().y - (frame_height - this->Type->GetTileSize().y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y) / 2 + this->Type->GetOffsetY();
 	//Wyrmgus end
-	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;
-	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
+	const Vector2i vpSize = vp.GetPixelSize();
+	const Vector2i vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;
+	const Vector2i vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	if (x + frame_width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
 		|| y + frame_height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
@@ -5351,7 +5351,7 @@ static int myatan(int val)
 **
 **  @return         Angle (0..255)
 */
-int DirectionToHeading(const Vec2i &delta)
+int DirectionToHeading(const Vector2i &delta)
 {
 	//  Check which quadrant.
 	if (delta.x > 0) {
@@ -5368,20 +5368,6 @@ int DirectionToHeading(const Vec2i &delta)
 		return myatan((delta.y * -64) / -delta.x) + 64 * 3;
 	}
 	return 0;
-}
-
-/**
-**  Convert direction to heading.
-**
-**  @param delta  Delta.
-**
-**  @return         Angle (0..255)
-*/
-int DirectionToHeading(const PixelDiff &delta)
-{
-	// code is identic for Vec2i and PixelDiff
-	Vec2i delta2(delta.x, delta.y);
-	return DirectionToHeading(delta2);
 }
 
 /**
@@ -5426,7 +5412,7 @@ void UnitUpdateHeading(CUnit &unit)
 **  @param unit  Unit for new direction looking.
 **  @param delta  map tile delta direction.
 */
-void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
+void UnitHeadingFromDeltaXY(CUnit &unit, const Vector2i &delta)
 {
 	//Wyrmgus start
 //	unit.Direction = DirectionToHeading(delta);
@@ -5453,7 +5439,7 @@ void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 */
 void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 {
-	Vec2i pos;
+	Vector2i pos;
 	int addx = 0;
 	int addy = 0;
 	//Wyrmgus start
@@ -5462,9 +5448,9 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 
 	if (container) {
 		pos = container->GetTilePos();
-		pos -= unit.GetType()->TileSize - 1;
-		addx = container->GetType()->TileSize.x + unit.GetType()->TileSize.x - 1;
-		addy = container->GetType()->TileSize.y + unit.GetType()->TileSize.y - 1;
+		pos -= unit.GetType()->GetTileSize() - 1;
+		addx = container->GetType()->GetTileSize().x + unit.GetType()->GetTileSize().x - 1;
+		addy = container->GetType()->GetTileSize().y + unit.GetType()->GetTileSize().y - 1;
 		z = container->GetMapLayer()->GetIndex();
 
 		if (heading < LookingNE || heading > LookingNW) {
@@ -5555,10 +5541,10 @@ found:
 **  @param addx  Tile width of unit it's dropping out of.
 **  @param addy  Tile height of unit it's dropping out of.
 */
-void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
+void DropOutNearest(CUnit &unit, const Vector2i &goalPos, const CUnit *container)
 {
-	Vec2i pos;
-	Vec2i bestPos;
+	Vector2i pos;
+	Vector2i bestPos;
 	int bestd = 99999;
 	int addx = 0;
 	int addy = 0;
@@ -5569,9 +5555,9 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 	if (container) {
 		Assert(unit.Removed);
 		pos = container->GetTilePos();
-		pos -= unit.GetType()->TileSize - 1;
-		addx = container->GetType()->TileSize.x + unit.GetType()->TileSize.x - 1;
-		addy = container->GetType()->TileSize.y + unit.GetType()->TileSize.y - 1;
+		pos -= unit.GetType()->GetTileSize() - 1;
+		addx = container->GetType()->GetTileSize().x + unit.GetType()->GetTileSize().x - 1;
+		addy = container->GetType()->GetTileSize().y + unit.GetType()->GetTileSize().y - 1;
 		--pos.x;
 		z = container->GetMapLayer()->GetIndex();
 	} else {
@@ -5749,15 +5735,15 @@ CUnit *UnitOnScreen(int x, int y)
 	return candidate;
 }
 
-PixelPos CUnit::GetMapPixelPosTopLeft() const
+Vector2i CUnit::GetMapPixelPosTopLeft() const
 {
-	const PixelPos pos(this->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + this->GetPixelOffset().x, this->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + this->GetPixelOffset().y);
+	const Vector2i pos(this->GetTilePos().x * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).x + this->GetPixelOffset().x, this->GetTilePos().y * CMap::Map.GetMapLayerPixelTileSize(this->GetMapLayer()->GetIndex()).y + this->GetPixelOffset().y);
 	return pos;
 }
 
-PixelSize CUnit::GetTilePixelSize() const
+Vector2i CUnit::GetTilePixelSize() const
 {
-	return PixelSize(this->GetTileSize()) * CMap::PixelTileSize;
+	return this->GetTileSize() * CMap::PixelTileSize;
 }
 
 const PaletteImage *CUnit::GetImage() const
@@ -6934,7 +6920,7 @@ bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 {
 	bool has_adjacent_rail = false;
 	Vec2i top_left_pos(this->GetTilePos() - Vec2i(1, 1));
-	Vec2i bottom_right_pos(this->GetTilePos() + this->Type->TileSize);
+	Vec2i bottom_right_pos(this->GetTilePos() + this->Type->GetTileSize());
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 		Vec2i tile_pos(x, top_left_pos.y);
@@ -7736,7 +7722,7 @@ void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
 void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 //Wyrmgus end
 {
-	Vec2i pos = target.GetTilePos() - attacker.GetTilePos();
+	Vector2i pos = target.GetTilePos() - attacker.GetTilePos();
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
 	if (!d) {
@@ -7928,7 +7914,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 //	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning) {
-	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.IsUnderConstruction() && target.GetType()->TileSize.x != 1 && target.GetType()->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.IsUnderConstruction() && target.GetType()->GetTileSize().x != 1 && target.GetType()->GetTileSize().y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
@@ -8012,7 +7998,7 @@ int CUnit::MapDistanceTo(const CUnit &dst) const
  **
  **  @return      The distance between in tiles.
  */
-int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
+int CUnit::MapDistanceTo(const Vector2i &pos, int z) const
 {
 	//Wyrmgus start
 	if (z != this->GetMapLayer()->GetIndex()) {
@@ -8027,19 +8013,19 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 		dx = this->GetTilePos().x - pos.x;
 	//Wyrmgus start
 	} else if (this->Container) { //if unit is within another, use the tile size of the transporter to calculate the distance
-		dx = std::max<int>(0, pos.x - this->GetTilePos().x - this->Container->GetType()->TileSize.x + 1);
+		dx = std::max<int>(0, pos.x - this->GetTilePos().x - this->Container->GetType()->GetTileSize().x + 1);
 	//Wyrmgus end
 	} else {
-		dx = std::max<int>(0, pos.x - this->GetTilePos().x - this->GetType()->TileSize.x + 1);
+		dx = std::max<int>(0, pos.x - this->GetTilePos().x - this->GetType()->GetTileSize().x + 1);
 	}
 	if (pos.y <= this->GetTilePos().y) {
 		dy = this->GetTilePos().y - pos.y;
 	//Wyrmgus start
 	} else if (this->Container) {
-		dy = std::max<int>(0, pos.y - this->GetTilePos().y - this->Container->GetType()->TileSize.y + 1);
+		dy = std::max<int>(0, pos.y - this->GetTilePos().y - this->Container->GetType()->GetTileSize().y + 1);
 	//Wyrmgus end
 	} else {
-		dy = std::max<int>(0, pos.y - this->GetTilePos().y - this->GetType()->TileSize.y + 1);
+		dy = std::max<int>(0, pos.y - this->GetTilePos().y - this->GetType()->GetTileSize().y + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
@@ -8056,7 +8042,7 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 */
 int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z)
 {
-	return MapDistance(src.TileSize, pos1, src_z, dst.TileSize, pos2, dst_z);
+	return MapDistance(src.GetTileSize(), pos1, src_z, dst.GetTileSize(), pos2, dst_z);
 }
 
 int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z)
@@ -8415,20 +8401,20 @@ bool CUnit::IsUnusable(bool ignore_built_state) const
 **  Check if the unit attacking its goal will result in a ranged attack
 */
 //Wyrmgus start
-//bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
-bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
+//bool CUnit::IsAttackRanged(const CUnit *goal, const Vector2i &goalPos)
+bool CUnit::IsAttackRanged(const CUnit *goal, const Vector2i &goalPos, const int z) const
 //Wyrmgus end
 {
 	if (this->Variable[ATTACKRANGE_INDEX].Value <= 1) { //always return false if the units attack range is 1 or lower
 		return false;
 	}
 	
-	if (this->Container) { //if the unit is inside a container, the attack will always be ranged
+	if (this->Container != nullptr) { //if the unit is inside a container, the attack will always be ranged
 		return true;
 	}
 	
 	if (
-		goal
+		goal != nullptr
 		&& goal->IsAliveOnMap()
 		&& (
 			this->MapDistanceTo(*goal) > 1
@@ -8439,7 +8425,7 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		return true;
 	}
 	
-	if (!goal && CMap::Map.Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
+	if (goal == nullptr && CMap::Map.Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
 		return true;
 	}
 	
@@ -8597,7 +8583,7 @@ void CUnit::HandleBuffsEachSecond()
 			if (
 				(
 					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && this->GetMapLayer()->Field(this->GetTilePos().x, this->GetTilePos().y)->GetTerrainType(false)->IsDesert())
-					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && this->GetMapLayer()->TileBlockHasTree(this->GetTilePos() - 1, this->Type->TileSize + 2))
+					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && this->GetMapLayer()->TileBlockHasTree(this->GetTilePos() - 1, this->Type->GetTileSize() + 2))
 					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && this->GetMapLayer()->Field(this->GetTilePos().x, this->GetTilePos().y)->GetTerrainType(false)->IsSwamp())
 				)
 				&& (this->GetVariableValue(INVISIBLE_INDEX) > 0 || !this->IsInCombat())

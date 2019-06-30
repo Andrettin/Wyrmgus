@@ -129,11 +129,11 @@ void CancelBuildingMode()
 	UI.ButtonPanel.Update();
 }
 
-static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
+static bool CanBuildOnArea(const CUnit &unit, const Vector2i &pos)
 {
-	for (int j = 0; j < unit.GetType()->TileSize.y; ++j) {
-		for (int i = 0; i < unit.GetType()->TileSize.x; ++i) {
-			const Vec2i tempPos(i, j);
+	for (int j = 0; j < unit.GetType()->GetTileSize().y; ++j) {
+		for (int i = 0; i < unit.GetType()->GetTileSize().x; ++i) {
+			const Vector2i tempPos(i, j);
 			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				return false;
 			}
@@ -242,7 +242,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 **
 **  @return	True if a spell was autocast, false otherwise
 */
-static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vector2i &pos, int flush, int &acknowledged)
 {
 	if (dest == nullptr) {
 		return false;
@@ -381,7 +381,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	return false;
 }
 
-static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vector2i &pos, int flush, int &acknowledged)
 {
 	if (!UI.CurrentMapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return false;
@@ -431,7 +431,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	return false;
 }
 
-static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vector2i &pos, int flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.GetType();
 
@@ -570,7 +570,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	return true;
 }
 
-static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vector2i &pos, int flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.GetType();
 	const int action = type.MouseAction;
@@ -640,7 +640,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	return false;
 }
 
-static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vector2i &pos, int flush, int &acknowledged)
 {
 	if (dest != nullptr && unit.CurrentAction() != UnitActionBuilt) {
 		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
@@ -789,7 +789,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	return false;
 }
 
-static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vector2i &pos, int flush, int &acknowledged)
 {
 	// Go and harvest from a unit
 	//Wyrmgus start
@@ -821,7 +821,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	return false;
 }
 
-static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i &pos, int &acknowledged)
+static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vector2i &pos, int &acknowledged)
 {
 	// don't self targeting.
 	if (dest == &unit) {
@@ -958,13 +958,13 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 **
 **  @param mapPixelPos  map position in pixels.
 */
-void DoRightButton(const PixelPos &mapPixelPos)
+void DoRightButton(const Vector2i &mapPixelPos)
 {
 	// No unit selected
 	if (Selected.empty()) {
 		return;
 	}
-	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->GetIndex());
+	const Vector2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->GetIndex());
 	CUnit *dest;            // unit under the cursor if any.
 
 	if (UnitUnderCursor != nullptr && !UnitUnderCursor->GetType()->BoolFlag[DECORATION_INDEX].value) {
@@ -1014,7 +1014,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 **
 **  @return True if mouse is on the button, False otherwise.
 */
-bool CUIButton::Contains(const PixelPos &screenPos) const
+bool CUIButton::Contains(const Vector2i &screenPos) const
 {
 	Assert(this->Style);
 
@@ -1027,7 +1027,7 @@ bool CUIButton::Contains(const PixelPos &screenPos) const
 **
 **  @param screenPos  screen position.
 */
-static void HandleMouseOn(const PixelPos screenPos)
+static void HandleMouseOn(const Vector2i screenPos)
 {
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
@@ -1348,7 +1348,7 @@ void RestrictCursorToMinimap()
 **
 **  @param pos  Screen position.
 */
-static void MouseScrollMap(const PixelPos &pos)
+static void MouseScrollMap(const Vector2i &pos)
 {
 	const int speed = (KeyModifiers & ModifierControl) ? UI.MouseScrollSpeedControl : UI.MouseScrollSpeedDefault;
 	const PixelDiff diff(pos - CursorStartScreenPos);
@@ -1362,7 +1362,7 @@ static void MouseScrollMap(const PixelPos &pos)
 **
 **  @param cursorPos  Screen X position.
 */
-void UIHandleMouseMove(const PixelPos &cursorPos)
+void UIHandleMouseMove(const Vector2i &cursorPos)
 {
 	enum _cursor_on_ OldCursorOn;
 
@@ -1394,7 +1394,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap && (MouseButtons & LeftButton)) {
-		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vector2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
 		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
@@ -1446,13 +1446,13 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	
 	if (CursorOn == CursorOnMap && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		const CViewport &vp = *UI.MouseViewport;
-		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
+		const Vector2i tilePos = vp.ScreenToTilePos(cursorPos);
 
 		try {
 			if (CursorBuilding && (MouseButtons & LeftButton) && Selected.at(0)
 				&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
 				const CUnit &unit = *Selected[0];
-				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+				const Vector2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 				bool explored = CanBuildOnArea(*Selected[0], tilePos);
 
 				// We now need to check if there are another build commands on this build spot
@@ -1463,9 +1463,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					if (order.Action == UnitActionBuild) {
 						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
 						if (tilePos.x >= build.GetGoalPos().x
-							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileSize.x
+							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().GetTileSize().x
 							&& tilePos.y >= build.GetGoalPos().y
-							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileSize.y) {
+							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().GetTileSize().y) {
 							buildable = false;
 							break;
 						}
@@ -1513,7 +1513,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		}
 
 		if (show) {
-			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
+			const Vector2i mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
 		}
 		
@@ -1521,7 +1521,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (show && Selected.size() >= 1 && Selected[0]->GetPlayer() == CPlayer::GetThisPlayer()) {
 			bool has_terrain_resource = false;
 			const CViewport &vp = *UI.MouseViewport;
-			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
+			const Vector2i tilePos = vp.ScreenToTilePos(cursorPos);
 			for (int res = 0; res < MaxCosts; ++res) {
 				if (Selected[0]->GetType()->ResInfo[res]
 					//Wyrmgus start
@@ -1538,7 +1538,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		}
 		//Wyrmgus end
 	} else if (CursorOn == CursorOnMinimap) {
-		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
+		const Vector2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
 		if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
 			//Wyrmgus start
@@ -1588,7 +1588,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				}
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
-				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+				const Vector2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 				//  Minimap move viewpoint
 				UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 			}
@@ -1627,7 +1627,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		//  Minimap move viewpoint
-		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vector2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 		CursorStartScreenPos = CursorScreenPos;
@@ -1643,8 +1643,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 **  @param tilePos  tile map position.
 */
 //Wyrmgus start
-//static int SendRepair(const Vec2i &tilePos)
-static int SendRepair(const Vec2i &tilePos, int flush)
+//static int SendRepair(const Vector2i &tilePos)
+static int SendRepair(const Vector2i &tilePos, int flush)
 //Wyrmgus end
 {
 	CUnit *dest = UnitUnderCursor;
@@ -1687,8 +1687,8 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 **        the destination is reachable and handle nice group movements.
 */
 //Wyrmgus start
-//static int SendMove(const Vec2i &tilePos)
-static int SendMove(const Vec2i &tilePos, int flush)
+//static int SendMove(const Vector2i &tilePos)
+static int SendMove(const Vector2i &tilePos, int flush)
 //Wyrmgus end
 {
 	CUnit *goal = UnitUnderCursor;
@@ -1774,8 +1774,8 @@ static int SendMove(const Vec2i &tilePos, int flush)
 **  @see Selected
 */
 //Wyrmgus start
-//static int SendAttack(const Vec2i &tilePos)
-static int SendAttack(const Vec2i &tilePos, int flush)
+//static int SendAttack(const Vector2i &tilePos)
+static int SendAttack(const Vector2i &tilePos, int flush)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1823,8 +1823,8 @@ static int SendAttack(const Vec2i &tilePos, int flush)
 **  @param tilePos  tile map position.
 */
 //Wyrmgus start
-//static int SendAttackGround(const Vec2i &tilePos)
-static int SendAttackGround(const Vec2i &tilePos, int flush)
+//static int SendAttackGround(const Vector2i &tilePos)
+static int SendAttackGround(const Vector2i &tilePos, int flush)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1860,8 +1860,8 @@ static int SendAttackGround(const Vec2i &tilePos, int flush)
 **  @param tilePos  tile map position.
 */
 //Wyrmgus start
-//static int SendPatrol(const Vec2i &tilePos)
-static int SendPatrol(const Vec2i &tilePos, int flush)
+//static int SendPatrol(const Vector2i &tilePos)
+static int SendPatrol(const Vector2i &tilePos, int flush)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1886,8 +1886,8 @@ static int SendPatrol(const Vec2i &tilePos, int flush)
 **  @see Selected
 */
 //Wyrmgus start
-//static int SendResource(const Vec2i &pos)
-static int SendResource(const Vec2i &pos, int flush)
+//static int SendResource(const Vector2i &pos)
+static int SendResource(const Vector2i &pos, int flush)
 //Wyrmgus end
 {
 	int res;
@@ -1983,8 +1983,8 @@ static int SendResource(const Vec2i &pos, int flush)
 **  @param tilePos  tile map position.
 */
 //Wyrmgus start
-//static int SendUnload(const Vec2i &tilePos)
-static int SendUnload(const Vec2i &tilePos, int flush)
+//static int SendUnload(const Vector2i &tilePos)
+static int SendUnload(const Vector2i &tilePos, int flush)
 //Wyrmgus emd
 {
 	//Wyrmgus start
@@ -2012,7 +2012,7 @@ static int SendUnload(const Vec2i &tilePos, int flush)
 **
 **  @see Selected
 */
-static int SendSpellCast(const Vec2i &tilePos, int flush)
+static int SendSpellCast(const Vector2i &tilePos, int flush)
 {
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -2070,7 +2070,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 **  @todo To reduce the CPU load for pathfinder, we should check if
 **        the destination is reachable and handle nice group movements.
 */
-static int SendRallyPoint(const Vec2i &tilePos)
+static int SendRallyPoint(const Vector2i &tilePos)
 {
 	int ret = 0;
 
@@ -2090,7 +2090,7 @@ static int SendRallyPoint(const Vec2i &tilePos)
 **
 **  @param tilePos  tile map position.
 */
-static void SendCommand(const Vec2i &tilePos)
+static void SendCommand(const Vector2i &tilePos)
 {
 	int ret = 0;
 
@@ -2279,7 +2279,7 @@ static void UISelectStateButtonDown(unsigned)
 
 		if (MouseButtons & LeftButton) {
 			const CViewport &vp = *UI.MouseViewport;
-			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
+			const Vector2i mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->GetIndex());
@@ -2293,10 +2293,10 @@ static void UISelectStateButtonDown(unsigned)
 	//  Clicking on the minimap.
 	//
 	if (CursorOn == CursorOnMinimap) {
-		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vector2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
+			const Vector2i mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
@@ -2366,7 +2366,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		// need to make sure there is a unit to build
 		if (Selected[0] && (MouseButtons & LeftButton)
 			&& UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {// enter select mode
-			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+			const Vector2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			bool explored = CanBuildOnArea(*Selected[0], tilePos);
 
 			// 0 Test build, don't really build
@@ -2414,19 +2414,19 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			CUnit *unit;
 			// FIXME: Rethink the complete chaos of coordinates here
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
-			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+			const Vector2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->GetIndex()))
 				&& !UnitUnderCursor->GetType()->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
 				if (!ClickMissile.empty()) {
-					const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+					const Vector2i mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->GetIndex());
 				}
 			}
-			const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			const Vector2i mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 			DoRightButton(mapPixelPos);
 		}
 	} else if (MouseButtons & LeftButton) { // enter select mode
@@ -2445,13 +2445,13 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 
 static void UIHandleButtonDown_OnMinimap(unsigned button)
 {
-	const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+	const Vector2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
 		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
+			const Vector2i mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->GetIndex());
 			}
@@ -3092,9 +3092,9 @@ void UIHandleButtonUp(unsigned button)
 		//
 		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
 			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y) {
-			PixelPos pos0 = CursorStartMapPos;
-			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
-			PixelPos pos1 = cursorMapPos;
+			Vector2i pos0 = CursorStartMapPos;
+			const Vector2i cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			Vector2i pos1 = cursorMapPos;
 
 			if (pos0.x > pos1.x) {
 				std::swap(pos0.x, pos1.x);
@@ -3131,10 +3131,10 @@ void UIHandleButtonUp(unsigned button)
 			//
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
-			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+			const Vector2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			CUnit *unit = nullptr;
 			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+				const Vector2i cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 			}
@@ -3288,7 +3288,7 @@ void DrawPieMenu()
 		if (buttons[i].GetPos() != -1) {
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
-			const PixelPos pos(x, y);
+			const Vector2i pos(x, y);
 
 			bool gray = false;
 			for (size_t j = 0; j != Selected.size(); ++j) {

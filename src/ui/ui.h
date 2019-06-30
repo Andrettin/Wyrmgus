@@ -82,7 +82,7 @@ public:
 	IntColor BorderColor = 0;
 	int BorderSize = 0;
 	TextAlignment TextAlign = TextAlignUndefined;	/// Text alignment
-	PixelPos TextPos = PixelPos(0, 0);	/// Text location
+	Vector2i TextPos = Vector2i(0, 0);	/// Text location
 	std::string TextNormalColor;	/// Normal text color
 	std::string TextReverseColor;	/// Reverse text color
 };
@@ -109,7 +109,7 @@ class CUIButton
 public:
 	~CUIButton() {}
 
-	bool Contains(const PixelPos &screenPos) const;
+	bool Contains(const Vector2i &screenPos) const;
 
 public:
 	int X = 0;						/// x coordinate on the screen
@@ -142,7 +142,7 @@ enum ViewportModeType {
 class CMapArea
 {
 public:
-	bool Contains(const PixelPos &screenPos) const;
+	bool Contains(const Vector2i &screenPos) const;
 
 public:
 	int X = 0;						/// Screen pixel left corner x coordinate
@@ -373,7 +373,7 @@ public:
 	/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl = 0;
 
-	PixelPos MouseWarpPos;				/// Cursor warp screen position
+	Vector2i MouseWarpPos;				/// Cursor warp screen position
 
 	std::string NormalFontColor;		/// Color for normal text displayed
 	std::string ReverseFontColor;		/// Color for reverse text displayed
@@ -556,7 +556,7 @@ extern CPopup *PopupByIdent(const std::string &ident);
 extern ButtonStyle *FindButtonStyle(const std::string &style);
 
 /// Called if the mouse is moved in Normal interface state
-extern void UIHandleMouseMove(const PixelPos &pos);
+extern void UIHandleMouseMove(const Vector2i &pos);
 /// Called if any mouse button is pressed down
 extern void UIHandleButtonDown(unsigned button);
 /// Called if any mouse button is released up
@@ -568,7 +568,7 @@ extern void RestrictCursorToViewport();
 extern void RestrictCursorToMinimap();
 
 /// Get viewport for screen pixel position
-extern CViewport *GetViewport(const PixelPos &screenPos);
+extern CViewport *GetViewport(const Vector2i &screenPos);
 /// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
 /// Select viewport mode

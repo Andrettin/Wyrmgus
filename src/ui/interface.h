@@ -222,7 +222,7 @@ extern void HandleButtonUp(unsigned button);
 /// Keep coordinates in window and update cursor position
 extern void HandleCursorMove(int *x, int *y);
 /// Called if the mouse is moved
-extern void HandleMouseMove(const PixelPos &pos);
+extern void HandleMouseMove(const Vector2i &pos);
 /// Called if the mouse exits the game window (only for some videomodes)
 extern void HandleMouseExit();
 
@@ -359,7 +359,7 @@ extern void DrawGenericPopup(const std::string &popup_text, int x = 0, int y = 0
 //Wyrmgus end
 
 /// Handle the mouse in scroll area
-extern bool HandleMouseScrollArea(const PixelPos &mousePos);
+extern bool HandleMouseScrollArea(const Vector2i &mousePos);
 
 //
 // in button_checks.cpp

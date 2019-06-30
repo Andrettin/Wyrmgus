@@ -93,7 +93,7 @@ std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 CMap CMap::Map;				/// The current map
-PixelSize CMap::PixelTileSize = PixelSize(32, 32);	/// The pixel tile size
+Vector2i CMap::PixelTileSize = Vector2i(32, 32);	/// The pixel tile size
 int FlagRevealMap;			/// Flag must reveal the map
 int ReplayRevealMap;		/// Reveal Map is replay
 int ForestRegeneration;		/// Forest regeneration
@@ -230,27 +230,27 @@ void CMap::Reveal(bool only_person_players)
 --  Map queries
 ----------------------------------------------------------------------------*/
 
-Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const
+Vector2i CMap::MapPixelPosToTilePos(const Vector2i &mapPos, const int map_layer) const
 {
-	const Vec2i tilePos(mapPos.x / GetMapLayerPixelTileSize(map_layer).x, mapPos.y / GetMapLayerPixelTileSize(map_layer).y);
+	const Vector2i tilePos(mapPos.x / GetMapLayerPixelTileSize(map_layer).x, mapPos.y / GetMapLayerPixelTileSize(map_layer).y);
 
 	return tilePos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const
+Vector2i CMap::TilePosToMapPixelPos_TopLeft(const Vector2i &tilePos, const CMapLayer *map_layer) const
 {
-	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1).x, tilePos.y * GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1).y);
+	Vector2i mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1).x, tilePos.y * GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1).y);
 
 	return mapPixelPos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const
+Vector2i CMap::TilePosToMapPixelPos_Center(const Vector2i &tilePos, const CMapLayer *map_layer) const
 {
 	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer ? map_layer->GetIndex() : -1) / 2;
 }
 
 //Wyrmgus start
-const CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
+const CTerrainType *CMap::GetTileTerrain(const Vector2i &pos, const bool overlay, const int z) const
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -259,7 +259,7 @@ const CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, c
 	return this->MapLayers[z]->GetTileTerrainType(pos, overlay);
 }
 
-const CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
+const CTerrainType *CMap::GetTileTopTerrain(const Vector2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -270,7 +270,7 @@ const CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, c
 	return mf.GetTopTerrainType();
 }
 
-int CMap::GetTileLandmass(const Vec2i &pos, int z) const
+int CMap::GetTileLandmass(const Vector2i &pos, const int z) const
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return 0;
@@ -328,21 +328,21 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->GivesResource && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		}
 		
 		if (table.size() == 0) {
 			bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
-			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
-				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
+			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->GetTileSize().x + 1; ++x) {
+				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->GetTileSize().y + 1; ++y) {
 					if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
 						passable_surroundings = false;
 					}
@@ -359,7 +359,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 //Wyrmgus end
 
 //Wyrmgus start
-bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
+bool CMap::CurrentTerrainCanBeAt(const Vector2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
 	const CTerrainType *terrain = nullptr;
@@ -383,7 +383,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
@@ -417,13 +417,13 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 **
 **	@return	True if the tile borders a given terrain type, or false otherwise
 */
-bool CMap::TileBordersTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const
+bool CMap::TileBordersTerrain(const Vector2i &pos, const CTerrainType *terrain_type, const int z) const
 {
 	const bool overlay = terrain_type != nullptr ? terrain_type->IsOverlay() : false;
 	
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
@@ -446,11 +446,11 @@ bool CMap::TileBordersTerrain(const Vec2i &pos, const CTerrainType *terrain_type
 **
 **	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
 */
-bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain_type, const int z) const
+bool CMap::TileBordersOnlySameTerrain(const Vector2i &pos, const CTerrainType *new_terrain_type, const int z) const
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
@@ -484,11 +484,11 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_
 	return true;
 }
 
-bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
+bool CMap::TileBordersFlag(const Vector2i &pos, int z, int flag, bool reverse)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
@@ -503,11 +503,11 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
 	return false;
 }
 
-bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
+bool CMap::TileBordersBuilding(const Vector2i &pos, int z)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
@@ -522,11 +522,11 @@ bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 	return false;
 }
 
-bool CMap::TileBordersPathway(const Vec2i &pos, int z, bool only_railroad)
+bool CMap::TileBordersPathway(const Vector2i &pos, int z, bool only_railroad)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
@@ -544,11 +544,11 @@ bool CMap::TileBordersPathway(const Vec2i &pos, int z, bool only_railroad)
 	return false;
 }
 
-bool CMap::TileBordersUnit(const Vec2i &pos, int z)
+bool CMap::TileBordersUnit(const Vector2i &pos, int z)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
@@ -576,7 +576,7 @@ bool CMap::TileBordersUnit(const Vec2i &pos, int z)
 **
 **	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
 */
-bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const
+bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vector2i &pos, const CTerrainType *terrain_type, const int z) const
 {
 	if (!terrain_type || !terrain_type->IsOverlay()) {
 		return false;
@@ -586,7 +586,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 	
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
@@ -631,7 +631,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 **
 **	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
 */
-bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const
+bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vector2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const
 {
 	if (!terrain_type) {
 		return false;
@@ -639,7 +639,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 	
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			Vector2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
@@ -683,7 +683,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 **
 **	@return	Whether the tile has units that are incompatible with the given terrain type
 */
-bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z)
+bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vector2i &pos, const CTerrainType *terrain_type, const int z)
 {
 	CMapField &mf = *CMap::Map.Field(pos, z);
 	
@@ -707,15 +707,15 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainT
 **
 **	@return	True if the tile is in a subtemplate area, or false otherwise
 */
-bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate) const
+bool CMap::IsPointInASubtemplateArea(const Vector2i &pos, const int z, const CMapTemplate *subtemplate) const
 {
 	for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
 		if (subtemplate && subtemplate != std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
 			continue;
 		}
 		
-		Vec2i min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
-		Vec2i max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
+		Vector2i min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
+		Vector2i max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
 		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
 			return true;
 		}
@@ -731,10 +731,10 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTe
 **
 **	@return	The subtemplate's rectangle if found, or {(-1, -1), (-1, -1)} otherwise
 */
-std::pair<Vec2i, Vec2i> CMap::GetSubtemplateRect(const CMapTemplate *subtemplate) const
+std::pair<Vector2i, Vector2i> CMap::GetSubtemplateRect(const CMapTemplate *subtemplate) const
 {
 	if (!subtemplate) {
-		return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
+		return std::make_pair(Vector2i(-1, -1), Vector2i(-1, -1));
 	}
 	
 	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
@@ -749,7 +749,7 @@ std::pair<Vec2i, Vec2i> CMap::GetSubtemplateRect(const CMapTemplate *subtemplate
 		}
 	}
 	
-	return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
+	return std::make_pair(Vector2i(-1, -1), Vector2i(-1, -1));
 }
 
 /**
@@ -759,9 +759,9 @@ std::pair<Vec2i, Vec2i> CMap::GetSubtemplateRect(const CMapTemplate *subtemplate
 **
 **	@return	The subtemplate's position if found, or (-1, -1) otherwise
 */
-Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
+Vector2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
 {
-	std::pair<Vec2i, Vec2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
+	std::pair<Vector2i, Vector2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
 	
 	return subtemplate_rect.first;
 }
@@ -773,12 +773,12 @@ Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
 **
 **	@return	The subtemplate's center position if found, or (-1, -1) otherwise
 */
-Vec2i CMap::GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const
+Vector2i CMap::GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const
 {
-	std::pair<Vec2i, Vec2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
+	std::pair<Vector2i, Vector2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
 	
-	const Vec2i &start_pos = subtemplate_rect.first;
-	const Vec2i &end_pos = subtemplate_rect.second;
+	const Vector2i &start_pos = subtemplate_rect.first;
+	const Vector2i &end_pos = subtemplate_rect.second;
 	
 	return start_pos + ((end_pos - start_pos) / 2);
 }
@@ -790,9 +790,9 @@ Vec2i CMap::GetSubtemplateCenterPos(const CMapTemplate *subtemplate) const
 **
 **	@return	The subtemplate's end position if found, or (-1, -1) otherwise
 */
-Vec2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
+Vector2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
 {
-	std::pair<Vec2i, Vec2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
+	std::pair<Vector2i, Vector2i> subtemplate_rect = this->GetSubtemplateRect(subtemplate);
 	
 	return subtemplate_rect.second;
 }
@@ -846,7 +846,7 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 		const CMapLayer *map_layer = this->GetMapLayer(main_template->GetPlane(), main_template->GetWorld(), main_template->GetSurfaceLayer());
 		if (map_layer != nullptr) {
 			for (CUnit *connector_unit : map_layer->GetLayerConnectors()) {
-				const Vec2i unit_pos = connector_unit->GetTileCenterPos();
+				const Vector2i unit_pos = connector_unit->GetTileCenterPos();
 				
 				if (is_main_template && this->IsPointInASubtemplateArea(unit_pos, map_layer->GetIndex())) {
 					continue;
@@ -870,7 +870,7 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 **
 **	@return	True if the tile is adjacent to a non-subtemplate area tile, or false otherwise
 */
-bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const
+bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vector2i &pos, const int z) const
 {
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -878,7 +878,7 @@ bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) co
 				continue;
 			}
 			
-			Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+			Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 			
 			if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
 				return true;
@@ -1055,8 +1055,8 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
 **  @return      True if could be entered, false otherwise.
 */
 //Wyrmgus start
-//bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
-bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
+//bool UnitTypeCanBeAt(const CUnitType &type, const Vector2i &pos)
+bool UnitTypeCanBeAt(const CUnitType &type, const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	const int mask = type.MovementMask;
@@ -1065,8 +1065,8 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
 	//Wyrmgus end
 
-	for (int addy = 0; addy < type.TileSize.y; ++addy) {
-		for (int addx = 0; addx < type.TileSize.x; ++addx) {
+	for (int addy = 0; addy < type.GetTileSize().y; ++addy) {
+		for (int addx = 0; addx < type.GetTileSize().x; ++addx) {
 			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
 				|| CMap::Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
 				return false;
@@ -1089,8 +1089,8 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 **  @return      True if could be placeded, false otherwise.
 */
 //Wyrmgus start
-//bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
-bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z)
+//bool UnitCanBeAt(const CUnit &unit, const Vector2i &pos)
+bool UnitCanBeAt(const CUnit &unit, const Vector2i &pos, const int z)
 //Wyrmgus end
 {
 	Assert(unit.GetType());
@@ -1164,7 +1164,7 @@ int GetSubtemplateStartX(const std::string &subtemplate_ident)
 
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+			Vector2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
 			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.x;
 			}
@@ -1184,7 +1184,7 @@ int GetSubtemplateStartY(const std::string &subtemplate_ident)
 
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+			Vector2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
 			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.y;
 			}
@@ -1354,9 +1354,9 @@ bool CMapInfo::IsPointOnMap(const int x, const int y, const int z) const
 **
 **	@return	True if the coordinate is valid, false otherwise
 */
-bool CMapInfo::IsPointOnMap(const Vec2i &pos, const int z) const
+bool CMapInfo::IsPointOnMap(const Vector2i &pos, const int z) const
 {
-	return IsPointOnMap(pos.x, pos.y, z);
+	return this->IsPointOnMap(pos.x, pos.y, z);
 }
 
 /**
@@ -1381,9 +1381,9 @@ bool CMapInfo::IsPointOnMap(const int x, const int y, const CMapLayer *map_layer
 **
 **	@return	True if the coordinate is valid, false otherwise
 */
-bool CMapInfo::IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const
+bool CMapInfo::IsPointOnMap(const Vector2i &pos, const CMapLayer *map_layer) const
 {
-	return IsPointOnMap(pos.x, pos.y, map_layer);
+	return this->IsPointOnMap(pos.x, pos.y, map_layer);
 }
 
 /**
@@ -1457,7 +1457,7 @@ void CMap::Create()
 {
 	Assert(this->MapLayers.size() == 0);
 
-	CMapLayer *map_layer = new CMapLayer(this->MapLayers.size(), this->Info.MapWidth, this->Info.MapHeight);
+	CMapLayer *map_layer = new CMapLayer(this->MapLayers.size(), Vector2i(this->Info.MapWidth, this->Info.MapHeight));
 	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
@@ -1649,7 +1649,7 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
+void CMap::SetTileTerrain(const Vector2i &pos, const CTerrainType *terrain, const int z)
 {
 	if (!terrain) {
 		return;
@@ -1698,7 +1698,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
@@ -1725,7 +1725,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
 			for (int x_offset = -16; x_offset <= 16; ++x_offset) {
 				for (int y_offset = -16; y_offset <= 16; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
-						Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+						Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 							CMap::Map.CalculateTileOwnership(adjacent_pos, z);
 						}
@@ -1737,8 +1737,8 @@ void CMap::SetTileTerrain(const Vec2i &pos, const CTerrainType *terrain, int z)
 }
 
 //Wyrmgus start
-//void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
-void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
+//void CMap::RemoveTileOverlayTerrain(const Vector2i &pos)
+void CMap::RemoveTileOverlayTerrain(const Vector2i &pos, const int z)
 //Wyrmgus end
 {
 	CMapField &mf = *this->Field(pos, z);
@@ -1762,7 +1762,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
@@ -1783,7 +1783,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
 			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 						CMap::Map.CalculateTileOwnership(adjacent_pos, z);
 					}
@@ -1793,7 +1793,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
+void CMap::SetOverlayTerrainDestroyed(const Vector2i &pos, bool destroyed, int z)
 {
 	CMapLayer *map_layer = this->MapLayers[z];
 	
@@ -1849,7 +1849,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
@@ -1874,7 +1874,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
 			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 						CMap::Map.CalculateTileOwnership(adjacent_pos, z);
 					}
@@ -1884,7 +1884,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	}
 }
 
-void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
+void CMap::SetOverlayTerrainDamaged(const Vector2i &pos, bool damaged, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
 	
@@ -2007,7 +2007,7 @@ static int GetTransitionType(std::vector<int> &adjacent_directions, bool allow_s
 	return transition_type;
 }
 
-void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
+void CMap::CalculateTileTransitions(const Vector2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
 	const CTerrainType *terrain = nullptr;
@@ -2030,7 +2030,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					const CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
@@ -2161,7 +2161,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	}
 }
 
-void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
+void CMap::CalculateTileLandmass(const Vector2i &pos, int z)
 {
 	if (!this->Info.IsPointOnMap(pos, z)) {
 		return;
@@ -2184,14 +2184,14 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	this->Landmasses += 1;
 	this->BorderLandmasses.resize(this->Landmasses + 1);
 	//now, spread the new landmass ID to neighboring land tiles
-	std::vector<Vec2i> landmass_tiles;
+	std::vector<Vector2i> landmass_tiles;
 	landmass_tiles.push_back(pos);
 	//calculate the landmass of any neighboring land tiles with no set landmass as well
 	for (size_t i = 0; i < landmass_tiles.size(); ++i) {
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
+					Vector2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
 					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						const bool adjacent_is_water = (adjacent_mf.GetFlags() & MapFieldWaterAllowed) || (adjacent_mf.GetFlags() & MapFieldCoastAllowed);
@@ -2210,7 +2210,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
+void CMap::CalculateTileTerrainFeature(const Vector2i &pos, int z)
 {
 	if (!this->Info.IsPointOnMap(pos, z)) {
 		return;
@@ -2230,7 +2230,7 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if ((x_offset != 0 || y_offset != 0) && !(x_offset != 0 && y_offset != 0)) { //only directly adjacent tiles (no diagonal ones, and not the same tile)
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 
@@ -2244,7 +2244,7 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
+void CMap::CalculateTileOwnership(const Vector2i &pos, int z)
 {
 	if (!this->Info.IsPointOnMap(pos, z)) {
 		return;
@@ -2280,7 +2280,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 		obstacle_flags.push_back(MapFieldUnpassable);
 
 		std::vector<CUnit *> table;
-		Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), table, z);
+		Select(pos - Vector2i(16, 16), pos + Vector2i(16, 16), table, z);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit *unit = table[i];
 			if (!unit) {
@@ -2290,9 +2290,9 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				bool obstacle_check = true;
 				for (size_t j = 0; j < obstacle_flags.size(); ++j) {
 					bool obstacle_subcheck = false;
-					for (int x = 0; x < unit->GetType()->TileSize.x; ++x) {
-						for (int y = 0; y < unit->GetType()->TileSize.y; ++y) {
-							if (CheckObstaclesBetweenTiles(unit->GetTilePos() + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->GetPlayer()->GetIndex())) { //the obstacle must be avoidable from at least one of the unit's tiles
+					for (int x = 0; x < unit->GetType()->GetTileSize().x; ++x) {
+						for (int y = 0; y < unit->GetType()->GetTileSize().y; ++y) {
+							if (CheckObstaclesBetweenTiles(unit->GetTilePos() + Vector2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->GetPlayer()->GetIndex())) { //the obstacle must be avoidable from at least one of the unit's tiles
 								obstacle_subcheck = true;
 								break;
 							}
@@ -2323,7 +2323,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 							
@@ -2335,7 +2335,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
+void CMap::CalculateTileOwnershipTransition(const Vector2i &pos, int z)
 {
 	if (!this->Info.IsPointOnMap(pos, z)) {
 		return;
@@ -2358,7 +2358,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					if (adjacent_mf.Owner != mf.Owner) {
@@ -2573,15 +2573,15 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	const int max_tile_quantity = (max_pos.x + 1 - min_pos.x) * (max_pos.y + 1 - min_pos.y) * generated_terrain->MaxPercent / 100;
 	int tile_quantity = 0;
 	
-	Vec2i random_pos(0, 0);
+	Vector2i random_pos(0, 0);
 	int count = seed_count;
 	
-	std::vector<Vec2i> seeds;
+	std::vector<Vector2i> seeds;
 	
 	if (generated_terrain->UseExistingAsSeeds) { //use existing tiles of the given terrain as seeds for the terrain generation
 		for (int x = min_pos.x; x <= max_pos.x; ++x) {
 			for (int y = min_pos.y; y <= max_pos.y; ++y) {
-				const Vec2i tile_pos(x, y);
+				const Vector2i tile_pos(x, y);
 				const CMapField *tile = this->Field(x, y, z);
 				
 				if (max_tile_quantity != 0 && tile->GetTopTerrainType() == terrain_type) {
@@ -2603,12 +2603,12 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	
 	if (generated_terrain->UseSubtemplateBordersAsSeeds) {
 		for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			const Vec2i subtemplate_min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
-			const Vec2i subtemplate_max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
+			const Vector2i &subtemplate_min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
+			const Vector2i &subtemplate_max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
 			
 			for (int x = subtemplate_min_pos.x; x <= subtemplate_max_pos.x; ++x) {
 				for (int y = subtemplate_min_pos.y; y <= subtemplate_max_pos.y; ++y) {
-					const Vec2i tile_pos(x, y);
+					const Vector2i tile_pos(x, y);
 					const CMapField *tile = this->Field(x, y, z);
 					
 					if (!generated_terrain->CanUseTileAsSeed(tile)) {
@@ -2625,10 +2625,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		}
 	}
 	
-	std::vector<Vec2i> potential_positions;
+	std::vector<Vector2i> potential_positions;
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			potential_positions.push_back(Vec2i(x, y));
+			potential_positions.push_back(Vector2i(x, y));
 		}
 	}
 	
@@ -2667,12 +2667,12 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain_type, z)
 			&& (!(terrain_type->GetFlags() & MapFieldUnpassable) || !this->TileBordersUnit(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to units
 		) {
-			std::vector<Vec2i> adjacent_positions;
+			std::vector<Vector2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 				for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-					Vec2i diagonal_pos(random_pos.x + sub_x, random_pos.y + sub_y);
-					Vec2i vertical_pos(random_pos.x, random_pos.y + sub_y);
-					Vec2i horizontal_pos(random_pos.x + sub_x, random_pos.y);
+					Vector2i diagonal_pos(random_pos.x + sub_x, random_pos.y + sub_y);
+					Vector2i vertical_pos(random_pos.x, random_pos.y + sub_y);
+					Vector2i horizontal_pos(random_pos.x + sub_x, random_pos.y);
 					if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
 						continue;
 					}
@@ -2716,22 +2716,22 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			}
 			
 			if (adjacent_positions.size() > 0) {
-				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+				Vector2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
 				if (!terrain_type->IsOverlay()) {
 					this->Field(random_pos, z)->RemoveOverlayTerrain();
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->RemoveOverlayTerrain();
+					this->Field(Vector2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
+					this->Field(Vector2i(adjacent_pos.x, random_pos.y), z)->RemoveOverlayTerrain();
 				}
 				this->Field(random_pos, z)->SetTerrain(terrain_type);
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain_type);
+				this->Field(Vector2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
+				this->Field(Vector2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain_type);
 				count -= 1;
 				seeds.push_back(random_pos);
 				seeds.push_back(adjacent_pos);
-				seeds.push_back(Vec2i(random_pos.x, adjacent_pos.y));
-				seeds.push_back(Vec2i(adjacent_pos.x, random_pos.y));
+				seeds.push_back(Vector2i(random_pos.x, adjacent_pos.y));
+				seeds.push_back(Vector2i(adjacent_pos.x, random_pos.y));
 				
 				tile_quantity += 4;
 			}
@@ -2740,7 +2740,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	
 	// expand seeds
 	for (size_t i = 0; i < seeds.size(); ++i) {
-		Vec2i seed_pos = seeds[i];
+		Vector2i seed_pos = seeds[i];
 		
 		if (max_tile_quantity != 0 && tile_quantity >= max_tile_quantity) {
 			break;
@@ -2751,12 +2751,12 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			continue;
 		}
 		
-		std::vector<Vec2i> adjacent_positions;
+		std::vector<Vector2i> adjacent_positions;
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
-				Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
-				Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
+				Vector2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
+				Vector2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
+				Vector2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
 				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
 					continue;
 				}
@@ -2837,9 +2837,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		}
 		
 		if (adjacent_positions.size() > 0) {
-			Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
-			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
+			Vector2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+			Vector2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
+			Vector2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
 			
 			if (!this->IsPointInASubtemplateArea(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->IsOverlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
 				if (!terrain_type->IsOverlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
@@ -3141,14 +3141,14 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 		if (unit_type->GivesResource) {
 			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CUnit *unit = CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileSize.x > 1 && unit_type->TileSize.y > 1);
+			CUnit *unit = CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->GetTileSize().x > 1 && unit_type->GetTileSize().y > 1);
 		}
 	}
 }
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::ClearOverlayTile(const Vec2i &pos, int z)
+void CMap::ClearOverlayTile(const Vector2i &pos, const int z)
 {
 	CMapField &mf = *this->Field(pos, z);
 
@@ -3176,7 +3176,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						

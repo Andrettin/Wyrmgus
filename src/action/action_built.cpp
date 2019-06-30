@@ -133,7 +133,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Built::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	return lastScreenPos;
 }

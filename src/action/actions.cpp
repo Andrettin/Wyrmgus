@@ -177,9 +177,9 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder::GetGoalPos() const
+/* virtual */ const Vector2i COrder::GetGoalPos() const
 {
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 	if (this->HasGoal()) {
 		return this->GetGoal()->GetTilePos();
 	}

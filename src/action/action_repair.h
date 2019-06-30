@@ -36,8 +36,8 @@ class COrder_Repair : public COrder
 {
 	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
-	friend COrder *COrder::NewActionRepair(const Vec2i &pos, int z);
+//	friend COrder *COrder::NewActionRepair(const Vector2i &pos);
+	friend COrder *COrder::NewActionRepair(const Vector2i &pos, int z);
 	//Wyrmgus end
 public:
 	COrder_Repair() : COrder(UnitActionRepair)
@@ -52,7 +52,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 	const CUnitPtr &GetReparableTarget() const { return ReparableTarget; }
@@ -62,7 +62,7 @@ private:
 	CUnitPtr ReparableTarget;
 	unsigned int State = 0;
 	unsigned int RepairCycle = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end

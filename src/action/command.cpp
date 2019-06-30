@@ -334,7 +334,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 **  @param pos    map position to move to.
 **  @param flush  if true, flush command queue.
 */
-void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
+void CommandMove(CUnit &unit, const Vector2i &pos, int flush, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -387,7 +387,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 **  @param unit   pointer to unit.
 **  @param pos    new rally point map position.
 */
-void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
+void CommandRallyPoint(CUnit &unit, const Vector2i &pos, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	
@@ -509,8 +509,8 @@ void CommandBuyResource(CUnit &unit, int resource, int player)
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
-void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
+//void CommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush)
+void CommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush, int z)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -564,7 +564,7 @@ void CommandAutoRepair(CUnit &unit, int on)
 **  @param target  or unit to be attacked.
 **  @param flush   if true, flush command queue.
 */
-void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
+void CommandAttack(CUnit &unit, const Vector2i &pos, CUnit *target, int flush, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -619,7 +619,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 **  @param pos    map position to fire on.
 **  @param flush  if true, flush command queue.
 */
-void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
+void CommandAttackGround(CUnit &unit, const Vector2i &pos, int flush, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -735,7 +735,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 **  @param pos    map position to patrol between.
 **  @param flush  if true, flush command queue.
 */
-void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
+void CommandPatrolUnit(CUnit &unit, const Vector2i &pos, int flush, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -808,8 +808,8 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
-void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z, int landmass)
+//void CommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush)
+void CommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush, int z, int landmass)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -841,8 +841,8 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, int flush)
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, int flush, const int z, const CSite *settlement)
+//void CommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &what, int flush)
+void CommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &what, int flush, const int z, const CSite *settlement)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -917,8 +917,8 @@ void CommandDismiss(CUnit &unit, bool salvage)
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
-//void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
-void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
+//void CommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush)
+void CommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush, int z)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -1294,7 +1294,7 @@ void CommandLearnAbility(CUnit &unit, const CUpgrade &what)
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &spell, int flush, int z, bool isAutocast)
+void CommandSpellCast(CUnit &unit, const Vector2i &pos, CUnit *dest, const CSpell &spell, int flush, int z, bool isAutocast)
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);

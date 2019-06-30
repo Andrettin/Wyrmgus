@@ -1597,7 +1597,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 			continue;
 		}
 		
-		Vec2i pos(0, 0);
+		Vector2i pos(0, 0);
 		if (FindTerrainType(0, 0, 8, *this, settlement_unit->GetTilePos(), &pos, settlement_unit->GetMapLayer()->GetIndex(), water_zone)) {
 			return true;
 		}
@@ -1606,7 +1606,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
-CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
+CSite *CPlayer::GetNearestSettlement(const Vector2i &pos, const int z, const Vector2i &size) const
 {
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
@@ -1618,7 +1618,7 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 		if (!this->HasNeutralFactionType() && this != settlement_unit->GetPlayer()) {
 			continue;
 		}
-		int distance = MapDistance(size, pos, z, settlement_unit->GetType()->TileSize, settlement_unit->GetTilePos(), settlement_unit->GetMapLayer()->GetIndex());
+		int distance = MapDistance(size, pos, z, settlement_unit->GetType()->GetTileSize(), settlement_unit->GetTilePos(), settlement_unit->GetMapLayer()->GetIndex());
 		if (!best_hall || distance < best_distance) {
 			best_hall = settlement_unit;
 			best_distance = distance;
@@ -3940,7 +3940,7 @@ void DebugPlayers()
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
+void CPlayer::Notify(int type, const Vector2i &pos, int z, const char *fmt, ...) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	char temp[128];

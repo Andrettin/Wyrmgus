@@ -102,7 +102,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.GetTilePos() + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
+	const Vector2i pos = unit.GetTilePos() + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
 	CUnit *container = unit.Container;
 
 	//Wyrmgus start
@@ -420,7 +420,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 }
 
 
-/* virtual */ PixelPos COrder_TransformInto::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_TransformInto::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	return lastScreenPos;
 }
@@ -474,7 +474,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, const CUnitType &n
 	return true;
 }
 
-/* virtual */ PixelPos COrder_UpgradeTo::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_UpgradeTo::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	return lastScreenPos;
 }

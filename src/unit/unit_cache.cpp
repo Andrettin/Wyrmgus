@@ -54,8 +54,8 @@ void CMap::Insert(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.GetType()->TileSize.x;
-	const int h = unit.GetType()->TileSize.y;
+	const int w = unit.GetType()->GetTileSize().x;
+	const int h = unit.GetType()->GetTileSize().y;
 	int j, i = h;
 
 	do {
@@ -78,8 +78,8 @@ void CMap::Remove(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.GetType()->TileSize.x;
-	const int h = unit.GetType()->TileSize.y;
+	const int w = unit.GetType()->GetTileSize().x;
+	const int h = unit.GetType()->GetTileSize().y;
 	int j, i = h;
 
 	do {
@@ -94,14 +94,14 @@ void CMap::Remove(CUnit &unit)
 }
 
 //Wyrmgus start
-//void CMap::Clamp(Vec2i &pos) const
-void CMap::Clamp(Vec2i &pos, int z) const
+//void CMap::Clamp(Vector2i &pos) const
+void CMap::Clamp(Vector2i &pos, const int z) const
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	pos.x = std::clamp<short int>(pos.x, 0, this->Info.MapWidth - 1);
-//	pos.y = std::clamp<short int>(pos.y, 0, this->Info.MapHeight - 1);
-	pos.x = std::clamp<short int>(pos.x, 0, this->Info.MapWidths[z] - 1);
-	pos.y = std::clamp<short int>(pos.y, 0, this->Info.MapHeights[z] - 1);
+//	pos.x = std::clamp<int>(pos.x, 0, this->Info.MapWidth - 1);
+//	pos.y = std::clamp<int>(pos.y, 0, this->Info.MapHeight - 1);
+	pos.x = std::clamp<int>(pos.x, 0, this->Info.MapWidths[z] - 1);
+	pos.y = std::clamp<int>(pos.y, 0, this->Info.MapHeights[z] - 1);
 	//Wyrmgus end
 }

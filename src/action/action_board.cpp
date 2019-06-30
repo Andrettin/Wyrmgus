@@ -118,9 +118,9 @@ enum {
 	return this->HasGoal() && this->GetGoal()->IsAliveOnMap();
 }
 
-/* virtual */ PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Board::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
-	PixelPos targetPos;
+	Vector2i targetPos;
 
 	if (this->HasGoal()) {
 		//Wyrmgus start
@@ -155,7 +155,7 @@ enum {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
 
-	Vec2i tileSize;
+	Vector2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
@@ -181,7 +181,7 @@ enum {
 */
 int COrder_Board::MoveToTransporter(CUnit &unit)
 {
-	const Vec2i oldPos = unit.GetTilePos();
+	const Vector2i oldPos = unit.GetTilePos();
 	const int res = DoActionMove(unit);
 
 	// We have to reset a lot, or else they will circle each other and stuff.

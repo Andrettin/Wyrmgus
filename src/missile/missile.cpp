@@ -99,8 +99,8 @@ Missile::Missile() :
 **  @return       created missile.
 */
 //Wyrmgus start
-///* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
-/* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+///* static */ Missile *Missile::Init(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos)
+/* static */ Missile *Missile::Init(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos, int z)
 //Wyrmgus end
 {
 	Missile *missile = nullptr;
@@ -192,8 +192,8 @@ Missile::Missile() :
 **  @return       created missile.
 */
 //Wyrmgus start
-//Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
-Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+//Missile *MakeMissile(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos)
+Missile *MakeMissile(const MissileType &mtype, const Vector2i &startPos, const Vector2i &destPos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -609,11 +609,11 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 **  @param unit  Unit that fires the missile.
 */
 //Wyrmgus start
-//void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
-void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
+//void FireMissile(CUnit &unit, CUnit *goal, const Vector2i &goalPos)
+void FireMissile(CUnit &unit, CUnit *goal, const Vector2i &goalPos, int z)
 //Wyrmgus end
 {
-	Vec2i newgoalPos = goalPos;
+	Vector2i newgoalPos = goalPos;
 	//Wyrmgus start
 	int new_z = z;
 	//Wyrmgus end
@@ -719,7 +719,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
 	const PixelPos startPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(from->GetTilePos(), from->GetMapLayer()) + PixelSize(from->GetType()->GetHalfTilePixelSize().x, from->GetType()->GetHalfTilePixelSize().y) + unit.GetType()->MissileOffsets[dir][0];
 
-	Vec2i dpos;
+	Vector2i dpos;
 	if (goal) {
 		Assert(goal->GetType());  // Target invalid?
 		// Moved out of attack range?
@@ -779,10 +779,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 **
 **  @return         sx,sy,ex,ey defining area in Map
 */
-static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
+static void GetMissileMapArea(const Missile &missile, Vector2i &boxMin, Vector2i &boxMax)
 {
-	PixelSize missileSize(missile.Type->Width(), missile.Type->Height());
-	PixelDiff margin(CMap::Map.GetMapLayerPixelTileSize(missile.MapLayer).x - 1, CMap::Map.GetMapLayerPixelTileSize(missile.MapLayer).y - 1);
+	Vector2i missileSize(missile.Type->Width(), missile.Type->Height());
+	Vector2i margin(CMap::Map.GetMapLayerPixelTileSize(missile.MapLayer).x - 1, CMap::Map.GetMapLayerPixelTileSize(missile.MapLayer).y - 1);
 	boxMin = CMap::Map.MapPixelPosToTilePos(missile.position, missile.MapLayer);
 	boxMax = CMap::Map.MapPixelPosToTilePos(missile.position + missileSize + margin, missile.MapLayer);
 	CMap::Map.Clamp(boxMin, missile.MapLayer);
@@ -799,14 +799,14 @@ static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxM
 */
 static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 {
-	Vec2i boxmin;
-	Vec2i boxmax;
+	Vector2i boxmin;
+	Vector2i boxmax;
 
 	GetMissileMapArea(missile, boxmin, boxmax);
 	if (!vp.AnyMapAreaVisibleInViewport(boxmin, boxmax)) {
 		return 0;
 	}
-	Vec2i pos;
+	Vector2i pos;
 	for (pos.x = boxmin.x; pos.x <= boxmax.x; ++pos.x) {
 		for (pos.y = boxmin.y; pos.y <= boxmax.y; ++pos.y) {
 			if (ReplayRevealMap || CMap::Map.Field(pos, missile.MapLayer)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
@@ -901,7 +901,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 **
 **  @internal We have : SpriteFrame / (2 * (Numdirection - 1)) == DirectionToHeading / 256.
 */
-void Missile::MissileNewHeadingFromXY(const PixelPos &delta)
+void Missile::MissileNewHeadingFromXY(const Vector2i &delta)
 {
 	if (this->Type->NumDirections == 1 || (delta.x == 0 && delta.y == 0)) {
 		return;
@@ -1007,7 +1007,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							&& unit.GetPlayer() != missile.SourceUnit->GetPlayer() && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
-								if (unit.GetType()->TileSize.x == 1 || unit.GetType()->TileSize.y == 1) {
+								if (unit.GetType()->GetTileSize().x == 1 || unit.GetType()->GetTileSize().y == 1) {
 									missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.GetTilePos(), unit.GetMapLayer());
 								}
 							} else {
@@ -1029,7 +1029,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit)) {
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
-						if (unit.GetType()->TileSize.x == 1 || unit.GetType()->TileSize.y == 1) {
+						if (unit.GetType()->GetTileSize().x == 1 || unit.GetType()->GetTileSize().y == 1) {
 							missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.GetTilePos(), unit.GetMapLayer());
 						}
 						missile.DestroyMissile = 1;
@@ -1315,7 +1315,7 @@ void Missile::MissileHit(CUnit *unit)
 			}
 		}
 		MissileHitsGoal(*this, *unit, 1);
-		if (mtype.Class == MissileClassPointToPointBounce && (unit->GetType()->TileSize.x > mtype.MaxBounceSize || unit->GetType()->TileSize.y > mtype.MaxBounceSize)) {
+		if (mtype.Class == MissileClassPointToPointBounce && (unit->GetType()->GetTileSize().x > mtype.MaxBounceSize || unit->GetType()->GetTileSize().y > mtype.MaxBounceSize)) {
 			this->TTL = 0;
 		}
 		return;
@@ -1349,7 +1349,7 @@ void Missile::MissileHit(CUnit *unit)
 				splash = mtype.SplashFactor;
 			}
 			MissileHitsGoal(*this, goal, splash);
-			if (mtype.Class == MissileClassPointToPointBounce && (goal.GetType()->TileSize.x > mtype.MaxBounceSize || goal.GetType()->TileSize.y > mtype.MaxBounceSize)) {
+			if (mtype.Class == MissileClassPointToPointBounce && (goal.GetType()->GetTileSize().x > mtype.MaxBounceSize || goal.GetType()->GetTileSize().y > mtype.MaxBounceSize)) {
 				this->TTL = 0;
 			}
 			return;
@@ -1433,7 +1433,7 @@ void Missile::MissileHit(CUnit *unit)
 						}
 					}
 					MissileHitsGoal(*this, goal, splash);
-					if (mtype.Class == MissileClassPointToPointBounce && (goal.GetType()->TileSize.x > mtype.MaxBounceSize || goal.GetType()->TileSize.y > mtype.MaxBounceSize)) {
+					if (mtype.Class == MissileClassPointToPointBounce && (goal.GetType()->GetTileSize().x > mtype.MaxBounceSize || goal.GetType()->GetTileSize().y > mtype.MaxBounceSize)) {
 						this->TTL = 0;
 					}
 				}

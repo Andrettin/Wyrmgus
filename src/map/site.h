@@ -77,7 +77,7 @@ public:
 		return this->Major;
 	}
 	
-	Vec2i GetMapPos() const;
+	Vector2i GetMapPos() const;
 	CMapLayer *GetMapLayer() const;
 
 private:

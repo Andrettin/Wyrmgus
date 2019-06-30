@@ -36,10 +36,10 @@ class COrder_Attack : public COrder
 {
 	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-//	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
-	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
+//	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vector2i &dest);
+//	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vector2i &dest);
+	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vector2i &dest, int z);
+	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vector2i &dest, int z);
 	//Wyrmgus end
 public:
 	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack) {}
@@ -52,11 +52,11 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	virtual const Vector2i GetGoalPos() const { return goalPos; }
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const { return MapLayer; }
 	//Wyrmgus end
@@ -72,7 +72,7 @@ private:
 	int State = 0;
 	int MinRange = 0;
 	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end

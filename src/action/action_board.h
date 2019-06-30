@@ -46,7 +46,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
 	bool WaitForTransporter(CUnit &unit);
@@ -54,7 +54,7 @@ private:
 private:
 	int State = 0;
 	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end

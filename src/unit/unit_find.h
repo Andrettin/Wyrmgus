@@ -204,14 +204,14 @@ public:
 class OutOfMinRange : public CUnitFilter
 {
 public:
-	explicit OutOfMinRange(const int range, const Vec2i pos, int z) : range(range), pos(pos), z(z) {}
+	explicit OutOfMinRange(const int range, const Vector2i pos, int z) : range(range), pos(pos), z(z) {}
 	bool operator()(const CUnit *unit) const
 	{
 		return unit->MapDistanceTo(pos, z) >= range;
 	}
 private:
 	int range;
-	Vec2i pos;
+	Vector2i pos;
 	int z;
 };
 
@@ -292,9 +292,9 @@ class UnitFinder
 public:
 	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask, CUnit **unitP, int z) :
 		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP), z(z) {}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
-	CUnit *FindUnitAtPos(const Vec2i &pos) const;
+	CUnit *FindUnitAtPos(const Vector2i &pos) const;
 private:
 	const CPlayer &player;
 	const std::vector<CUnit *> &units;
@@ -306,8 +306,8 @@ private:
 
 template <typename Pred>
 //Wyrmgus start
-//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
+//void SelectFixed(const Vector2i &ltPos, const Vector2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+void SelectFixed(const Vector2i &ltPos, const Vector2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
@@ -327,7 +327,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	}
 	//Wyrmgus end
 
-	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
+	for (Vector2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			//Wyrmgus start
 			if (circle) {
@@ -362,11 +362,11 @@ template <typename Pred>
 void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred, bool circle = false)
 //Wyrmgus end
 {
-	const Vec2i offset(range, range);
+	const Vector2i offset(range, range);
 	//Wyrmgus start
-//	const Vec2i typeSize(unit.GetType()->TileSize.x - 1, unit.GetType()->TileSize.y - 1);
+//	const Vector2i typeSize(unit.GetType()->GetTileSize().x - 1, unit.GetType()->GetTileSize().y - 1);
 	const CUnit *firstContainer = unit.GetFirstContainer();
-	const Vec2i typeSize(firstContainer->GetType()->TileSize - 1);
+	const Vector2i typeSize(firstContainer->GetType()->GetTileSize() - 1);
 	//Wyrmgus end
 
 	Select(unit.GetTilePos() - offset,
@@ -380,12 +380,12 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 
 template <typename Pred>
 //Wyrmgus start
-//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
+//void Select(const Vector2i &ltPos, const Vector2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+void Select(const Vector2i &ltPos, const Vector2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
 //Wyrmgus end
 {
-	Vec2i minPos = ltPos;
-	Vec2i maxPos = rbPos;
+	Vector2i minPos = ltPos;
+	Vector2i maxPos = rbPos;
 
 	//Wyrmgus start
 //	CMap::Map.FixSelectionArea(minPos, maxPos);
@@ -395,7 +395,7 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 	//Wyrmgus end
 }
 
-inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
+inline void Select(const Vector2i &ltPos, const Vector2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
 {
 	//Wyrmgus start
 //	Select(ltPos, rbPos, units, NoFilter());
@@ -403,7 +403,7 @@ inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> 
 	//Wyrmgus end
 }
 
-inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
+inline void SelectFixed(const Vector2i &ltPos, const Vector2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
 {
 	//Wyrmgus start
 //	Select(ltPos, rbPos, units, NoFilter());
@@ -417,12 +417,12 @@ inline void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> 
 }
 
 template <typename Pred>
-CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
+CUnit *FindUnit_IfFixed(const Vector2i &ltPos, const Vector2i &rbPos, int z, Pred pred)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
 	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 
-	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
+	for (Vector2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			const CMapField &mf = *CMap::Map.Field(posIt, z);
 			const CUnitCache &cache = mf.UnitCache;
@@ -437,10 +437,10 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred
 }
 
 template <typename Pred>
-CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
+CUnit *FindUnit_If(const Vector2i &ltPos, const Vector2i &rbPos, int z, Pred pred)
 {
-	Vec2i minPos = ltPos;
-	Vec2i maxPos = rbPos;
+	Vector2i minPos = ltPos;
+	Vector2i maxPos = rbPos;
 
 	CMap::Map.FixSelectionArea(minPos, maxPos, z);
 	return FindUnit_IfFixed(minPos, maxPos, z, pred);
@@ -468,8 +468,8 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 extern bool FindTerrainType(int movemask, int resource, int range,
 //Wyrmgus end
 							//Wyrmgus start
-//							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
-							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, int landmass = 0);
+//							const CPlayer &player, const Vector2i &startPos, Vector2i *pos);
+							const CPlayer &player, const Vector2i &startPos, Vector2i *pos, int z, int landmass = 0);
 							//Wyrmgus end
 
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
@@ -478,27 +478,27 @@ extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, 
 extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, const bool ai_active_only = false);
 /// Return any unit on that map tile
 //Wyrmgus start
-//extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
-extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z);// = -1);
+//extern CUnit *UnitOnMapTile(const Vector2i &pos, unsigned int type);// = -1);
+extern CUnit *UnitOnMapTile(const Vector2i &pos, unsigned int type, int z);// = -1);
 //Wyrmgus end
 /// Return possible attack target on that map area
-extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2, int z);
+extern CUnit *TargetOnMap(const CUnit &unit, const Vector2i &pos1, const Vector2i &pos2, int z);
 
 /// Return resource, if on map tile
 //Wyrmgus start
-//extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = true);
-extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable = true, bool only_same = true);
+//extern CUnit *ResourceOnMap(const Vector2i &pos, int resource, bool mine_on_top = true);
+extern CUnit *ResourceOnMap(const Vector2i &pos, int resource, int z, bool only_harvestable = true, bool only_same = true);
 //Wyrmgus end
 /// Return resource deposit, if on map tile
 //Wyrmgus start
-//extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
-extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z);
+//extern CUnit *ResourceDepositOnMap(const Vector2i &pos, int resource);
+extern CUnit *ResourceDepositOnMap(const Vector2i &pos, int resource, int z);
 //Wyrmgus end
 
 /// Check map for obstacles in a line between 2 tiles
 //Wyrmgus start
-//extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, uint16_t flags, int *distance = nullptr);
-extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, uint16_t flags, int z, int max_difference = 0, int *distance = nullptr, int player = -1);
+//extern bool CheckObstaclesBetweenTiles(const Vector2i &unitPos, const Vector2i &goalPos, uint16_t flags, int *distance = nullptr);
+extern bool CheckObstaclesBetweenTiles(const Vector2i &unitPos, const Vector2i &goalPos, uint16_t flags, int z, int max_difference = 0, int *distance = nullptr, int player = -1);
 //Wyrmgus end
 /// Find best enemy in numeric range to attack
 //Wyrmgus start

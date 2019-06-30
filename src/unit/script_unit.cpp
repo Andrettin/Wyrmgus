@@ -1061,7 +1061,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	lua_pushvalue(l, 4);
@@ -1085,7 +1085,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	Vec2i new_pos;
+	Vector2i new_pos;
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->GetMapLayer()->GetIndex());
 	
 	if (!CMap::Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {

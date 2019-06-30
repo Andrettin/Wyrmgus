@@ -48,7 +48,7 @@
 
 #include <algorithm>
 
-bool CViewport::Contains(const PixelPos &screenPos) const
+bool CViewport::Contains(const Vector2i &screenPos) const
 {
 	return this->GetTopLeftPos().x <= screenPos.x && screenPos.x <= this->GetBottomRightPos().x
 		   && this->GetTopLeftPos().y <= screenPos.y && screenPos.y <= this->GetBottomRightPos().y;
@@ -61,7 +61,7 @@ void CViewport::Restrict(int &screenPosX, int &screenPosY) const
 	screenPosY = std::clamp(screenPosY, this->GetTopLeftPos().y, this->GetBottomRightPos().y - 1);
 }
 
-PixelSize CViewport::GetPixelSize() const
+Vector2i CViewport::GetPixelSize() const
 {
 	return this->BottomRightPos - this->TopLeftPos;
 }
@@ -79,7 +79,7 @@ void CViewport::SetClipping() const
 **
 **  @return    True if any part of area is visible, false otherwise
 */
-bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const
+bool CViewport::AnyMapAreaVisibleInViewport(const Vector2i &boxmin, const Vector2i &boxmax) const
 {
 	Assert(boxmin.x <= boxmax.x && boxmin.y <= boxmax.y);
 
@@ -92,51 +92,51 @@ bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &bo
 	return true;
 }
 
-bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
+bool CViewport::IsInsideMapArea(const Vector2i &screenPixelPos) const
 {
-	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
+	const Vector2i tilePos = ScreenToTilePos(screenPixelPos);
 
 	return CMap::Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
 }
 
 // Convert viewport coordinates into map pixel coordinates
-PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
+Vector2i CViewport::ScreenToMapPixelPos(const Vector2i &screenPixelPos) const
 {
-	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
+	const Vector2i relPos = screenPixelPos - this->TopLeftPos + this->Offset;
+	const Vector2i mapPixelPos = relPos + CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
 
 	return mapPixelPos;
 }
 
 // Convert map pixel coordinates into viewport coordinates
-PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
+Vector2i CViewport::MapToScreenPixelPos(const Vector2i &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
+	const Vector2i relPos = mapPixelPos - CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
 
 /// convert screen coordinate into tilepos
-Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
+Vector2i CViewport::ScreenToTilePos(const Vector2i &screenPixelPos) const
 {
-	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->GetIndex());
+	const Vector2i mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
+	const Vector2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->GetIndex());
 
 	return tilePos;
 }
 
 /// convert tilepos coordonates into screen (take the top left of the tile)
-PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
+Vector2i CViewport::TilePosToScreen_TopLeft(const Vector2i &tilePos) const
 {
-	const PixelPos mapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
+	const Vector2i mapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
 
 	return MapToScreenPixelPos(mapPos);
 }
 
 /// convert tilepos coordonates into screen (take the center of the tile)
-PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
+Vector2i CViewport::TilePosToScreen_Center(const Vector2i &tilePos) const
 {
-	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
+	const Vector2i topLeft = TilePosToScreen_TopLeft(tilePos);
 
 	return topLeft + CMap::Map.GetCurrentPixelTileSize() / 2;
 }
@@ -147,7 +147,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 **  @param tilePos  map tile position.
 **  @param offset   offset in tile.
 */
-void CViewport::Set(const PixelPos &mapPos)
+void CViewport::Set(const Vector2i &mapPos)
 {
 	int x = mapPos.x;
 	int y = mapPos.y;
@@ -155,7 +155,7 @@ void CViewport::Set(const PixelPos &mapPos)
 	x = std::max(x, -UI.MapArea.ScrollPaddingLeft);
 	y = std::max(y, -UI.MapArea.ScrollPaddingTop);
 
-	const PixelSize pixelSize = this->GetPixelSize();
+	const Vector2i pixelSize = this->GetPixelSize();
 
 	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetWidth() : CMap::Map.Info.MapWidth) * CMap::Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
 	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetHeight() : CMap::Map.Info.MapHeight) * CMap::Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
@@ -186,9 +186,9 @@ void CViewport::Set(const PixelPos &mapPos)
 **  @param tilePos  map tile position.
 **  @param offset   offset in tile.
 */
-void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
+void CViewport::Set(const Vector2i &tilePos, const Vector2i &offset)
 {
-	const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer) + offset;
+	const Vector2i mapPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer) + offset;
 
 	this->Set(mapPixelPos);
 }
@@ -198,7 +198,7 @@ void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 **
 **  @param mapPixelPos     map pixel position.
 */
-void CViewport::Center(const PixelPos &mapPixelPos)
+void CViewport::Center(const Vector2i &mapPixelPos)
 {
 	this->Set(mapPixelPos - this->GetPixelSize() / 2);
 }
@@ -378,7 +378,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 **  @param hidden  If true, write "Unrevealed terrain"
 **
 */
-static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hidden = false)
+static void ShowUnitName(const CViewport &vp, Vector2i pos, CUnit *unit, bool hidden = false)
 {
 	CFont &font = GetSmallFont();
 	int width;
@@ -510,7 +510,7 @@ void CViewport::Draw() const
 //	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
 	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
 	//Wyrmgus end
-		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
+		const Vector2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		//Wyrmgus start
 //		const bool isMapFieldVisile = CMap::Map.Field(tilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
 		const bool isMapFieldVisile = CMap::Map.Field(tilePos, UI.CurrentMapLayer->GetIndex())->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
@@ -521,7 +521,7 @@ void CViewport::Draw() const
 //			&& ((isMapFieldVisile && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			&& ((isMapFieldVisile && !UnitUnderCursor->GetType()->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->GetTilePos(), UnitUnderCursor->GetMapLayer());
+			Vector2i unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->GetTilePos(), UnitUnderCursor->GetMapLayer());
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
@@ -574,6 +574,6 @@ void CViewport::DrawBorder() const
 		color = ColorOrange;
 	}
 
-	const PixelSize pixelSize = this->GetPixelSize();
+	const Vector2i pixelSize = this->GetPixelSize();
 	Video.DrawRectangle(color, this->TopLeftPos.x, this->TopLeftPos.y, pixelSize.x + 1, pixelSize.y + 1);
 }

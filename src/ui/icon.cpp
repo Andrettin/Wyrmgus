@@ -120,7 +120,7 @@ void CIcon::Load()
 **  @param player  Player pointer used for icon colors
 **  @param pos     display pixel position
 */
-void CIcon::DrawIcon(const PixelPos &pos, const int player) const
+void CIcon::DrawIcon(const Vector2i &pos, const int player) const
 {
 	if (player != -1 ) {
 		//Wyrmgus start
@@ -137,7 +137,7 @@ void CIcon::DrawIcon(const PixelPos &pos, const int player) const
 **
 **  @param pos     display pixel position
 */
-void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const int player) const
+void CIcon::DrawGrayscaleIcon(const Vector2i &pos, const int player) const
 {
 	if (this->GScale) {
 		if (player != -1) {
@@ -154,7 +154,7 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const int player) const
 **  @param pos       display pixel position
 **  @param percent   cooldown percent
 */
-void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
+void CIcon::DrawCooldownSpellIcon(const Vector2i &pos, const int percent) const
 {
 	// TO-DO: implement more effect types (clock-like)
 	if (this->GScale) {
@@ -178,8 +178,8 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 */
 void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 						 //Wyrmgus start
-//						 const PixelPos &pos, const std::string &text, int player) const
-						 const PixelPos &pos, const std::string &text, int player, bool transparent, bool grayscale, int show_percent) const
+//						 const Vector2i &pos, const std::string &text, int player) const
+						 const Vector2i &pos, const std::string &text, int player, bool transparent, bool grayscale, int show_percent) const
 						 //Wyrmgus end
 {
 	ButtonStyle s(style);

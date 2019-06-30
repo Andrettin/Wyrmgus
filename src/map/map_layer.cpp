@@ -56,10 +56,10 @@
 /**
 **	@brief	Constructor
 */
-CMapLayer::CMapLayer(const int index, const int width, const int height, CPlane *plane, CWorld *world, const int surface_layer)
-	: Index(index), Width(width), Height(height), Plane(plane), World(world), SurfaceLayer(surface_layer)
+CMapLayer::CMapLayer(const int index, const Vector2i &size, CPlane *plane, CWorld *world, const int surface_layer)
+	: Index(index), Size(size), Plane(plane), World(world), SurfaceLayer(surface_layer)
 {
-	const int max_tile_index = this->Width * this->Height;
+	const int max_tile_index = this->GetWidth() * this->GetHeight();
 
 	this->Fields = new CMapField[max_tile_index];
 }
@@ -106,7 +106,7 @@ void CMapLayer::DoPerHourLoop()
 void CMapLayer::RegenerateForest()
 {
 	for (size_t i = 0; i < this->DestroyedForestTiles.size();) {
-		const Vec2i &pos = this->DestroyedForestTiles[i];
+		const Vector2i &pos = this->DestroyedForestTiles[i];
 		CMapField &mf = *this->Field(pos);
 		if (!mf.IsDestroyedForestTile()) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
 			this->DestroyedForestTiles.erase(this->DestroyedForestTiles.begin() + i);
@@ -124,7 +124,7 @@ void CMapLayer::RegenerateForest()
 **
 **	@return	True if the forest tile was regenerated, or false otherwise
 */
-void CMapLayer::RegenerateForestTile(const Vec2i &pos)
+void CMapLayer::RegenerateForestTile(const Vector2i &pos)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, this->GetIndex()));
 	
@@ -154,16 +154,16 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 	mf.Value = ForestRegeneration;
 	
 	//Wyrmgus start
-//	const Vec2i offset(0, -1);
+//	const Vector2i offset(0, -1);
 //	CMapField &topMf = *(&mf - this->Info.MapWidth);
 
 	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
 		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
-			const Vec2i verticalOffset(0, y_offset);
+			const Vector2i verticalOffset(0, y_offset);
 			CMapField &verticalMf = *this->Field(pos + verticalOffset);
-			const Vec2i horizontalOffset(x_offset, 0);
+			const Vector2i horizontalOffset(x_offset, 0);
 			CMapField &horizontalMf = *this->Field(pos + horizontalOffset);
-			const Vec2i diagonalOffset(x_offset, y_offset);
+			const Vector2i diagonalOffset(x_offset, y_offset);
 			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
@@ -193,7 +193,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 **
 **	@return	True if the tile is a wall, or false otherwise.
 */
-bool CMapLayer::WallOnMap(const Vec2i &pos) const
+bool CMapLayer::WallOnMap(const Vector2i &pos) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, this->GetIndex()));
 	return this->Field(pos)->isAWall();
@@ -207,12 +207,12 @@ bool CMapLayer::WallOnMap(const Vec2i &pos) const
 **
 **	@return	True if the tile block borders has a tree tile, or false otherwise
 */
-bool CMapLayer::TileBlockHasTree(const Vec2i &pos, const Vec2i &size) const
+bool CMapLayer::TileBlockHasTree(const Vector2i &pos, const Vector2i &size) const
 {
-	Vec2i max_pos = pos + size - 1;
+	Vector2i max_pos = pos + size - 1;
 	for (int x = pos.x; x <= max_pos.x; ++x) {
 		for (int y = pos.y; y <= max_pos.y; ++y) {
-			const Vec2i tile_pos(x, y);
+			const Vector2i tile_pos(x, y);
 			
 			if (!CMap::Map.Info.IsPointOnMap(tile_pos, this->GetIndex())) {
 				continue;
@@ -399,8 +399,8 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 	this->Season = season;
 	
 	//update map layer tiles affected by the season change
-	for (int x = 0; x < this->Width; x++) {
-		for (int y = 0; y < this->Height; y++) {
+	for (int x = 0; x < this->GetWidth(); x++) {
+		for (int y = 0; y < this->GetHeight(); y++) {
 			const CMapField &mf = *this->Field(x, y);
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap
@@ -408,7 +408,7 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 				(mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(old_season) != mf.playerInfo.SeenTerrain->GetGraphics(new_season))
 				|| (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->GetGraphics(old_season) != mf.playerInfo.SeenOverlayTerrain->GetGraphics(new_season))
 			) {
-				UI.Minimap.UpdateXY(Vec2i(x, y), this->GetIndex());
+				UI.Minimap.UpdateXY(Vector2i(x, y), this->GetIndex());
 			}
 		}
 	}
@@ -443,6 +443,9 @@ void CMapLayer::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_index"), &CMapLayer::GetIndex);
 	ClassDB::bind_method(D_METHOD("get_tile_index", "tile_pos"), +[](const CMapLayer *map_layer, const Vector2 &tile_pos){ return map_layer->GetTileIndex(Vector2i(tile_pos)); });
+	ClassDB::bind_method(D_METHOD("get_size"), +[](const CMapLayer *map_layer){ return Vector2(map_layer->GetSize()); });
+	ClassDB::bind_method(D_METHOD("get_width"), &CMapLayer::GetWidth);
+	ClassDB::bind_method(D_METHOD("get_height"), &CMapLayer::GetHeight);
 	
 	ClassDB::bind_method(D_METHOD("get_tile_terrain_type", "tile_pos", "overlay"), +[](const CMapLayer *map_layer, const Vector2 &tile_pos, const bool overlay){ return const_cast<CTerrainType *>(map_layer->GetTileTerrainType(Vector2i(tile_pos), overlay)); });
 }

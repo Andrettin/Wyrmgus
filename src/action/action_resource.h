@@ -35,8 +35,8 @@
 class COrder_Resource : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
-	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+//	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vector2i &pos);
+	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vector2i &pos, int z);
 	//Wyrmgus end
 	friend COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine);
 	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
@@ -60,13 +60,13 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 
 	int GetCurrentResource() const { return CurrentResource; }
-	Vec2i GetHarvestLocation() const;
+	Vector2i GetHarvestLocation() const;
 	//Wyrmgus start
 	int GetHarvestMapLayer() const;
 	//Wyrmgus end
@@ -93,7 +93,7 @@ private:
 	CUnitPtr worker;	/// unit that own this order.
 	unsigned char CurrentResource = 0;
 	struct {
-		Vec2i Pos;	/// position for terrain resource.
+		Vector2i Pos;	/// position for terrain resource
 		//Wyrmgus start
 		int MapLayer;
 		//Wyrmgus end
@@ -104,13 +104,11 @@ private:
 	int TimeToHarvest = 0;			/// how much time until we harvest some more.
 	bool DoneHarvesting = false;	/// Harvesting done, wait for action to break.
 	int Range = 0;
-#if 1
 	// duplicate of Resource.Pos ?
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end
-#endif
 };
 
 #endif

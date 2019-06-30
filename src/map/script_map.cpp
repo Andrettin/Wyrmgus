@@ -128,7 +128,7 @@ static int CclStratagusMap(lua_State *l)
 //					delete[] CMap::Map.Fields;
 //					CMap::Map.Fields = new CMapField[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
 					CMap::Map.ClearMapLayers();
-					CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+					CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), Vector2i(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight));
 					CMap::Map.MapLayers.push_back(map_layer);
 					CMap::Map.Info.MapWidths.clear();
 					CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
@@ -159,7 +159,7 @@ static int CclStratagusMap(lua_State *l)
 						}
 						const int width = LuaToNumber(l, -1, 1);
 						const int height = LuaToNumber(l, -1, 2);
-						CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), width, height);
+						CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), Vector2i(width, height));
 						CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
 						CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
 						CMap::Map.MapLayers.push_back(map_layer);
@@ -2118,11 +2118,11 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosX")) {
-		Vec2i pos = CMap::Map.GetSubtemplateEndPos(map_template);
+		Vector2i pos = CMap::Map.GetSubtemplateEndPos(map_template);
 		lua_pushnumber(l, pos.x);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosY")) {
-		Vec2i pos = CMap::Map.GetSubtemplateEndPos(map_template);
+		Vector2i pos = CMap::Map.GetSubtemplateEndPos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {

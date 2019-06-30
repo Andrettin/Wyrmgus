@@ -151,9 +151,9 @@ public:
 		return height;
 	}
 	
-	Vec2i GetAppliedSize() const
+	Vector2i GetAppliedSize() const
 	{
-		return Vec2i(this->GetAppliedWidth(), this->GetAppliedHeight());
+		return Vector2i(this->GetAppliedWidth(), this->GetAppliedHeight());
 	}
 	
 	int GetAppliedAreaWithDependentTemplateOffsets() const
@@ -248,16 +248,16 @@ public:
 		return offset;
 	}
 	
-	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
-	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
-	void Apply(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z);
-	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
-	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
-	void ApplyConnectors(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
-	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const Vec2i &map_end, const int z, const bool random = false) const;
+	void ApplyTerrainFile(bool overlay, Vector2i template_start_pos, Vector2i map_start_pos, int z) const;
+	void ApplyTerrainImage(bool overlay, Vector2i template_start_pos, Vector2i map_start_pos, int z) const;
+	void Apply(const Vector2i &template_start_pos, const Vector2i &map_start_pos, const int z);
+	void ApplySubtemplates(const Vector2i &template_start_pos, const Vector2i &map_start_pos, const Vector2i &map_end, const int z, const bool random = false) const;
+	void ApplySites(const Vector2i &template_start_pos, const Vector2i &map_start_pos, const Vector2i &map_end, const int z, const bool random = false) const;
+	void ApplyConnectors(const Vector2i &template_start_pos, const Vector2i &map_start_pos, const Vector2i &map_end, const int z, const bool random = false) const;
+	void ApplyUnits(const Vector2i &template_start_pos, const Vector2i &map_start_pos, const Vector2i &map_end, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
 	const CMapTemplate *GetTopMapTemplate() const;
-	Vec2i GetBestLocationMapPosition(const std::vector<const CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
+	Vector2i GetBestLocationMapPosition(const std::vector<const CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vector2i &template_start_pos, const Vector2i &map_start_pos, const bool random) const;
 	
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;
@@ -272,15 +272,15 @@ private:
 	bool OutputTerrainImage = false;
 	bool GrowForSubtemplates = false;
 public:
-	Vec2i SubtemplatePosition = Vec2i(-1, -1);
-	Vec2i StartPos = Vec2i(-1, -1);	/// the start position within the map template to be applied when it is used
-	Vec2i EndPos = Vec2i(-1, -1);	/// the end position within the map template to be applied when it is used
-	Vec2i MinPos = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
-	Vec2i MaxPos = Vec2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)
-	Vec2i MinPosPercent = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage
-	Vec2i MaxPosPercent = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage
-	Vec2i CurrentStartPos = Vec2i(0, 0);
-	PixelSize PixelTileSize = Vec2i(32, 32);
+	Vector2i SubtemplatePosition = Vector2i(-1, -1);
+	Vector2i StartPos = Vector2i(-1, -1);	/// the start position within the map template to be applied when it is used
+	Vector2i EndPos = Vector2i(-1, -1);	/// the end position within the map template to be applied when it is used
+	Vector2i MinPos = Vector2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
+	Vector2i MaxPos = Vector2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)
+	Vector2i MinPosPercent = Vector2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage
+	Vector2i MaxPosPercent = Vector2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template), as a percentage
+	Vector2i CurrentStartPos = Vector2i(0, 0);
+	PixelSize PixelTileSize = PixelSize(32, 32);
 	CMapTemplate *MainTemplate = nullptr;					/// main template in which this one is located, if this is a subtemplate
 	CMapTemplate *UpperTemplate = nullptr;					/// map template corresponding to this one in the upper layer
 	CMapTemplate *LowerTemplate = nullptr;					/// map template corresponding to this one in the lower layer
@@ -302,15 +302,15 @@ public:
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, UniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, UniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
-	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
-	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, UniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, UniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, int, UniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vector2i, CUnitType *, CFaction *, CDate, CDate, UniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
+	std::vector<std::tuple<Vector2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
+	std::vector<std::tuple<Vector2i, CUnitType *, CPlane *, UniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vector2i, CUnitType *, CWorld *, UniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vector2i, CUnitType *, int, UniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<CSite *> Sites;
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
-	std::vector<std::tuple<Vec2i, const CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
+	std::vector<std::tuple<Vector2i, const CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 	
 	friend int CclDefineMapTemplate(lua_State *l);
 

@@ -57,7 +57,7 @@
 class _EnemyOnMapTile
 {
 public:
-	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
+	_EnemyOnMapTile(const CUnit &unit, const Vector2i &_pos, CUnit **enemy) :
 		source(&unit) , pos(_pos), best(enemy)
 	{
 	}
@@ -77,8 +77,8 @@ public:
 		if (unit->GetType()->UnitType == UnitTypeFly && unit->IsAgressive() == false) {
 			return;
 		}
-		if (pos.x < unit->GetTilePos().x || pos.x >= unit->GetTilePos().x + type.TileSize.x
-			|| pos.y < unit->GetTilePos().y || pos.y >= unit->GetTilePos().y + type.TileSize.y) {
+		if (pos.x < unit->GetTilePos().x || pos.x >= unit->GetTilePos().x + type.GetTileSize().x
+			|| pos.y < unit->GetTilePos().y || pos.y >= unit->GetTilePos().y + type.GetTileSize().y) {
 			return;
 		}
 		if (!CanTarget(*source->GetType(), type)) {
@@ -98,7 +98,7 @@ public:
 
 private:
 	const CUnit *const source;
-	const Vec2i pos;
+	const Vector2i pos;
 	CUnit **best;
 };
 
@@ -110,7 +110,7 @@ private:
 **
 **  @return        Returns ideal target on map tile.
 */
-static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, const int z)
+static CUnit *EnemyOnMapTile(const CUnit &source, const Vector2i &pos, const int z)
 {
 	CUnit *enemy = nullptr;
 
@@ -122,7 +122,7 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, const int z)
 class WallFinder
 {
 public:
-	WallFinder(const CUnit &unit, int maxDist, Vec2i *resultPos) :
+	WallFinder(const CUnit &unit, int maxDist, Vector2i *resultPos) :
 		//Wyrmgus start
 		unit(unit),
 		//Wyrmgus end
@@ -130,17 +130,17 @@ public:
 		movemask(unit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resultPos(resultPos)
 	{}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	//Wyrmgus start
 	const CUnit &unit;
 	//Wyrmgus end
 	int maxDist;
 	int movemask;
-	Vec2i *resultPos;
+	Vector2i *resultPos;
 };
 
-VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
@@ -164,7 +164,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 }
 
-static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
+static bool FindWall(const CUnit &unit, int range, Vector2i *wallPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -203,7 +203,7 @@ int AiFindWall(AiForce *force)
 		}
 	}
 	const int maxRange = 1000;
-	Vec2i wallPos;
+	Vector2i wallPos;
 
 	if (FindWall(*unit, maxRange, &wallPos)) {
 		force->State = AiForceAttackingState_Waiting;
@@ -232,7 +232,7 @@ public:
 		//Wyrmgus end
 		movemask(unit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
 	{}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	//Wyrmgus start
 	const CUnit &unit;
@@ -240,7 +240,7 @@ private:
 	int movemask;
 };
 
-VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
@@ -265,28 +265,28 @@ static void MarkReacheableTerrainType(const CUnit &unit, TerrainTraversal *terra
 class EnemyFinderWithTransporter
 {
 public:
-	EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos) :
+	EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vector2i *resultPos) :
 		unit(unit),
 		terrainTransporter(terrainTransporter),
 		movemask(unit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resultPos(resultPos)
 	{}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
-	bool IsAccessibleForTransporter(const Vec2i &pos) const;
+	bool IsAccessibleForTransporter(const Vector2i &pos) const;
 private:
 	const CUnit &unit;
 	const TerrainTraversal &terrainTransporter;
 	int movemask;
-	Vec2i *resultPos;
+	Vector2i *resultPos;
 };
 
-bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) const
+bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vector2i &pos) const
 {
 	return terrainTransporter.IsReached(pos);
 }
 
-VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
@@ -306,8 +306,8 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 }
 
 //Wyrmgus start
-//static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
-static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
+//static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vector2i *resultPos)
+static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vector2i *resultPos)
 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -399,7 +399,7 @@ int AiForce::PlanAttack()
 		return 0;
 	}
 
-	Vec2i pos = this->GoalPos;
+	Vector2i pos = this->GoalPos;
 
 	if (AiFindTarget(*landUnit, transporterTerrainTraversal, &pos)) {
 		const unsigned int forceIndex = AiPlayer->Force.getIndex(this) + 1;
@@ -452,7 +452,7 @@ int AiForce::PlanAttack()
 
 //Wyrmgus start
 /*
-static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
+static bool ChooseRandomUnexploredPositionNear(const Vector2i &center, Vector2i *pos)
 {
 	Assert(pos != nullptr);
 

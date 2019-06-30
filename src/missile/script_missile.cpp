@@ -376,7 +376,7 @@ static int CclCreateMissile(lua_State *l)
 	if (!mtype) {
 		LuaError(l, "Bad missile");
 	}
-	PixelPos startpos, endpos;
+	Vector2i startpos, endpos;
 	CclGetPos(l, &startpos.x, &startpos.y, 2);
 	CclGetPos(l, &endpos.x, &endpos.y, 3);
 

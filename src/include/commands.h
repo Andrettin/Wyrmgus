@@ -30,9 +30,9 @@
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
 
-//Wyrmgus start
-#include <vector>
-//Wyrmgus end
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
 #include "vec2i.h"
 
@@ -72,12 +72,12 @@ extern void CommandDefend(CUnit &unit, CUnit &dest, int flush);
 extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command move
 //Wyrmgus start
-//extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
-extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void CommandMove(CUnit &unit, const Vector2i &pos, int flush);
+extern void CommandMove(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 //Wyrmgus start
 /// Prepare command rally point
-extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
+extern void CommandRallyPoint(CUnit &unit, const Vector2i &pos, int z = 0);
 /// Prepare command pick up
 extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command quest
@@ -93,20 +93,20 @@ extern void CommandBuyResource(CUnit &unit, int resource, int player);
 //Wyrmgus end
 /// Prepare command repair
 //Wyrmgus start
-//extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//extern void CommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush);
+extern void CommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush, int z = 0);
 //Wyrmgus end
 /// Send auto repair command
 extern void CommandAutoRepair(CUnit &unit, int on);
 /// Prepare command attack
 //Wyrmgus start
-//extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//extern void CommandAttack(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush);
+extern void CommandAttack(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush, int z = 0);
 //Wyrmgus end
 /// Prepare command attack ground
 //Wyrmgus start
-//extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
-extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void CommandAttackGround(CUnit &unit, const Vector2i &pos, int flush);
+extern void CommandAttackGround(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 //Wyrmgus start
 /// Prepare command use
@@ -116,27 +116,27 @@ extern void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer =
 //Wyrmgus end
 /// Prepare command patrol
 //Wyrmgus start
-//extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
-extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void CommandPatrolUnit(CUnit &unit, const Vector2i &pos, int flush);
+extern void CommandPatrolUnit(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 /// Prepare command board
 extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command unload
 //Wyrmgus start
-//extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
-extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
+//extern void CommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush);
+extern void CommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
 //Wyrmgus end
 /// Prepare command build
 //Wyrmgus start
-//extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &, int flush);
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &, int flush, const int z = 0, const CSite *settlement = nullptr);
+//extern void CommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &, int flush);
+extern void CommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &, int flush, const int z = 0, const CSite *settlement = nullptr);
 //Wyrmgus end
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);
 /// Prepare command resource location
 //Wyrmgus start
-//extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
-extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void CommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush);
+extern void CommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 /// Prepare command resource
 extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
@@ -167,7 +167,7 @@ extern void CommandCancelResearch(CUnit &unit);
 extern void CommandLearnAbility(CUnit &unit, const CUpgrade &what);
 //Wyrmgus end
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &spell, int flush, int z = 0, bool isAutocast = false);
+extern void CommandSpellCast(CUnit &unit, const Vector2i &pos, CUnit *dest, const CSpell &spell, int flush, int z = 0, bool isAutocast = false);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, const CSpell *spell, const bool on);
 /// Prepare diplomacy command

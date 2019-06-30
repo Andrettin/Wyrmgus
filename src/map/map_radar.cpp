@@ -78,9 +78,9 @@ IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapFieldP
 
 bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 {
-	const int x_max = Type->TileSize.x;
+	const int x_max = this->Type->GetTileSize().x;
 	unsigned int index = Offset;
-	int j = Type->TileSize.y;
+	int j = this->Type->GetTileSize().y;
 	do {
 		const CMapField *mf = this->GetMapLayer()->Field(index);
 

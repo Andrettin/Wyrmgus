@@ -58,8 +58,8 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
-/* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
+///* static */ COrder *COrder::NewActionPatrol(const Vector2i &currentPos, const Vector2i &dest)
+/* static */ COrder *COrder::NewActionPatrol(const Vector2i &currentPos, const Vector2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(currentPos, current_z));
@@ -140,14 +140,14 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Patrol::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
 	if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 		return lastScreenPos;
 	}
 
-	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
-	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
+	const Vector2i pos1 = vp.TilePosToScreen_Center(this->goalPos);
+	const Vector2i pos2 = vp.TilePosToScreen_Center(this->WayPoint);
 
 	if (Preference.ShowPathlines) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
@@ -163,7 +163,7 @@
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
-	const Vec2i tileSize(0, 0);
+	const Vector2i tileSize(0, 0);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 

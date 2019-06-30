@@ -98,12 +98,12 @@
 /* virtual */ int Spell_Demolish::Cast(CUnit &caster, const CSpell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	// Allow error margins. (Lame, I know)
-	const Vec2i offset(this->Range + 2, this->Range + 2);
+	const Vector2i offset(this->Range + 2, this->Range + 2);
 	//Wyrmgus start
-//	Vec2i minpos = goalPos - offset;
-//	Vec2i maxpos = goalPos + offset;
-	Vec2i minpos = caster.GetTilePos() - offset;
-	Vec2i maxpos = caster.GetTilePos() + Vec2i(caster.GetType()->TileSize - 1) + offset;
+//	Vector2i minpos = goalPos - offset;
+//	Vector2i maxpos = goalPos + offset;
+	Vector2i minpos = caster.GetTilePos() - offset;
+	Vector2i maxpos = caster.GetTilePos() + Vector2i(caster.GetType()->GetTileSize() - 1) + offset;
 	//Wyrmgus end
 
 	CMap::Map.FixSelectionArea(minpos, maxpos, z);
@@ -113,7 +113,7 @@
 	//
 
 	if (this->DamageTerrain) {
-		Vec2i ipos;
+		Vector2i ipos;
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 				const CMapField &mf = *CMap::Map.Field(ipos, z);

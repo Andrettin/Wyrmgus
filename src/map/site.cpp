@@ -273,15 +273,15 @@ const String &CSite::GetCulturalName(const CCivilization *civilization) const
 **
 **	@return	The site's position on the current map (an invalid position is returned if the site isn't on the map)
 */
-Vec2i CSite::GetMapPos() const
+Vector2i CSite::GetMapPos() const
 {
 	if (this->SiteUnit != nullptr) {
 		return this->SiteUnit->GetTilePos();
 	}
 	
 	if (this->MapTemplate != nullptr && this->Position.x != -1 && this->Position.y != -1) {
-		Vec2i template_start_pos(-1, -1);
-		Vec2i template_end_pos(-1, -1);
+		Vector2i template_start_pos(-1, -1);
+		Vector2i template_end_pos(-1, -1);
 		
 		if (this->MapTemplate->IsSubtemplateArea()) {
 			template_start_pos = CMap::Map.GetSubtemplatePos(this->MapTemplate);
@@ -289,14 +289,14 @@ Vec2i CSite::GetMapPos() const
 		} else {
 			const CMapLayer *map_layer = CMap::Map.GetMapLayer(this->MapTemplate->GetPlane(), this->MapTemplate->GetWorld(), this->MapTemplate->GetSurfaceLayer());
 			if (map_layer != nullptr) {
-				template_start_pos = Vec2i(0, 0);
+				template_start_pos = Vector2i(0, 0);
 				template_end_pos.x = map_layer->GetWidth() - 1;
 				template_end_pos.y = map_layer->GetHeight() - 1;
 			}
 		}
 		
 		if (template_start_pos.x != -1 && template_start_pos.y != -1) {
-			Vec2i site_map_pos = template_start_pos - this->MapTemplate->CurrentStartPos + this->Position;
+			Vector2i site_map_pos = template_start_pos - this->MapTemplate->CurrentStartPos + this->Position;
 			
 			if (site_map_pos.x >= template_start_pos.x && site_map_pos.y >= template_start_pos.y && site_map_pos.x <= template_end_pos.x && site_map_pos.y <= template_end_pos.y) {
 				return site_map_pos;
@@ -304,7 +304,7 @@ Vec2i CSite::GetMapPos() const
 		}
 	}
 	
-	return Vec2i(-1, -1);
+	return Vector2i(-1, -1);
 }
 
 /**

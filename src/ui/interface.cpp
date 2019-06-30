@@ -182,9 +182,9 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 	}
 }
 
-static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_group)
+static Vector2i GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_group)
 {
-	PixelPos pos(0, 0);
+	Vector2i pos(0, 0);
 	
 	int map_layer_units = 0;
 	for (size_t i = 0; i != unit_group.size(); ++i) {
@@ -196,7 +196,7 @@ static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_g
 	}
 
 	if (map_layer_units == 0) {
-		return PixelPos(-1, -1);
+		return Vector2i(-1, -1);
 	}	
 	
 	pos /= map_layer_units;
@@ -226,7 +226,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 	SetBestMapLayerForUnitGroup(unit_group);
 	
 	// FIXME: what should we do with the removed units? ignore?
-	PixelPos pos = GetMiddlePositionForUnitGroup(unit_group);
+	Vector2i pos = GetMiddlePositionForUnitGroup(unit_group);
 	
 	if (pos.x != -1) {
 		UI.SelectedViewport->Center(pos);
@@ -466,7 +466,7 @@ static void UiCenterOnSelected()
 
 	SetBestMapLayerForUnitGroup(Selected);
 
-	PixelPos pos = GetMiddlePositionForUnitGroup(Selected);
+	Vector2i pos = GetMiddlePositionForUnitGroup(Selected);
 
 	if (pos.x != -1) {
 		UI.SelectedViewport->Center(pos);
@@ -1425,16 +1425,16 @@ void HandleKeyRepeat(unsigned, unsigned keychar)
 **
 **  @return   true if the mouse is in the scroll area, false otherwise
 */
-bool HandleMouseScrollArea(const PixelPos &mousePos)
+bool HandleMouseScrollArea(const Vector2i &mousePos)
 {
 	//Wyrmgus start
 	if (!UI.MapArea.EndX || !UI.MapArea.EndY || !UI.SelectedViewport) {
 		return false;
 	}
-	const PixelPos top_left_pos(UI.MapArea.X, UI.MapArea.Y);
-	const PixelPos top_left_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(top_left_pos);
-	const PixelPos bottom_right_pos(UI.MapArea.EndX, UI.MapArea.EndY);
-	const PixelPos bottom_right_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(bottom_right_pos);
+	const Vector2i top_left_pos(UI.MapArea.X, UI.MapArea.Y);
+	const Vector2i top_left_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(top_left_pos);
+	const Vector2i bottom_right_pos(UI.MapArea.EndX, UI.MapArea.EndY);
+	const Vector2i bottom_right_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(bottom_right_pos);
 //	if (mousePos.x < SCROLL_LEFT) {
 	if (mousePos.x < SCROLL_LEFT && top_left_map_pos.x > 0) {
 	//Wyrmgus end
@@ -1520,9 +1520,9 @@ void HandleCursorMove(int *x, int *y)
 **
 **  @param screePos  screen pixel position.
 */
-void HandleMouseMove(const PixelPos &screenPos)
+void HandleMouseMove(const Vector2i &screenPos)
 {
-	PixelPos pos(screenPos);
+	Vector2i pos(screenPos);
 	HandleCursorMove(&pos.x, &pos.y);
 	UIHandleMouseMove(pos);
 }
@@ -1567,7 +1567,7 @@ static enum {
 	ClickedMouseState			/// button is clicked
 } MouseState;					/// Current state of mouse
 
-static PixelPos LastMousePos;		/// Last mouse position
+static Vector2i LastMousePos;		/// Last mouse position
 static unsigned LastMouseButton;	/// last mouse button handled
 static unsigned StartMouseTicks;	/// Ticks of first click
 static unsigned LastMouseTicks;		/// Ticks of last mouse event
@@ -1650,7 +1650,7 @@ void InputMouseButtonRelease(const EventCallback &callbacks,
 void InputMouseMove(const EventCallback &callbacks,
 					unsigned ticks, int x, int y)
 {
-	PixelPos mousePos(x, y);
+	Vector2i mousePos(x, y);
 	// Don't reset the mouse state unless we really moved
 #ifdef USE_TOUCHSCREEN
 	const int buff = 32;

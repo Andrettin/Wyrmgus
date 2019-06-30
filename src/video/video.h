@@ -260,7 +260,7 @@ struct EventCallback {
 	/// Callback for mouse button release
 	void (*ButtonReleased)(unsigned buttons);
 	/// Callback for mouse move
-	void (*MouseMoved)(const PixelPos &screenPos);
+	void (*MouseMoved)(const Vector2i &screenPos);
 	/// Callback for mouse exit of game window
 	void (*MouseExit)();
 
@@ -318,7 +318,7 @@ public:
 
 	void DrawLine(Uint32 color, int sx, int sy, int dx, int dy);
 	void DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha);
-	void DrawLineClip(Uint32 color, const PixelPos &pos1, const PixelPos &pos2);
+	void DrawLineClip(Uint32 color, const Vector2i &pos1, const Vector2i &pos2);
 	void DrawTransLineClip(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha);
 
 	void DrawRectangle(Uint32 color, int x, int y, int w, int h);
@@ -338,7 +338,7 @@ public:
 
 	void FillCircle(Uint32 color, int x, int y, int radius);
 	void FillTransCircle(Uint32 color, int x, int y, int radius, unsigned char alpha);
-	void FillCircleClip(Uint32 color, const PixelPos &screenPos, int radius);
+	void FillCircleClip(Uint32 color, const Vector2i &screenPos, int radius);
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
 	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)

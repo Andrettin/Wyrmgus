@@ -1253,9 +1253,9 @@ void AiCanNotReach(CUnit &unit, const CUnitType &what, const int landmass, const
 */
 static void AiMoveUnitInTheWay(CUnit &unit)
 {
-	static Vec2i dirs[8] = {Vec2i(-1, -1), Vec2i(-1, 0), Vec2i(-1, 1), Vec2i(0, 1), Vec2i(1, 1), Vec2i(1, 0), Vec2i(1, -1), Vec2i(0, -1)};
+	static Vector2i dirs[8] = {Vector2i(-1, -1), Vector2i(-1, 0), Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1), Vector2i(1, 0), Vector2i(1, -1), Vector2i(0, -1)};
 	CUnit *movableunits[16];
-	Vec2i movablepos[16];
+	Vector2i movablepos[16];
 	int movablenb;
 
 	AiPlayer = unit.GetPlayer()->Ai;
@@ -1266,8 +1266,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	}
 
 	const CUnitType &unit_type = *unit.GetType();
-	const Vec2i u0 = unit.GetTilePos();
-	const Vec2i u1(u0 + unit_type.TileSize - 1);
+	const Vector2i u0 = unit.GetTilePos();
+	const Vector2i u1(u0 + unit_type.GetTileSize() - 1);
 
 	movablenb = 0;
 
@@ -1315,14 +1315,14 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			continue;
 		}
 
-		const Vec2i b0 = blocker.GetTilePos();
-		const Vec2i b1(b0 + blockertype.TileSize - 1);
+		const Vector2i b0 = blocker.GetTilePos();
+		const Vector2i b1(b0 + blockertype.GetTileSize() - 1);
 
 		if (&unit == &blocker) {
 			continue;
 		}
 		// Check for collision
-		if (unit.MapDistanceTo(blocker) >= unit.GetType()->TileSize.x + 1) {
+		if (unit.MapDistanceTo(blocker) >= unit.GetType()->GetTileSize().x + 1) {
 			continue;
 		}
 
@@ -1333,7 +1333,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			r = (r + 1) & 7;
 			--trycount;
 
-			const Vec2i pos = blocker.GetTilePos() + blocker.GetType()->TileSize * dirs[r];
+			const Vector2i pos = blocker.GetTilePos() + blocker.GetType()->GetTileSize() * dirs[r];
 
 			// Out of the map => no !
 			if (!CMap::Map.Info.IsPointOnMap(pos, unit.GetMapLayer())) {
@@ -1382,7 +1382,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 */
 void AiCanNotMove(CUnit &unit)
 {
-	const Vec2i &goalPos = unit.pathFinderData->input.GetGoalPos();
+	const Vector2i &goalPos = unit.pathFinderData->input.GetGoalPos();
 	const int gw = unit.pathFinderData->input.GetGoalSize().x;
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 

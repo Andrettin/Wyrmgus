@@ -120,16 +120,16 @@ public:
 	void Load();
 
 	/// Draw icon
-	void DrawIcon(const PixelPos &pos, const int player = -1) const;
+	void DrawIcon(const Vector2i &pos, const int player = -1) const;
 	/// Draw grayscale icon
-	void DrawGrayscaleIcon(const PixelPos &pos, const int player = -1) const;
+	void DrawGrayscaleIcon(const Vector2i &pos, const int player = -1) const;
 	/// Draw cooldown spell
-	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const;
+	void DrawCooldownSpellIcon(const Vector2i &pos, const int percent) const;
 	/// Draw icon of a unit
 	void DrawUnitIcon(const ButtonStyle &style,
 					  //Wyrmgus start
-//					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1) const;
-					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
+//					  unsigned flags, const Vector2i &pos, const std::string &text, const int player = -1) const;
+					  unsigned flags, const Vector2i &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
 	const PaletteImage *GetImage() const

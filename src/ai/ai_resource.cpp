@@ -68,8 +68,8 @@ constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//static int AiMakeUnit(const CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(const CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, const CSite *settlement = nullptr);
+//static int AiMakeUnit(const CUnitType &type, const Vector2i &nearPos);
+static int AiMakeUnit(const CUnitType &type, const Vector2i &nearPos, int z, int landmass = 0, const CSite *settlement = nullptr);
 //Wyrmgus end
 
 /**
@@ -239,11 +239,11 @@ private:
 */
 int AiEnemyUnitsInDistance(const CPlayer &player,
 						   //Wyrmgus start
-//						   const CUnitType *type, const Vec2i &pos, unsigned range)
-						   const CUnitType *type, const Vec2i &pos, unsigned range, int z)
+//						   const CUnitType *type, const Vector2i &pos, unsigned range)
+						   const CUnitType *type, const Vector2i &pos, unsigned range, int z)
 						   //Wyrmgus end
 {
-	const Vec2i offset(range, range);
+	const Vector2i offset(range, range);
 	std::vector<CUnit *> units;
 
 	if (type == nullptr) {
@@ -253,7 +253,7 @@ int AiEnemyUnitsInDistance(const CPlayer &player,
 		//Wyrmgus end
 		return static_cast<int>(units.size());
 	} else {
-		const Vec2i typeSize(type->TileSize - 1);
+		const Vector2i typeSize(type->GetTileSize() - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
 
 		//Wyrmgus start
@@ -314,8 +314,8 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **  @note            We must check if the dependencies are fulfilled.
 */
 //Wyrmgus start
-//static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, const CSite *settlement = nullptr)
+//static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, const Vector2i &nearPos)
+static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, const Vector2i &nearPos, int z, int landmass = 0, const CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -389,7 +389,7 @@ static int AiBuildBuilding(const CUnitType &type, const CUnitType &building, con
 		z = unit.GetMapLayer()->GetIndex();
 	}
 	
-	Vec2i pos;
+	Vector2i pos;
 	// Find a place to build.
 	//Wyrmgus start
 //	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
@@ -509,8 +509,8 @@ int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
 }
 
 //Wyrmgus start
-//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource);
-extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z);
+//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vector2i &pos, int range, int resource);
+extern CUnit *FindDepositNearLoc(CPlayer &p, const Vector2i &pos, int range, int resource, int z);
 //Wyrmgus end
 
 void AiNewDepotRequest(CUnit &worker)
@@ -525,7 +525,7 @@ void AiNewDepotRequest(CUnit &worker)
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 
-	const Vec2i pos = order.GetHarvestLocation();
+	const Vector2i pos = order.GetHarvestLocation();
 	//Wyrmgus start
 	const int z = order.GetHarvestMapLayer();
 	//Wyrmgus end
@@ -952,8 +952,8 @@ static bool AiTrainUnit(const CUnitType &type, const CUnitType &what, const int 
 **  @note        We must check if the dependencies are fulfilled.
 */
 //Wyrmgus start
-//static int AiMakeUnit(const CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(const CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, const CSite *settlement)
+//static int AiMakeUnit(const CUnitType &typeToMake, const Vector2i &nearPos)
+static int AiMakeUnit(const CUnitType &typeToMake, const Vector2i &nearPos, int z, int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	// Find equivalents unittypes.
@@ -1245,15 +1245,11 @@ static void AiCheckingWork()
 static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_range)
 //Wyrmgus end
 {
-	// TODO : hardcoded forest
-	Vec2i forestPos;
-	//Wyrmgus start
-	Vec2i rockPos;
-	//Wyrmgus end
+	Vector2i resourcePos;
 
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.GetType()->MovementMask, resource, resource_range, *unit.GetPlayer(), unit.GetTilePos(), &forestPos, unit.GetMapLayer()->GetIndex())) {
-		CommandResourceLoc(unit, forestPos, FlushCommands, unit.GetMapLayer()->GetIndex());
+	if (FindTerrainType(unit.GetType()->MovementMask, resource, resource_range, *unit.GetPlayer(), unit.GetTilePos(), &resourcePos, unit.GetMapLayer()->GetIndex())) {
+		CommandResourceLoc(unit, resourcePos, FlushCommands, unit.GetMapLayer()->GetIndex());
 		return 1;
 	}
 	// Ask the AI to explore...
@@ -2141,15 +2137,15 @@ static void AiCheckPathwayConstruction()
 				continue;
 			}
 			
-			std::vector<Vec2i> pathway_tiles;
-			for (int x = unit.GetTilePos().x - 1; x < unit.GetTilePos().x + unit.GetType()->TileSize.x + 1; ++x) {
-				for (int y = unit.GetTilePos().y - 1; y < unit.GetTilePos().y + unit.GetType()->TileSize.y + 1; ++y) {
-					pathway_tiles.push_back(Vec2i(x, y));
+			std::vector<Vector2i> pathway_tiles;
+			for (int x = unit.GetTilePos().x - 1; x < unit.GetTilePos().x + unit.GetType()->GetTileSize().x + 1; ++x) {
+				for (int y = unit.GetTilePos().y - 1; y < unit.GetTilePos().y + unit.GetType()->GetTileSize().y + 1; ++y) {
+					pathway_tiles.push_back(Vector2i(x, y));
 				}
 			}
 
 			if (unit.GetType()->GivesResource) { //if is a mine, build pathways to the depot as well
-				const CUnit *depot = FindDepositNearLoc(*unit.GetPlayer(), unit.GetTilePos() + Vec2i((unit.GetType()->TileSize - 1) / 2), 32, unit.GivesResource, unit.GetMapLayer()->GetIndex());
+				const CUnit *depot = FindDepositNearLoc(*unit.GetPlayer(), unit.GetTilePos() + ((unit.GetType()->GetTileSize() - 1) / 2), 32, unit.GivesResource, unit.GetMapLayer()->GetIndex());
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
 					const CUnitType *test_worker_type = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("worker"));
@@ -2157,16 +2153,16 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
-						CUnit *test_worker = MakeUnitAndPlace(unit.GetTilePos() + Vec2i((unit.GetType()->TileSize - 1) / 2), *test_worker_type, CPlayer::Players[PlayerNumNeutral], unit.GetMapLayer()->GetIndex());
+						CUnit *test_worker = MakeUnitAndPlace(unit.GetTilePos() + ((unit.GetType()->GetTileSize() - 1) / 2), *test_worker_type, CPlayer::Players[PlayerNumNeutral], unit.GetMapLayer()->GetIndex());
 						char worker_path[64];
 						
 						//make the first path
-						int worker_path_length = AStarFindPath(test_worker->GetTilePos(), depot->GetTilePos(), depot->GetType()->TileSize.x, depot->GetType()->TileSize.y, test_worker->GetType()->TileSize.x, test_worker->GetType()->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.GetMapLayer()->GetIndex(), false);
-						Vec2i worker_path_pos(test_worker->GetTilePos());
-						std::vector<Vec2i> first_path_tiles;
+						int worker_path_length = AStarFindPath(test_worker->GetTilePos(), depot->GetTilePos(), depot->GetType()->GetTileSize().x, depot->GetType()->GetTileSize().y, test_worker->GetType()->GetTileSize().x, test_worker->GetType()->GetTileSize().y, 0, 1, worker_path, 64, *test_worker, 0, unit.GetMapLayer()->GetIndex(), false);
+						Vector2i worker_path_pos(test_worker->GetTilePos());
+						std::vector<Vector2i> first_path_tiles;
 						std::vector<CMapField *> unpassable_marked_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
-							Vec2i pos_change(0, 0);
+							Vector2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
 							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
 							worker_path_pos += pos_change;
@@ -2187,10 +2183,10 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(test_worker->GetTilePos(), depot->GetTilePos(), depot->GetType()->TileSize.x, depot->GetType()->TileSize.y, test_worker->GetType()->TileSize.x, test_worker->GetType()->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.GetMapLayer()->GetIndex(), false);
+						worker_path_length = AStarFindPath(test_worker->GetTilePos(), depot->GetTilePos(), depot->GetType()->GetTileSize().x, depot->GetType()->GetTileSize().y, test_worker->GetType()->GetTileSize().x, test_worker->GetType()->GetTileSize().y, 0, 1, worker_path, 64, *test_worker, 0, unit.GetMapLayer()->GetIndex(), false);
 						worker_path_pos = test_worker->GetTilePos();
 						while (worker_path_length > 0 && worker_path_length <= 64) {
-							Vec2i pos_change(0, 0);
+							Vector2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
 							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
 							worker_path_pos += pos_change;
@@ -2213,7 +2209,7 @@ static void AiCheckPathwayConstruction()
 			}
 			
 			for (size_t z = 0; z != pathway_tiles.size(); ++z) {
-				Vec2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
+				Vector2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
 				if (!CMap::Map.Info.IsPointOnMap(pathway_pos, unit.GetMapLayer())) {
 					continue;
 				}
@@ -2705,7 +2701,7 @@ void AiCheckWorkers()
 */
 //Wyrmgus start
 //void AiAddUnitTypeRequest(const CUnitType &type, int count)
-void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int landmass, CSite *settlement, const Vec2i pos, int z)
+void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int landmass, CSite *settlement, const Vector2i pos, int z)
 //Wyrmgus end
 {
 	AiBuildQueue queue;

@@ -50,11 +50,7 @@ class CButtonLevel;
 class CUnit;
 class UnitClass;
 struct lua_State;
-
-template <typename T>
-class Vec2T;
-
-typedef Vec2T<int> PixelPos;
+struct Vector2i;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -194,7 +190,7 @@ public:
 	std::string Mod;			/// Mod to which this button belongs to
 	
 	friend class CButtonPanel;
-	friend bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos);
+	friend bool EditorCallbackMouse_EditUnitArea(const Vector2i &screenPos);
 	friend int CclDefineButton(lua_State *l);
 	friend void DrawPopups();
 	friend void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActions);

@@ -82,9 +82,9 @@ static void MenuHandleButtonUp(unsigned button)
 //Wyrmgus end
 {
 }
-static void MenuHandleMouseMove(const PixelPos &screenPos)
+static void MenuHandleMouseMove(const Vector2i &screenPos)
 {
-	PixelPos pos(screenPos);
+	Vector2i pos(screenPos);
 	HandleCursorMove(&pos.x, &pos.y);
 }
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)

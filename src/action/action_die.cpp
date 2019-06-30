@@ -69,7 +69,7 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Die::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Die::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	return lastScreenPos;
 }
@@ -119,7 +119,7 @@ static bool AnimateActionDie(CUnit &unit)
 	}
 
 	const CUnitType &corpseType = *type.CorpseType;
-	Assert(type.TileSize.x >= corpseType.TileSize.x && type.TileSize.y >= corpseType.TileSize.y);
+	Assert(type.GetTileSize().x >= corpseType.GetTileSize().x && type.GetTileSize().y >= corpseType.GetTileSize().y);
 
 	// Update sight for new corpse
 	// We have to unmark BEFORE changing the type.

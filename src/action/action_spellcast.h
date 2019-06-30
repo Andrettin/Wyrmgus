@@ -34,7 +34,7 @@
 
 class COrder_SpellCast : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
+	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vector2i &pos, CUnit *target, int z, bool isAutocast);
 public:
 	COrder_SpellCast(const bool autocast = false) : COrder(UnitActionSpellCast), isAutocast(autocast)
 	{
@@ -48,12 +48,12 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual Vector2i Show(const CViewport &vp, const Vector2i &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 	virtual void OnAnimationAttack(CUnit &unit);
 
-	virtual const Vec2i GetGoalPos() const;
+	virtual const Vector2i GetGoalPos() const;
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const;
 	//Wyrmgus end
@@ -68,7 +68,7 @@ private:
 	const CSpell *Spell = nullptr;
 	int State = 0;
 	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	Vector2i goalPos = Vector2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end

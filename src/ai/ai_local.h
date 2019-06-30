@@ -167,17 +167,17 @@ public:
 	bool IsHeroOnlyForce() const;
 	
 	//Wyrmgus start
-//	void Attack(const Vec2i &pos);
-	void Attack(const Vec2i &pos, int z);
+//	void Attack(const Vector2i &pos);
+	void Attack(const Vector2i &pos, int z);
 	//Wyrmgus end
 	void RemoveDeadUnit();
 	int PlanAttack();
 
 	void ReturnToHome();
 	//Wyrmgus start
-//	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
-	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
-	bool CheckTransporters(const Vec2i &pos, int z);
+//	bool NewRallyPoint(const Vector2i &startPos, Vector2i *resultPos);
+	bool NewRallyPoint(const Vector2i &startPos, Vector2i *resultPos, const int z);
+	bool CheckTransporters(const Vector2i &pos, int z);
 	//Wyrmgus end
 	void Insert(CUnit &unit);
 
@@ -201,8 +201,8 @@ public:
 	// If attacking
 	int FormerForce = -1;	/// Original force number
 	AiForceAttackingState State = AiForceAttackingState_Free;	/// Attack state
-	Vec2i GoalPos = Vec2i(-1, -1);	/// Attack point tile map position
-	Vec2i HomePos = Vec2i(-1, -1);	/// Return after attack tile map position
+	Vector2i GoalPos = Vector2i(-1, -1);	/// Attack point tile map position
+	Vector2i HomePos = Vector2i(-1, -1);	/// Return after attack tile map position
 	//Wyrmgus start
 	int GoalMapLayer = 0;
 	int HomeMapLayer = 0;
@@ -278,7 +278,7 @@ public:
 	unsigned int Made = 0;		/// built number
 	const CUnitType *Type = nullptr;	/// unit-type
 	unsigned long Wait = 0;		/// wait until this cycle
-	Vec2i Pos = Vec2i(-1, -1);	/// build near pos on map
+	Vector2i Pos = Vector2i(-1, -1);	/// build near pos on map
 	//Wyrmgus start
 	int MapLayer = 0;
 	int Landmass = 0;
@@ -480,7 +480,7 @@ extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
 //Wyrmgus start
 //extern void AiAddUnitTypeRequest(const CUnitType &type, int count);
-extern void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int landmass = 0, CSite *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+extern void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int landmass = 0, CSite *settlement = nullptr, const Vector2i pos = Vector2i(-1, -1), const int z = 0);
 //Wyrmgus end
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(const CUnitType &type);
@@ -517,8 +517,8 @@ extern void AiCheckBuildings();
 //
 /// Find nice building place
 //Wyrmgus start
-//extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const CSite *settlement = nullptr);
+//extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vector2i &nearPos, Vector2i *resultPos);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vector2i &nearPos, Vector2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const CSite *settlement = nullptr);
 //Wyrmgus end
 
 //
@@ -572,8 +572,8 @@ extern int AiCheckUnitTypeCosts(const CUnitType &type);
 /// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
 								  //Wyrmgus start
-//								  const Vec2i &pos, unsigned range);
-								  const Vec2i &pos, unsigned range, int z);
+//								  const Vector2i &pos, unsigned range);
+								  const Vector2i &pos, unsigned range, int z);
 								  //Wyrmgus end
 
 //

@@ -217,8 +217,8 @@ void DrawBuildingCursor()
 {
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
-	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
-	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
+	const Vector2i mpos = vp.ScreenToTilePos(CursorScreenPos);
+	const Vector2i screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
 	CUnit *ontop = nullptr;
 
@@ -298,8 +298,8 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize());
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * CMap::Map.GetCurrentPixelTileSize().x + 1;
+		const Vector2i center(screenPos + CursorBuilding->GetHalfTilePixelSize());
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->GetTileSize().x - 1)) * CMap::Map.GetCurrentPixelTileSize().x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -325,10 +325,10 @@ void DrawBuildingCursor()
 	}
 
 	const int mask = CursorBuilding->MovementMask;
-	int h = CursorBuilding->TileSize.y;
+	int h = CursorBuilding->GetTileSize().y;
 	// reduce to view limits
 	h = std::min(h, vp.MapPos.y + vp.MapHeight - mpos.y);
-	int w0 = CursorBuilding->TileSize.x;
+	int w0 = CursorBuilding->GetTileSize().x;
 	w0 = std::min(w0, vp.MapPos.x + vp.MapWidth - mpos.x);
 
 	while (h--) {

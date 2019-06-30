@@ -1357,9 +1357,9 @@ void CUnitType::Initialize()
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
-PixelSize CUnitType::GetTilePixelSize() const
+Vector2i CUnitType::GetTilePixelSize() const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * CMap::PixelTileSize);
+	return this->GetTileSize() * CMap::PixelTileSize;
 }
 
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
@@ -2671,7 +2671,7 @@ void SaveUnitTypes(CFile &file)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const Vector2i &screenPos)
 {
 	//Wyrmgus start
 	if (sprite == nullptr) {
@@ -2679,13 +2679,13 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	}
 	//Wyrmgus end
 	
-	PixelPos pos = screenPos;
+	Vector2i pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.GetFrameSize().x - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-//	pos.y -= (type.GetFrameSize().y - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
-	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+//	pos.x -= (type.GetFrameSize().x - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+//	pos.y -= (type.GetFrameSize().y - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	//Wyrmgus end
 	pos.x += type.GetOffsetX();
 	pos.y += type.GetOffsetY();

@@ -122,7 +122,7 @@ enum EditorActionType {
 
 struct EditorAction {
 	EditorActionType Type;
-	Vec2i tilePos;
+	Vector2i tilePos;
 	const CUnitType *UnitType;
 	CPlayer *Player;
 };
@@ -195,8 +195,8 @@ static EditorSliderListener *editorSliderListener;
 **  @param tile  Tile type to edit.
 */
 //Wyrmgus start
-//static void EditTile(const Vec2i &pos, int tile)
-static void EditTile(const Vec2i &pos, CTerrainType *terrain)
+//static void EditTile(const Vector2i &pos, int tile)
+static void EditTile(const Vector2i &pos, CTerrainType *terrain)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
@@ -259,20 +259,20 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 **  @bug  This function does not support mirror editing!
 */
 //Wyrmgus start
-//static void EditTilesInternal(const Vec2i &pos, int tile, int size)
-static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
+//static void EditTilesInternal(const Vector2i &pos, int tile, int size)
+static void EditTilesInternal(const Vector2i &pos, CTerrainType *terrain, int size)
 //Wyrmgus end
 {
-	Vec2i minPos = pos;
-	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
+	Vector2i minPos = pos;
+	Vector2i maxPos(pos.x + size - 1, pos.y + size - 1);
 
 	CMap::Map.FixSelectionArea(minPos, maxPos, UI.CurrentMapLayer->GetIndex());
 
 	//Wyrmgus start
-	std::vector<Vec2i> changed_tiles;
+	std::vector<Vector2i> changed_tiles;
 	//Wyrmgus end
 	
-	Vec2i itPos;
+	Vector2i itPos;
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
 			//Wyrmgus start
@@ -301,7 +301,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
-						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+						Vector2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 									
@@ -322,7 +322,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 				for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 						if (x_offset != 0 || y_offset != 0) {
-							Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+							Vector2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 							if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
 								continue;
 							}
@@ -342,7 +342,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+					Vector2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 					
 					if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
 						continue;
@@ -371,7 +371,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 								for (int sub_x_offset = -1; sub_x_offset <= 1; ++sub_x_offset) {
 									for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
-											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
+											Vector2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (CMap::Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
 												const CTerrainType *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->GetIndex());
 												if (adjacent_terrain->IsOverlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
@@ -410,7 +410,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+					Vector2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 					
 					if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
 						continue;
@@ -436,8 +436,8 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 **  @param size  Size of rectangle
 */
 //Wyrmgus start
-//static void EditTiles(const Vec2i &pos, int tile, int size)
-static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
+//static void EditTiles(const Vector2i &pos, int tile, int size)
+static void EditTiles(const Vector2i &pos, CTerrainType *terrain, int size)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -448,15 +448,15 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos(UI.CurrentMapLayer->GetWidth() - size, UI.CurrentMapLayer->GetHeight() - size);
-	const Vec2i mirror = mpos - pos;
-	const Vec2i mirrorv(mirror.x, pos.y);
+	const Vector2i mpos(UI.CurrentMapLayer->GetWidth() - size, UI.CurrentMapLayer->GetHeight() - size);
+	const Vector2i mirror = mpos - pos;
+	const Vector2i mirrorv(mirror.x, pos.y);
 
 	EditTilesInternal(mirrorv, terrain, size);
 	if (MirrorEdit == 1) {
 		return;
 	}
-	const Vec2i mirrorh(pos.x, mirror.y);
+	const Vector2i mirrorh(pos.x, mirror.y);
 
 	EditTilesInternal(mirrorh, terrain, size);
 	EditTilesInternal(mirror, terrain, size);
@@ -476,7 +476,7 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+static void EditorActionPlaceUnit(const Vector2i &pos, const CUnitType &type, CPlayer *player)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
@@ -534,7 +534,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+static void EditorPlaceUnit(const Vector2i &pos, const CUnitType &type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
@@ -839,7 +839,7 @@ static void DrawUnitIcons()
 //		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
 		const CIcon *icon = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->GetIcon() : CIcon::Get("icon-level-up");
 		//Wyrmgus end
-		const PixelPos pos(x, y);
+		const Vector2i pos(x, y);
 
 		unsigned int flag = 0;
 		if (i == Editor.CursorUnitIndex) {
@@ -1101,8 +1101,8 @@ static void DrawTileIcons()
 static void DrawEditorPanel_SelectIcon()
 {
 	//Wyrmgus start
-//	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
-	const PixelPos pos(UI.InfoPanel.X + 11, UI.InfoPanel.Y + 7);
+//	const Vector2i pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
+	const Vector2i pos(UI.InfoPanel.X + 11, UI.InfoPanel.Y + 7);
 	//Wyrmgus end
 	CIcon *icon = Editor.Select.Icon;
 	Assert(icon);
@@ -1126,8 +1126,8 @@ static void DrawEditorPanel_SelectIcon()
 static void DrawEditorPanel_UnitsIcon()
 {
 	//Wyrmgus start
-//	const PixelPos pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
-	const PixelPos pos(UI.InfoPanel.X + 11 + UNIT_ICON_X, UI.InfoPanel.Y + 7 + UNIT_ICON_Y);
+//	const Vector2i pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
+	const Vector2i pos(UI.InfoPanel.X + 11 + UNIT_ICON_X, UI.InfoPanel.Y + 7 + UNIT_ICON_Y);
 	//Wyrmgus end
 	CIcon *icon = Editor.Units.Icon;
 	Assert(icon);
@@ -1162,7 +1162,7 @@ static void DrawEditorPanel_StartIcon()
 	if (Editor.StartUnit) {
 		const CIcon *icon = Editor.StartUnit->GetIcon();
 		Assert(icon);
-		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
+		const Vector2i pos(x + START_ICON_X, y + START_ICON_Y);
 		unsigned int flag = 0;
 		if (ButtonUnderCursor == StartButton) {
 			flag = IconActive;
@@ -1188,14 +1188,14 @@ static void DrawEditorPanel_StartIcon()
 		}
 		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
 
-		const PixelPos lt(x, y);
+		const Vector2i lt(x, y);
 		//Wyrmgus start
-//		const PixelPos lb(x, y + IconHeight - 2);
-//		const PixelPos rt(x + IconHeight - 2, y);
-		const PixelPos lb(x, y + IconHeight - 3);
-		const PixelPos rt(x + IconHeight - 3, y);
+//		const Vector2i lb(x, y + IconHeight - 2);
+//		const Vector2i rt(x + IconHeight - 2, y);
+		const Vector2i lb(x, y + IconHeight - 3);
+		const Vector2i rt(x + IconHeight - 3, y);
 		//Wyrmgus end
-		const PixelPos rb(x + IconHeight - 2, y + IconHeight - 2);
+		const Vector2i rb(x + IconHeight - 2, y + IconHeight - 2);
 		//Wyrmgus start
 //		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
 		const Uint32 color = CPlayer::Players[Editor.SelectedPlayer]->Color;
@@ -1274,8 +1274,8 @@ static void DrawMapCursor()
 
 	// Draw map cursor
 	if (UI.MouseViewport && !CursorBuilding) {
-		const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
+		const Vector2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+		const Vector2i screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			//Wyrmgus start
@@ -1285,7 +1285,7 @@ static void DrawMapCursor()
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 
-			PixelPos screenPosIt;
+			Vector2i screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
 				screenPosIt.y = screenPos.y + j * CMap::Map.GetCurrentPixelTileSize().y;
 				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
@@ -1320,12 +1320,12 @@ static void DrawMapCursor()
 	}
 }
 
-static void DrawCross(const PixelPos &topleft_pos, const PixelSize &size, Uint32 color)
+static void DrawCross(const Vector2i &topleft_pos, const Vector2i &size, Uint32 color)
 {
-	const PixelPos lt = topleft_pos;
-	const PixelPos lb(topleft_pos.x, topleft_pos.y + size.y);
-	const PixelPos rt(topleft_pos.x + size.x, topleft_pos.y);
-	const PixelPos rb = topleft_pos + size;
+	const Vector2i lt = topleft_pos;
+	const Vector2i lb(topleft_pos.x, topleft_pos.y + size.y);
+	const Vector2i rt(topleft_pos.x + size.x, topleft_pos.y);
+	const Vector2i rb = topleft_pos + size;
 
 	Video.DrawLineClip(color, lt, rb);
 	Video.DrawLineClip(color, lb, rt);
@@ -1343,7 +1343,7 @@ static void DrawStartLocations()
 
 		for (int i = 0; i < PlayerMax; i++) {
 			if (CMap::Map.Info.PlayerType[i] != PlayerNobody && CMap::Map.Info.PlayerType[i] != PlayerNeutral && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->GetIndex()) {
-				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
+				const Vector2i startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
 
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
@@ -1363,8 +1363,7 @@ static void DrawStartLocations()
 */
 static void DrawEditorInfo()
 {
-#if 1
-	Vec2i pos(0, 0);
+	Vector2i pos(0, 0);
 
 	if (UI.MouseViewport) {
 		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
@@ -1424,7 +1423,6 @@ static void DrawEditorInfo()
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 298, UI.StatusLine.TextY - 12, buf);
 	//Wyrmgus end
-#endif
 }
 
 /**
@@ -1614,7 +1612,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on minimap
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+			const Vector2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
 		}
 		return;
@@ -1751,7 +1749,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			UI.SelectedViewport = vp;
 		}
 		if (MouseButtons & LeftButton) {
-			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+			const Vector2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
@@ -1970,7 +1968,7 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned)
 	}
 }
 
-static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
+static bool EditorCallbackMouse_EditUnitArea(const Vector2i &screenPos)
 {
 	Assert(Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation);
 	
@@ -2084,7 +2082,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	return false;
 }
 
-static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
+static bool EditorCallbackMouse_EditTileArea(const Vector2i &screenPos)
 {
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 4;
@@ -2152,18 +2150,18 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 **
 **  @param pos  Screen position.
 */
-static void EditorCallbackMouse(const PixelPos &pos)
+static void EditorCallbackMouse(const Vector2i &pos)
 {
 	static int LastMapX;
 	static int LastMapY;
 
-	PixelPos restrictPos = pos;
+	Vector2i restrictPos = pos;
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
-	const PixelPos screenPos = pos;
+	const Vector2i screenPos = pos;
 
 	// Move map.
 	if (GameCursor == UI.Scroll.Cursor) {
-		Vec2i tilePos = UI.MouseViewport->MapPos;
+		Vector2i tilePos = UI.MouseViewport->MapPos;
 
 		// FIXME: Support with CTRL for faster scrolling.
 		// FIXME: code duplication, see ../ui/mouse.c
@@ -2196,7 +2194,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Automatically unpress when map tile has changed
-	const Vec2i cursorTilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
+	const Vector2i cursorTilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 	if (LastMapX != cursorTilePos.x || LastMapY != cursorTilePos.y) {
 		LastMapX = cursorTilePos.x;
@@ -2206,7 +2204,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	// Drawing tiles on map.
 	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton)
 		&& (Editor.State == EditorEditTile || Editor.State == EditorEditUnit)) {
-		Vec2i vpTilePos = UI.SelectedViewport->MapPos;
+		Vector2i vpTilePos = UI.SelectedViewport->MapPos;
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
@@ -2226,7 +2224,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 		// Scroll the map, if cursor moves outside the viewport.
 		RestrictCursorToViewport();
-		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
+		const Vector2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
@@ -2245,7 +2243,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	// Minimap move viewpoint
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vector2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
 		return;
@@ -2378,7 +2376,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 		if (UI.MouseViewport) {
 			// Look if there is an unit under the cursor.
-			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			const Vector2i cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 			UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 
 			if (UnitUnderCursor != nullptr) {
@@ -2467,7 +2465,7 @@ void CEditor::Init()
 		//Wyrmgus start
 //		CMap::Map.Fields = new CMapField[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
 		CMap::Map.ClearMapLayers();
-		CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+		CMapLayer *map_layer = new CMapLayer(CMap::Map.MapLayers.size(), Vector2i(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight));
 		CMap::Map.MapLayers.push_back(map_layer);
 		CMap::Map.Info.MapWidths.clear();
 		CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);

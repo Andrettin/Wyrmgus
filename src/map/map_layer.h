@@ -36,6 +36,7 @@
 
 #include "vec2i.h"
 
+#include <core/math/vector2.h>
 #include <core/object.h>
 
 #include <tuple>
@@ -64,7 +65,7 @@ class CMapLayer : public Object
 	GDCLASS(CMapLayer, Object)
 	
 public:
-	CMapLayer(const int index = -1, const int width = 0, const int height = 0, CPlane *plane = nullptr, CWorld *world = nullptr, const int surface_layer = 0);
+	CMapLayer(const int index = -1, const Vector2i &size = Vector2i(0, 0), CPlane *plane = nullptr, CWorld *world = nullptr, const int surface_layer = 0);
 	~CMapLayer();
 	
 	int GetIndex() const
@@ -72,19 +73,19 @@ public:
 		return this->Index;
 	}
 	
+	const Vector2i &GetSize() const
+	{
+		return this->Size;
+	}
+	
 	int GetWidth() const
 	{
-		return this->Width;
+		return this->Size.width;
 	}
 	
 	int GetHeight() const
 	{
-		return this->Height;
-	}
-	
-	Vec2i GetSize() const
-	{
-		return Vec2i(this->Width, this->Height);
+		return this->Size.height;
 	}
 	
 	const CTerrainType *GetTileTerrainType(const Vector2i &pos, const bool overlay) const;
@@ -108,7 +109,7 @@ public:
 	*/
 	CMapField *Field(const int x, const int y) const
 	{
-		return this->Field(x + y * this->Width);
+		return this->Field(x + y * this->GetWidth());
 	}
 	
 	/**
@@ -123,17 +124,17 @@ public:
 		return this->Field(pos.x, pos.y);
 	}
 	
-	Vec2i GetPosFromIndex(unsigned int index) const
+	Vector2i GetPosFromIndex(unsigned int index) const
 	{
-		Vec2i pos;
-		pos.x = index % this->Width;
-		pos.y = index / this->Width;
+		Vector2i pos;
+		pos.x = index % this->GetWidth();
+		pos.y = index / this->GetWidth();
 		return pos;
 	}
 	
 	int GetTileIndex(const int x, const int y) const
 	{
-		return x + y * this->Width;
+		return x + y * this->GetWidth();
 	}
 	
 	int GetTileIndex(const Vector2i &tile_pos) const
@@ -159,12 +160,12 @@ public:
 	void DoPerHourLoop();
 	void RegenerateForest();
 	/// regenerate a forest tile	
-	void RegenerateForestTile(const Vec2i &pos);
+	void RegenerateForestTile(const Vector2i &pos);
 	
 	/// Returns true if there is a wall on the map tile field
-	bool WallOnMap(const Vec2i &pos) const;
+	bool WallOnMap(const Vector2i &pos) const;
 	
-	bool TileBlockHasTree(const Vec2i &min_pos, const Vec2i &max_pos) const;
+	bool TileBlockHasTree(const Vector2i &min_pos, const Vector2i &max_pos) const;
 	
 private:
 	void DecrementRemainingTimeOfDayHours();
@@ -199,27 +200,29 @@ public:
 private:
 	int Index = -1;
 	CMapField *Fields = nullptr;				/// fields on the map layer
-	int Width = 0;								/// the width in tiles of the map layer
-	int Height = 0;								/// the height in tiles of the map layer
-public:
+	Vector2i Size = Vector2i(0, 0);				/// the size in tiles of the map layer
 	const CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
 	const CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
 	int RemainingTimeOfDayHours = 0;			/// the quantity of hours remaining for the current time of day to end
 	const CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	const CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-private:
 	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer
 	CWorld *World = nullptr;					/// the world pointer (if any) for the map layer
 	int SurfaceLayer = 0;						/// the surface layer for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
 public:
 	PixelSize PixelTileSize = PixelSize(32, 32);	/// the pixel tile size for the map layer
-	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
-	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
+	std::vector<std::tuple<Vector2i, Vector2i, CMapTemplate *>> SubtemplateAreas;
+	std::vector<Vector2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 	
+	friend class CMap;
+	friend class CMapTemplate;
 	friend int CclStratagusMap(lua_State *l);
-	friend CMapTemplate;
+	friend void SetTimeOfDay(const std::string &time_of_day_ident, int z);
+	friend void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const unsigned z);
+	friend void SetSeason(const std::string &season_ident, int z);
+	friend void SetSeasonSchedule(const std::string &season_schedule_ident, int z);
 	
 protected:
 	static void _bind_methods();

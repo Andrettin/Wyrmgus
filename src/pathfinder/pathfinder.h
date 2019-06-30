@@ -40,8 +40,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#include <core/math/vector2.h>
+
 #include <queue>
-#include "vec2i.h"
 
 class CUnit;
 class CFile;
@@ -66,24 +67,24 @@ class PathFinderInput
 {
 public:
 	CUnit *GetUnit() const { return unit; }
-	const Vec2i &GetUnitPos() const;
+	const Vector2i &GetUnitPos() const;
 	//Wyrmgus start
 	const int GetUnitMapLayer() const;
 	//Wyrmgus end
-	Vec2i GetUnitSize() const;
-	const Vec2i &GetGoalPos() const { return goalPos; }
+	Vector2i GetUnitSize() const;
+	const Vector2i &GetGoalPos() const { return goalPos; }
 	//Wyrmgus start
 	const int GetGoalMapLayer() const { return MapLayer; }
 	//Wyrmgus end
-	const Vec2i &GetGoalSize() const { return goalSize; }
+	const Vector2i &GetGoalSize() const { return goalSize; }
 	int GetMinRange() const { return minRange; }
 	int GetMaxRange() const { return maxRange; }
 	bool IsRecalculateNeeded() const { return isRecalculatePathNeeded; }
 
 	void SetUnit(CUnit &_unit);
 	//Wyrmgus start
-//	void SetGoal(const Vec2i &pos, const Vec2i &size);
-	void SetGoal(const Vec2i &pos, const Vec2i &size, int z);
+//	void SetGoal(const Vector2i &pos, const Vector2i &size);
+	void SetGoal(const Vector2i &pos, const Vector2i &size, int z);
 	//Wyrmgus end
 	void SetMinRange(int range);
 	void SetMaxRange(int range);
@@ -95,9 +96,9 @@ public:
 
 private:
 	CUnit *unit = nullptr;
-	Vec2i unitSize = Vec2i(0, 0);
-	Vec2i goalPos = Vec2i(-1, -1);
-	Vec2i goalSize = Vec2i(0, 0);
+	Vector2i unitSize = Vector2i(0, 0);
+	Vector2i goalPos = Vector2i(-1, -1);
+	Vector2i goalSize = Vector2i(0, 0);
 	int minRange = 0;
 	int maxRange = 0;
 	//Wyrmgus start
@@ -149,27 +150,27 @@ public:
 	void SetDiagonalAllowed(const bool allowed);
 	void Init();
 
-	void PushPos(const Vec2i &pos);
-	void PushNeighbor(const Vec2i &pos);
+	void PushPos(const Vector2i &pos);
+	void PushNeighbor(const Vector2i &pos);
 	void PushUnitPosAndNeighbor(const CUnit &unit);
 
 	template <typename T>
 	bool Run(T &context);
 
-	bool IsVisited(const Vec2i &pos) const;
-	bool IsReached(const Vec2i &pos) const;
-	bool IsInvalid(const Vec2i &pos) const;
+	bool IsVisited(const Vector2i &pos) const;
+	bool IsReached(const Vector2i &pos) const;
+	bool IsInvalid(const Vector2i &pos) const;
 
 	// Accept pos to be at one inside the real map
-	dataType Get(const Vec2i &pos) const;
+	dataType Get(const Vector2i &pos) const;
 
 private:
-	void Set(const Vec2i &pos, dataType value);
+	void Set(const Vector2i &pos, dataType value);
 
 	struct PosNode {
-		PosNode(const Vec2i &pos, const Vec2i &from) : pos(pos), from(from) {}
-		Vec2i pos;
-		Vec2i from;
+		PosNode(const Vector2i &pos, const Vector2i &from) : pos(pos), from(from) {}
+		Vector2i pos;
+		Vector2i from;
 	};
 
 private:
@@ -228,14 +229,14 @@ extern void InitPathfinder();
 extern void FreePathfinder();
 
 /// Returns the next element of the path
-extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
+extern int NextPathElement(CUnit &unit, int *xdp, int *ydp);
 /// Return distance to unit.
 //Wyrmgus start
 //extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
 extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range, int max_length = 0, bool from_outside_container = false);
 //Wyrmgus end
 /// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
+extern int PlaceReachable(const CUnit &src, const Vector2i &pos, int w, int h,
 						  //Wyrmgus start
 //						  int minrange, int maxrange);
 						  int minrange, int maxrange, int max_length, int z, bool from_outside_container = false);
@@ -256,7 +257,7 @@ extern int GetAStarUnknownTerrainCost();
 
 //Wyrmgus start
 /// Find and a* path for a unit
-extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
+extern int AStarFindPath(const Vector2i &startPos, const Vector2i &goalPos, int gw, int gh,
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
 //						 int maxrange, char *path, int pathlen, const CUnit &unit);

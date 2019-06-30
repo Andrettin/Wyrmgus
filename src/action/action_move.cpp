@@ -60,8 +60,8 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionMove(const Vec2i &pos)
-/* static */ COrder *COrder::NewActionMove(const Vec2i &pos, int z)
+///* static */ COrder *COrder::NewActionMove(const Vector2i &pos)
+/* static */ COrder *COrder::NewActionMove(const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -118,13 +118,13 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Move::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
 	if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
 		return lastScreenPos;
 	}
 
-	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	const Vector2i targetPos = vp.TilePosToScreen_Center(this->goalPos);
 
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
@@ -137,7 +137,7 @@
 
 /* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
 {
-	const Vec2i tileSize(0, 0);
+	const Vector2i tileSize(0, 0);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 
 	int distance = this->Range;
@@ -186,7 +186,7 @@ int DoActionMove(CUnit &unit)
 	}
 	//Wyrmgus end
 	
-	Vec2i posd; // movement in tile.
+	Vector2i posd; // movement in tile.
 	int d;
 	
 	Assert(unit.CanMove());
@@ -246,7 +246,7 @@ int DoActionMove(CUnit &unit)
 				PlayUnitSound(unit, VoiceDocking); // undocking
 			}
 		}
-		Vec2i pos = unit.GetTilePos() + posd;
+		Vector2i pos = unit.GetTilePos() + posd;
 		//Wyrmgus start
 		if (unit.GetType()->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;

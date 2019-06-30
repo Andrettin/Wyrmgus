@@ -53,8 +53,8 @@ class CMinimap
 	void UpdateSeen(void *const pixels, const int pitch);
 
 public:
-	void UpdateXY(const Vec2i &pos, int z);
-	void UpdateSeenXY(const Vec2i &) {}
+	void UpdateXY(const Vector2i &pos, int z);
+	void UpdateSeenXY(const Vector2i &) {}
 	void Update();
 	void Create();
 
@@ -65,14 +65,14 @@ public:
 	void Draw() const;
 	void DrawViewportArea(const CViewport &viewport) const;
 	//Wyrmgus start
-//	void AddEvent(const Vec2i &pos, IntColor color);
-	void AddEvent(const Vec2i &pos, int z, IntColor color);
+//	void AddEvent(const Vector2i &pos, IntColor color);
+	void AddEvent(const Vector2i &pos, int z, IntColor color);
 	//Wyrmgus end
 
-	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;
-	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;
+	Vector2i ScreenToTilePos(const Vector2i &screenPos) const;
+	Vector2i TilePosToScreenPos(const Vector2i &tilePos) const;
 
-	bool Contains(const PixelPos &screenPos) const;
+	bool Contains(const Vector2i &screenPos) const;
 public:
 	int X = 0;
 	int Y = 0;

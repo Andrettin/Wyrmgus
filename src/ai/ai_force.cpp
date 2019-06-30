@@ -63,7 +63,7 @@ constexpr int AIATTACK_AGRESSIVE = 3;
 class EnemyUnitFinder
 {
 public:
-	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, int find_type, bool include_neutral, bool allow_water) :
+	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vector2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, int find_type, bool include_neutral, bool allow_water) :
 	//Wyrmgus end
 		unit(unit),
 		movemask(unit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
@@ -77,7 +77,7 @@ public:
 	{
 		*result_unit = nullptr;
 	}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	const CUnit &unit;
 	unsigned int movemask;
@@ -86,11 +86,11 @@ private:
 	bool include_neutral;
 	bool allow_water;
 	CUnit **result_unit;
-	Vec2i *result_enemy_wall_pos;
+	Vector2i *result_enemy_wall_pos;
 	int *result_enemy_wall_map_layer;
 };
 
-VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	if (!unit.GetMapLayer()->Field(pos)->playerInfo.IsTeamExplored(*unit.GetPlayer())) {
 		return VisitResult_DeadEnd;
@@ -123,8 +123,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 
 	std::vector<CUnit *> table;
-	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
-	Vec2i maxpos = pos + Vec2i(unit.GetType()->TileSize - 1 + attackrange);
+	Vector2i minpos = pos - Vector2i(attackrange, attackrange);
+	Vector2i maxpos = pos + Vector2i(unit.GetType()->GetTileSize() - 1 + attackrange);
 	Select(minpos, maxpos, table, unit.GetMapLayer()->GetIndex(), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
@@ -167,7 +167,7 @@ class AiForceEnemyFinder
 public:
 	//Wyrmgus start
 //	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
+	AiForceEnemyFinder(int force, const CUnit **enemy, Vector2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != nullptr);
@@ -177,7 +177,7 @@ public:
 
 	//Wyrmgus start
 //	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
+	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vector2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != nullptr);
@@ -266,7 +266,7 @@ public:
 private:
 	const CUnit **enemy;
 	//Wyrmgus start
-	Vec2i *result_enemy_wall_pos;
+	Vector2i *result_enemy_wall_pos;
 	int *result_enemy_wall_map_layer;
 	const bool IncludeNeutral;
 	const bool allow_water;
@@ -494,8 +494,8 @@ class AiForceRallyPointFinder
 {
 public:
 	//Wyrmgus start
-//	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
-	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos, int z) :
+//	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vector2i &startPos, Vector2i *resultPos) :
+	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vector2i &startPos, Vector2i *resultPos, int z) :
 	//Wyrmgus end
 		startUnit(startUnit), distance(distance), startPos(startPos),
 		movemask(startUnit.GetType()->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
@@ -504,19 +504,19 @@ public:
 		resultPos(resultPos), z(z)
 		//Wyrmgus end
 	{}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from);
 private:
 	const CUnit &startUnit;
 	const int distance;
-	const Vec2i startPos;
+	const Vector2i startPos;
 	const int movemask;
-	Vec2i *resultPos;
+	Vector2i *resultPos;
 	//Wyrmgus start
 	const int z;
 	//Wyrmgus end
 };
 
-VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vector2i &pos, const Vector2i &from)
 {
 	//Wyrmgus start
 	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*startUnit.GetPlayer())) { // don't pick unexplored positions
@@ -566,8 +566,8 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 }
 
 //Wyrmgus start
-//bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
-bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
+//bool AiForce::NewRallyPoint(const Vector2i &startPos, Vector2i *resultPos)
+bool AiForce::NewRallyPoint(const Vector2i &startPos, Vector2i *resultPos, const int z)
 //Wyrmgus end
 {
 	Assert(this->Units.size() > 0);
@@ -599,7 +599,7 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 }
 
 //Wyrmgus start
-bool AiForce::CheckTransporters(const Vec2i &pos, int z)
+bool AiForce::CheckTransporters(const Vector2i &pos, int z)
 {
 	int home_landmass = CMap::Map.GetTileLandmass(this->HomePos, this->HomeMapLayer);
 	int goal_landmass = CMap::Map.GetTileLandmass(pos, z);
@@ -787,8 +787,8 @@ bool AiForce::IsHeroOnlyForce() const
 }
 
 //Wyrmgus start
-//void AiForce::Attack(const Vec2i &pos)
-void AiForce::Attack(const Vec2i &pos, int z)
+//void AiForce::Attack(const Vector2i &pos)
+void AiForce::Attack(const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	bool isDefenceForce = false;
@@ -816,7 +816,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 		this->Attacking = true;
 	}
-	Vec2i goalPos(pos);
+	Vector2i goalPos(pos);
 
 	bool isNaval = this->IsNaval();
 	bool isTransporter = false;
@@ -836,7 +836,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		//Wyrmgus end
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
-		Vec2i enemy_wall_pos(-1, -1);
+		Vector2i enemy_wall_pos(-1, -1);
 		int enemy_wall_map_layer = -1;
 		if (isTransporter) {
 			//Wyrmgus start
@@ -925,7 +925,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus end
 	
 	if (this->State == AiForceAttackingState_Waiting && isDefenceForce == false) {
-		Vec2i resultPos;
+		Vector2i resultPos;
 		//Wyrmgus start
 //		NewRallyPoint(goalPos, &resultPos);
 		NewRallyPoint(goalPos, &resultPos, z);
@@ -1013,7 +1013,7 @@ void AiForce::ReturnToHome()
 			//Wyrmgus end
 		}
 	}
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 
 	this->HomePos = invalidPos;
 	this->GoalPos = invalidPos;
@@ -1235,7 +1235,7 @@ void AiAssignFreeUnitsToForce(int force)
 void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 //Wyrmgus end
 {
-	const Vec2i pos(x, y);
+	const Vector2i pos(x, y);
 
 	if (!(force < AI_MAX_FORCE_INTERNAL)) {
 		DebugPrint("Force out of range: %d" _C_ force);
@@ -1295,7 +1295,7 @@ void AiAttackWithForce(unsigned int force)
 		force = f;
 	}
 
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 	//Wyrmgus start
 	int z = AiPlayer->Player->StartMapLayer;
 	if (AiPlayer->Force[force].Units.size() > 0) {
@@ -1316,7 +1316,7 @@ void AiAttackWithForce(unsigned int force)
 */
 void AiAttackWithForces(int *forces)
 {
-	const Vec2i invalidPos(-1, -1);
+	const Vector2i invalidPos(-1, -1);
 	bool found = false;
 	unsigned int top;
 	unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
@@ -1473,7 +1473,7 @@ void AiForce::Update()
 	//Wyrmgus end
 	//if force still has no goal, run its Attack function again to get a target
 	if (CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
-		const Vec2i invalidPos(-1, -1);
+		const Vector2i invalidPos(-1, -1);
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
 		if (Units.size() > 0) {
@@ -1619,7 +1619,7 @@ void AiForce::Update()
 			const CUnit *unit = nullptr;
 
 			//Wyrmgus start
-			Vec2i enemy_wall_pos(-1, -1);
+			Vector2i enemy_wall_pos(-1, -1);
 			int enemy_wall_map_layer = -1;
 			
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
@@ -1721,7 +1721,7 @@ void AiForce::Update()
 
 	if (State == AiForceAttackingState_Attacking && idleUnits.size() == this->Size()) {
 		const CUnit *unit = nullptr;
-		Vec2i enemy_wall_pos(-1, -1);
+		Vector2i enemy_wall_pos(-1, -1);
 		int enemy_wall_map_layer = -1;
 
 		bool isNaval = this->IsNaval();
@@ -1755,7 +1755,7 @@ void AiForce::Update()
 			//Wyrmgus end
 			return;
 		} else {
-			Vec2i resultPos;
+			Vector2i resultPos;
 			if (unit) {
 				NewRallyPoint(unit->GetTilePos(), &resultPos, unit->GetMapLayer()->GetIndex());
 				if (resultPos.x == 0 && resultPos.y == 0) {
@@ -1858,7 +1858,7 @@ void AiForceManager::CheckForceRecruitment()
 			}
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
-				const Vec2i invalidPos(-1, -1);
+				const Vector2i invalidPos(-1, -1);
 				int z = force.Units[0]->GetMapLayer()->GetIndex();
 				
 				force.Attack(invalidPos, z);
@@ -1986,7 +1986,7 @@ void AiForceManager::Update()
 					//Wyrmgus end
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = nullptr;
-						Vec2i dummy_wall_pos(-1, -1);
+						Vector2i dummy_wall_pos(-1, -1);
 						int dummy_wall_map_layer = -1;
 						//Wyrmgus start
 //						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
@@ -2005,7 +2005,7 @@ void AiForceManager::Update()
 				// Find idle units and order them to defend
 				// Don't attack if there aren't our units near goal point
 				std::vector<CUnit *> nearGoal;
-				const Vec2i offset(15, 15);
+				const Vector2i offset(15, 15);
 				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
 						//Wyrmgus start
 						force.GoalMapLayer,

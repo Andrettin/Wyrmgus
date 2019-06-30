@@ -30,8 +30,21 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
-#include "vec2i.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include <core/math/vector2.h>
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
 class CUnit;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 /**
 **  A map viewport.
@@ -62,24 +75,24 @@ class CViewport
 {
 public:
 	/// Check if pos pixels are within map area
-	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
+	bool IsInsideMapArea(const Vector2i &screenPixelPos) const;
 
 	/// Convert screen coordinates into map pixel coordinates
-	PixelPos ScreenToMapPixelPos(const PixelPos &screenPixelPos) const;
+	Vector2i ScreenToMapPixelPos(const Vector2i &screenPixelPos) const;
 	// Convert map pixel coordinates into screen coordinates
-	PixelPos MapToScreenPixelPos(const PixelPos &mapPixelPos) const;
+	Vector2i MapToScreenPixelPos(const Vector2i &mapPixelPos) const;
 
 	/// convert screen coordinate into tilepos
-	Vec2i ScreenToTilePos(const PixelPos &screenPixelPos) const;
+	Vector2i ScreenToTilePos(const Vector2i &screenPixelPos) const;
 	/// convert tilepos coordonates into screen (take the top left of the tile)
-	PixelPos TilePosToScreen_TopLeft(const Vec2i &tilePos) const;
+	Vector2i TilePosToScreen_TopLeft(const Vector2i &tilePos) const;
 	/// convert tilepos coordonates into screen (take the center of the tile)
-	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
+	Vector2i TilePosToScreen_Center(const Vector2i &tilePos) const;
 
 	/// Set the current map view to x,y(upper,left corner)
-	void Set(const Vec2i &tilePos, const PixelDiff &offset);
+	void Set(const Vector2i &tilePos, const Vector2i &offset);
 	/// Center map on point in viewport
-	void Center(const PixelPos &mapPixelPos);
+	void Center(const Vector2i &mapPixelPos);
 
 	void SetClipping() const;
 
@@ -87,18 +100,18 @@ public:
 	void Draw() const;
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
-	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
+	bool AnyMapAreaVisibleInViewport(const Vector2i &boxmin, const Vector2i &boxmax) const;
 
-	bool Contains(const PixelPos &screenPos) const;
+	bool Contains(const Vector2i &screenPos) const;
 
 	void Restrict(int &screenPosX, int &screenPosY) const;
 
-	PixelSize GetPixelSize() const;
-	const PixelPos &GetTopLeftPos() const { return TopLeftPos;}
-	const PixelPos &GetBottomRightPos() const { return BottomRightPos;}
+	Vector2i GetPixelSize() const;
+	const Vector2i &GetTopLeftPos() const { return TopLeftPos;}
+	const Vector2i &GetBottomRightPos() const { return BottomRightPos;}
 private:
 	/// Set the current map view to x,y(upper,left corner)
-	void Set(const PixelPos &mapPixelPos);
+	void Set(const Vector2i &mapPixelPos);
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
@@ -106,12 +119,12 @@ private:
 
 public:
 	//private:
-	PixelPos TopLeftPos = PixelPos(0, 0);		/// Screen pixel top-left corner
-	PixelPos BottomRightPos = PixelPos(0, 0);	/// Screen pixel bottom-right corner
+	Vector2i TopLeftPos = Vector2i(0, 0);		/// Screen pixel top-left corner
+	Vector2i BottomRightPos = Vector2i(0, 0);	/// Screen pixel bottom-right corner
 
 public:
-	Vec2i MapPos = Vec2i(0, 0);	/// Map tile left-upper corner
-	PixelDiff Offset = PixelDiff(0, 0);	/// Offset within MapX, MapY
+	Vector2i MapPos = Vector2i(0, 0);	/// Map tile left-upper corner
+	Vector2i Offset = Vector2i(0, 0);	/// Offset within MapX, MapY
 	int MapWidth = 0;		/// Width in map tiles
 	int MapHeight = 0;		/// Height in map tiles
 

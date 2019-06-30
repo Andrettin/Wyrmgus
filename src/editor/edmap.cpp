@@ -47,7 +47,7 @@
 
 
 /// Callback for changed tile (with direction mask)
-static void EditorChangeSurrounding(const Vec2i &pos, int d);
+static void EditorChangeSurrounding(const Vector2i &pos, int d);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -63,7 +63,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d);
 */
 //Wyrmgus start
 /*
-void ChangeTile(const Vec2i &pos, int tile)
+void ChangeTile(const Vector2i &pos, int tile)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos));
 
@@ -89,7 +89,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 */
 //Wyrmgus start
 /*
-static unsigned QuadFromTile(const Vec2i &pos)
+static unsigned QuadFromTile(const Vector2i &pos)
 {
 	// find the abstact tile number
 	const int tile = CMap::Map.Field(pos)->getGraphicTile();
@@ -105,7 +105,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-void EditorChangeTile(const Vec2i &pos, int tileIndex)
+void EditorChangeTile(const Vector2i &pos, int tileIndex)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
@@ -144,7 +144,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 					CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->GetIndex());
 					CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->GetIndex());
@@ -184,8 +184,8 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 **  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
 //Wyrmgus start
-//static void EditorChangeSurrounding(const Vec2i &pos, int d)
-static void EditorChangeSurrounding(const Vec2i &pos, int tile)
+//static void EditorChangeSurrounding(const Vector2i &pos, int d)
+static void EditorChangeSurrounding(const Vector2i &pos, int tile)
 //Wyrmgus end
 {
 	// Special case 1) Walls.
@@ -201,7 +201,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					Vector2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 							
@@ -218,11 +218,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		}
 		
 		if (std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end()) {
-			EditorChangeTile(pos + Vec2i(0, -1), tile);
-			EditorChangeTile(pos + Vec2i(0, 1), tile);
+			EditorChangeTile(pos + Vector2i(0, -1), tile);
+			EditorChangeTile(pos + Vector2i(0, 1), tile);
 		} else if (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end()) {
-			EditorChangeTile(pos + Vec2i(-1, 0), tile);
-			EditorChangeTile(pos + Vec2i(1, 0), tile);
+			EditorChangeTile(pos + Vector2i(-1, 0), tile);
+			EditorChangeTile(pos + Vector2i(1, 0), tile);
 		}
 		
 	}
@@ -254,7 +254,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	//  then check if the margin matches.
 	//  Otherwise, call EditorChangeTile again.
 	if ((d & DIR_UP) && pos.y) {
-		const Vec2i offset(0, -1);
+		const Vector2i offset(0, -1);
 		// Insert into the bottom the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
@@ -264,7 +264,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		}
 	}
 	if ((d & DIR_DOWN) && pos.y < CMap::Map.Info.MapHeight - 1) {
-		const Vec2i offset(0, 1);
+		const Vector2i offset(0, 1);
 		// Insert into the top the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
@@ -274,7 +274,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		}
 	}
 	if ((d & DIR_LEFT) && pos.x) {
-		const Vec2i offset(-1, 0);
+		const Vector2i offset(-1, 0);
 		// Insert into the left the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
@@ -284,7 +284,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		}
 	}
 	if ((d & DIR_RIGHT) && pos.x < CMap::Map.Info.MapWidth - 1) {
-		const Vec2i offset(1, 0);
+		const Vector2i offset(1, 0);
 		// Insert into the right the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
@@ -303,8 +303,8 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 **  @param pos  Map tile position of change.
 */
 //Wyrmgus start
-//void EditorTileChanged(const Vec2i &pos)
-void EditorTileChanged(const Vec2i &pos, int tile)
+//void EditorTileChanged(const Vector2i &pos)
+void EditorTileChanged(const Vector2i &pos, int tile)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -328,15 +328,15 @@ void EditorTileChanged(const Vec2i &pos, int tile)
 **  TileFill(centerx, centery, tile_type_water, map_width)
 **  will fill map with water...
 */
-static void TileFill(const Vec2i &pos, int tile, int size)
+static void TileFill(const Vector2i &pos, int tile, int size)
 {
-	const Vec2i diag(size / 2, size / 2);
-	Vec2i ipos = pos - diag;
-	Vec2i apos = pos + diag;
+	const Vector2i diag(size / 2, size / 2);
+	Vector2i ipos = pos - diag;
+	Vector2i apos = pos + diag;
 
 	CMap::Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->GetIndex());
 
-	Vec2i itPos;
+	Vector2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
 		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
 			EditorChangeTile(itPos, tile);
@@ -353,13 +353,13 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
-	const Vec2i mpos(UI.CurrentMapLayer->GetWidth() - 1, UI.CurrentMapLayer->GetHeight() - 1);
+	const Vector2i mpos(UI.CurrentMapLayer->GetWidth() - 1, UI.CurrentMapLayer->GetHeight() - 1);
 
 	for (int i = 0; i < count; ++i) {
-		const Vec2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
-		const Vec2i mirror = mpos - rpos;
-		const Vec2i mirrorh(rpos.x, mirror.y);
-		const Vec2i mirrorv(mirror.x, rpos.y);
+		const Vector2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
+		const Vector2i mirror = mpos - rpos;
+		const Vector2i mirrorh(rpos.x, mirror.y);
+		const Vector2i mirrorv(mirror.x, rpos.y);
 		const int rz = rand() % max_size + 1;
 
 		TileFill(rpos, tile, rz);
@@ -384,25 +384,25 @@ constexpr int ROCK_TILE = 0x80;
 */
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-	const Vec2i mpos(UI.CurrentMapLayer->GetWidth(), UI.CurrentMapLayer->GetHeight());
+	const Vector2i mpos(UI.CurrentMapLayer->GetWidth(), UI.CurrentMapLayer->GetHeight());
 	CUnitType *typeptr = CUnitType::Get(unit_type);
 
 	if (!typeptr) { // Error
 		return;
 	}
 	CUnitType &type = *typeptr;
-	const Vec2i tpos(type.TileSize);
+	const Vector2i tpos(type.GetTileSize());
 
 	for (int i = 0; i < count; ++i) {
-		const Vec2i rpos(rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1));
-		const Vec2i mirror(mpos.x - rpos.x - 1, mpos.y - rpos.y - 1);
-		const Vec2i mirrorh(rpos.x, mirror.y);
-		const Vec2i mirrorv(mirror.x, rpos.y);
-		const Vec2i tmirror(mpos.x - rpos.x - tpos.x, mpos.y - rpos.y - tpos.y);
-		const Vec2i tmirrorh(rpos.x, tmirror.y);
-		const Vec2i tmirrorv(tmirror.x, rpos.y);
+		const Vector2i rpos(rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1));
+		const Vector2i mirror(mpos.x - rpos.x - 1, mpos.y - rpos.y - 1);
+		const Vector2i mirrorh(rpos.x, mirror.y);
+		const Vector2i mirrorv(mirror.x, rpos.y);
+		const Vector2i tmirror(mpos.x - rpos.x - tpos.x, mpos.y - rpos.y - tpos.y);
+		const Vector2i tmirrorh(rpos.x, tmirror.y);
+		const Vector2i tmirrorv(tmirror.x, rpos.y);
 		int tile = GRASS_TILE;
-		const int z = type.TileSize.y;
+		const int z = type.GetTileSize().y;
 
 		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
 		// FIXME: handle units larger than 1 square
@@ -468,7 +468,7 @@ void CEditor::CreateRandomMap() const
 	const int mz = std::max(UI.CurrentMapLayer->GetHeight(), UI.CurrentMapLayer->GetWidth());
 
 	// make water-base
-	const Vec2i zeros(0, 0);
+	const Vector2i zeros(0, 0);
 	TileFill(zeros, WATER_TILE, mz * 3);
 	// remove all units
 	EditorDestroyAllUnits();

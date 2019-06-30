@@ -136,9 +136,9 @@ enum {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_PickUp::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_PickUp::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
-	PixelPos targetPos;
+	Vector2i targetPos;
 
 	if (this->HasGoal()) {
 		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
@@ -166,7 +166,7 @@ enum {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
 
-	Vec2i tileSize;
+	Vector2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();

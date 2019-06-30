@@ -603,8 +603,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.GetType()->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y / 100,
+				x + var.OffsetX + var.OffsetXPercent * unit.GetType()->GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.GetType()->GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -624,9 +624,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.GetType()->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x + unit.GetType()->GetBoxWidth()) / 2 - width;
+		x += (unit.GetType()->GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x + unit.GetType()->GetBoxWidth()) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.GetType()->TileSize.y * CMap::Map.GetCurrentPixelTileSize().y + unit.GetType()->GetBoxHeight()) / 2 - height;
+		y += (unit.GetType()->GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y + unit.GetType()->GetBoxHeight()) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -653,8 +653,8 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 		return;
 	}
 	PixelPos pos = screenPos;
-	pos.x -= (type.ShadowWidth - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (type.ShadowHeight - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (type.ShadowWidth - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (type.ShadowHeight - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x += type.GetOffsetX() + type.ShadowOffsetX;
 	pos.y += type.GetOffsetY() + type.ShadowOffsetY;
 
@@ -692,8 +692,8 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x += type.GetOffsetX();
 	pos.y += type.GetOffsetY();
 
@@ -734,8 +734,8 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x += type.GetOffsetX();
 	pos.y += type.GetOffsetY();
 
@@ -825,7 +825,7 @@ void ShowOrder(const CUnit &unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit &unit, const CUnitType &type, const PixelPos &screenPos)
+static void DrawInformations(const CUnit &unit, const CUnitType &type, const Vector2i &screenPos)
 {
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
@@ -840,14 +840,14 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
-		const PixelPos center(screenPos + type.GetHalfTilePixelSize());
+		const Vector2i center(screenPos + type.GetHalfTilePixelSize());
 
 		if (Preference.ShowSightRange) {
 			//Wyrmgus start
 //			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
 			const int value = unit.CurrentSightRange;
 			//Wyrmgus end
-			const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
+			const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.GetTileSize().x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
 
 			if (value) {
 				// Radius -1 so you can see all ranges
@@ -863,7 +863,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 //				const int value = (unit.GetPlayer()->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
 				//Wyrmgus end
-				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
+				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.GetTileSize().x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -875,7 +875,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 				
 				//Wyrmgus end
-				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
+				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.GetTileSize().x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
 					// Radius +1 so you can see all ranges
@@ -888,8 +888,8 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
-				const int value = AuraRange - (unit.GetType()->TileSize.x - 1);
-				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
+				const int value = AuraRange - (unit.GetType()->GetTileSize().x - 1);
+				const int radius = value * CMap::Map.GetCurrentPixelTileSize().x + (type.GetTileSize().x - 1) * CMap::Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -924,9 +924,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 	if (cframe->File == ConstructionFileType::Construction) {
 		if (variation && variation->GetConstruction()) {
 			if (variation->GetConstruction()->ShadowSprite) {
-				pos.x -= (variation->GetConstruction()->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+				pos.x -= (variation->GetConstruction()->Width - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.GetOffsetX();
-				pos.y -= (variation->GetConstruction()->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (variation->GetConstruction()->Height - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.GetOffsetY();
 				if (frame < 0) {
 					variation->GetConstruction()->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -936,9 +936,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 			}
 		} else {
 			if (type.GetConstruction()->ShadowSprite) {
-				pos.x -= (type.GetConstruction()->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+				pos.x -= (type.GetConstruction()->Width - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.GetOffsetX();
-				pos.y -= (type.GetConstruction()->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (type.GetConstruction()->Height - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.GetOffsetY();
 				if (frame < 0) {
 					type.GetConstruction()->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -949,9 +949,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 		}
 	} else {
 		if (variation && variation->ShadowSprite) {
-			pos.x -= (type.ShadowWidth - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+			pos.x -= (type.ShadowWidth - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.ShadowOffsetX + type.GetOffsetX();
-			pos.y -= (type.ShadowHeight - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+			pos.y -= (type.ShadowHeight - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 			pos.y += type.ShadowOffsetY + type.GetOffsetY();
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -959,9 +959,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		} else if (type.ShadowSprite) {
-			pos.x -= (type.ShadowWidth - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+			pos.x -= (type.ShadowWidth - type.GetTileSize().x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.ShadowOffsetX + type.GetOffsetX();
-			pos.y -= (type.ShadowHeight - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+			pos.y -= (type.ShadowHeight - type.GetTileSize().y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 			pos.y += type.ShadowOffsetY + type.GetOffsetY();
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -1064,7 +1064,7 @@ void CUnit::Draw(const CViewport &vp) const
 
 	int player = this->GetDisplayPlayer();
 	int action = this->CurrentAction();
-	PixelPos screenPos;
+	Vector2i screenPos;
 	if (ReplayRevealMap || IsVisible) {
 		screenPos = vp.MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
 		type = this->Type;
@@ -1237,7 +1237,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	if (state == 1) {
 		if (under_construction && cframe) {
-			const PixelPos pos(screenPos + type->GetHalfTilePixelSize());
+			const Vector2i pos(screenPos + type->GetHalfTilePixelSize());
 			DrawConstruction(player, cframe, *this, *type, frame, pos);
 		} else {
 			DrawUnitType(*type, sprite, player, frame, screenPos);
@@ -1364,8 +1364,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->GetTilePos().y + c1->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c1->GetPixelOffset().y;
-		const int pos2 = (c2->GetTilePos().y + c2->GetType()->TileSize.y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c2->GetPixelOffset().y;
+		const int pos1 = (c1->GetTilePos().y + c1->GetType()->GetTileSize().y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c1->GetPixelOffset().y;
+		const int pos2 = (c2->GetTilePos().y + c2->GetType()->GetTileSize().y - 1) * CMap::Map.GetCurrentPixelTileSize().y + c2->GetPixelOffset().y;
 		return pos1 == pos2 ?
 			   (c1->GetTilePos().x != c2->GetTilePos().x ? c1->GetTilePos().x < c2->GetTilePos().x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

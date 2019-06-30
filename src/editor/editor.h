@@ -150,11 +150,11 @@ extern void EditorCclRegister();
 
 /// Update surroundings for tile changes
 //Wyrmgus start
-//extern void EditorTileChanged(const Vec2i &pos);
-extern void EditorTileChanged(const Vec2i &pos, int tile);
+//extern void EditorTileChanged(const Vector2i &pos);
+extern void EditorTileChanged(const Vector2i &pos, int tile);
 
-//extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
-extern void EditorChangeTile(const Vec2i &pos, int tileIndex);
+//extern void EditorChangeTile(const Vector2i &pos, int tileIndex, int d);
+extern void EditorChangeTile(const Vector2i &pos, int tileIndex);
 //Wyrmgus end
 
 

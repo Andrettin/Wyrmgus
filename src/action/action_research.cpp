@@ -114,7 +114,7 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Research::Show(const CViewport &, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Research::Show(const CViewport &, const Vector2i &lastScreenPos) const
 {
 	return lastScreenPos;
 }

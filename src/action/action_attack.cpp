@@ -139,8 +139,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
-/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
+///* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vector2i &dest)
+/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vector2i &dest, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(dest, z));
@@ -163,8 +163,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
-/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z)
+///* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vector2i &dest)
+/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vector2i &dest, int z)
 //Wyrmgus end
 {
 	COrder_Attack *order = new COrder_Attack(true);
@@ -248,9 +248,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	}
 }
 
-/* virtual */ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Attack::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
-	PixelPos targetPos;
+	Vector2i targetPos;
 
 	if (this->HasGoal()) {
 		if (this->GetGoal()->GetMapLayer() != UI.CurrentMapLayer) {
@@ -273,7 +273,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
-	Vec2i tileSize;
+	Vector2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
@@ -519,8 +519,8 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 				// Reached another unit, now attacking it
 				unsigned char oldDir = unit.Direction;
 				//Wyrmgus start
-//				const Vec2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
-				const Vec2i dir = PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) - unit.GetHalfTilePixelSize();
+//				const Vector2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
+				const Vector2i dir = (goal->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) + goal->GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) - unit.GetHalfTilePixelSize();
 				//Wyrmgus end
 				UnitHeadingFromDeltaXY(unit, dir);
 				if (unit.GetType()->BoolFlag[SIDEATTACK_INDEX].value) {
@@ -713,8 +713,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	// Turn always to target
 	if (goal) {
 		//Wyrmgus start
-//		const Vec2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
-		const Vec2i dir = PixelSize(PixelSize(goal->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) - unit.GetHalfTilePixelSize();
+//		const Vector2i dir = goal->GetTilePos() + goal->GetType()->GetHalfTileSize() - unit.GetTilePos();
+		const Vector2i dir = (goal->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) + goal->GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer)) - unit.GetHalfTilePixelSize();
 		//Wyrmgus end
 		unsigned char oldDir = unit.Direction;
 		UnitHeadingFromDeltaXY(unit, dir);
@@ -790,8 +790,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					//Wyrmgus end
 					if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.GetTilePos(), goalPos, MapFieldAirUnpassable, MapLayer)) {
 						//Wyrmgus start
-//						const Vec2i dir = goal.GetTilePos() + goal.GetType()->GetHalfTileSize() - unit.GetTilePos();
-						const Vec2i dir = PixelSize(PixelSize(goal.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(goal.GetMapLayer()->GetIndex())) + goal.GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
+//						const Vector2i dir = goal.GetTilePos() + goal.GetType()->GetHalfTileSize() - unit.GetTilePos();
+						const Vector2i dir = (goal.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(goal.GetMapLayer()->GetIndex())) + goal.GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(unit.GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
 						//Wyrmgus end
 						unsigned char oldDir = unit.Direction;
 						UnitHeadingFromDeltaXY(unit, dir);

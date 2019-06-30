@@ -84,8 +84,8 @@ enum {
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building)
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const CUnitType &building, const int z, const CSite *settlement)
+///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vector2i &pos, const CUnitType &building)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vector2i &pos, const CUnitType &building, const int z, const CSite *settlement)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -175,7 +175,7 @@ enum {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+/* virtual */ Vector2i COrder_Build::Show(const CViewport &vp, const Vector2i &lastScreenPos) const
 {
 	//Wyrmgus start
 	if (this->MapLayer != UI.CurrentMapLayer->GetIndex()) {
@@ -183,8 +183,8 @@ enum {
 	}
 	//Wyrmgus end
 
-	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer) / 2;
+	Vector2i targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	targetPos += (this->GetUnitType().GetTileSize() - 1) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer) / 2;
 
 	const int w = this->GetUnitType().GetBoxWidth();
 	const int h = this->GetUnitType().GetBoxHeight();
@@ -207,7 +207,7 @@ enum {
 	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
 	input.SetMaxRange(this->Range);
 
-	const Vec2i tileSize(this->Type->TileSize);
+	const Vector2i tileSize(this->Type->GetTileSize());
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 
@@ -351,7 +351,7 @@ private:
 */
 CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 {
-	const Vec2i pos = this->goalPos;
+	const Vector2i pos = this->goalPos;
 	const CUnitType &type = this->GetUnitType();
 
 	// Check if the building could be built there.
@@ -484,7 +484,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->GetTilePos() - unit.GetTilePos());
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = PixelSize(PixelSize(build->GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->GetMapLayer()->GetIndex())) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.GetTilePos()) * CMap::Map.GetMapLayerPixelTileSize(build->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
+		const Vector2i dir = (build->GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(build->GetMapLayer()->GetIndex())) + build->GetHalfTilePixelSize() - (unit.GetTilePos() * CMap::Map.GetMapLayerPixelTileSize(build->GetMapLayer()->GetIndex())) - unit.GetHalfTilePixelSize();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}
@@ -591,7 +591,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		}
 		else { /* can't be built */
 			// Check if already building
-			const Vec2i pos = this->goalPos;
+			const Vector2i pos = this->goalPos;
 			const CUnitType &type = this->GetUnitType();
 
 			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::Map.Field(pos, this->MapLayer));
