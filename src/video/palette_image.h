@@ -76,6 +76,11 @@ public:
 		return this->FrameSize;
 	}
 	
+	const Ref<Texture> &GetTexture() const
+	{
+		return this->Texture;
+	}
+	
 private:
 	String File;							/// the image file
 	Vector2i FrameSize = Vector2i(0, 0);	/// the size of a frame in the image, in pixels

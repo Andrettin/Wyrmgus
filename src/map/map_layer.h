@@ -126,7 +126,7 @@ public:
 		return this->Field(pos.x, pos.y);
 	}
 	
-	Vector2i GetPosFromIndex(unsigned int index) const
+	Vector2i GetPosFromIndex(const unsigned int index) const
 	{
 		Vector2i pos;
 		pos.x = index % this->GetWidth();

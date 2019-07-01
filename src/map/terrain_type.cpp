@@ -45,6 +45,10 @@
 #include "video/palette_image.h"
 #include "video/video.h"
 
+#pragma warning(push, 0)
+#include <scene/resources/tile_set.h>
+#pragma warning(pop)
+
 #include <algorithm>
 
 /*----------------------------------------------------------------------------
@@ -352,6 +356,18 @@ bool CTerrainType::ProcessConfigDataSection(const CConfigData *section)
 }
 
 /**
+**	@brief	Initialize the terrain_type
+*/
+void CTerrainType::Initialize()
+{
+	if (this->GetSolidTiles().empty()) {
+		print_error("Terrain type \"" + this->GetIdent() + "\" has no solid tiles.");
+	}
+	
+	this->Initialized = true;
+}
+
+/**
 **	@brief	Get the graphics for the terrain type
 **
 **	@param	season	The season for the graphics, if any
@@ -367,6 +383,14 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 	} else {
 		return this->Graphics;
 	}
+}
+
+Vector2i CTerrainType::GetTilePosFromIndex(const unsigned int index) const
+{
+	Vector2i pos;
+	pos.x = index % (this->GetImage()->GetTexture()->get_width() / CMap::Map.PixelTileSize.width);
+	pos.y = index / (this->GetImage()->GetTexture()->get_width() / CMap::Map.PixelTileSize.width);
+	return pos;
 }
 
 void CTerrainType::_bind_methods()
@@ -390,4 +414,14 @@ void CTerrainType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_swamp", "swamp"), +[](CTerrainType *terrain_type, const bool swamp){ terrain_type->Swamp = swamp; });
 	ClassDB::bind_method(D_METHOD("is_swamp"), &CTerrainType::IsSwamp);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "swamp"), "set_swamp", "is_swamp");
+	
+	ClassDB::bind_method(D_METHOD("get_solid_tiles"), +[](const CTerrainType *terrain_type){ return ContainerToGodotArray(terrain_type->GetSolidTiles()); });
+	
+	ClassDB::bind_method(D_METHOD("get_solid_tile_positions"), +[](const CTerrainType *terrain_type){
+		Array tile_positions;
+		for (int tile_index : terrain_type->GetSolidTiles()) {
+			tile_positions.push_back(Vector2(terrain_type->GetTilePosFromIndex(tile_index)));
+		}
+		return tile_positions;
+	});
 }

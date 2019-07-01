@@ -149,15 +149,15 @@ void CMapField::SetTerrain(const CTerrainType *terrain_type)
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 		this->OverlayTerrain = terrain_type;
-		if (terrain_type->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
+		if (terrain_type->GetSolidTiles().size() > 0) {
+			this->OverlaySolidTile = terrain_type->GetSolidTiles()[SyncRand(terrain_type->GetSolidTiles().size())];
 		}
 		this->OverlayTerrainDestroyed = false;
 		this->OverlayTerrainDamaged = false;
 	} else {
 		this->Terrain = terrain_type;
-		if (terrain_type->SolidTiles.size() > 0) {
-			this->SolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
+		if (terrain_type->GetSolidTiles().size() > 0) {
+			this->SolidTile = terrain_type->GetSolidTiles()[SyncRand(terrain_type->GetSolidTiles().size())];
 		}
 		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrainTypes.begin(), this->OverlayTerrain->BaseTerrainTypes.end(), terrain_type) == this->OverlayTerrain->BaseTerrainTypes.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->GetFlags());
@@ -266,8 +266,8 @@ void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
 			this->OverlaySolidTile = this->OverlayTerrain->DestroyedTiles[SyncRand(this->OverlayTerrain->DestroyedTiles.size())];
 		}
 	} else {
-		if (this->OverlayTerrain->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->SolidTiles[SyncRand(this->OverlayTerrain->SolidTiles.size())];
+		if (this->OverlayTerrain->GetSolidTiles().size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->GetSolidTiles()[SyncRand(this->OverlayTerrain->GetSolidTiles().size())];
 		}
 	}
 }
@@ -285,8 +285,8 @@ void CMapField::SetOverlayTerrainDamaged(bool damaged)
 			this->OverlaySolidTile = this->OverlayTerrain->DamagedTiles[SyncRand(this->OverlayTerrain->DamagedTiles.size())];
 		}
 	} else {
-		if (this->OverlayTerrain->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->SolidTiles[SyncRand(this->OverlayTerrain->SolidTiles.size())];
+		if (this->OverlayTerrain->GetSolidTiles().size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->GetSolidTiles()[SyncRand(this->OverlayTerrain->GetSolidTiles().size())];
 		}
 	}
 }

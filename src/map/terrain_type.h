@@ -83,6 +83,7 @@ public:
 
 	virtual bool ProcessConfigDataProperty(const String &key, String value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 	uint16_t GetFlags() const
 	{
@@ -130,7 +131,14 @@ public:
 	{
 		return this->Swamp;
 	}
+	
+	const std::vector<int> &GetSolidTiles() const
+	{
+		return this->SolidTiles;
+	}
 
+	Vector2i GetTilePosFromIndex(const unsigned int index) const;
+	
 	std::string Character;
 	CColor Color;
 	int SolidAnimationFrames = 0;
@@ -161,7 +169,9 @@ public:
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
 	std::vector<CTerrainType *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
 	std::vector<CTerrainType *> OuterBorderTerrains;			/// Terrain types which this one can border, and which are "entered" by this tile type in transitions
+private:
 	std::vector<int> SolidTiles;
+public:
 	std::vector<int> DamagedTiles;
 	std::vector<int> DestroyedTiles;
 	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)

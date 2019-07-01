@@ -955,7 +955,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	y -= 1;
 //	CMap::Map.TileGraphic->DrawFrameClip(CMap::Map.Tileset->tiles[tilenum].tile, x, y);
 	const CTerrainType *terrain = Editor.ShownTileTypes[0];
-	terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
+	terrain->GetGraphics()->DrawFrameClip(terrain->GetSolidTiles().front(), x, y);
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
@@ -1068,8 +1068,8 @@ static void DrawTileIcons()
 
 			const CTerrainType *terrain = Editor.ShownTileTypes[i];
 
-			if (terrain->GetGraphics() && terrain->SolidTiles.size() > 0) {
-				terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
+			if (terrain->GetGraphics() && terrain->GetSolidTiles().size() > 0) {
+				terrain->GetGraphics()->DrawFrameClip(terrain->GetSolidTiles().front(), x, y);
 			}
 			//Wyrmgus end
 			Video.DrawRectangleClip(ColorGray, x, y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
@@ -1299,8 +1299,8 @@ static void DrawMapCursor()
 					//Wyrmgus start
 //					CMap::Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
 
-					if (terrain->GetGraphics() && terrain->SolidTiles.size() > 0) {
-						terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], screenPosIt.x, screenPosIt.y);
+					if (terrain->GetGraphics() && terrain->GetSolidTiles().size() > 0) {
+						terrain->GetGraphics()->DrawFrameClip(terrain->GetSolidTiles().front(), screenPosIt.x, screenPosIt.y);
 					}
 					//Wyrmgus end
 				}
