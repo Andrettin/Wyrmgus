@@ -419,9 +419,146 @@ void CTerrainType::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_solid_tile_positions"), +[](const CTerrainType *terrain_type){
 		Array tile_positions;
-		for (int tile_index : terrain_type->GetSolidTiles()) {
+		for (const int tile_index : terrain_type->GetSolidTiles()) {
 			tile_positions.push_back(Vector2(terrain_type->GetTilePosFromIndex(tile_index)));
 		}
 		return tile_positions;
+	});
+	
+	ClassDB::bind_method(D_METHOD("get_tile_bitmasks"), +[](const CTerrainType *terrain_type){
+		//returns the transition tile bitmasks, mapped to their position
+		Dictionary tile_bitmasks;
+		
+		int solid_tile_bitmask = 0;
+		solid_tile_bitmask += TileSet::BIND_TOPLEFT;
+		solid_tile_bitmask += TileSet::BIND_TOP;
+		solid_tile_bitmask += TileSet::BIND_TOPRIGHT;
+		solid_tile_bitmask += TileSet::BIND_LEFT;
+		solid_tile_bitmask += TileSet::BIND_CENTER;
+		solid_tile_bitmask += TileSet::BIND_RIGHT;
+		solid_tile_bitmask += TileSet::BIND_BOTTOMLEFT;
+		solid_tile_bitmask += TileSet::BIND_BOTTOM;
+		solid_tile_bitmask += TileSet::BIND_BOTTOMRIGHT;
+		
+		for (const int tile_index : terrain_type->GetSolidTiles()) {
+			Vector2 tile_position = Vector2(terrain_type->GetTilePosFromIndex(tile_index));
+			tile_bitmasks[tile_position] = solid_tile_bitmask;
+		}
+		
+		for (const auto &element : terrain_type->TransitionTiles) {
+			int bitmask = 0;
+			const int transition_type = std::get<1>(element.first);
+			
+			if (transition_type == NorthTransitionType) {
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else if (transition_type == SouthTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+			} else if (transition_type == WestTransitionType) {
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else if (transition_type == EastTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+			} else if (transition_type == NorthwestOuterTransitionType) {
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else if (transition_type == NortheastOuterTransitionType) {
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+			} else if (transition_type == SouthwestOuterTransitionType) {
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+			} else if (transition_type == SoutheastOuterTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+			} else if (transition_type == NorthwestInnerTransitionType) {
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else if (transition_type == NortheastInnerTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else if (transition_type == SouthwestInnerTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else if (transition_type == SoutheastInnerTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+			} else if (transition_type == NorthwestSoutheastInnerTransitionType) {
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_TOPRIGHT;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOMLEFT;
+				bitmask += TileSet::BIND_BOTTOM;
+			} else if (transition_type == NortheastSouthwestInnerTransitionType) {
+				bitmask += TileSet::BIND_TOPLEFT;
+				bitmask += TileSet::BIND_TOP;
+				bitmask += TileSet::BIND_LEFT;
+				bitmask += TileSet::BIND_CENTER;
+				bitmask += TileSet::BIND_RIGHT;
+				bitmask += TileSet::BIND_BOTTOM;
+				bitmask += TileSet::BIND_BOTTOMRIGHT;
+			} else {
+				continue;
+			}
+			
+			for (int tile_index : element.second) {
+				Vector2 tile_position = Vector2(terrain_type->GetTilePosFromIndex(tile_index));
+				tile_bitmasks[tile_position] = bitmask;
+			}
+		}
+		
+		return tile_bitmasks;
 	});
 }
