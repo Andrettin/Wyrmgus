@@ -848,7 +848,7 @@ static void DoNextReplay()
 	const int unitSlot = ReplayStep->UnitNumber;
 	const char *action = ReplayStep->Action.c_str();
 	const int flags = ReplayStep->Flush;
-	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
+	const Vector2i pos(ReplayStep->PosX, ReplayStep->PosY);
 	const int arg1 = ReplayStep->PosX;
 	const int arg2 = ReplayStep->PosY;
 	CUnit *unit = unitSlot != -1 ? &UnitManager.GetSlotUnit(unitSlot) : nullptr;

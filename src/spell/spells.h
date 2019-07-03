@@ -38,7 +38,8 @@
 #include "data_element.h"
 #include "luacallback.h"
 #include "sound/unit_sound.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 #ifdef __MORPHOS__
 #undef Enable
@@ -75,7 +76,7 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
-	virtual int Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
+	virtual int Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vector2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster = 0;
@@ -100,12 +101,12 @@ enum TargetType {
 class Target
 {
 public:
-	Target(TargetType type, CUnit *unit, const Vec2i &pos, int z) :
+	Target(TargetType type, CUnit *unit, const Vector2i &pos, int z) :
 		Type(type), Unit(unit), targetPos(pos), MapLayer(z) {}
 
 	TargetType Type;                  /// type of target.
 	CUnit *Unit;                      /// Unit target.
-	Vec2i targetPos;
+	Vector2i targetPos;
 	int MapLayer;
 };
 

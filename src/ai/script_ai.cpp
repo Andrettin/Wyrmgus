@@ -1447,7 +1447,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		LuaError(l, "incorrect argument");
 	}
 
-	Vec2i pos(-1, -1);
+	Vector2i pos(-1, -1);
 	//Wyrmgus start
 	int z = -1;
 	int landmass = 0;
@@ -1686,7 +1686,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				Vec2i pos;
+				Vector2i pos;
 
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {

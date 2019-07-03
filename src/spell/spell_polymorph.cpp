@@ -108,7 +108,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Polymorph::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_Polymorph::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vector2i &goalPos, int z, int modifier)
 {
 	if (!target) {
 		return 0;
@@ -136,7 +136,7 @@
 	if (unit_type == nullptr) {
 		return 0;
 	}
-//	const Vec2i pos(goalPos - type.GetHalfTileSize());
+//	const Vector2i pos(goalPos - type.GetHalfTileSize());
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -167,11 +167,11 @@
 	// as said somewhere else -- no corpses :)
 	//Wyrmgus start
 //	target->Remove(nullptr);
-//	Vec2i offset;
+//	Vector2i offset;
 	//Wyrmgus end
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	//Wyrmgus start
-//	Vec2i resPos;
+//	Vector2i resPos;
 //	FindNearestDrop(unit_type, pos, resPos, LookingW);
 	TransformUnitIntoType(*target, *unit_type);
 	//Wyrmgus end

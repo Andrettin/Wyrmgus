@@ -39,10 +39,8 @@
 #include "video/color.h"
 //Wyrmgus end
 
-//Wyrmgus start
-#include <map>
-#include <tuple>
-//Wyrmgus end
+#include <core/math/vector2.h>
+
 #include <vector>
 
 struct lua_State;

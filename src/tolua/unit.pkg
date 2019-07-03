@@ -1,10 +1,3 @@
-class Vec2i
-{
-	short int x;
-	short int y;
-};
-
-
 class CUnit
 {
 	const CUnitType *GetType() const;

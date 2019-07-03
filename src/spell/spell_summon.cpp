@@ -92,17 +92,17 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Summon::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_Summon::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vector2i &goalPos, int z, int modifier)
 {
-	Vec2i pos = goalPos;
+	Vector2i pos = goalPos;
 	bool cansummon;
 	CUnitType &unit_type = *this->UnitType;
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		const Vec2i offset(1, 1);
-		const Vec2i minPos = pos - offset;
-		const Vec2i maxPos = pos + offset;
+		const Vector2i offset(1, 1);
+		const Vector2i minPos = pos - offset;
+		const Vector2i maxPos = pos + offset;
 
 		CUnit *unit = FindUnit_If(minPos, maxPos, z, IsDyingAndNotABuilding());
 		cansummon = false;

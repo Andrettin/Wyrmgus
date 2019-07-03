@@ -279,7 +279,6 @@ inline int Distance(const Vector2i &pos1, const Vector2i &pos2)
 	return isqrt(SquareDistance(pos1, pos2));
 }
 
-typedef Vec2T<short int> Vec2i;
 typedef Vec2T<int> PixelPos;
 typedef Vec2T<int> PixelDiff;
 typedef Vec2T<int> PixelSize;

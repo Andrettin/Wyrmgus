@@ -111,8 +111,8 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *par
 **  Check And Restriction
 */
 //Wyrmgus start
-//bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const
-bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+//bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const
+bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const
 //Wyrmgus end
 {
 	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
@@ -130,7 +130,7 @@ bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, co
 /**
 **  Check Or Restriction
 */
-bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const
 {
 	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
 		if ((*i)->Check(builder, type, pos, ontoptarget, z)) {
@@ -154,12 +154,12 @@ void CBuildRestrictionDistance::Init()
 **  Check Distance Restriction
 */
 //Wyrmgus start
-//bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+//bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&) const
+bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&, int z) const
 //Wyrmgus end
 {
-	Vec2i pos1(0, 0);
-	Vec2i pos2(0, 0);
+	Vector2i pos1(0, 0);
+	Vector2i pos2(0, 0);
 	int distance = 0;
 	CPlayer* player = builder != nullptr ? builder->GetPlayer() : CPlayer::GetThisPlayer();
 
@@ -233,12 +233,12 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 **  Check HasUnit Restriction
 */
 //Wyrmgus start
-//bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+//bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&) const
+bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&, int z) const
 //Wyrmgus end
 {
-	Vec2i pos1(0, 0);
-	Vec2i pos2(0, 0);
+	Vector2i pos1(0, 0);
+	Vector2i pos2(0, 0);
 	CPlayer* player = builder != nullptr ? builder->GetPlayer() : CPlayer::GetThisPlayer();
 	int count = 0;
 	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
@@ -277,12 +277,12 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 **  Check Surrounded By Restriction
 */
 //Wyrmgus start
-//bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+//bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&) const
+bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&, int z) const
 //Wyrmgus end
 {
-	Vec2i pos1(0, 0);
-	Vec2i pos2(0, 0);
+	Vector2i pos1(0, 0);
+	Vector2i pos2(0, 0);
 	int distance = 0;
 	int count = 0;
 
@@ -367,11 +367,11 @@ inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit)
 **  Check AddOn Restriction
 */
 //Wyrmgus start
-//bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&, int z) const
+//bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vector2i &pos, CUnit *&) const
+bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vector2i &pos, CUnit *&, int z) const
 //Wyrmgus end
 {
-	Vec2i pos1 = pos - this->Offset;
+	Vector2i pos1 = pos - this->Offset;
 
 	if (CMap::Map.Info.IsPointOnMap(pos1, z) == false) {
 		return false;
@@ -413,7 +413,7 @@ private:
 	const CUnitType *type;
 };
 
-bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vector2i &pos, CUnit *&ontoptarget, int z) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -426,7 +426,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 	if (it != cache.end() && (*it)->GetTilePos() == pos) {
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
-		Vec2i endPos(found.GetTilePos() + found.GetType()->GetTileSize() - 1);
+		Vector2i endPos(found.GetTilePos() + found.GetType()->GetTileSize() - 1);
 		Select(found.GetTilePos(), endPos, table, found.GetMapLayer()->GetIndex());
 		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
 			if (*it == *it2) {
@@ -460,7 +460,7 @@ void CBuildRestrictionTerrain::Init()
 /**
 **  Check Terrain Restriction
 */
-bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&, int z) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -469,7 +469,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 			if (!CMap::Map.Info.IsPointOnMap(x, y, z)) {
 				continue;
 			}
-			Vec2i tile_pos(x, y);
+			Vector2i tile_pos(x, y);
 			const CTerrainType *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->IsOverlay(), z);
 			if (this->RestrictTerrainType == terrain) {
 				return true;

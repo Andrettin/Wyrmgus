@@ -40,6 +40,8 @@
 #include "time/date.h"
 #include "vec2i.h"
 
+#include <core/math/vector2.h>
+
 #include <set>
 
 /*----------------------------------------------------------------------------

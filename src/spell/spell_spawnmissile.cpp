@@ -252,7 +252,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 ** @param res          pointer to PixelPos of the result
 */
 static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
-									CUnit &caster, CUnit *target, const Vec2i &goalPos, PixelPos *res)
+									CUnit &caster, CUnit *target, const Vector2i &goalPos, PixelPos *res)
 {
 	if (location.Base == LocBaseCaster) {
 		*res = caster.GetMapPixelPosCenter();
@@ -283,7 +283,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const CSpell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const CSpell &, CUnit *target, const Vector2i &goalPos, int z, int modifier)
 {
 	PixelPos startPos;
 	PixelPos endPos;
@@ -292,7 +292,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		hardcoded, will be done with Lua when it's possible
 	*/
 	if (this->Missile->Class == MissileClassDeathCoil) {
-		const Vec2i offset(2, 2);
+		const Vector2i offset(2, 2);
 		std::vector<CUnit *> table;
 		//Wyrmgus start
 //		Select(goalPos - offset, goalPos + offset, table);

@@ -64,13 +64,13 @@
 //Wyrmgus start
 /*
 //  Calculate the correct tile. Depends on the surrounding.
-static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
+static int GetDirectionFromSurrounding(const Vector2i &pos, bool human, bool seen)
 {
-	const Vec2i offsets[4] = {Vec2i(0, -1), Vec2i(1, 0), Vec2i(0, 1), Vec2i(-1, 0)};
+	const Vector2i offsets[4] = {Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)};
 	int dirFlag = 0;
 
 	for (int i = 0; i != 4; ++i) {
-		const Vec2i newpos = pos + offsets[i];
+		const Vector2i newpos = pos + offsets[i];
 
 		if (!CMap::Map.Info.IsPointOnMap(newpos)) {
 			dirFlag |= 1 << i;
@@ -95,9 +95,9 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 */
 //Wyrmgus start
 /*
-static void MapFixWallNeighbors(const Vec2i &pos)
+static void MapFixWallNeighbors(const Vector2i &pos)
 {
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
+	const Vector2i offset[] = {Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)};
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		MapFixWallTile(pos + offset[i]);
@@ -115,7 +115,7 @@ static void MapFixWallNeighbors(const Vec2i &pos)
 */
 //Wyrmgus start
 /*
-void CMap::RemoveWall(const Vec2i &pos)
+void CMap::RemoveWall(const Vector2i &pos)
 {
 	CMapField &mf = *Field(pos);
 
@@ -142,8 +142,8 @@ void CMap::RemoveWall(const Vec2i &pos)
 ** @param damage  Damage done to wall.
 */
 //Wyrmgus start
-//void CMap::HitWall(const Vec2i &pos, unsigned damage)
-void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
+//void CMap::HitWall(const Vector2i &pos, unsigned damage)
+void CMap::HitWall(const Vector2i &pos, unsigned damage, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start

@@ -85,7 +85,7 @@ public:
 	//Wyrmgus start
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 	
-	Vec2i ImageOrigin = Vec2i(0, 0);
+	Vector2i ImageOrigin = Vector2i(0, 0);
 	//Wyrmgus end
 };
 
@@ -99,7 +99,7 @@ public:
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
 	std::string WidgetPlayerColor;
-	Vec2i ImageOrigin = Vec2i(0, 0);
+	Vector2i ImageOrigin = Vector2i(0, 0);
 };
 //Wyrmgus end
 
@@ -144,7 +144,7 @@ public:
 	gcn::Image *frameImage;
 	gcn::Image *pressedframeImage;
 	int Transparency;
-	Vec2i ImageOrigin;
+	Vector2i ImageOrigin;
 	//Wyrmgus end
 };
 
@@ -174,7 +174,7 @@ public:
 	gcn::Image *pressedframeImage;
 	std::string ButtonPlayerColor;
 	int Transparency;
-	Vec2i ImageOrigin;
+	Vector2i ImageOrigin;
 };
 //Wyrmgus end
 

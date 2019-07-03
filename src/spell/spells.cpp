@@ -689,7 +689,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 		return nullptr;
 	}
 	
-	const Vec2i &pos = caster.GetTilePos();
+	const Vector2i &pos = caster.GetTilePos();
 	CMapLayer *map_layer = caster.GetMapLayer();
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
@@ -725,7 +725,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 			autocast->PositionAutoCast->pushPreamble();
 			autocast->PositionAutoCast->pushIntegers(array);
 			autocast->PositionAutoCast->run(2);
-			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
+			Vector2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
 			if (CMap::Map.Info.IsPointOnMap(resPos, map_layer)) {
 				Target *target = new Target(TargetPosition, nullptr, resPos, map_layer->GetIndex());
 				return target;

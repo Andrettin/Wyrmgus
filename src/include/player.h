@@ -39,11 +39,11 @@
 //Wyrmgus end
 #include "ui/icon_config.h"
 #include "upgrade/upgrade_structs.h"
-#include "vec2i.h"
 //Wyrmgus start
 #include "video/color.h"
 //Wyrmgus end
 
+#include <core/math/vector2.h>
 #include <core/object.h>
 
 #include <map>

@@ -181,8 +181,8 @@ static int CclGetNumUnitsAt(lua_State *l)
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 
-	Vec2i minPos;
-	Vec2i maxPos;
+	Vector2i minPos;
+	Vector2i maxPos;
 	CclGetPos(l, &minPos.x, &minPos.y, 3);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
 	

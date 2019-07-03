@@ -58,7 +58,7 @@ void MissileWhirlwind::Action()
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
 	const PixelPos centerOffset(CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x / 2, CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y);
-	const Vec2i center = CMap::Map.MapPixelPosToTilePos(pixelCenter + centerOffset, this->MapLayer);
+	const Vector2i center = CMap::Map.MapPixelPosToTilePos(pixelCenter + centerOffset, this->MapLayer);
 
 	//Wyrmgus start
 	Assert(this->Type->AttackSpeed);
@@ -69,7 +69,7 @@ void MissileWhirlwind::Action()
 	}
 	// Changes direction every 3 seconds (approx.)
 	if (!(this->TTL % 100)) { // missile has reached target unit/spot
-		Vec2i newPos;
+		Vector2i newPos;
 
 		do {
 			// find new destination in the map

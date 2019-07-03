@@ -36,7 +36,8 @@
 
 #include "data_type.h"
 #include "detailed_data_element.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 #include <tuple>
 
@@ -147,7 +148,7 @@ public:
 	int Terrain = -1;							/// Tile terrain (i.e. plains)
 	int Resource = -1;							/// The tile's resource, if any
 	bool Capital = false;						/// Whether the tile is its province's capital
-	Vec2i Position = Vec2i(-1, -1);				/// Position of the tile
+	Vector2i Position = Vector2i(-1, -1);				/// Position of the tile
 	CWorld *World = nullptr;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each culture/civilization
 	std::map<std::pair<int,const CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction

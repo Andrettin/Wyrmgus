@@ -107,7 +107,7 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 */
 void CCreateUnitTriggerEffect::Do(CPlayer *player) const
 {
-	Vec2i tile_pos = player->StartPos;
+	Vector2i tile_pos = player->StartPos;
 	int z = player->StartMapLayer;
 	
 	CPlayer *unit_player = player;

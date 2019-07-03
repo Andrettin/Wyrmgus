@@ -122,8 +122,8 @@ bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "map_template") {
 		CMapTemplate *map_template = nullptr;
-		Vec2i start_pos(0, 0);
-		Vec2i map_size(0, 0);
+		Vector2i start_pos(0, 0);
+		Vector2i map_size(0, 0);
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {
@@ -211,13 +211,13 @@ bool CCampaign::IsAvailable() const
 	return true;
 }
 
-Vec2i CCampaign::GetMapSize(const int z) const
+Vector2i CCampaign::GetMapSize(const int z) const
 {
 	if (this->MapSizes[z].x != 0 && this->MapSizes[z].y != 0) {
 		return this->MapSizes[z];
 	}
 	
-	return Vec2i(this->MapTemplates[z]->GetWidth(), this->MapTemplates[z]->GetHeight());
+	return Vector2i(this->MapTemplates[z]->GetWidth(), this->MapTemplates[z]->GetHeight());
 }
 
 bool CCampaign::HasMapTemplateForLayer(const CPlane *plane, const CWorld *world, const int surface_layer) const

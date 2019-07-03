@@ -636,7 +636,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 	std::vector<CUnit *> depots;
-	const Vec2i offset(MaxMapWidth, MaxMapHeight);
+	const Vector2i offset(MaxMapWidth, MaxMapHeight);
 
 	for (std::vector<CUnit *>::iterator it = worker.GetPlayer()->UnitBegin(); it != worker.GetPlayer()->UnitEnd(); ++it) {
 		CUnit &unit = **it;
@@ -838,7 +838,7 @@ static bool AiRequestSupply()
 	if (j) {
 		if (!cache[0].needmask) {
 			CUnitType &type = *cache[0].type;
-			Vec2i invalidPos(-1, -1);
+			Vector2i invalidPos(-1, -1);
 			//Wyrmgus start
 //			if (AiMakeUnit(type, invalidPos)) {
 			if (AiMakeUnit(type, invalidPos, AiPlayer->Player->StartMapLayer)) {
@@ -1893,7 +1893,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	UnitFinder unitFinder(player, table, maxRange, movemask, &unit, building.GetMapLayer()->GetIndex());
 
 	if (terrainTraversal.Run(unitFinder) && unit != nullptr) {
-		const Vec2i invalidPos(-1, -1);
+		const Vector2i invalidPos(-1, -1);
 		CommandRepair(*unit, invalidPos, &building, FlushCommands, building.GetMapLayer()->GetIndex());
 		return true;
 	}
@@ -2722,7 +2722,7 @@ void AiAddUnitTypeRequest(const CUnitType &type, const int count, const int land
 **  @param pos   Pos of the zone
 **  @param mask  Mask to explore ( land/sea/air )
 */
-void AiExplore(const Vec2i &pos, int mask)
+void AiExplore(const Vector2i &pos, int mask)
 {
 	if (!Preference.AiExplores) {
 		return;

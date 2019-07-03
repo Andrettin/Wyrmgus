@@ -557,7 +557,7 @@ void GameMainLoop()
 		}
 		
 		if (!IsNetworkGame() && CPlayer::GetThisPlayer() && CurrentCustomHero != nullptr) {
-			Vec2i resPos;
+			Vector2i resPos;
 			FindNearestDrop(*CurrentCustomHero->UnitType, CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
 			if (CMap::Map.Info.IsPointOnMap(resPos, CPlayer::GetThisPlayer()->StartMapLayer)) {
 				CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->UnitType, CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);

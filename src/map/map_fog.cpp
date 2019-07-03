@@ -122,7 +122,7 @@ int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z
 	return fogMask;
 }
 
-int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z)
+int MapFogFilterFlags(CPlayer &player, const Vector2i &pos, int mask, int z)
 {
 	if (CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return MapFogFilterFlags(player, CMap::Map.getIndex(pos, z), mask, z);
@@ -271,8 +271,8 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 }
 
 //Wyrmgus start
-//void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
-void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
+//void MapMarkTileSight(const CPlayer &player, const Vector2i &pos)
+void MapMarkTileSight(const CPlayer &player, const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -313,8 +313,8 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 }
 
 //Wyrmgus start
-//void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
-void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
+//void MapUnmarkTileSight(const CPlayer &player, const Vector2i &pos)
+void MapUnmarkTileSight(const CPlayer &player, const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -345,8 +345,8 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int
 }
 
 //Wyrmgus start
-//void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
-void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
+//void MapMarkTileDetectCloak(const CPlayer &player, const Vector2i &pos)
+void MapMarkTileDetectCloak(const CPlayer &player, const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -379,8 +379,8 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 }
 
 //Wyrmgus start
-//void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
-void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
+//void MapUnmarkTileDetectCloak(const CPlayer &player, const Vector2i &pos)
+void MapUnmarkTileDetectCloak(const CPlayer &player, const Vector2i &pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -407,7 +407,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, 
 	++*v;
 }
 
-void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
+void MapMarkTileDetectEthereal(const CPlayer &player, const Vector2i &pos, int z)
 {
 	MapMarkTileDetectEthereal(player, CMap::Map.getIndex(pos, z), z);
 }
@@ -429,7 +429,7 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index
 	--*v;
 }
 
-void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
+void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vector2i &pos, int z)
 {
 	MapUnmarkTileDetectEthereal(player, CMap::Map.getIndex(pos, z), z);
 }
@@ -446,8 +446,8 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 **  @param marker  Function to mark or unmark sight
 */
 //Wyrmgus start
-//void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
-void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker, int z)
+//void MapSight(const CPlayer &player, const Vector2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void MapSight(const CPlayer &player, const Vector2i &pos, int w, int h, int range, MapMarkerFunc *marker, int z)
 //Wyrmgus end
 {
 	// Units under construction have no sight range.
@@ -477,7 +477,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 //		const int maxx = std::min(CMap::Map.Info.MapWidth, pos.x + w + offsetx);
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + offsetx);
 		//Wyrmgus end
-		Vec2i mpos(minx, pos.y + offsety);
+		Vector2i mpos(minx, pos.y + offsety);
 #ifdef MARKER_ON_INDEX
 		//Wyrmgus start
 //		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
@@ -492,7 +492,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 				bool obstacle_subcheck = false;
 				for (int x = 0; x < w; ++x) {
 					for (int y = 0; y < h; ++y) {
-						if (CheckObstaclesBetweenTiles(pos + Vec2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
+						if (CheckObstaclesBetweenTiles(pos + Vector2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
 							obstacle_subcheck = true;
 							break;
 						}
@@ -534,7 +534,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 //		const int maxx = std::min(CMap::Map.Info.MapWidth, pos.x + w + range);
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + range);
 		//Wyrmgus end
-		Vec2i mpos(minx, pos.y + offsety);
+		Vector2i mpos(minx, pos.y + offsety);
 #ifdef MARKER_ON_INDEX
 		//Wyrmgus start
 //		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
@@ -549,7 +549,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 				bool obstacle_subcheck = false;
 				for (int x = 0; x < w; ++x) {
 					for (int y = 0; y < h; ++y) {
-						if (CheckObstaclesBetweenTiles(pos + Vec2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
+						if (CheckObstaclesBetweenTiles(pos + Vector2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
 							obstacle_subcheck = true;
 							break;
 						}
@@ -597,7 +597,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 //		const int maxx = std::min(CMap::Map.Info.MapWidth, pos.x + w + offsetx);
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + offsetx);
 		//Wyrmgus end
-		Vec2i mpos(minx, pos.y + h + offsety);
+		Vector2i mpos(minx, pos.y + h + offsety);
 #ifdef MARKER_ON_INDEX
 		//Wyrmgus start
 //		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
@@ -612,7 +612,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 				bool obstacle_subcheck = false;
 				for (int x = 0; x < w; ++x) {
 					for (int y = 0; y < h; ++y) {
-						if (CheckObstaclesBetweenTiles(pos + Vec2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
+						if (CheckObstaclesBetweenTiles(pos + Vector2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
 							obstacle_subcheck = true;
 							break;
 						}

@@ -90,7 +90,7 @@ constexpr int SCROLL_LEFT = 7;
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static Vec2i SavedMapPosition[3];				/// Saved map position
+static Vector2i SavedMapPosition[3];			/// Saved map position
 static char Input[80];							/// line input for messages/long commands
 static int InputIndex;							/// current index into input
 static char InputStatusLine[99];				/// Last input status line

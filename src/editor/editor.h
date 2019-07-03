@@ -35,7 +35,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "ui/icon_config.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 #include <string>
 #include <vector>

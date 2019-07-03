@@ -129,8 +129,8 @@ void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
 ** @param flush   Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
-void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
+//void SendCommandMove(CUnit &unit, const Vector2i &pos, int flush)
+void SendCommandMove(CUnit &unit, const Vector2i &pos, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -151,7 +151,7 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 ** @param unit    pointer to unit.
 ** @param pos     map tile position to move to.
 */
-void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
+void SendCommandRallyPoint(CUnit &unit, const Vector2i &pos, int z)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("rally-point", &unit, 0, pos.x, pos.y, NoUnitP, nullptr, -1);
@@ -259,8 +259,8 @@ void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush)
 ** @param flush   Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
-void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
+//void SendCommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush)
+void SendCommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -299,8 +299,8 @@ void SendCommandAutoRepair(CUnit &unit, int on)
 ** @param flush    Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
-void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush, int z)
+//void SendCommandAttack(CUnit &unit, const Vector2i &pos, CUnit *attack, int flush)
+void SendCommandAttack(CUnit &unit, const Vector2i &pos, CUnit *attack, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -322,8 +322,8 @@ void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush, 
 ** @param flush    Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
-void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
+//void SendCommandAttackGround(CUnit &unit, const Vector2i &pos, int flush)
+void SendCommandAttackGround(CUnit &unit, const Vector2i &pos, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -381,8 +381,8 @@ void SendCommandTrade(CUnit &unit, CUnit &dest, int flush)
 ** @param flush    Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
-void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush, int z)
+//void SendCommandPatrol(CUnit &unit, const Vector2i &pos, int flush)
+void SendCommandPatrol(CUnit &unit, const Vector2i &pos, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -422,8 +422,8 @@ void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
 ** @param flush   Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
-void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z)
+//void SendCommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush)
+void SendCommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -446,8 +446,8 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, in
 ** @param flush   Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, const int flush)
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, const int flush, const int z)
+//void SendCommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &what, const int flush)
+void SendCommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &what, const int flush, const int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -485,8 +485,8 @@ void SendCommandDismiss(CUnit &unit, bool salvage)
 ** @param flush    Flag flush all pending commands.
 */
 //Wyrmgus start
-//void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
-void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
+//void SendCommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush)
+void SendCommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush, int z)
 //Wyrmgus end
 {
 	if (!IsNetworkGame()) {
@@ -704,7 +704,7 @@ void SendCommandLearnAbility(CUnit &unit, const CUpgrade &what)
 ** @param spellid   Spell type id.
 ** @param flush     Flag flush all pending commands.
 */
-void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z)
+void SendCommandSpellCast(CUnit &unit, const Vector2i &pos, CUnit *dest, int spellid, int flush, int z)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, nullptr, spellid);
@@ -858,7 +858,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				 unsigned short x, unsigned short y, UnitRef dstnr)
 {
 	CUnit &unit = UnitManager.GetSlotUnit(unum);
-	const Vec2i pos(x, y);
+	const Vector2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
 	//

@@ -3581,7 +3581,7 @@ void UpdateUnitVariables(CUnit &unit)
 	}
 
 	// Target Position
-	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
+	const Vector2i goalPos = unit.CurrentOrder()->GetGoalPos();
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
 	unit.Variable[TARGETPOSX_INDEX].Max = CMap::Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;

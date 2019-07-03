@@ -37,7 +37,8 @@
 #include "data_element.h"
 #include "data_type.h"
 #include "time/date.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 #include <shared_mutex>
 
@@ -110,7 +111,7 @@ public:
 		return this->CompletionQuest;
 	}
 	
-	Vec2i GetMapSize(const int z) const;
+	Vector2i GetMapSize(const int z) const;
 	
 	bool HasMapTemplateForLayer(const CPlane *plane, const CWorld *world, const int surface_layer) const;
 	
@@ -126,9 +127,9 @@ private:
 public:
 	std::vector<CMapTemplate *> MapTemplates;	/// map templates used by the campaign
 private:
-	std::vector<Vec2i> MapSizes;				/// map sizes
+	std::vector<Vector2i> MapSizes;				/// map sizes
 public:
-	std::vector<Vec2i> MapTemplateStartPos;		/// map template position the map will start on
+	std::vector<Vector2i> MapTemplateStartPos;		/// map template position the map will start on
 	
 	friend int CclDefineCampaign(lua_State *l);
 	friend int CclGetCampaignData(lua_State *l);

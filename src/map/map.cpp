@@ -161,7 +161,7 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 	const int y = index / map_layer->GetWidth();
 	const int x = index - (y * map_layer->GetWidth());
 	//Wyrmgus end
-	const Vec2i pos = {x, y}
+	const Vector2i pos = {x, y}
 #endif
 
 #ifdef MINIMAP_UPDATE
@@ -281,15 +281,15 @@ int CMap::GetTileLandmass(const Vector2i &pos, const int z) const
 	return mf.Landmass;
 }
 
-Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
+Vector2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vector2i &min_pos, const Vector2i &max_pos, const int z) const
 {
 	if (SaveGameLoading) {
-		return Vec2i(-1, -1);
+		return Vector2i(-1, -1);
 	}
 	
 	CPlayer *player = CPlayer::GetFactionPlayer(faction);
 	
-	Vec2i random_pos(-1, -1);
+	Vector2i random_pos(-1, -1);
 	
 	std::vector<const CTerrainType *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->GetSpecies()) { //if the unit is a fauna one, it has to start on terrain it is native to
@@ -307,10 +307,10 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		}
 	}
 
-	std::vector<Vec2i> potential_positions;
+	std::vector<Vector2i> potential_positions;
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			potential_positions.push_back(Vec2i(x, y));
+			potential_positions.push_back(Vector2i(x, y));
 		}
 	}
 	
@@ -328,15 +328,15 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+			Select(random_pos - Vector2i(32, 32), random_pos + Vector2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vector2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
+				Select(random_pos - Vector2i(16, 16), random_pos + Vector2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vector2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+				Select(random_pos - Vector2i(8, 8), random_pos + Vector2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vector2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->GivesResource && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+			Select(random_pos - Vector2i(4, 4), random_pos + Vector2i(unit_type->GetTileSize().x - 1, unit_type->GetTileSize().y - 1) + Vector2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		}
 		
 		if (table.size() == 0) {
@@ -354,7 +354,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		}
 	}
 	
-	return Vec2i(-1, -1);
+	return Vector2i(-1, -1);
 }
 //Wyrmgus end
 
@@ -1041,7 +1041,7 @@ CMapLayer *CMap::GetMapLayer(const CPlane *plane, const CWorld *world, const int
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
+bool CheckedCanMoveToMask(const Vector2i &pos, int mask, int z)
 {
 	return CMap::Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
 }
@@ -1123,13 +1123,13 @@ void PreprocessMap()
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
 				CMapField &mf = *CMap::Map.Field(ix, iy, z);
-				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
-				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
-				CMap::Map.CalculateTileLandmass(Vec2i(ix, iy), z);
-				CMap::Map.CalculateTileOwnership(Vec2i(ix, iy), z);
-				CMap::Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
+				CMap::Map.CalculateTileTransitions(Vector2i(ix, iy), false, z);
+				CMap::Map.CalculateTileTransitions(Vector2i(ix, iy), true, z);
+				CMap::Map.CalculateTileLandmass(Vector2i(ix, iy), z);
+				CMap::Map.CalculateTileOwnership(Vector2i(ix, iy), z);
+				CMap::Map.CalculateTileTerrainFeature(Vector2i(ix, iy), z);
 				mf.UpdateSeenTile();
-				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
+				UI.Minimap.UpdateXY(Vector2i(ix, iy), z);
 				if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf, z);
 				}
@@ -1217,7 +1217,7 @@ void ChangeCurrentMapLayer(const int z)
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
+	Vector2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = CMap::Map.MapLayers[z];
@@ -1418,7 +1418,7 @@ unsigned int CMap::getIndex(int x, int y, int z) const
 	return x + y * this->Info.MapWidths[z];
 }
 
-unsigned int CMap::getIndex(const Vec2i &pos, int z) const
+unsigned int CMap::getIndex(const Vector2i &pos, int z) const
 {
 	return getIndex(pos.x, pos.y, z);
 }
@@ -1635,10 +1635,10 @@ void CMap::Save(CFile &file) const
 */
 //Wyrmgus start
 /*
-void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
+void CMap::FixNeighbors(unsigned short type, int seen, const Vector2i &pos)
 {
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1),
-							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)
+	const Vector2i offset[] = {Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
+							Vector2i(-1, -1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(1, 1)
 						   };
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
@@ -2381,8 +2381,8 @@ void CMap::CalculateTileOwnershipTransition(const Vector2i &pos, int z)
 void CMap::AdjustMap()
 {
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		Vec2i map_start_pos(0, 0);
-		Vec2i map_end(this->Info.MapWidths[z], this->Info.MapHeights[z]);
+		Vector2i map_start_pos(0, 0);
+		Vector2i map_end(this->Info.MapWidths[z], this->Info.MapHeights[z]);
 		
 		this->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		this->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
@@ -2392,7 +2392,7 @@ void CMap::AdjustMap()
 	}
 }
 
-void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z)
+void CMap::AdjustTileMapIrregularities(const bool overlay, const Vector2i &min_pos, const Vector2i &max_pos, const int z)
 {
 	bool no_irregularities_found = false;
 	int try_count = 0;
@@ -2420,41 +2420,41 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 				int sw_quadrant_adjacent_tiles = 0;
 				int se_quadrant_adjacent_tiles = 0;
 				
-				if ((x - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x - 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vector2i(x - 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					horizontal_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vector2i(x + 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					horizontal_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
 				
-				if ((y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vector2i(x, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					vertical_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vector2i(x, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					vertical_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
 
-				if ((x - 1) >= 0 && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x - 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vector2i(x - 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					nw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
-				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vector2i(x - 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					sw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vector2i(x + 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					ne_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vector2i(x + 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					se_quadrant_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 				}
@@ -2472,7 +2472,7 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 									continue;
 								}
 								
-								const CTerrainType *tile_terrain = this->GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+								const CTerrainType *tile_terrain = this->GetTileTerrain(Vector2i(x + sub_x, y + sub_y), false, z);
 								if (mf.Terrain != tile_terrain) {
 									if (best_terrain_scores.find(tile_terrain) == best_terrain_scores.end()) {
 										best_terrain_scores[tile_terrain] = 0;
@@ -2502,7 +2502,7 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 	}
 }
 
-void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z)
+void CMap::AdjustTileMapTransitions(const Vector2i &min_pos, const Vector2i &max_pos, int z)
 {
 	for (int x = min_pos.x; x < max_pos.x; ++x) {
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
@@ -2513,8 +2513,8 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
-					const CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
-					const CTerrainType *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const CTerrainType *tile_terrain = GetTileTerrain(Vector2i(x + sub_x, y + sub_y), false, z);
+					const CTerrainType *tile_top_terrain = GetTileTopTerrain(Vector2i(x + sub_x, y + sub_y), false, z);
 					if (
 						mf.Terrain != tile_terrain
 						&& tile_top_terrain->IsOverlay()
@@ -2538,7 +2538,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
-					const CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const CTerrainType *tile_terrain = GetTileTerrain(Vector2i(x + sub_x, y + sub_y), false, z);
 					if (mf.Terrain != tile_terrain && std::find(mf.Terrain->BorderTerrains.begin(), mf.Terrain->BorderTerrains.end(), tile_terrain) == mf.Terrain->BorderTerrains.end()) {
 						for (const CTerrainType *border_terrain : mf.Terrain->BorderTerrains) {
 							if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), mf.Terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), tile_terrain) != border_terrain->BorderTerrains.end()) {
@@ -2562,7 +2562,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 **	@param	preserve_coastline	Whether to avoid changing the coastline during terrain generation
 **	@param	z					The map layer to generate the terrain on
 */
-void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z)
+void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vector2i &min_pos, const Vector2i &max_pos, const bool preserve_coastline, const int z)
 {
 	if (SaveGameLoading) {
 		return;
@@ -2914,21 +2914,21 @@ bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const 
 **	@param	preserve_coastline	Whether to avoid changing the coastline during terrain generation
 **	@param	z					The map layer to generate the terrain on
 */
-void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z)
+void CMap::GenerateMissingTerrain(const Vector2i &min_pos, const Vector2i &max_pos, const int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 	
-	Vec2i random_pos(0, 0);
+	Vector2i random_pos(0, 0);
 	
-	std::vector<Vec2i> seeds;
+	std::vector<Vector2i> seeds;
 	
 	//use tiles that have a terrain as seeds for the terrain generation
 	bool has_tile_with_missing_terrain = false;
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			const Vec2i tile_pos(x, y);
+			const Vector2i tile_pos(x, y);
 			
 			if (!this->IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
 				continue;
@@ -2955,7 +2955,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	
 	// expand seeds
 	while (!seeds.empty()) {
-		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
+		Vector2i seed_pos = seeds[SyncRand(seeds.size())];
 		seeds.erase(std::remove(seeds.begin(), seeds.end(), seed_pos), seeds.end());
 		
 		const CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
@@ -2971,12 +2971,12 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 			}
 		}
 		
-		std::vector<Vec2i> adjacent_positions;
+		std::vector<Vector2i> adjacent_positions;
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
-				Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
-				Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
+				Vector2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
+				Vector2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
+				Vector2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
 				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
 					continue;
 				}
@@ -3035,9 +3035,9 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
 			}
 				
-			Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
-			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
+			Vector2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+			Vector2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
+			Vector2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
 			
 			if (this->GetTileTopTerrain(adjacent_pos, false, z) == nullptr) {
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
@@ -3062,7 +3062,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	//set the terrain of the remaining tiles without any to their most-neighbored terrain/overlay terrain pair
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			const Vec2i tile_pos(x, y);
+			const Vector2i tile_pos(x, y);
 			
 			if (this->IsPointInASubtemplateArea(tile_pos, z)) {
 				continue;
@@ -3082,7 +3082,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 						continue;
 					}
 					
-					Vec2i adjacent_pos(tile_pos.x + x_offset, tile_pos.y + y_offset);
+					Vector2i adjacent_pos(tile_pos.x + x_offset, tile_pos.y + y_offset);
 					
 					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
 						continue;
@@ -3123,13 +3123,13 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	}
 }
 
-void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z)
+void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vector2i &min_pos, const Vector2i &max_pos, bool grouped, int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 	
-	Vec2i unit_pos(-1, -1);
+	Vector2i unit_pos(-1, -1);
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {

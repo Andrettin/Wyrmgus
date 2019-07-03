@@ -34,14 +34,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-//Wyrmgus start
-#include <tuple>
-//Wyrmgus end
-
 #include "unit/unit_cache.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
+
+#include <vector>
 
 #ifdef __MORPHOS__
 #undef Wait
@@ -292,10 +290,10 @@ public:
 class AiExplorationRequest
 {
 public:
-	AiExplorationRequest(const Vec2i &pos, int mask) : pos(pos), Mask(mask) {}
+	AiExplorationRequest(const Vector2i &pos, int mask) : pos(pos), Mask(mask) {}
 
 public:
-	Vec2i pos;          /// pos on map
+	Vector2i pos;          /// pos on map
 	int Mask;           /// mask ( ex: MapFieldLandUnit )
 };
 
@@ -489,7 +487,7 @@ extern void AiAddResearchRequest(const CUpgrade *upgrade);
 /// Periodic called resource manager handler
 extern void AiResourceManager();
 /// Ask the ai to explore around pos
-extern void AiExplore(const Vec2i &pos, int exploreMask);
+extern void AiExplore(const Vector2i &pos, int exploreMask);
 /// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b);
 /// Remove any equivalence between unittypes

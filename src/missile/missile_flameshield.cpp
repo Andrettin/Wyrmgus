@@ -69,7 +69,7 @@ void MissileFlameShield::Action()
 	while (unit->Container) {
 		unit = unit->Container;
 	}
-	const Vec2i upos = unit->GetTilePos();
+	const Vector2i upos = unit->GetTilePos();
 	const int ix = unit->GetPixelOffset().x;
 	const int iy = unit->GetPixelOffset().y;
 	const int uw = unit->GetType()->GetTileSize().x;

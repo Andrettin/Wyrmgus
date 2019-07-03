@@ -609,8 +609,8 @@ static int CclChangeUnitsOwner(lua_State *l)
 {
 	LuaCheckArgs(l, 4);
 
-	Vec2i pos1;
-	Vec2i pos2;
+	Vector2i pos1;
+	Vector2i pos2;
 	CclGetPos(l, &pos1.x, &pos1.y, 1);
 	CclGetPos(l, &pos2.x, &pos2.y, 2);
 	const int oldp = LuaToNumber(l, 3);

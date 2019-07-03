@@ -89,8 +89,8 @@ void CGrandStrategyGame::DrawInterface()
 		stored_resources.push_back(ResearchCost);
 		stored_resources.push_back(PrestigeCost);
 
-		Vec2i hovered_research_icon(-1, -1);
-		Vec2i hovered_prestige_icon(-1, -1);
+		Vector2i hovered_research_icon(-1, -1);
+		Vector2i hovered_prestige_icon(-1, -1);
 		for (size_t i = 0; i < stored_resources.size(); ++i) {
 			int x = 154 + (100 * i);
 			int y = 0;

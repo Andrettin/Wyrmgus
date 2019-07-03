@@ -38,6 +38,7 @@
 #include "unit/unit_type.h"
 #include "vec2i.h"
 
+#include <core/math/vector2.h>
 #include <core/object.h>
 
 #include <set>
@@ -96,9 +97,9 @@ constexpr int ExperienceRange = 6;
 extern void SelectedUnitChanged();
 
 /// Returns the map distance between to unittype as locations
-extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z);
+extern int MapDistanceBetweenTypes(const CUnitType &src, const Vector2i &pos1, int src_z, const CUnitType &dst, const Vector2i &pos2, int dst_z);
 								   
-extern int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z);
+extern int MapDistance(const Vector2i &src_size, const Vector2i &pos1, int src_z, const Vector2i &dst_size, const Vector2i &pos2, int dst_z);
 
 /**
 **  Unit/Missile headings.
@@ -676,9 +677,9 @@ public:
 	//Wyrmgus end
 	
 private:
-	Vector2i TilePos = Vec2i(-1, -1);	/// Map position X
+	Vector2i TilePos = Vector2i(-1, -1);	/// Map position X
 public:
-	Vector2i RallyPointPos = Vec2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
+	Vector2i RallyPointPos = Vector2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
 private:
 	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
 public:
@@ -824,7 +825,7 @@ public:
 	friend int CclShowMapLocation(lua_State *l);
 	friend int CclUnit(lua_State *l);
 	friend void Finish(COrder_Built &order, CUnit &unit);
-	friend void UnitInXY(CUnit &unit, const Vec2i &pos, const int z);
+	friend void UnitInXY(CUnit &unit, const Vector2i &pos, const int z);
 	
 protected:
 	static void _bind_methods();
@@ -921,13 +922,13 @@ extern CUnit *MakeUnitAndPlace(const Vector2i &pos, const CUnitType &type, CPlay
 //Wyrmgus end
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
-extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building = false);
-extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique = true);
+extern CUnit *CreateUnit(const Vector2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building = false);
+extern CUnit *CreateResourceUnit(const Vector2i &pos, const CUnitType &type, int z, bool allow_unique = true);
 //Wyrmgus end
 /// Find the nearest position at which unit can be placed.
 //Wyrmgus start
-//void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false);
+//void FindNearestDrop(const CUnitType &type, const Vector2i &goalPos, Vector2i &resPos, int heading);
+void FindNearestDrop(const CUnitType &type, const Vector2i &goalPos, Vector2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false);
 //Wyrmgus end
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
@@ -1012,7 +1013,7 @@ extern void HitUnit_RunAway(CUnit &target, const CUnit &attacker);
 //Wyrmgus end
 
 /// Calculate the distance from current view point to coordinate
-extern int ViewPointDistance(const Vec2i &pos);
+extern int ViewPointDistance(const Vector2i &pos);
 /// Calculate the distance from current view point to unit
 extern int ViewPointDistanceToUnit(const CUnit &dest);
 

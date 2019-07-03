@@ -41,7 +41,7 @@ class Spell_AreaBombardment : public SpellActionType
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
+					 CUnit *target, const Vector2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:

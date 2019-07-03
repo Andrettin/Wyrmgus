@@ -77,10 +77,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vector2i &goalPos, int z, int modifier)
 {
-	const Vec2i range(this->Range, this->Range);
-	const Vec2i typeSize(caster.GetType()->GetTileSize());
+	const Vector2i range(this->Range, this->Range);
+	const Vector2i typeSize(caster.GetType()->GetTileSize());
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit

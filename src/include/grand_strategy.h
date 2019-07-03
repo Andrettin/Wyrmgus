@@ -38,10 +38,11 @@
 #include "faction.h"
 #include "map/map.h"
 #include "player.h"
-#include "vec2i.h"
 #include "video/video.h"
 #include "upgrade/upgrade_structs.h"
 #include "world/province.h"
+
+#include <core/math/vector2.h>
 
 #include <vector>
 
@@ -156,7 +157,7 @@ public:
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	std::vector<CGrandStrategyFaction *> Claims;						/// Factions which have a claim to this province
-	std::vector<Vec2i> ResourceTiles[MaxCosts];							/// Resources tiles in the province
+	std::vector<Vector2i> ResourceTiles[MaxCosts];						/// Resources tiles in the province
 	std::vector<CUpgrade *> Modifiers;									/// Modifiers affecting the province
 };
 

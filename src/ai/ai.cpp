@@ -1022,7 +1022,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	/*
 	// Send defending forces, also send attacking forces if they are home/traning.
 	// This is still basic model where we suspect only one base ;(
-	const Vec2i &pos = attacker->GetTilePos();
+	const Vector2i &pos = attacker->GetTilePos();
 
 	for (unsigned int i = 0; i < pai.Force.Size(); ++i) {
 		AiForce &aiForce = pai.Force[i];

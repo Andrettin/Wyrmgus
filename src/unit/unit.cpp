@@ -1158,8 +1158,8 @@ bool CUnit::CheckTerrainForVariation(const UnitTypeVariation *variation) const
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->GetTileSize().x; ++x) {
 			for (int y = 0; y < this->Type->GetTileSize().y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vec2i(x, y), false, this->GetMapLayer()->GetIndex(), true)) == variation->Terrains.end()) {
+				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vector2i(x, y), this->MapLayer)) {
+					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vector2i(x, y), false, this->GetMapLayer()->GetIndex(), true)) == variation->Terrains.end()) {
 						terrain_check = false;
 						break;
 					}
@@ -1182,8 +1182,8 @@ bool CUnit::CheckTerrainForVariation(const UnitTypeVariation *variation) const
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->GetTileSize().x; ++x) {
 			for (int y = 0; y < this->Type->GetTileSize().y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vec2i(x, y), false, this->GetMapLayer()->GetIndex(), true)) == variation->TerrainsForbidden.end()) {
+				if (CMap::Map.Info.IsPointOnMap(this->GetTilePos() + Vector2i(x, y), this->MapLayer)) {
+					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), CMap::Map.GetTileTopTerrain(this->GetTilePos() + Vector2i(x, y), false, this->GetMapLayer()->GetIndex(), true)) == variation->TerrainsForbidden.end()) {
 						terrain_check = false;
 						break;
 					}
@@ -2278,7 +2278,7 @@ void CUnit::GenerateDrop()
 		return;
 	}
 	
-	Vec2i drop_pos = this->GetTilePos();
+	Vector2i drop_pos = this->GetTilePos();
 	drop_pos.x += SyncRand(this->Type->GetTileSize().x);
 	drop_pos.y += SyncRand(this->Type->GetTileSize().y);
 	CUnit *droppedUnit = nullptr;
@@ -2310,7 +2310,7 @@ void CUnit::GenerateDrop()
 	if (chosen_drop != nullptr) {
 		CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->GetMapLayer()->Field(drop_pos)->GetFlags() & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
-			Vec2i resPos;
+			Vector2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->GetMapLayer()->GetIndex());
 			if (!CMap::Map.Info.IsPointOnMap(resPos, this->GetMapLayer()->GetIndex())) {
 				return;
@@ -3251,7 +3251,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 **  @param f       Function to (un)mark for normal vision.
 **  @param f2        Function to (un)mark for cloaking vision.
 */
-static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
+static void MapMarkUnitSightRec(const CUnit &unit, const Vector2i &pos, int width, int height,
 								//Wyrmgus start
 //								MapMarkerFunc *f, MapMarkerFunc *f2)
 								MapMarkerFunc *f, MapMarkerFunc *f2, MapMarkerFunc *f3)
@@ -3989,7 +3989,7 @@ void CUnit::XPChanged()
 **  and after CMap::Map.Insert(unit), MapMarkUnitSight(unit)
 **  are often necessary. Check Flag also for Pathfinder.
 */
-static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
+static void UnitInXY(CUnit &unit, const Vector2i &pos, const int z)
 {
 	const CMapLayer *old_map_layer = unit.GetMapLayer();
 	
@@ -4116,7 +4116,7 @@ void CUnit::Place(const Vector2i &pos, const int z)
 					if (!CMap::Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
-					Vec2i building_tile_pos(x, y);
+					Vector2i building_tile_pos(x, y);
 					CMapField &mf = *this->GetMapLayer()->Field(building_tile_pos);
 					if ((mf.GetFlags() & MapFieldRoad) || (mf.GetFlags() & MapFieldRailroad) || (mf.GetFlags() & MapFieldWall)) {
 						CMap::Map.RemoveTileOverlayTerrain(building_tile_pos, this->GetMapLayer()->GetIndex());
@@ -4182,9 +4182,9 @@ CUnit *MakeUnitAndPlace(const Vector2i &pos, const CUnitType &type, CPlayer *pla
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building)
+CUnit *CreateUnit(const Vector2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building)
 {
-	Vec2i res_pos;
+	Vector2i res_pos;
 	const int heading = SyncRand() % 256;
 	FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
 	if (!CMap::Map.Info.IsPointOnMap(res_pos, z)) {
@@ -4213,7 +4213,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 	return unit;
 }
 
-CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique)
+CUnit *CreateResourceUnit(const Vector2i &pos, const CUnitType &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, CPlayer::Players[PlayerNumNeutral], z, true);
 	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
@@ -4232,7 +4232,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 		metal_rock_type = CUnitType::Get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
-		Vec2i metal_rock_offset((type.GetTileSize() - 1) / 2);
+		Vector2i metal_rock_offset((type.GetTileSize() - 1) / 2);
 		for (int i = 0; i < 9; ++i) {
 			CUnit *metal_rock_unit = CreateUnit(unit->GetTilePos() + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
@@ -4251,13 +4251,13 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 **  @param heading  preferense side to drop out of.
 */
 //Wyrmgus start
-//void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements)
+//void FindNearestDrop(const CUnitType &type, const Vector2i &goalPos, Vector2i &resPos, int heading)
+void FindNearestDrop(const CUnitType &type, const Vector2i &goalPos, Vector2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements)
 //Wyrmgus end
 {
 	int addx = 0;
 	int addy = 0;
-	Vec2i pos = goalPos;
+	Vector2i pos = goalPos;
 	int directions_outside_the_map = 0;
 
 	if (heading < LookingNE || heading > LookingNW) {
@@ -4343,7 +4343,7 @@ startn:
 		
 		if (directions_outside_the_map == 4) {
 			fprintf(stderr, "Could not find valid position on the map for unit type \"%s\".\n", type.Ident.c_str());
-			resPos = Vec2i(-1, -1);
+			resPos = Vector2i(-1, -1);
 			return;
 		}
 	}
@@ -4723,15 +4723,15 @@ void CorrectWallDirections(CUnit &unit)
 		return;
 	}
 	const struct {
-		Vec2i offset;
+		Vector2i offset;
 		const int dirFlag;
-	} configs[] = {{Vec2i(0, -1), W_NORTH}, {Vec2i(1, 0), W_EAST},
-		{Vec2i(0, 1), W_SOUTH}, {Vec2i(-1, 0), W_WEST}
+	} configs[] = {{Vector2i(0, -1), W_NORTH}, {Vector2i(1, 0), W_EAST},
+		{Vector2i(0, 1), W_SOUTH}, {Vector2i(-1, 0), W_WEST}
 	};
 	int flags = 0;
 
 	for (int i = 0; i != sizeof(configs) / sizeof(*configs); ++i) {
-		const Vec2i pos = unit.GetTilePos() + configs[i].offset;
+		const Vector2i pos = unit.GetTilePos() + configs[i].offset;
 		const int dirFlag = configs[i].dirFlag;
 
 		if (CMap::Map.Info.IsPointOnMap(pos, unit.GetMapLayer()) == false) {
@@ -4757,10 +4757,10 @@ void CorrectWallNeighBours(CUnit &unit)
 {
 	Assert(unit.GetType()->BoolFlag[WALL_INDEX].value);
 
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
+	const Vector2i offset[] = {Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)};
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
-		const Vec2i pos = unit.GetTilePos() + offset[i];
+		const Vector2i pos = unit.GetTilePos() + offset[i];
 
 		if (CMap::Map.Info.IsPointOnMap(pos, unit.GetMapLayer()) == false) {
 			continue;
@@ -6919,11 +6919,11 @@ bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
 bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 {
 	bool has_adjacent_rail = false;
-	Vec2i top_left_pos(this->GetTilePos() - Vec2i(1, 1));
-	Vec2i bottom_right_pos(this->GetTilePos() + this->Type->GetTileSize());
+	Vector2i top_left_pos(this->GetTilePos() - Vector2i(1, 1));
+	Vector2i bottom_right_pos(this->GetTilePos() + this->Type->GetTileSize());
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
-		Vec2i tile_pos(x, top_left_pos.y);
+		Vector2i tile_pos(x, top_left_pos.y);
 		if (CMap::Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->GetMapLayer()->GetIndex())) {
 			has_adjacent_rail = true;
 			break;
@@ -6938,7 +6938,7 @@ bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 			
 	if (!has_adjacent_rail) {
 		for (int y = top_left_pos.y; y <= bottom_right_pos.y; ++y) {
-			Vec2i tile_pos(top_left_pos.x, y);
+			Vector2i tile_pos(top_left_pos.x, y);
 			if (CMap::Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->GetMapLayer()->GetIndex())) {
 				has_adjacent_rail = true;
 				break;
@@ -8040,12 +8040,12 @@ int CUnit::MapDistanceTo(const Vector2i &pos, int z) const
 **
 **	@return	The distance between the types
 */
-int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z)
+int MapDistanceBetweenTypes(const CUnitType &src, const Vector2i &pos1, int src_z, const CUnitType &dst, const Vector2i &pos2, int dst_z)
 {
 	return MapDistance(src.GetTileSize(), pos1, src_z, dst.GetTileSize(), pos2, dst_z);
 }
 
-int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z)
+int MapDistance(const Vector2i &src_size, const Vector2i &pos1, int src_z, const Vector2i &dst_size, const Vector2i &pos2, int dst_z)
 {
 	if (src_z != dst_z) {
 		return 16384;
@@ -8074,11 +8074,11 @@ int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
-int ViewPointDistance(const Vec2i &pos)
+int ViewPointDistance(const Vector2i &pos)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
-	const Vec2i middle = vp.MapPos + vpSize / 2;
+	const Vector2i vpSize(vp.MapWidth, vp.MapHeight);
+	const Vector2i middle = vp.MapPos + vpSize / 2;
 
 	return Distance(middle, pos);
 }
@@ -8093,8 +8093,8 @@ int ViewPointDistance(const Vec2i &pos)
 int ViewPointDistanceToUnit(const CUnit &dest)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
-	const Vec2i midPos = vp.MapPos + vpSize / 2;
+	const Vector2i vpSize(vp.MapWidth, vp.MapHeight);
+	const Vector2i midPos = vp.MapPos + vpSize / 2;
 
 	//Wyrmgus start
 //	return dest.MapDistanceTo(midPos);

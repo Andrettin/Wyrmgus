@@ -37,7 +37,8 @@
 #include "data_element.h"
 #include "data_type.h"
 #include "time/date.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -84,7 +85,7 @@ private:
 	const CWord *NameWord = nullptr;
 	bool Major = false;						/// whether the site is a major one; major sites have settlement sites, and as such can have town halls
 public:
-	Vec2i Position = Vec2i(-1, -1);			/// position of the site in its map template
+	Vector2i Position = Vector2i(-1, -1);			/// position of the site in its map template
 	CMapTemplate *MapTemplate = nullptr;	/// map template where this site is located
 	CUnit *SiteUnit = nullptr;				/// unit which represents this site
 	std::vector<CRegion *> Regions;			/// regions where this site is located

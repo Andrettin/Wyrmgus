@@ -114,7 +114,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	// Don't move
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
-	const Vec2i tileSize(0, 0);
+	const Vector2i tileSize(0, 0);
 	input.SetGoal(input.GetUnit()->GetTilePos(), tileSize, input.GetUnit()->GetMapLayer()->GetIndex());
 }
 
@@ -165,7 +165,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	CUnit *goal = AttackUnitsInRange(unit);
 
 	if (goal != nullptr) {
-		const Vec2i invalidPos(-1, -1);
+		const Vector2i invalidPos(-1, -1);
 
 		FireMissile(unit, goal, invalidPos, goal->GetMapLayer()->GetIndex());
 		UnHideUnit(unit); // unit is invisible until attacks

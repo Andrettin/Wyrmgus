@@ -1000,7 +1000,7 @@ void DrawPopups()
 	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
 		CViewport *vp = GetViewport(CursorScreenPos);
 		if (vp) {
-			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
+			const Vector2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
 			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
 			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
 
@@ -1256,7 +1256,7 @@ constexpr int OBJECTIVES_MAX = 32;			/// How many objectives be displayed
 //Wyrmgus end
 
 static char MessagesEvent[MESSAGES_MAX][256];  /// Array of event messages
-static Vec2i MessagesEventPos[MESSAGES_MAX];   /// coordinate of event
+static Vector2i MessagesEventPos[MESSAGES_MAX];   /// coordinate of event
 static int MessagesEventCount;                 /// Number of event messages
 static int MessagesEventIndex;                 /// FIXME: docu
 
@@ -1786,7 +1786,7 @@ void ShiftMessagesEvent()
 **  @note FIXME: vladi: I know this can be just separated func w/o msg but
 **               it is handy to stick all in one call, someone?
 */
-void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
+void SetMessageEvent(const Vector2i &pos, int z, const char *fmt, ...)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -1839,7 +1839,7 @@ void CenterOnMessage()
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
+	const Vector2i &pos(MessagesEventPos[MessagesEventIndex]);
 	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;

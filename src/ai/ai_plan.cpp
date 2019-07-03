@@ -471,10 +471,10 @@ static bool ChooseRandomUnexploredPositionNear(const Vector2i &center, Vector2i 
 	return false;
 }
 
-static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
+static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vector2i *pos)
 {
 	// Choose a target, "near"
-	const Vec2i &center = request.pos;
+	const Vector2i &center = request.pos;
 	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
 		return nullptr;
 	}
@@ -628,7 +628,7 @@ void AiSendExplorers()
 		const int requestid = SyncRand() % requestcount;
 		const AiExplorationRequest &request = AiPlayer->FirstExplorationRequest[requestid];
 
-		Vec2i pos;
+		Vector2i pos;
 		CUnit *bestunit = GetBestExplorer(request, &pos);
 		if (bestunit != nullptr) {
 			CommandMove(*bestunit, pos, FlushCommands);

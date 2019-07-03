@@ -35,7 +35,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "time/date.h"
-#include "vec2i.h"
+
+#include <core/math/vector2.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -57,7 +58,7 @@ public:
 public:
 	CDate Date; //the historical location's date
 	CMapTemplate *MapTemplate = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
-	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
+	Vector2i Position = Vector2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
 	CSite *Site = nullptr; //the historical location's site (if any)
 };
 

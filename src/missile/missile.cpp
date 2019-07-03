@@ -956,7 +956,7 @@ bool MissileInitMove(Missile &missile)
 	return false;
 }
 
-void MissileHandlePierce(Missile &missile, const Vec2i &pos)
+void MissileHandlePierce(Missile &missile, const Vector2i &pos)
 {
 	if (CMap::Map.Info.IsPointOnMap(pos, missile.MapLayer) == false) {
 		return;
@@ -996,7 +996,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 		if (shouldHit) {
 			// search for blocking units
 			std::vector<CUnit *> blockingUnits;
-			const Vec2i missilePos = CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer);
+			const Vector2i missilePos = CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer);
 			Select(missilePos, missilePos, blockingUnits, missile.MapLayer);
 			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
@@ -1094,7 +1094,7 @@ bool PointToPointMissile(Missile &missile)
 		 pos.y += (double)diff.y / missile.TotalStep) {
 		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 								(int)pos.y + missile.Type->size.y / 2);
-		const Vec2i tilePos(CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer));
+		const Vector2i tilePos(CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer));
 
 		if (CMap::Map.Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
 			return true;
@@ -1204,7 +1204,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 **
 **  @todo FIXME: Support for more races.
 */
-static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int splash)
+static void MissileHitsWall(const Missile &missile, const Vector2i &tilePos, int splash)
 {
 	CUnitStats *stats; // stat of the wall.
 
@@ -1292,7 +1292,7 @@ void Missile::MissileHit(CUnit *unit)
 		return;
 	}
 
-	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(pixelPos, this->MapLayer);
+	const Vector2i pos = CMap::Map.MapPixelPosToTilePos(pixelPos, this->MapLayer);
 
 	if (!CMap::Map.Info.IsPointOnMap(pos, this->MapLayer)) {
 		// FIXME: this should handled by caller?
@@ -1362,7 +1362,7 @@ void Missile::MissileHit(CUnit *unit)
 		//
 		// Hits all units in range.
 		//
-		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
+		const Vector2i range(mtype.Range - 1, mtype.Range - 1);
 		std::vector<CUnit *> table;
 		//Wyrmgus start
 //		Select(pos - range, pos + range, table);
@@ -1442,11 +1442,11 @@ void Missile::MissileHit(CUnit *unit)
 	}
 
 	// Missile hits ground.
-	const Vec2i offset(mtype.Range, mtype.Range);
-	const Vec2i posmin = pos - offset;
+	const Vector2i offset(mtype.Range, mtype.Range);
+	const Vector2i posmin = pos - offset;
 	for (int i = mtype.Range * 2; --i;) {
 		for (int j = mtype.Range * 2; --j;) {
-			const Vec2i posIt(posmin.x + i, posmin.y + j);
+			const Vector2i posIt(posmin.x + i, posmin.y + j);
 
 			if (CMap::Map.Info.IsPointOnMap(posIt, this->MapLayer)) {
 				int d = Distance(pos, posIt);
@@ -1600,7 +1600,7 @@ void MissileActions()
 int ViewPointDistanceToMissile(const Missile &missile)
 {
 	const PixelPos pixelPos = missile.position + missile.Type->size / 2;
-	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(pixelPos, missile.MapLayer);
+	const Vector2i tilePos = CMap::Map.MapPixelPosToTilePos(pixelPos, missile.MapLayer);
 
 	return ViewPointDistance(tilePos);
 }

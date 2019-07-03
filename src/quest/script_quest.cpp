@@ -478,14 +478,14 @@ static int CclDefineCampaign(lua_State *l)
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
-				Vec2i map_template_start_pos;
+				Vector2i map_template_start_pos;
 				CclGetPos(l, &map_template_start_pos.x, &map_template_start_pos.y);
 				campaign->MapTemplateStartPos.push_back(map_template_start_pos);
 				lua_pop(l, 1);
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
-				Vec2i map_size;
+				Vector2i map_size;
 				CclGetPos(l, &map_size.x, &map_size.y);
 				campaign->MapSizes.push_back(map_size);
 				lua_pop(l, 1);
@@ -495,11 +495,11 @@ static int CclDefineCampaign(lua_State *l)
 			CMapTemplate *map_template = CMapTemplate::GetOrAdd(map_template_ident);
 			campaign->MapTemplates.push_back(map_template);
 		} else if (!strcmp(value, "MapTemplateStartPos")) {
-			Vec2i map_template_start_pos;
+			Vector2i map_template_start_pos;
 			CclGetPos(l, &map_template_start_pos.x, &map_template_start_pos.y);
 			campaign->MapTemplateStartPos.push_back(map_template_start_pos);
 		} else if (!strcmp(value, "MapSize")) {
-			Vec2i map_size;
+			Vector2i map_size;
 			CclGetPos(l, &map_size.x, &map_size.y);
 			campaign->MapSizes.push_back(map_size);
 		} else {

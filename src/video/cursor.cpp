@@ -334,7 +334,7 @@ void DrawBuildingCursor()
 	while (h--) {
 		int w = w0;
 		while (w--) {
-			const Vec2i posIt(mpos.x + w, mpos.y + h);
+			const Vector2i posIt(mpos.x + w, mpos.y + h);
 			Uint32 color;
 
 			if (f && (ontop ||

@@ -1383,10 +1383,10 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 {
 	//  Select all units touching the viewpoint.
-	const Vec2i offset(1, 1);
-	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
-	const Vec2i minPos = vp.MapPos - offset;
-	const Vec2i maxPos = vp.MapPos + vpSize + offset;
+	const Vector2i offset(1, 1);
+	const Vector2i vpSize(vp.MapWidth, vp.MapHeight);
+	const Vector2i minPos = vp.MapPos - offset;
+	const Vector2i maxPos = vp.MapPos + vpSize + offset;
 
 	//Wyrmgus start
 //	Select(minPos, maxPos, table);

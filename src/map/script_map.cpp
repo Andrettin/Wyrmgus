@@ -333,7 +333,7 @@ static int CclStratagusMap(lua_State *l)
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
-				CMap::Map.CalculateTileOwnershipTransition(Vec2i(ix, iy), z); //so that the correct ownership border is shown after a loaded game
+				CMap::Map.CalculateTileOwnershipTransition(Vector2i(ix, iy), z); //so that the correct ownership border is shown after a loaded game
 			}
 		}
 	}
@@ -378,7 +378,7 @@ static int CclRevealMap(lua_State *l)
 static int CclCenterMap(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+	const Vector2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer));
 	return 0;
@@ -612,7 +612,7 @@ static int CclSetBorderTerrain(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
+void SetTile(unsigned int tileIndex, const Vector2i &pos, int value, int z)
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
@@ -651,7 +651,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int value, int z)
+void SetTileTerrain(const std::string &terrain_ident, const Vector2i &pos, int value, int z)
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
@@ -691,7 +691,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 		}
 	}
 
-	Vec2i pos;
+	Vector2i pos;
 	CclGetPos(l, &pos.x, &pos.y, 3);
 	
 	CDate date;
@@ -700,7 +700,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 		CclGetDate(l, &date, 4);
 	}
 	
-	map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(pos, terrain, date));
+	map_template->HistoricalTerrains.push_back(std::tuple<Vector2i, const CTerrainType *, CDate>(pos, terrain, date));
 
 	if (nargs >= 5) {
 		map_template->TileLabels[std::pair<int, int>(pos.x, pos.y)] = LuaToString(l, 5);
@@ -716,7 +716,7 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 
 	std::string label_string = LuaToString(l, 2);
 	
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	map_template->TileLabels[std::pair<int, int>(ipos.x, ipos.y)] = TransliterateText(label_string);
@@ -738,7 +738,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		}
 	}
 
-	Vec2i start_pos;
+	Vector2i start_pos;
 	if (lua_istable(l, 3)) { //coordinates
 		CclGetPos(l, &start_pos.x, &start_pos.y, 3);
 	} else { //site ident
@@ -751,7 +751,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		start_pos.y = site->Position.y;
 	}
 	
-	Vec2i end_pos;
+	Vector2i end_pos;
 	if (lua_istable(l, 4)) { //coordinates
 		CclGetPos(l, &end_pos.x, &end_pos.y, 4);
 	} else { //site ident
@@ -770,14 +770,14 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetDate(l, &date, 5);
 	}
 	
-	Vec2i pos(start_pos);
-	Vec2i pathway_length(end_pos - start_pos);
-	Vec2i pathway_change(pathway_length.x ? pathway_length.x / abs(pathway_length.x) : 0, pathway_length.y ? pathway_length.y / abs(pathway_length.y) : 0);
+	Vector2i pos(start_pos);
+	Vector2i pathway_length(end_pos - start_pos);
+	Vector2i pathway_change(pathway_length.x ? pathway_length.x / abs(pathway_length.x) : 0, pathway_length.y ? pathway_length.y / abs(pathway_length.y) : 0);
 	pathway_length.x = abs(pathway_length.x);
 	pathway_length.y = abs(pathway_length.y);
 	int offset = 0;
 	while (pos != end_pos) {
-		Vec2i current_length(pos - start_pos);
+		Vector2i current_length(pos - start_pos);
 		current_length.x = abs(current_length.x);
 		current_length.y = abs(current_length.y);
 		if (pathway_length.x == pathway_length.y) {
@@ -788,7 +788,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 				if (pathway_length.x % pathway_length.y != 0 && current_length.x % (pathway_length.x / (pathway_length.x % pathway_length.y)) == 0) {
 					offset += 1;
 				} else if ((current_length.x - offset) % (std::max(1, pathway_length.x / pathway_length.y)) == 0) {
-					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+					map_template->HistoricalTerrains.push_back(std::tuple<Vector2i, const CTerrainType *, CDate>(Vector2i(pos), terrain, date));
 					pos.y += pathway_change.y;
 				}
 			}
@@ -798,7 +798,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 				if (pathway_length.y % pathway_length.x != 0 && current_length.y % (pathway_length.y / (pathway_length.y % pathway_length.x)) == 0) {
 					offset += 1;
 				} else if ((current_length.y - offset) % (std::max(1, pathway_length.y / pathway_length.x)) == 0) {
-					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+					map_template->HistoricalTerrains.push_back(std::tuple<Vector2i, const CTerrainType *, CDate>(Vector2i(pos), terrain, date));
 					pos.x += pathway_change.x;
 				}
 			}
@@ -808,12 +808,12 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			break;
 		}
 
-		Vec2i pos_diff(end_pos - pos);
+		Vector2i pos_diff(end_pos - pos);
 		if ((pos_diff.x < 0 && pathway_change.x >= 0) || (pos_diff.x > 0 && pathway_change.x <= 0) || (pos_diff.y < 0 && pathway_change.y >= 0) || (pos_diff.y > 0 && pathway_change.y <= 0)) {
 			break;
 		}
 
-		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, const CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+		map_template->HistoricalTerrains.push_back(std::tuple<Vector2i, const CTerrainType *, CDate>(Vector2i(pos), terrain, date));
 	}
 
 	return 1;
@@ -830,7 +830,7 @@ static int CclSetMapTemplateResource(lua_State *l)
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	int resources_held = 0;
@@ -863,7 +863,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
 
 	std::string faction_name = LuaToString(l, 3);
@@ -888,7 +888,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 		}
 	}
 	
-	map_template->Units.push_back(std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, UniqueItem *>(ipos, unittype, faction, start_date, end_date, unique));
+	map_template->Units.push_back(std::tuple<Vector2i, CUnitType *, CFaction *, CDate, CDate, UniqueItem *>(ipos, unittype, faction, start_date, end_date, unique));
 	
 	return 1;
 }
@@ -903,7 +903,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 		LuaError(l, "Hero doesn't exist");
 	}
 
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
 
 	std::string faction_name = LuaToString(l, 3);
@@ -922,7 +922,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 		CclGetDate(l, &end_date, 6);
 	}
 	
-	map_template->Heroes.push_back(std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
+	map_template->Heroes.push_back(std::tuple<Vector2i, CCharacter *, CFaction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
 	
 	return 1;
 }
@@ -938,7 +938,7 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	UniqueItem *unique = nullptr;
@@ -953,13 +953,13 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 	
 	if (lua_isnumber(l, 4)) {
 		int layer = LuaToNumber(l, 4);
-		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, UniqueItem *>(ipos, unittype, layer, unique));
+		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vector2i, CUnitType *, int, UniqueItem *>(ipos, unittype, layer, unique));
 	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
 		if (CWorld::Get(realm, false)) {
-			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, UniqueItem *>(ipos, unittype, CWorld::Get(realm), unique));
+			map_template->WorldConnectors.push_back(std::tuple<Vector2i, CUnitType *, CWorld *, UniqueItem *>(ipos, unittype, CWorld::Get(realm), unique));
 		} else if (CPlane::Get(realm, false)) {
-			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, UniqueItem *>(ipos, unittype, CPlane::Get(realm), unique));
+			map_template->PlaneConnectors.push_back(std::tuple<Vector2i, CUnitType *, CPlane *, UniqueItem *>(ipos, unittype, CPlane::Get(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -1039,7 +1039,7 @@ void ApplyMapTemplate(const std::string &map_template_ident, int template_start_
 		return;
 	}
 	
-	map_template->Apply(Vec2i(template_start_x, template_start_y), Vec2i(map_start_x, map_start_y), z);
+	map_template->Apply(Vector2i(template_start_x, template_start_y), Vector2i(map_start_x, map_start_y), z);
 }
 
 void ApplyCampaignMap(const std::string &campaign_ident)
@@ -1051,7 +1051,7 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 	}
 	
 	for (size_t i = 0; i < campaign->MapTemplates.size(); ++i) {
-		campaign->MapTemplates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
+		campaign->MapTemplates[i]->Apply(campaign->MapTemplateStartPos[i], Vector2i(0, 0), i);
 	}
 }
 //Wyrmgus end
@@ -1205,7 +1205,7 @@ static int CclGetTileTerrainName(lua_State *l)
 	}
 	//Wyrmgus end
 
-	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+	const Vector2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
 	/*
@@ -1235,7 +1235,7 @@ static int CclGetTileTerrainMixedName(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
-	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+	const Vector2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	const CMapField &mf = *CMap::Map.Field(pos);
 	const CTileset &tileset = *CMap::Map.Tileset;
@@ -1270,7 +1270,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	}
 	//Wyrmgus end
 
-	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+	const Vector2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
 	if (pos.x < 0 || pos.x >= CMap::Map.Info.MapWidths[z] || pos.y < 0 || pos.y >= CMap::Map.Info.MapHeights[z]) {
@@ -1607,7 +1607,7 @@ static int CclDefineMapTemplate(lua_State *l)
 	std::string map_template_ident = LuaToString(l, 1);
 	CMapTemplate *map_template = CMapTemplate::GetOrAdd(map_template_ident);
 	
-	Vec2i subtemplate_position_top_left(-1, -1);
+	Vector2i subtemplate_position_top_left(-1, -1);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2110,11 +2110,11 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushnumber(l, map_template->CurrentStartPos.y);
 		return 1;
 	} else if (!strcmp(data, "MapStartPosX")) {
-		Vec2i pos = CMap::Map.GetSubtemplatePos(map_template);
+		Vector2i pos = CMap::Map.GetSubtemplatePos(map_template);
 		lua_pushnumber(l, pos.x);
 		return 1;
 	} else if (!strcmp(data, "MapStartPosY")) {
-		Vec2i pos = CMap::Map.GetSubtemplatePos(map_template);
+		Vector2i pos = CMap::Map.GetSubtemplatePos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosX")) {

@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "vec2i.h"
+#include <core/math/vector2.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -196,12 +196,12 @@ extern void SendCommandDefend(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Send move command
 //Wyrmgus start
-//extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
-extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void SendCommandMove(CUnit &unit, const Vector2i &pos, int flush);
+extern void SendCommandMove(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 //Wyrmgus start
 /// Send rally point command
-extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
+extern void SendCommandRallyPoint(CUnit &unit, const Vector2i &pos, int z = 0);
 /// Send quest command
 extern void SendCommandQuest(CUnit &unit, CQuest *quest);
 /// Send buy command
@@ -217,20 +217,20 @@ extern void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end
 /// Send repair command
 //Wyrmgus start
-//extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//extern void SendCommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush);
+extern void SendCommandRepair(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush, int z = 0);
 //Wyrmgus end
 /// Send auto repair command
 extern void SendCommandAutoRepair(CUnit &unit, int on);
 /// Send attack command
 //Wyrmgus start
-//extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//extern void SendCommandAttack(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush);
+extern void SendCommandAttack(CUnit &unit, const Vector2i &pos, CUnit *dest, int flush, int z = 0);
 //Wyrmgus end
 /// Send attack ground command
 //Wyrmgus start
-//extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
-extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void SendCommandAttackGround(CUnit &unit, const Vector2i &pos, int flush);
+extern void SendCommandAttackGround(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 //Wyrmgus start
 /// Send use command
@@ -240,27 +240,27 @@ extern void SendCommandTrade(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end
 /// Send patrol command
 //Wyrmgus start
-//extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush);
-extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void SendCommandPatrol(CUnit &unit, const Vector2i &pos, int flush);
+extern void SendCommandPatrol(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //WYrmgus end
 /// Send board command
 extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Send unload command
 //Wyrmgus start
-//extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
-extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
+//extern void SendCommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush);
+extern void SendCommandUnload(CUnit &unit, const Vector2i &pos, CUnit *what, int flush, int z = 0);
 //Wyrmgus end
 /// Send build building command
 //Wyrmgus start
-//extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, const int flush);
-extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const CUnitType &what, const int flush, const int z = 0);
+//extern void SendCommandBuildBuilding(CUnit &unit, const Vector2i &pos, CUnitType &what, const int flush);
+extern void SendCommandBuildBuilding(CUnit &unit, const Vector2i &pos, const CUnitType &what, const int flush, const int z = 0);
 //Wyrmgus end
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit, bool salvage = false);
 /// Send harvest location command
 //Wyrmgus start
-//extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
-extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//extern void SendCommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush);
+extern void SendCommandResourceLoc(CUnit &unit, const Vector2i &pos, int flush, int z = 0);
 //Wyrmgus end
 /// Send harvest command
 extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
@@ -294,8 +294,8 @@ extern void SendCommandLearnAbility(CUnit &unit, const CUpgrade &what);
 //Wyrmgus end
 /// Send spell cast command
 //Wyrmgus start
-//extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush);
-extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z = 0);
+//extern void SendCommandSpellCast(CUnit &unit, const Vector2i &pos, CUnit *dest, int spellid, int flush);
+extern void SendCommandSpellCast(CUnit &unit, const Vector2i &pos, CUnit *dest, int spellid, int flush, int z = 0);
 //Wyrmgus end
 /// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, const int spell_id, const bool on);

@@ -39,6 +39,8 @@
 #include "vec2i.h"
 #include "video/color.h"
 
+#include <core/math/vector2.h>
+
 #include <tuple>
 
 /*----------------------------------------------------------------------------

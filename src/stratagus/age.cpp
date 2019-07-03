@@ -78,7 +78,7 @@ bool CAge::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "image") {
 		std::string file;
-		Vec2i size(0, 0);
+		Vector2i size(0, 0);
 		
 		for (const CConfigProperty &property : section->Properties) {
 			if (property.Operator != CConfigOperator::Assignment) {

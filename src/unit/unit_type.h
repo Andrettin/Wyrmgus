@@ -44,6 +44,8 @@
 #include "vec2i.h"
 #include "video/color.h"
 
+#include <core/math/vector2.h>
+
 #include <algorithm>
 #include <climits>
 #include <cstring>
@@ -881,8 +883,8 @@ public:
 	virtual ~CBuildRestriction() {}
 	virtual void Init() {};
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const = 0;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const = 0;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() = 0;
@@ -907,8 +909,8 @@ public:
 		}
 	}
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() override
@@ -946,7 +948,7 @@ public:
 			(*i)->Init();
 		}
 	}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	
 	virtual CBuildRestriction *Duplicate() override
 	{
@@ -970,18 +972,18 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 	class functor
 	{
 	public:
-		functor(const CUnitType *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
+		functor(const CUnitType *type, const Vector2i &_pos): Parent(type), pos(_pos) {}
 		inline bool operator()(const CUnit *const unit) const;
 	private:
 		const CUnitType *const Parent;   /// building that is unit is an addon too.
-		const Vec2i pos; //functor work position
+		const Vector2i pos; //functor work position
 	};
 public:
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init() {this->Parent = CUnitType::Get(this->ParentName); }
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() override
@@ -993,7 +995,7 @@ public:
 		return duplicate;
 	}
 
-	Vec2i Offset = Vec2i(0, 0);		/// offset from the main building to place this
+	Vector2i Offset = Vector2i(0, 0);		/// offset from the main building to place this
 	std::string ParentName;			/// building that is unit is an addon too.
 	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
 };
@@ -1003,19 +1005,19 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 	class functor
 	{
 	public:
-		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
+		functor(const CUnitType *type, const Vector2i &_pos): ontop(0), Parent(type), pos(_pos) {}
 		inline bool operator()(CUnit *const unit);
 		CUnit *ontop;   /// building that is unit is an addon too.
 	private:
 		const CUnitType *const Parent;  /// building that is unit is an addon too.
-		const Vec2i pos;  //functor work position
+		const Vector2i pos;  //functor work position
 	};
 public:
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = CUnitType::Get(this->ParentName);};
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() override
@@ -1040,8 +1042,8 @@ public:
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init();
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() override
@@ -1076,8 +1078,8 @@ public:
 	virtual ~CBuildRestrictionHasUnit() {};
 	virtual void Init() { this->RestrictType = CUnitType::Get(this->RestrictTypeName); };
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() override
@@ -1104,8 +1106,8 @@ public:
 	virtual ~CBuildRestrictionSurroundedBy() {}
 	virtual void Init() { this->RestrictType = CUnitType::Get(this->RestrictTypeName); }
 	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
 	virtual CBuildRestriction *Duplicate() override
@@ -1138,7 +1140,7 @@ class CBuildRestrictionTerrain : public CBuildRestriction
 public:
 	virtual ~CBuildRestrictionTerrain() {}
 	virtual void Init();
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vector2i &pos, CUnit *&ontoptarget, int z) const;
 	
 	virtual CBuildRestriction *Duplicate() override
 	{

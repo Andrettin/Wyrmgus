@@ -420,7 +420,7 @@ static int CclUnit(lua_State *l)
 			//Wyrmgus end
 				LuaError(l, "incorrect argument");
 			}
-			Vec2i pos;
+			Vector2i pos;
 			//Wyrmgus start
 			int z;
 			//Wyrmgus end
@@ -788,7 +788,7 @@ static int CclMoveUnit(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 2);
 
 	if (UnitCanBeAt(*unit, ipos, unit->GetMapLayer()->GetIndex())) {
@@ -854,7 +854,7 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
-	Vec2i ipos;
+	Vector2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	//Wyrmgus start
@@ -896,10 +896,10 @@ static int CclCreateUnit(lua_State *l)
 		} else {
 			const int heading = SyncRand() % 256;
 
-			Vec2i res_pos;
+			Vector2i res_pos;
 			FindNearestDrop(*unit->GetType(), ipos, res_pos, heading, z, unit->GetType()->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
 			if (!CMap::Map.Info.IsPointOnMap(res_pos, z)) {
-				unit->Place(Vec2i(0, 0), z);
+				unit->Place(Vector2i(0, 0), z);
 				return 0;
 			}
 			unit->Place(res_pos, z);
@@ -942,7 +942,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	CUnit *transporter = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	Vec2i ipos;
+	Vector2i ipos;
 	ipos.x = transporter->GetTilePos().x;
 	ipos.y = transporter->GetTilePos().y;
 
@@ -1015,7 +1015,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 	CUnit *on_top = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	Vec2i ipos;
+	Vector2i ipos;
 	ipos.x = on_top->GetTilePos().x;
 	ipos.y = on_top->GetTilePos().y;
 	int z = on_top->GetMapLayer()->GetIndex();
@@ -1232,11 +1232,11 @@ static int CclOrderUnit(lua_State *l)
 	if (!lua_istable(l, 3)) {
 		LuaError(l, "incorrect argument");
 	}
-	Vec2i pos1;
+	Vector2i pos1;
 	pos1.x = LuaToNumber(l, 3, 1);
 	pos1.y = LuaToNumber(l, 3, 2);
 	
-	Vec2i pos2;
+	Vector2i pos2;
 	if (lua_rawlen(l, 3) == 4) {
 		pos2.x = LuaToNumber(l, 3, 3);
 		pos2.y = LuaToNumber(l, 3, 4);
@@ -1246,8 +1246,8 @@ static int CclOrderUnit(lua_State *l)
 	
 	int z = LuaToNumber(l, 4);
 
-	Vec2i dpos1;
-	Vec2i dpos2;
+	Vector2i dpos1;
+	Vector2i dpos2;
 	if (lua_istable(l, 5)) {
 		dpos1.x = LuaToNumber(l, 5, 1);
 		dpos1.y = LuaToNumber(l, 5, 2);
@@ -1401,8 +1401,8 @@ static int CclKillUnitAt(lua_State *l)
 	if (!lua_istable(l, 4) || !lua_istable(l, 5)) {
 		LuaError(l, "incorrect argument");
 	}
-	Vec2i pos1;
-	Vec2i pos2;
+	Vector2i pos1;
+	Vector2i pos2;
 	CclGetPos(l, &pos1.x, &pos1.y, 4);
 	CclGetPos(l, &pos2.x, &pos2.y, 5);
 
@@ -2172,8 +2172,8 @@ static int CclUnitIsAt(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	
-	Vec2i minPos;
-	Vec2i maxPos;
+	Vector2i minPos;
+	Vector2i maxPos;
 	CclGetPos(l, &minPos.x, &minPos.y, 2);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 3);
 
