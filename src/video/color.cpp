@@ -35,9 +35,7 @@
 #include "config_operator.h"
 #include "script.h"
 
-#pragma warning(push, 0)
 #include <core/print_string.h>
-#pragma warning(pop)
 
 #include <SDL.h>
 

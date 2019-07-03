@@ -80,9 +80,7 @@ constexpr int IconCommandButton = 32;	/// is the icon a command button
 #include "data_element.h"
 #include "data_type.h"
 
-#pragma warning(push, 0)
 #include <core/math/vector2.h>
-#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Declarations

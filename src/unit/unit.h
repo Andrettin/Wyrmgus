@@ -38,9 +38,7 @@
 #include "unit/unit_type.h"
 #include "vec2i.h"
 
-#pragma warning(push, 0)
 #include <core/object.h>
-#pragma warning(pop)
 
 #include <set>
 #include <vector>

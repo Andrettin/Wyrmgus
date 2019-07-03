@@ -32,9 +32,7 @@
 
 #include "unit/unit_ptr.h"
 
-#pragma warning(push, 0)
 #include <core/math/vector2.h>
-#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Declarations

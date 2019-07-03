@@ -238,9 +238,7 @@
 #include "unit/unit_type.h"
 #include "video/video.h"
 
-#pragma warning(push, 0)
 #include <core/math/random_number_generator.h>
-#pragma warning(pop)
 
 #include <deque>
 #include <list>

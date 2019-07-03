@@ -108,9 +108,7 @@
 //Wyrmgus end
 #include "wyrmgus.h"
 
-#pragma warning(push, 0)
 #include <core/math/random_number_generator.h>
-#pragma warning(pop)
 
 #include <png.h>
 

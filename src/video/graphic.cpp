@@ -908,9 +908,8 @@ void CGraphic::Load(bool grayscale)
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
-		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
-				Width, Height, GraphicWidth, GraphicHeight);
+		print_error("Invalid graphic (width, height) " + String(File.c_str()));
+		print_error("Expected: (" + String::num_int64(Width) + "," + String::num_int64(Height) + ")  Found: (" + String::num_int64(GraphicWidth) + "," + String::num_int64(GraphicHeight) + ")");
 		ExitFatal(-1);
 	}
 

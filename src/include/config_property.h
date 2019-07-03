@@ -36,9 +36,7 @@
 
 #include "config_operator.h"
 
-#pragma warning(push, 0)
 #include <core/ustring.h>
-#pragma warning(pop)
 
 #include <stdexcept>
 #include <vector>

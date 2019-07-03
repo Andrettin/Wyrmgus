@@ -45,9 +45,7 @@
 #include "video/palette_image.h"
 #include "video/video.h"
 
-#pragma warning(push, 0)
 #include <scene/resources/tile_set.h>
-#pragma warning(pop)
 
 #include <algorithm>
 

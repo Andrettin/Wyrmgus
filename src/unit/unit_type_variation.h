@@ -38,9 +38,7 @@
 #include "ui/icon_config.h"
 #include "unit/unit_type.h" //for the image layers enum
 
-#pragma warning(push, 0)
 #include <core/object.h>
-#pragma warning(pop)
 
 #include <map>
 #include <string>

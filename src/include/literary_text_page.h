@@ -34,10 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#pragma warning(push, 0)
 #include <core/object.h>
 #include <core/ustring.h>
-#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Definition

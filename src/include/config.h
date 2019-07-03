@@ -36,10 +36,8 @@
 
 #include "config_property.h"
 
-#pragma warning(push, 0)
 #include <core/color.h>
 #include <core/ustring.h>
-#pragma warning(pop)
 
 #include <functional>
 #include <map>

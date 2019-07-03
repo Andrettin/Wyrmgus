@@ -57,9 +57,7 @@
 #include "upgrade/upgrade.h"
 #include "include/version.h"
 
-#pragma warning(push, 0)
 #include <core/math/random_number_generator.h>
-#pragma warning(pop)
 
 #include <time.h>
 
