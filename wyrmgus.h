@@ -5,10 +5,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#pragma warning(push, 0)
 #include <core/ustring.h>
 #include <scene/main/node.h>
-#pragma warning(pop)
 
 /*----------------------------------------------------------------------------
 --  Declarations

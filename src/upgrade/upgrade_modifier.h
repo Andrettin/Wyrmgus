@@ -38,6 +38,7 @@
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
 #include <core/object.h>
+#include <core/method_bind_free_func.gen.inc>
 
 #include <map>
 #include <set>

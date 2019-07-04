@@ -38,6 +38,7 @@
 #include "ui/icon_config.h"
 
 #include <core/object.h>
+#include <core/method_bind_free_func.gen.inc>
 
 #include <string>
 #include <vector>

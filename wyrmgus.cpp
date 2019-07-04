@@ -31,6 +31,8 @@
 
 #include <oamlGodotModule/oamlGodotModule.h>
 
+#include <core/method_bind_free_func.gen.inc>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/

@@ -3541,11 +3541,14 @@ void CPlayer::ChangeUnitTypeCount(const CUnitType *type, int quantity)
 
 int CPlayer::GetUnitTypeCount(const CUnitType *type) const
 {
-	if (type && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
-		return this->UnitTypesCount.find(type)->second;
-	} else {
-		return 0;
+	if (type != nullptr) {
+		auto find_iterator = this->UnitTypesCount.find(type);
+		if (find_iterator != this->UnitTypesCount.end()) {
+			return find_iterator->second;
+		}
 	}
+	
+	return 0;
 }
 
 void CPlayer::SetUnitTypeUnderConstructionCount(const CUnitType *type, int quantity)

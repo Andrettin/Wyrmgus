@@ -45,6 +45,7 @@
 
 #include <core/math/vector2.h>
 #include <core/object.h>
+#include <core/method_bind_free_func.gen.inc>
 
 #include <map>
 #include <shared_mutex>
