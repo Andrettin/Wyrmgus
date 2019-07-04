@@ -390,6 +390,10 @@ void CUpgrade::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_magic_level"), &CUpgrade::GetMagicLevel);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "magic_level"), "set_magic_level", "get_magic_level");
 	
+	ClassDB::bind_method(D_METHOD("set_work", "ident"), +[](CUpgrade *upgrade, const String &ident){ upgrade->Work = ItemClass::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_work"), +[](const CUpgrade *upgrade){ return const_cast<ItemClass *>(upgrade->Work); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "work"), "set_work", "get_work");
+	
 	ClassDB::bind_method(D_METHOD("set_effects_string", "effects_string"), +[](CUpgrade *upgrade, const String &effects_string){ upgrade->EffectsString = effects_string; });
 	ClassDB::bind_method(D_METHOD("get_effects_string"), &CUpgrade::GetEffectsString);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "effects_string"), "set_effects_string", "get_effects_string");

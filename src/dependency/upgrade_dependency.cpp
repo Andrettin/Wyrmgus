@@ -35,9 +35,11 @@
 
 #include "dependency/upgrade_dependency.h"
 
+#include "faction.h"
 #include "player.h"
 #include "unit/unit.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
@@ -52,16 +54,35 @@ void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<String, Strin
 		value = value.replace("_", "-");
 		this->Upgrade = CUpgrade::Get(value.utf8().get_data());
 		if (!this->Upgrade) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.utf8().get_data());
+			print_error("Invalid upgrade: \"" + value + "\".");
 		}
+	} else if (key == "upgrade_class") {
+		this->UpgradeClass = UpgradeClass::Get(value);
 	} else {
-		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.utf8().get_data());
+		print_error("Invalid upgrade dependency property: \"" + key + "\".");
+	}
+}
+
+void CUpgradeDependency::Initialize()
+{
+	if (this->Upgrade == nullptr && this->UpgradeClass == nullptr) {
+		print_error("Upgrade dependency has neither a unit type nor a unit class.");
 	}
 }
 
 bool CUpgradeDependency::CheckInternal(const CPlayer *player, const bool ignore_units) const
 {
-	return UpgradeIdAllowed(*player, this->Upgrade->GetIndex()) == 'R';
+	const CUpgrade *upgrade = this->Upgrade;
+	
+	if (upgrade == nullptr) {
+		upgrade = CFaction::GetFactionClassUpgrade(player->GetFaction(), this->UpgradeClass);
+	}
+	
+	if (upgrade == nullptr) {
+		return false;
+	}
+	
+	return UpgradeIdAllowed(*player, upgrade->GetIndex()) == 'R';
 }
 
 bool CUpgradeDependency::Check(const CUnit *unit, const bool ignore_units) const
@@ -71,6 +92,14 @@ bool CUpgradeDependency::Check(const CUnit *unit, const bool ignore_units) const
 
 std::string CUpgradeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Upgrade->GetName().utf8().get_data() + '\n';
+	std::string str = prefix;
+	
+	if (this->Upgrade != nullptr) {
+		str += this->Upgrade->GetName().utf8().get_data();
+	} else if (this->UpgradeClass != nullptr) {
+		str += this->UpgradeClass->GetName().utf8().get_data();
+	}
+
+	str += '\n';
 	return str;
 }

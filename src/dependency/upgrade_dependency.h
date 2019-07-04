@@ -42,6 +42,7 @@
 
 class CPlayer;
 class CUpgrade;
+class UpgradeClass;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -54,6 +55,7 @@ public:
 	CUpgradeDependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
 	
 	virtual void ProcessConfigDataProperty(const std::pair<String, String> &property) override;
+	virtual void Initialize() override;
 private:
 	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const override;
 public:
@@ -62,6 +64,7 @@ public:
 
 private:
 	const CUpgrade *Upgrade = nullptr;
+	const ::UpgradeClass *UpgradeClass = nullptr;
 };
 
 #endif

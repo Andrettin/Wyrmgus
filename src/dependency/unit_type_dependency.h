@@ -42,6 +42,7 @@
 
 class CPlayer;
 class CUnitType;
+class UnitClass;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -54,6 +55,7 @@ public:
 	CUnitTypeDependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
 	
 	virtual void ProcessConfigDataProperty(const std::pair<String, String> &property) override;
+	virtual void Initialize() override;
 private:
 	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const override;
 public:
@@ -61,6 +63,7 @@ public:
 
 private:
 	const CUnitType *UnitType = nullptr;
+	const UnitClass *UnitClass = nullptr;
 	int Count = 1;		/// How many of the unit type are required
 };
 

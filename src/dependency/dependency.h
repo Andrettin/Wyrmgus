@@ -58,6 +58,7 @@ public:
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<String, String> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
+	virtual void Initialize() {}
 	bool Check(const CPlayer *player, const bool ignore_units = false) const;
 private:
 	virtual bool CheckInternal(const CPlayer *player, const bool ignore_units = false) const = 0;

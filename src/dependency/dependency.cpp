@@ -100,7 +100,7 @@ CDependency *CDependency::FromConfigData(const CConfigData *config_data)
 	} else if (config_data->Tag == "trigger") {
 		dependency = new CTriggerDependency;
 	} else {
-		fprintf(stderr, "Invalid dependency type: \"%s\".\n", config_data->Tag.utf8().get_data());
+		print_error("Invalid dependency type: \"" + config_data->Tag + "\".");
 	}
 	
 	dependency->ProcessConfigData(config_data);
@@ -135,16 +135,18 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 	for (const CConfigData *section : config_data->Sections) {
 		this->ProcessConfigDataSection(section);
 	}
+	
+	this->Initialize();
 }
 
 void CDependency::ProcessConfigDataProperty(const std::pair<String, String> &property)
 {
-	fprintf(stderr, "Invalid dependency property: \"%s\".\n", property.first.utf8().get_data());
+	print_error("Invalid dependency property: \"" + property.first + "\".");
 }
 
 void CDependency::ProcessConfigDataSection(const CConfigData *section)
 {
-	fprintf(stderr, "Invalid dependency property: \"%s\".\n", section->Tag.utf8().get_data());
+	print_error("Invalid dependency property: \"" + section->Tag + "\".");
 }
 
 bool CDependency::Check(const CPlayer *player, const bool ignore_units) const

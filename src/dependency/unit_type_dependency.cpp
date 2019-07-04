@@ -35,7 +35,9 @@
 
 #include "dependency/unit_type_dependency.h"
 
+#include "faction.h"
 #include "player.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
@@ -48,10 +50,19 @@ void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<String, Stri
 	String value = property.second;
 	if (key == "unit_type") {
 		this->UnitType = CUnitType::Get(value);
+	} else if (key == "unit_class") {
+		this->UnitClass = UnitClass::Get(value);
 	} else if (key == "count") {
 		this->Count = value.to_int();
 	} else {
-		fprintf(stderr, "Invalid unit type dependency property: \"%s\".\n", key.utf8().get_data());
+		print_error("Invalid unit type dependency property: \"" + key + "\".");
+	}
+}
+
+void CUnitTypeDependency::Initialize()
+{
+	if (this->UnitType == nullptr && this->UnitClass == nullptr) {
+		print_error("Unit type dependency has neither a unit type nor a unit class.");
 	}
 }
 
@@ -61,12 +72,28 @@ bool CUnitTypeDependency::CheckInternal(const CPlayer *player, const bool ignore
 		return true;
 	}
 	
-	return player->GetUnitTypeCount(this->UnitType) >= this->Count;
+	const CUnitType *unit_type = this->UnitType;
+	
+	if (unit_type == nullptr) {
+		unit_type = CFaction::GetFactionClassUnitType(player->GetFaction(), this->UnitClass);
+	}
+	
+	if (unit_type == nullptr) {
+		return false;
+	}
+	
+	return player->GetUnitTypeCount(unit_type) >= this->Count;
 }
 
 std::string CUnitTypeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->UnitType->GetName().utf8().get_data();
+	std::string str = prefix;
+	
+	if (this->UnitType != nullptr) {
+		str += this->UnitType->GetName().utf8().get_data();
+	} else if (this->UnitClass != nullptr) {
+		str += this->UnitClass->GetName().utf8().get_data();
+	}
 	
 	if (this->Count > 1) {
 		str += '(' + std::to_string(this->Count) + ')';
