@@ -13,6 +13,12 @@ env.Append(LIBPATH=['#bin'])
 
 env_wyrmgus = env_modules.Clone()
 
+if os.getenv("VCINSTALLDIR"):
+  env_wyrmgus['PCH'] = env_wyrmgus.PCH('pch.pch', 'pch.cpp')[0]
+  env_wyrmgus['PCHSTOP'] = 'pch.h'
+  env_wyrmgus.Append(CXXFLAGS=['/FIpch.h'])
+  env.Append(LINKFLAGS=[env_wyrmgus.Dir('.').abspath + '\pch.obj'])
+
 # Godot source files
 env_wyrmgus.add_source_files(env.modules_sources, "register_types.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "wyrmgus.cpp")
