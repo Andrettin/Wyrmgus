@@ -1,7 +1,7 @@
 #ifndef __RENDERER_H__
 #define __RENDERER_H__
 
-#include <assert.h>
+#include <cassert>
 
 struct CPrimitives {
 	virtual void DrawPixel(Uint32 color, int x, int y) = 0;

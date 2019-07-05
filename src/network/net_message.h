@@ -29,7 +29,7 @@
 #ifndef NET_MESSAGE_H
 #define NET_MESSAGE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 /*----------------------------------------------------------------------------

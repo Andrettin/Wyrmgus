@@ -67,7 +67,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "world/province.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <map>
 #include <string>
 

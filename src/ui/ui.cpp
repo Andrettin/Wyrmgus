@@ -55,7 +55,7 @@
 #include "video/video.h"
 #include "world/world.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 
 /*----------------------------------------------------------------------------
 -- Variables

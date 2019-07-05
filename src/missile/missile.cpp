@@ -58,7 +58,7 @@
 #include "unit/unit_type.h"
 #include "video/font.h"
 
-#include <math.h>
+#include <cmath>
 
 #ifdef __MORPHOS__
 #undef Wait

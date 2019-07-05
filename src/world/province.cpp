@@ -37,7 +37,7 @@
 
 #include "map/map.h" // for the terrain features, which are cleaned here
 
-#include <ctype.h>
+#include <cctype>
 #include <string>
 #include <map>
 

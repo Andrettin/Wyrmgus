@@ -107,7 +107,7 @@
 #include "wyrmgus.h"
 
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 /*----------------------------------------------------------------------------
 -- Documentation
@@ -658,11 +658,17 @@ void CUnit::SetPlayer(CPlayer *player)
 		return;
 	}
 	
-	Color old_selection_color = IntColorToColor(this->GetSelectionColor());
+	Color old_selection_color;
+	if (this->IsSelected()) {
+		old_selection_color = IntColorToColor(this->GetSelectionColor());
+	}
 	
 	this->Player = player;
 	
-	Color new_selection_color = IntColorToColor(this->GetSelectionColor());
+	Color new_selection_color;
+	if (this->IsSelected()) {
+		new_selection_color = IntColorToColor(this->GetSelectionColor());
+	}
 	
 	this->emit_signal("player_changed", player);
 	
@@ -8720,6 +8726,10 @@ void CUnit::HandleUnitAction()
 
 IntColor CUnit::GetSelectionColor() const
 {
+	if (this->GetPlayer() == nullptr) {
+		return ColorGray;
+	}
+	
 	if (Editor.Running && UnitUnderCursor == this && Editor.State == EditorSelecting) {
 		return ColorWhite;
 	} else if (this->IsSelected() || this->TeamSelected || (this->Blink & 1)) {

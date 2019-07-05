@@ -40,7 +40,7 @@
 #include "missile/missile_type.h"
 #include "unit/unit_find.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 /**
 **  Calculate parabolic trajectories.

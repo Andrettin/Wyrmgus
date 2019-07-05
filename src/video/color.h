@@ -163,7 +163,7 @@ public:
 };
 
 
-#include <stdint.h>
+#include <cstdint>
 
 typedef uint32_t IntColor; // Uint32 in SDL
 

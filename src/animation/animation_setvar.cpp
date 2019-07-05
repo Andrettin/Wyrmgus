@@ -45,7 +45,7 @@
 #include "util.h"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 
 
 /* virtual */ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const

@@ -59,7 +59,7 @@
 
 #include <core/math/random_number_generator.h>
 
-#include <time.h>
+#include <ctime>
 
 extern void StartMap(const std::string &filename, bool clean);
 

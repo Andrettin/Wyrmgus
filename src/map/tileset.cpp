@@ -101,7 +101,7 @@
 
 #include "video/video.h"
 
-#include <limits.h>
+#include <climits>
 
 /*----------------------------------------------------------------------------
 -- Variables

@@ -31,7 +31,7 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "stratagus.h"
 #include "map/map.h"

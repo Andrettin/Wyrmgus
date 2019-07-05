@@ -84,8 +84,8 @@
 #include "video/palette_image.h"
 #include "video/video.h"
 
+#include <cctype>
 #include <cstring>
-#include <ctype.h>
 
 /*----------------------------------------------------------------------------
 -- Documentation

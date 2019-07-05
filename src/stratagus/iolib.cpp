@@ -45,8 +45,8 @@
 //Wyrmgus end
 #include "util.h"
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 
 #include <zlib.h>
 

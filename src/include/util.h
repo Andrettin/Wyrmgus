@@ -78,7 +78,7 @@ inline int square(int v)
 --  Strings
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
+#include <cstring>
 
 #ifndef _TRUNCATE
 #define _TRUNCATE ((size_t)-1)

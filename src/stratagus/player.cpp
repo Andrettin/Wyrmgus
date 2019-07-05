@@ -32,8 +32,6 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
-
 #include "stratagus.h"
 
 #include "player.h"
@@ -111,6 +109,7 @@
 #include "world/world.h"
 #include "wyrmgus.h"
 
+#include <cstdarg>
 #include <mutex>
 
 /*----------------------------------------------------------------------------

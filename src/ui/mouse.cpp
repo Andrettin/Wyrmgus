@@ -34,9 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <ctype.h>
-#include <stdexcept>
-
 #include "stratagus.h"
 
 #include "ui/ui.h"
@@ -84,6 +81,8 @@
 #include "world/world.h"
 
 #include <algorithm>
+#include <cctype>
+#include <stdexcept>
 
 /*----------------------------------------------------------------------------
 --  Variables

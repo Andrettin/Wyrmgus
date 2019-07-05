@@ -35,7 +35,7 @@
 #include "stratagus.h"
 
 #ifdef DEBUG
-#include <signal.h>
+#include <csignal>
 #endif
 
 #include <map>
@@ -43,8 +43,8 @@
 #include <vector>
 
 
-#include <limits.h>
-#include <math.h>
+#include <climits>
+#include <cmath>
 
 #ifndef _WIN32
 #include <sys/types.h>

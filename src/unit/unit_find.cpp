@@ -49,7 +49,7 @@
 #include "unit/unit_type.h"
 
 #include <algorithm>
-#include <limits.h>
+#include <climits>
 
 /*----------------------------------------------------------------------------
   -- Finding units

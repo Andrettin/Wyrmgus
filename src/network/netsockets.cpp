@@ -37,7 +37,7 @@
 
 #include "network/net_lowlevel.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #ifdef __MORPHOS__
 #undef socket

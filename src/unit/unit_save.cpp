@@ -52,9 +52,9 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 
+#include <cstdio>
 #include <iomanip>
 #include <sstream>
-#include <stdio.h>
 
 /*----------------------------------------------------------------------------
 --  Functions

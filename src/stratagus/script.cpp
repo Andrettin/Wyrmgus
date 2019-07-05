@@ -78,9 +78,9 @@
 #include "video/font.h"
 #include "wyrmgus.h"
 
+#include <csignal>
 #include <mutex>
 #include <queue>
-#include <signal.h>
 
 /*----------------------------------------------------------------------------
 --  Variables

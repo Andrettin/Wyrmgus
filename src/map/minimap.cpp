@@ -50,7 +50,7 @@
 #include "world/province.h"
 #include "world/world.h"
 
-#include <string.h>
+#include <cstring>
 
 /*----------------------------------------------------------------------------
 --  Defines

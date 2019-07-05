@@ -43,10 +43,10 @@
 #include "script.h"
 #include "include/version.h"
 
-#include <errno.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <limits.h>
+#include <cctype>
+#include <cerrno>
+#include <climits>
+#include <cstdarg>
 
 
 /*----------------------------------------------------------------------------

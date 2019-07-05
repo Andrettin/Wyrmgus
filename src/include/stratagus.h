@@ -39,7 +39,7 @@
 
 //the following is necessary to include shared_mutex without errors
 #undef SIZE_MAX
-#include <wchar.h>
+#include <cwchar>
 #define __STDC_LIMIT_MACROS
 #include <cstdint>
 
@@ -125,7 +125,7 @@ extern void PrintOnStdErr(const char *format, ...);
 ==  Definitions
 ============================================================================*/
 
-#include <string.h>
+#include <cstring>
 
 #include "util.h"
 

@@ -35,9 +35,9 @@
 
 #include "network/net_lowlevel.h"
 
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 #include <fcntl.h>
-#include <errno.h>
 
 //----------------------------------------------------------------------------
 //  Declarations

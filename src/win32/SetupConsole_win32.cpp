@@ -27,9 +27,9 @@
 #endif
 
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <io.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 
 #ifdef __cplusplus

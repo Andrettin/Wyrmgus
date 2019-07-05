@@ -37,7 +37,7 @@
 
 #include "unit/unit.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 /* virtual */ void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

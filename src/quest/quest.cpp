@@ -55,7 +55,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
-#include <ctype.h>
+#include <cctype>
 
 /*----------------------------------------------------------------------------
 --  Variables

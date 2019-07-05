@@ -40,15 +40,14 @@
 
 #include <boost/tokenizer.hpp>
 
-#include <ctype.h>
 #include <cctype>
-#include <errno.h>
+#include <cerrno>
 #include <map>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 //Wyrmgus start
-#include <time.h>
+#include <ctime>
 //Wyrmgus end
 
 #ifdef WIN32
@@ -449,7 +448,7 @@ String SnakeCaseToPascalCase(const String &str)
 **  an 'argument required' error.
 */
 
-#include <string.h>
+#include <cstring>
 
 int opterr = 1;
 int optind = 1;

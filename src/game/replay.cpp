@@ -62,8 +62,8 @@
 
 #include <core/math/random_number_generator.h>
 
+#include <ctime>
 #include <sstream>
-#include <time.h>
 
 extern void ExpandPath(std::string &newpath, const std::string &path);
 extern void StartMap(const std::string &filename, bool clean);

@@ -45,7 +45,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -31,7 +31,7 @@
 
 #include "parameters.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 /* static */ Parameters Parameters::Instance;
 

@@ -240,9 +240,9 @@
 
 #include <core/math/random_number_generator.h>
 
+#include <cstddef>
 #include <deque>
 #include <list>
-#include <stddef.h>
 
 //----------------------------------------------------------------------------
 //  Declaration

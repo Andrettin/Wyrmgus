@@ -48,7 +48,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 
-#include <ctype.h>
+#include <cctype>
 
 /*----------------------------------------------------------------------------
 --  Functions

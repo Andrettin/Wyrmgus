@@ -90,7 +90,7 @@
 #include "video/video.h"
 
 #include <algorithm>
-#include <ctype.h>
+#include <cctype>
 #include <sstream>
 #include <vector>
 

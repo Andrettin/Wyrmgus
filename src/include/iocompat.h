@@ -34,12 +34,12 @@
 --  Platform dependent IO-related Includes and Definitions
 ----------------------------------------------------------------------------*/
 
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <errno.h>
 
 #ifdef _MSC_VER
 

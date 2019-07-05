@@ -213,8 +213,8 @@ extern void beos_init(int argc, char **argv);
 #include <stacktrace/stack_exception.hpp>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include <windows.h>

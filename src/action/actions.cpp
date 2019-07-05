@@ -31,9 +31,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <time.h>
-
 #include "stratagus.h"
+
 #include "include/version.h"
 
 #include "action/actions.h"
@@ -81,6 +80,8 @@
 #include "unit/unit_type.h"
 
 #include <core/math/random_number_generator.h>
+
+#include <ctime>
 
 /*----------------------------------------------------------------------------
 --  Variables

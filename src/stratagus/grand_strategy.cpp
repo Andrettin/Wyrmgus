@@ -59,7 +59,7 @@
 #include "video/font.h"	// for grand strategy mode tooltip drawing
 #include "video/video.h"
 
-#include <ctype.h>
+#include <cctype>
 
 /*----------------------------------------------------------------------------
 --  Variables
