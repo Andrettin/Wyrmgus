@@ -1183,7 +1183,7 @@ bool CUnit::CheckTerrainForVariation(const UnitTypeVariation *variation) const
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (variation->TerrainsForbidden.size() > 0) {
 		if (!CMap::Map.Info.IsPointOnMap(this->GetTilePos(), this->MapLayer)) {
-			return false;
+			return true;
 		}
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->GetTileSize().x; ++x) {
@@ -4144,11 +4144,12 @@ void CUnit::Place(const Vector2i &pos, const int z)
 		}
 		
 		const UnitTypeVariation *variation = this->GetVariation();
-		if (variation) {
+		if (
+			(variation != nullptr && (!this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)))
+			|| (old_map_layer == nullptr && !this->GetType()->Variations.empty())
+		) {
 			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
-			if (!old_map_layer || !this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
-				this->ChooseVariation();
-			}
+			this->ChooseVariation();
 		}
 	}
 	//Wyrmgus end
