@@ -502,8 +502,8 @@ private:
 	
 	mutable std::shared_mutex Mutex;	/// mutex for the player
 
-	friend void ApplyReplaySettings();
 	friend int CclPlayer(lua_State *l);
+	friend void ApplyReplaySettings();
 	
 protected:
 	static void _bind_methods();

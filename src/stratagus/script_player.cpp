@@ -176,7 +176,6 @@ void CPlayer::Load(lua_State *l)
 			if (civilization) {
 				this->Race = civilization->GetIndex();
 			}
-		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			const std::string faction_ident = LuaToString(l, j + 1);
 			const CFaction *faction = CFaction::Get(faction_ident);
@@ -189,7 +188,18 @@ void CPlayer::Load(lua_State *l)
 			int color_id = LuaToNumber(l, j + 1);
 			this->Color = PlayerColors[color_id][0];
 			this->UnitColors.Colors = PlayerColorsRGB[color_id];
-		//Wyrmgus end
+		} else if (!strcmp(value, "primary-color")) {
+			String player_color_ident = LuaToString(l, j + 1);
+			const CPlayerColor *player_color = CPlayerColor::Get(player_color_ident);
+			if (player_color != nullptr) {
+				this->PrimaryColor = player_color;
+			}
+		} else if (!strcmp(value, "secondary-color")) {
+			String player_color_ident = LuaToString(l, j + 1);
+			const CPlayerColor *player_color = CPlayerColor::Get(player_color_ident);
+			if (player_color != nullptr) {
+				this->SecondaryColor = player_color;
+			}
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "team")) {

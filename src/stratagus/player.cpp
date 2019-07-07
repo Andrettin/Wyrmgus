@@ -630,6 +630,11 @@ void CPlayer::Save(CFile &file) const
 			file.printf(" \"color\", %u,", i);
 			break;
 		}
+	if (this->PrimaryColor != nullptr) {
+		file.printf(" \"primary-color\", \"%s\",", this->PrimaryColor->Ident.c_str());
+	}
+	if (this->SecondaryColor != nullptr) {
+		file.printf(" \"secondary-color\", \"%s\",", this->SecondaryColor->Ident.c_str());
 	}
 	//Wyrmgus end
 	file.printf("  \"name\", \"%s\",\n", this->Name.c_str());

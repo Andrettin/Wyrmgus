@@ -491,7 +491,7 @@ void CUnit::Init()
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
-	Colors = nullptr;
+	this->Colors = nullptr;
 	//Wyrmgus start
 	this->Name.clear();
 	this->ExtraName.clear();
