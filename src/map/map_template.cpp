@@ -736,9 +736,9 @@ void CMapTemplate::Apply(const Vector2i &template_start_pos, const Vector2i &map
 		if (current_faction && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->GetFaction() != current_faction) {
 			CPlayer::GetThisPlayer()->SetCivilization(current_faction->GetCivilization()->GetIndex());
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);
-			CPlayer::GetThisPlayer()->Resources[CopperCost] = 2500; // give the player enough resources to start up
-			CPlayer::GetThisPlayer()->Resources[WoodCost] = 2500;
-			CPlayer::GetThisPlayer()->Resources[StoneCost] = 2500;
+			CPlayer::GetThisPlayer()->SetResource(CopperCost, 2500); // give the player enough resources to start up
+			CPlayer::GetThisPlayer()->SetResource(WoodCost, 2500);
+			CPlayer::GetThisPlayer()->SetResource(StoneCost, 2500);
 		}
 	}
 	

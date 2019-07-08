@@ -48,7 +48,6 @@
 #include <core/method_bind_free_func.gen.inc>
 
 #include <map>
-#include <shared_mutex>
 #include <string>
 #include <tuple>
 
@@ -119,7 +118,12 @@ class CPlayer : public Object
 	
 public:
 	static void SetThisPlayer(CPlayer *player);
-	static CPlayer *GetThisPlayer();
+	
+	static CPlayer *GetThisPlayer()
+	{
+		return CPlayer::ThisPlayer;
+	}
+	
 	static CPlayer *GetPlayer(const int index);
 	
 	/// create a new player
@@ -135,7 +139,6 @@ public:
 
 private:
 	static CPlayer *ThisPlayer;		/// Player on local computer
-	static std::shared_mutex PlayerMutex;	/// Mutex for players as a whole
 	
 public:
 	int GetIndex() const
@@ -500,8 +503,6 @@ private:
 	unsigned int Allied = 0;		/// allied bit field for this player
 	unsigned int SharedVision = 0;	/// shared vision bit field
 	
-	mutable std::shared_mutex Mutex;	/// mutex for the player
-
 	friend int CclPlayer(lua_State *l);
 	friend void ApplyReplaySettings();
 	

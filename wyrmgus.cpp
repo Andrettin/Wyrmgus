@@ -145,6 +145,7 @@ void Wyrmgus::_bind_methods()
 	ADD_SIGNAL(MethodInfo("initialized"));
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
+	ADD_SIGNAL(MethodInfo("resource_stored_changed", PropertyInfo(Variant::OBJECT, "resource"), PropertyInfo(Variant::INT, "amount")));
 	
 	//this signal occurs when the time of day of the map layer being currently seen by the player has changed
 	ADD_SIGNAL(MethodInfo("time_of_day_changed", PropertyInfo(Variant::OBJECT, "old_time_of_day"), PropertyInfo(Variant::OBJECT, "new_time_of_day")));

@@ -110,7 +110,6 @@
 #include "wyrmgus.h"
 
 #include <cstdarg>
-#include <mutex>
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -368,7 +367,6 @@ int NumPlayers;							/// How many player slots used
 
 CPlayer *CPlayer::ThisPlayer = nullptr;	/// Player on this computer
 std::vector<CPlayer *> CPlayer::Players;	/// All players in play
-std::shared_mutex CPlayer::PlayerMutex;
 
 bool NoRescueCheck;						/// Disable rescue check
 
@@ -448,19 +446,13 @@ void SavePlayers(CFile &file)
 
 void CPlayer::SetThisPlayer(CPlayer *player)
 {
-	CPlayer *old_player = nullptr;
+	CPlayer *old_player = CPlayer::ThisPlayer;
 	
-	{
-		std::unique_lock<std::shared_mutex> lock(PlayerMutex);
-		
-		old_player = CPlayer::ThisPlayer;
-		
-		if (old_player == player) {
-			return;
-		}
-		
-		CPlayer::ThisPlayer = player;
+	if (old_player == player) {
+		return;
 	}
+	
+	CPlayer::ThisPlayer = player;
 	
 	Wyrmgus::GetInstance()->emit_signal("this_player_changed", old_player, player);
 	
@@ -469,19 +461,19 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 	if (new_interface != old_interface) {
 		Wyrmgus::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
 	}
-}
-
-CPlayer *CPlayer::GetThisPlayer()
-{
-	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
 	
-	return CPlayer::ThisPlayer;
+	for (int i = 0; i < MaxCosts; ++i) {
+		const int old_amount = old_player ? old_player->GetResource(i, STORE_BOTH) : 0;
+		const int new_amount = player ? player->GetResource(i, STORE_BOTH) : 0;
+		
+		if (old_amount != new_amount) {
+			Wyrmgus::GetInstance()->emit_signal("resource_stored_changed", CResource::Get(i), new_amount);
+		}
+	}
 }
 
 CPlayer *CPlayer::GetPlayer(const int index)
 {
-	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
-	
 	if (index < 0) {
 		fprintf(stderr, "Cannot get player for index %i: the index is negative.\n", index);
 		return nullptr;
@@ -587,9 +579,9 @@ CPlayer *CPlayer::GetOrAddFactionPlayer(const CFaction *faction)
 			CPlayer::Players[i]->AiEnabled = true;
 			CPlayer::Players[i]->AiName = faction->GetDefaultAI();
 			CPlayer::Players[i]->Team = 1;
-			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
-			CPlayer::Players[i]->Resources[WoodCost] = 2500;
-			CPlayer::Players[i]->Resources[StoneCost] = 2500;
+			CPlayer::Players[i]->SetResource(CopperCost, 2500); // give the new player enough resources to start up
+			CPlayer::Players[i]->SetResource(WoodCost, 2500);
+			CPlayer::Players[i]->SetResource(StoneCost, 2500);
 			
 			if (GameRunning) {
 				AiInit(*CPlayer::Players[i]);
@@ -630,6 +622,7 @@ void CPlayer::Save(CFile &file) const
 			file.printf(" \"color\", %u,", i);
 			break;
 		}
+	}
 	if (this->PrimaryColor != nullptr) {
 		file.printf(" \"primary-color\", \"%s\",", this->PrimaryColor->Ident.c_str());
 	}
@@ -962,8 +955,6 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		return;
 	}
 
-	std::unique_lock<std::shared_mutex> lock(this->Mutex);
-	
 	std::vector<CUnit *>().swap(this->Units);
 	std::vector<CUnit *>().swap(this->FreeWorkers);
 	//Wyrmgus start
@@ -1142,11 +1133,7 @@ void CPlayer::SetCivilization(int civilization)
 		this->Faction = nullptr;
 	}
 
-	{
-		std::unique_lock<std::shared_mutex> lock(this->Mutex);
-		
-		this->Race = civilization;
-	}
+	this->Race = civilization;
 
 	//if the civilization of the person player changed, update the UI
 	if (CPlayer::GetThisPlayer() == this || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
@@ -1180,8 +1167,6 @@ void CPlayer::SetCivilization(int civilization)
 
 CCivilization *CPlayer::GetCivilization() const
 {
-	std::shared_lock<std::shared_mutex> lock(this->Mutex);
-	
 	return CCivilization::Get(this->Race);
 }
 	
@@ -2088,8 +2073,6 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 */
 void CPlayer::Clear()
 {
-	std::unique_lock<std::shared_mutex> lock(this->Mutex);
-	
 	this->Index = 0;
 	this->Name.clear();
 	this->Type = 0;
@@ -3023,6 +3006,10 @@ void CPlayer::ChangeResource(const int resource_index, const int value, const bo
 			this->Resources[resource_index] += value;
 		}
 	}
+	
+	if (this == CPlayer::GetThisPlayer()) {
+		Wyrmgus::GetInstance()->emit_signal("resource_stored_changed", CResource::Get(resource_index), this->GetResource(resource_index, STORE_BOTH));
+	}
 }
 
 /**
@@ -3046,6 +3033,10 @@ void CPlayer::SetResource(const int resource, const int value, const int type)
 		this->StoredResources[resource] = std::min(value, this->MaxResources[resource]);
 	} else if (type == STORE_OVERALL) {
 		this->Resources[resource] = value;
+	}
+	
+	if (this == CPlayer::GetThisPlayer()) {
+		Wyrmgus::GetInstance()->emit_signal("resource_stored_changed", CResource::Get(resource), this->GetResource(resource, STORE_BOTH));
 	}
 }
 
