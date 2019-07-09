@@ -46,7 +46,6 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
 #include "video/palette_image.h"
-#include "video/video.h"
 #include "wyrmgus.h"
 
 /*----------------------------------------------------------------------------
@@ -64,9 +63,6 @@ const CAge *CAge::CurrentAge = nullptr;
 */
 CAge::~CAge()
 {
-	if (this->G) {
-		CGraphic::Free(this->G);
-	}
 }
 
 /**
@@ -84,9 +80,6 @@ bool CAge::ProcessConfigDataSection(const CConfigData *section)
 		PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
 		image->ProcessConfigData(section);
 		this->Image = image;
-		
-		this->G = CGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().width, image->GetFrameSize().height);
-		this->G->Load();
 	} else if (section->Tag == "predependencies") {
 		this->Predependency = new CAndDependency;
 		this->Predependency->ProcessConfigData(section);
@@ -128,8 +121,6 @@ void CAge::SetCurrentAge(const CAge *new_age)
 		return;
 	}
 	
-	const CAge *old_age = CAge::CurrentAge;
-	
 	CAge::CurrentAge = new_age;
 	
 	if (GameCycle > 0 && !SaveGameLoading) {
@@ -140,8 +131,6 @@ void CAge::SetCurrentAge(const CAge *new_age)
 			}
 		}
 	}
-	
-	Wyrmgus::GetInstance()->emit_signal("age_changed", old_age, new_age);
 }
 
 /**
@@ -190,9 +179,5 @@ void SetCurrentAge(const std::string &age_ident)
 		return;
 	}
 	
-	const CAge *old_age = CAge::CurrentAge;
-	
 	CAge::CurrentAge = new_age;
-	
-	Wyrmgus::GetInstance()->emit_signal("age_changed", old_age, new_age);
 }

@@ -39,7 +39,6 @@
 #include "config_operator.h"
 #include "module.h"
 #include "video/palette_image.h"
-#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -62,9 +61,6 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 		PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
 		image->ProcessConfigData(section);
 		this->Image = image;
-		
-		this->G = CGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().width, image->GetFrameSize().height);
-		this->G->Load();
 	} else {
 		return false;
 	}

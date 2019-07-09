@@ -181,7 +181,7 @@ private:
 public:
 	CReligion *Religion = nullptr;	/// religion of the player
 	CDynasty *Dynasty = nullptr;	/// ruling dynasty of the player
-	CAge *Age = nullptr;			/// The current age the player/faction is in
+	const CAge *Age = nullptr;		/// the current age the player/faction is in
 	std::string AiName; /// AI for computer
 
 	// friend enemy detection
@@ -292,7 +292,7 @@ public:
 	
 	//Wyrmgus start
 	void CheckAge();
-	void SetAge(CAge *age);
+	void SetAge(const CAge *new_age);
 	Currency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorAvailable(const CPlayerColor *player_color) const;

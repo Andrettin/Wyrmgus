@@ -42,7 +42,6 @@
 ----------------------------------------------------------------------------*/
 
 class CDependency;
-class CGraphic;
 class CUpgrade;
 class PaletteImage;
 
@@ -87,8 +86,6 @@ public:
 		return this->Image;
 	}
 	
-public:
-	CGraphic *G = nullptr;
 private:
 	int Priority = 0;
 	int YearBoost = 0;

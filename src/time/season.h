@@ -41,7 +41,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CGraphic;
 class PaletteImage;
 
 /*----------------------------------------------------------------------------
@@ -62,7 +61,6 @@ public:
 		return this->Image;
 	}
 
-	CGraphic *G = nullptr;
 private:
 	const PaletteImage *Image = nullptr;
 

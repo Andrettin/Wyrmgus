@@ -42,7 +42,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CGraphic;
 class PaletteImage;
 
 /*----------------------------------------------------------------------------
@@ -58,11 +57,6 @@ public:
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 
-	CGraphic *GetGraphic() const
-	{
-		return this->G;
-	}
-	
 	bool IsDawn() const
 	{
 		return this->Dawn;
@@ -110,7 +104,6 @@ private:
 	bool Night = false;		/// whether this is a night time of day
 	CColor ColorModification;	/// the color modification applied to graphics when the time of day is active
 	const PaletteImage *Image = nullptr;
-	CGraphic *G = nullptr;
 
 protected:
 	static void _bind_methods();

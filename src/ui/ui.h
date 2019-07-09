@@ -383,10 +383,7 @@ public:
 	CResourceInfo Resources[MaxResourceInfo];	/// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;				/// Info panel
-	CResourceInfo TimeOfDayPanel;		/// Time of day panel
-	CResourceInfo SeasonPanel;			/// Season panel
 	CResourceInfo DatePanel;			/// Date panel
-	CResourceInfo AgePanel;				/// Age panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;	/// Info panel contents
 
 	std::vector<CPopup *> ButtonPopups;	/// Popup windows for buttons

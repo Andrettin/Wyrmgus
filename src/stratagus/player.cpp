@@ -1416,26 +1416,24 @@ void CPlayer::CheckAge()
 **
 **	@param	age	The age to be set for the player
 */
-void CPlayer::SetAge(CAge *age)
+void CPlayer::SetAge(const CAge *new_age)
 {
-	if (this->Age == age) {
+	if (this->Age == new_age) {
 		return;
 	}
 	
-	this->Age = age;
+	const CAge *old_age = CAge::CurrentAge;
+	
+	this->Age = new_age;
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		if (this->Age) {
-			UI.AgePanel.Text = this->Age->GetName().utf8().get_data();
-			UI.AgePanel.G = this->Age->G;
-			
+		if (this->Age != nullptr) {
 			if (GameCycle > 0 && !SaveGameLoading) {
 				this->Notify(_("The %s has dawned upon us."), this->Age->GetName().utf8().get_data());
 			}
-		} else {
-			UI.AgePanel.Text.clear();
-			UI.AgePanel.G = nullptr;
 		}
+		
+		Wyrmgus::GetInstance()->emit_signal("age_changed", old_age, new_age);
 	}
 	
 	CAge::CheckCurrentAge();

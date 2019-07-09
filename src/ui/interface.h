@@ -314,8 +314,6 @@ extern void DrawMessages();
 extern void DrawResources();
 /// Draw the time of day, season and date
 extern void DrawTime();
-/// Draw the age
-extern void DrawAge();
 /// Draw the map layer buttons
 extern void DrawMapLayerButtons();
 //Wyrmgus start
