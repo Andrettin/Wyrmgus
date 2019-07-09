@@ -1225,8 +1225,20 @@ void ChangeCurrentMapLayer(const int z)
 	UI.SelectedViewport->Set(new_viewport_map_pos, CMap::Map.GetCurrentPixelTileSize() / 2);
 	UpdateSurfaceLayerButtons();
 	
-	if (GameRunning && (!UI.PreviousMapLayer || UI.PreviousMapLayer->GetTimeOfDay() != UI.CurrentMapLayer->GetTimeOfDay())) {
-		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", UI.PreviousMapLayer->GetTimeOfDay(), UI.CurrentMapLayer->GetTimeOfDay());
+	if (GameRunning) {
+		const CTimeOfDay *old_time_of_day = nullptr;
+		const CSeason *old_season = nullptr;
+		if (UI.PreviousMapLayer != nullptr) {
+			old_time_of_day = UI.PreviousMapLayer->GetTimeOfDay();
+			old_season = UI.PreviousMapLayer->GetSeason();
+		}
+		
+		if (old_time_of_day != UI.CurrentMapLayer->GetTimeOfDay()) {
+			Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", old_time_of_day, UI.CurrentMapLayer->GetTimeOfDay());
+		}
+		if (old_season != UI.CurrentMapLayer->GetSeason()) {
+			Wyrmgus::GetInstance()->emit_signal("season_changed", old_season, UI.CurrentMapLayer->GetSeason());
+		}
 	}
 	
 	Wyrmgus::GetInstance()->emit_signal("current_map_layer_changed", UI.PreviousMapLayer, UI.CurrentMapLayer);

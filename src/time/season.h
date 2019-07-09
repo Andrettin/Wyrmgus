@@ -42,6 +42,7 @@
 ----------------------------------------------------------------------------*/
 
 class CGraphic;
+class PaletteImage;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -55,11 +56,18 @@ public:
 	static constexpr const char *ClassIdentifier = "season";
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
+	}
 
 	CGraphic *G = nullptr;
+private:
+	const PaletteImage *Image = nullptr;
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

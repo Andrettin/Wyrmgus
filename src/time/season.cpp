@@ -38,6 +38,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "module.h"
+#include "video/palette_image.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -54,49 +55,24 @@
 bool CSeason::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "image") {
-		std::string file;
-		Vector2i size(0, 0);
-			
-		for (const CConfigProperty &property : section->Properties) {
-			if (property.Operator != CConfigOperator::Assignment) {
-				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
-				continue;
-			}
-			
-			String key = property.Key;
-			String value = property.Value;
-			
-			if (key == "file") {
-				file = CModule::GetCurrentPath() + value.utf8().get_data();
-			} else if (key == "width") {
-				size.x = value.to_int();
-			} else if (key == "height") {
-				size.y = value.to_int();
-			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
-			}
-		}
+		String image_ident = "season_" + this->GetIdent();
+		image_ident = image_ident.replace("_", "-");
+		PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+		image->ProcessConfigData(section);
+		this->Image = image;
 		
-		if (file.empty()) {
-			fprintf(stderr, "Image has no file.\n");
-			return true;
-		}
-		
-		if (size.x == 0) {
-			fprintf(stderr, "Image has no width.\n");
-			return true;
-		}
-		
-		if (size.y == 0) {
-			fprintf(stderr, "Image has no height.\n");
-			return true;
-		}
-		
-		this->G = CGraphic::New(file, size.x, size.y);
+		this->G = CGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().width, image->GetFrameSize().height);
 		this->G->Load();
 	} else {
 		return false;
 	}
 	
 	return true;
+}
+
+void CSeason::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CSeason *season, const String &ident){ season->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const CSeason *season){ return const_cast<PaletteImage *>(season->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
 }

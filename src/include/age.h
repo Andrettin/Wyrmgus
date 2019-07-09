@@ -44,6 +44,7 @@
 class CDependency;
 class CGraphic;
 class CUpgrade;
+class PaletteImage;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -63,10 +64,10 @@ public:
 public:
 	static constexpr const char *ClassIdentifier = "age";
 	
-	static void SetCurrentAge(CAge *age);
+	static void SetCurrentAge(const CAge *new_age);
 	static void CheckCurrentAge();
 	
-	static CAge *CurrentAge;
+	static const CAge *CurrentAge;
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
@@ -81,11 +82,17 @@ public:
 		return this->YearBoost;
 	}
 	
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
+	}
+	
 public:
 	CGraphic *G = nullptr;
 private:
 	int Priority = 0;
 	int YearBoost = 0;
+	const PaletteImage *Image = nullptr;
 public:
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;

@@ -398,6 +398,10 @@ void CMapLayer::SetSeason(const CScheduledSeason *season)
 	
 	this->Season = season;
 	
+	if (GameRunning && this == UI.CurrentMapLayer) {
+		Wyrmgus::GetInstance()->emit_signal("season_changed", old_season, new_season);
+	}
+	
 	//update map layer tiles affected by the season change
 	for (int x = 0; x < this->GetWidth(); x++) {
 		for (int y = 0; y < this->GetHeight(); y++) {

@@ -45,13 +45,15 @@
 #include "time/calendar.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
+#include "video/palette_image.h"
 #include "video/video.h"
+#include "wyrmgus.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CAge *CAge::CurrentAge = nullptr;
+const CAge *CAge::CurrentAge = nullptr;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -77,45 +79,13 @@ CAge::~CAge()
 bool CAge::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "image") {
-		std::string file;
-		Vector2i size(0, 0);
+		String image_ident = "age_" + this->GetIdent();
+		image_ident = image_ident.replace("_", "-");
+		PaletteImage *image = PaletteImage::GetOrAdd(image_ident.utf8().get_data());
+		image->ProcessConfigData(section);
+		this->Image = image;
 		
-		for (const CConfigProperty &property : section->Properties) {
-			if (property.Operator != CConfigOperator::Assignment) {
-				print_error("Wrong operator enumeration index for property \"" + property.Key + "\": " + String::num_int64(static_cast<int>(property.Operator)) + ".");
-				continue;
-			}
-			
-			String key = property.Key;
-			String value = property.Value;
-			
-			if (key == "file") {
-				file = CModule::GetCurrentPath() + value.utf8().get_data();
-			} else if (key == "width") {
-				size.x = value.to_int();
-			} else if (key == "height") {
-				size.y = value.to_int();
-			} else {
-				fprintf(stderr, "Invalid image property: \"%s\".\n", key.utf8().get_data());
-			}
-		}
-		
-		if (file.empty()) {
-			fprintf(stderr, "Image has no file.\n");
-			return true; //returns true, because false is only for if the property doesn't exist
-		}
-		
-		if (size.x == 0) {
-			fprintf(stderr, "Image has no width.\n");
-			return true;
-		}
-		
-		if (size.y == 0) {
-			fprintf(stderr, "Image has no height.\n");
-			return true;
-		}
-		
-		this->G = CGraphic::New(file, size.x, size.y);
+		this->G = CGraphic::New(image->GetFile().utf8().get_data(), image->GetFrameSize().width, image->GetFrameSize().height);
 		this->G->Load();
 	} else if (section->Tag == "predependencies") {
 		this->Predependency = new CAndDependency;
@@ -152,13 +122,15 @@ void CAge::Initialize()
 /**
 **	@brief	Set the current age
 */
-void CAge::SetCurrentAge(CAge *age)
+void CAge::SetCurrentAge(const CAge *new_age)
 {
-	if (age == CAge::CurrentAge) {
+	if (new_age == CAge::CurrentAge) {
 		return;
 	}
 	
-	CAge::CurrentAge = age;
+	const CAge *old_age = CAge::CurrentAge;
+	
+	CAge::CurrentAge = new_age;
 	
 	if (GameCycle > 0 && !SaveGameLoading) {
 		if (CAge::CurrentAge && CAge::CurrentAge->YearBoost > 0) {
@@ -168,6 +140,8 @@ void CAge::SetCurrentAge(CAge *age)
 			}
 		}
 	}
+	
+	Wyrmgus::GetInstance()->emit_signal("age_changed", old_age, new_age);
 }
 
 /**
@@ -175,7 +149,7 @@ void CAge::SetCurrentAge(CAge *age)
 */
 void CAge::CheckCurrentAge()
 {
-	CAge *best_age = CAge::CurrentAge;
+	const CAge *best_age = CAge::CurrentAge;
 	
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (CPlayer::Players[p]->Age && (!best_age || CPlayer::Players[p]->Age->Priority > best_age->Priority)) {
@@ -197,6 +171,10 @@ void CAge::_bind_methods()
 	ClassDB::bind_method(D_METHOD("set_year_boost", "year_boost"), +[](CAge *age, const int year_boost){ age->YearBoost = year_boost; });
 	ClassDB::bind_method(D_METHOD("get_year_boost"), &CAge::GetYearBoost);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "year_boost"), "set_year_boost", "get_year_boost");
+	
+	ClassDB::bind_method(D_METHOD("set_image", "ident"), +[](CAge *age, const String &ident){ age->Image = PaletteImage::Get(ident); });
+	ClassDB::bind_method(D_METHOD("get_image"), +[](const CAge *age){ return const_cast<PaletteImage *>(age->GetImage()); });
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "image"), "set_image", "get_image");
 }
 
 /**
@@ -206,11 +184,15 @@ void CAge::_bind_methods()
 */
 void SetCurrentAge(const std::string &age_ident)
 {
-	CAge *age = CAge::Get(age_ident);
+	const CAge *new_age = CAge::Get(age_ident);
 	
-	if (!age) {
+	if (!new_age) {
 		return;
 	}
 	
-	CAge::CurrentAge = age;
+	const CAge *old_age = CAge::CurrentAge;
+	
+	CAge::CurrentAge = new_age;
+	
+	Wyrmgus::GetInstance()->emit_signal("age_changed", old_age, new_age);
 }

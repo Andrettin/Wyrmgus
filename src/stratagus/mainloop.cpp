@@ -65,6 +65,7 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "time/calendar.h"
+#include "time/season.h"
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "trigger/trigger.h"
@@ -533,6 +534,7 @@ void GameMainLoop()
 	MultiPlayerReplayEachCycle();
 	
 	Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", static_cast<CTimeOfDay *>(nullptr), UI.CurrentMapLayer->GetTimeOfDay());
+	Wyrmgus::GetInstance()->emit_signal("season_changed", static_cast<CSeason *>(nullptr), UI.CurrentMapLayer->GetSeason());
 
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
@@ -582,6 +584,7 @@ void GameMainLoop()
 	SingleGameLoop();
 	
 	Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", UI.CurrentMapLayer->GetTimeOfDay(), static_cast<CTimeOfDay *>(nullptr));
+	Wyrmgus::GetInstance()->emit_signal("season_changed", UI.CurrentMapLayer->GetSeason(), static_cast<CSeason *>(nullptr));
 
 	//
 	// Game over

@@ -147,8 +147,12 @@ void Wyrmgus::_bind_methods()
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
 	ADD_SIGNAL(MethodInfo("resource_stored_changed", PropertyInfo(Variant::OBJECT, "resource"), PropertyInfo(Variant::INT, "amount")));
 	
-	//this signal occurs when the time of day of the map layer being currently seen by the player has changed
+	//these signals occur when the time of day or season of the map layer being currently seen by the player has changed
 	ADD_SIGNAL(MethodInfo("time_of_day_changed", PropertyInfo(Variant::OBJECT, "old_time_of_day"), PropertyInfo(Variant::OBJECT, "new_time_of_day")));
+	ADD_SIGNAL(MethodInfo("season_changed", PropertyInfo(Variant::OBJECT, "old_season"), PropertyInfo(Variant::OBJECT, "new_season")));
+	
+	//emitted when the age for the current player (e.g. Bronze Age) changes
+	ADD_SIGNAL(MethodInfo("age_changed", PropertyInfo(Variant::OBJECT, "old_age"), PropertyInfo(Variant::OBJECT, "new_age")));
 	
 	ADD_SIGNAL(MethodInfo("map_layer_created", PropertyInfo(Variant::OBJECT, "map_layer")));
 	ADD_SIGNAL(MethodInfo("current_map_layer_changed", PropertyInfo(Variant::OBJECT, "old_map_layer"), PropertyInfo(Variant::OBJECT, "new_map_layer")));

@@ -1563,9 +1563,9 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		calendar->CurrentDate = CCalendar::BaseCalendar->CurrentDate.ToCalendar(CCalendar::BaseCalendar, calendar);
 		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
 	}
-	
-	CAge::CurrentAge = nullptr;
 	//Wyrmgus end
+	
+	CAge::SetCurrentAge(nullptr);
 
 	if (CMap::Map.Info.Filename.empty() && !filename.empty()) {
 		const std::string path = LibraryFileName(filename.c_str());

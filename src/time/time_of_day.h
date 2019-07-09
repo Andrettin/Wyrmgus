@@ -43,6 +43,7 @@
 ----------------------------------------------------------------------------*/
 
 class CGraphic;
+class PaletteImage;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -97,12 +98,18 @@ public:
 		return this->ColorModification;
 	}
 	
+	const PaletteImage *GetImage() const
+	{
+		return this->Image;
+	}
+	
 private:
 	bool Dawn = false;		/// whether this is a dawn time of day
 	bool Day = false;		/// whether this is a day time of day
 	bool Dusk = false;		/// whether this is a dusk time of day
 	bool Night = false;		/// whether this is a night time of day
 	CColor ColorModification;	/// the color modification applied to graphics when the time of day is active
+	const PaletteImage *Image = nullptr;
 	CGraphic *G = nullptr;
 
 protected:
