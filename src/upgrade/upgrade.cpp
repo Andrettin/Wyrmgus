@@ -1494,7 +1494,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
-						unit.GetPlayer()->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+						unit.GetPlayer()->ChangeSupply(um->Modifier.Variables[SUPPLY_INDEX].Value);
 					}
 				}
 			}
@@ -1507,7 +1507,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
-						unit.GetPlayer()->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
+						unit.GetPlayer()->ChangeDemand(um->Modifier.Variables[DEMAND_INDEX].Value);
 					}
 				}
 			}
@@ -1781,7 +1781,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
-						unit.GetPlayer()->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+						unit.GetPlayer()->ChangeSupply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
 					}
 				}
 			}
@@ -1794,7 +1794,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.GetPlayer()->GetIndex() == pn && unit.IsAlive()) {
-						unit.GetPlayer()->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
+						unit.GetPlayer()->ChangeDemand(-um->Modifier.Variables[DEMAND_INDEX].Value);
 					}
 				}
 			}
@@ -2029,7 +2029,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
-			unit.GetPlayer()->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+			unit.GetPlayer()->ChangeSupply(um->Modifier.Variables[SUPPLY_INDEX].Value);
 		}
 	}
 
@@ -2128,7 +2128,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
-			unit.GetPlayer()->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+			unit.GetPlayer()->ChangeSupply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
 		}
 	}
 	

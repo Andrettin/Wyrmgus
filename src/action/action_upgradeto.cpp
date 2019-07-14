@@ -144,8 +144,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (!unit.IsUnderConstruction()) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
-		player.Demand += newtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value;
-		player.Supply += newtype.Stats[player.GetIndex()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[SUPPLY_INDEX].Value;
+		player.ChangeDemand(newtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value);
+		player.ChangeSupply(newtype.Stats[player.GetIndex()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.GetIndex()].Variables[SUPPLY_INDEX].Value);
 
 		// Change resource limit
 		for (size_t i = 0; i < CResource::GetAll().size(); ++i) {

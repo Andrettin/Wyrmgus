@@ -1180,6 +1180,32 @@ String CPlayer::GetInterface() const
 	return "";
 }
 
+void CPlayer::SetSupply(const int amount)
+{
+	if (this->Supply == amount) {
+		return;
+	}
+	
+	this->Supply = amount;
+	
+	if (this == CPlayer::GetThisPlayer()) {
+		Wyrmgus::GetInstance()->emit_signal("supply_changed", amount);
+	}
+}
+
+void CPlayer::SetDemand(const int amount)
+{
+	if (this->Demand == amount) {
+		return;
+	}
+	
+	this->Demand = amount;
+	
+	if (this == CPlayer::GetThisPlayer()) {
+		Wyrmgus::GetInstance()->emit_signal("demand_changed", amount);
+	}
+}
+
 /**
 **  Change player faction.
 **

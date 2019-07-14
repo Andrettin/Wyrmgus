@@ -3089,7 +3089,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		player.IncreaseCountsForUnit(this);
 
-		player.Demand += type.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value; // food needed
+		player.ChangeDemand(type.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value); // food needed
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
@@ -4490,11 +4490,11 @@ void UnitLost(CUnit &unit)
 	}
 
 	//  Handle unit demand. (Currently only food supported.)
-	player.Demand -= type.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value;
+	player.ChangeDemand(-type.Stats[player.GetIndex()].Variables[DEMAND_INDEX].Value);
 
 	//  Update information.
 	if (unit.CurrentAction() != UnitActionBuilt) {
-		player.Supply -= unit.Variable[SUPPLY_INDEX].Value;
+		player.ChangeSupply(-unit.Variable[SUPPLY_INDEX].Value);
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (player.MaxResources[i] != -1 && type.Stats[player.GetIndex()].Storing[i]) {
@@ -4639,7 +4639,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
 	if (!upgrade) {
-		player.Supply += unit.Variable[SUPPLY_INDEX].Value;
+		player.ChangeSupply(unit.Variable[SUPPLY_INDEX].Value);
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (player.MaxResources[i] != -1 && type.Stats[player.GetIndex()].Storing[i]) {
 				player.MaxResources[i] += type.Stats[player.GetIndex()].Storing[i];
@@ -5109,8 +5109,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer.Demand += Type->Stats[newplayer.GetIndex()].Variables[DEMAND_INDEX].Value;
-	newplayer.Supply += this->Variable[SUPPLY_INDEX].Value;
+	newplayer.ChangeDemand(this->Type->Stats[newplayer.GetIndex()].Variables[DEMAND_INDEX].Value);
+	newplayer.ChangeSupply(this->Variable[SUPPLY_INDEX].Value);
 	// Increase resource limit
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.GetIndex()].Storing[i]) {

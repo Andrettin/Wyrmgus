@@ -856,11 +856,11 @@ void DrawResources()
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
 		char tmp[256];
-		snprintf(tmp, sizeof(tmp), "%d/%d", CPlayer::GetThisPlayer()->Demand, CPlayer::GetThisPlayer()->Supply);
+		snprintf(tmp, sizeof(tmp), "%d/%d", CPlayer::GetThisPlayer()->GetDemand(), CPlayer::GetThisPlayer()->GetSupply());
 		UI.Resources[FoodCost].Text = tmp;
 		UI.Resources[FoodCost].Font = &GetGameFont();
 		label.SetFont(*UI.Resources[FoodCost].Font);
-		if (CPlayer::GetThisPlayer()->Supply < CPlayer::GetThisPlayer()->Demand) {
+		if (CPlayer::GetThisPlayer()->GetSupply() < CPlayer::GetThisPlayer()->GetDemand()) {
 			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);
 		} else {
 			label.Draw(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);

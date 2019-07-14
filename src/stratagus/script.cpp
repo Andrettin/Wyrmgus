@@ -1312,9 +1312,9 @@ static int GetPlayerData(const int player, const char *prop, const char *arg)
 		return CPlayer::Players[player]->NumBuildingsUnderConstruction;
 	//Wyrmgus end
 	} else if (!strcmp(prop, "Supply")) {
-		return CPlayer::Players[player]->Supply;
+		return CPlayer::Players[player]->GetSupply();
 	} else if (!strcmp(prop, "Demand")) {
-		return CPlayer::Players[player]->Demand;
+		return CPlayer::Players[player]->GetDemand();
 	} else if (!strcmp(prop, "UnitLimit")) {
 		return CPlayer::Players[player]->UnitLimit;
 	} else if (!strcmp(prop, "BuildingLimit")) {

@@ -169,6 +169,30 @@ public:
 	void SetDynasty(CDynasty *dynasty);
 	String GetInterface() const;
 	
+	int GetSupply() const
+	{
+		return this->Supply;
+	}
+
+	void ChangeSupply(const int change)
+	{
+		this->SetSupply(this->GetSupply() + change);
+	}
+	
+	void SetSupply(const int amount);
+
+	int GetDemand() const
+	{
+		return this->Demand;
+	}
+	
+	void ChangeDemand(const int change)
+	{
+		this->SetDemand(this->GetDemand() + change);
+	}
+
+	void SetDemand(const int amount);
+	
 private:
 	int Index = 0;		/// player as number
 public:
@@ -247,9 +271,11 @@ public:
 	int NumBuildingsUnderConstruction = 0;	/// # buildings under construction
 	int NumTownHalls = 0;
 	//Wyrmgus end
+private:
 	int Supply = 0;		/// supply available/produced
 	int Demand = 0;		/// demand of player
 
+public:
 	int UnitLimit;		/// # food units allowed
 	int BuildingLimit;	/// # buildings allowed
 	int TotalUnitLimit;	/// # total unit number allowed
