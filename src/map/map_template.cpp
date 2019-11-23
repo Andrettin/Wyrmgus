@@ -421,8 +421,7 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vector2i template_start_pos, V
 	
 	std::string line_str;
 	int y = 0;
-	while (std::getline(is_map, line_str))
-	{
+	while (std::getline(is_map, line_str)) {
 		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
 			y++;
 			continue;
