@@ -1905,7 +1905,7 @@ void CButtonPanel::Update()
 void CButtonPanel::DoClicked_SelectTarget(int button)
 {
 	// Select target.
-	CursorState = CursorStateSelect;
+	CurrentCursorState = CursorState::Select;
 	if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
 		GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
 		CustomCursor = CurrentButtons[button].ButtonCursor;
@@ -2046,7 +2046,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
 	CursorBuilding = nullptr;
-	CursorState = CursorStatePoint;
+	CurrentCursorState = CursorState::Point;
 }
 
 void CButtonPanel::DoClicked_CancelTrain()

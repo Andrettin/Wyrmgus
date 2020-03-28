@@ -153,18 +153,18 @@ public:
 };
 
 /// Cursor state
-enum CursorStates {
-	CursorStatePoint,      /// Normal cursor
-	CursorStateSelect,     /// Select position
-	CursorStateRectangle,  /// Rectangle selecting
-	CursorStatePieMenu     /// Displaying Pie Menu
+enum class CursorState {
+	Point,      /// Normal cursor
+	Select,     /// Select position
+	Rectangle,  /// Rectangle selecting
+	PieMenu     /// Displaying Pie Menu
 };
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CursorStates CursorState;  /// current cursor state (point,...)
+extern CursorState CurrentCursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
 extern CUnitType *CursorBuilding; /// building cursor

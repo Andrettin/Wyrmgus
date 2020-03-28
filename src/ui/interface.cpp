@@ -1664,9 +1664,9 @@ void InputMouseMove(const EventCallback &callbacks,
 		LastMouseTicks = ticks;
 		// Reset rectangle select cursor state if we moved by a lot
 		// - rectangle select should be a drag, not a tap
-		if (CursorState == CursorStateRectangle
+		if (CurrentCursorState == CursorState::Rectangle
 			&& (abs(diff.x) > 2 * buff || abs(diff.y) > 2 * buff)) {
-			CursorState = CursorStatePoint;
+			CursorState = CursorState::Point;
 		}
 	}
 	LastMousePos = mousePos;

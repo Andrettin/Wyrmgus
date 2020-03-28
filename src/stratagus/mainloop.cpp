@@ -223,7 +223,7 @@ void UpdateDisplay()
 		DrawMapArea();
 		DrawMessages();
 
-		if (CursorState == CursorStateRectangle) {
+		if (CurrentCursorState == CursorState::Rectangle) {
 			DrawCursor();
 		}
 
@@ -295,7 +295,7 @@ void UpdateDisplay()
 
 	DrawGuichanWidgets();
 	
-	if (CursorState != CursorStateRectangle) {
+	if (CurrentCursorState != CursorState::Rectangle) {
 		DrawCursor();
 	}
 

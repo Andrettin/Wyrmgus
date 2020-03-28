@@ -300,7 +300,7 @@ static int MenuLoop()
 
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
-	CursorState = CursorStatePoint;
+	CurrentCursorState = CursorState::Point;
 	GameCursor = UI.Point.Cursor;
 
 	// FIXME delete this when switching to full guichan GUI

@@ -1113,7 +1113,7 @@ void SelectionChanged()
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
 	CursorBuilding = nullptr;
-	CursorState = CursorStatePoint;
+	CurrentCursorState = CursorState::Point;
 	UI.ButtonPanel.Update();
 }
 

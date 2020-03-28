@@ -77,25 +77,25 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	// Look if found what was required.
 	CUnit *unit = FindUnitAtPos(pos);
 	if (unit) {
 		*unitP = unit;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) { // reachable
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
 	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -125,12 +125,12 @@ private:
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 	//Wyrmgus start
 	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != player.Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	
@@ -142,17 +142,17 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 		if (resPos) {
 			*resPos = pos;
 		}
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -595,7 +595,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
 	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 
 	//Wyrmgus start
@@ -603,7 +603,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
 	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->Index && !Players[worker.MapLayer->Field(pos)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 
@@ -624,19 +624,19 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			*resultMine = mine;
 
 			if (cost.IsMin()) {
-				return VisitResult_Finished;
+				return VisitResult::Finished;
 			}
 			bestCost = cost;
 		}
 	}
 	if (CanMoveToMask(pos, movemask, worker.MapLayer->ID)) { // reachable
 		if (terrainTraversal.Get(pos) < maxRange) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -1654,14 +1654,14 @@ VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, c
 {
 	if (pos.x >= dst_unit.tilePos.x && pos.x <= (dst_unit.tilePos.x + dst_unit.Type->TileSize.x - 1) && pos.y >= dst_unit.tilePos.y && pos.y <= (dst_unit.tilePos.y + dst_unit.Type->TileSize.y - 1)) {
 		*result = true;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	
 	if (!src_unit.MapLayer->Field(pos)->CheckMask(flags)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
-	return VisitResult_Ok;
+	return VisitResult::Ok;
 }
 
 bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags)

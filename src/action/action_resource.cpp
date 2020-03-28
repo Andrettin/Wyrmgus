@@ -107,12 +107,12 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 //	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 	//Wyrmgus end
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 
 	//Wyrmgus start
 	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != player.Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 
@@ -124,19 +124,19 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 		if (resPos) {
 			*resPos = from;
 		}
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) { // reachable
 	if (Map.Field(pos, z)->GetResource() == resource) { // reachable
 	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 

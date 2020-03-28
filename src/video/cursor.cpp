@@ -67,7 +67,7 @@
 */
 static std::vector<CCursor *> AllCursors;
 
-CursorStates CursorState;    /// current cursor state (point,...)
+CursorState CurrentCursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
 std::string CustomCursor;    /// custom cursor for button
@@ -365,7 +365,7 @@ void DrawBuildingCursor()
 void DrawCursor()
 {
 	// Selecting rectangle
-	if (CursorState == CursorStateRectangle && CursorStartScreenPos != CursorScreenPos) {
+	if (CurrentCursorState == CursorState::Rectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);

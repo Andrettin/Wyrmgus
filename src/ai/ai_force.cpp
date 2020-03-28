@@ -92,7 +92,7 @@ private:
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 	if (unit.MapLayer->Field(pos)->CheckMask(MapFieldWall) && !Map.Info.IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
@@ -114,11 +114,11 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			unsigned int water_movemask = movemask;
 			water_movemask &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 			if (CanMoveToMask(pos, water_movemask, unit.MapLayer->ID)) {
-				return VisitResult_Ok; //if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
+				return VisitResult::Ok; //if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
 			}
 		}
 		
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 
 	std::vector<CUnit *> table;
@@ -150,13 +150,13 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		
 		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
 			*result_unit = dest;
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		} else if (*result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
 			*result_unit = dest;
 		}
 	}
 
-	return VisitResult_Ok;
+	return VisitResult::Ok;
 }
 //Wyrmgus end
 
@@ -520,13 +520,13 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 {
 	//Wyrmgus start
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	
 	//Wyrmgus start
 	if (!CanMoveToMask(pos, movemask, z)) { // unreachable, put this at the beginning to improve performance
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	
@@ -535,16 +535,16 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 //	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist) == false
 //		&& Distance(pos, startPos) <= abs(distance - minDist)) {
 //		*resultPos = pos;
-//		return VisitResult_Finished;
+//		return VisitResult::Finished;
 //	}
 	
 	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist, z) > 0) { // if there are enemies within the minimum distance here, then it is a dead end
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 	if (Distance(pos, startPos) <= abs(distance - minDist)) {
 		*resultPos = pos;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	//Wyrmgus end
 	
@@ -555,13 +555,13 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 //	if (CanMoveToMask(pos, movemask)) { // reachable
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
 	//Wyrmgus end
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	*/
 	
-	return VisitResult_Ok;
+	return VisitResult::Ok;
 	//Wyrmgus end
 }
 

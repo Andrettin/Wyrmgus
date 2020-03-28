@@ -154,12 +154,12 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	/*
 #if 0
 	if (!unit.Player->AiEnabled && !Map.IsFieldExplored(*unit.Player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	*/
 	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	// Look if found what was required.
@@ -171,16 +171,16 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 		if (resultPos) {
 			*resultPos = from;
 		}
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (unit.MapLayer->Field(pos)->CheckMask(movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -263,13 +263,13 @@ private:
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	if (CanMoveToMask(pos, movemask, unit.MapLayer->ID)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -309,19 +309,19 @@ bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) co
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 
 	if (EnemyOnMapTile(unit, pos, unit.MapLayer->ID) && CanMoveToMask(from, movemask, unit.MapLayer->ID)) {
 		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
 		*resultPos = pos;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 
 	if (CanMoveToMask(pos, movemask, unit.MapLayer->ID) || IsAccessibleForTransporter(pos)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 

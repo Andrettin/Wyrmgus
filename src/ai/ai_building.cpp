@@ -210,16 +210,16 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	*/
 	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 //	if (CanBuildUnitType(&worker, type, pos, 1)
@@ -236,7 +236,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		if (AiCheckSurrounding(worker, type, pos, backupok, z) && checkSurround) {
 		//Wyrmgus end
 			*resultPos = pos;
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		} else if (backupok && resultPos->x == -1) {
 			*resultPos = pos;
 		}
@@ -245,9 +245,9 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 //	if (CanMoveToMask(pos, movemask)) { // reachable
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
 	//Wyrmgus end
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -382,7 +382,7 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	*/
@@ -390,12 +390,12 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 //	if (!IgnoreExploration && !Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
 	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 	//Wyrmgus end
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
 	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 //	CUnit *mine = ResourceOnMap(pos, resource);
@@ -418,16 +418,16 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 //		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos)) {
 		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos, IgnoreExploration, z)) {
 		//Wyrmgus end
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		}
 	}
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) { // reachable
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
 	//Wyrmgus end
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -523,17 +523,17 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	*/
 	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
 	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	
 //	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
@@ -543,7 +543,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 //		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
 		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos, IgnoreExploration, z)) {
 		//Wyrmgus end
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		}
 	}
 	//Wyrmgus start
@@ -551,9 +551,9 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	if (CanMoveToMask(pos, movemask, z)
 	//Wyrmgus end
 		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
