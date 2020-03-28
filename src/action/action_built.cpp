@@ -212,7 +212,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	std::vector<CUnit *> table;
 	SelectAroundUnit(unit, 2, table);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 			// If we can harvest from the new building, do it.
 			if (table[i]->Type->ResInfo[type.GivesResource]) {
 				CommandResource(*table[i], unit, 0);
@@ -267,7 +267,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	//Wyrmgus start
 	for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
-		if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 			table[i]->ChangeExperience(xp_gained / worker_count);
 		}
 	}
@@ -301,7 +301,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			PlayUnitSound(unit, VoiceReady);
 		}
 		if (worker) {
-			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitActionBuild) {
+			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
 				PlayUnitSound(*worker, VoiceWorkCompleted);
 			}
 		//Wyrmgus end
@@ -310,8 +310,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			// why play the under-construction sound if the building has just been completed?
 //			PlayUnitSound(unit, VoiceBuilding);
 			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
-				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
-					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitActionBuild) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
+				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
 						PlayUnitSound(*table[i], VoiceWorkCompleted);
 						break;
 					}

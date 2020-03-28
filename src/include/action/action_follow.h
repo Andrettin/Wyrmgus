@@ -39,8 +39,8 @@ class COrder_Follow : public COrder
 	friend COrder *COrder::NewActionFollow(CUnit &dest);
 public:
 	//Wyrmgus start
-//	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0)
-	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0), MapLayer(0)
+//	COrder_Follow() : COrder(UnitAction::Follow), State(0), Range(0)
+	COrder_Follow() : COrder(UnitAction::Follow), State(0), Range(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

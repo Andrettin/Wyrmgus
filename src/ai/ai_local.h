@@ -106,22 +106,20 @@ public:
 /**
 **  Roles for forces
 */
-enum AiForceRole {
-	AiForceRoleDefault = 0, /// So default is attacking
-	AiForceRoleAttack = 0, /// Force should attack
-	AiForceRoleDefend      /// Force should defend
+enum class AiForceRole {
+	Default = 0, /// So default is attacking
+	Attack = 0, /// Force should attack
+	Defend      /// Force should defend
 };
 
-enum AiForceAttackingState {
-	AiForceAttackingState_Free = -1,
-	AiForceAttackingState_Waiting = 0,
-	AiForceAttackingState_Boarding,
-	AiForceAttackingState_GoingToRallyPoint,
-	AiForceAttackingState_AttackingWithTransporter,
-	AiForceAttackingState_Attacking,
-	//Wyrmgus start
-	AiForceAttackingState_WaitingForTransporters,
-	//Wyrmgus end
+enum class AiForceAttackingState {
+	Free = -1,
+	Waiting = 0,
+	Boarding,
+	GoingToRallyPoint,
+	AttackingWithTransporter,
+	Attacking,
+	WaitingForTransporters
 };
 
 #define AI_WAIT_ON_RALLY_POINT 60          /// Max seconds AI units will wait on rally point
@@ -141,7 +139,7 @@ public:
 		HomeMapLayer(0),
 		GoalMapLayer(0),
 		//Wyrmgus end
-		Role(AiForceRoleDefault), FormerForce(-1), State(AiForceAttackingState_Free),
+		Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState::Free),
 		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
 	{
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
@@ -166,9 +164,9 @@ public:
 		WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
 		if (types) {
 			UnitTypes.clear();
-			State = AiForceAttackingState_Free;
+			State = AiForceAttackingState::Free;
 		} else {
-			State = AiForceAttackingState_Waiting;
+			State = AiForceAttackingState::Waiting;
 		}
 		Units.for_each(InternalRemoveUnit);
 		Units.clear();
@@ -279,7 +277,7 @@ public:
 	void Update();
 	void UpdatePerHalfMinute();
 	void UpdatePerMinute();
-	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0, bool allow_hero_only_force = false);
+	unsigned int FindFreeForce(const AiForceRole role = AiForceRole::Default, int begin = 0, bool allow_hero_only_force = false);
 	void CheckUnits(int *counter);
 	void CheckForceRecruitment();
 private:

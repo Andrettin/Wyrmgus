@@ -42,8 +42,8 @@ class COrder_Train : public COrder
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	COrder_Train() : COrder(UnitActionTrain), Type(nullptr), Ticks(0) {}
-	COrder_Train() : COrder(UnitActionTrain), Type(nullptr), Player(0), Ticks(0) {}
+//	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Ticks(0) {}
+	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Player(0), Ticks(0) {}
 	//Wyrmgus end
 
 	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }

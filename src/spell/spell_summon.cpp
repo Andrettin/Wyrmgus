@@ -80,7 +80,7 @@ class IsDyingAndNotABuilding
 public:
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->CurrentAction() == UnitActionDie && !unit->Type->BoolFlag[BUILDING_INDEX].value;
+		return unit->CurrentAction() == UnitAction::Die && !unit->Type->BoolFlag[BUILDING_INDEX].value;
 	}
 };
 

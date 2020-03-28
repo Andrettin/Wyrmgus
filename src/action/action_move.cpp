@@ -407,7 +407,7 @@ int DoActionMove(CUnit &unit)
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-							if (table[i]->CurrentAction() == UnitActionStill) {
+							if (table[i]->CurrentAction() == UnitAction::Still) {
 								CommandStopUnit(*table[i]);
 								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 							}
@@ -419,7 +419,7 @@ int DoActionMove(CUnit &unit)
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
-							if (table[i]->CurrentAction() == UnitActionStill) {
+							if (table[i]->CurrentAction() == UnitAction::Still) {
 								CommandStopUnit(*table[i]);
 								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 							}

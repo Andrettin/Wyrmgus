@@ -1445,7 +1445,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		//Wyrmgus end
 			//Wyrmgus start
 			// convert transformation order
-			if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTransformInto) {
+			if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 				COrder_TransformInto &order = *static_cast<COrder_TransformInto *>(unit.CriticalOrder);
 
 				if (&order.GetUnitType() == &src) {
@@ -1455,7 +1455,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 			//Wyrmgus end
 			
 			for (size_t j = 0; j < unit.Orders.size(); ++j) {
-				if (unit.Orders[j]->Action == UnitActionTrain) {
+				if (unit.Orders[j]->Action == UnitAction::Train) {
 					COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[j]);
 
 					if (&order.GetUnitType() == &src) {
@@ -1463,14 +1463,14 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 					}
 				//Wyrmgus start
 				// convert building orders as well
-				} else if (unit.Orders[j]->Action == UnitActionBuild) {
+				} else if (unit.Orders[j]->Action == UnitAction::Build) {
 					COrder_Build &order = *static_cast<COrder_Build *>(unit.Orders[j]);
 
 					if (&order.GetUnitType() == &src) {
 						order.ConvertUnitType(unit, dst);
 					}
 				// also convert upgrade orders
-				} else if (unit.Orders[j]->Action == UnitActionUpgradeTo) {
+				} else if (unit.Orders[j]->Action == UnitAction::UpgradeTo) {
 					COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.Orders[j]);
 
 					if (&order.GetUnitType() == &src) {

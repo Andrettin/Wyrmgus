@@ -1997,7 +1997,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		//check if the required core settlements are owned by the player
 		if (CurrentCampaign != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
-				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitActionBuilt) {
+				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitAction::Built) {
 					return false;
 				}
 			}
@@ -2507,7 +2507,7 @@ void CPlayer::UpdateFreeWorkers()
 //		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
 		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed && !unit.Type->BoolFlag[TRADER_INDEX].value) {
 		//Wyrmgus end
-			if (unit.CurrentAction() == UnitActionStill) {
+			if (unit.CurrentAction() == UnitAction::Still) {
 				FreeWorkers.push_back(&unit);
 			}
 		}
@@ -3467,7 +3467,7 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 		//Wyrmgus end
 		CUnit &unit = **it;
 
-		if (unit.CurrentAction() == UnitActionUpgradeTo) {
+		if (unit.CurrentAction() == UnitAction::UpgradeTo) {
 			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit.CurrentOrder());
 			if (order.GetUnitType().Slot == type.Slot) {
 				++count;
@@ -4376,7 +4376,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 	if (
 		this != unit.Player
 		&& this->Type != PlayerNeutral
-		&& unit.CurrentAction() == UnitActionAttack
+		&& unit.CurrentAction() == UnitAction::Attack
 		&& unit.CurrentOrder()->HasGoal()
 		&& unit.CurrentOrder()->GetGoal()->Player == this
 		&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value

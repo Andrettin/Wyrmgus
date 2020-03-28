@@ -44,7 +44,7 @@ class COrder_Attack : public COrder
 	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 public:
-	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
+	explicit COrder_Attack(bool ground) : COrder(ground ? UnitAction::AttackGround : UnitAction::Attack),
 		//Wyrmgus start
 //		State(0), MinRange(0), Range(0), goalPos(-1, -1) {}
 		State(0), MinRange(0), Range(0), goalPos(-1, -1), MapLayer(0) {}

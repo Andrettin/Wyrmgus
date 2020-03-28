@@ -544,7 +544,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	// make workers attack enemy units if those are right-clicked upon
-	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitAction::Built && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
@@ -648,7 +648,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 
 static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	if (dest != nullptr && unit.CurrentAction() != UnitActionBuilt) {
+	if (dest != nullptr && unit.CurrentAction() != UnitAction::Built) {
 		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
 			return;
 		}
@@ -1183,7 +1183,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 		//Wyrmgus end
 		if (Selected.size() == 1) {
-			if (Selected[0]->CurrentAction() == UnitActionTrain) {
+			if (Selected[0]->CurrentAction() == UnitAction::Train) {
 				if (Selected[0]->Orders.size() == 1) {
 					if (UI.SingleTrainingButton->Contains(screenPos)) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
@@ -1195,15 +1195,15 @@ static void HandleMouseOn(const PixelPos screenPos)
 					const size_t size = UI.TrainingButtons.size();
 					size_t j = 0;
 					for (size_t i = 0; i < Selected[0]->Orders.size() && j < size; ++i) {
-						if (Selected[0]->Orders[i]->Action == UnitActionTrain) {
+						if (Selected[0]->Orders[i]->Action == UnitAction::Train) {
 							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
-							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitActionTrain) {
+							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitAction::Train) {
 								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
 								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
 									continue;
 								}
 							}
-							if (Selected[0]->Orders[i]->Action == UnitActionTrain
+							if (Selected[0]->Orders[i]->Action == UnitAction::Train
 								&& UI.TrainingButtons[j].Contains(screenPos)) {
 								ButtonAreaUnderCursor = ButtonAreaTraining;
 								ButtonUnderCursor = j;
@@ -1214,14 +1214,14 @@ static void HandleMouseOn(const PixelPos screenPos)
 						}
 					}
 				}
-			} else if (Selected[0]->CurrentAction() == UnitActionUpgradeTo) {
+			} else if (Selected[0]->CurrentAction() == UnitAction::UpgradeTo) {
 				if (UI.UpgradingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaUpgrading;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
-			} else if (Selected[0]->CurrentAction() == UnitActionResearch) {
+			} else if (Selected[0]->CurrentAction() == UnitAction::Research) {
 				if (UI.ResearchingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaResearching;
 					ButtonUnderCursor = 0;
@@ -1478,7 +1478,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
 					 it != unit.Orders.end(); ++it) {
 					COrder &order = **it;
-					if (order.Action == UnitActionBuild) {
+					if (order.Action == UnitAction::Build) {
 						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
 						if (tilePos.x >= build.GetGoalPos().x
 							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileSize.x
@@ -2564,7 +2564,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
-					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
+					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitAction::Train) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
 
 					DebugPrint("Cancel slot %d %s\n" _C_ ButtonUnderCursor _C_ order.GetUnitType().Ident.c_str());
@@ -2688,9 +2688,9 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					size_t j = 0;
 					int order_slot = -1;
 					for (size_t i = 0; i < Selected[0]->Orders.size(); ++i) {
-						if (Selected[0]->Orders[i]->Action == UnitActionTrain) {
+						if (Selected[0]->Orders[i]->Action == UnitAction::Train) {
 							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
-							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitActionTrain) {
+							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitAction::Train) {
 								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
 								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
 									if (order_slot != -1) {
@@ -3210,7 +3210,7 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (Selected.size() == 1) {
-				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->Player->Index == ThisPlayer->Index) {
+				if (Selected[0]->CurrentAction() == UnitAction::Built && Selected[0]->Player->Index == ThisPlayer->Index) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning

@@ -43,8 +43,8 @@ class COrder_Repair : public COrder
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)
-	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0), MapLayer(0)
+//	COrder_Repair() : COrder(UnitAction::Repair), State(0), RepairCycle(0)
+	COrder_Repair() : COrder(UnitAction::Repair), State(0), RepairCycle(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

@@ -510,7 +510,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 
 static void DrawUnitInfo_Training(const CUnit &unit)
 {
-	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitActionTrain) {
+	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitAction::Train) {
 		if (!UI.SingleTrainingText.empty()) {
 			CLabel label(*UI.SingleTrainingFont);
 			label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY, UI.SingleTrainingText);
@@ -545,9 +545,9 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			size_t j = 0;
 			std::vector<int> train_counter;
 			for (size_t i = 0; i < unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitActionTrain) {
+				if (unit.Orders[i]->Action == UnitAction::Train) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
-					if (i > 0 && j > 0 && unit.Orders[i - 1]->Action == UnitActionTrain) {
+					if (i > 0 && j > 0 && unit.Orders[i - 1]->Action == UnitAction::Train) {
 						const COrder_Train &previous_order = *static_cast<COrder_Train *>(unit.Orders[i - 1]);
 						if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
 							train_counter[j - 1]++;
@@ -636,7 +636,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 static bool DrawUnitInfo_single_selection(const CUnit &unit)
 {
 	switch (unit.CurrentAction()) {
-		case UnitActionTrain: { //  Building training units.
+		case UnitAction::Train: { //  Building training units.
 			//Wyrmgus start
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			if (order.GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) { //don't show the training button for a quick moment if the time cost is 0
@@ -646,7 +646,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 			DrawUnitInfo_Training(unit);
 			return true;
 		}
-		case UnitActionUpgradeTo: { //  Building upgrading to better type.
+		case UnitAction::UpgradeTo: { //  Building upgrading to better type.
 			if (UI.UpgradingButton) {
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 				
@@ -669,7 +669,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 			}
 			return true;
 		}
-		case UnitActionResearch: { //  Building research new technology.
+		case UnitAction::Research: { //  Building research new technology.
 			if (UI.ResearchingButton) {
 				COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
 				
@@ -1971,10 +1971,10 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		|| ThisPlayer->IsTeamed(unit)
 		|| ThisPlayer->IsAllied(unit)
 		|| ReplayRevealMap) {
-		if (unit.Orders[0]->Action == UnitActionBuilt
-			|| unit.Orders[0]->Action == UnitActionResearch
-			|| unit.Orders[0]->Action == UnitActionUpgradeTo
-			|| unit.Orders[0]->Action == UnitActionTrain) {
+		if (unit.Orders[0]->Action == UnitAction::Built
+			|| unit.Orders[0]->Action == UnitAction::Research
+			|| unit.Orders[0]->Action == UnitAction::UpgradeTo
+			|| unit.Orders[0]->Action == UnitAction::Train) {
 			panelIndex = 3;
 		//Wyrmgus start
 //		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
@@ -1992,10 +1992,10 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	//draw icon panel frame, if any
 	if (
 		Preference.InfoPanelFrameG
-		&& (unit.CurrentAction() != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
-		&& (unit.CurrentAction() != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
-		&& (unit.CurrentAction() != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
-		&& unit.CurrentAction() != UnitActionBuilt
+		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
+		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
+		&& unit.CurrentAction() != UnitAction::Built
 		&& !unit.IsEnemy(*ThisPlayer)
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
 	) {

@@ -244,8 +244,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			return unit.Container;
 		case UnitRefWorker :
 			//Wyrmgus start
-//			if (unit.CurrentAction() == UnitActionBuilt) {
-			if (unit.CurrentAction() == UnitActionBuilt && !unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value) {
+//			if (unit.CurrentAction() == UnitAction::Built) {
+			if (unit.CurrentAction() == UnitAction::Built && !unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value) {
 			//Wyrmgus end
 				COrder_Built &order = *static_cast<COrder_Built *>(unit.CurrentOrder());
 

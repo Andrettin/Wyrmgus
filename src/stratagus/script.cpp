@@ -1638,7 +1638,7 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == ThisPlayer && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitActionBuilt;
+					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == ThisPlayer && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitAction::Built;
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}

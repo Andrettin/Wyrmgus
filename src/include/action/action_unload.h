@@ -42,8 +42,8 @@ class COrder_Unload : public COrder
 	//WYrmgus end
 public:
 	//Wyrmgus start
-//	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0)
-	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0), MapLayer(0)
+//	COrder_Unload() : COrder(UnitAction::Unload), State(0), Range(0)
+	COrder_Unload() : COrder(UnitAction::Unload), State(0), Range(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

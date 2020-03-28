@@ -365,15 +365,15 @@ bool ButtonCheckNoNetwork(const CUnit &, const ButtonAction &)
 */
 bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction &)
 {
-	int action = unit.CurrentAction();
+	const UnitAction action = unit.CurrentAction();
 	//Wyrmgus start
-//	return action != UnitActionTrain
-//		   && action != UnitActionUpgradeTo
-//		   && action != UnitActionResearch;
+//	return action != UnitAction::Train
+//		   && action != UnitAction::UpgradeTo
+//		   && action != UnitAction::Research;
 	//don't stop showing the button for a quick moment if the time cost is 0
-	return (action != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
-		   && (action != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
-		   && (action != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0);
+	return (action != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		   && (action != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		   && (action != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0);
 	//Wyrmgus end
 }
 
@@ -387,8 +387,8 @@ bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction &)
 */
 bool ButtonCheckNoResearch(const CUnit &unit, const ButtonAction &)
 {
-	int action = unit.CurrentAction();
-	return action != UnitActionUpgradeTo && action != UnitActionResearch;
+	const UnitAction action = unit.CurrentAction();
+	return action != UnitAction::UpgradeTo && action != UnitAction::Research;
 }
 
 /**
@@ -402,7 +402,7 @@ bool ButtonCheckNoResearch(const CUnit &unit, const ButtonAction &)
 */
 bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 {
-	if (unit.CurrentAction() != UnitActionStill) {
+	if (unit.CurrentAction() != UnitAction::Still) {
 		return false;
 	}
 	return CheckDependencies(UnitTypes[button.Value], unit.Player, false, true);

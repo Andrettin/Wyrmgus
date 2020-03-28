@@ -39,8 +39,8 @@ class COrder_Board : public COrder
 	friend COrder *COrder::NewActionBoard(CUnit &unit);
 public:
 	//Wyrmgus start
-//	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1) {}
-	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
+//	COrder_Board() : COrder(UnitAction::Board), State(0), Range(0), goalPos(-1, -1) {}
+	COrder_Board() : COrder(UnitAction::Board), State(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
 	//Wyrmgus end
 
 	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }

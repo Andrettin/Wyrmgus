@@ -44,7 +44,7 @@ class COrder_Resource : public COrder
 	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
-	COrder_Resource(CUnit &harvester) : COrder(UnitActionResource), worker(&harvester),
+	COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester),
 		//Wyrmgus start
 //		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0)
 		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0), MapLayer(0)

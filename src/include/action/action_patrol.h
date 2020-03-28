@@ -42,8 +42,8 @@ class COrder_Patrol : public COrder
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0)
-	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0), MapLayer(0), WayPointMapLayer(0)
+//	COrder_Patrol() : COrder(UnitAction::Patrol), WaitingCycle(0), Range(0)
+	COrder_Patrol() : COrder(UnitAction::Patrol), WaitingCycle(0), Range(0), MapLayer(0), WayPointMapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

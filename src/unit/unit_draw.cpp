@@ -154,7 +154,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
-	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
+	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
 		DrawSelectionCircleWithTrans(unit.Player->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
@@ -182,7 +182,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 			}
 		}
 	} else if (CursorBuilding && unit.Type->BoolFlag[BUILDING_INDEX].value
-			   && unit.CurrentAction() != UnitActionDie
+			   && unit.CurrentAction() != UnitAction::Die
 			   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 		// If building mark all own buildings
 		color = ColorGray;
@@ -927,7 +927,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		}
 		
 		//Wyrmgus start
-		if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
+		if (unit.IsAlive() && unit.CurrentAction() != UnitAction::Built) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
 				const int value = AuraRange - (unit.Type->TileSize.x - 1);
@@ -942,7 +942,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
+	if (unit.CurrentAction() != UnitAction::Die && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 		DrawDecoration(unit, type, screenPos);
 	}
 }
@@ -1108,22 +1108,22 @@ void CUnit::Draw(const CViewport &vp) const
 //	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	int player = this->GetDisplayPlayer();
 	//Wyrmgus end
-	int action = this->CurrentAction();
+	const UnitAction action = this->CurrentAction();
 	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {
 		screenPos = vp.MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
 		type = this->Type;
 		frame = this->Frame;
-		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
+		state = (action == UnitAction::Built) | ((action == UnitAction::UpgradeTo) << 1);
 		under_construction = this->UnderConstruction;
 		// Reset Type to the type being upgraded to
-		if (action == UnitActionUpgradeTo) {
+		if (action == UnitAction::UpgradeTo) {
 			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(this->CurrentOrder());
 
 			type = &order.GetUnitType();
 		}
 
-		if (this->CurrentAction() == UnitActionBuilt) {
+		if (this->CurrentAction() == UnitAction::Built) {
 			COrder_Built &order = *static_cast<COrder_Built *>(this->CurrentOrder());
 
 			cframe = &order.GetFrame();
@@ -1171,7 +1171,7 @@ void CUnit::Draw(const CViewport &vp) const
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		if (action != UnitActionDie) {
+//		if (action != UnitAction::Die) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			DrawShadow(*type, frame, screenPos);
@@ -1203,16 +1203,16 @@ void CUnit::Draw(const CViewport &vp) const
 	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south); if the position of the arms in the southeast frame is inverted, don't draw the left arm yet either
 	if (
-		(this->Direction != LookingS || this->CurrentAction() == UnitActionDie)
+		(this->Direction != LookingS || this->CurrentAction() == UnitAction::Die)
 		&& frame != type->StillFrame
 		&& !(
 			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
-			&& this->CurrentAction() != UnitActionDie
+			&& this->CurrentAction() != UnitAction::Die
 		)
 		&& !(
 			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
-			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
 		//draw the shield before the left arm if not facing south
@@ -1223,15 +1223,15 @@ void CUnit::Draw(const CViewport &vp) const
 	
 	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
 	if (
-		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)
+		(this->Direction == LookingN && this->CurrentAction() != UnitAction::Die)
 		|| (
 			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
-			&& this->CurrentAction() != UnitActionDie
+			&& this->CurrentAction() != UnitAction::Die
 		)
 		|| (
 			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
-			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
@@ -1296,19 +1296,19 @@ void CUnit::Draw(const CViewport &vp) const
 	
 	//Wyrmgus start
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
-	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
+	if ((this->Direction != LookingS || this->CurrentAction() == UnitAction::Die) && frame != type->StillFrame) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
 	}
 	if (
-		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)
+		(this->Direction == LookingN && this->CurrentAction() != UnitAction::Die)
 		|| (
 			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
-			&& this->CurrentAction() != UnitActionDie
+			&& this->CurrentAction() != UnitAction::Die
 		)
 		|| (
 			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
-			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
@@ -1318,7 +1318,7 @@ void CUnit::Draw(const CViewport &vp) const
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos);
 	
 	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
-	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitActionDie) {
+	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitAction::Die) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 	
@@ -1328,16 +1328,16 @@ void CUnit::Draw(const CViewport &vp) const
 	
 	//draw the left arm just after the body if facing south
 	if (
-		(this->Direction == LookingS && this->CurrentAction() != UnitActionDie)
+		(this->Direction == LookingS && this->CurrentAction() != UnitAction::Die)
 		|| frame == type->StillFrame
 		|| (
 			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
-			&& this->CurrentAction() != UnitActionDie
+			&& this->CurrentAction() != UnitAction::Die
 		)
 		|| (
 			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
-			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
@@ -1347,18 +1347,18 @@ void CUnit::Draw(const CViewport &vp) const
 
 	//draw the right arm just after the body if not facing north
 	if (
-		(this->Direction != LookingN || this->CurrentAction() == UnitActionDie)
+		(this->Direction != LookingN || this->CurrentAction() == UnitAction::Die)
 		&& !(
 			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
-			&& this->CurrentAction() != UnitActionDie
+			&& this->CurrentAction() != UnitAction::Die
 		)
 		&& !(
 			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
-			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitActionDie && this->GetLayerSprite(RightHandImageLayer) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
+		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitAction::Die && this->GetLayerSprite(RightHandImageLayer) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
@@ -1377,7 +1377,7 @@ void CUnit::Draw(const CViewport &vp) const
 		|| this->Direction == LookingNE
 		|| this->Direction == LookingNW
 		|| (
-			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitActionDie
+			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitAction::Die
 		)
 	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);

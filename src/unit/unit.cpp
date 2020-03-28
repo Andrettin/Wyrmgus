@@ -906,7 +906,7 @@ void CUnit::HealingItemAutoUse()
 
 void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 {
-	if (this->CurrentAction() == UnitActionDie) {
+	if (this->CurrentAction() == UnitAction::Die) {
 		return;
 	}
 	
@@ -2557,9 +2557,9 @@ void CUnit::Scout()
 }
 //Wyrmgus end
 
-unsigned int CUnit::CurrentAction() const
+UnitAction CUnit::CurrentAction() const
 {
-	return (CurrentOrder()->Action);
+	return this->CurrentOrder()->Action;
 }
 
 void CUnit::ClearAction()
@@ -2575,21 +2575,21 @@ void CUnit::ClearAction()
 bool CUnit::IsIdle() const
 {
 	//Wyrmgus start
-//	return Orders.size() == 1 && CurrentAction() == UnitActionStill;
-	return Orders.size() == 1 && CurrentAction() == UnitActionStill && this->Variable[STUN_INDEX].Value == 0;
+//	return Orders.size() == 1 && CurrentAction() == UnitAction::Still;
+	return Orders.size() == 1 && CurrentAction() == UnitAction::Still && this->Variable[STUN_INDEX].Value == 0;
 	//Wyrmgus end
 }
 
 bool CUnit::IsAlive() const
 {
-	return !Destroyed && CurrentAction() != UnitActionDie;
+	return !Destroyed && CurrentAction() != UnitAction::Die;
 }
 
 int CUnit::GetDrawLevel() const
 {
-	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
+	return ((Type->CorpseType && CurrentAction() == UnitAction::Die) ?
 		Type->CorpseType->DrawLevel :
-	((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));
+	((CurrentAction() == UnitAction::Die) ? Type->DrawLevel - 10 : Type->DrawLevel));
 }
 
 /**
@@ -2734,8 +2734,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 
 	// Build player unit table
 	//Wyrmgus start
-//	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie) {
-	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie && !this->Destroyed) {
+//	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitAction::Die) {
+	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitAction::Die && !this->Destroyed) {
 	//Wyrmgus end
 		player.AddUnit(*this);
 		if (!SaveGameLoading) {
@@ -2771,15 +2771,15 @@ void CUnit::AssignToPlayer(CPlayer &player)
 
 	// Don't Add the building if it's dying, used to load a save game
 	//Wyrmgus start
-//	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitActionDie) {
-	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitActionDie && !this->Destroyed && !type.BoolFlag[VANISHES_INDEX].value) {
+//	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitAction::Die) {
+	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitAction::Die && !this->Destroyed && !type.BoolFlag[VANISHES_INDEX].value) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 		//Wyrmgus end
 			player.NumBuildings++;
 			//Wyrmgus start
-			if (CurrentAction() == UnitActionBuilt) {
+			if (CurrentAction() == UnitAction::Built) {
 				player.NumBuildingsUnderConstruction++;
 				player.ChangeUnitTypeUnderConstructionCount(&type, 1);
 			}
@@ -3121,7 +3121,7 @@ void MarkUnitFieldFlags(const CUnit &unit)
 
 	//Wyrmgus start
 //	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
-	if (unit.Type->BoolFlag[VANISHES_INDEX].value || unit.CurrentAction() == UnitActionDie) {
+	if (unit.Type->BoolFlag[VANISHES_INDEX].value || unit.CurrentAction() == UnitAction::Die) {
 	//Wyrmgus end
 		return ;
 	}
@@ -3144,7 +3144,7 @@ public:
 
 	void operator()(CUnit *const unit) const
 	{
-		if (main != unit && unit->CurrentAction() != UnitActionDie) {
+		if (main != unit && unit->CurrentAction() != UnitAction::Die) {
 			mf->Flags |= unit->Type->FieldFlags;
 		}
 	}
@@ -3572,7 +3572,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 	MapMarkUnitSight(*this);
 
 	// Correct directions for wall units
-	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitActionBuilt) {
+	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitAction::Built) {
 		CorrectWallDirections(*this);
 		UnitUpdateHeading(*this);
 		CorrectWallNeighBours(*this);
@@ -3894,7 +3894,7 @@ void UnitLost(CUnit &unit)
 			//Wyrmgus end
 				player.NumBuildings--;
 				//Wyrmgus start
-				if (unit.CurrentAction() == UnitActionBuilt) {
+				if (unit.CurrentAction() == UnitAction::Built) {
 					player.NumBuildingsUnderConstruction--;
 					player.ChangeUnitTypeUnderConstructionCount(&type, -1);
 				}
@@ -3903,7 +3903,7 @@ void UnitLost(CUnit &unit)
 //			}
 			//Wyrmgus end
 		}
-		if (unit.CurrentAction() != UnitActionBuilt) {
+		if (unit.CurrentAction() != UnitAction::Built) {
 			if (player.AiEnabled && player.Ai) {
 				if (std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
 					if (player.Ai->Scouting) { //if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
@@ -3930,7 +3930,7 @@ void UnitLost(CUnit &unit)
 	player.Demand -= type.Stats[player.Index].Variables[DEMAND_INDEX].Value;
 
 	//  Update information.
-	if (unit.CurrentAction() != UnitActionBuilt) {
+	if (unit.CurrentAction() != UnitAction::Built) {
 		player.Supply -= unit.Variable[SUPPLY_INDEX].Value;
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -4573,7 +4573,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 		newplayer.NumBuildings++;
 	}
 	//Wyrmgus start
-	if (CurrentAction() == UnitActionBuilt) {
+	if (CurrentAction() == UnitAction::Built) {
 		newplayer.NumBuildingsUnderConstruction++;
 		newplayer.ChangeUnitTypeUnderConstructionCount(this->Type, 1);
 	}
@@ -6184,7 +6184,7 @@ bool CUnit::CanEat(const CUnit &unit) const
 		this->Type->BoolFlag[DETRITIVORE_INDEX].value
 		&& (
 			unit.Type->BoolFlag[DETRITUS_INDEX].value
-			|| (unit.CurrentAction() == UnitActionDie && (unit.Type->BoolFlag[FLESH_INDEX].value || unit.Type->BoolFlag[INSECT_INDEX].value))
+			|| (unit.CurrentAction() == UnitAction::Die && (unit.Type->BoolFlag[FLESH_INDEX].value || unit.Type->BoolFlag[INSECT_INDEX].value))
 		)
 	) {
 		return true;
@@ -6549,7 +6549,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (!suicide && unit.CurrentAction() != UnitActionBuilt && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
+	if (!suicide && unit.CurrentAction() != UnitAction::Built && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
 		unit.GenerateDrop();
 	}
 	//Wyrmgus end
@@ -7046,14 +7046,14 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 //	if (target.Player->AiEnabled == false) {
 	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
 	//Wyrmgus end
-		if (target.CurrentAction() == UnitActionAttack) {
+		if (target.CurrentAction() == UnitAction::Attack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsWeakTargetSelected() == false) {
 				return;
 			}
 		//Wyrmgus start
 //		} else {
-		} else if (target.CurrentAction() != UnitActionStill) {
+		} else if (target.CurrentAction() != UnitAction::Still) {
 		//Wyrmgus end
 			return;
 		}
@@ -7068,7 +7068,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		// Reveal Unit that is attacking
 		goal = &attacker;
 	} else {
-		if (target.CurrentAction() == UnitActionStandGround) {
+		if (target.CurrentAction() == UnitAction::StandGround) {
 			goal = AttackUnitsInRange(target);
 		} else {
 			// Check for any other units in range
@@ -7129,7 +7129,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		return;
 	}
 
-	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
+	Assert(damage != 0 && target.CurrentAction() != UnitAction::Die && !target.Type->BoolFlag[VANISHES_INDEX].value);
 
 	//Wyrmgus start
 	if (
@@ -7249,11 +7249,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	// Can't attack run away.
 	//Wyrmgus start
-//	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
+//	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitAction::Still && !target.BoardCount) {
 	if (
 		(!target.IsAgressive() || attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value)
 		&& target.CanMove()
-		&& (target.CurrentAction() == UnitActionStill || target.Variable[TERROR_INDEX].Value > 0)
+		&& (target.CurrentAction() == UnitAction::Still || target.Variable[TERROR_INDEX].Value > 0)
 		&& !target.BoardCount
 		&& !target.Type->BoolFlag[BRIDGE_INDEX].value
 	) {
@@ -7284,7 +7284,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	}
 
 	// What should we do with workers on :
-	// case UnitActionRepair:
+	// case UnitAction::Repair:
 	// Drop orders and run away or return after escape?
 }
 
@@ -7470,7 +7470,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	if (!transporter.Type->CanTransport()) {
 		return 0;
 	}
-	if (transporter.CurrentAction() == UnitActionBuilt) { // Under construction
+	if (transporter.CurrentAction() == UnitAction::Built) { // Under construction
 		return 0;
 	}
 	if (&transporter == &unit) { // Cannot transporter itself.
@@ -7530,7 +7530,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !IsItemClassConsumable(unit.Type->ItemClass)) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
-	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction
+	if (picker.CurrentAction() == UnitAction::Built) { // Under construction
 		return false;
 	}
 	if (&picker == &unit) { // Cannot pick up itself.
@@ -7606,7 +7606,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 	if (
 		this->Player != unit.Player
 		&& this->Player->Type != PlayerNeutral
-		&& unit.CurrentAction() == UnitActionAttack
+		&& unit.CurrentAction() == UnitAction::Attack
 		&& unit.CurrentOrder()->HasGoal()
 		&& unit.CurrentOrder()->GetGoal()->Player == this->Player
 		&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
@@ -7707,11 +7707,11 @@ bool CUnit::IsTeamed(const CUnit &unit) const
 
 /**
 **  Check if the unit is unusable (for attacking...)
-**  @todo look if correct used (UnitActionBuilt is no problem if attacked)?
+**  @todo look if correct used (UnitAction::Built is no problem if attacked)?
 */
 bool CUnit::IsUnusable(bool ignore_built_state) const
 {
-	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitActionBuilt));
+	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitAction::Built));
 }
 
 /**

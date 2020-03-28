@@ -799,7 +799,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		//Wyrmgus start
 		AiPlayer->Scouting = false;
 		//Wyrmgus end
-		this->State = AiForceAttackingState_Waiting;
+		this->State = AiForceAttackingState::Waiting;
 		return;
 	}
 	//Wyrmgus start
@@ -809,8 +809,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus end
 	if (!this->Attacking) {
 		// Remember the original force position so we can return there after attack
-		if (this->Role == AiForceRoleDefend
-			|| (this->Role == AiForceRoleAttack && this->State == AiForceAttackingState_Waiting)) {
+		if (this->Role == AiForceRole::Defend
+			|| (this->Role == AiForceRole::Attack && this->State == AiForceAttackingState::Waiting)) {
 			this->HomePos = this->Units[this->Units.size() - 1]->tilePos;
 			this->HomeMapLayer = this->Units[this->Units.size() - 1]->MapLayer->ID;
 		}
@@ -895,7 +895,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus end
 	if (Map.Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
-		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
+		if (State == AiForceAttackingState::Waiting && !PlanAttack()) {
 			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
 			Attacking = false;
 		}
@@ -924,7 +924,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 	//Wyrmgus end
 	
-	if (this->State == AiForceAttackingState_Waiting && isDefenceForce == false) {
+	if (this->State == AiForceAttackingState::Waiting && isDefenceForce == false) {
 		Vec2i resultPos;
 		//Wyrmgus start
 //		NewRallyPoint(goalPos, &resultPos);
@@ -937,13 +937,13 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		//Wyrmgus start
 		this->GoalMapLayer = z;
 		//Wyrmgus end
-		this->State = AiForceAttackingState_GoingToRallyPoint;
+		this->State = AiForceAttackingState::GoingToRallyPoint;
 	} else {
 		this->GoalPos = goalPos;
 		//Wyrmgus start
 		this->GoalMapLayer = z;
 		//Wyrmgus end
-		this->State = AiForceAttackingState_Attacking;
+		this->State = AiForceAttackingState::Attacking;
 	}
 	//  Send all units in the force to enemy.
 	
@@ -1026,7 +1026,7 @@ void AiForce::ReturnToHome()
 	//Wyrmgus start
 	AiPlayer->Scouting = false;
 	//Wyrmgus end
-	this->State = AiForceAttackingState_Waiting;
+	this->State = AiForceAttackingState::Waiting;
 }
 
 AiForceManager::AiForceManager()
@@ -1035,12 +1035,12 @@ AiForceManager::AiForceManager()
 	memset(script, -1, AI_MAX_FORCES * sizeof(char));
 }
 
-unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin, bool allow_hero_only_force)
+unsigned int AiForceManager::FindFreeForce(const AiForceRole role, int begin, bool allow_hero_only_force)
 {
 	/* find free force */
 	unsigned int f = begin;
 	for (; f < forces.size(); ++f) {
-		if (forces[f].State == AiForceAttackingState_Free) {
+		if (forces[f].State == AiForceAttackingState::Free) {
 			break;
 		}
 		
@@ -1052,7 +1052,7 @@ unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin, bool all
 	if (f == forces.size()) {
 		forces.resize(f + 1);
 	}
-	forces[f].State = AiForceAttackingState_Waiting;
+	forces[f].State = AiForceAttackingState::Waiting;
 	forces[f].Role = role;
 	return f;
 }
@@ -1143,7 +1143,7 @@ void AiForceManager::CheckUnits(int *counter)
 	for (unsigned int i = 0; i < forces.size(); ++i) {
 		const AiForce &force = forces[i];
 
-		if (force.State > AiForceAttackingState_Free && force.IsAttacking()) {
+		if (force.State > AiForceAttackingState::Free && force.IsAttacking()) {
 			for (unsigned int j = 0; j < force.Size(); ++j) {
 				const CUnit *unit = force.Units[j];
 				attacking[unit->Type->Slot]++;
@@ -1155,7 +1155,7 @@ void AiForceManager::CheckUnits(int *counter)
 		AiForce &force = forces[i];
 
 		// No troops for attacking force
-		if (force.State == AiForceAttackingState_Free || force.IsAttacking()) {
+		if (force.State == AiForceAttackingState::Free || force.IsAttacking()) {
 			continue;
 		}
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
@@ -1274,7 +1274,7 @@ void AiAttackWithForce(unsigned int force)
 	// the first force, so we can reuse it
 	if (!AiPlayer->Force[intForce].Defending) {
 		unsigned int top;
-		unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
+		unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRole::Default, AI_MAX_FORCE_INTERNAL);
 		AiPlayer->Force[f].Reset();
 		AiPlayer->Force[f].FormerForce = force;
 		AiPlayer->Force[f].Role = AiPlayer->Force[intForce].Role;
@@ -1320,7 +1320,7 @@ void AiAttackWithForces(int *forces)
 	const Vec2i invalidPos(-1, -1);
 	bool found = false;
 	unsigned int top;
-	unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
+	unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRole::Default, AI_MAX_FORCE_INTERNAL);
 
 	AiPlayer->Force[f].Reset();
 
@@ -1380,7 +1380,7 @@ void AiAttackWithForces(int *forces)
 */
 static void AiGroupAttackerForTransport(AiForce &aiForce)
 {
-	Assert(aiForce.State == AiForceAttackingState_Boarding);
+	Assert(aiForce.State == AiForceAttackingState::Boarding);
 
 	unsigned int nbToTransport = 0;
 	unsigned int transporterIndex = 0;
@@ -1395,7 +1395,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		}
 	}
 	if (transporterIndex == aiForce.Size()) {
-		aiForce.State = AiForceAttackingState_AttackingWithTransporter;
+		aiForce.State = AiForceAttackingState::AttackingWithTransporter;
 		return ;
 	}
 	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
@@ -1408,19 +1408,19 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		}
 	}
 	if (forceIsReady == true) {
-		aiForce.State = AiForceAttackingState_AttackingWithTransporter;
+		aiForce.State = AiForceAttackingState::AttackingWithTransporter;
 		return ;
 	}
 	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
 		CUnit &unit = *aiForce.Units[i];
 		CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (unit.CurrentAction() == UnitActionBoard
+		if (unit.CurrentAction() == UnitAction::Board
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() == &transporter) {
 			CommandFollow(transporter, unit, 0);
 		}
 		if (CanTransport(transporter, unit) && (unit.IsIdle() 
-			|| (unit.CurrentAction() == UnitActionBoard && !unit.Moving
+			|| (unit.CurrentAction() == UnitAction::Board && !unit.Moving
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter)) && unit.Container == nullptr) {
 				CommandBoard(unit, transporter, FlushCommands);
 				CommandFollow(transporter, unit, 0);
@@ -1451,7 +1451,7 @@ void AiForce::Update()
 	Assert(Defending == false);
 	if (Size() == 0) {
 		Attacking = false;
-		if (!Defending && State > AiForceAttackingState_Waiting) {
+		if (!Defending && State > AiForceAttackingState::Waiting) {
 			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
 					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
@@ -1497,7 +1497,7 @@ void AiForce::Update()
 		}
 	}
 	if (Attacking == false) {
-		if (!Defending && State > AiForceAttackingState_Waiting) {
+		if (!Defending && State > AiForceAttackingState::Waiting) {
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
 					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
@@ -1505,7 +1505,7 @@ void AiForce::Update()
 		return ;
 	}
 #if 0
-	if (State == AiForceAttackingState_Waiting) {
+	if (State == AiForceAttackingState::Waiting) {
 		if (!this->PlanAttack()) {
 			DebugPrint("Can't transport, look for walls\n");
 			if (!AiFindWall(this)) {
@@ -1513,14 +1513,14 @@ void AiForce::Update()
 				return ;
 			}
 		}
-		State = AiForceAttackingState_Boarding;
+		State = AiForceAttackingState::Boarding;
 	}
 #endif
-	if (State == AiForceAttackingState_Boarding) {
+	if (State == AiForceAttackingState::Boarding) {
 		AiGroupAttackerForTransport(*this);
 		return ;
 	}
-	if (State == AiForceAttackingState_AttackingWithTransporter) {
+	if (State == AiForceAttackingState::AttackingWithTransporter) {
 		// Move transporters to goalpos
 		std::vector<CUnit *> transporters;
 		bool emptyTrans = true;
@@ -1541,7 +1541,7 @@ void AiForce::Update()
 			Reset(true);
 		} else if (emptyTrans) {
 			// We have emptied our transporters, go go go
-			State = AiForceAttackingState_GoingToRallyPoint;
+			State = AiForceAttackingState::GoingToRallyPoint;
 		} else {
 			for (size_t i = 0; i != transporters.size(); ++i) {
 				CUnit &trans = *transporters[i];
@@ -1596,7 +1596,7 @@ void AiForce::Update()
 	//Wyrmgus start
 	bool include_neutral = AiPlayer->Player->AtPeace();
 	//Wyrmgus end
-	if (State == AiForceAttackingState_GoingToRallyPoint) {
+	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		//Wyrmgus start
 //		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
@@ -1639,7 +1639,7 @@ void AiForce::Update()
 					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 					Attacking = false;
-					State = AiForceAttackingState_Waiting;
+					State = AiForceAttackingState::Waiting;
 					*/
 					GoalPos.x = -1;
 					GoalPos.y = -1;
@@ -1672,7 +1672,7 @@ void AiForce::Update()
 				}
 			}
 			
-			State = AiForceAttackingState_Attacking;
+			State = AiForceAttackingState::Attacking;
 			for (size_t i = 0; i != this->Size(); ++i) {
 				CUnit &aiunit = *this->Units[i];
 				
@@ -1720,7 +1720,7 @@ void AiForce::Update()
 		return;
 	}
 
-	if (State == AiForceAttackingState_Attacking && idleUnits.size() == this->Size()) {
+	if (State == AiForceAttackingState::Attacking && idleUnits.size() == this->Size()) {
 		const CUnit *unit = nullptr;
 		Vec2i enemy_wall_pos(-1, -1);
 		int enemy_wall_map_layer = -1;
@@ -1745,7 +1745,7 @@ void AiForce::Update()
 			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 			Attacking = false;
-			State = AiForceAttackingState_Waiting;
+			State = AiForceAttackingState::Waiting;
 			*/
 			GoalPos.x = -1;
 			GoalPos.y = -1;
@@ -1785,7 +1785,7 @@ void AiForce::Update()
 					}
 				}
 			}
-			this->State = AiForceAttackingState_GoingToRallyPoint;
+			this->State = AiForceAttackingState::GoingToRallyPoint;
 		}
 	}
 	//Wyrmgus start
@@ -1803,7 +1803,7 @@ void AiForce::Update()
 		//Wyrmgus end
 		if (leader) {
 			if (aiunit.IsAgressive()) {
-				if (State == AiForceAttackingState_Attacking) {
+				if (State == AiForceAttackingState::Attacking) {
 					//Wyrmgus start
 //					CommandAttack(aiunit, leader->tilePos, nullptr, FlushCommands);
 					CommandAttack(aiunit, leader->tilePos, nullptr, FlushCommands, leader->MapLayer);
@@ -1941,11 +1941,11 @@ void AiForceManager::CheckForceRecruitment()
 			CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : nullptr;
 		
 			if (force_template) {
-				unsigned int new_force_id = this->FindFreeForce(AiForceRoleDefault, 1, true);
+				unsigned int new_force_id = this->FindFreeForce(AiForceRole::Default, 1, true);
 				AiForce &new_force = forces[new_force_id];
 				new_force.Reset(true);
-				new_force.State = AiForceAttackingState_Waiting;
-				new_force.Role = AiForceRoleDefault;
+				new_force.State = AiForceAttackingState::Waiting;
+				new_force.Role = AiForceRole::Default;
 				for (size_t i = 0; i < force_template->Units.size(); ++i) {
 					int class_id = force_template->Units[i].first;
 					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
@@ -1979,7 +1979,7 @@ void AiForceManager::Update()
 			if (force.Size() == 0) {
 				force.Attacking = false;
 				force.Defending = false;
-				force.State = AiForceAttackingState_Waiting;
+				force.State = AiForceAttackingState::Waiting;
 				continue;
 			}
 			const int nearDist = 5;

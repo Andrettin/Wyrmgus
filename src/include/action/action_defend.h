@@ -39,8 +39,8 @@ class COrder_Defend : public COrder
 	friend COrder *COrder::NewActionDefend(CUnit &dest);
 public:
 	//Wyrmgus start
-//	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0)
-	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0), MapLayer(0)
+//	COrder_Defend() : COrder(UnitAction::Defend), State(0), Range(0)
+	COrder_Defend() : COrder(UnitAction::Defend), State(0), Range(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

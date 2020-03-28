@@ -42,8 +42,8 @@ class COrder_Move : public COrder
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	COrder_Move() : COrder(UnitActionMove), Range(0)
-	COrder_Move() : COrder(UnitActionMove), Range(0), MapLayer(0)
+//	COrder_Move() : COrder(UnitAction::Move), Range(0)
+	COrder_Move() : COrder(UnitAction::Move), Range(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

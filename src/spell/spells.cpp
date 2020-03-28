@@ -580,9 +580,9 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 			const int react_range = target->GetReactionRange();
 			if (
 				(
-					target->CurrentAction() != UnitActionAttack
-					&& target->CurrentAction() != UnitActionAttackGround
-					&& target->CurrentAction() != UnitActionSpellCast
+					target->CurrentAction() != UnitAction::Attack
+					&& target->CurrentAction() != UnitAction::AttackGround
+					&& target->CurrentAction() != UnitAction::SpellCast
 				)
 				|| target->CurrentOrder()->HasGoal() == false
 				|| target->MapDistanceTo(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer()) > react_range
@@ -594,11 +594,11 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 	
 	// Check for corpse
 	if (autocast->Corpse == CONDITION_ONLY) {
-		if (target->CurrentAction() != UnitActionDie) {
+		if (target->CurrentAction() != UnitAction::Die) {
 			return false;
 		}
 	} else if (autocast->Corpse == CONDITION_FALSE) {
-		if (target->CurrentAction() == UnitActionDie || target->IsAlive() == false) {
+		if (target->CurrentAction() == UnitAction::Die || target->IsAlive() == false) {
 			return false;
 		}
 	}
@@ -650,7 +650,7 @@ std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, co
 	int range = autocast->Range;
 	int min_range = autocast->MinRange;
 
-	if (caster.CurrentAction() == UnitActionStandGround) {
+	if (caster.CurrentAction() == UnitAction::StandGround) {
 		range = std::min(range, this->Range);
 	}
 	
@@ -694,7 +694,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
 
-	if (caster.CurrentAction() == UnitActionStandGround) {
+	if (caster.CurrentAction() == UnitAction::StandGround) {
 		range = std::min(range, spell.Range);
 	}
 
@@ -830,7 +830,7 @@ int AutoCastSpell(CUnit &caster, const CSpell &spell)
 	} else {
 		// Save previous order
 		COrder *savedOrder = nullptr;
-		if (caster.CurrentAction() != UnitActionStill && caster.CanStoreOrder(caster.CurrentOrder())) {
+		if (caster.CurrentAction() != UnitAction::Still && caster.CanStoreOrder(caster.CurrentOrder())) {
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?

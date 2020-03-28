@@ -490,7 +490,7 @@ static int MoveToDropZone(CUnit &unit)
 			return 0;
 	}
 
-	Assert(unit.CurrentAction() == UnitActionUnload);
+	Assert(unit.CurrentAction() == UnitAction::Unload);
 	return 1;
 }
 

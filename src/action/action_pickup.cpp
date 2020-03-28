@@ -278,7 +278,7 @@ enum {
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitActionStill) {
+						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
 							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
@@ -334,9 +334,9 @@ enum {
 				}
 
 				if (dest.NewOrder == nullptr
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
-					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
+					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.CanAttack(true))
+					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;
 				} else {

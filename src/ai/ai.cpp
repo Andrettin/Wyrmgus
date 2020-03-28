@@ -284,7 +284,7 @@ static void AiCheckUnits()
 		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == nullptr) {
 			for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
 				CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
-				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
+				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitAction::Built) {
 					continue;
 				}
 				
@@ -434,10 +434,10 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 
 		file.printf(" \"role\", ");
 		switch (ai.Force[i].Role) {
-			case AiForceRoleAttack:
+			case AiForceRole::Attack:
 				file.printf("\"attack\",");
 				break;
-			case AiForceRoleDefend:
+			case AiForceRole::Defend:
 				file.printf("\"defend\",");
 				break;
 			default:
@@ -974,7 +974,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
-				if (aiunit.CurrentAction() == UnitActionAttack) {
+				if (aiunit.CurrentAction() == UnitAction::Attack) {
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
@@ -1033,10 +1033,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		AiForce &aiForce = pai.Force[i];
 
 		if (aiForce.Size() > 0
-			&& ((aiForce.Role == AiForceRoleDefend && !aiForce.Attacking)
+			&& ((aiForce.Role == AiForceRole::Defend && !aiForce.Attacking)
 				//Wyrmgus start
-//				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
-				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State)
+//				|| (aiForce.Role == AiForceRole::Attack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
+				|| (aiForce.Role == AiForceRole::Attack && !aiForce.Attacking && !aiForce.State)
 				|| (defender.GroupId && i == (defender.GroupId - 1)))) {  // none attacking
 				//Wyrmgus end
 			//Wyrmgus start
@@ -1065,7 +1065,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 					bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
-					if (aiunit.CurrentAction() == UnitActionAttack) {
+					if (aiunit.CurrentAction() == UnitAction::Attack) {
 						const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 						const CUnit *oldGoal = orderAttack.GetGoal();
 
@@ -1137,7 +1137,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
-				if (aiunit.CurrentAction() == UnitActionAttack) {
+				if (aiunit.CurrentAction() == UnitAction::Attack) {
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
@@ -1178,7 +1178,7 @@ void AiUnitKilled(CUnit &unit)
 		force.Remove(unit);
 		if (force.Size() == 0) {
 			force.Attacking = false;
-			if (!force.Defending && force.State > 0) {
+			if (!force.Defending && force.State > AiForceAttackingState::Waiting) {
 				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
 						   _C_ unit.Player->Index _C_(long unsigned int)(&force  - & (unit.Player->Ai->Force[0])));
 				force.Reset(true);
@@ -1309,7 +1309,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		
 		int blocker_force = blocker.Player->Ai->Force.GetForce(blocker);
 		if (blocker_force != -1 && blocker.Player->Ai->Force[blocker_force].Attacking) { //don't try to move the blocker if it is part of a force that is attacking
-			if (unit.CurrentAction() != UnitActionBoard) { //unless the unit is trying to board a ship, in which case the blocker should be moved
+			if (unit.CurrentAction() != UnitAction::Board) { //unless the unit is trying to board a ship, in which case the blocker should be moved
 				continue;
 			}
 		}

@@ -245,7 +245,7 @@ enum {
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitActionStill) {
+						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
 							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
@@ -305,12 +305,12 @@ enum {
 				}
 
 				if (dest.NewOrder == nullptr
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
+					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					//Wyrmgus start
-//					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
+//					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.Type->CanAttack)
+					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.CanAttack(true))
 					//Wyrmgus end
-					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;
 				} else {
@@ -358,8 +358,8 @@ enum {
 	//Wyrmgus end
 		//Wyrmgus start
 		&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range //only try to auto-attack if already reached the goal
-//		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
-		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill || goal->CurrentAction() == UnitActionStandGround)) {
+//		&& (!goal || goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::Still)) {
+		&& (!goal || goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::Still || goal->CurrentAction() == UnitAction::StandGround)) {
 		//Wyrmgus end
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {

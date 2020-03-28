@@ -39,8 +39,8 @@ class COrder_PickUp : public COrder
 	friend COrder *COrder::NewActionPickUp(CUnit &dest);
 public:
 	//Wyrmgus start
-//	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0)
-	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0), MapLayer(0)
+//	COrder_PickUp() : COrder(UnitAction::PickUp), State(0), Range(0)
+	COrder_PickUp() : COrder(UnitAction::PickUp), State(0), Range(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

@@ -38,7 +38,7 @@ class COrder_SpellCast : public COrder
 {
 	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
 public:
-	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
+	COrder_SpellCast(bool autocast = false) : COrder(UnitAction::SpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;

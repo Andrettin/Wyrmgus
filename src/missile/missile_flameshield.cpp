@@ -77,7 +77,7 @@ void MissileFlameShield::Action()
 	const int uh = unit->Type->TileSize.y;
 	this->position.x = upos.x * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
 	this->position.y = upos.y * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
-	if (unit->CurrentAction() == UnitActionDie) {
+	if (unit->CurrentAction() == UnitAction::Die) {
 		this->TTL = index;
 	}
 
@@ -96,7 +96,7 @@ void MissileFlameShield::Action()
 	std::vector<CUnit *> table;
 	SelectAroundUnit(*unit, 1, table);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->CurrentAction() != UnitActionDie) {
+		if (table[i]->CurrentAction() != UnitAction::Die) {
 			HitUnit(this->SourceUnit, *table[i], this->Damage);
 		}
 	}

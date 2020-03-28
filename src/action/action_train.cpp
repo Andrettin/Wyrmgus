@@ -179,7 +179,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	if (order == nullptr) {
 		return false;
 	}
-	if (order->Action == UnitActionResource) {
+	if (order->Action == UnitAction::Resource) {
 		//  Check if new unit can harvest.
 		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 			return false;
@@ -195,12 +195,12 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 		return true;
 	}
 	//Wyrmgus start
-//	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
-	if (order->Action == UnitActionAttack && !unit.CanAttack(true)) {
+//	if (order->Action == UnitAction::Attack && !unit.Type->CanAttack) {
+	if (order->Action == UnitAction::Attack && !unit.CanAttack(true)) {
 	//Wyrmgus end
 		return false;
 	}
-	if (order->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand) {
+	if (order->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand) {
 		return false;
 	}
 	return true;

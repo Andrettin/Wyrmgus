@@ -57,7 +57,7 @@
 
 bool IsBuiltUnit::operator()(const CUnit *unit) const
 {
-	return unit->CurrentAction() != UnitActionBuilt;
+	return unit->CurrentAction() != UnitAction::Built;
 }
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
@@ -206,7 +206,7 @@ class BestDepotFinder
 			&& (NEARLOCATION || u_near.worker->CanReturnGoodsTo(dest, resource))
 			//Wyrmgus end
 			&& dest->IsAliveOnMap()
-			&& dest->CurrentAction() != UnitActionBuilt) {
+			&& dest->CurrentAction() != UnitAction::Built) {
 			// Unit in range?
 
 			if (NEARLOCATION) {
@@ -312,7 +312,7 @@ class BestHomeMarketFinder
 		if (
 			dest->Type->BoolFlag[MARKET_INDEX].value
 			&& dest->IsAliveOnMap()
-			&& dest->CurrentAction() != UnitActionBuilt) {
+			&& dest->CurrentAction() != UnitAction::Built) {
 			// Unit in range?
 
 			if (NEARLOCATION) {
@@ -754,7 +754,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = player.GetUnit(i);
 		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
-			if (unit.CurrentAction() == UnitActionStill) {
+			if (unit.CurrentAction() == UnitAction::Still) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;
 				}

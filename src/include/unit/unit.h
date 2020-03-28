@@ -71,6 +71,7 @@ class CUpgrade;
 class CVariable;
 class CViewport;
 class PathFinderData;
+enum class UnitAction : char;
 struct lua_State;
 
 typedef COrder *COrderPtr;
@@ -136,7 +137,7 @@ public:
 
 	COrder *CurrentOrder() const { return Orders[0]; }
 
-	unsigned int CurrentAction() const;
+	UnitAction CurrentAction() const;
 
 	bool IsIdle() const;
 

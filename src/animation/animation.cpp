@@ -215,7 +215,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		return goal->Type->BoolFlag[index].value;
 	} else if (s[0] == 's') { //spell type detected
-		Assert(goal->CurrentAction() == UnitActionSpellCast);
+		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const CSpell &spell = order.GetSpell();
 		if (!strcmp(spell.Ident.c_str(), cur)) {

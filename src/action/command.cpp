@@ -72,13 +72,13 @@ static void ReleaseOrders(CUnit &unit)
 
 	// Order 0 must be stopped in the action loop.
 	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		if (unit.Orders[i]->Action == UnitActionBuilt) {
+		if (unit.Orders[i]->Action == UnitAction::Built) {
 			(dynamic_cast<COrder_Built *>(unit.Orders[i]))->Cancel(unit);
-		} else if (unit.Orders[i]->Action == UnitActionResearch) {
+		} else if (unit.Orders[i]->Action == UnitAction::Research) {
 			(dynamic_cast<COrder_Research *>(unit.Orders[i]))->Cancel(unit);
-		} else if (unit.Orders[i]->Action == UnitActionTrain) {
+		} else if (unit.Orders[i]->Action == UnitAction::Train) {
 			(dynamic_cast<COrder_Train *>(unit.Orders[i]))->Cancel(unit);
-		} else if (unit.Orders[i]->Action == UnitActionUpgradeTo) {
+		} else if (unit.Orders[i]->Action == UnitAction::UpgradeTo) {
 			(dynamic_cast<COrder_UpgradeTo *>(unit.Orders[i]))->Cancel(unit);
 		}
 		if (i > 0) {
@@ -88,7 +88,7 @@ static void ReleaseOrders(CUnit &unit)
 	unit.Orders.resize(1);
 	//Wyrmgus start
 //	unit.Orders[0]->Finished = true;
-	if (unit.Variable[STUN_INDEX].Value == 0 || unit.Orders[0]->Action != UnitActionStill) { //if the unit is stunned, don't end its current "still" order
+	if (unit.Variable[STUN_INDEX].Value == 0 || unit.Orders[0]->Action != UnitAction::Still) { //if the unit is stunned, don't end its current "still" order
 		unit.Orders[0]->Finished = true;
 	}
 	//Wyrmgus end
@@ -106,7 +106,7 @@ static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 {
 	//Wyrmgus start
 //	if (flush) {
-	if (flush && unit.CurrentAction() != UnitActionUpgradeTo && unit.CurrentAction() != UnitActionTrain && unit.CurrentAction() != UnitActionResearch) { //training, researching and upgrading must be canceled manually
+	if (flush && unit.CurrentAction() != UnitAction::UpgradeTo && unit.CurrentAction() != UnitAction::Train && unit.CurrentAction() != UnitAction::Research) { //training, researching and upgrading must be canceled manually
 	//Wyrmgus end
 		// empty command queue
 		ReleaseOrders(unit);
@@ -160,7 +160,7 @@ static void ClearSavedAction(CUnit &unit)
 
 static bool IsUnitValidForNetwork(const CUnit &unit)
 {
-	return !unit.Removed && unit.CurrentAction() != UnitActionDie;
+	return !unit.Removed && unit.CurrentAction() != UnitAction::Die;
 }
 
 //Wyrmgus start
@@ -883,7 +883,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 void CommandDismiss(CUnit &unit, bool salvage)
 {
 	// Check if building is still under construction? (NETWORK!)
-	if (unit.CurrentAction() == UnitActionBuilt) {
+	if (unit.CurrentAction() == UnitAction::Built) {
 		unit.CurrentOrder()->Cancel(unit);
 	} else {
 		if (salvage) {
@@ -891,7 +891,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 			SelectAroundUnit(unit, 16, table, IsEnemyWith(*unit.Player));
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (
-					(table[i]->CurrentAction() == UnitActionAttack || table[i]->CurrentAction() == UnitActionSpellCast)
+					(table[i]->CurrentAction() == UnitAction::Attack || table[i]->CurrentAction() == UnitAction::SpellCast)
 					&& table[i]->CurrentOrder()->HasGoal()
 					&& table[i]->CurrentOrder()->GetGoal() == &unit
 				) {
@@ -1067,7 +1067,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	}
 
 	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
-		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
+		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::Train) {
 			return;
 		}
 		Assert(unit.CriticalOrder == nullptr);
@@ -1078,7 +1078,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	//Wyrmgus end
 
 	// Not already training?
-	if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
+	if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 		DebugPrint("Unit queue disabled!\n");
 		return;
 	}
@@ -1113,7 +1113,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 	// Check if unit is still training 'slot'? (NETWORK!)
 	if (slot == -1) {
 		// Cancel All training
-		while (unit.CurrentAction() == UnitActionTrain) {
+		while (unit.CurrentAction() == UnitAction::Train) {
 			unit.CurrentOrder()->Cancel(unit);
 			RemoveOrder(unit, 0);
 		}
@@ -1123,10 +1123,10 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 	} else if (unit.Orders.size() <= static_cast<size_t>(slot)) {
 		// Order has moved
 		return;
-	} else if (unit.Orders[slot]->Action != UnitActionTrain) {
+	} else if (unit.Orders[slot]->Action != UnitAction::Train) {
 		// Order has moved, we are not training
 		return;
-	} else if (unit.Orders[slot]->Action == UnitActionTrain) {
+	} else if (unit.Orders[slot]->Action == UnitAction::Train) {
 		COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[slot]);
 		// Still training this order, same unit?
 		if (type && &order.GetUnitType() != type) {
@@ -1178,7 +1178,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 */
 void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 {
-	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTransformInto) {
+	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 		return;
 	}
 	Assert(unit.CriticalOrder == nullptr);
@@ -1194,7 +1194,7 @@ void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 void CommandCancelUpgradeTo(CUnit &unit)
 {
 	// Check if unit is still upgrading? (NETWORK!)
-	if (unit.CurrentAction() == UnitActionUpgradeTo) {
+	if (unit.CurrentAction() == UnitAction::UpgradeTo) {
 		unit.CurrentOrder()->Cancel(unit);
 		RemoveOrder(unit, 0);
 		if (!Selected.empty()) {
@@ -1255,7 +1255,7 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
 void CommandCancelResearch(CUnit &unit)
 {
 	// Check if unit is still researching? (NETWORK!)
-	if (unit.CurrentAction() == UnitActionResearch) {
+	if (unit.CurrentAction() == UnitAction::Research) {
 		unit.CurrentOrder()->Cancel(unit);
 		RemoveOrder(unit, 0);
 		if (!Selected.empty()) {

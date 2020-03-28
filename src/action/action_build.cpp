@@ -252,7 +252,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitActionStill) {
+						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
 							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 						}
@@ -532,7 +532,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		return false;
 	}
 
-	if (this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
+	if (this->BuildingUnit->CurrentAction() == UnitAction::Built) {
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
 		CUnit &goal = *const_cast<COrder_Build *>(this)->BuildingUnit;
 
@@ -542,7 +542,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	if (unit.Anim.Unbreakable) {
 		return false;
 	}
-	return this->BuildingUnit->CurrentAction() != UnitActionBuilt;
+	return this->BuildingUnit->CurrentAction() != UnitAction::Built;
 }
 
 

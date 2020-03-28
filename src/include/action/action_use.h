@@ -38,7 +38,7 @@ class COrder_Use : public COrder
 {
 	friend COrder *COrder::NewActionUse(CUnit &dest);
 public:
-	COrder_Use() : COrder(UnitActionUse), State(0), Range(0), MapLayer(0)
+	COrder_Use() : COrder(UnitAction::Use), State(0), Range(0), MapLayer(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;

@@ -96,7 +96,7 @@ static int AiCheckCosts(const int *costs)
 		for (size_t k = 0; k < unit.Orders.size(); ++k) {
 			const COrder &order = *unit.Orders[k];
 
-			if (order.Action == UnitActionBuild) {
+			if (order.Action == UnitAction::Build) {
 				const COrder_Build &orderBuild = static_cast<const COrder_Build &>(order);
 				int building_costs[MaxCosts];
 				AiPlayer->Player->GetUnitTypeCosts(&orderBuild.GetUnitType(), building_costs);
@@ -285,12 +285,12 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range, int z)
 static bool IsAlreadyWorking(const CUnit &unit)
 {
 	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		const int action = unit.Orders[i]->Action;
+		const UnitAction action = unit.Orders[i]->Action;
 
-		if (action == UnitActionBuild || action == UnitActionRepair) {
+		if (action == UnitAction::Build || action == UnitAction::Repair) {
 			return true;
 		}
-		if (action == UnitActionResource) {
+		if (action == UnitAction::Resource) {
 			const COrder_Resource &order = *static_cast<const COrder_Resource *>(unit.Orders[i]);
 
 			if (order.IsGatheringStarted()) {
@@ -520,7 +520,7 @@ void AiNewDepotRequest(CUnit &worker)
 			   _C_ worker->CurrentResource
 			   _C_ worker->Data.Move.Cycles);
 #endif
-	Assert(worker.CurrentAction() == UnitActionResource);
+	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 
@@ -631,7 +631,7 @@ private:
 */
 CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
 {
-	Assert(worker.CurrentAction() == UnitActionResource);
+	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 	std::vector<CUnit *> depots;
@@ -1360,7 +1360,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 	// It can't.
 	//Wyrmgus start
 //	if (unit.Removed) {
-	if (unit.Removed || unit.CurrentAction() == UnitActionBuild) { //prevent units building from outside to being assigned to gather a resource, and then leaving the construction unbuilt forever and ever
+	if (unit.Removed || unit.CurrentAction() == UnitAction::Build) { //prevent units building from outside to being assigned to gather a resource, and then leaving the construction unbuilt forever and ever
 	//Wyrmgus end
 		return 0;
 	}
@@ -1516,7 +1516,7 @@ static void AiCollectResources()
 
 		// See if it's assigned already
 		if (unit.Orders.size() == 1 &&
-			unit.CurrentAction() == UnitActionResource) {
+			unit.CurrentAction() == UnitAction::Resource) {
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
@@ -1701,7 +1701,7 @@ static void AiCollectResources()
 					}
 					//Wyrmgus end
 
-					Assert(unit->CurrentAction() == UnitActionResource);
+					Assert(unit->CurrentAction() == UnitAction::Resource);
 					COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
 
 					if (order.IsGatheringFinished()) {
@@ -1710,7 +1710,7 @@ static void AiCollectResources()
 					}
 
 					//Wyrmgus start
-					if (unit->Removed || unit->CurrentAction() == UnitActionBuild) { //if unit is removed or is currently building something, it can't be told to harvest (do this here so that AiAssignHarvester returning false later on is only because of unit type not being able to harvest something)
+					if (unit->Removed || unit->CurrentAction() == UnitAction::Build) { //if unit is removed or is currently building something, it can't be told to harvest (do this here so that AiAssignHarvester returning false later on is only because of unit type not being able to harvest something)
 						unit = nullptr;
 						continue;
 					}
@@ -1840,7 +1840,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 {
 	if (unit.IsIdle()) {
 		return true;
-	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitActionResource) {
+	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitAction::Resource) {
 		COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 
 		if (order.IsGatheringStarted() == false) {
@@ -1985,10 +1985,10 @@ static void AiCheckRepair()
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit.Type->RepairHP
 			//Wyrmgus start
-//			&& unit.CurrentAction() != UnitActionBuilt
-			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value)
+//			&& unit.CurrentAction() != UnitAction::Built
+			&& (unit.CurrentAction() != UnitAction::Built || unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value)
 			//Wyrmgus end
-			&& unit.CurrentAction() != UnitActionUpgradeTo
+			&& unit.CurrentAction() != UnitAction::UpgradeTo
 			//Wyrmgus start
 //			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
 			&& unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)
@@ -2022,11 +2022,11 @@ static void AiCheckRepair()
 			}
 		}
 		// Building under construction but no worker
-		if (unit.CurrentAction() == UnitActionBuilt) {
+		if (unit.CurrentAction() == UnitAction::Built) {
 			int j;
 			for (j = 0; j < AiPlayer->Player->GetUnitCount(); ++j) {
 				COrder *order = AiPlayer->Player->GetUnit(j).CurrentOrder();
-				if (order->Action == UnitActionRepair) {
+				if (order->Action == UnitAction::Repair) {
 					COrder_Repair &orderRepair = *static_cast<COrder_Repair *>(order);
 
 					if (orderRepair.GetReparableTarget() == &unit) {
@@ -2135,7 +2135,7 @@ static void AiCheckPathwayConstruction()
 		// Building should have pathways but doesn't?
 		if (
 			unit.Type->BoolFlag[BUILDING_INDEX].value
-			&& unit.CurrentAction() != UnitActionBuilt //only build pathways for buildings that have already been constructed
+			&& unit.CurrentAction() != UnitAction::Built //only build pathways for buildings that have already been constructed
 		) {
 			//
 			// FIXME: Construct pathways only for buildings under control

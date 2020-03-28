@@ -149,7 +149,7 @@
 
 /* virtual */ bool COrder_SpellCast::IsValid() const
 {
-	Assert(Action == UnitActionSpellCast);
+	Assert(Action == UnitAction::SpellCast);
 	if (this->HasGoal()) {
 		return this->GetGoal()->IsAliveOnMap();
 	} else {
@@ -366,7 +366,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-					if (table[i]->CurrentAction() == UnitActionStill) {
+					if (table[i]->CurrentAction() == UnitAction::Still) {
 						CommandStopUnit(*table[i]);
 						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 					}
@@ -529,7 +529,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					}
 				}
 			}
-			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
+			if (!unit.ReCast && unit.CurrentAction() != UnitAction::Die) {
 				if (!unit.RestoreOrder()) {
 					this->Finished = true;
 				}

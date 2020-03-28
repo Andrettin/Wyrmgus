@@ -46,6 +46,7 @@
 #ifdef _MSC_VER
 
 #define WIN32_LEAN_AND_MEAN
+#define WINDOWS_IGNORE_PACKING_MISMATCH //for SDL
 
 #if _MSC_VER >= 1800
 // From VS2013 onwards, std::min/max are only defined if algorithm is included

@@ -887,7 +887,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		if (goal->Removed) {
 			return;
 		}
-		if (goal->CurrentAction() == UnitActionDie) {
+		if (goal->CurrentAction() == UnitAction::Die) {
 			//Wyrmgus start
 //			if (unit.Type->Missile.Missile->AlwaysFire) {
 			if (unit.GetMissile().Missile->AlwaysFire) {
@@ -1477,7 +1477,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		return;
 	}
 	
-	if (goal.CurrentAction() != UnitActionDie) {
+	if (goal.CurrentAction() != UnitAction::Die) {
 		//Wyrmgus start
 		if (goal.Type->BoolFlag[ITEM_INDEX].value && splash != 1) { //don't damage items with splash damage
 			return;
@@ -1746,7 +1746,7 @@ void Missile::MissileHit(CUnit *unit)
 				if (mtype.CorrectSphashDamage == true) {
 					bool isPosition = false;
 					if (this->TargetUnit == nullptr) {
-						if (this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
+						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
 							if (order.GetSpell().Target == TargetPosition) {
 								isPosition = true;
@@ -1755,7 +1755,7 @@ void Missile::MissileHit(CUnit *unit)
 							isPosition = true;
 						}
 					}
-					if (isPosition || this->SourceUnit->CurrentAction() == UnitActionAttackGround) {
+					if (isPosition || this->SourceUnit->CurrentAction() == UnitAction::AttackGround) {
 						if (goal.Type->UnitType != this->SourceUnit->Type->UnitType) {
 							shouldHit = false;
 						}

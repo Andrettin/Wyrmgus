@@ -121,8 +121,8 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
 {
-	unit.Seen.State = ((Action == UnitActionUpgradeTo) << 1);
-	if (unit.CurrentAction() == UnitActionDie) {
+	unit.Seen.State = ((Action == UnitAction::UpgradeTo) << 1);
+	if (unit.CurrentAction() == UnitAction::Die) {
 		unit.Seen.State = 3;
 	}
 	unit.Seen.CFrame = nullptr;
@@ -140,9 +140,9 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 /* virtual */ void COrder::AiUnitKilled(CUnit &unit)
 {
 	switch (Action) {
-		case UnitActionStill:
-		case UnitActionAttack:
-		case UnitActionMove:
+		case UnitAction::Still:
+		case UnitAction::Attack:
+		case UnitAction::Move:
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
@@ -387,8 +387,8 @@ static void HandleBuffsEachCycle(CUnit &unit)
 static bool HandleBurnAndPoison(CUnit &unit)
 {
 	if (unit.Removed || unit.Destroyed || unit.Variable[HP_INDEX].Max == 0
-		|| unit.CurrentAction() == UnitActionBuilt
-		|| unit.CurrentAction() == UnitActionDie) {
+		|| unit.CurrentAction() == UnitAction::Built
+		|| unit.CurrentAction() == UnitAction::Die) {
 		return false;
 	}
 	// Burn & poison
@@ -453,7 +453,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
+	if (unit.IsAlive() && unit.CurrentAction() != UnitAction::Built) {
 		//apply auras
 		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) {
 			unit.ApplyAura(LEADERSHIPAURA_INDEX);
@@ -531,7 +531,7 @@ static void HandleUnitAction(CUnit &unit)
 			unit.CriticalOrder = nullptr;
 		}
 
-		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitActionStill
+		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitAction::Still
 			&& unit.Orders.size() == 1) {
 
 			delete unit.Orders[0];
@@ -543,9 +543,9 @@ static void HandleUnitAction(CUnit &unit)
 
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		if ((unit.Orders[0]->Action == UnitActionStandGround || unit.Orders[0]->Finished)
+		if ((unit.Orders[0]->Action == UnitAction::StandGround || unit.Orders[0]->Finished)
 			&& unit.Orders.size() > 1) {
-			if (unit.Removed && unit.Orders[0]->Action != UnitActionBoard) { // FIXME: johns I see this as an error
+			if (unit.Removed && unit.Orders[0]->Action != UnitAction::Board) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.
 				return;
@@ -630,7 +630,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fprintf(logf, "%lu: ", GameCycle);
 	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
-			!unit.Orders.empty() ? unit.CurrentAction() : -1,
+			!unit.Orders.empty() ? static_cast<int>(unit.CurrentAction()) : -1,
 			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
 			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
@@ -679,7 +679,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
-		SyncHash ^= unit.Orders.empty() == false ? unit.CurrentAction() << 18 : 0;
+		SyncHash ^= unit.Orders.empty() == false ? static_cast<int>(unit.CurrentAction()) << 18 : 0;
 		SyncHash ^= unit.Refs << 3;
 	}
 }

@@ -86,7 +86,7 @@ enum {
 
 /* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
 {
-	if (this->Action == UnitActionStill) {
+	if (this->Action == UnitAction::Still) {
 		file.printf("{\"action-still\",");
 	} else {
 		file.printf("{\"action-stand-ground\",");
@@ -120,14 +120,14 @@ enum {
 {
 	//Wyrmgus start
 	/*
-	if (this->Action == UnitActionStandGround) {
+	if (this->Action == UnitAction::StandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
 	} else {
 		Video.FillCircleClip(ColorGray, lastScreenPos, 2);
 	}
 	*/
 	if (Preference.ShowPathlines) {
-		if (this->Action == UnitActionStandGround) {
+		if (this->Action == UnitAction::StandGround) {
 			Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
 		} else {
 			Video.FillCircleClip(ColorGray, lastScreenPos, 2);
@@ -433,7 +433,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	//Wyrmgus start
 	//if unit is in a container which is attacking, and the container has a goal, use that goal (if possible) instead
 //	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
-	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitActionAttack && unit.Container->CurrentOrder()->HasGoal() ? unit.Container->CurrentOrder()->GetGoal() : AttackUnitsInRange(unit);
+	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitAction::Attack && unit.Container->CurrentOrder()->HasGoal() ? unit.Container->CurrentOrder()->GetGoal() : AttackUnitsInRange(unit);
 	//Wyrmgus end
 
 	if (autoAttackUnit == nullptr) {
@@ -493,7 +493,7 @@ bool AutoAttack(CUnit &unit)
 	}
 	COrder *savedOrder = nullptr;
 
-	if (unit.CurrentAction() == UnitActionStill) {
+	if (unit.CurrentAction() == UnitAction::Still) {
 		//Wyrmgus start
 //		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
 		savedOrder = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer->ID);
@@ -552,8 +552,8 @@ bool AutoAttack(CUnit &unit)
 	}
 	//Wyrmgus end
 	this->State = SUB_STILL_STANDBY;
-	this->Finished = (this->Action == UnitActionStill);
-	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {
+	this->Finished = (this->Action == UnitAction::Still);
+	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
 		if (unit.AutoCastSpell) {
 			this->AutoCastStand(unit);
 		}
