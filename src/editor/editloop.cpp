@@ -987,7 +987,7 @@ static void DrawTileIcons()
 	int x = UI.InfoPanel.X + 46;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
 
-	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
+	if (CursorOn == cursor_on::button && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
 		//Wyrmgus start
 //		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 		if (ButtonUnderCursor <= 303) {
@@ -1486,12 +1486,12 @@ void EditorUpdateDisplay()
 	*/
 	//Wyrmgus end
 
-	if (CursorOn == CursorOnMap && Gui->getTop() == editorContainer && !GamePaused) {
+	if (CursorOn == cursor_on::map && Gui->getTop() == editorContainer && !GamePaused) {
 		DrawMapCursor(); // cursor on map
 	}
 
 	//Wyrmgus start
-	if (CursorBuilding && CursorOn == CursorOnMap) {
+	if (CursorBuilding && CursorOn == cursor_on::map) {
 		DrawBuildingCursor();
 	}
 	//Wyrmgus end
@@ -1531,7 +1531,7 @@ void EditorUpdateDisplay()
 	}
 	DrawEditorPanel();
 
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == cursor_on::map) {
 		DrawEditorInfo();
 	}
 
@@ -1615,7 +1615,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		return;
 	}
 	// Click on menu button
-	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
+	if (CursorOn == cursor_on::button && ButtonAreaUnderCursor == ButtonAreaMenu &&
 		//Wyrmgus start
 //		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 		(MouseButtons & LeftButton) && !UI.MenuButton.Clicked) {
@@ -1628,7 +1628,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		return;
 	}
 	// Click on minimap
-	if (CursorOn == CursorOnMinimap) {
+	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
@@ -1636,7 +1636,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		return;
 	}
 	// Click on mode area
-	if (CursorOn == CursorOnButton) {
+	if (CursorOn == cursor_on::button) {
 		CursorBuilding = nullptr;
 		switch (ButtonUnderCursor) {
 			case SelectButton :
@@ -1671,7 +1671,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 	// Click on tile area
 	if (Editor.State == EditorEditTile) {
-		if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100) {
+		if (CursorOn == cursor_on::button && ButtonUnderCursor >= 100) {
 			switch (ButtonUnderCursor) {
 				case 300: TileCursorSize = 1; return;
 				case 301: TileCursorSize = 2; return;
@@ -1747,7 +1747,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 
 	// Click on map area
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == cursor_on::map) {
 		if (MouseButtons & RightButton) {
 			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
 				Editor.SelectedUnitIndex = -1;
@@ -2037,7 +2037,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			Editor.CursorPlayer = i;
 #if 0
 			ButtonUnderCursor = i + 100;
-			CursorOn = CursorOnButton;
+			CursorOn = cursor_on::button;
 #endif
 			return true;
 		}
@@ -2111,7 +2111,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	for (int i = 0; i < 6; ++i) {
 		if (bx < screenPos.x && screenPos.x < bx + 100 && by < screenPos.y && screenPos.y < by + 18) {
 			ButtonUnderCursor = i + 300;
-			CursorOn = CursorOnButton;
+			CursorOn = cursor_on::button;
 			return true;
 		}
 		by += 20;
@@ -2220,7 +2220,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		UnitPlacedThisPress = false;
 	}
 	// Drawing tiles on map.
-	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton)
+	if (CursorOn == cursor_on::map && (MouseButtons & LeftButton)
 		&& (Editor.State == EditorEditTile || Editor.State == EditorEditUnit)) {
 		Vec2i vpTilePos = UI.SelectedViewport->MapPos;
 		// Scroll the map
@@ -2259,7 +2259,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Minimap move viewpoint
-	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
+	if (CursorOn == cursor_on::minimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
@@ -2269,7 +2269,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 	MouseScrollState = ScrollNone;
 	GameCursor = UI.Point.Cursor;
-	CursorOn = CursorOnUnknown;
+	CursorOn = cursor_on::unknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
 	Editor.CursorTileIndex = -1;
@@ -2278,7 +2278,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 	// Minimap
 	if (UI.Minimap.Contains(screenPos)) {
-		CursorOn = CursorOnMinimap;
+		CursorOn = cursor_on::minimap;
 	}
 	// Handle edit unit area
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
@@ -2310,7 +2310,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
-		CursorOn = CursorOnButton;
+		CursorOn = cursor_on::button;
 		UI.StatusLine.Set(_("Select Mode"));
 		return;
 	}
@@ -2326,7 +2326,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	//Wyrmgus end
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
-		CursorOn = CursorOnButton;
+		CursorOn = cursor_on::button;
 		UI.StatusLine.Set(_("Unit Mode"));
 		return;
 	}
@@ -2341,7 +2341,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + Map.GetCurrentPixelTileSize().y + 7) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
-			CursorOn = CursorOnButton;
+			CursorOn = cursor_on::button;
 			UI.StatusLine.Set(_("Tile Mode"));
 			return;
 		}
@@ -2363,20 +2363,20 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	//Wyrmgus end
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
-		CursorOn = CursorOnButton;
+		CursorOn = cursor_on::button;
 		UI.StatusLine.Set(_("Set Start Location"));
 		return;
 	}
 	if (UI.MenuButton.X != -1 && UI.MenuButton.Contains(screenPos)) {
 		ButtonAreaUnderCursor = ButtonAreaMenu;
 		ButtonUnderCursor = ButtonUnderMenu;
-		CursorOn = CursorOnButton;
+		CursorOn = cursor_on::button;
 		return;
 	}
 
 	// Minimap
 	if (UI.Minimap.Contains(screenPos)) {
-		CursorOn = CursorOnMinimap;
+		CursorOn = cursor_on::minimap;
 		return;
 	}
 
@@ -2390,7 +2390,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			DebugPrint("active viewport changed to %ld.\n" _C_
 					   static_cast<long int>(UI.Viewports - vp));
 		}
-		CursorOn = CursorOnMap;
+		CursorOn = cursor_on::map;
 
 		if (UI.MouseViewport) {
 			// Look if there is an unit under the cursor.
@@ -2737,7 +2737,7 @@ void EditorMainLoop()
 			}
 			if (UI.KeyScroll) {
 				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
-				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
+				if (CursorOn == cursor_on::map && (MouseButtons & LeftButton) &&
 					(Editor.State == EditorEditTile ||
 					 Editor.State == EditorEditUnit)) {
 					EditorCallbackButtonDown(0);

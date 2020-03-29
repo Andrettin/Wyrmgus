@@ -2893,7 +2893,7 @@ int MenuScreen::run(bool loop)
 
 	CurrentCursorState = CursorState::Point;
 	GameCursor = UI.Point.Cursor;
-	CursorOn = CursorOnUnknown;
+	CursorOn = cursor_on::unknown;
 
 	CallbackMusicOn();
 

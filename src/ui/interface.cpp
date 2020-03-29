@@ -1443,18 +1443,18 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 //		if (mousePos.y < SCROLL_UP) {
 		if (mousePos.y < SCROLL_UP && top_left_map_pos.y > 0) {
 		//Wyrmgus end
-			CursorOn = CursorOnScrollLeftUp;
+			CursorOn = cursor_on::scroll_left_up;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
 		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
-			CursorOn = CursorOnScrollLeftDown;
+			CursorOn = cursor_on::scroll_left_down;
 			MouseScrollState = ScrollLeftDown;
 			GameCursor = UI.ArrowSW.Cursor;
 		} else {
-			CursorOn = CursorOnScrollLeft;
+			CursorOn = cursor_on::scroll_left;
 			MouseScrollState = ScrollLeft;
 			GameCursor = UI.ArrowW.Cursor;
 		}
@@ -1466,18 +1466,18 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 //		if (mousePos.y < SCROLL_UP) {
 		if (mousePos.y < SCROLL_UP && top_left_map_pos.y > 0) {
 		//Wyrmgus end
-			CursorOn = CursorOnScrollRightUp;
+			CursorOn = cursor_on::scroll_right_up;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
 		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
-			CursorOn = CursorOnScrollRightDown;
+			CursorOn = cursor_on::scroll_right_down;
 			MouseScrollState = ScrollRightDown;
 			GameCursor = UI.ArrowSE.Cursor;
 		} else {
-			CursorOn = CursorOnScrollRight;
+			CursorOn = cursor_on::scroll_right;
 			MouseScrollState = ScrollRight;
 			GameCursor = UI.ArrowE.Cursor;
 		}
@@ -1486,14 +1486,14 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 //		if (mousePos.y < SCROLL_UP) {
 		if (mousePos.y < SCROLL_UP && top_left_map_pos.y > 0) {
 		//Wyrmgus end
-			CursorOn = CursorOnScrollUp;
+			CursorOn = cursor_on::scroll_up;
 			MouseScrollState = ScrollUp;
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
 		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
-			CursorOn = CursorOnScrollDown;
+			CursorOn = cursor_on::scroll_down;
 			MouseScrollState = ScrollDown;
 			GameCursor = UI.ArrowS.Cursor;
 		} else {

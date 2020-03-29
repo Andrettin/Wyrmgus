@@ -564,8 +564,8 @@ void CViewport::Draw() const
 	//Wyrmgus start
 	/*
 	//Wyrmgus start
-//	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
-	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
+//	if (CursorOn == cursor_on::map && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
+	if (CursorOn == cursor_on::map && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
 	//Wyrmgus end
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		//Wyrmgus start

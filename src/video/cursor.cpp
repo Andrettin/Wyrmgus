@@ -371,7 +371,7 @@ void DrawCursor()
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
 	//Wyrmgus start
 	/*
-	} else if (CursorBuilding && CursorOn == CursorOnMap) {
+	} else if (CursorBuilding && CursorOn == cursor_on::map) {
 		// Selecting position for building
 		DrawBuildingCursor();
 	*/

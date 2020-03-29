@@ -228,7 +228,7 @@ void UpdateDisplay()
 		}
 
 		//Wyrmgus start
-		if (CursorBuilding && CursorOn == CursorOnMap) {
+		if (CursorBuilding && CursorOn == cursor_on::map) {
 			DrawBuildingCursor();
 		}
 		//Wyrmgus end

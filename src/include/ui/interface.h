@@ -119,31 +119,31 @@ enum _key_state_ {
 #define MiddleAndRightButton (MiddleButton | RightButton) /// Middle + Right button on mouse
 
 /// Where is our cursor ?
-enum _cursor_on_ {
-	CursorOnUnknown = -1,     /// not known
-	CursorOnMinimap,          /// minimap area
-	CursorOnButton,           /// button area see: ButtonUnderCursor
-	CursorOnMap,              /// over map area
-	CursorOnScrollUp,         /// in scroll up area
-	CursorOnScrollDown,       /// in scroll down area
-	CursorOnScrollLeft,       /// in scroll left area
-	CursorOnScrollRight,      /// in scroll right area
-	CursorOnScrollLeftUp,     /// in scroll left+up area
-	CursorOnScrollLeftDown,   /// in scroll left+down area
-	CursorOnScrollRightUp,    /// in scroll right+up area
-	CursorOnScrollRightDown   /// in scroll right+down area
+enum class cursor_on {
+	unknown = -1,     /// not known
+	minimap,          /// minimap area
+	button,           /// button area see: ButtonUnderCursor
+	map,              /// over map area
+	scroll_up,         /// in scroll up area
+	scroll_down,       /// in scroll down area
+	scroll_left,       /// in scroll left area
+	scroll_right,      /// in scroll right area
+	scroll_left_up,     /// in scroll left+up area
+	scroll_left_down,   /// in scroll left+down area
+	scroll_right_up,    /// in scroll right+up area
+	scroll_right_down   /// in scroll right+down area
 };
 
 /// Are We Scrolling With the Keyboard ?
-#define ScrollNone 0        /// not scrolling
-#define ScrollUp 1          /// scroll up only
-#define ScrollDown 2        /// scroll down only
-#define ScrollLeft 4        /// scroll left only
-#define ScrollRight 8       /// scroll right only
-#define ScrollLeftUp 5      /// scroll left + up
-#define ScrollLeftDown 6    /// scroll left + down
-#define ScrollRightUp 9     /// scroll right + up
-#define ScrollRightDown 10  /// scroll right + down
+static constexpr int ScrollNone = 0;       /// not scrolling
+static constexpr int ScrollUp = 1;         /// scroll up only
+static constexpr int ScrollDown = 2;       /// scroll down only
+static constexpr int ScrollLeft = 4;       /// scroll left only
+static constexpr int ScrollRight = 8;      /// scroll right only
+static constexpr int ScrollLeftUp = 5;     /// scroll left + up
+static constexpr int ScrollLeftDown = 6;   /// scroll left + down
+static constexpr int ScrollRightUp = 9;    /// scroll right + up
+static constexpr int ScrollRightDown = 10; /// scroll right + down
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -197,7 +197,7 @@ extern bool GameDiplomacyButtonClicked;
 /// Mouse leaves windows stops scroll
 extern bool LeaveStops;
 /// current CursorOn field
-extern enum _cursor_on_ CursorOn;
+extern cursor_on CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
 extern CButtonLevel *CurrentButtonLevel;
