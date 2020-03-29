@@ -10,7 +10,7 @@
 //
 /**@name config.cpp - The config source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "plane.h"
+#include "player_color.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
@@ -331,6 +332,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CPlane *plane = CPlane::GetOrAddPlane(ident);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "player_color") {
+			CPlayerColor* player_color = CPlayerColor::GetOrAddPlayerColor(ident);
+			if (!define_only) {
+				player_color->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "school_of_magic") {
 			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAddSchoolOfMagic(ident);
