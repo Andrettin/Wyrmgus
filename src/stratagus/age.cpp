@@ -10,7 +10,7 @@
 //
 /**@name age.cpp - The age source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -105,8 +105,8 @@ CAge *CAge::GetOrAddAge(const std::string &ident)
 */
 void CAge::ClearAges()
 {
-	for (size_t i = 0; i < Ages.size(); ++i) {
-		delete Ages[i];
+	for (CAge *age : Ages) {
+		delete age;
 	}
 	Ages.clear();
 }

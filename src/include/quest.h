@@ -37,7 +37,6 @@
 #include <tuple>
 
 #include "icons.h"
-#include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -140,32 +139,6 @@ public:
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };
 
-class CCampaign
-{
-public:
-	CCampaign() :
-		ID(-1),
-		Hidden(false), Sandbox(false),
-		Faction(nullptr), StartEffects(nullptr)
-	{
-	}
-	~CCampaign();
-	
-	std::string Ident;				/// Ident of the campaign
-	std::string Name;				/// Name of the campaign
-	std::string Description;		/// Description of the campaign
-	int ID;
-	CDate StartDate;				/// The starting date of the campaign
-	bool Hidden;					/// Whether the campaign is hidden
-	bool Sandbox;					/// Whether the campaign is a sandbox one
-	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
-	std::vector<Vec2i> MapSizes;				/// Map sizes
-	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
-	CFaction *Faction;				/// Which faction the player plays as in the campaign
-	std::vector<CMapTemplate *> MapTemplates;		/// Map templates used by the campaign
-	LuaCallback *StartEffects;		/// The effects at game start to set up the campaign
-};
-
 class CAchievement
 {
 public:
@@ -195,8 +168,6 @@ public:
 
 extern std::vector<CQuest *> Quests;
 extern CQuest *CurrentQuest;
-extern std::vector<CCampaign *> Campaigns;
-extern CCampaign *CurrentCampaign;
 extern std::vector<CAchievement *> Achievements;
 
 /*----------------------------------------------------------------------------
@@ -209,13 +180,10 @@ extern void CheckAchievements();
 std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type);
 extern ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type);
 extern CQuest *GetQuest(const std::string &quest_ident);
-extern CCampaign *GetCampaign(const std::string &campaign_ident);
 extern CAchievement *GetAchievement(const std::string &achievement_ident);
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();
-extern void SetCurrentCampaign(const std::string &campaign_ident);
-extern std::string GetCurrentCampaign();
 extern void SetQuestCompleted(const std::string &quest_ident, int difficulty = 2, bool save = true);
 extern void SetQuestCompleted(const std::string &quest_ident, bool save);
 extern void SetAchievementObtained(const std::string &achievement_ident, bool save = true, bool display = true);

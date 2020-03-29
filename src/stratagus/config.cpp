@@ -37,6 +37,7 @@
 
 #include "age.h"
 #include "animation.h"
+#include "campaign.h"
 #include "character.h"
 #include "currency.h"
 #include "game.h"
@@ -271,6 +272,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				calendar->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "campaign") {
+			CCampaign *campaign = CCampaign::GetOrAddCampaign(ident);
+			if (!define_only) {
+				campaign->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "character") {
 			CCharacter *character = nullptr;
 			if (LoadingHistory) {
@@ -334,7 +340,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				plane->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "player_color") {
-			CPlayerColor* player_color = CPlayerColor::GetOrAddPlayerColor(ident);
+			CPlayerColor *player_color = CPlayerColor::GetOrAddPlayerColor(ident);
 			if (!define_only) {
 				player_color->ProcessConfigData(config_data);
 			}

@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Andreas Arens,
+//      (c) Copyright 1998-2020 by Lutz Sammer, Andreas Arens,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -44,6 +42,7 @@
 #include "age.h"
 #include "ai.h"
 #include "animation.h"
+#include "campaign.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -1639,9 +1638,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		InitSyncRand();
 	}
 	
-	if (CurrentCampaign) {
-		CDate::CurrentTotalHours = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
-		CCalendar::BaseCalendar->CurrentDate = CurrentCampaign->StartDate;
+	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+	if (current_campaign) {
+		CCalendar::BaseCalendar->CurrentDate = current_campaign->GetStartDate();
+		CDate::CurrentTotalHours = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	} else {
 		CCalendar::BaseCalendar->CurrentDate.Clear();
 		CCalendar::BaseCalendar->CurrentDate.Year = 1;
@@ -2436,6 +2436,3 @@ void LuaRegisterModules()
 	UserInterfaceCclRegister();
 	VideoCclRegister();
 }
-
-
-//@}

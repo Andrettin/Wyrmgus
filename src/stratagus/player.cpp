@@ -10,7 +10,7 @@
 //
 /**@name player.cpp - The player source file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@
 #include "ai.h"
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
+#include "campaign.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
@@ -1994,7 +1995,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	
 	if (!pre) {
 		//check if the required core settlements are owned by the player
-		if (CurrentCampaign != nullptr) { //only check for settlements in the Scenario mode
+		if (CCampaign::GetCurrentCampaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
 				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitAction::Built) {
 					return false;
@@ -2635,7 +2636,7 @@ void CPlayer::UpdateLevelUpUnits()
 
 void CPlayer::UpdateQuestPool()
 {
-	if (CurrentCampaign == nullptr) { // in-game quests only while playing the campaign mode
+	if (CCampaign::GetCurrentCampaign() == nullptr) { // in-game quests only while playing the campaign mode
 		return;
 	}
 	

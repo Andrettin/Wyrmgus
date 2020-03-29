@@ -10,7 +10,7 @@
 //
 /**@name build.cpp - The units. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon, Rafal Bursig
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Rafal Bursig
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -511,7 +509,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 	
 	//Wyrmgus start
-	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
+	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x - 1; x < pos.x + type.TileSize.x + 1; ++x) {
 			for (int y = pos.y - 1; y < pos.y + type.TileSize.y + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
@@ -736,5 +734,3 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 	// We can build here: check distance to gold mine/oil patch!
 	return ontop;
 }
-
-//@}

@@ -10,7 +10,7 @@
 //
 /**@name loadgame.cpp - Load game. */
 //
-//      (c) Copyright 2001-2019 by Lutz Sammer, Andreas Arens and Andrettin
+//      (c) Copyright 2001-2020 by Lutz Sammer, Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
+#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -120,6 +121,7 @@ void CleanModules()
 	PlayerRaces.Clean();
 	CAge::ClearAges();
 	CCalendar::ClearCalendars();
+	CCampaign::ClearCampaigns();
 	CCharacter::ClearCharacters();
 	CCivilization::ClearCivilizations();
 	CleanConstructions();

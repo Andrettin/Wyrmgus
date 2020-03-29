@@ -10,7 +10,7 @@
 //
 /**@name botpanel.cpp - The bottom panel. */
 //
-//      (c) Copyright 1999-2019 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2020 by Lutz Sammer, Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +41,9 @@
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
+//Wyrmgus end
+#include "campaign.h"
+//Wyrmgus start
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
@@ -524,7 +525,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CurrentCampaign != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CCampaign::GetCurrentCampaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
@@ -2514,5 +2515,3 @@ int CButtonPanel::DoKey(int key)
 	}
 	return 0;
 }
-
-//@}

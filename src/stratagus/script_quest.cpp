@@ -10,7 +10,7 @@
 //
 /**@name script_quest.cpp - The quest ccl functions. */
 //
-//      (c) Copyright 2015-2019 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -37,6 +35,7 @@
 
 #include "quest.h"
 
+#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "dialogue.h"
@@ -428,13 +427,7 @@ static int CclDefineCampaign(lua_State *l)
 	}
 
 	std::string campaign_ident = LuaToString(l, 1);
-	CCampaign *campaign = GetCampaign(campaign_ident);
-	if (!campaign) {
-		campaign = new CCampaign;
-		campaign->ID = Campaigns.size();
-		Campaigns.push_back(campaign);
-		campaign->Ident = campaign_ident;
-	}
+	CCampaign *campaign = CCampaign::GetOrAddCampaign(campaign_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -454,8 +447,6 @@ static int CclDefineCampaign(lua_State *l)
 			campaign->StartDate.Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartDate")) {
 			CclGetDate(l, &campaign->StartDate);
-		} else if (!strcmp(value, "StartEffects")) {
-			campaign->StartEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "RequiredQuests")) {
 			campaign->RequiredQuests.clear();
 			const int args = lua_rawlen(l, -1);
@@ -514,10 +505,10 @@ static int CclDefineCampaign(lua_State *l)
 
 static int CclGetCampaigns(lua_State *l)
 {
-	lua_createtable(l, Campaigns.size(), 0);
-	for (size_t i = 1; i <= Campaigns.size(); ++i)
+	lua_createtable(l, CCampaign::Campaigns.size(), 0);
+	for (size_t i = 1; i <= CCampaign::Campaigns.size(); ++i)
 	{
-		lua_pushstring(l, Campaigns[i-1]->Ident.c_str());
+		lua_pushstring(l, CCampaign::Campaigns[i - 1]->GetIdent().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -534,7 +525,7 @@ static int CclGetCampaignData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string campaign_ident = LuaToString(l, 1);
-	const CCampaign *campaign = GetCampaign(campaign_ident);
+	const CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
 	if (!campaign) {
 		LuaError(l, "Campaign \"%s\" doesn't exist." _C_ campaign_ident.c_str());
 	}
@@ -869,5 +860,3 @@ void QuestCclRegister()
 	lua_register(Lua, "GetAchievementData", CclGetAchievementData);
 	lua_register(Lua, "DefineDialogue", CclDefineDialogue);
 }
-
-//@}

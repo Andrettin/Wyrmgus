@@ -10,7 +10,7 @@
 //
 /**@name data_type.h - The data type header file. */
 //
-//      (c) Copyright 2019 by Andrettin
+//      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DATA_TYPE_H__
-#define __DATA_TYPE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -45,10 +44,20 @@ class CConfigData;
 class CDataType
 {
 public:
+	CDataType()
+	{
+	}
+
+	CDataType(const std::string& ident) : Ident(ident)
+	{
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	
-public:
-	std::string Ident;	/// String identifier of the instance
-};
+	const std::string &GetIdent() const
+	{
+		return this->Ident;
+	}
 
-#endif
+	std::string Ident;	///string identifier of the instance
+};

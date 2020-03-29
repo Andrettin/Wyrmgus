@@ -10,7 +10,7 @@
 //
 /**@name script_map.cpp - The map ccl functions. */
 //
-//      (c) Copyright 1999-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -37,6 +35,7 @@
 
 #include "map/map.h"
 
+#include "campaign.h"
 #include "civilization.h"
 //Wyrmgus start
 #include "editor.h"
@@ -1038,10 +1037,9 @@ void ApplyMapTemplate(const std::string &map_template_ident, int template_start_
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	CCampaign *campaign = GetCampaign(campaign_ident);
+	const CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
 	
 	if (!campaign) {
-		fprintf(stderr, "Campaign \"%s\" doesn't exist.\n", campaign_ident.c_str());
 		return;
 	}
 	
@@ -2389,5 +2387,3 @@ void MapCclRegister()
 //	lua_register(Lua, "CreateMapTemplateTerrainFile", CclCreateMapTemplateTerrainFile);
 	//Wyrmgus end
 }
-
-//@}

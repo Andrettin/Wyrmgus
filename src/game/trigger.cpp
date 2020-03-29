@@ -10,7 +10,7 @@
 //
 /**@name trigger.cpp - The trigger source file. */
 //
-//      (c) Copyright 2002-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 
 #include "trigger.h"
 
+#include "campaign.h"
 #include "config.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -728,7 +729,7 @@ void CTrigger::InitActiveTriggers()
 		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
 			continue;
 		}
-		if (trigger->CampaignOnly && CurrentCampaign == nullptr) {
+		if (trigger->CampaignOnly && CCampaign::GetCurrentCampaign() == nullptr) {
 		}
 		CTrigger::ActiveTriggers.push_back(trigger);
 	}

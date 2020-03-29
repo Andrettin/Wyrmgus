@@ -9,7 +9,7 @@
 #         Stratagus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
-#    Copyright (C) 2011-2019  Pali Rohár <pali.rohar@gmail.com>, cybermind <cybermindid@gmail.com> and Andrettin
+#    Copyright (C) 2011-2020  Pali Rohár <pali.rohar@gmail.com>, cybermind <cybermindid@gmail.com> and Andrettin
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -303,6 +303,7 @@ source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
 	src/stratagus/age.cpp
+	src/stratagus/campaign.cpp
 	src/stratagus/character.cpp
 	src/stratagus/civilization.cpp
 	src/stratagus/config.cpp
@@ -666,6 +667,7 @@ set(stratagus_generic_HDRS
 	src/include/age.h
 	src/include/ai.h
 	src/include/animation.h
+	src/include/campaign.h
 	src/include/character.h
 	src/include/civilization.h
 	src/include/color.h

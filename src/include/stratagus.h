@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __STRATAGUS_H__
-#define __STRATAGUS_H__
-
-//@{
+#pragma once
 
 /*============================================================================
 ==  Config definitions
@@ -38,6 +35,12 @@
 
 // Dynamic loading.
 //#define DYNAMIC_LOAD
+
+//the following is necessary to include shared_mutex without errors
+#undef SIZE_MAX
+#include <wchar.h>
+#define __STDC_LIMIT_MACROS
+#include <cstdint>
 
 /*============================================================================
 ==  Compiler repairs
@@ -131,9 +134,7 @@ extern void PrintOnStdOut(const char *format, ...);
 
 #include <string.h>
 
-#ifndef __UTIL_H__
 #include "util.h"
-#endif
 
 inline char *new_strdup(const char *str)
 {
@@ -257,7 +258,3 @@ extern int GetDirectionIdByName(const std::string &direction);
 extern int GetDirectionFromOffset(int x, int y);
 extern Vec2i GetDirectionOffset(int direction);
 //Wyrmgus end
-
-//@}
-
-#endif // !__STRATAGUS_H__

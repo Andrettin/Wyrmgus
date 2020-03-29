@@ -10,7 +10,7 @@
 //
 /**@name mainloop.cpp - The main game loop. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 //  Includes
 //----------------------------------------------------------------------------
@@ -36,6 +34,7 @@
 #include "stratagus.h"
 
 #include "actions.h"
+#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -569,10 +568,12 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
-		if (CurrentCampaign != nullptr) {
+		const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+		if (current_campaign != nullptr) {
+			const CDate start_date = current_campaign->GetStartDate();
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
-					if (CurrentCampaign->StartDate.Year) {
+					if (start_date.Year) {
 						CCivilization *civilization = CCivilization::Civilizations[Players[i].Race];
 						CFaction *faction = PlayerRaces.Factions[Players[i].Faction];
 						
@@ -583,7 +584,7 @@ void GameMainLoop()
 								continue;
 							}
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-								if (second_iterator->first.Year == 0 || CurrentCampaign->StartDate.ContainsDate(second_iterator->first)) {
+								if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
 									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
 									} else if (!second_iterator->second) {
@@ -600,7 +601,7 @@ void GameMainLoop()
 								continue;
 							}
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-								if (second_iterator->first.Year == 0 || CurrentCampaign->StartDate.ContainsDate(second_iterator->first)) {
+								if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
 									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
 									} else if (!second_iterator->second) {
@@ -611,7 +612,7 @@ void GameMainLoop()
 						}
 
 						for (std::map<std::pair<CDate, CFaction *>, int>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
-							if (iterator->first.first.Year == 0 || CurrentCampaign->StartDate.ContainsDate(iterator->first.first)) {
+							if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
 								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 								if (diplomacy_state_player) {
 									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);
@@ -625,17 +626,12 @@ void GameMainLoop()
 						}
 
 						for (std::map<std::pair<CDate, int>, int>::iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
-							if (iterator->first.first.Year == 0 || CurrentCampaign->StartDate.ContainsDate(iterator->first.first)) {
+							if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
 								Players[i].SetResource(iterator->first.second, iterator->second);
 							}
 						}
 					}
 				}
-			}
-	
-			if (CurrentCampaign->StartEffects) {
-				CurrentCampaign->StartEffects->pushPreamble();
-				CurrentCampaign->StartEffects->run();
 			}
 		}
 		
@@ -695,5 +691,3 @@ void GameMainLoop()
 
 	SetCallbacks(old_callbacks);
 }
-
-//@}
