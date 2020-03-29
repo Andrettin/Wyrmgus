@@ -28,13 +28,9 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
-
-#include <stdarg.h>
 
 #include "stratagus.h"
 
@@ -83,6 +79,7 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 //Wyrmgus end
+#include "unit/unit_type_type.h"
 #include "unitsound.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
@@ -95,6 +92,8 @@
 //Wyrmgus start
 #include "../ai/ai_local.h"
 //Wyrmgus end
+
+#include <cstdarg>
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -5200,5 +5199,3 @@ bool IsNameValidForWord(const std::string &word_name)
 	return true;
 }
 //Wyrmgus end
-
-//@}

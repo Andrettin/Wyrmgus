@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DEITY_H__
-#define __DEITY_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -91,5 +90,3 @@ public:
 	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
 	std::map<const CCivilization *, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
-
-#endif

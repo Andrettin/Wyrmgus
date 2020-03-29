@@ -27,17 +27,9 @@
 //      02111-1307, USA.
 //
 
-//@{
-
-#define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
-#define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-
-#include <ctype.h>
-#include <stdexcept>
 
 #include "stratagus.h"
 
@@ -75,15 +67,22 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "unitsound.h"
 #include "upgrade/dependency.h"
 #include "video.h"
 #include "widgets.h"
 #include "world.h"
 
+#include <cctype>
+#include <stdexcept>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+#define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
+#define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
 
 int MouseButtons;                            /// Current pressed mouse buttons
 
@@ -3384,4 +3383,3 @@ static void HandlePieMenuMouseSelection()
 		UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 	}
 }
-//@}

@@ -28,9 +28,6 @@
 //      02111-1307, USA.
 //
 
-
-//@{
-
 //----------------------------------------------------------------------------
 // Documentation
 //----------------------------------------------------------------------------
@@ -171,6 +168,7 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
@@ -1666,5 +1664,3 @@ bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_req
 	
 	return false;
 }
-
-//@}

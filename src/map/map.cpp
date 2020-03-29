@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -74,6 +72,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
+#include "unit/unit_type_type.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
@@ -3062,5 +3061,3 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	const std::string filename = LibraryFileName(mapname.c_str());
 	LuaLoadFile(filename);
 }
-
-//@}

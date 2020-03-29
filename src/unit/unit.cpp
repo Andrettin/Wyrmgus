@@ -2973,7 +2973,7 @@ CUnit *CUnit::GetFirstContainer() const
 */
 void MapMarkUnitSight(CUnit &unit)
 {
-	CUnit *container = unit.GetFirstContainer();// First container of the unit.
+	CUnit *container = unit.GetFirstContainer(); //first container of the unit.
 	Assert(container->Type);
 
 	MapMarkUnitSightRec(unit, container->tilePos, container->Type->TileSize.x, container->Type->TileSize.y,
