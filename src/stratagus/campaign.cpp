@@ -89,7 +89,7 @@ CCampaign *CCampaign::GetOrAddCampaign(const std::string &ident)
 	CCampaign *campaign = GetCampaign(ident, false);
 	
 	if (!campaign) {
-		campaign = new CCampaign(campaign->Ident, Campaigns.size());
+		campaign = new CCampaign(ident, Campaigns.size());
 		Campaigns.push_back(campaign);
 		CampaignsByIdent[ident] = campaign;
 	}
