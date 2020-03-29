@@ -1042,7 +1042,7 @@ void DrawPopups()
 					//hackish way to make the popup appear correctly for the unit under cursor
 					ButtonAction *ba = new ButtonAction;
 					ba->Hint = unit_name;
-					ba->Action = ButtonUnit;
+					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*UnitUnderCursor);
 					ba->Popup = "popup-unit-under-cursor";
 					DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
@@ -1072,13 +1072,12 @@ void DrawPopups()
 			}
 			
 			//hackish way to make the popup appear correctly for the single selected unit
-			ButtonAction *ba = new ButtonAction;
-			ba->Hint = Selected[0]->GetMessageName();
-			ba->Action = ButtonUnit;
-			ba->Value = UnitNumber(*Selected[0]);
-			ba->Popup = "popup-unit";
-			DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-			delete ba;
+			ButtonAction ba;
+			ba.Hint = Selected[0]->GetMessageName();
+			ba.Action = ButtonCmd::Unit;
+			ba.Value = UnitNumber(*Selected[0]);
+			ba.Popup = "popup-unit";
+			DrawPopup(ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 			LastDrawnButtonPopup = nullptr;
 		}
 		
@@ -1120,7 +1119,7 @@ void DrawPopups()
 					}
 					ba->Pos = j;
 					ba->Level = CButtonLevel::InventoryButtonLevel;
-					ba->Action = ButtonUnit;
+					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*uins);
 					ba->Popup = "popup-item-inventory";
 					DrawPopup(*ba, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
@@ -1191,7 +1190,7 @@ void DrawPopups()
 			//hackish way to make the popup appear correctly for the resource
 			ButtonAction *ba = new ButtonAction;
 			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
-			ba->Action = ButtonProduceResource;
+			ba->Action = ButtonCmd::ProduceResource;
 			ba->Value = i;
 			ba->ValueStr = DefaultResourceNames[i];
 			ba->Popup = "popup-resource";

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNITTYPE_H__
-#define __UNITTYPE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -39,6 +38,7 @@
 #include "icons.h"
 #include "missileconfig.h"
 #include "unitsound.h"
+#include "ui/button_cmd.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
@@ -76,6 +76,7 @@ struct lua_State;
 class Mng;
 #endif
 class LuaCallback;
+enum class UnitTypeType;
 
 #define UnitSides 8
 #define MaxAttackPos 5
@@ -499,16 +500,7 @@ public:
 	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
 };
 
-enum UnitTypeType {
-	UnitTypeLand,  /// Unit lives on land
-	UnitTypeFly,   /// Unit lives in air
-	//Wyrmgus start
-	UnitTypeFlyLow,   /// Unit lives in air, but flies low, so that it can be attacked by melee land units and cannot fly over rocks
-	//Wyrmgus end
-	UnitTypeNaval  /// Unit lives on water
-};
-
-enum DistanceTypeType {
+enum class DistanceTypeType {
 	Equal,
 	NotEqual,
 	LessThan,
@@ -678,7 +670,11 @@ public:
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {};
+	CBuildRestrictionSurroundedBy()
+		: Count(0), Distance(0), DistanceType(DistanceTypeType::Equal), CountType(DistanceTypeType::Equal), RestrictType(nullptr), CheckBuilder(false)
+	{
+	}
+
 	virtual ~CBuildRestrictionSurroundedBy() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
 	//Wyrmgus start
@@ -842,7 +838,7 @@ public:
 	
 	//Wyrmgus start
 	void SetParent(CUnitType *parent_type);
-	void RemoveButtons(int button_action = -1, std::string mod_file = "");
+	void RemoveButtons(const ButtonCmd button_action = ButtonCmd::None, const std::string &mod_file = "");
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
@@ -893,7 +889,7 @@ public:
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
 	std::string LayerFiles[MaxImageLayers];	/// Layer files
-	std::map<int, IconConfig> ButtonIcons;					/// icons for button actions
+	std::map<ButtonCmd, IconConfig> ButtonIcons;			/// icons for button actions
 	std::map<int, CUnitType *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
@@ -1292,5 +1288,3 @@ extern int GetImageLayerIdByName(const std::string &image_layer);
 
 extern std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end
-
-#endif

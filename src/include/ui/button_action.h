@@ -40,6 +40,7 @@
 #include <vector>
 
 #include "icons.h"
+#include "ui/button_cmd.h"
 #include "unitsound.h"
 
 /*----------------------------------------------------------------------------
@@ -53,44 +54,6 @@ class CUnit;
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-/// Button Commands that need target selection
-enum ButtonCmd {
-	ButtonMove,           /// order move
-	ButtonAttack,         /// order attack
-	ButtonRepair,         /// order repair
-	ButtonHarvest,        /// order harvest
-	ButtonBuild,          /// order build
-	ButtonPatrol,         /// order patrol
-	ButtonAttackGround,   /// order attack ground
-	ButtonSpellCast,      /// order cast spell
-	ButtonUnload,         /// order unload unit
-	ButtonStop,           /// order stop
-	ButtonButton,         /// choose other button set
-	ButtonTrain,          /// order train
-	ButtonStandGround,    /// order stand ground
-	ButtonReturn,         /// order return goods
-	ButtonResearch,       /// order reseach
-	ButtonLearnAbility,   /// order learn ability
-	ButtonExperienceUpgradeTo,   /// order upgrade (experience)
-	ButtonUpgradeTo,      /// order upgrade
-	ButtonRallyPoint,		/// set rally point
-	ButtonFaction,			/// change faction
-	ButtonQuest,			/// receive quest
-	ButtonBuy,				/// buy item
-	ButtonProduceResource,	/// produce a resource
-	ButtonSellResource,		/// sell a resource
-	ButtonBuyResource,		/// buy a resource
-	ButtonSalvage,			/// salvage a building
-	ButtonEnterMapLayer,	/// enter a map layer
-	ButtonUnit,				/// used to display popups for inventory items and for units in transporters
-	ButtonEditorUnit,		/// used to display popups for editor unit type buttons
-	ButtonCancel,         /// cancel
-	ButtonCancelUpgrade,  /// cancel upgrade
-	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild,    /// cancel building
-	ButtonCallbackAction
-};
-
 class ButtonAction;
 typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 
@@ -98,7 +61,7 @@ typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(nullptr), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(nullptr),
+	ButtonAction() : Pos(0), Level(nullptr), AlwaysShow(false), Value(0), Payload(nullptr),
 		Allowed(nullptr), Key(0) {}
 	
 	static void ProcessConfigData(const CConfigData *config_data);
@@ -112,7 +75,7 @@ public:
 	int Pos;					/// button position in the grid
 	CButtonLevel *Level;		/// requires button level
 	bool AlwaysShow;			/// button is always shown but drawn grayscale if not available
-	ButtonCmd Action;			/// command on button press
+	ButtonCmd Action = ButtonCmd::Move;	/// command on button press
 	int Value;					/// extra value for command
 	void *Payload;
 	std::string ValueStr;		/// keep original value string
@@ -168,9 +131,9 @@ extern int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction
 // Get the cooldown percent for the button for the unit.
 extern int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction);
 
-extern std::string GetButtonActionNameById(const int button_action);
-extern int GetButtonActionIdByName(const std::string &button_action);
-extern bool IsNeutralUsableButtonAction(const int button_action);
+extern std::string GetButtonActionNameById(const ButtonCmd button_action);
+extern ButtonCmd GetButtonActionIdByName(const std::string &button_action);
+extern bool IsNeutralUsableButtonAction(const ButtonCmd button_action);
 
 //@}
 

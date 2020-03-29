@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -62,6 +60,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "unitsound.h"
 #include "video.h"
 
@@ -1334,8 +1333,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
-				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeLand) {
-					if (!missile.TargetUnit || missile.TargetUnit->Type->UnitType == UnitTypeLand) {
+				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeType::Land) {
+					if (!missile.TargetUnit || missile.TargetUnit->Type->UnitType == UnitTypeType::Land) {
 						if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
 							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
@@ -1748,7 +1747,7 @@ void Missile::MissileHit(CUnit *unit)
 					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
-							if (order.GetSpell().Target == TargetPosition) {
+							if (order.GetSpell().Target == TargetType::Position) {
 								isPosition = true;
 							}
 						} else {
@@ -2160,5 +2159,3 @@ void FreeBurningBuildingFrames()
 	}
 	BurningBuildingFrames.clear();
 }
-
-//@}

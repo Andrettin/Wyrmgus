@@ -153,7 +153,7 @@ int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 	if (!value.empty()) {
 		ba->ValueStr = value;
 		switch (action) {
-			case ButtonSpellCast:
+			case ButtonCmd::SpellCast:
 				ba->Value = CSpell::GetSpell(value)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
@@ -162,38 +162,38 @@ int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 				}
 #endif
 				break;
-			case ButtonTrain:
+			case ButtonCmd::Train:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
-			case ButtonResearch:
+			case ButtonCmd::Research:
 				ba->Value = UpgradeIdByIdent(value);
 				break;
 			//Wyrmgus start
-			case ButtonLearnAbility:
+			case ButtonCmd::LearnAbility:
 				ba->Value = UpgradeIdByIdent(value);
 				break;
-			case ButtonExperienceUpgradeTo:
+			case ButtonCmd::ExperienceUpgradeTo:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			//Wyrmgus end
-			case ButtonUpgradeTo:
+			case ButtonCmd::UpgradeTo:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
-			case ButtonBuild:
+			case ButtonCmd::Build:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			//Wyrmgus start
-			case ButtonProduceResource:
+			case ButtonCmd::ProduceResource:
 				ba->Value = GetResourceIdByName(value.c_str());
 				break;
-			case ButtonSellResource:
+			case ButtonCmd::SellResource:
 				ba->Value = GetResourceIdByName(value.c_str());
 				break;
-			case ButtonBuyResource:
+			case ButtonCmd::BuyResource:
 				ba->Value = GetResourceIdByName(value.c_str());
 				break;
 			//Wyrmgus end
-			case ButtonButton:
+			case ButtonCmd::Button:
 				if (CButtonLevel::GetButtonLevel(value)) {
 					ba->Value = CButtonLevel::GetButtonLevel(value)->ID;
 				} else {
@@ -294,7 +294,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	//Wyrmgus start
 	res |= IconCommandButton;
 	
-	if (button.Action == ButtonProduceResource) {
+	if (button.Action == ButtonCmd::ProduceResource) {
 		size_t i;
 		for (i = 0; i < Selected.size(); ++i) {
 			if (Selected[i]->GivesResource != button.Value) {
@@ -309,23 +309,23 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	
 	UnitAction action = UnitAction::None;
 	switch (button.Action) {
-		case ButtonStop:
+		case ButtonCmd::Stop:
 			action = UnitAction::Still;
 			break;
-		case ButtonStandGround:
+		case ButtonCmd::StandGround:
 			action = UnitAction::StandGround;
 			break;
-		case ButtonAttack:
+		case ButtonCmd::Attack:
 			action = UnitAction::Attack;
 			break;
-		case ButtonAttackGround:
+		case ButtonCmd::AttackGround:
 			action = UnitAction::AttackGround;
 			break;
-		case ButtonPatrol:
+		case ButtonCmd::Patrol:
 			action = UnitAction::Patrol;
 			break;
-		case ButtonHarvest:
-		case ButtonReturn:
+		case ButtonCmd::Harvest:
+		case ButtonCmd::Return:
 			action = UnitAction::Resource;
 			break;
 		default:
@@ -344,7 +344,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	// other cases : manage AutoCast and different possible action.
 	size_t i;
 	switch (button.Action) {
-		case ButtonMove:
+		case ButtonCmd::Move:
 			for (i = 0; i < Selected.size(); ++i) {
 				const UnitAction saction = Selected[i]->CurrentAction();
 				if (saction != UnitAction::Move &&
@@ -361,7 +361,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				res |= IconSelected;
 			}
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			// FIXME : and IconSelected ?
 
 			// Autocast
@@ -375,7 +375,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				res |= IconAutoCast;
 			}
 			break;
-		case ButtonRepair:
+		case ButtonCmd::Repair:
 			for (i = 0; i < Selected.size(); ++i) {
 				if (Selected[i]->CurrentAction() != UnitAction::Repair) {
 					break;
@@ -395,7 +395,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			}
 			break;
 		// FIXME: must handle more actions
-		case ButtonSellResource:
+		case ButtonCmd::SellResource:
 			if (std::find(ThisPlayer->AutosellResources.begin(), ThisPlayer->AutosellResources.end(), button.Value) != ThisPlayer->AutosellResources.end()) {
 				res |= IconAutoCast;
 			}
@@ -445,7 +445,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
-	if (condition->UnitTypeType != -1) {
+	if (condition->UnitTypeType != UnitTypeType::None) {
 		if (!type || condition->UnitTypeType != type->UnitType) {
 			return false;
 		}
@@ -471,7 +471,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
-		if (button.Action == ButtonProduceResource) {
+		if (button.Action == ButtonCmd::ProduceResource) {
 			if (ThisPlayer->Incomes[button.Value] > CResource::Resources[button.Value]->DefaultIncome) {
 				improve_incomes = true;
 			}
@@ -501,7 +501,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->Quote.empty())) {
+	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->Quote.empty())) {
 		return false;
 	}
 	
@@ -509,35 +509,35 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->SettlementName && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Settlement)) {
+	if (condition->SettlementName && !(button.Action == ButtonCmd::Unit && UnitManager.GetSlotUnit(button.Value).Settlement)) {
 		return false;
 	}
 	
-	if (condition->CanActiveHarvest && !(button.Action == ButtonUnit && Selected.size() > 0 && Selected[0]->CanHarvest(&UnitManager.GetSlotUnit(button.Value), false))) {
+	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->CanHarvest(&UnitManager.GetSlotUnit(button.Value), false))) {
 		return false;
 	}
 
 	if (condition->FactionUpgrade != CONDITION_TRUE) {
-		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ (button.Action == ButtonFaction)) {
+		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Faction)) {
 			return false;
 		}
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CurrentCampaign != nullptr && button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CurrentCampaign != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
 	
 	CUpgrade *upgrade = nullptr;
-	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility) {
 		upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+	} else if (button.Action == ButtonCmd::Faction && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
 		upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
-		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdAllowed(*ThisPlayer, upgrade->ID) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::Faction) && UpgradeIdAllowed(*ThisPlayer, upgrade->ID) == 'R') || (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
 			return false;
 		}
 	}
@@ -561,31 +561,31 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && CResource::Resources[button.Value]->LuxuryResource)) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && CResource::Resources[button.Value]->LuxuryResource)) {
 			return false;
 		}
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == ThisPlayer && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->RequirementsString.empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == ThisPlayer && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->RequirementsString.empty())))) {
 			return false;
 		}
 	}
 	
 	if (condition->ExperienceRequirementsString != CONDITION_TRUE) {
-		if ((condition->ExperienceRequirementsString == CONDITION_ONLY) ^ (button.Action == ButtonExperienceUpgradeTo && !IsButtonUsable(*Selected[0], button) && type && !type->ExperienceRequirementsString.empty())) {
+		if ((condition->ExperienceRequirementsString == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ExperienceUpgradeTo && !IsButtonUsable(*Selected[0], button) && type && !type->ExperienceRequirementsString.empty())) {
 			return false;
 		}
 	}
 	
 	if (condition->BuildingRulesString != CONDITION_TRUE) {
-		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ (button.Action == ButtonBuild && type && !type->BuildingRulesString.empty())) {
+		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Build && type && !type->BuildingRulesString.empty())) {
 			return false;
 		}
 	}
 	//Wyrmgus end
 
-	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {
+	if (condition->ButtonAction != ButtonCmd::None && button.Action != condition->ButtonAction) {
 		return false;
 	}
 
@@ -599,7 +599,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 
 	//Wyrmgus start
 //	if (condition->Variables && type) {
-	if (condition->Variables && type && button.Action != ButtonUnit && button.Action != ButtonBuy) {
+	if (condition->Variables && type && button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy) {
 	//Wyrmgus end
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
@@ -609,7 +609,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 	//Wyrmgus start
-	} else if (condition->Variables && (button.Action == ButtonUnit || button.Action == ButtonBuy)) {
+	} else if (condition->Variables && (button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy)) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
@@ -651,7 +651,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (button.Action == ButtonSpellCast) {
+	if (button.Action == ButtonCmd::SpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
 			if ((condition->AutoCast == CONDITION_ONLY) ^ (CSpell::Spells[button.Value]->AutoCast != nullptr)) {
 				return false;
@@ -659,7 +659,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 		
-	if (button.Action == ButtonUnit || button.Action == ButtonBuy) {
+	if (button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
 		if (unit.Type->BoolFlag[ITEM_INDEX].value) {
 			if (condition->Equipped != CONDITION_TRUE) {
@@ -759,12 +759,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		
-		if (!(button.Action == ButtonBuy && unit.Character) && condition->Opponent != CONDITION_TRUE) {
+		if (!(button.Action == ButtonCmd::Buy && unit.Character) && condition->Opponent != CONDITION_TRUE) {
 			if ((condition->Opponent == CONDITION_ONLY) ^ ThisPlayer->IsEnemy(unit)) {
 				return false;
 			}
 		}
-		if (!(button.Action == ButtonBuy && unit.Character) && condition->Neutral != CONDITION_TRUE) {
+		if (!(button.Action == ButtonCmd::Buy && unit.Character) && condition->Neutral != CONDITION_TRUE) {
 			if ((condition->Neutral == CONDITION_ONLY) ^ (!ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && ThisPlayer != unit.Player && (unit.Container == nullptr || (!ThisPlayer->IsEnemy(*unit.Container) && !ThisPlayer->IsAllied(*unit.Container) && ThisPlayer != unit.Container->Player)))) {
 				return false;
 			}
@@ -820,8 +820,8 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 		if (
-			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
-			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
+			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
+			|| ((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
 		) {
 		//Wyrmgus end
 			// Automatically write the calculated coordinates.
@@ -871,19 +871,19 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 	memset(Costs, 0, sizeof(Costs));
 
 	switch (button.Action) {
-		case ButtonResearch:
+		case ButtonCmd::Research:
 			//Wyrmgus start
 //			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
 			ThisPlayer->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
 			//Wyrmgus end
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			memcpy(Costs, CSpell::Spells[button.Value]->Costs, sizeof(CSpell::Spells[button.Value]->Costs));
 			Costs[ManaResCost] = CSpell::Spells[button.Value]->ManaCost;
 			break;
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo:
+		case ButtonCmd::Build:
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo:
 			//Wyrmgus start
 //			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
 //				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
@@ -895,7 +895,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
-		case ButtonBuy:
+		case ButtonCmd::Buy:
 			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
 			Costs[CopperCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
 			break;
@@ -936,8 +936,8 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 		if (
-			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
-			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
+			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
+			|| ((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
 		) {
 		//Wyrmgus end
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
@@ -1128,7 +1128,7 @@ void CButtonPanel::Draw()
 			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 				gray = true;
 				break;
-			} else if (buttons[i].Action == ButtonSpellCast
+			} else if (buttons[i].Action == ButtonCmd::SpellCast
 					   && (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[buttons[i].Value]->Slot]) {
 				Assert(CSpell::Spells[buttons[i].Value]->CoolDown > 0);
 				cooldownSpell = true;
@@ -1175,21 +1175,21 @@ void CButtonPanel::Draw()
 		CIcon *button_icon = buttons[i].Icon.Icon;
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != nullptr) {
+		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonCmd::Attack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
 		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
-		} else if (buttons[i].Action == ButtonExperienceUpgradeTo && Selected[0]->GetVariation() && UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
+		} else if (buttons[i].Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != nullptr && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
+		} else if ((buttons[i].Action == ButtonCmd::Train || buttons[i].Action == ButtonCmd::Build || buttons[i].Action == ButtonCmd::UpgradeTo || buttons[i].Action == ButtonCmd::ExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != nullptr && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
+		} else if ((buttons[i].Action == ButtonCmd::Train || buttons[i].Action == ButtonCmd::Build || buttons[i].Action == ButtonCmd::UpgradeTo || buttons[i].Action == ButtonCmd::ExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
-		} else if (buttons[i].Action == ButtonBuy) {
+		} else if (buttons[i].Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
-		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
+		} else if (buttons[i].Action == ButtonCmd::Research && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
 			button_icon = AllUpgrades[buttons[i].Value]->Icon;
-		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
+		} else if (buttons[i].Action == ButtonCmd::Faction && buttons[i].Icon.Name.empty() && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
 			button_icon = PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttons[i].Value]->Icon.Icon;
 		}
 		//Wyrmgus end
@@ -1225,15 +1225,15 @@ void CButtonPanel::Draw()
 												   pos, buf, player, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 												   
 				if (
-					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
-					|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
+					(buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
+					|| buttons[i].Action == ButtonCmd::SellResource || buttons[i].Action == ButtonCmd::BuyResource
 				) {
 					std::string number_string;
-					if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
+					if (buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
 						number_string = std::to_string((long long) Selected[0]->GetUnitStock(UnitTypes[buttons[i].Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]));
-					} else if (buttons[i].Action == ButtonSellResource) {
+					} else if (buttons[i].Action == ButtonCmd::SellResource) {
 						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
-					} else if (buttons[i].Action == ButtonBuyResource) {
+					} else if (buttons[i].Action == ButtonCmd::BuyResource) {
 						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceBuyPrice(buttons[i].Value));
 					}
 					std::string oldnc;
@@ -1244,8 +1244,8 @@ void CButtonPanel::Draw()
 					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
 			} else if ( //draw researched technologies (or acquired abilities) grayed
-				buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R'
-				|| (buttons[i].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(buttons[i].ValueStr)) == CUpgrade::Get(buttons[i].ValueStr)->MaxLimit)
+				buttons[i].Action == ButtonCmd::Research && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R'
+				|| (buttons[i].Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(buttons[i].ValueStr)) == CUpgrade::Get(buttons[i].ValueStr)->MaxLimit)
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
@@ -1315,9 +1315,9 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 	UI.StatusLine.Set(button.GetHint());
 	//Wyrmgus end
 	switch (button.Action) {
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo: {
+		case ButtonCmd::Build:
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo: {
 			// FIXME: store pointer in button table!
 			//Wyrmgus start
 //			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
@@ -1328,10 +1328,10 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 			//Wyrmgus end
 			break;
 		}
-		case ButtonResearch:
+		case ButtonCmd::Research:
 			UI.StatusLine.SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			UI.StatusLine.SetCosts(CSpell::Spells[button.Value]->ManaCost, 0, CSpell::Spells[button.Value]->Costs);
 			break;
 		default:
@@ -1378,30 +1378,30 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
-		case ButtonStop:
-		case ButtonStandGround:
-		case ButtonButton:
-		case ButtonMove:
-		case ButtonCallbackAction:
+		case ButtonCmd::Stop:
+		case ButtonCmd::StandGround:
+		case ButtonCmd::Button:
+		case ButtonCmd::Move:
+		case ButtonCmd::CallbackAction:
 		//Wyrmgus start
-		case ButtonRallyPoint:
-		case ButtonUnit:
-		case ButtonEditorUnit:
-		case ButtonProduceResource:
-		case ButtonSellResource:
-		case ButtonBuyResource:
-		case ButtonSalvage:
-		case ButtonEnterMapLayer:
+		case ButtonCmd::RallyPoint:
+		case ButtonCmd::Unit:
+		case ButtonCmd::EditorUnit:
+		case ButtonCmd::ProduceResource:
+		case ButtonCmd::SellResource:
+		case ButtonCmd::BuyResource:
+		case ButtonCmd::Salvage:
+		case ButtonCmd::EnterMapLayer:
 		//Wyrmgus end
 			res = true;
 			break;
-		case ButtonRepair:
+		case ButtonCmd::Repair:
 			res = unit.Type->RepairRange > 0;
 			break;
-		case ButtonPatrol:
+		case ButtonCmd::Patrol:
 			res = unit.CanMove();
 			break;
-		case ButtonHarvest:
+		case ButtonCmd::Harvest:
 			if (!unit.CurrentResource
 				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
 				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
@@ -1414,7 +1414,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			//Wyrmgus end
 			break;
-		case ButtonReturn:
+		case ButtonCmd::Return:
 			if (!(!unit.CurrentResource
 				  || !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
 				  || (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
@@ -1422,15 +1422,15 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				res = true;
 			}
 			break;
-		case ButtonAttack:
+		case ButtonCmd::Attack:
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
-		case ButtonAttackGround:
+		case ButtonCmd::AttackGround:
 			if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 				res = true;
 			}
 			break;
-		case ButtonTrain:
+		case ButtonCmd::Train:
 			// Check if building queue is enabled
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
@@ -1439,10 +1439,10 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				break;
 			}
 		// FALL THROUGH
-		case ButtonUpgradeTo:
-		case ButtonResearch:
-		case ButtonBuild:
-			if (buttonaction.Action == ButtonResearch) {
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::Research:
+		case ButtonCmd::Build:
+			if (buttonaction.Action == ButtonCmd::Research) {
 				res = CheckDependencies(AllUpgrades[buttonaction.Value], unit.Player, false, true, !ThisPlayer->IsTeamed(unit));
 				if (res) {
 					//Wyrmgus start
@@ -1455,25 +1455,25 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				res = CheckDependencies(UnitTypes[buttonaction.Value], unit.Player, false, true, !ThisPlayer->IsTeamed(unit));
 			}
 			break;
-		case ButtonExperienceUpgradeTo:
+		case ButtonCmd::ExperienceUpgradeTo:
 			res = CheckDependencies(UnitTypes[buttonaction.Value], &unit, true, true);
 			if (res && unit.Character != nullptr) {
 				res = std::find(unit.Character->ForbiddenUpgrades.begin(), unit.Character->ForbiddenUpgrades.end(), UnitTypes[buttonaction.Value]) == unit.Character->ForbiddenUpgrades.end();
 			}
 			break;
-		case ButtonLearnAbility:
+		case ButtonCmd::LearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr), true);
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
-		case ButtonUnload:
+		case ButtonCmd::Unload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
 			break;
-		case ButtonCancel:
+		case ButtonCmd::Cancel:
 			res = true;
 			break;
-		case ButtonCancelUpgrade:
+		case ButtonCmd::CancelUpgrade:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitAction::UpgradeTo
 //				  || unit.CurrentAction() == UnitAction::Research;
@@ -1482,23 +1482,23 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				|| (unit.CurrentAction() == UnitAction::Research && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] > 0);
 			//Wyrmgus end
 			break;
-		case ButtonCancelTrain:
+		case ButtonCmd::CancelTrain:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitAction::Train;
 			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
 			//Wyrmgus end
 			break;
-		case ButtonCancelBuild:
+		case ButtonCmd::CancelBuild:
 			res = unit.CurrentAction() == UnitAction::Built;
 			break;
 		//Wyrmgus start
-		case ButtonFaction:
+		case ButtonCmd::Faction:
 			res = ThisPlayer->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo.size() && ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value], true);
 			break;
-		case ButtonQuest:
+		case ButtonCmd::Quest:
 			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
 			break;
-		case ButtonBuy:
+		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
 			break;
 		//Wyrmgus end
@@ -1539,29 +1539,29 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
-		case ButtonStop:
-		case ButtonStandGround:
-		case ButtonButton:
-		case ButtonMove:
-		case ButtonCallbackAction:
-		case ButtonRallyPoint:
-		case ButtonUnit:
-		case ButtonEditorUnit:
-		case ButtonRepair:
-		case ButtonPatrol:
-		case ButtonHarvest:
-		case ButtonReturn:
-		case ButtonAttack:
-		case ButtonAttackGround:
-		case ButtonSalvage:
-		case ButtonEnterMapLayer:
+		case ButtonCmd::Stop:
+		case ButtonCmd::StandGround:
+		case ButtonCmd::Button:
+		case ButtonCmd::Move:
+		case ButtonCmd::CallbackAction:
+		case ButtonCmd::RallyPoint:
+		case ButtonCmd::Unit:
+		case ButtonCmd::EditorUnit:
+		case ButtonCmd::Repair:
+		case ButtonCmd::Patrol:
+		case ButtonCmd::Harvest:
+		case ButtonCmd::Return:
+		case ButtonCmd::Attack:
+		case ButtonCmd::AttackGround:
+		case ButtonCmd::Salvage:
+		case ButtonCmd::EnterMapLayer:
 			res = true;
 			break;
-		case ButtonTrain:
-		case ButtonUpgradeTo:
-		case ButtonResearch:
-		case ButtonBuild:
-			if (buttonaction.Action == ButtonResearch) {
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::Research:
+		case ButtonCmd::Build:
+			if (buttonaction.Action == ButtonCmd::Research) {
 				res = CheckDependencies(AllUpgrades[buttonaction.Value], unit.Player, false, false, !ThisPlayer->IsTeamed(unit));
 				if (res) {
 					res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependencies(AllUpgrades[buttonaction.Value], ThisPlayer, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
@@ -1570,33 +1570,33 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 				res = CheckDependencies(UnitTypes[buttonaction.Value], unit.Player, false, false, !ThisPlayer->IsTeamed(unit));
 			}
 			break;
-		case ButtonExperienceUpgradeTo:
+		case ButtonCmd::ExperienceUpgradeTo:
 			res = CheckDependencies(UnitTypes[buttonaction.Value], &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
-		case ButtonLearnAbility:
+		case ButtonCmd::LearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
-		case ButtonFaction:
+		case ButtonCmd::Faction:
 			res = ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value]);
 			break;
-		case ButtonBuy:
+		case ButtonCmd::Buy:
 			res = true;
 			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				res = ThisPlayer->Heroes.size() < PlayerHeroMax;
 			}
 			break;
-		case ButtonUnload:
-		case ButtonCancel:
-		case ButtonCancelUpgrade:
-		case ButtonCancelTrain:
-		case ButtonCancelBuild:
-		case ButtonQuest:
-		case ButtonProduceResource:
-		case ButtonSellResource:
-		case ButtonBuyResource:
+		case ButtonCmd::Unload:
+		case ButtonCmd::Cancel:
+		case ButtonCmd::CancelUpgrade:
+		case ButtonCmd::CancelTrain:
+		case ButtonCmd::CancelBuild:
+		case ButtonCmd::Quest:
+		case ButtonCmd::ProduceResource:
+		case ButtonCmd::SellResource:
+		case ButtonCmd::BuyResource:
 			res = true;
 			break;
 	}
@@ -1618,7 +1618,7 @@ int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction)
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
-		case ButtonBuy:
+		case ButtonCmd::Buy:
 			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = ThisPlayer->HeroCooldownTimer;
 			}
@@ -1642,7 +1642,7 @@ int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
-		case ButtonBuy:
+		case ButtonCmd::Buy:
 			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = ThisPlayer->HeroCooldownTimer * 100 / HeroCooldownCycles;
 			}
@@ -1789,7 +1789,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 
 		// Special case for researches
 		int researchCheck = true;
-		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonResearch
+		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonCmd::Research
 			//Wyrmgus start
 //			&& UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R') {
 			&& UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') {
@@ -1836,7 +1836,7 @@ void CButtonPanel::Update()
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
 		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-			if (UnitButtonTable[i]->Action != ButtonFaction && UnitButtonTable[i]->Action != ButtonBuy) {
+			if (UnitButtonTable[i]->Action != ButtonCmd::Faction && UnitButtonTable[i]->Action != ButtonCmd::Buy) {
 				continue;
 			}
 			char unit_ident[128];
@@ -1845,7 +1845,7 @@ void CButtonPanel::Update()
 				continue;
 			}
 
-			if (UnitButtonTable[i]->Action == ButtonFaction) {
+			if (UnitButtonTable[i]->Action == ButtonCmd::Faction) {
 				if (ThisPlayer->Faction == -1 || potential_faction_count >= PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo.size()) {
 					UnitButtonTable[i]->Value = -1;
 				} else {
@@ -1862,7 +1862,7 @@ void CButtonPanel::Update()
 					UnitButtonTable[i]->Description += PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Name;
 				}
 				potential_faction_count += 1;
-			} else if (UnitButtonTable[i]->Action == ButtonBuy) {
+			} else if (UnitButtonTable[i]->Action == ButtonCmd::Buy) {
 				if (sold_unit_count >= unit.SoldUnits.size()) {
 					UnitButtonTable[i]->Value = -1;
 				} else {
@@ -1928,7 +1928,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  Unload on coast valid only for sea units
 	//
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitAction::Still
-		 && Selected[0]->Type->UnitType == UnitTypeNaval && Selected[0]->MapLayer->Field(Selected[0]->tilePos)->CoastOnMap())
+		 && Selected[0]->Type->UnitType == UnitTypeType::Naval && Selected[0]->MapLayer->Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush, Selected[0]->MapLayer->ID);
 		return ;
@@ -2413,11 +2413,11 @@ void CButtonPanel::DoClicked(int button)
 	//Wyrmgus start
 	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
 		if (
-			(CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R')
-			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
+			(CurrentButtons[button].Action == ButtonCmd::Research && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R')
+			|| (CurrentButtons[button].Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
 		) {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
-		} else if (CurrentButtons[button].Action == ButtonBuy && ThisPlayer->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != nullptr) {
+		} else if (CurrentButtons[button].Action == ButtonCmd::Buy && ThisPlayer->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != nullptr) {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The hero limit has been reached"));
 		} else {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
@@ -2440,43 +2440,43 @@ void CButtonPanel::DoClicked(int button)
 	
 	//  Handle action on button.
 	switch (CurrentButtons[button].Action) {
-		case ButtonUnload: { DoClicked_Unload(button); break; }
-		case ButtonSpellCast: { DoClicked_SpellCast(button); break; }
-		case ButtonRepair: { DoClicked_Repair(button); break; }
-		case ButtonMove:    // Follow Next
-		case ButtonPatrol:  // Follow Next
-		case ButtonHarvest: // Follow Next
-		case ButtonAttack:  // Follow Next
+		case ButtonCmd::Unload: { DoClicked_Unload(button); break; }
+		case ButtonCmd::SpellCast: { DoClicked_SpellCast(button); break; }
+		case ButtonCmd::Repair: { DoClicked_Repair(button); break; }
+		case ButtonCmd::Move:    // Follow Next
+		case ButtonCmd::Patrol:  // Follow Next
+		case ButtonCmd::Harvest: // Follow Next
+		case ButtonCmd::Attack:  // Follow Next
 		//Wyrmgus start
-		case ButtonRallyPoint:
-		case ButtonUnit:
-		case ButtonEditorUnit:
+		case ButtonCmd::RallyPoint:
+		case ButtonCmd::Unit:
+		case ButtonCmd::EditorUnit:
 		//Wyrmgus end
-		case ButtonAttackGround: { DoClicked_SelectTarget(button); break; }
-		case ButtonReturn: { DoClicked_Return(); break; }
-		case ButtonStop: { DoClicked_Stop(); break; }
-		case ButtonStandGround: { DoClicked_StandGround(); break; }
-		case ButtonButton: { DoClicked_Button(button); break; }
-		case ButtonCancel: // Follow Next
-		case ButtonCancelUpgrade: { DoClicked_CancelUpgrade(); break; }
-		case ButtonCancelTrain: { DoClicked_CancelTrain(); break; }
-		case ButtonCancelBuild: { DoClicked_CancelBuild(); break; }
-		case ButtonBuild: { DoClicked_Build(button); break; }
-		case ButtonTrain: { DoClicked_Train(button); break; }
-		case ButtonUpgradeTo: { DoClicked_UpgradeTo(button); break; }
-		case ButtonResearch: { DoClicked_Research(button); break; }
-		case ButtonCallbackAction: { DoClicked_CallbackAction(button); break; }
+		case ButtonCmd::AttackGround: { DoClicked_SelectTarget(button); break; }
+		case ButtonCmd::Return: { DoClicked_Return(); break; }
+		case ButtonCmd::Stop: { DoClicked_Stop(); break; }
+		case ButtonCmd::StandGround: { DoClicked_StandGround(); break; }
+		case ButtonCmd::Button: { DoClicked_Button(button); break; }
+		case ButtonCmd::Cancel: // Follow Next
+		case ButtonCmd::CancelUpgrade: { DoClicked_CancelUpgrade(); break; }
+		case ButtonCmd::CancelTrain: { DoClicked_CancelTrain(); break; }
+		case ButtonCmd::CancelBuild: { DoClicked_CancelBuild(); break; }
+		case ButtonCmd::Build: { DoClicked_Build(button); break; }
+		case ButtonCmd::Train: { DoClicked_Train(button); break; }
+		case ButtonCmd::UpgradeTo: { DoClicked_UpgradeTo(button); break; }
+		case ButtonCmd::Research: { DoClicked_Research(button); break; }
+		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button); break; }
 		//Wyrmgus start
-		case ButtonLearnAbility: { DoClicked_LearnAbility(button); break; }
-		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
-		case ButtonFaction: { DoClicked_Faction(button); break; }
-		case ButtonQuest: { DoClicked_Quest(button); break; }
-		case ButtonBuy: { DoClicked_Buy(button); break; }
-		case ButtonProduceResource: { DoClicked_ProduceResource(button); break; }
-		case ButtonSellResource: { DoClicked_SellResource(button); break; }
-		case ButtonBuyResource: { DoClicked_BuyResource(button); break; }
-		case ButtonSalvage: { DoClicked_Salvage(); break; }
-		case ButtonEnterMapLayer: { DoClicked_EnterMapLayer(); break; }
+		case ButtonCmd::LearnAbility: { DoClicked_LearnAbility(button); break; }
+		case ButtonCmd::ExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
+		case ButtonCmd::Faction: { DoClicked_Faction(button); break; }
+		case ButtonCmd::Quest: { DoClicked_Quest(button); break; }
+		case ButtonCmd::Buy: { DoClicked_Buy(button); break; }
+		case ButtonCmd::ProduceResource: { DoClicked_ProduceResource(button); break; }
+		case ButtonCmd::SellResource: { DoClicked_SellResource(button); break; }
+		case ButtonCmd::BuyResource: { DoClicked_BuyResource(button); break; }
+		case ButtonCmd::Salvage: { DoClicked_Salvage(); break; }
+		case ButtonCmd::EnterMapLayer: { DoClicked_EnterMapLayer(); break; }
 		//Wyrmgus end
 	}
 }

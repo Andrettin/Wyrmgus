@@ -52,6 +52,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "video.h"
 
 enum {
@@ -319,7 +320,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 					if (pathRet == PF_UNREACHABLE) {
 						//Wyrmgus start
 						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 							std::vector<CUnit *> table;
 							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 							for (size_t i = 0; i != table.size(); ++i) {

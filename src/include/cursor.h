@@ -115,6 +115,7 @@
 
 class CGraphic;
 class CUnitType;
+enum class ButtonCmd;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -165,7 +166,7 @@ enum class CursorState {
 ----------------------------------------------------------------------------*/
 
 extern CursorState CurrentCursorState;  /// current cursor state (point,...)
-extern int CursorAction;          /// action for selection
+extern ButtonCmd CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
 extern CUnitType *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button

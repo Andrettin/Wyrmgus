@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -50,6 +48,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 
 /*----------------------------------------------------------------------------
   -- Finding units
@@ -833,13 +832,13 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 **  @return      Returns first found unit on tile.
 */
 //Wyrmgus start
-//CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
-CUnit *UnitOnMapTile(const unsigned int index, unsigned int type, int z)
+//static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type)
+static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type, const int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return Map.Field(index)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
-	return Map.Field(index, z)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
+//	return Map.Field(index)->UnitCache.find(CUnitTypeFinder(type));
+	return Map.Field(index, z)->UnitCache.find(CUnitTypeFinder(type));
 	//Wyrmgus end
 }
 
@@ -852,8 +851,8 @@ CUnit *UnitOnMapTile(const unsigned int index, unsigned int type, int z)
 **  @return      Returns first found unit on tile.
 */
 //Wyrmgus start
-//CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
-CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z)
+//CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type)
+CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1038,7 +1037,7 @@ private:
 			return INT_MAX;
 		}
 
-		if (dtype.UnitType == UnitTypeFly && dest->IsAgressive() == false) {
+		if (dtype.UnitType == UnitTypeType::Fly && dest->IsAgressive() == false) {
 			return INT_MAX / 2;
 		}
 
@@ -1682,5 +1681,3 @@ bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsign
 	
 	return result;
 }
-
-//@}

@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_demolish.h"
@@ -38,6 +36,7 @@
 #include "map/map.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "unit/unit_type_type.h"
 
 /* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {
@@ -175,7 +174,7 @@
 		//Wyrmgus end
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
-			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
+			if (unit.Type->UnitType != UnitTypeType::Fly && unit.IsAlive()
 				//Wyrmgus start
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!
@@ -218,7 +217,3 @@
 
 	return 1;
 }
-
-
-
-//@}

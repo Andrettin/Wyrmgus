@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -51,6 +49,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 
 //Wyrmgus start
 #include "../ai/ai_local.h" // for AiHelpers
@@ -872,7 +871,7 @@ int SelectArmy()
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeNaval || unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == UnitTypeType::Naval || unit.Type->UnitType == UnitTypeType::Fly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else on team has this unit
@@ -984,7 +983,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == UnitTypeType::Fly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1035,7 +1034,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.Type->UnitType != UnitTypeType::Fly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1107,7 +1106,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == UnitTypeType::Fly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1178,7 +1177,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.Type->UnitType != UnitTypeType::Fly) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1283,5 +1282,3 @@ void SelectionCclRegister()
 	lua_register(Lua, "SetGroupId", CclSetGroupId);
 	lua_register(Lua, "Selection", CclSelection);
 }
-
-//@}

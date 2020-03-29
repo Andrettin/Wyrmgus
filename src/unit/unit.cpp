@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -87,6 +85,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 #include "upgrade/dependency.h"
@@ -1311,19 +1310,19 @@ const CUnitTypeVariation *CUnit::GetLayerVariation(const unsigned int image_laye
 
 void CUnit::UpdateButtonIcons()
 {
-	this->ChooseButtonIcon(ButtonAttack);
-	this->ChooseButtonIcon(ButtonStop);
-	this->ChooseButtonIcon(ButtonMove);
-	this->ChooseButtonIcon(ButtonStandGround);
-	this->ChooseButtonIcon(ButtonPatrol);
+	this->ChooseButtonIcon(ButtonCmd::Attack);
+	this->ChooseButtonIcon(ButtonCmd::Stop);
+	this->ChooseButtonIcon(ButtonCmd::Move);
+	this->ChooseButtonIcon(ButtonCmd::StandGround);
+	this->ChooseButtonIcon(ButtonCmd::Patrol);
 	if (this->Type->BoolFlag[HARVESTER_INDEX].value) {
-		this->ChooseButtonIcon(ButtonReturn);
+		this->ChooseButtonIcon(ButtonCmd::Return);
 	}
 }
 
-void CUnit::ChooseButtonIcon(int button_action)
+void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 {
-	if (button_action == ButtonAttack) {
+	if (button_action == ButtonCmd::Attack) {
 		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon;
 			return;
@@ -1333,17 +1332,17 @@ void CUnit::ChooseButtonIcon(int button_action)
 			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon;
 			return;
 		}
-	} else if (button_action == ButtonStop) {
+	} else if (button_action == ButtonCmd::Stop) {
 		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass == ShieldItemClass && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon;
 			return;
 		}
-	} else if (button_action == ButtonMove) {
+	} else if (button_action == ButtonCmd::Move) {
 		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon;
 			return;
 		}
-	} else if (button_action == ButtonStandGround) {
+	} else if (button_action == ButtonCmd::StandGround) {
 		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.end()) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.find(button_action)->second.Icon;
 			return;
@@ -1376,22 +1375,22 @@ void CUnit::ChooseButtonIcon(int button_action)
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
 			if (
 				(
-					(button_action == ButtonAttack && ((upgrade->Weapon && upgrade->Item->ItemClass != BowItemClass) || upgrade->Arrows))
-					|| (button_action == ButtonStop && upgrade->Shield)
-					|| (button_action == ButtonMove && upgrade->Boots)
+					(button_action == ButtonCmd::Attack && ((upgrade->Weapon && upgrade->Item->ItemClass != BowItemClass) || upgrade->Arrows))
+					|| (button_action == ButtonCmd::Stop && upgrade->Shield)
+					|| (button_action == ButtonCmd::Move && upgrade->Boots)
 				)
 				&& upgrade->Item->Icon.Icon != nullptr
 			) {
 				this->ButtonIcons[button_action] = upgrade->Item->Icon.Icon;
 				return;
-			} else if (button_action == ButtonStandGround && (upgrade->Weapon || upgrade->Arrows) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
+			} else if (button_action == ButtonCmd::StandGround && (upgrade->Weapon || upgrade->Arrows) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
 				this->ButtonIcons[button_action] = upgrade->Item->ButtonIcons.find(button_action)->second.Icon;
 				return;
 			}
 		}
 	}
 	
-	if (button_action == ButtonAttack) {
+	if (button_action == ButtonCmd::Attack) {
 		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon;
 			return;
@@ -1401,17 +1400,17 @@ void CUnit::ChooseButtonIcon(int button_action)
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon;
 			return;
 		}
-	} else if (button_action == ButtonStop) {
+	} else if (button_action == ButtonCmd::Stop) {
 		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass == ShieldItemClass && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon;
 			return;
 		}
-	} else if (button_action == ButtonMove) {
+	} else if (button_action == ButtonCmd::Move) {
 		if (this->Type->DefaultEquipment.find(BootsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon;
 			return;
 		}
-	} else if (button_action == ButtonStandGround) {
+	} else if (button_action == ButtonCmd::StandGround) {
 		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.end()) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.find(button_action)->second.Icon;
 			return;
@@ -1562,14 +1561,14 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item_slot == WeaponItemSlot || item_slot == ArrowsItemSlot) {
-		this->ChooseButtonIcon(ButtonAttack);
-		this->ChooseButtonIcon(ButtonStandGround);
+		this->ChooseButtonIcon(ButtonCmd::Attack);
+		this->ChooseButtonIcon(ButtonCmd::StandGround);
 	} else if (item_slot == ShieldItemSlot) {
-		this->ChooseButtonIcon(ButtonStop);
+		this->ChooseButtonIcon(ButtonCmd::Stop);
 	} else if (item_slot == BootsItemSlot) {
-		this->ChooseButtonIcon(ButtonMove);
+		this->ChooseButtonIcon(ButtonCmd::Move);
 	}
-	this->ChooseButtonIcon(ButtonPatrol);
+	this->ChooseButtonIcon(ButtonCmd::Patrol);
 	
 	//add item bonuses
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
@@ -1745,14 +1744,14 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item_slot == WeaponItemSlot || item_slot == ArrowsItemSlot) {
-		this->ChooseButtonIcon(ButtonAttack);
-		this->ChooseButtonIcon(ButtonStandGround);
+		this->ChooseButtonIcon(ButtonCmd::Attack);
+		this->ChooseButtonIcon(ButtonCmd::StandGround);
 	} else if (item_slot == ShieldItemSlot) {
-		this->ChooseButtonIcon(ButtonStop);
+		this->ChooseButtonIcon(ButtonCmd::Stop);
 	} else if (item_slot == BootsItemSlot) {
-		this->ChooseButtonIcon(ButtonMove);
+		this->ChooseButtonIcon(ButtonCmd::Move);
 	}
-	this->ChooseButtonIcon(ButtonPatrol);
+	this->ChooseButtonIcon(ButtonCmd::Patrol);
 }
 
 void CUnit::ReadWork(CUpgrade *work, bool affect_character)
@@ -3526,7 +3525,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 	
 	//Wyrmgus start
 	// if there is a trap in the new tile, trigger it
-	if ((this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
+	if ((this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
 		const CUnitCache &cache = Map.Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			if (!cache[i]) {
@@ -3600,7 +3599,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 					std::vector<CUnit *> table;
 					Select(building_tile_pos, building_tile_pos, table, this->MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 							if (Editor.Running == EditorNotRunning) {
 								LetUnitDie(*table[i]);			
 							} else {
@@ -5322,7 +5321,7 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		}
 		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	} else if (index == SPEED_INDEX) {
-		if (this->MapLayer && this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
+		if (this->MapLayer && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow) {
 			value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->getCost();
 		}
 	}
@@ -5743,10 +5742,10 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 			return false;
 		}
 		
-		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
+		if (this->Type->UnitType != UnitTypeType::Naval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeNaval) { //ships cannot trade with land markets
+		if (this->Type->UnitType == UnitTypeType::Naval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeType::Naval) { //ships cannot trade with land markets
 			return false;
 		}
 	} else {
@@ -5785,10 +5784,10 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 			return false;
 		}
 		
-		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
+		if (this->Type->UnitType != UnitTypeType::Naval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeNaval) { //ships cannot return trade to land markets
+		if (this->Type->UnitType == UnitTypeType::Naval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeType::Naval) { //ships cannot return trade to land markets
 			return false;
 		}
 	} else {
@@ -6330,7 +6329,7 @@ IconConfig CUnit::GetIcon() const
 	}
 }
 
-CIcon *CUnit::GetButtonIcon(int button_action) const
+CIcon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
@@ -6532,7 +6531,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
@@ -7437,21 +7436,21 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 			}
 		}
 	}
-	if (dest.UnitType == UnitTypeLand) {
+	if (dest.UnitType == UnitTypeType::Land) {
 		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
 			return source.CanTarget & (CanTargetLand | CanTargetSea);
 		}
 		return source.CanTarget & CanTargetLand;
 	}
-	if (dest.UnitType == UnitTypeFly) {
+	if (dest.UnitType == UnitTypeType::Fly) {
 		return source.CanTarget & CanTargetAir;
 	}
 	//Wyrmgus start
-	if (dest.UnitType == UnitTypeFlyLow) {
+	if (dest.UnitType == UnitTypeType::FlyLow) {
 		return (source.CanTarget & CanTargetLand) || (source.CanTarget & CanTargetAir) || (source.CanTarget & CanTargetSea);
 	}
 	//Wyrmgus end
-	if (dest.UnitType == UnitTypeNaval) {
+	if (dest.UnitType == UnitTypeType::Naval) {
 		return source.CanTarget & CanTargetSea;
 	}
 	return 0;
@@ -7735,8 +7734,8 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		&& goal->IsAliveOnMap()
 		&& (
 			this->MapDistanceTo(*goal) > 1
-			|| (this->Type->UnitType != UnitTypeFly && goal->Type->UnitType == UnitTypeFly)
-			|| (this->Type->UnitType == UnitTypeFly && goal->Type->UnitType != UnitTypeFly)
+			|| (this->Type->UnitType != UnitTypeType::Fly && goal->Type->UnitType == UnitTypeType::Fly)
+			|| (this->Type->UnitType == UnitTypeType::Fly && goal->Type->UnitType != UnitTypeType::Fly)
 		)
 	) {
 		return true;
@@ -7806,5 +7805,3 @@ void CleanUnits()
 	FancyBuildings = false;
 	HelpMeLastCycle = 0;
 }
-
-//@}

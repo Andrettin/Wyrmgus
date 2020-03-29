@@ -164,16 +164,16 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	int distance = 0;
 	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 
-	if (this->DistanceType == LessThanEqual
-		|| this->DistanceType == GreaterThan
-		|| this->DistanceType == Equal
-		|| this->DistanceType == NotEqual) {
+	if (this->DistanceType == DistanceTypeType::LessThanEqual
+		|| this->DistanceType == DistanceTypeType::GreaterThan
+		|| this->DistanceType == DistanceTypeType::Equal
+		|| this->DistanceType == DistanceTypeType::NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
 		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance, Map.Info.MapWidths[z]);
 		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance, Map.Info.MapHeights[z]);
 		distance = this->Distance;
-	} else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
+	} else if (this->DistanceType == DistanceTypeType::LessThan || this->DistanceType == DistanceTypeType::GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
 		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance + 1, Map.Info.MapWidths[z]);
@@ -200,24 +200,24 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			 //Wyrmgus end
 
 			switch (this->DistanceType) {
-				case GreaterThan :
-				case GreaterThanEqual :
+				case DistanceTypeType::GreaterThan:
+				case DistanceTypeType::GreaterThanEqual:
 					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
 						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
 					}
 					break;
-				case LessThan :
-				case LessThanEqual :
+				case DistanceTypeType::LessThan:
+				case DistanceTypeType::LessThanEqual:
 					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
 						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
 					}
 					break;
-				case Equal :
+				case DistanceTypeType::Equal:
 					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
 						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
 					}
 					break;
-				case NotEqual :
+				case DistanceTypeType::NotEqual:
 					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
 						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
 					}
@@ -225,9 +225,9 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			}
 		}
 	}
-	return (this->DistanceType == GreaterThan ||
-			this->DistanceType == GreaterThanEqual ||
-			this->DistanceType == NotEqual);
+	return (this->DistanceType == DistanceTypeType::GreaterThan ||
+			this->DistanceType == DistanceTypeType::GreaterThanEqual ||
+			this->DistanceType == DistanceTypeType::NotEqual);
 }
 
 /**
@@ -264,12 +264,12 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 	}
 	switch (this->CountType)
 	{
-	case LessThan: return count < this->Count;
-	case LessThanEqual: return count <= this->Count;
-	case Equal: return count == this->Count;
-	case NotEqual: return count != this->Count;
-	case GreaterThanEqual: return count >= this->Count;
-	case GreaterThan: return count > this->Count;
+	case DistanceTypeType::LessThan: return count < this->Count;
+	case DistanceTypeType::LessThanEqual: return count <= this->Count;
+	case DistanceTypeType::Equal: return count == this->Count;
+	case DistanceTypeType::NotEqual: return count != this->Count;
+	case DistanceTypeType::GreaterThanEqual: return count >= this->Count;
+	case DistanceTypeType::GreaterThan: return count > this->Count;
 	default: return false;
 	}
 }
@@ -287,17 +287,17 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 	int distance = 0;
 	int count = 0;
 
-	if (this->DistanceType == LessThanEqual
-		|| this->DistanceType == GreaterThan
-		|| this->DistanceType == Equal
-		|| this->DistanceType == NotEqual) {
+	if (this->DistanceType == DistanceTypeType::LessThanEqual
+		|| this->DistanceType == DistanceTypeType::GreaterThan
+		|| this->DistanceType == DistanceTypeType::Equal
+		|| this->DistanceType == DistanceTypeType::NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
 		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance, Map.Info.MapWidths[z]);
 		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance, Map.Info.MapHeights[z]);
 		distance = this->Distance;
 	}
-	else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
+	else if (this->DistanceType == DistanceTypeType::LessThan || this->DistanceType == DistanceTypeType::GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
 		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance + 1, Map.Info.MapWidths[z]);
@@ -324,21 +324,21 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 				//Wyrmgus end
 
 			switch (this->DistanceType) {
-			case GreaterThan:
-			case GreaterThanEqual:
+			case DistanceTypeType::GreaterThan:
+			case DistanceTypeType::GreaterThanEqual:
 				break;
-			case LessThan:
-			case LessThanEqual:
+			case DistanceTypeType::LessThan:
+			case DistanceTypeType::LessThanEqual:
 				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
 					count++;
 				}
 				break;
-			case Equal:
+			case DistanceTypeType::Equal:
 				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
 					count++;
 				}
 				break;
-			case NotEqual:
+			case DistanceTypeType::NotEqual:
 				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
 					count++;
 				}
@@ -349,12 +349,12 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 
 	switch (this->CountType)
 	{
-	case LessThan: return count < this->Count;
-	case LessThanEqual: return count <= this->Count;
-	case Equal: return count == this->Count;
-	case NotEqual: return count != this->Count;
-	case GreaterThanEqual: return count >= this->Count;
-	case GreaterThan: return count > this->Count;
+	case DistanceTypeType::LessThan: return count < this->Count;
+	case DistanceTypeType::LessThanEqual: return count <= this->Count;
+	case DistanceTypeType::Equal: return count == this->Count;
+	case DistanceTypeType::NotEqual: return count != this->Count;
+	case DistanceTypeType::GreaterThanEqual: return count >= this->Count;
+	case DistanceTypeType::GreaterThan: return count > this->Count;
 	default: return false;
 	}
 }

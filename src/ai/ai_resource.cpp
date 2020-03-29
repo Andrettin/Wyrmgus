@@ -1321,18 +1321,18 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 
 		if (type && type->GivesResource == resource) {
 			switch (type->UnitType) {
-				case UnitTypeLand:
+				case UnitTypeType::Land:
 					exploremask |= MapFieldLandUnit;
 					break;
-				case UnitTypeFly:
+				case UnitTypeType::Fly:
 					exploremask |= MapFieldAirUnit;
 					break;
 				//Wyrmgus start
-				case UnitTypeFlyLow:
+				case UnitTypeType::FlyLow:
 					exploremask |= MapFieldLandUnit;
 					break;
 				//Wyrmgus end
-				case UnitTypeNaval:
+				case UnitTypeType::Naval:
 					exploremask |= MapFieldSeaUnit;
 					break;
 				default:

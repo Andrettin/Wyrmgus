@@ -1593,7 +1593,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
 		if (!unit.Unique && unit.Type->PersonalNames.size() == 0) {
-			if (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval && ship_names_changed) {
+			if (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeType::Naval && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
 		}
@@ -2682,7 +2682,7 @@ void CPlayer::AvailableQuestsChanged()
 {
 	if (this == ThisPlayer) {
 		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-			if (UnitButtonTable[i]->Action != ButtonQuest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
+			if (UnitButtonTable[i]->Action != ButtonCmd::Quest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
 				continue;
 			}
 			
@@ -4537,7 +4537,7 @@ bool CPlayer::HasNeutralFactionType() const
 /**
 **  Check if the player can use the buildings of another, for neutral building functions (i.e. unit training)
 */
-bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
+bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action) const
 {
 	if (player.IsEnemy(*this)) {
 		return false;
@@ -4551,7 +4551,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 		player.HasNeutralFactionType()
 		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
-		if (PlayerRaces.Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (PlayerRaces.Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::Buy) || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}

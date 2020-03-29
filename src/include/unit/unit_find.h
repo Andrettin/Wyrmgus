@@ -43,6 +43,7 @@
 
 class CPlayer;
 class CUnit;
+enum class UnitTypeType;
 
 //
 //  Some predicates
@@ -478,8 +479,8 @@ extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, 
 extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, bool ai_active = false);
 /// Return any unit on that map tile
 //Wyrmgus start
-//extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
-extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z);// = -1);
+//extern CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type);// = -1);
+extern CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z);// = -1);
 //Wyrmgus end
 /// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2, int z);

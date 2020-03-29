@@ -46,6 +46,8 @@
 #include "video.h"
 #include "widgets.h"
 
+#include <stdexcept>
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -75,8 +77,8 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 			ba.Icon.Name = value;
 		} else if (key == "action") {
 			value = FindAndReplaceString(value, "_", "-");
-			const int button_action_id = GetButtonActionIdByName(value);
-			if (button_action_id != -1) {
+			const ButtonCmd button_action_id = GetButtonActionIdByName(value);
+			if (button_action_id != ButtonCmd::None) {
 				ba.Action = ButtonCmd(button_action_id);
 			} else {
 				fprintf(stderr, "Invalid button action: \"%s\".\n", value.c_str());
@@ -172,15 +174,15 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 
 void ButtonAction::SetTriggerData() const
 {
-	if (this->Action != ButtonUnit && this->Action != ButtonBuy) {
+	if (this->Action != ButtonCmd::Unit && this->Action != ButtonCmd::Buy) {
 		TriggerData.Type = UnitTypes[this->Value];
 	} else {
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(this->Value).Type->Slot];
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
 	}
-	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
+	if (this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[this->Value];
-	} else if (this->Action == ButtonFaction) {
+	} else if (this->Action == ButtonCmd::Faction) {
 		TriggerData.Faction = PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value];
 		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
 			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
@@ -208,7 +210,7 @@ int ButtonAction::GetLevelID() const
 
 int ButtonAction::GetKey() const
 {
-	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
+	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
 		return 0;
 	}
 
@@ -216,7 +218,7 @@ int ButtonAction::GetKey() const
 		return this->Key;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage || this->Action == ButtonEnterMapLayer))) && this->Key != 0) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0) {
 		if (this->Pos == 1) {
 			return 'q';
 		} else if (this->Pos == 2) {
@@ -256,7 +258,7 @@ int ButtonAction::GetKey() const
 
 std::string ButtonAction::GetHint() const
 {
-	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
+	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
 		hint = FindAndReplaceString(hint, "~!", "");
 		return hint;
@@ -266,7 +268,7 @@ std::string ButtonAction::GetHint() const
 		return this->Hint;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage || this->Action == ButtonEnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
 		hint = FindAndReplaceString(hint, "~!", "");
 		hint += " (~!";
@@ -278,155 +280,158 @@ std::string ButtonAction::GetHint() const
 	return this->Hint;
 }
 
-std::string GetButtonActionNameById(const int button_action)
+std::string GetButtonActionNameById(const ButtonCmd button_action)
 {
-	if (button_action == ButtonMove) {
-		return "attack";
-	} else if (button_action == ButtonStop) {
-		return "stop";
-	} else if (button_action == ButtonAttack) {
-		return "attack";
-	} else if (button_action == ButtonRepair) {
-		return "repair";
-	} else if (button_action == ButtonHarvest) {
-		return "harvest";
-	} else if (button_action == ButtonButton) {
-		return "button";
-	} else if (button_action == ButtonBuild) {
-		return "build";
-	} else if (button_action == ButtonTrain) {
-		return "train-unit";
-	} else if (button_action == ButtonPatrol) {
-		return "patrol";
-	} else if (button_action == ButtonStandGround) {
-		return "stand-ground";
-	} else if (button_action == ButtonAttackGround) {
-		return "attack-ground";
-	} else if (button_action == ButtonReturn) {
-		return "return-goods";
-	} else if (button_action == ButtonSpellCast) {
-		return "cast-spell";
-	} else if (button_action == ButtonResearch) {
-		return "research";
-	} else if (button_action == ButtonLearnAbility) {
-		return "learn-ability";
-	} else if (button_action == ButtonExperienceUpgradeTo) {
-		return "experience-upgrade-to";
-	} else if (button_action == ButtonUpgradeTo) {
-		return "upgrade-to";
-	} else if (button_action == ButtonUnload) {
-		return "unload";
-	} else if (button_action == ButtonRallyPoint) {
-		return "rally-point";
-	} else if (button_action == ButtonFaction) {
-		return "faction";
-	} else if (button_action == ButtonQuest) {
-		return "quest";
-	} else if (button_action == ButtonBuy) {
-		return "buy";
-	} else if (button_action == ButtonProduceResource) {
-		return "produce-resource";
-	} else if (button_action == ButtonSellResource) {
-		return "sell-resource";
-	} else if (button_action == ButtonBuyResource) {
-		return "buy-resource";
-	} else if (button_action == ButtonSalvage) {
-		return "salvage";
-	} else if (button_action == ButtonEnterMapLayer) {
-		return "enter-map-layer";
-	} else if (button_action == ButtonUnit) {
-		return "unit";
-	} else if (button_action == ButtonEditorUnit) {
-		return "editor-unit";
-	} else if (button_action == ButtonCancel) {
-		return "cancel";
-	} else if (button_action == ButtonCancelUpgrade) {
-		return "cancel-upgrade";
-	} else if (button_action == ButtonCancelTrain) {
-		return "cancel-train-unit";
-	} else if (button_action == ButtonCancelBuild) {
-		return "cancel-build";
+	switch (button_action) {
+		case ButtonCmd::None:
+			return std::string();
+		case ButtonCmd::Move:
+			return "attack";
+		case ButtonCmd::Stop:
+			return "stop";
+		case ButtonCmd::Attack:
+			return "attack";
+		case ButtonCmd::Repair:
+			return "repair";
+		case ButtonCmd::Harvest:
+			return "harvest";
+		case ButtonCmd::Button:
+			return "button";
+		case ButtonCmd::Build:
+			return "build";
+		case ButtonCmd::Train:
+			return "train-unit";
+		case ButtonCmd::Patrol:
+			return "patrol";
+		case ButtonCmd::StandGround:
+			return "stand-ground";
+		case ButtonCmd::AttackGround:
+			return "attack-ground";
+		case ButtonCmd::Return:
+			return "return-goods";
+		case ButtonCmd::SpellCast:
+			return "cast-spell";
+		case ButtonCmd::Research:
+			return "research";
+		case ButtonCmd::LearnAbility:
+			return "learn-ability";
+		case ButtonCmd::ExperienceUpgradeTo:
+			return "experience-upgrade-to";
+		case ButtonCmd::UpgradeTo:
+			return "upgrade-to";
+		case ButtonCmd::Unload:
+			return "unload";
+		case ButtonCmd::RallyPoint:
+			return "rally-point";
+		case ButtonCmd::Faction:
+			return "faction";
+		case ButtonCmd::Quest:
+			return "quest";
+		case ButtonCmd::Buy:
+			return "buy";
+		case ButtonCmd::ProduceResource:
+			return "produce-resource";
+		case ButtonCmd::SellResource:
+			return "sell-resource";
+		case ButtonCmd::BuyResource:
+			return "buy-resource";
+		case ButtonCmd::Salvage:
+			return "salvage";
+		case ButtonCmd::EnterMapLayer:
+			return "enter-map-layer";
+		case ButtonCmd::Unit:
+			return "unit";
+		case ButtonCmd::EditorUnit:
+			return "editor-unit";
+		case ButtonCmd::Cancel:
+			return "cancel";
+		case ButtonCmd::CancelUpgrade:
+			return "cancel-upgrade";
+		case ButtonCmd::CancelTrain:
+			return "cancel-train-unit";
+		case ButtonCmd::CancelBuild:
+			return "cancel-build";
 	}
 
-	return "";
+	throw std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action)));
 }
 
-int GetButtonActionIdByName(const std::string &button_action)
+ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 {
 	if (button_action == "move") {
-		return ButtonMove;
+		return ButtonCmd::Move;
 	} else if (button_action == "stop") {
-		return ButtonStop;
+		return ButtonCmd::Stop;
 	} else if (button_action == "attack") {
-		return ButtonAttack;
+		return ButtonCmd::Attack;
 	} else if (button_action == "repair") {
-		return ButtonRepair;
+		return ButtonCmd::Repair;
 	} else if (button_action == "harvest") {
-		return ButtonHarvest;
+		return ButtonCmd::Harvest;
 	} else if (button_action == "button") {
-		return ButtonButton;
+		return ButtonCmd::Button;
 	} else if (button_action == "build") {
-		return ButtonBuild;
+		return ButtonCmd::Build;
 	} else if (button_action == "train-unit") {
-		return ButtonTrain;
+		return ButtonCmd::Train;
 	} else if (button_action == "patrol") {
-		return ButtonPatrol;
+		return ButtonCmd::Patrol;
 	} else if (button_action == "stand-ground") {
-		return ButtonStandGround;
+		return ButtonCmd::StandGround;
 	} else if (button_action == "attack-ground") {
-		return ButtonAttackGround;
+		return ButtonCmd::AttackGround;
 	} else if (button_action == "return-goods") {
-		return ButtonReturn;
+		return ButtonCmd::Return;
 	} else if (button_action == "cast-spell") {
-		return ButtonSpellCast;
+		return ButtonCmd::SpellCast;
 	} else if (button_action == "research") {
-		return ButtonResearch;
+		return ButtonCmd::Research;
 	} else if (button_action == "learn-ability") {
-		return ButtonLearnAbility;
+		return ButtonCmd::LearnAbility;
 	} else if (button_action == "experience-upgrade-to") {
-		return ButtonExperienceUpgradeTo;
+		return ButtonCmd::ExperienceUpgradeTo;
 	} else if (button_action == "upgrade-to") {
-		return ButtonUpgradeTo;
+		return ButtonCmd::UpgradeTo;
 	} else if (button_action == "unload") {
-		return ButtonUnload;
+		return ButtonCmd::Unload;
 	} else if (button_action == "rally-point") {
-		return ButtonRallyPoint;
+		return ButtonCmd::RallyPoint;
 	} else if (button_action == "faction") {
-		return ButtonFaction;
+		return ButtonCmd::Faction;
 	} else if (button_action == "quest") {
-		return ButtonQuest;
+		return ButtonCmd::Quest;
 	} else if (button_action == "buy") {
-		return ButtonBuy;
+		return ButtonCmd::Buy;
 	} else if (button_action == "produce-resource") {
-		return ButtonProduceResource;
+		return ButtonCmd::ProduceResource;
 	} else if (button_action == "sell-resource") {
-		return ButtonSellResource;
+		return ButtonCmd::SellResource;
 	} else if (button_action == "buy-resource") {
-		return ButtonBuyResource;
+		return ButtonCmd::BuyResource;
 	} else if (button_action == "salvage") {
-		return ButtonSalvage;
+		return ButtonCmd::Salvage;
 	} else if (button_action == "enter-map-layer") {
-		return ButtonEnterMapLayer;
+		return ButtonCmd::EnterMapLayer;
 	} else if (button_action == "unit") {
-		return ButtonUnit;
+		return ButtonCmd::Unit;
 	} else if (button_action == "editor-unit") {
-		return ButtonEditorUnit;
+		return ButtonCmd::EditorUnit;
 	} else if (button_action == "cancel") {
-		return ButtonCancel;
+		return ButtonCmd::Cancel;
 	} else if (button_action == "cancel-upgrade") {
-		return ButtonCancelUpgrade;
+		return ButtonCmd::CancelUpgrade;
 	} else if (button_action == "cancel-train-unit") {
-		return ButtonCancelTrain;
+		return ButtonCmd::CancelTrain;
 	} else if (button_action == "cancel-build") {
-		return ButtonCancelBuild;
+		return ButtonCmd::CancelBuild;
 	}
 
-	return -1;
+	return ButtonCmd::None;
 }
 
-bool IsNeutralUsableButtonAction(const int button_action)
+bool IsNeutralUsableButtonAction(const ButtonCmd button_action)
 {
-	return button_action == ButtonTrain || button_action == ButtonCancelTrain || button_action == ButtonBuy || button_action == ButtonSellResource || button_action == ButtonBuyResource || button_action == ButtonResearch;
+	return button_action == ButtonCmd::Train || button_action == ButtonCmd::CancelTrain || button_action == ButtonCmd::Buy || button_action == ButtonCmd::SellResource || button_action == ButtonCmd::BuyResource || button_action == ButtonCmd::Research;
 }
 
 //@}

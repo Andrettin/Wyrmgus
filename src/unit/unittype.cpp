@@ -62,6 +62,7 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 #include "upgrade/dependency.h"
@@ -582,7 +583,7 @@ CUnitType::CUnitType() :
 //	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
 	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(nullptr), ButtonPos(0), ButtonLevel(0),
 	//Wyrmgus end
-	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
+	UnitType(UnitTypeType::Land), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
 	Flip(1), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0),
@@ -696,12 +697,12 @@ CUnitType::~CUnitType()
 */
 void CUnitType::ProcessConfigData(const CConfigData *config_data)
 {
-	this->RemoveButtons(ButtonMove);
-	this->RemoveButtons(ButtonStop);
-	this->RemoveButtons(ButtonAttack);
-	this->RemoveButtons(ButtonPatrol);
-	this->RemoveButtons(ButtonStandGround);
-	this->RemoveButtons(ButtonReturn);
+	this->RemoveButtons(ButtonCmd::Move);
+	this->RemoveButtons(ButtonCmd::Stop);
+	this->RemoveButtons(ButtonCmd::Attack);
+	this->RemoveButtons(ButtonCmd::Patrol);
+	this->RemoveButtons(ButtonCmd::StandGround);
+	this->RemoveButtons(ButtonCmd::Return);
 		
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -754,16 +755,16 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->DrawLevel = std::stoi(value);
 		} else if (key == "type") {
 			if (value == "land") {
-				this->UnitType = UnitTypeLand;
+				this->UnitType = UnitTypeType::Land;
 				this->LandUnit = true;
 			} else if (value == "fly") {
-				this->UnitType = UnitTypeFly;
+				this->UnitType = UnitTypeType::Fly;
 				this->AirUnit = true;
 			} else if (value == "fly_low") {
-				this->UnitType = UnitTypeFlyLow;
+				this->UnitType = UnitTypeType::FlyLow;
 				this->AirUnit = true;
 			} else if (value == "naval") {
-				this->UnitType = UnitTypeNaval;
+				this->UnitType = UnitTypeType::Naval;
 				this->SeaUnit = true;
 			} else {
 				fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
@@ -1262,7 +1263,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		CclCommand(button_definition);
 	}
 	
-	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeFly)) {
+	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeType::Fly)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
@@ -1569,7 +1570,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		for (int i = 0; i < MaxImageLayers; ++i) {
 			variation->LayerFiles[i] = parent_variation->LayerFiles[i];
 		}
-		for (std::map<int, IconConfig>::iterator iterator = parent_variation->ButtonIcons.begin(); iterator != parent_variation->ButtonIcons.end(); ++iterator) {
+		for (std::map<ButtonCmd, IconConfig>::iterator iterator = parent_variation->ButtonIcons.begin(); iterator != parent_variation->ButtonIcons.end(); ++iterator) {
 			variation->ButtonIcons[iterator->first].Name = iterator->second.Name;
 			variation->ButtonIcons[iterator->first].Icon = nullptr;
 			variation->ButtonIcons[iterator->first].Load();
@@ -1608,7 +1609,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			}
 		}
 	}
-	for (std::map<int, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
+	for (std::map<ButtonCmd, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
 		this->ButtonIcons[iterator->first].Name = iterator->second.Name;
 		this->ButtonIcons[iterator->first].Icon = nullptr;
 		this->ButtonIcons[iterator->first].Load();
@@ -1633,11 +1634,11 @@ void CUnitType::UpdateDefaultBoolFlags()
 }
 
 //Wyrmgus start
-void CUnitType::RemoveButtons(int button_action, std::string mod_file)
+void CUnitType::RemoveButtons(const ButtonCmd button_action, const std::string &mod_file)
 {
 	int buttons_size = UnitButtonTable.size();
 	for (int i = (buttons_size - 1); i >= 0; --i) {
-		if (button_action != -1 && UnitButtonTable[i]->Action != button_action) {
+		if (button_action != ButtonCmd::None && UnitButtonTable[i]->Action != button_action) {
 			continue;
 		}
 		if (!mod_file.empty() && UnitButtonTable[i]->Mod != mod_file) {
@@ -1893,7 +1894,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 					return civilization->GetUnitClassNames(this->Class);
 				}
 				
-				if (this->UnitType == UnitTypeNaval) { // if is a ship
+				if (this->UnitType == UnitTypeType::Naval) { // if is a ship
 					if (faction && faction->GetShipNames().size() > 0) {
 						return faction->GetShipNames();
 					}
@@ -2035,7 +2036,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 
 	//  As side effect we calculate the movement flags/mask here.
 	switch (type.UnitType) {
-		case UnitTypeLand:                              // on land
+		case UnitTypeType::Land:                              // on land
 			//Wyrmgus start
 			/*
 			type.MovementMask =
@@ -2067,7 +2068,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			}
 			//Wyrmgus end
 			break;
-		case UnitTypeFly:                               // in air
+		case UnitTypeType::Fly:                               // in air
 			//Wyrmgus start
 			/*
 			type.MovementMask = MapFieldAirUnit; // already occuppied
@@ -2085,7 +2086,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
-		case UnitTypeFlyLow:                               // in low air
+		case UnitTypeType::FlyLow:                               // in low air
 			if (type.BoolFlag[DIMINUTIVE_INDEX].value) {
 				type.MovementMask =
 					MapFieldBuilding |
@@ -2100,7 +2101,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldAirUnpassable;
 			}
 			break;
-		case UnitTypeNaval:                             // on water
+		case UnitTypeType::Naval: // on water
 			//Wyrmgus start
 			/*
 			if (type.CanTransport()) {
@@ -2216,7 +2217,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	} else if (!type.BoolFlag[DIMINUTIVE_INDEX].value) {
 	//Wyrmgus end
 		switch (type.UnitType) {
-			case UnitTypeLand: // on land
+			case UnitTypeType::Land: // on land
 				type.FieldFlags = MapFieldLandUnit;			
 				//Wyrmgus start
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
@@ -2228,11 +2229,11 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				}
 				//Wyrmgus end
 				break;
-			case UnitTypeFly: // in air
+			case UnitTypeType::Fly: // in air
 				type.FieldFlags = MapFieldAirUnit;
 				break;
 			//Wyrmgus start
-			case UnitTypeFlyLow: // in low air
+			case UnitTypeType::FlyLow: // in low air
 				type.FieldFlags = MapFieldLandUnit;			
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
 					type.FieldFlags |= MapFieldUnpassable;
@@ -2240,7 +2241,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				}
 				break;
 			//Wyrmgus end
-			case UnitTypeNaval: // on water
+			case UnitTypeType::Naval: // on water
 				type.FieldFlags = MapFieldSeaUnit;
 				//Wyrmgus start
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)

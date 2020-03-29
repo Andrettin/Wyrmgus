@@ -10,7 +10,7 @@
 //
 /**@name popup.h - The Popup header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@
 //      02111-1307, USA.
 //
 
-#ifndef __POPUP_H__
-#define __POPUP_H__
+#pragma once
 
-//@{
-
-#include "script.h"
 #include "color.h"
+#include "script.h"
+#include "ui/button_cmd.h"
+#include "unit/unit_type_type.h"
 #include "vec2i.h"
+
 #include <vector>
 #include <string>
 
@@ -56,8 +56,8 @@ public:
 		//Wyrmgus start
 		Class(false), Description(false), Quote(false), Encyclopedia(false), SettlementName(false), CanActiveHarvest(false),
 		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), FactionCoreSettlements(0), Ability(0), ChildResources(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
-//		ButtonAction(-1), BoolFlags(nullptr), Variables(nullptr) {}
-		ButtonAction(-1), UnitTypeType(-1), UnitTypeClass(-1), ItemClass(-1), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
+//		BoolFlags(nullptr), Variables(nullptr) {}
+		UnitTypeClass(-1), ItemClass(-1), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
 		//Wyrmgus end
 	~PopupConditionPanel()
 	{
@@ -74,11 +74,11 @@ public:
 	bool Quote;					/// check if the button's unit type has a quote.
 	bool Encyclopedia;			/// check if the button's unit type has an encyclopedia entry.
 	bool SettlementName;		/// check if the button's unit has a settlement name.
-	bool CanActiveHarvest;			/// check if the active unit can harvest the button's unit.
+	bool CanActiveHarvest;		/// check if the active unit can harvest the button's unit.
 	//Wyrmgus end
-	int ButtonAction;           /// action type of button
+	ButtonCmd ButtonAction = ButtonCmd::None;	/// action type of button
 	//Wyrmgus start
-	int UnitTypeType;			/// unit type type (i.e. land, fly, etc.) of the button's unit type
+	UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
 	int UnitTypeClass;			/// unit type class of the button's unit type
 	int ItemClass;				/// item class of the button's item
 	int CanStore;				/// whether the button's unit type can store a particular resource
@@ -293,7 +293,3 @@ public:
 	IntColor BorderColor;                      /// Color used for popup's borders.
 };
 
-
-//@}
-
-#endif // !__UI_H__

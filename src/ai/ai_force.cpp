@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -48,6 +46,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
@@ -748,11 +747,11 @@ int AiForce::GetForceType() const
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 		
-		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
+		if (unit->Type->UnitType == UnitTypeType::Naval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
 			return NavalForceType;
 		}
 		
-		if (unit->Type->UnitType != UnitTypeFly) { //all units must be of UnitTypeFly for it to be considered an air force
+		if (unit->Type->UnitType != UnitTypeType::Fly) { //all units must be of UnitTypeType::Fly for it to be considered an air force
 			force_type = LandForceType;
 		}
 	}
@@ -908,7 +907,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit *const unit = this->Units[i];
 
-			if (unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow && Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != Map.GetTileLandmass(goalPos, z)) {
+			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != Map.GetTileLandmass(goalPos, z)) {
 				needs_transport = true;
 				break;
 			}
@@ -1565,7 +1564,7 @@ void AiForce::Update()
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
-		if (unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow && unit->Type->UnitType != UnitTypeNaval && Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
+		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Naval && Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
 		}
@@ -2120,5 +2119,3 @@ void AiForceManagerEachMinute()
 {
 	AiPlayer->Force.UpdatePerMinute();
 }
-
-//@}

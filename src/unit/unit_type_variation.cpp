@@ -297,7 +297,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->LayerFiles[image_layer] = file;
 		} else if (child_config_data->Tag == "button_icon") {
 			std::string icon_ident;
-			int button_action = -1;
+			ButtonCmd button_action = ButtonCmd::None;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -319,7 +319,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			if (button_action == -1) {
+			if (button_action == ButtonCmd::None) {
 				fprintf(stderr, "Unit type variation button icon has no button action.\n");
 				continue;
 			}

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -55,6 +53,7 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
@@ -167,7 +166,7 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 static void StopRaft(CUnit &unit)
 {
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -347,7 +346,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 	CMapField &new_mf = *Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
-	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -576,7 +575,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 	//Wyrmgus start
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 	CMapField &new_mf = *Map.Field(pos, z);
-	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -1486,5 +1485,3 @@ void CommandQuit(int player)
 		SetMessage(_("Player \"%s\" has been killed"), Players[player].Name.c_str());
 	}
 }
-
-//@}

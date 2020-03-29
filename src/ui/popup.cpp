@@ -190,7 +190,7 @@
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -230,7 +230,7 @@
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -253,7 +253,7 @@
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -466,7 +466,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 //	TriggerData.Type = UnitTypes[button.Value];
 	button.SetTriggerData();
 	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	//Wyrmgus end
@@ -498,7 +498,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 //		TriggerData.Type = UnitTypes[button.Value];
 		button.SetTriggerData();
 		int resource = button.Value;
-		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 			TriggerData.Resource = &resource;
 		}
 		//Wyrmgus end
@@ -530,7 +530,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		}
 		*/
 		int value;
-		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
+		if (button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy) {
 			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
@@ -554,7 +554,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			} else {
 				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
 				if (
-					(UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy)
+					(UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonCmd::Buy)
 					|| IsBonusVariable(this->Index)
 				) {
 					if (value >= 0) {
@@ -685,8 +685,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			}
 			*/
 			std::string value = LuaToString(l, -1);
-			int button_action_id = GetButtonActionIdByName(value);
-			if (button_action_id != -1) {
+			ButtonCmd button_action_id = GetButtonActionIdByName(value);
+			if (button_action_id != ButtonCmd::None) {
 				condition->ButtonAction = button_action_id;
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value.c_str());
@@ -729,15 +729,14 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Identified = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "UnitTypeType")) {
 			const char *unit_type_type = LuaToString(l, -1);
-			condition->UnitTypeType = GetUnitTypeClassIndexByName(LuaToString(l, -1));
 			if (!strcmp(unit_type_type, "land")) {
-				condition->UnitTypeType = UnitTypeLand;
+				condition->UnitTypeType = UnitTypeType::Land;
 			} else if (!strcmp(unit_type_type, "fly")) {
-				condition->UnitTypeType = UnitTypeFly;
+				condition->UnitTypeType = UnitTypeType::Fly;
 			} else if (!strcmp(unit_type_type, "fly-low")) {
-				condition->UnitTypeType = UnitTypeFlyLow;
+				condition->UnitTypeType = UnitTypeType::FlyLow;
 			} else if (!strcmp(unit_type_type, "naval")) {
-				condition->UnitTypeType = UnitTypeNaval;
+				condition->UnitTypeType = UnitTypeType::Naval;
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ unit_type_type);
 			}

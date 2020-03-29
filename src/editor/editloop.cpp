@@ -2064,7 +2064,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->Name;
 			CurrentButtons[j].Pos = j;
 			CurrentButtons[j].Level = 0;
-			CurrentButtons[j].Action = ButtonEditorUnit;
+			CurrentButtons[j].Action = ButtonCmd::EditorUnit;
 			CurrentButtons[j].ValueStr = Editor.ShownUnitTypes[i]->Ident;
 			CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->Slot;
 			CurrentButtons[j].Popup = "popup-unit";

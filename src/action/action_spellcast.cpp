@@ -33,8 +33,6 @@
 ** be considered a 'special' case attack action... //Vladi
 */
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -64,6 +62,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -361,7 +360,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+		if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
@@ -436,7 +435,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 										unit.GetMessageName().c_str(), spell.Name.c_str());
 										//Wyrmgus end
 				//Wyrmgus start
-				} else if (spell.Target == TargetUnit && order.GetGoal() == nullptr) {
+				} else if (spell.Target == TargetType::Unit && order.GetGoal() == nullptr) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.Name.c_str());
@@ -542,5 +541,3 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			break;
 	}
 }
-
-//@}

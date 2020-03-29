@@ -86,7 +86,7 @@ std::map<std::string, CSpell *> CSpell::SpellsByIdent;
 */
 static Target *NewTargetUnit(CUnit &unit)
 {
-	return new Target(TargetUnit, &unit, unit.tilePos, unit.MapLayer->ID);
+	return new Target(TargetType::Unit, &unit, unit.tilePos, unit.MapLayer->ID);
 }
 
 // ****************************************************************************
@@ -119,7 +119,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 	if (caster.Player->CheckCosts(spell.Costs, false)) {
 		return false;
 	}
-	if (spell.Target == TargetUnit) { // Casting a unit spell without a target.
+	if (spell.Target == TargetType::Unit) { // Casting a unit spell without a target.
 		if ((!target) || target->IsAlive() == false) {
 			return false;
 		}
@@ -416,11 +416,11 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 			this->ForceUseAnimation = StringToBool(value);
 		} else if (key == "target") {
 			if (value == "self") {
-				this->Target = TargetSelf;
+				this->Target = TargetType::Self;
 			} else if (value == "unit") {
-				this->Target = TargetUnit;
+				this->Target = TargetType::Unit;
 			} else if (value == "position") {
-				this->Target = TargetPosition;
+				this->Target = TargetType::Position;
 			} else {
 				fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
 			}
@@ -575,7 +575,7 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 	}
 	
 	// Check if unit is in battle
-	if (this->Target == TargetUnit) {
+	if (this->Target == TargetType::Unit) {
 		if (autocast->Attacker == CONDITION_ONLY) {
 			const int react_range = target->GetReactionRange();
 			if (
@@ -604,7 +604,7 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 	}
 	
 	//Wyrmgus start
-	if (this->Target == TargetUnit) {
+	if (this->Target == TargetType::Unit) {
 		//if caster is terrified, don't target enemy units
 		if (caster.Variable[TERROR_INDEX].Value > 0 && caster.IsEnemy(*target)) {
 			return false;
@@ -702,11 +702,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 	std::vector<CUnit *> table;
 	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
 
-	if (spell.Target == TargetSelf) {
+	if (spell.Target == TargetType::Self) {
 		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.Condition, map_layer) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->Condition, map_layer)) {
 			return NewTargetUnit(caster);
 		}
-	} else if (spell.Target == TargetPosition) {
+	} else if (spell.Target == TargetType::Position) {
 		if (!autocast->PositionAutoCast) {
 			return nullptr;
 		}
@@ -727,11 +727,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 			autocast->PositionAutoCast->run(2);
 			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
 			if (Map.Info.IsPointOnMap(resPos, map_layer)) {
-				Target *target = new Target(TargetPosition, nullptr, resPos, map_layer->ID);
+				Target *target = new Target(TargetType::Position, nullptr, resPos, map_layer->ID);
 				return target;
 			}
 		}
-	} else if (spell.Target == TargetUnit) {
+	} else if (spell.Target == TargetType::Unit) {
 		std::vector<CUnit *> table = spell.GetPotentialAutoCastTargets(caster, autocast);
 		//now select the best unit to target.
 		if (!table.empty()) {
@@ -804,7 +804,7 @@ bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 bool CanCastSpell(const CUnit &caster, const CSpell &spell,
 				  const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer)
 {
-	if (spell.Target == TargetUnit && target == nullptr) {
+	if (spell.Target == TargetType::Unit && target == nullptr) {
 		return false;
 	}
 	return PassCondition(caster, spell, target, goalPos, spell.Condition, map_layer);
@@ -866,7 +866,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
-	if (spell.Target == TargetSelf) {
+	if (spell.Target == TargetType::Self) {
 		pos = caster.tilePos;
 		map_layer = caster.MapLayer;
 		target = &caster;
@@ -880,7 +880,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
 		if (spell.SoundWhenCast.Sound) {
-			if (spell.Target == TargetSelf) {
+			if (spell.Target == TargetType::Self) {
 				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
 			} else {
 				//Wyrmgus start
@@ -890,7 +890,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 			}
 		//Wyrmgus start
 		} else if (caster.Type->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
-			if (spell.Target == TargetSelf) {
+			if (spell.Target == TargetType::Self) {
 				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
 			} else {
 				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->Range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);

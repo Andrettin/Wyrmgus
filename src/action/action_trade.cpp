@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -55,6 +53,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 #include "video.h"
 
@@ -257,12 +256,12 @@ enum {
 					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)) { //if unit is still damaged, see if there are further healing items for it to use
 						unit.HealingItemAutoUse();
 					}
-				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow) {
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 					}
 					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
-				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow) {
 					unit.Variable[SLOW_INDEX].Value = 1000;
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
@@ -302,7 +301,7 @@ enum {
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -365,7 +364,7 @@ enum {
 				if (dest.NewOrder == nullptr
 					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.CanAttack(true))
-					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeType::Land)) {
 					this->Finished = true;
 					return ;
 				} else {
@@ -404,5 +403,3 @@ enum {
 		return ;
 	}
 }
-
-//@}

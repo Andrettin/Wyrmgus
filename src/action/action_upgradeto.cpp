@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -55,6 +53,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
@@ -295,7 +294,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				oldtype.Civilization != -1 && newtype.Civilization != -1 && oldtype.Civilization != newtype.Civilization
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
-					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval)
+					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
 					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[newtype.Civilization]->GetUnitClassNames(newtype.Class))
 					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
 				)
@@ -580,4 +579,3 @@ void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 
 //Wyrmgus end
 #endif
-//@}

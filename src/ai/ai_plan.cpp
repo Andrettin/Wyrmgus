@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -47,6 +45,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -76,7 +75,7 @@ public:
 			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
-		if (unit->Type->UnitType == UnitTypeFly && unit->IsAgressive() == false) {
+		if (unit->Type->UnitType == UnitTypeType::Fly && unit->IsAgressive() == false) {
 			return;
 		}
 		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileSize.x
@@ -212,7 +211,7 @@ int AiFindWall(AiForce *force)
 	CUnit *unit = force->Units[0];
 	for (unsigned int i = 0; i < force->Units.size(); ++i) {
 		CUnit *aiunit = force->Units[i];
-		if (aiunit->Type->UnitType == UnitTypeLand) {
+		if (aiunit->Type->UnitType == UnitTypeType::Land) {
 			unit = aiunit;
 			//Wyrmgus start
 //			if (aiunit->Type->Missile.Missile->Range == 1) {
@@ -378,7 +377,7 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 **
 **  @todo         Perfect planning.
 **                Only works for water transporter!
-**  @todo transporter are more selective now (flag with unittypeland).
+**  @todo transporter are more selective now (flag with UnitTypeType::Land).
 **         We must manage it.
 */
 int AiForce::PlanAttack()
@@ -413,7 +412,7 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeLand));
+	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeType::Land));
 	if (landUnit == nullptr) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
 		return 0;
@@ -523,19 +522,19 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 		//Wyrmgus end
 		const CUnitType &type = *unit.Type;
 
-		if (type.UnitType != UnitTypeFly) {
+		if (type.UnitType != UnitTypeType::Fly) {
 			if (flyeronly) {
 				continue;
 			}
 			//Wyrmgus start
-//			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand) {
-			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand && type.UnitType != UnitTypeFlyLow) {
+//			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeType::Land) {
+			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
 			//Wyrmgus end
 				continue;
 			}
 			//Wyrmgus start
-//			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval) {
-			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval && type.UnitType != UnitTypeFlyLow) {
+//			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeType::Naval) {
+			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeType::Naval && type.UnitType != UnitTypeType::FlyLow) {
 			//Wyrmgus end
 				continue;
 			}
@@ -545,7 +544,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 
 		const int sqDistance = SquareDistance(unit.tilePos, *pos);
 		if (bestSquareDistance == -1 || sqDistance <= bestSquareDistance
-			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)) {
+			|| (bestunit->Type->UnitType != UnitTypeType::Fly && type.UnitType == UnitTypeType::Fly)) {
 			bestSquareDistance = sqDistance;
 			bestunit = &unit;
 		}
@@ -556,11 +555,11 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 //Wyrmgus end
 
 //Wyrmgus start
-static CUnit *GetBestScout(int unit_type)
+static CUnit *GetBestScout(const UnitTypeType unit_type)
 {
 	CUnit *bestunit = nullptr;
 
-	bool flyeronly = (unit_type == UnitTypeFly);
+	bool flyeronly = (unit_type == UnitTypeType::Fly);
 	
 	int best_score = 0;
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
@@ -594,14 +593,14 @@ static CUnit *GetBestScout(int unit_type)
 			continue;
 		}
 
-		if (type.UnitType != UnitTypeFly) {
+		if (type.UnitType != UnitTypeType::Fly) {
 			if (flyeronly) {
 				continue;
 			}
-			if (unit_type == UnitTypeLand && type.UnitType != UnitTypeLand && type.UnitType != UnitTypeFlyLow) {
+			if (unit_type == UnitTypeType::Land && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
 				continue;
 			}
-			if (unit_type == UnitTypeNaval && type.UnitType != UnitTypeNaval && type.UnitType != UnitTypeFlyLow) {
+			if (unit_type == UnitTypeType::Naval && type.UnitType != UnitTypeType::Naval && type.UnitType != UnitTypeType::FlyLow) {
 				continue;
 			}
 		} else {
@@ -618,7 +617,7 @@ static CUnit *GetBestScout(int unit_type)
 		if (
 			bestunit == nullptr
 			|| score > best_score
-			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)
+			|| (bestunit->Type->UnitType != UnitTypeType::Fly && type.UnitType == UnitTypeType::Fly)
 		) {
 			best_score = score;
 			bestunit = &unit;
@@ -669,24 +668,24 @@ void AiSendExplorers()
 			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, (int) i);
 			return;
 		}
-		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeFly) {
+		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Fly) {
 			land_scout = true;
 			naval_scout = true;
 			air_scout = true;
 			break;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeFlyLow) {
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::FlyLow) {
 			land_scout = true;
 			naval_scout = true;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeLand) {
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Land) {
 			land_scout = true;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeNaval) {
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Naval) {
 			naval_scout = true;
 		}
 	}
 		
 	//if no scouts are already present for a particular type, then choose a suitable unit to scout
 	if (!air_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeFly);
+		CUnit *bestunit = GetBestScout(UnitTypeType::Fly);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
@@ -695,17 +694,17 @@ void AiSendExplorers()
 		}
 	}
 	if (!land_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeLand);
+		CUnit *bestunit = GetBestScout(UnitTypeType::Land);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
-			if (bestunit->Type->UnitType == UnitTypeFlyLow) {
+			if (bestunit->Type->UnitType == UnitTypeType::FlyLow) {
 				naval_scout = true;
 			}
 		}
 	}
 	if (!naval_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeNaval);
+		CUnit *bestunit = GetBestScout(UnitTypeType::Naval);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
@@ -753,7 +752,7 @@ void AiCheckTransporters()
 		if (!unit.Type->CanTransport()) {
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeNaval && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+		if (unit.Type->UnitType != UnitTypeType::Naval && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow) {
 			continue;
 		}
 		if (unit.CanMove() == false) {
@@ -791,7 +790,7 @@ int AiGetRequestedTransportCapacity(int water_landmass)
 	
 	for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-		if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeNaval || queue.Type->UnitType == UnitTypeFly || queue.Type->UnitType == UnitTypeFlyLow)) {
+		if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeType::Naval || queue.Type->UnitType == UnitTypeType::Fly || queue.Type->UnitType == UnitTypeType::FlyLow)) {
 			transport_capacity += queue.Want * queue.Type->MaxOnBoard;
 		}
 	}
@@ -799,5 +798,3 @@ int AiGetRequestedTransportCapacity(int water_landmass)
 	return transport_capacity;
 }
 //Wyrmgus end
-
-//@}

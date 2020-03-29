@@ -3622,11 +3622,11 @@ void DisableMod(const std::string &mod_file)
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (UnitTypes[i]->ModTrains.find(mod_file) != UnitTypes[i]->ModTrains.end()) {
 			UnitTypes[i]->ModTrains.erase(mod_file);
-			UnitTypes[i]->RemoveButtons(-1, mod_file);
+			UnitTypes[i]->RemoveButtons(ButtonCmd::None, mod_file);
 		}
 		if (UnitTypes[i]->ModTrainedBy.find(mod_file) != UnitTypes[i]->ModTrainedBy.end()) {
 			UnitTypes[i]->ModTrainedBy.erase(mod_file);
-			UnitTypes[i]->RemoveButtons(-1, mod_file);
+			UnitTypes[i]->RemoveButtons(ButtonCmd::None, mod_file);
 		}
 		if (UnitTypes[i]->ModAiDrops.find(mod_file) != UnitTypes[i]->ModAiDrops.end()) {
 			UnitTypes[i]->ModAiDrops.erase(mod_file);

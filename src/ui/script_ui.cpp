@@ -800,11 +800,11 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 		} else if (!strcmp(value, "TextAlign")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "Center")) {
-				p->TextAlign = TextAlignCenter;
+				p->TextAlign = TextAlignment::Center;
 			} else if (!strcmp(value, "Right")) {
-				p->TextAlign = TextAlignRight;
+				p->TextAlign = TextAlignment::Right;
 			} else if (!strcmp(value, "Left")) {
-				p->TextAlign = TextAlignLeft;
+				p->TextAlign = TextAlignment::Left;
 			} else {
 				LuaError(l, "Invalid text alignment: %s" _C_ value);
 			}
@@ -859,11 +859,11 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (!strcmp(value, "TextAlign")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "Center")) {
-				b->TextAlign = TextAlignCenter;
+				b->TextAlign = TextAlignment::Center;
 			} else if (!strcmp(value, "Right")) {
-				b->TextAlign = TextAlignRight;
+				b->TextAlign = TextAlignment::Right;
 			} else if (!strcmp(value, "Left")) {
-				b->TextAlign = TextAlignLeft;
+				b->TextAlign = TextAlignment::Left;
 			} else {
 				LuaError(l, "Invalid text alignment: %s" _C_ value);
 			}
@@ -892,13 +892,13 @@ static int CclDefineButtonStyle(lua_State *l)
 		b->Clicked.TextPos.y = b->TextY;
 	}
 
-	if (b->Default.TextAlign == TextAlignUndefined) {
+	if (b->Default.TextAlign == TextAlignment::Undefined) {
 		b->Default.TextAlign = b->TextAlign;
 	}
-	if (b->Hover.TextAlign == TextAlignUndefined) {
+	if (b->Hover.TextAlign == TextAlignment::Undefined) {
 		b->Hover.TextAlign = b->TextAlign;
 	}
-	if (b->Clicked.TextAlign == TextAlignUndefined) {
+	if (b->Clicked.TextAlign == TextAlignment::Undefined) {
 		b->Clicked.TextAlign = b->TextAlign;
 	}
 	return 0;
@@ -965,8 +965,8 @@ static int CclDefineButton(lua_State *l)
 			ba.Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
 			value = LuaToString(l, -1);
-			int button_action_id = GetButtonActionIdByName(std::string(value));
-			if (button_action_id != -1) {
+			const ButtonCmd button_action_id = GetButtonActionIdByName(std::string(value));
+			if (button_action_id != ButtonCmd::None) {
 				ba.Action = ButtonCmd(button_action_id);
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);

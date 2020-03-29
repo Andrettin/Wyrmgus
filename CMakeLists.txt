@@ -52,6 +52,7 @@ endif()
 # Stratagus sources
 
 include_directories(
+	src
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
@@ -622,6 +623,7 @@ set(stratagus_time_HDRS
 
 set(stratagus_ui_HDRS
 	src/include/ui/button_action.h
+	src/ui/button_cmd.h
 	src/include/ui/button_level.h
 	src/include/ui/contenttype.h
 	src/include/ui/interface.h
@@ -640,6 +642,7 @@ set(stratagus_unit_HDRS
 	src/include/unit/unit_type_variation.h
 	src/include/unit/unitptr.h
 	src/include/unit/unittype.h
+	src/unit/unit_type_type.h
 )
 
 set(stratagus_upgrade_HDRS

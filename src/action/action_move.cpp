@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -55,6 +53,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -178,7 +177,7 @@ int DoActionMove(CUnit &unit)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 				if (table[i]->Moving) {
 					unit.Wait = 1;
 					unit.Moving = 0;
@@ -187,7 +186,7 @@ int DoActionMove(CUnit &unit)
 				}
 			}
 		}
-	} else if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft, don't move if the raft is still moving
+	} else if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft, don't move if the raft is still moving
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -222,7 +221,7 @@ int DoActionMove(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->IX = 0;
 					table[i]->IY = 0;
 				}
@@ -255,7 +254,7 @@ int DoActionMove(CUnit &unit)
 				break;
 		}
 		
-		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
+		if (unit.Type->UnitType == UnitTypeType::Naval) { // Boat (un)docking?
 			//Wyrmgus start
 //			const CMapField &mf_cur = *Map.Field(unit.Offset);
 //			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
@@ -275,7 +274,7 @@ int DoActionMove(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
 					table[i]->IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
 					table[i]->IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
@@ -332,7 +331,7 @@ int DoActionMove(CUnit &unit)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 				table[i]->IX += posd.x * move;
 				table[i]->IY += posd.y * move;
 			}
@@ -352,7 +351,7 @@ int DoActionMove(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->IX = 0;
 					table[i]->IY = 0;
 				}
@@ -402,7 +401,7 @@ int DoActionMove(CUnit &unit)
 		case PF_REACHED:
 			//Wyrmgus start
 			if (this->Range >= 1) {
-				if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
+				if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
@@ -418,7 +417,7 @@ int DoActionMove(CUnit &unit)
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
+						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitAction::Still) {
 								CommandStopUnit(*table[i]);
 								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
@@ -435,5 +434,3 @@ int DoActionMove(CUnit &unit)
 			break;
 	}
 }
-
-//@}

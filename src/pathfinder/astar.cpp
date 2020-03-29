@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +41,7 @@
 #include "time/time_of_day.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "unit/unit_type_type.h"
 
 #include "pathfinder.h"
 
@@ -799,7 +798,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus end
 			
 			// Add tile movement cost
-			if (unit.Type->UnitType == UnitTypeFly || unit.Type->UnitType == UnitTypeFlyLow) {
+			if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::FlyLow) {
 				cost += DefaultTileMovementCost;
 			} else {
 				cost += mf->getCost();
@@ -1701,9 +1700,8 @@ void SetAStarUnknownTerrainCost(int cost)
 	}
 	AStarUnknownTerrainCost = cost;
 }
+
 int GetAStarUnknownTerrainCost()
 {
 	return AStarUnknownTerrainCost;
 }
-
-//@}

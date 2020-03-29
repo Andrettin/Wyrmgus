@@ -84,10 +84,10 @@ public:
 /**
 **  Different targets.
 */
-enum TargetType {
-	TargetSelf,
-	TargetPosition,
-	TargetUnit
+enum class TargetType {
+	Self,
+	Position,
+	Unit
 };
 
 /*
@@ -99,7 +99,7 @@ enum TargetType {
 class Target
 {
 public:
-	Target(TargetType type, CUnit *unit, const Vec2i &pos, int z) :
+	Target(const TargetType type, CUnit *unit, const Vec2i &pos, int z) :
 		Type(type), Unit(unit), targetPos(pos), MapLayer(z) {}
 
 	TargetType Type;                  /// type of target.
@@ -282,7 +282,7 @@ public:
 
 	bool IsCasterOnly() const
 	{
-		return !Range && Target == TargetSelf;
+		return !Range && Target == TargetType::Self;
 	}
 	bool ForceUseAnimation;
 };

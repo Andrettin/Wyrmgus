@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -57,6 +55,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -330,7 +329,7 @@ static void AnimateActionRepair(CUnit &unit)
 					//Wyrmgus start
 					//if is unreachable and is on a raft, see if the raft can move closer
 					if (err == PF_UNREACHABLE) {
-						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 							std::vector<CUnit *> table;
 							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 							for (size_t i = 0; i != table.size(); ++i) {
@@ -395,6 +394,3 @@ static void AnimateActionRepair(CUnit &unit)
 		break;
 	}
 }
-
-
-//@}

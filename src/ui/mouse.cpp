@@ -1560,8 +1560,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
 			//Wyrmgus start
-//			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
-			UnitUnderCursor = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID);
+//			UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None);
+			UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID);
 			//Wyrmgus end
 		}
 	}
@@ -2068,7 +2068,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		
-		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
+		SendCommandSpellCast(unit, tilePos, spell->Target == TargetType::Position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
 		ret = 1;
 		
 		//if the spell's effects do not stack on the same target, then only one selected unit should cast it
@@ -2120,56 +2120,56 @@ static void SendCommand(const Vec2i &tilePos)
 	//Wyrmgus end
 	
 	switch (CursorAction) {
-		case ButtonMove:
+		case ButtonCmd::Move:
 			//Wyrmgus start
 //			ret = SendMove(tilePos);
 			ret = SendMove(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonRepair:
+		case ButtonCmd::Repair:
 			//Wyrmgus start
 //			ret = SendRepair(tilePos);
 			ret = SendRepair(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonAttack:
+		case ButtonCmd::Attack:
 			//Wyrmgus start
 //			ret = SendAttack(tilePos);
 			ret = SendAttack(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonAttackGround:
+		case ButtonCmd::AttackGround:
 			//Wyrmgus start
 //			ret = SendAttackGround(tilePos);
 			ret = SendAttackGround(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonPatrol:
+		case ButtonCmd::Patrol:
 			//Wyrmgus start
 //			ret = SendPatrol(tilePos);
 			ret = SendPatrol(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonHarvest:
+		case ButtonCmd::Harvest:
 			//Wyrmgus start
 //			ret = SendResource(tilePos);
 			ret = SendResource(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonUnload:
+		case ButtonCmd::Unload:
 			//Wyrmgus start
 //			ret = SendUnload(tilePos);
 			ret = SendUnload(tilePos, flush);
 			//Wyrmgus end
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			//Wyrmgus start
 //			ret = SendSpellCast(tilePos);
 			ret = SendSpellCast(tilePos, flush);
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
-		case ButtonRallyPoint:
+		case ButtonCmd::RallyPoint:
 			ret = SendRallyPoint(tilePos);
 			break;
 		//Wyrmgus end
@@ -2181,8 +2181,8 @@ static void SendCommand(const Vec2i &tilePos)
 		// Acknowledge the command with first selected unit.
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			//Wyrmgus start
-//			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
-			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround) {
+//			if (CursorAction == ButtonCmd::Attack || CursorAction == ButtonCmd::AttackGround || CursorAction == ButtonCmd::SpellCast) {
+			if (CursorAction == ButtonCmd::Attack || CursorAction == ButtonCmd::AttackGround) {
 			//Wyrmgus end
 				//Wyrmgus start
 				/*
@@ -2198,14 +2198,14 @@ static void SendCommand(const Vec2i &tilePos)
 				break;
 				//Wyrmgus end
 			//Wyrmgus start
-//			} else if (CursorAction == ButtonRepair && Selected[i]->Type->MapSound.Repair.Sound) {
-			} else if (CursorAction == ButtonRepair) {
+//			} else if (CursorAction == ButtonCmd::Repair && Selected[i]->Type->MapSound.Repair.Sound) {
+			} else if (CursorAction == ButtonCmd::Repair) {
 			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceRepairing);
 				break;
 			//Wyrmgus start
-//			} else if (CursorAction == ButtonBuild && Selected[i]->Type->MapSound.Build.Sound) {
-			} else if (CursorAction == ButtonBuild) {
+//			} else if (CursorAction == ButtonCmd::Build && Selected[i]->Type->MapSound.Build.Sound) {
+			} else if (CursorAction == ButtonCmd::Build) {
 			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceBuild);
 				break;
@@ -2434,7 +2434,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID))
+			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID))
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
@@ -3367,7 +3367,7 @@ static void HandlePieMenuMouseSelection()
 	if (pie != -1) {
 		const ButtonCmd action = CurrentButtons[pie].Action;
 		UI.ButtonPanel.DoClicked(pie);
-		if (action == ButtonButton) {
+		if (action == ButtonCmd::Button) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
 			CursorStartScreenPos = CursorScreenPos;

@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -61,6 +59,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 #include "video.h"
@@ -202,7 +201,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	//Wyrmgus start
 	int box_width = type.BoxWidth;
 	int box_height = type.BoxHeight;
-	if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
+	if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -1449,5 +1448,3 @@ int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 	std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
 	return n;
 }
-
-//@}

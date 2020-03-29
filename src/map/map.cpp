@@ -379,7 +379,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		if (player != nullptr) {
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
-			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
+			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeType::Fly)) {
 				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
 			} else {
 				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
@@ -1735,7 +1735,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 		std::vector<CUnit *> table;
 		Select(pos, pos, table, z);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (Editor.Running == EditorNotRunning) {
 					LetUnitDie(*table[i]);
 				} else {
@@ -2959,7 +2959,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	std::vector<CUnit *> table;
 	Select(pos, pos, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+		if (table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 			if (Editor.Running == EditorNotRunning) {
 				LetUnitDie(*table[i]);			
 			} else {

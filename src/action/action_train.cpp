@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -54,6 +52,7 @@
 //Wyrmgus end
 #include "unitsound.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 
 /// How many resources the player gets back if canceling training
 #define CancelTrainingCostsFactor  100
@@ -200,7 +199,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	//Wyrmgus end
 		return false;
 	}
-	if (order->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand) {
+	if (order->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeType::Land) {
 		return false;
 	}
 	return true;
@@ -495,5 +494,3 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 }
-
-//@}

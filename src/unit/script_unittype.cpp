@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -69,6 +67,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 //Wyrmgus start
@@ -457,22 +456,22 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					value = LuaToString(l, -1);
 					if (value[0] == '=') {
 						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->DistanceType = Equal;
+							b->DistanceType = DistanceTypeType::Equal;
 						}
 					} else if (value[0] == '>') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = GreaterThanEqual;
+							b->DistanceType = DistanceTypeType::GreaterThanEqual;
 						} else if (value[1] == '\0') {
-							b->DistanceType = GreaterThan;
+							b->DistanceType = DistanceTypeType::GreaterThan;
 						}
 					} else if (value[0] == '<') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = LessThanEqual;
+							b->DistanceType = DistanceTypeType::LessThanEqual;
 						} else if (value[1] == '\0') {
-							b->DistanceType = LessThan;
+							b->DistanceType = DistanceTypeType::LessThan;
 						}
 					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->DistanceType = NotEqual;
+						b->DistanceType = DistanceTypeType::NotEqual;
 					}
 				} else if (!strcmp(value, "Type")) {
 					b->RestrictTypeName = LuaToString(l, -1);
@@ -545,22 +544,22 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					value = LuaToString(l, -1);
 					if (value[0] == '=') {
 						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->CountType = Equal;
+							b->CountType = DistanceTypeType::Equal;
 						}
 					} else if (value[0] == '>') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = GreaterThanEqual;
+							b->CountType = DistanceTypeType::GreaterThanEqual;
 						} else if (value[1] == '\0') {
-							b->CountType = GreaterThan;
+							b->CountType = DistanceTypeType::GreaterThan;
 						}
 					} else if (value[0] == '<') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = LessThanEqual;
+							b->CountType = DistanceTypeType::LessThanEqual;
 						} else if (value[1] == '\0') {
-							b->CountType = LessThan;
+							b->CountType = DistanceTypeType::LessThan;
 						}
 					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->CountType = NotEqual;
+						b->CountType = DistanceTypeType::NotEqual;
 					}
 				} else {
 					LuaError(l, "Unsupported BuildingRules has-unit tag: %s" _C_ value);
@@ -583,22 +582,22 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					value = LuaToString(l, -1);
 					if (value[0] == '=') {
 						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->CountType = Equal;
+							b->CountType = DistanceTypeType::Equal;
 						}
 					} else if (value[0] == '>') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = GreaterThanEqual;
+							b->CountType = DistanceTypeType::GreaterThanEqual;
 						} else if (value[1] == '\0') {
-							b->CountType = GreaterThan;
+							b->CountType = DistanceTypeType::GreaterThan;
 						}
 					} else if (value[0] == '<') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = LessThanEqual;
+							b->CountType = DistanceTypeType::LessThanEqual;
 						} else if (value[1] == '\0') {
-							b->CountType = LessThan;
+							b->CountType = DistanceTypeType::LessThan;
 						}
 					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->CountType = NotEqual;
+						b->CountType = DistanceTypeType::NotEqual;
 					}
 				} else if (!strcmp(value, "Distance")) {
 					b->Distance = LuaToNumber(l, -1);
@@ -606,22 +605,22 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					value = LuaToString(l, -1);
 					if (value[0] == '=') {
 						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->DistanceType = Equal;
+							b->DistanceType = DistanceTypeType::Equal;
 						}
 					} else if (value[0] == '>') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = GreaterThanEqual;
+							b->DistanceType = DistanceTypeType::GreaterThanEqual;
 						} else if (value[1] == '\0') {
-							b->DistanceType = GreaterThan;
+							b->DistanceType = DistanceTypeType::GreaterThan;
 						}
 					} else if (value[0] == '<') {
 						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = LessThanEqual;
+							b->DistanceType = DistanceTypeType::LessThanEqual;
 						} else if (value[1] == '\0') {
-							b->DistanceType = LessThan;
+							b->DistanceType = DistanceTypeType::LessThan;
 						}
 					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->DistanceType = NotEqual;
+						b->DistanceType = DistanceTypeType::NotEqual;
 					}
 				} else if (!strcmp(value, "Owner")) {
 					b->RestrictTypeOwner = LuaToString(l, -1);
@@ -701,12 +700,12 @@ static int CclDefineUnitType(lua_State *l)
 	if (type) {
 		redefine = 1;
 		//Wyrmgus start
-		type->RemoveButtons(ButtonMove);
-		type->RemoveButtons(ButtonStop);
-		type->RemoveButtons(ButtonAttack);
-		type->RemoveButtons(ButtonPatrol);
-		type->RemoveButtons(ButtonStandGround);
-		type->RemoveButtons(ButtonReturn);
+		type->RemoveButtons(ButtonCmd::Move);
+		type->RemoveButtons(ButtonCmd::Stop);
+		type->RemoveButtons(ButtonCmd::Attack);
+		type->RemoveButtons(ButtonCmd::Patrol);
+		type->RemoveButtons(ButtonCmd::StandGround);
+		type->RemoveButtons(ButtonCmd::Return);
 		//Wyrmgus end
 	} else {
 		type = NewUnitTypeSlot(str);
@@ -797,7 +796,7 @@ static int CclDefineUnitType(lua_State *l)
 						variation->Icon.Load();
 						variation->Icon.Icon->Load();
 					} else if (!strcmp(value, "button-icon")) {
-						int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
+						const ButtonCmd button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 						++k;
 						variation->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
 						variation->ButtonIcons[button_action].Icon = nullptr;
@@ -1010,7 +1009,7 @@ static int CclDefineUnitType(lua_State *l)
 				const int subargs = lua_rawlen(l, -1);
 				int image_layer = 0;
 				for (int k = 0; k < subargs; ++k) {
-					int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
+					const ButtonCmd button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 					++k;
 					type->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
 					type->ButtonIcons[button_action].Icon = nullptr;
@@ -1161,8 +1160,8 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "ButtonKey")) {
 			type->ButtonKey = LuaToString(l, -1);
 		} else if (!strcmp(value, "Trains")) {
-			type->RemoveButtons(ButtonTrain);
-			type->RemoveButtons(ButtonBuild);
+			type->RemoveButtons(ButtonCmd::Train);
+			type->RemoveButtons(ButtonCmd::Build);
 			for (size_t i = 0; i < type->Trains.size(); ++i) {
 				if (std::find(type->Trains[i]->TrainedBy.begin(), type->Trains[i]->TrainedBy.end(), type) != type->Trains[i]->TrainedBy.end()) {
 					type->Trains[i]->TrainedBy.erase(std::remove(type->Trains[i]->TrainedBy.begin(), type->Trains[i]->TrainedBy.end(), type), type->Trains[i]->TrainedBy.end());
@@ -1282,24 +1281,24 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {
-				type->UnitType = UnitTypeLand;
+				type->UnitType = UnitTypeType::Land;
 				//Wyrmgus start
 				type->LandUnit = true;
 				//Wyrmgus end
 			} else if (!strcmp(value, "fly")) {
-				type->UnitType = UnitTypeFly;
+				type->UnitType = UnitTypeType::Fly;
 				//Wyrmgus start
 				type->AirUnit = true;
 				//Wyrmgus end
 			//Wyrmgus start
 			} else if (!strcmp(value, "fly-low")) {
-				type->UnitType = UnitTypeFlyLow;
+				type->UnitType = UnitTypeType::FlyLow;
 				//Wyrmgus start
 				type->AirUnit = true;
 				//Wyrmgus end
 			//Wyrmgus end
 			} else if (!strcmp(value, "naval")) {
-				type->UnitType = UnitTypeNaval;
+				type->UnitType = UnitTypeType::Naval;
 				//Wyrmgus start
 				type->SeaUnit = true;
 				//Wyrmgus end
@@ -2114,7 +2113,7 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanMove() && ((!type->BoolFlag[COWARD_INDEX].value && type->CanAttack) || type->UnitType == UnitTypeFly)) {
+	if (type->CanMove() && ((!type->BoolFlag[COWARD_INDEX].value && type->CanAttack) || type->UnitType == UnitTypeType::Fly)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
@@ -2604,18 +2603,18 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (type->UnitType == UnitTypeLand) {
+		if (type->UnitType == UnitTypeType::Land) {
 			lua_pushstring(l, "land");
 			return 1;
-		} else if (type->UnitType == UnitTypeFly) {
+		} else if (type->UnitType == UnitTypeType::Fly) {
 			lua_pushstring(l, "fly");
 			return 1;
 		//Wyrmgus start
-		} else if (type->UnitType == UnitTypeFlyLow) {
+		} else if (type->UnitType == UnitTypeType::FlyLow) {
 			lua_pushstring(l, "fly-low");
 			return 1;
 		//Wyrmgus end
-		} else if (type->UnitType == UnitTypeNaval) {
+		} else if (type->UnitType == UnitTypeType::Naval) {
 			lua_pushstring(l, "naval");
 			return 1;
 		}
@@ -4365,7 +4364,7 @@ static int CclSetModTrains(lua_State *l)
 		}
 	}
 	type->ModTrains[mod_file].clear();
-	type->RemoveButtons(-1, mod_file);
+	type->RemoveButtons(ButtonCmd::None, mod_file);
 	
 	if (!lua_istable(l, 3)) {
 		LuaError(l, "incorrect argument");
@@ -4481,5 +4480,3 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);
 	//Wyrmgus end
 }
-
-//@}

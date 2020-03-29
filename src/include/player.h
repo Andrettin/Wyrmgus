@@ -50,6 +50,9 @@
 //Wyrmgus start
 #include "item.h"
 #include "time/date.h"
+//Wyrmgus end
+#include "ui/button_cmd.h"
+//Wyrmgus start
 #include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
 #include "upgrade/upgrade_structs.h"
@@ -411,7 +414,7 @@ public:
 	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasNeutralFactionType() const;
-	bool HasBuildingAccess(const CPlayer &player, int button_action = -1) const;
+	bool HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action = ButtonCmd::None) const;
 	bool HasHero(const CCharacter *hero) const;
 	//Wyrmgus end
 
@@ -647,7 +650,7 @@ public:
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
-	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
+	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
@@ -817,7 +820,7 @@ public:
 	std::string CivilizationUpgrades[MAX_RACES];
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
-	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
+	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions;    								/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops

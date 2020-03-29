@@ -375,11 +375,11 @@ static int CclDefineSpell(lua_State *l)
 		} else if (!strcmp(value, "target")) {
 			value = LuaToString(l, i + 1);
 			if (!strcmp(value, "self")) {
-				spell->Target = TargetSelf;
+				spell->Target = TargetType::Self;
 			} else if (!strcmp(value, "unit")) {
-				spell->Target = TargetUnit;
+				spell->Target = TargetType::Unit;
 			} else if (!strcmp(value, "position")) {
-				spell->Target = TargetPosition;
+				spell->Target = TargetType::Position;
 			} else {
 				LuaError(l, "Unsupported spell target type tag: %s" _C_ value);
 			}

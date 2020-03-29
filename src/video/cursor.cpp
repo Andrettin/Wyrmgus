@@ -68,7 +68,7 @@
 static std::vector<CCursor *> AllCursors;
 
 CursorState CurrentCursorState;    /// current cursor state (point,...)
-int CursorAction;            /// action for selection
+ButtonCmd CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
 std::string CustomCursor;    /// custom cursor for button
 

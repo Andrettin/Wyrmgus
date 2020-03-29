@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -54,6 +52,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -271,7 +270,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	
 	//Wyrmgus start
 	//if this is a naval transporter and the unit has a disembarkment bonus, apply it
-	if (transporter.Type->UnitType == UnitTypeNaval && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
+	if (transporter.Type->UnitType == UnitTypeType::Naval && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
 		unit.Variable[INSPIRE_INDEX].Enable = 1;
 		unit.Variable[INSPIRE_INDEX].Value = 1000;
 		unit.Variable[INSPIRE_INDEX].Max = 1000;
@@ -639,5 +638,3 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			return ;
 	}
 }
-
-//@}

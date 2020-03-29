@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -40,6 +38,7 @@
 #include "actions.h"
 #include "map/map.h"
 #include "unit/unit.h"
+#include "unit/unit_type_type.h"
 
 struct LandMineTargetFinder {
 	const CUnit *const source;
@@ -49,7 +48,7 @@ struct LandMineTargetFinder {
 	inline bool operator()(const CUnit *const unit) const
 	{
 		return (!(unit == source && !CanHitOwner)
-				&& unit->Type->UnitType != UnitTypeFly
+				&& unit->Type->UnitType != UnitTypeType::Fly
 				&& unit->CurrentAction() != UnitAction::Die);
 	}
 	inline CUnit *FindOnTile(const CMapField *const mf) const
@@ -82,5 +81,3 @@ void MissileLandMine::Action()
 	}
 	this->Wait = 1;
 }
-
-//@}

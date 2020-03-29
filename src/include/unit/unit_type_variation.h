@@ -105,7 +105,7 @@ public:
 	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
 	
-	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
+	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
 };
 
 #endif

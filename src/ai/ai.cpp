@@ -930,8 +930,8 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 	//  Don't send help to scouts (zeppelin,eye of vision).
 	//Wyrmgus start
-//	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeFly) {
-	if (!defender.CanAttack() && defender.Type->UnitType == UnitTypeFly) {
+//	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeType::Fly) {
+	if (!defender.CanAttack() && defender.Type->UnitType == UnitTypeType::Fly) {
 	//Wyrmgus end
 		return;
 	}
@@ -1448,7 +1448,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	what.Player->Ai->Force.Assign(what, -1);
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
-		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeNaval || what.Type->UnitType == UnitTypeFly || what.Type->UnitType == UnitTypeFlyLow)) {
+		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeType::Naval || what.Type->UnitType == UnitTypeType::Fly || what.Type->UnitType == UnitTypeType::FlyLow)) {
 			int landmass = Map.GetTileLandmass(what.tilePos, what.MapLayer->ID);
 			
 			what.Player->Ai->Transporters[landmass].push_back(&what);

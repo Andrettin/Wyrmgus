@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -49,6 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 
 /**
@@ -288,7 +287,7 @@ static std::vector<CUnitType *> GetNavalTransporterUnits()
 	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
-		if (type.CanTransport() && (type.UnitType == UnitTypeNaval || type.UnitType == UnitTypeFly || type.UnitType == UnitTypeFlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
+		if (type.CanTransport() && (type.UnitType == UnitTypeType::Naval || type.UnitType == UnitTypeType::Fly || type.UnitType == UnitTypeType::FlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
 			res.push_back(&type);
 		}
 	}
@@ -367,14 +366,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button.UnitMask);
 
 		switch (button.Action) {
-			case ButtonRepair :
+			case ButtonCmd::Repair :
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					for (std::vector<CUnitType *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
 						AiHelperInsert(aiHelper.Repair, (*k)->Slot, **j);
 					}
 				}
 				break;
-			case ButtonBuild: {
+			case ButtonCmd::Build: {
 				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -382,7 +381,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonTrain : {
+			case ButtonCmd::Train : {
 				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -390,7 +389,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonUpgradeTo : {
+			case ButtonCmd::UpgradeTo : {
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -402,7 +401,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonResearch : {
+			case ButtonCmd::Research : {
 				int researchId = UpgradeIdByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -415,7 +414,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			//Wyrmgus start
-			case ButtonSellResource : {
+			case ButtonCmd::SellResource : {
 				int resource = GetResourceIdByName(button.ValueStr.c_str());
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -423,7 +422,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonBuyResource : {
+			case ButtonCmd::BuyResource : {
 				int resource = GetResourceIdByName(button.ValueStr.c_str());
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -431,7 +430,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonProduceResource : {
+			case ButtonCmd::ProduceResource : {
 				int resource = GetResourceIdByName(button.ValueStr.c_str());
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -439,7 +438,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonExperienceUpgradeTo : {
+			case ButtonCmd::ExperienceUpgradeTo : {
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -447,7 +446,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonLearnAbility : {
+			case ButtonCmd::LearnAbility : {
 				CUpgrade *ability = CUpgrade::Get(button.ValueStr);
 
 				if (ability->Ability) {
@@ -1830,5 +1829,3 @@ void AiCclRegister()
 	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
 	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
 }
-
-//@}

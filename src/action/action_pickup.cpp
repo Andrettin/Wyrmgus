@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -54,6 +52,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "unit/unit_type_type.h"
 #include "video.h"
 
 enum {
@@ -273,7 +272,7 @@ enum {
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -336,7 +335,7 @@ enum {
 				if (dest.NewOrder == nullptr
 					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.CanAttack(true))
-					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeType::Land)) {
 					this->Finished = true;
 					return ;
 				} else {
@@ -375,5 +374,3 @@ enum {
 		return ;
 	}
 }
-
-//@}

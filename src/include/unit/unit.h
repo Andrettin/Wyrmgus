@@ -211,7 +211,7 @@ public:
 	const CUnitTypeVariation *GetVariation() const;
 	const CUnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
-	void ChooseButtonIcon(int button_action);
+	void ChooseButtonIcon(const ButtonCmd button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
 	void ReadWork(CUpgrade *work, bool affect_character = true);
@@ -428,7 +428,7 @@ public:
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
-	CIcon *GetButtonIcon(int button_action) const;
+	CIcon *GetButtonIcon(const ButtonCmd button_action) const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
 	std::string GetName() const;
@@ -512,7 +512,7 @@ public:
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)
-	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
+	std::map<ButtonCmd, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
 

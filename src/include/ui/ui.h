@@ -68,18 +68,18 @@ class LuaActionListener;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-enum TextAlignment {
-	TextAlignUndefined,
-	TextAlignCenter,
-	TextAlignLeft,
-	TextAlignRight
+enum class TextAlignment {
+	Undefined,
+	Center,
+	Left,
+	Right
 };
 
 class ButtonStyleProperties
 {
 public:
 	ButtonStyleProperties() : Sprite(nullptr), Frame(0), BorderColor(0),
-		BorderSize(0), TextAlign(TextAlignUndefined),
+		BorderSize(0), TextAlign(TextAlignment::Undefined),
 		TextPos(0, 0)
 	{}
 
@@ -98,7 +98,7 @@ class ButtonStyle
 {
 public:
 	ButtonStyle() : Width(0), Height(0), Font(nullptr),
-		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
+		TextAlign(TextAlignment::Undefined), TextX(0), TextY(0) {}
 
 	int Width;                      /// Button width
 	int Height;                     /// Button height
