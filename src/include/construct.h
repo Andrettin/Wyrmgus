@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CONSTRUCT_H__
-#define __CONSTRUCT_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -181,7 +178,3 @@ extern CConstruction *ConstructionByIdent(const std::string &ident);
 
 /// Register ccl features
 extern void ConstructionCclRegister();
-
-//@}
-
-#endif // !__CONSTRUCT_H__

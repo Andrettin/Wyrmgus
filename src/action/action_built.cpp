@@ -188,8 +188,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	
 	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 		if (
-			(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
-			|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.Class)
+			(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
+			|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->UnitClass == type.Class)
 		) {
 			if (!objective->Settlement || objective->Settlement == unit.Settlement) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);

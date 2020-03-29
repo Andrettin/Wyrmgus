@@ -52,8 +52,8 @@ class CPlane;
 class CReligion;
 class CUpgrade;
 
-#define MAJOR_DEITY_DOMAIN_MAX 3 // major deities can only have up to three domains
-#define MINOR_DEITY_DOMAIN_MAX 1 // minor deities can only have one domain
+static constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; //major deities can only have up to three domains
+static constexpr int MINOR_DEITY_DOMAIN_MAX = 1; //minor deities can only have one domain
 
 class CDeity : public CDataType
 {
@@ -71,22 +71,22 @@ public:
 	
 	std::string GetCulturalName(const CCivilization *civilization) const;
 	
-	int Gender = 0;								/// Deity's gender
-	bool Major = false;							/// Whether the deity is a major one or not
-	std::string Name;							/// Name of the deity
+	int Gender = 0;								//deity's gender
+	bool Major = false;							//whether the deity is a major one or not
+	std::string Name;							//name of the deity
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	CPantheon *Pantheon = nullptr;				/// Pantheon to which the deity belongs
-	CPlane *HomePlane = nullptr;				/// The home plane of the deity
-	CUpgrade *DeityUpgrade = nullptr;			/// The deity's upgrade applied to a player that worships it
-	CUpgrade *CharacterUpgrade = nullptr;		/// The deity's upgrade applied to its character as an individual upgrade
-	IconConfig Icon;							/// Deity's icon
-	std::vector<CCivilization *> Civilizations;	/// Civilizations which may worship the deity
-	std::vector<CReligion *> Religions;			/// Religions for which this deity is available
+	CPantheon *Pantheon = nullptr;				//pantheon to which the deity belongs
+	CPlane *HomePlane = nullptr;				//the home plane of the deity
+	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
+	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
+	IconConfig Icon;							//deity's icon
+	std::vector<CCivilization *> Civilizations;	//civilizations which may worship the deity
+	std::vector<CReligion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
-	std::vector<CFaction *> HolyOrders;			/// Holy orders of this deity
-	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
-	std::map<const CCivilization *, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+	std::vector<CFaction *> HolyOrders;			//holy orders of this deity
+	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
+	std::map<const CCivilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };

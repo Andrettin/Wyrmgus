@@ -28,10 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MAP_H__
-#define __MAP_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -570,7 +567,3 @@ inline void MapUnmarkOwnership(const CPlayer &player, const Vec2i &pos, int w, i
 	MapSight(player, pos, w, h, range, MapUnmarkTileOwnership, z);
 }
 //Wyrmgus end
-
-//@}
-
-#endif // !__MAP_H__

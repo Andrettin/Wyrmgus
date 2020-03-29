@@ -10,7 +10,7 @@
 //
 /**@name time_of_day.h - The time of day header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,15 +27,14 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIME_OF_DAY_H__
-#define __TIME_OF_DAY_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
 #include "color.h"
+#include "data_type.h"
 
 #include <map>
 #include <string>
@@ -69,5 +68,3 @@ public:
 	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
 	CGraphic *G = nullptr;
 };
-
-#endif

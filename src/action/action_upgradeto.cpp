@@ -380,8 +380,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		if (!unit.UnderConstruction) {
 			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 				if (
-					(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
-					|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == newtype.Class)
+					(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
+					|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->UnitClass == newtype.Class)
 				) {
 					if (!objective->Settlement || objective->Settlement == unit.Settlement) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);

@@ -10,7 +10,7 @@
 //
 /**@name quest.h - The quest header file. */
 //
-//      (c) Copyright 2015-2019 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __QUEST_H__
-#define __QUEST_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,26 +54,25 @@ class CUpgrade;
 class LuaCallback;
 class CMapTemplate;
 
-enum ObjectiveTypes {
-	GatherResourceObjectiveType,
-	HaveResourceObjectiveType,
-	BuildUnitsObjectiveType,
-	BuildUnitsOfClassObjectiveType,
-	DestroyUnitsObjectiveType,
-	ResearchUpgradeObjectiveType,
-	RecruitHeroObjectiveType,
-	DestroyHeroObjectiveType,
-	HeroMustSurviveObjectiveType,
-	DestroyUniqueObjectiveType,
-	DestroyFactionObjectiveType,
-	
-	MaxObjectiveTypes
+enum class ObjectiveType {
+	None = -1,
+	GatherResource,
+	HaveResource,
+	BuildUnits,
+	BuildUnitsOfClass,
+	DestroyUnits,
+	ResearchUpgrade,
+	RecruitHero,
+	DestroyHero,
+	HeroMustSurvive,
+	DestroyUnique,
+	DestroyFaction
 };
 
 class CQuestObjective
 {
 public:
-	int ObjectiveType = -1;
+	ObjectiveType ObjectiveType = ObjectiveType::None;
 	int Quantity = 1;
 	int Resource = -1;
 	int UnitClass = -1;
@@ -171,13 +169,6 @@ public:
 class CAchievement
 {
 public:
-	CAchievement() :
-		PlayerColor(0), CharacterLevel(0), Difficulty(-1),
-		Hidden(false), Obtained(false), Unobtainable(false),
-		Character(nullptr), CharacterType(nullptr)
-	{
-	}
-	
 	void Obtain(bool save = true, bool display = true);
 	bool CanObtain() const;
 	int GetProgress() const;
@@ -186,15 +177,15 @@ public:
 	std::string Ident;				/// Ident of the achievement
 	std::string Name;				/// Name of the achievement
 	std::string Description;		/// Description of the achievement
-	int PlayerColor;				/// Player color used for the achievement's icon
-	int CharacterLevel;				/// Character level required for the achievement
-	int Difficulty;					/// Which difficulty the achievement's requirements need to be done in
-	bool Hidden;					/// Whether the achievement is hidden
-	bool Obtained;					/// Whether the achievement has been obtained
-	bool Unobtainable;				/// Whether this achievement can be obtained by checking for it or not
+	int PlayerColor = 0;			/// Player color used for the achievement's icon
+	int CharacterLevel = 0;			/// Character level required for the achievement
+	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
+	bool Hidden = false;			/// Whether the achievement is hidden
+	bool Obtained = false;			/// Whether the achievement has been obtained
+	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
-	CCharacter *Character;			/// Character related to the achievement's requirements
-	CUnitType *CharacterType;		/// Unit type required for a character to have for the achievement
+	CCharacter *Character = nullptr;	/// Character related to the achievement's requirements
+	CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
 	std::vector<CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
 };
 
@@ -215,8 +206,8 @@ extern std::vector<CAchievement *> Achievements;
 extern void CleanQuests();
 extern void SaveQuestCompletion();
 extern void CheckAchievements();
-std::string GetQuestObjectiveTypeNameById(int objective_type);
-extern int GetQuestObjectiveTypeIdByName(const std::string &objective_type);
+std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type);
+extern ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type);
 extern CQuest *GetQuest(const std::string &quest_ident);
 extern CCampaign *GetCampaign(const std::string &campaign_ident);
 extern CAchievement *GetAchievement(const std::string &achievement_ident);
@@ -230,5 +221,3 @@ extern void SetQuestCompleted(const std::string &quest_ident, bool save);
 extern void SetAchievementObtained(const std::string &achievement_ident, bool save = true, bool display = true);
 
 extern void QuestCclRegister();
-
-#endif
