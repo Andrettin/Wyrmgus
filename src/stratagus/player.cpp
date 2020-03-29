@@ -2726,11 +2726,11 @@ void CPlayer::UpdateCurrentQuests()
 {
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = this->QuestObjectives[i];
-		if (objective->ObjectiveType == HaveResourceObjectiveType) {
+		if (objective->ObjectiveType == ObjectiveType::HaveResource) {
 			objective->Counter = std::min(this->GetResource(objective->Resource, STORE_BOTH), objective->Quantity);
-		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
 			objective->Counter = UpgradeIdAllowed(*this, objective->Upgrade->ID) == 'R' ? 1 : 0;
-		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::RecruitHero) {
 			objective->Counter = this->HasHero(objective->Character) ? 1 : 0;
 		}
 	}
@@ -2854,9 +2854,9 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	int recruit_heroes_quantity = 0;
 	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 		CQuestObjective *objective = quest->Objectives[i];
-		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+		if (objective->ObjectiveType == ObjectiveType::BuildUnits || objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
-			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+			if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
 				if (unit_type_id == -1) {
 					return false;
@@ -2881,7 +2881,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			if (!validated) {
 				return false;
 			}
-		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
 			const CUpgrade *upgrade = objective->Upgrade;
 			
 			bool has_researcher = this->HasUpgradeResearcher(upgrade);
@@ -2892,9 +2892,9 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 						continue;
 					}
 						
-					if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+					if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
-						if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+						if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 							int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
 							if (unit_type_id == -1) {
 								continue;
@@ -2920,12 +2920,12 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
 				return false;
 			}
-		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::RecruitHero) {
 			if (!this->CanRecruitHero(objective->Character, true)) {
 				return false;
 			}
 			recruit_heroes_quantity++;
-		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::DestroyUnits || objective->ObjectiveType == ObjectiveType::DestroyHero || objective->ObjectiveType == ObjectiveType::DestroyUnique) {
 			if (objective->Faction) {
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
@@ -2937,16 +2937,16 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				}
 			}
 			
-			if (objective->ObjectiveType == DestroyHeroObjectiveType) {
+			if (objective->ObjectiveType == ObjectiveType::DestroyHero) {
 				if (objective->Character->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
-			} else if (objective->ObjectiveType == DestroyUniqueObjectiveType) {
+			} else if (objective->ObjectiveType == ObjectiveType::DestroyUnique) {
 				if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
 			}
-		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::DestroyFaction) {
 			CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 			if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 				return false;
@@ -3013,10 +3013,10 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		if (objective->Quest != quest) {
 			continue;
 		}
-		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+		if (objective->ObjectiveType == ObjectiveType::BuildUnits || objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 			if (objective->Counter < objective->Quantity) {
 				std::vector<const CUnitType *> unit_types = objective->UnitTypes;
-				if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+				if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 					int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
 					if (unit_type_id == -1) {
 						return "You can no longer produce the required unit.";
@@ -3045,7 +3045,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					return validation_error;
 				}
 			}
-		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
 			const CUpgrade *upgrade = objective->Upgrade;
 			
 			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
@@ -3057,9 +3057,9 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 							continue;
 						}
 						
-						if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+						if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 							std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
-							if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+							if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 								int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
 								if (unit_type_id == -1) {
 									continue;
@@ -3086,11 +3086,11 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					return "You can no longer research the required upgrade.";
 				}
 			}
-		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::RecruitHero) {
 			if (!this->HasHero(objective->Character) && !this->CanRecruitHero(objective->Character, true)) {
 				return "The hero can no longer be recruited.";
 			}
-		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::DestroyUnits || objective->ObjectiveType == ObjectiveType::DestroyHero || objective->ObjectiveType == ObjectiveType::DestroyUnique) {
 			if (objective->Faction && objective->Counter < objective->Quantity) {
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
@@ -3102,16 +3102,16 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 				}
 			}
 			
-			if (objective->ObjectiveType == DestroyHeroObjectiveType) {
+			if (objective->ObjectiveType == ObjectiveType::DestroyHero) {
 				if (objective->Counter == 0 && objective->Character->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
-			} else if (objective->ObjectiveType == DestroyUniqueObjectiveType) {
+			} else if (objective->ObjectiveType == ObjectiveType::DestroyUnique) {
 				if (objective->Counter == 0 && objective->Unique->CanDrop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
 			}
-		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::DestroyFaction) {
 			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {

@@ -10,7 +10,7 @@
 //
 /**@name quest.cpp - The quest source file. */
 //
-//      (c) Copyright 2015-2019 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -44,8 +44,7 @@
 #include "player.h"
 #include "script.h"
 
-#include <ctype.h>
-
+#include <cctype>
 #include <string>
 #include <map>
 
@@ -128,62 +127,62 @@ void CheckAchievements()
 	}
 }
 
-std::string GetQuestObjectiveTypeNameById(int objective_type)
+std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type)
 {
-	if (objective_type == GatherResourceObjectiveType) {
+	if (objective_type == ObjectiveType::GatherResource) {
 		return "gather-resource";
-	} else if (objective_type == HaveResourceObjectiveType) {
+	} else if (objective_type == ObjectiveType::HaveResource) {
 		return "have-resource";
-	} else if (objective_type == BuildUnitsObjectiveType) {
+	} else if (objective_type == ObjectiveType::BuildUnits) {
 		return "build-units";
-	} else if (objective_type == BuildUnitsOfClassObjectiveType) {
+	} else if (objective_type == ObjectiveType::BuildUnitsOfClass) {
 		return "build-units-of-class";
-	} else if (objective_type == DestroyUnitsObjectiveType) {
+	} else if (objective_type == ObjectiveType::DestroyUnits) {
 		return "destroy-units";
-	} else if (objective_type == ResearchUpgradeObjectiveType) {
+	} else if (objective_type == ObjectiveType::ResearchUpgrade) {
 		return "research-upgrade";
-	} else if (objective_type == RecruitHeroObjectiveType) {
+	} else if (objective_type == ObjectiveType::RecruitHero) {
 		return "recruit-hero";
-	} else if (objective_type == DestroyHeroObjectiveType) {
+	} else if (objective_type == ObjectiveType::DestroyHero) {
 		return "destroy-hero";
-	} else if (objective_type == HeroMustSurviveObjectiveType) {
+	} else if (objective_type == ObjectiveType::HeroMustSurvive) {
 		return "hero-must-survive";
-	} else if (objective_type == DestroyUniqueObjectiveType) {
+	} else if (objective_type == ObjectiveType::DestroyUnique) {
 		return "destroy-unique";
-	} else if (objective_type == DestroyFactionObjectiveType) {
+	} else if (objective_type == ObjectiveType::DestroyFaction) {
 		return "destroy-faction";
 	}
 
 	return "";
 }
 
-int GetQuestObjectiveTypeIdByName(const std::string &objective_type)
+ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 {
 	if (objective_type == "gather-resource") {
-		return GatherResourceObjectiveType;
+		return ObjectiveType::GatherResource;
 	} else if (objective_type == "have-resource") {
-		return HaveResourceObjectiveType;
+		return ObjectiveType::HaveResource;
 	} else if (objective_type == "build-units") {
-		return BuildUnitsObjectiveType;
+		return ObjectiveType::BuildUnits;
 	} else if (objective_type == "build-units-of-class") {
-		return BuildUnitsOfClassObjectiveType;
+		return ObjectiveType::BuildUnitsOfClass;
 	} else if (objective_type == "destroy-units") {
-		return DestroyUnitsObjectiveType;
+		return ObjectiveType::DestroyUnits;
 	} else if (objective_type == "research-upgrade") {
-		return ResearchUpgradeObjectiveType;
+		return ObjectiveType::ResearchUpgrade;
 	} else if (objective_type == "recruit-hero") {
-		return RecruitHeroObjectiveType;
+		return ObjectiveType::RecruitHero;
 	} else if (objective_type == "destroy-hero") {
-		return DestroyHeroObjectiveType;
+		return ObjectiveType::DestroyHero;
 	} else if (objective_type == "hero-must-survive") {
-		return HeroMustSurviveObjectiveType;
+		return ObjectiveType::HeroMustSurvive;
 	} else if (objective_type == "destroy-unique") {
-		return DestroyUniqueObjectiveType;
+		return ObjectiveType::DestroyUnique;
 	} else if (objective_type == "destroy-faction") {
-		return DestroyFactionObjectiveType;
+		return ObjectiveType::DestroyFaction;
 	}
 
-	return -1;
+	return ObjectiveType::None;
 }
 
 CQuest *GetQuest(const std::string &quest_ident)

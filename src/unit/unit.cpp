@@ -2754,8 +2754,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				
 				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 					if (
-						(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
-						|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.Class)
+						(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
+						|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->UnitClass == type.Class)
 					) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 					}
@@ -6820,14 +6820,14 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	for (size_t i = 0; i < attacker.Player->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = attacker.Player->QuestObjectives[i];
 		if (
-			(objective->ObjectiveType == DestroyUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end() && (!objective->Settlement || objective->Settlement == target.Settlement))
-			|| (objective->ObjectiveType == DestroyHeroObjectiveType && target.Character && objective->Character == target.Character)
-			|| (objective->ObjectiveType == DestroyUniqueObjectiveType && target.Unique && objective->Unique == target.Unique)
+			(objective->ObjectiveType == ObjectiveType::DestroyUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end() && (!objective->Settlement || objective->Settlement == target.Settlement))
+			|| (objective->ObjectiveType == ObjectiveType::DestroyHero && target.Character && objective->Character == target.Character)
+			|| (objective->ObjectiveType == ObjectiveType::DestroyUnique && target.Unique && objective->Unique == target.Unique)
 		) {
 			if (!objective->Faction || objective->Faction->ID == target.Player->Faction) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
-		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
+		} else if (objective->ObjectiveType == ObjectiveType::DestroyFaction) {
 			const CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 			
 			if (faction_player) {

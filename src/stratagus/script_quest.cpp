@@ -199,10 +199,10 @@ static int CclDefineQuest(lua_State *l)
 					++k;
 					if (!strcmp(value, "objective-type")) {
 						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, k + 1));
-						if (objective->ObjectiveType == -1) {
+						if (objective->ObjectiveType == ObjectiveType::None) {
 							LuaError(l, "Objective type doesn't exist.");
 						}
-						if (objective->ObjectiveType == HeroMustSurviveObjectiveType) {
+						if (objective->ObjectiveType == ObjectiveType::HeroMustSurvive) {
 							objective->Quantity = 0;
 						}
 					} else if (!strcmp(value, "objective-string")) {

@@ -456,7 +456,7 @@ void CPlayer::Load(lua_State *l)
 						}
 					} else if (!strcmp(value, "objective-type")) {
 						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, n + 1));
-						if (objective->ObjectiveType == -1) {
+						if (objective->ObjectiveType == ObjectiveType::None) {
 							LuaError(l, "Objective type doesn't exist.");
 						}
 					} else if (!strcmp(value, "objective-string")) {
