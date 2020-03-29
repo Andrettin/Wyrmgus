@@ -3361,7 +3361,7 @@ void CUnit::UpdateSettlement()
 			}
 			const CFaction *faction = nullptr;
 			if (faction_id != -1) {
-				PlayerRaces.Factions[faction_id];
+				faction = PlayerRaces.Factions[faction_id];
 			}
 
 			std::vector<CSite *> potential_settlements;
