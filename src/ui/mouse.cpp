@@ -2420,7 +2420,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		GameCursor = UI.Point.Cursor;  // Reset
 		CursorStartScreenPos = CursorScreenPos;
 		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CurrentCursorState == CursorState::Point) {
-			CurrentCursorState == CursorState::PieMenu;
+			CurrentCursorState = CursorState::PieMenu;
 		}
 #ifdef USE_TOUCHSCREEN
 	} else if (doubleLeftButton) {
