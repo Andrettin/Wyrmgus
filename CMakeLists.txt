@@ -429,6 +429,7 @@ source_group(win32 FILES ${win32_SRCS})
 
 set(tolua_FILES
 	src/tolua/ai.pkg
+	src/tolua/campaign.pkg
 	src/tolua/editor.pkg
 	src/tolua/font.pkg
 	src/tolua/game.pkg

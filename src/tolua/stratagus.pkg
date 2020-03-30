@@ -2,7 +2,6 @@ $#include "stratagus.h"
 
 $#include "age.h"
 $#include "ai.h"
-$#include "campaign.h"
 //Wyrmgus start
 $#include "character.h"
 //Wyrmgus end
@@ -181,8 +180,6 @@ extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string 
 extern void SaveQuestCompletion();
 extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
-extern void SetCurrentCampaign(std::string campaign_ident);
-extern std::string GetCurrentCampaign();
 extern void SetQuestCompleted(std::string quest_ident, int difficulty = DifficultyNormal, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, bool save);
 extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);
