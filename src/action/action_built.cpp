@@ -10,7 +10,7 @@
 //
 /**@name action_build.cpp - The build building action. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon,
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon,
 //      Russell Smith and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,9 +28,8 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
+
 #include "action/action_built.h"
 
 #include "ai.h"
@@ -334,11 +333,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (type.TerrainType) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-		if (type.TerrainType->Overlay && Map.GetTileTerrain(unit.tilePos, type.TerrainType->Overlay, unit.MapLayer->ID) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
-			Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
+//		CMap::Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+		if (type.TerrainType->Overlay && CMap::Map.GetTileTerrain(unit.tilePos, type.TerrainType->Overlay, unit.MapLayer->ID) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
+			CMap::Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
 		}
-		Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
+		CMap::Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
 		//Wyrmgus end
 		unit.Remove(nullptr);
 		UnitLost(unit);
@@ -448,7 +447,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID), unit.Settlement);
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID), unit.Settlement);
 	//Wyrmgus end
 }
 
@@ -538,5 +537,3 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 	currentValue = (newProgress * maxValue) / costs - damageValue;
 	currentValue = std::min(currentValue, maxValue);
 }
-
-//@}

@@ -10,7 +10,7 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Francois Beerten,
+//      (c) Copyright 1998-2020 by Lutz Sammer, Francois Beerten,
 //                                 Jimmy Salmon, Pali Rohár, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -156,7 +156,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <ctype.h>
+#include <cctype>
 
 #ifdef USE_BEOS
 #include <fcntl.h>

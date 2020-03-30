@@ -10,7 +10,7 @@
 //
 /**@name map.h - The map header file. */
 //
-//      (c) Copyright 1998-2019 by Vladi Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2020 by Vladi Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -111,8 +111,8 @@ class CWorld;
 --  Map
 ----------------------------------------------------------------------------*/
 
-#define MaxMapWidth  512  /// max map width supported
-#define MaxMapHeight 512  /// max map height supported
+static constexpr int MaxMapWidth = 512; /// max map width supported
+static constexpr int MaxMapHeight = 512; /// max map height supported
 
 //Wyrmgus start
 class CTerrainFeature
@@ -176,6 +176,8 @@ public:
 class CMap
 {
 public:
+	static CMap Map; //the current map
+
 	CMap();
 	~CMap();
 
@@ -366,7 +368,6 @@ extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 
-extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
 /// Contrast of fog of war
@@ -535,7 +536,7 @@ void MapUnmarkUnitSight(CUnit &unit);
 /// Can a unit with 'mask' enter the field
 inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
 {
-	return !Map.Field(pos, z)->CheckMask(mask);
+	return !CMap::Map.Field(pos, z)->CheckMask(mask);
 }
 
 /// Handle Marking and Unmarking of radar vision

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -75,8 +73,8 @@ void MissileFlameShield::Action()
 	const int iy = unit->IY;
 	const int uw = unit->Type->TileSize.x;
 	const int uh = unit->Type->TileSize.y;
-	this->position.x = upos.x * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
-	this->position.y = upos.y * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
+	this->position.x = upos.x * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
+	this->position.y = upos.y * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitAction::Die) {
 		this->TTL = index;
 	}
@@ -101,5 +99,3 @@ void MissileFlameShield::Action()
 		}
 	}
 }
-
-//@}

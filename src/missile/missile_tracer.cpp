@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -95,7 +93,7 @@ static bool TracerMissile(Missile &missile)
 
 		if (missile.Type->Pierce) {
 			const PixelPos posInt((int)pos.x, (int)pos.y);
-			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(posInt, missile.MapLayer));
+			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt, missile.MapLayer));
 		}
 	}
 
@@ -131,5 +129,3 @@ void MissileTracer::Action()
 		this->NextMissileFrame(1, 0);
 	}
 }
-
-//@}

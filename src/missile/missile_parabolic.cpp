@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -106,7 +104,7 @@ static bool ParabolicMissile(Missile &missile)
 
 		if (missile.Type->Pierce) {
 			const PixelPos position((int)pos.x, (int)pos.y);
-			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(position, missile.MapLayer));
+			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer));
 		}
 	}
 
@@ -130,5 +128,3 @@ void MissileParabolic::Action()
 		this->NextMissileFrameCycle();
 	}
 }
-
-//@}

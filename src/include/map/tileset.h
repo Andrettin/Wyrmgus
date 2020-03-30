@@ -10,7 +10,7 @@
 //
 /**@name tileset.h - The tileset headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef TILESET_H
-#define TILESET_H
+#pragma once
 
 //@{
 
@@ -341,7 +340,3 @@ extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 extern std::string GetTransitionTypeNameById(int transition_type);
 extern int GetTransitionTypeIdByName(const std::string &transition_type);
 //Wyrmgus end
-
-//@}
-
-#endif // !TILESET_H

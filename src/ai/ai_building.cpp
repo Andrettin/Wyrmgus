@@ -10,7 +10,7 @@
 //
 /**@name ai_building.cpp - AI building functions. */
 //
-//      (c) Copyright 2001-2019 by Lutz Sammer and Andrettin
+//      (c) Copyright 2001-2020 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -59,12 +57,12 @@
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 //Wyrmgus end
 {
-	if (Map.Info.IsPointOnMap(pos, z) == false) {
+	if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
 		return false;
 	}
 	//Wyrmgus start
-//	const CMapField &mf = *Map.Field(pos);
-	const CMapField &mf = *Map.Field(pos, z);
+//	const CMapField &mf = *CMap::Map.Field(pos);
+	const CMapField &mf = *CMap::Map.Field(pos, z);
 	//Wyrmgus end
 	const CUnitCache &unitCache = mf.UnitCache;
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
@@ -214,17 +212,17 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	
-	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
 		return VisitResult::DeadEnd;
 	}
 	
 //	if (CanBuildUnitType(&worker, type, pos, 1)
 	if (
-		(!landmass || Map.GetTileLandmass(pos, z) == landmass)
+		(!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)
 		&& CanBuildUnitType(&worker, type, pos, 1, IgnoreExploration, z)
 		&& !AiEnemyUnitsInDistance(*worker.Player, nullptr, pos, 8, z)
 		&& (!settlement || settlement == worker.Player->GetNearestSettlement(pos, z, type.TileSize))
@@ -270,15 +268,15 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
 	if (startUnit != nullptr) {
 		terrainTraversal.PushUnitPosAndNeighbor(*startUnit);
 	} else {
-		Assert(Map.Info.IsPointOnMap(startPos, z));
+		Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
 		terrainTraversal.PushPos(startPos);
 	}
 
@@ -288,7 +286,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	//Wyrmgus end
 
 	terrainTraversal.Run(buildingPlaceFinder);
-	return Map.Info.IsPointOnMap(*resultPos, z);
+	return CMap::Map.Info.IsPointOnMap(*resultPos, z);
 }
 
 class HallPlaceFinder
@@ -387,14 +385,14 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 #endif
 	*/
 	//Wyrmgus start
-//	if (!IgnoreExploration && !Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
-	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+//	if (!IgnoreExploration && !CMap::Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 	//Wyrmgus end
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -465,12 +463,12 @@ static bool AiFindHallPlace(const CUnit &worker,
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(Map.Info.IsPointOnMap(startPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -527,17 +525,17 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
 		return VisitResult::DeadEnd;
 	}
 	
-//	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
-	if (Map.Field(pos, z)->IsTerrainResourceOnMap(resource)) {
+//	if (CMap::Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
+	if (CMap::Map.Field(pos, z)->IsTerrainResourceOnMap(resource)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
@@ -578,12 +576,12 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(Map.Info.IsPointOnMap(startPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -645,7 +643,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 	}
 	//Wyrmgus end
 
-	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
+	const Vec2i &startPos = CMap::Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
@@ -703,5 +701,3 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 	return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos, ignore_exploration, z, landmass, settlement);
 	//Wyrmgus end
 }
-
-//@}

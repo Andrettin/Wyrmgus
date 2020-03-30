@@ -10,7 +10,7 @@
 //
 /**@name action_move.cpp - The move action. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@
 /* static */ COrder *COrder::NewActionMove(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	COrder_Move *order = new COrder_Move;
 
@@ -276,8 +276,8 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
-					table[i]->IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
-					table[i]->IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
+					table[i]->IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
+					table[i]->IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -307,8 +307,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
-		unit.IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
+		unit.IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
+		unit.IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -340,7 +340,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x * 2) || abs(unit.IY) > (Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y * 2)) {
+	if (abs(unit.IX) > (CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x * 2) || abs(unit.IY) > (CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y * 2)) {
 		unit.IX = 0;
 		unit.IY = 0;
 #ifdef DEBUG

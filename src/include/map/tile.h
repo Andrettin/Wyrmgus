@@ -10,7 +10,7 @@
 //
 /**@name tile.h - The map tile header file. */
 //
-//      (c) Copyright 1998-2019 by Vladi Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2020 by Vladi Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Rafal Bursig and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __MAP_TILE_H__
-#define __MAP_TILE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -166,14 +165,14 @@ public:
 	bool IsTeamExplored(const CPlayer &player) const;
 	//Wyrmgus end
 
-	/// @note Manage Map.NoFogOfWar
+	/// @note Manage CMap::Map.NoFogOfWar
 	bool IsVisible(const CPlayer &player) const;
 	bool IsTeamVisible(const CPlayer &player) const;
 	/**
 	**  Find out how a field is seen (By player, or by shared vision)
 	**
 	**  @param player   Player to check for.
-	**  @note manage fogOfWar (using Map.NoFogOfWar)
+	**  @note manage fogOfWar (using CMap::Map.NoFogOfWar)
 	**
 	**  @return        0 unexplored, 1 explored, 2 visible.
 	*/
@@ -292,6 +291,3 @@ public:
 
 	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
 };
-
-#endif
-

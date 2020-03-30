@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_teleport.h"
@@ -58,11 +56,11 @@
 */
 /* virtual */ int Spell_Teleport::Cast(CUnit &caster, const CSpell &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
 {
-	if (Map.Info.IsPointOnMap(goalPos, z)) {
+	if (CMap::Map.Info.IsPointOnMap(goalPos, z)) {
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
 		caster.tilePos = goalPos;
-		caster.MapLayer = Map.MapLayers[z];
+		caster.MapLayer = CMap::Map.MapLayers[z];
 		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {
 			SelectUnit(caster);
@@ -70,5 +68,3 @@
 	}
 	return 0;
 }
-
-//@}

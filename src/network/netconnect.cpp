@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------------
@@ -757,10 +755,10 @@ void CClient::Parse_Map(const unsigned char *buf)
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
 	const std::string mappath = StratagusLibPath + "/" + NetworkMapName;
 	LoadStratagusMapInfo(mappath);
-	if (msg.MapUID != Map.Info.MapUID) {
+	if (msg.MapUID != CMap::Map.Info.MapUID) {
 		networkState.State = ccs_badmap;
 		fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
-				Map.Info.MapUID, static_cast<unsigned int>(msg.MapUID));
+			CMap::Map.Info.MapUID, static_cast<unsigned int>(msg.MapUID));
 		return;
 	}
 	networkState.State = ccs_mapinfo;
@@ -975,7 +973,7 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
-	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
+	const CInitMessage_Map message(NetworkMapName.c_str(), CMap::Map.Info.MapUID);
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -1484,7 +1482,7 @@ void NetworkServerStartGame()
 	int rev[PlayerMax];
 	int h = 0;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
+		if (CMap::Map.Info.PlayerType[i] == PlayerPerson) {
 			rev[i] = h;
 			num[h++] = i;
 			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ rev[i]);
@@ -1493,15 +1491,15 @@ void NetworkServerStartGame()
 	// Make a list of the available computer slots.
 	int n = h;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
+		if (CMap::Map.Info.PlayerType[i] == PlayerComputer) {
 			rev[i] = n++;
 			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
 		}
 	}
 	// Make a list of the remaining slots.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] != PlayerPerson
-			&& Map.Info.PlayerType[i] != PlayerComputer) {
+		if (CMap::Map.Info.PlayerType[i] != PlayerPerson
+			&& CMap::Map.Info.PlayerType[i] != PlayerComputer) {
 			rev[i] = n++;
 			// PlayerNobody - not available to anything..
 		}
@@ -1582,7 +1580,7 @@ void NetworkServerStartGame()
 
 	if (NoRandomPlacementMultiplayer == 1) {
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (Map.Info.PlayerType[i] != PlayerComputer) {
+			if (CMap::Map.Info.PlayerType[i] != PlayerComputer) {
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
@@ -1822,10 +1820,10 @@ void NetworkGamePrepareGameSettings()
 	int c = 0;
 	int h = 0;
 	for (int i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
+		if (CMap::Map.Info.PlayerType[i] == PlayerPerson) {
 			num[h++] = i;
 		}
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
+		if (CMap::Map.Info.PlayerType[i] == PlayerComputer) {
 			comp[c++] = i; // available computer player slots
 		}
 	}
@@ -1877,5 +1875,3 @@ void NetworkCclRegister()
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 }
 
-
-//@}

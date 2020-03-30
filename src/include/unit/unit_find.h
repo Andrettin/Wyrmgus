@@ -10,7 +10,7 @@
 //
 /**@name unit_find.h - The unit find header file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon, Joris Dauphin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Joris Dauphin
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,8 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNIT_FIND_H__
-#define __UNIT_FIND_H__
+#pragma once
 
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -311,11 +310,11 @@ template <typename Pred>
 void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(ltPos, z));
-	Assert(Map.Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
-	const CMapLayer *map_layer = Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	
 	//Wyrmgus start
 	double middle_x;
@@ -389,9 +388,9 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 	Vec2i maxPos = rbPos;
 
 	//Wyrmgus start
-//	Map.FixSelectionArea(minPos, maxPos);
+//	CMap::Map.FixSelectionArea(minPos, maxPos);
 //	SelectFixed(minPos, maxPos, units, pred);
-	Map.FixSelectionArea(minPos, maxPos, z);
+	CMap::Map.FixSelectionArea(minPos, maxPos, z);
 	SelectFixed(minPos, maxPos, units, z, pred, circle);
 	//Wyrmgus end
 }
@@ -420,12 +419,12 @@ inline void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> 
 template <typename Pred>
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 {
-	Assert(Map.Info.IsPointOnMap(ltPos, z));
-	Assert(Map.Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			const CMapField &mf = *Map.Field(posIt, z);
+			const CMapField &mf = *CMap::Map.Field(posIt, z);
 			const CUnitCache &cache = mf.UnitCache;
 
 			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
@@ -443,7 +442,7 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
-	Map.FixSelectionArea(minPos, maxPos, z);
+	CMap::Map.FixSelectionArea(minPos, maxPos, z);
 	return FindUnit_IfFixed(minPos, maxPos, z, pred);
 }
 
@@ -524,5 +523,3 @@ extern CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral = 
 
 extern bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags);
 //Wyrmgus end
-
-#endif

@@ -10,8 +10,8 @@
 //
 /**@name spell_summon.cpp - The spell Summon. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 #include "stratagus.h"
 
@@ -134,7 +132,7 @@ public:
 		target = MakeUnit(unittype, caster.Player);
 		if (target != nullptr) {
 			target->tilePos = pos;
-			target->MapLayer = Map.MapLayers[z];
+			target->MapLayer = CMap::Map.MapLayers[z];
 			DropOutOnSide(*target, LookingW, nullptr);
 			// To avoid defending summoned unit for AI
 			target->Summoned = 1;
@@ -163,5 +161,3 @@ public:
 	}
 	return 0;
 }
-
-//@}

@@ -10,7 +10,7 @@
 //
 /**@name spell_adjustvariable.cpp - The spell AdjustVariable. */
 //
-//      (c) Copyright 1998-2019 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 #include "stratagus.h"
 
@@ -257,6 +255,3 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 	}
 	return 1;
 }
-
-
-//@}

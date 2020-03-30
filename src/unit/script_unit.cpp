@@ -10,7 +10,7 @@
 //
 /**@name script_unit.cpp - The unit ccl functions. */
 //
-//      (c) Copyright 2001-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2001-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -350,7 +348,7 @@ static int CclUnit(lua_State *l)
 			unit->Settlement = CSite::GetSite(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || SettlementSiteUnitType == type) {
 				unit->Settlement->SiteUnit = unit;
-				Map.SiteUnits.push_back(unit);
+				CMap::Map.SiteUnits.push_back(unit);
 			}
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::Get(LuaToString(l, 2, j + 1));
@@ -454,12 +452,12 @@ static int CclUnit(lua_State *l)
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "map-layer")) {
-			unit->MapLayer = Map.MapLayers[LuaToNumber(l, 2, j + 1)];
+			unit->MapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
 			lua_pop(l, 1);
-			unit->Offset = Map.getIndex(unit->tilePos, unit->MapLayer->ID);
+			unit->Offset = CMap::Map.getIndex(unit->tilePos, unit->MapLayer->ID);
 		} else if (!strcmp(value, "seen-tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);
@@ -732,7 +730,7 @@ static int CclUnit(lua_State *l)
 			unit->RallyPointPos.x = rally_point_x;
 			unit->RallyPointPos.y = rally_point_y;
 		} else if (!strcmp(value, "rally-point-map-layer")) {
-			unit->RallyPointMapLayer = Map.MapLayers[LuaToNumber(l, 2, j + 1)];
+			unit->RallyPointMapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)];
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
@@ -858,7 +856,7 @@ static int CclCreateUnit(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	//Wyrmgus start
-	if (!Map.Info.IsPointOnMap(ipos, z)) {
+	if (!CMap::Map.Info.IsPointOnMap(ipos, z)) {
 		fprintf(stderr, "Point on map %d, %d (map layer %d) is invalid.\n", ipos.x, ipos.y, z);
 		return 0;
 	}
@@ -1084,7 +1082,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	Vec2i new_pos;
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer->ID);
 	
-	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
+	if (!CMap::Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
 		new_pos = Players[playerno].StartPos;
 	}
 	
@@ -2234,5 +2232,3 @@ void UnitCclRegister()
 	lua_register(Lua, "UnitIsAt", CclUnitIsAt);
 	//Wyrmgus end
 }
-
-//@}

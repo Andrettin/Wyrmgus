@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -49,8 +47,8 @@ void MissileClipToTarget::Action()
 	this->Wait = this->Type->Sleep;
 
 	if (this->TargetUnit != nullptr) {
-		this->position.x = this->TargetUnit->tilePos.x * Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).x + this->TargetUnit->IX;
-		this->position.y = this->TargetUnit->tilePos.y * Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).y + this->TargetUnit->IY;
+		this->position.x = this->TargetUnit->tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).x + this->TargetUnit->IX;
+		this->position.y = this->TargetUnit->tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).y + this->TargetUnit->IY;
 	}
 
 	if (this->NextMissileFrame(1, 0)) {
@@ -60,5 +58,3 @@ void MissileClipToTarget::Action()
 		this->TTL = 0;
 	}
 }
-
-//@}

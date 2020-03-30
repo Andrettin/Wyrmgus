@@ -10,7 +10,7 @@
 //
 /**@name ui.h - The user interface header file. */
 //
-//      (c) Copyright 1999-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UI_H__
-#define __UI_H__
-
-//@{
+#pragma once
 
 /// @todo this only the start of the new user interface
 /// @todo all user interface variables should go here and be configurable
@@ -643,7 +640,3 @@ extern void CalculateItemsToLoad();
 extern void UpdateLoadingBar();
 extern void IncItemsLoaded();
 extern void ResetItemsToLoad();
-
-//@}
-
-#endif // !__UI_H__

@@ -24,6 +24,8 @@ class CTileset
 
 class CMap
 {
+	static CMap Map;
+
 	CMapInfo Info;
 	CTileset *Tileset;
 	
@@ -31,8 +33,6 @@ class CMap
 	void AdjustMap();
 	//Wyrmgus end
 };
-
-extern CMap Map;
 
 //Wyrmgus start
 extern int GetMapLayer(const std::string plane_ident = "", const std::string world_ident = "", const int surface_layer = 0);

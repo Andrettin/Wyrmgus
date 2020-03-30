@@ -10,7 +10,7 @@
 //
 /**@name mapfield.cpp - The map field source file. */
 //
-//      (c) Copyright 2013-2019 by Joris Dauphin and Andrettin
+//      (c) Copyright 2013-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -769,7 +767,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 			}
 		}
 	}
-	if (maxVision == 1 && Map.NoFogOfWar) {
+	if (maxVision == 1 && CMap::Map.NoFogOfWar) {
 		return 2;
 	}
 	return maxVision;
@@ -789,7 +787,7 @@ bool CMapFieldPlayerInfo::IsTeamExplored(const CPlayer &player) const
 
 bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
 {
-	const bool fogOfWar = !Map.NoFogOfWar;
+	const bool fogOfWar = !CMap::Map.NoFogOfWar;
 	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
 }
 
@@ -797,5 +795,3 @@ bool CMapFieldPlayerInfo::IsTeamVisible(const CPlayer &player) const
 {
 	return TeamVisibilityState(player) == 2;
 }
-
-//@}

@@ -10,7 +10,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Valery Shchedrin,
+//      (c) Copyright 1998-2020 by Lutz Sammer, Valery Shchedrin,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -976,7 +974,7 @@ void DrawMapLayerButtons()
 		if (UI.PlaneButtons[i].X != -1) {
 			DrawUIButton(UI.PlaneButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerPlane && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.PlaneButtons[i].Clicked || Map.GetCurrentPlane() == CPlane::Planes[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.PlaneButtons[i].Clicked || CMap::Map.GetCurrentPlane() == CPlane::Planes[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.PlaneButtons[i].X, UI.PlaneButtons[i].Y,
 				UI.PlaneButtons[i].Text
 			);
@@ -987,7 +985,7 @@ void DrawMapLayerButtons()
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.WorldButtons[i].Clicked || Map.GetCurrentWorld() == CWorld::Worlds[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == CWorld::Worlds[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
 			);
@@ -998,7 +996,7 @@ void DrawMapLayerButtons()
 		if (UI.SurfaceLayerButtons[i].X != -1) {
 			DrawUIButton(UI.SurfaceLayerButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.SurfaceLayerButtons[i].Clicked || Map.GetCurrentSurfaceLayer() == i) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.SurfaceLayerButtons[i].Clicked || CMap::Map.GetCurrentSurfaceLayer() == i) ? MI_FLAGS_CLICKED : 0),
 				UI.SurfaceLayerButtons[i].X, UI.SurfaceLayerButtons[i].Y,
 				UI.SurfaceLayerButtons[i].Text
 			);
@@ -1024,7 +1022,7 @@ void DrawPopups()
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
+					PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
 					std::string unit_name;
 					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
@@ -1049,7 +1047,7 @@ void DrawPopups()
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
 				} else if (mf.TerrainFeature) {
-					PixelPos tile_center_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
+					PixelPos tile_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
 					std::string terrain_feature_name = mf.TerrainFeature->Name;
 					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(Players[mf.Owner].Race) != mf.TerrainFeature->CulturalNames.end()) {
@@ -1810,7 +1808,7 @@ void ShiftMessagesEvent()
 */
 void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	char temp[256];
 	va_list va;
@@ -1862,7 +1860,7 @@ void CenterOnMessage()
 		return;
 	}
 	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }
@@ -2129,5 +2127,3 @@ void UpdateTimer()
 		GameTimer.LastUpdate = GameCycle;
 	}
 }
-
-//@}

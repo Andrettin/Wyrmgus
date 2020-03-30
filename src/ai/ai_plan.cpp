@@ -10,7 +10,7 @@
 //
 /**@name ai_plan.cpp - AI planning functions. */
 //
-//      (c) Copyright 2002-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -120,8 +120,8 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, int z)
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
 	//Wyrmgus start
-//	Map.Field(pos)->UnitCache.for_each(filter);
-	Map.Field(pos, z)->UnitCache.for_each(filter);
+//	CMap::Map.Field(pos)->UnitCache.for_each(filter);
+	CMap::Map.Field(pos, z)->UnitCache.for_each(filter);
 	//Wyrmgus end
 	return enemy;
 }
@@ -163,8 +163,8 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	//Wyrmgus end
 	// Look if found what was required.
 	//Wyrmgus start
-//	if (Map.WallOnMap(pos)) {
-	if (Map.WallOnMap(pos, unit.MapLayer->ID)) {
+//	if (CMap::Map.WallOnMap(pos)) {
+	if (CMap::Map.WallOnMap(pos, unit.MapLayer->ID)) {
 	//Wyrmgus end
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
 		if (resultPos) {
@@ -389,8 +389,8 @@ int AiForce::PlanAttack()
 	TerrainTraversal transporterTerrainTraversal;
 
 	//Wyrmgus start
-//	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	transporterTerrainTraversal.SetSize(Map.Info.MapWidths[this->GoalMapLayer], Map.Info.MapHeights[this->GoalMapLayer]);
+//	transporterTerrainTraversal.SetSize(CMap::Map.Info.MapWidth, Map.Info.MapHeight);
+	transporterTerrainTraversal.SetSize(CMap::Map.Info.MapWidths[this->GoalMapLayer], CMap::Map.Info.MapHeights[this->GoalMapLayer]);
 	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
@@ -576,7 +576,7 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 		}
 		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
 			int force = AiPlayer->Force.GetForce(unit);
-			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
+			if (force != -1 && CMap::Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
 				continue;
 			}
 		}
@@ -765,7 +765,7 @@ void AiCheckTransporters()
 			continue;
 		}
 		
-		int landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
+		int landmass = CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
 		
 		AiPlayer->Transporters[landmass].push_back(&unit);
 	}

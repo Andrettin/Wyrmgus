@@ -10,7 +10,7 @@
 //
 /**@name date.h - The date header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DATE_H__
-#define __DATE_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -45,7 +42,7 @@
 class CCalendar;
 class CTimeline;
 
-#define BaseCalendarYearOffsetForHours 10000 //essentially the Human Era
+static constexpr int BaseCalendarYearOffsetForHours = 10000; //essentially the Human Era
 
 class CDate
 {
@@ -158,7 +155,3 @@ public:
 extern void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string);
 extern void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week);
 extern void SetCurrentTotalHours(const unsigned long long hours);
-
-//@}
-
-#endif // !__DATE_H__

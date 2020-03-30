@@ -10,7 +10,7 @@
 //
 /**@name png.cpp - The png graphic file loader. */
 //
-//      (c) Copyright 1998-2011 by Lutz Sammer, Jimmy Salmon and Pali Rohár
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -445,8 +445,8 @@ void SaveMapPNG(const char *name)
 		return;
 	}
 
-	const size_t imageWidth = UI.CurrentMapLayer->GetWidth() * Map.GetCurrentPixelTileSize().x;
-	const size_t imageHeight = UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y;
+	const size_t imageWidth = UI.CurrentMapLayer->GetWidth() * CMap::Map.GetCurrentPixelTileSize().x;
+	const size_t imageHeight = UI.CurrentMapLayer->GetHeight() * CMap::Map.GetCurrentPixelTileSize().y;
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -477,10 +477,10 @@ void SaveMapPNG(const char *name)
 			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;
 			srcRect.y = terrain->GetGraphics()->frame_map[tile].y;
 			//Wyrmgus end
-			dstRect.x = i * Map.GetCurrentPixelTileSize().x;
-			dstRect.y = j * Map.GetCurrentPixelTileSize().y;
-			srcRect.w = dstRect.w = Map.GetCurrentPixelTileSize().x;
-			srcRect.h = dstRect.h = Map.GetCurrentPixelTileSize().y;
+			dstRect.x = i * CMap::Map.GetCurrentPixelTileSize().x;
+			dstRect.y = j * CMap::Map.GetCurrentPixelTileSize().y;
+			srcRect.w = dstRect.w = CMap::Map.GetCurrentPixelTileSize().x;
+			srcRect.h = dstRect.h = CMap::Map.GetCurrentPixelTileSize().y;
 			//Wyrmgus start
 //			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
 			SDL_BlitSurface(terrain->GetGraphics()->Surface, &srcRect, mapImage, &dstRect);

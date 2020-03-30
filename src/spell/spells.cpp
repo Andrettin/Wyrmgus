@@ -10,7 +10,7 @@
 //
 /**@name spells.cpp - The spell cast action. */
 //
-//      (c) Copyright 1998-2019 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -618,7 +618,7 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 
 	//Wyrmgus start
 	int range = this->Range;
-	if (Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
+	if (CMap::Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
 		range = 1; //if there are e.g. dungeon walls between the caster and the target, the unit reachable check must see if the target is reachable with a range of 1 instead of the spell's normal range (to make sure the spell can be cast; spells can't be cast through dungeon walls)
 	}
 
@@ -726,7 +726,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 			autocast->PositionAutoCast->pushIntegers(array);
 			autocast->PositionAutoCast->run(2);
 			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
-			if (Map.Info.IsPointOnMap(resPos, map_layer)) {
+			if (CMap::Map.Info.IsPointOnMap(resPos, map_layer)) {
 				Target *target = new Target(TargetType::Position, nullptr, resPos, map_layer->ID);
 				return target;
 			}

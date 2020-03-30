@@ -10,7 +10,7 @@
 //
 /**@name action_patrol.cpp - The patrol action. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -63,8 +63,8 @@
 /* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(currentPos, current_z));
-	Assert(Map.Info.IsPointOnMap(dest, dest_z));
+	Assert(CMap::Map.Info.IsPointOnMap(currentPos, current_z));
+	Assert(CMap::Map.Info.IsPointOnMap(dest, dest_z));
 
 	COrder_Patrol *order = new COrder_Patrol();
 

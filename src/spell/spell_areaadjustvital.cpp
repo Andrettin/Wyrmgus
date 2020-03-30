@@ -10,8 +10,8 @@
 //
 /**@name spell_areaadjustvital.cpp - The spell AreaAdjustVital. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 #include "stratagus.h"
 
@@ -88,7 +86,7 @@
 		// if (!PassCondition(caster, spell, target, goalPos) {
 		//Wyrmgus start
 //		if (!CanCastSpell(caster, spell, target, goalPos)) {
-		if (!CanCastSpell(caster, spell, target, goalPos, Map.MapLayers[z])) {
+		if (!CanCastSpell(caster, spell, target, goalPos, CMap::Map.MapLayers[z])) {
 		//Wyrmgus end
 			continue;
 		}
@@ -114,5 +112,3 @@
 	}
 	return 0;
 }
-
-//@}

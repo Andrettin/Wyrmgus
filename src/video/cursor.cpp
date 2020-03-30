@@ -10,8 +10,8 @@
 //
 /**@name cursor.cpp - The cursors. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Nehal Mistry,
-//                                 and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Nehal Mistry,
+//                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -301,7 +299,7 @@ void DrawBuildingCursor()
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * Map.GetCurrentPixelTileSize().x + 1;
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * CMap::Map.GetCurrentPixelTileSize().x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -351,8 +349,8 @@ void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, screenPos.x + w * Map.GetCurrentPixelTileSize().x,
-										 screenPos.y + h * Map.GetCurrentPixelTileSize().y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y, 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * CMap::Map.GetCurrentPixelTileSize().x,
+										 screenPos.y + h * CMap::Map.GetCurrentPixelTileSize().y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y, 95);
 		}
 	}
 	PopClipping();
@@ -575,6 +573,3 @@ void CursorCclRegister()
 	lua_register(Lua, "DefineCursor", CclDefineCursor);
 	lua_register(Lua, "SetGameCursor", CclSetGameCursor);
 }
-
-
-//@}

@@ -10,7 +10,7 @@
 //
 /**@name map.cpp - The map source file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Vladi Shabanski,
+//      (c) Copyright 1998-2020 by Lutz Sammer, Vladi Shabanski,
 //                                 Francois Beerten and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -96,11 +96,11 @@ std::vector<CTerrainFeature *> TerrainFeatures;
 std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
-CMap Map;                   /// The current map
-int FlagRevealMap;          /// Flag must reveal the map
-int ReplayRevealMap;        /// Reveal Map is replay
-int ForestRegeneration;     /// Forest regeneration
-char CurrentMapPath[1024];  /// Path of the current map
+CMap CMap::Map; //the current map
+int FlagRevealMap; //flag must reveal the map
+int ReplayRevealMap; //reveal Map is replay
+int ForestRegeneration; //forest regeneration
+char CurrentMapPath[1024]; //path of the current map
 
 //Wyrmgus start
 /**
@@ -995,7 +995,7 @@ PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
 */
 bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
 {
-	return Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
+	return CMap::Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
 }
 
 /**
@@ -1013,20 +1013,20 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 {
 	const int mask = type.MovementMask;
 	//Wyrmgus start
-//	unsigned int index = pos.y * Map.Info.MapWidth;
-	unsigned int index = pos.y * Map.Info.MapWidths[z];
+//	unsigned int index = pos.y * CMap::Map.Info.MapWidth;
+	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
 	//Wyrmgus end
 
 	for (int addy = 0; addy < type.TileSize.y; ++addy) {
 		for (int addx = 0; addx < type.TileSize.x; ++addx) {
-			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
-				|| Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
+			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
+				|| CMap::Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
 				return false;
 			}
 		}
 		//Wyrmgus start
-//		index += Map.Info.MapWidth;
-		index += Map.Info.MapWidths[z];
+//		index += CMap::Map.Info.MapWidth;
+		index += CMap::Map.Info.MapWidths[z];
 		//Wyrmgus end
 	}
 	return true;
@@ -1071,19 +1071,19 @@ void PreprocessMap()
 		}
 	}
 	*/
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
-				CMapField &mf = *Map.Field(ix, iy, z);
-				Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
-				Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
-				Map.CalculateTileLandmass(Vec2i(ix, iy), z);
-				Map.CalculateTileOwnership(Vec2i(ix, iy), z);
-				Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+				CMapField &mf = *CMap::Map.Field(ix, iy, z);
+				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
+				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
+				CMap::Map.CalculateTileLandmass(Vec2i(ix, iy), z);
+				CMap::Map.CalculateTileOwnership(Vec2i(ix, iy), z);
+				CMap::Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
 				if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-					Map.MarkSeenTile(mf, z);
+					CMap::Map.MarkSeenTile(mf, z);
 				}
 			}
 		}
@@ -1111,8 +1111,8 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, 
 	CPlane *plane = CPlane::GetPlane(plane_ident, false);
 	CWorld *world = CWorld::GetWorld(world_ident, false);
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->World == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			return z;
 		}
 	}
@@ -1128,10 +1128,10 @@ int GetSubtemplateStartX(const std::string &subtemplate_ident)
 		return -1;
 	}
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		for (size_t i = 0; i < Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
-			if (subtemplate == std::get<2>(Map.MapLayers[z]->SubtemplateAreas[i])) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.x;
 			}
 		}
@@ -1148,10 +1148,10 @@ int GetSubtemplateStartY(const std::string &subtemplate_ident)
 		return -1;
 	}
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		for (size_t i = 0; i < Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
-			if (subtemplate == std::get<2>(Map.MapLayers[z]->SubtemplateAreas[i])) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.y;
 			}
 		}
@@ -1179,16 +1179,16 @@ void ChangeToPreviousMapLayer()
 */
 void ChangeCurrentMapLayer(const int z)
 {
-	if (z < 0 || z >= (int) Map.MapLayers.size() || UI.CurrentMapLayer->ID == z) {
+	if (z < 0 || z >= static_cast<int>(CMap::Map.MapLayers.size()) || UI.CurrentMapLayer->ID == z) {
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
-	UI.CurrentMapLayer = Map.MapLayers[z];
+	UI.CurrentMapLayer = CMap::Map.MapLayers[z];
 	UI.Minimap.UpdateCache = true;
-	UI.SelectedViewport->Set(new_viewport_map_pos, Map.GetCurrentPixelTileSize() / 2);
+	UI.SelectedViewport->Set(new_viewport_map_pos, CMap::Map.GetCurrentPixelTileSize() / 2);
 	UpdateSurfaceLayerButtons();
 }
 
@@ -1201,16 +1201,16 @@ void ChangeCurrentMapLayer(const int z)
 void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 {
 	if (time_of_day_ident.empty()) {
-		Map.MapLayers[z]->SetTimeOfDay(nullptr);
-		Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
+		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = Map.MapLayers[z]->TimeOfDaySchedule;
+		CTimeOfDaySchedule *schedule = CMap::Map.MapLayers[z]->TimeOfDaySchedule;
 		if (schedule) {
 			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
 				CScheduledTimeOfDay *time_of_day = schedule->ScheduledTimesOfDay[i];
 				if (time_of_day->TimeOfDay->Ident == time_of_day_ident)  {
-					Map.MapLayers[z]->SetTimeOfDay(time_of_day);
-					Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(Map.MapLayers[z]->GetSeason());
+					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day);
+					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(CMap::Map.MapLayers[z]->GetSeason());
 					break;
 				}
 			}
@@ -1227,15 +1227,15 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
 {
 	if (time_of_day_schedule_ident.empty()) {
-		Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
-		Map.MapLayers[z]->SetTimeOfDay(nullptr);
-		Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+		CMap::Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
+		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
+		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
 		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
 		if (schedule) {
-			Map.MapLayers[z]->TimeOfDaySchedule = schedule;
-			Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
-			Map.MapLayers[z]->RemainingTimeOfDayHours = Map.MapLayers[z]->TimeOfDay->GetHours(Map.MapLayers[z]->GetSeason());
+			CMap::Map.MapLayers[z]->TimeOfDaySchedule = schedule;
+			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
+			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->TimeOfDay->GetHours(CMap::Map.MapLayers[z]->GetSeason());
 		}
 	}
 }
@@ -1249,16 +1249,16 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
 void SetSeason(const std::string &season_ident, int z)
 {
 	if (season_ident.empty()) {
-		Map.MapLayers[z]->SetSeason(nullptr);
-		Map.MapLayers[z]->RemainingSeasonHours = 0;
+		CMap::Map.MapLayers[z]->SetSeason(nullptr);
+		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = Map.MapLayers[z]->SeasonSchedule;
+		CSeasonSchedule *schedule = CMap::Map.MapLayers[z]->SeasonSchedule;
 		if (schedule) {
 			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
 				CScheduledSeason *season = schedule->ScheduledSeasons[i];
 				if (season->Season->Ident == season_ident)  {
-					Map.MapLayers[z]->SetSeason(season);
-					Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
+					CMap::Map.MapLayers[z]->SetSeason(season);
+					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
 					break;
 				}
 			}
@@ -1275,15 +1275,15 @@ void SetSeason(const std::string &season_ident, int z)
 void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 {
 	if (season_schedule_ident.empty()) {
-		Map.MapLayers[z]->SeasonSchedule = nullptr;
-		Map.MapLayers[z]->SetSeason(nullptr);
-		Map.MapLayers[z]->RemainingSeasonHours = 0;
+		CMap::Map.MapLayers[z]->SeasonSchedule = nullptr;
+		CMap::Map.MapLayers[z]->SetSeason(nullptr);
+		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
 		CSeasonSchedule *schedule = CSeasonSchedule::GetSeasonSchedule(season_schedule_ident);
 		if (schedule) {
-			Map.MapLayers[z]->SeasonSchedule = schedule;
-			Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
-			Map.MapLayers[z]->RemainingSeasonHours = Map.MapLayers[z]->Season->Hours;
+			CMap::Map.MapLayers[z]->SeasonSchedule = schedule;
+			CMap::Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
+			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->Season->Hours;
 		}
 	}
 }
@@ -3054,8 +3054,8 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	// Set the default map setup by replacing .smp with .sms
 	size_t loc = mapname.find(".smp");
 	if (loc != std::string::npos) {
-		Map.Info.Filename = mapname;
-		Map.Info.Filename.replace(loc, 4, ".sms");
+		CMap::Map.Info.Filename = mapname;
+		CMap::Map.Info.Filename.replace(loc, 4, ".sms");
 	}
 
 	const std::string filename = LibraryFileName(mapname.c_str());

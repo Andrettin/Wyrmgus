@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "particle.h"
@@ -78,15 +76,15 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	}
 
 	PixelSize graphicSize(g->Width, g->Height);
-	PixelDiff margin(Map.GetCurrentPixelTileSize().x - 1, Map.GetCurrentPixelTileSize().y - 1);
+	PixelDiff margin(CMap::Map.GetCurrentPixelTileSize().x - 1, CMap::Map.GetCurrentPixelTileSize().y - 1);
 	PixelPos position(pos.x, pos.y);
-	Vec2i minPos = Map.MapPixelPosToTilePos(position, UI.CurrentMapLayer->ID);
-	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin, UI.CurrentMapLayer->ID);
+	Vec2i minPos = CMap::Map.MapPixelPosToTilePos(position, UI.CurrentMapLayer->ID);
+	Vec2i maxPos = CMap::Map.MapPixelPosToTilePos(position + graphicSize + margin, UI.CurrentMapLayer->ID);
 	//Wyrmgus start
-//	Map.Clamp(minPos);
-//	Map.Clamp(maxPos);
-	Map.Clamp(minPos, z);
-	Map.Clamp(maxPos, z);
+//	CMap::Map.Clamp(minPos);
+//	CMap::Map.Clamp(maxPos);
+	CMap::Map.Clamp(minPos, z);
+	CMap::Map.Clamp(maxPos, z);
 	//Wyrmgus end
 
 	if (!vp.AnyMapAreaVisibleInViewport(minPos, maxPos)) {
@@ -97,8 +95,8 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	for (p.x = minPos.x; p.x <= maxPos.x; ++p.x) {
 		for (p.y = minPos.y; p.y <= maxPos.y; ++p.y) {
 			//Wyrmgus start
-//			if (ReplayRevealMap || Map.Field(p)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			if (ReplayRevealMap || Map.Field(p, z)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+//			if (ReplayRevealMap || CMap::Map.Field(p)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || CMap::Map.Field(p, z)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 			//Wyrmgus end
 				return true;
 			}
@@ -111,5 +109,3 @@ GraphicAnimation *GraphicAnimation::clone()
 {
 	return new GraphicAnimation(g, ticksPerFrame);
 }
-
-//@}

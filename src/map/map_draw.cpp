@@ -10,7 +10,7 @@
 //
 /**@name map_draw.cpp - The map drawing. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 #include "stratagus.h"
 
@@ -109,14 +107,14 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	return Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
+	return CMap::Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
 }
 
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
+	const PixelPos mapPixelPos = relPos + CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
 
 	return mapPixelPos;
 }
@@ -124,7 +122,7 @@ PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
+	const PixelDiff relPos = mapPixelPos - CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -133,7 +131,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
+	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
 
 	return tilePos;
 }
@@ -141,7 +139,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
+	const PixelPos mapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
 
 	return MapToScreenPixelPos(mapPos);
 }
@@ -151,7 +149,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
 
-	return topLeft + Map.GetCurrentPixelTileSize() / 2;
+	return topLeft + CMap::Map.GetCurrentPixelTileSize() / 2;
 }
 
 /**
@@ -170,27 +168,27 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetWidth() : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetHeight() : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetWidth() : CMap::Map.Info.MapWidth) * CMap::Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetHeight() : CMap::Map.Info.MapHeight) * CMap::Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
-	this->MapPos.x = x / Map.GetCurrentPixelTileSize().x;
-	if (x < 0 && x % Map.GetCurrentPixelTileSize().x) {
+	this->MapPos.x = x / CMap::Map.GetCurrentPixelTileSize().x;
+	if (x < 0 && x % CMap::Map.GetCurrentPixelTileSize().x) {
 		this->MapPos.x--;
 	}
-	this->MapPos.y = y / Map.GetCurrentPixelTileSize().y;
-	if (y < 0 && y % Map.GetCurrentPixelTileSize().y) {
+	this->MapPos.y = y / CMap::Map.GetCurrentPixelTileSize().y;
+	if (y < 0 && y % CMap::Map.GetCurrentPixelTileSize().y) {
 		this->MapPos.y--;
 	}
-	this->Offset.x = x % Map.GetCurrentPixelTileSize().x;
+	this->Offset.x = x % CMap::Map.GetCurrentPixelTileSize().x;
 	if (this->Offset.x < 0) {
-		this->Offset.x += Map.GetCurrentPixelTileSize().x;
+		this->Offset.x += CMap::Map.GetCurrentPixelTileSize().x;
 	}
-	this->Offset.y = y % Map.GetCurrentPixelTileSize().y;
+	this->Offset.y = y % CMap::Map.GetCurrentPixelTileSize().y;
 	if (this->Offset.y < 0) {
-		this->Offset.y += Map.GetCurrentPixelTileSize().y;
+		this->Offset.y += CMap::Map.GetCurrentPixelTileSize().y;
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / Map.GetCurrentPixelTileSize().x + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / Map.GetCurrentPixelTileSize().y + 1;
+	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / CMap::Map.GetCurrentPixelTileSize().x + 1;
+	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / CMap::Map.GetCurrentPixelTileSize().y + 1;
 }
 
 /**
@@ -201,7 +199,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer) + offset;
+	const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer) + offset;
 
 	this->Set(mapPixelPos);
 }
@@ -248,11 +246,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int map_max = UI.CurrentMapLayer->GetWidth() * UI.CurrentMapLayer->GetHeight();
-	const CSeason *season = Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
+	const CSeason *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
-		dy += Map.GetCurrentPixelTileSize().y;
+		dy += CMap::Map.GetCurrentPixelTileSize().y;
 	}
 	sy *=  UI.CurrentMapLayer->GetWidth();
 
@@ -262,7 +260,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->GetWidth())) {
 			if (sx - sy < 0) {
 				++sx;
-				dx += Map.GetCurrentPixelTileSize().x;
+				dx += CMap::Map.GetCurrentPixelTileSize().x;
 				continue;
 			}
 			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
@@ -288,12 +286,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.TransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-					if (Map.BorderTerrain->GetGraphics(season)) {
-						Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
+						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
-					if (Map.BorderTerrain->PlayerColorGraphics) {
-						Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				if (mf.OverlayTerrain && mf.OverlayTransitionTiles.size() == 0) {
@@ -312,12 +310,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-					if (Map.BorderTerrain->GetGraphics(season)) {
-						Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
+						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
-					if (Map.BorderTerrain->PlayerColorGraphics) {
-						Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
@@ -335,12 +333,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenTransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && is_unpassable_seen) {
-					if (Map.BorderTerrain->GetGraphics(season)) {
-						Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable_seen) {
+					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
+						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
-					if (Map.BorderTerrain->PlayerColorGraphics) {
-						Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
@@ -359,12 +357,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !is_unpassable_seen) {
-					if (Map.BorderTerrain->GetGraphics(season)) {
-						Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable_seen) {
+					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
+						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
-					if (Map.BorderTerrain->PlayerColorGraphics) {
-						Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
@@ -375,10 +373,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus end
 			++sx;
-			dx += Map.GetCurrentPixelTileSize().x;
+			dx += CMap::Map.GetCurrentPixelTileSize().x;
 		}
 		sy += UI.CurrentMapLayer->GetWidth();
-		dy += Map.GetCurrentPixelTileSize().y;
+		dy += CMap::Map.GetCurrentPixelTileSize().y;
 	}
 }
 
@@ -634,5 +632,3 @@ void CViewport::DrawBorder() const
 	const PixelSize pixelSize = this->GetPixelSize();
 	Video.DrawRectangle(color, this->TopLeftPos.x, this->TopLeftPos.y, pixelSize.x + 1, pixelSize.y + 1);
 }
-
-//@}

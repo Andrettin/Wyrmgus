@@ -10,7 +10,7 @@
 //
 /**@name map_wall.cpp - The map wall handling. */
 //
-//      (c) Copyright 1999-2015 by Vladi Shabanski and Andrettin
+//      (c) Copyright 1999-2020 by Vladi Shabanski and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,16 +27,14 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-
 #include "stratagus.h"
+
 #include "map/map.h"
+
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "ui/ui.h"
@@ -44,6 +42,8 @@
 #include "settings.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+
+#include <cstdio>
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -106,7 +106,7 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 	for (int i = 0; i != 4; ++i) {
 		const Vec2i newpos = pos + offsets[i];
 
-		if (!Map.Info.IsPointOnMap(newpos)) {
+		if (!CMap::Map.Info.IsPointOnMap(newpos)) {
 			dirFlag |= 1 << i;
 		} else {
 			const CMapField &mf = *Map.Field(newpos);
@@ -323,5 +323,3 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
 		//Wyrmgus end
 	}
 }
-
-//@}

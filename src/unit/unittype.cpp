@@ -10,7 +10,7 @@
 //
 /**@name unittype.cpp - The unit type source file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1309,7 +1309,7 @@ Vec2i CUnitType::GetHalfTileSize() const
 
 PixelSize CUnitType::GetTilePixelSize(const int map_layer) const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * Map.GetMapLayerPixelTileSize(map_layer));
+	return PixelSize(PixelSize(this->GetTileSize()) * CMap::Map.GetMapLayerPixelTileSize(map_layer));
 }
 
 Vec2i CUnitType::GetTileCenterPosOffset() const
@@ -2480,10 +2480,10 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
-//	pos.y -= (type.Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
-	pos.x -= (sprite->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
+//	pos.x -= (type.Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+//	pos.y -= (type.Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.TileSize.x * CMap::Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.TileSize.y * CMap::Map.GetCurrentPixelTileSize().y) / 2;
 	//Wyrmgus end
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;

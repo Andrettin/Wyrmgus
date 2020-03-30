@@ -10,7 +10,7 @@
 //
 /**@name script_player.cpp - The player ccl functions. */
 //
-//      (c) Copyright 2001-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2001-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1535,7 +1535,7 @@ static int CclDefineLanguageWord(lua_State *l)
 		} else if (!strcmp(value, "Mod")) {
 			word->Mod = LuaToString(l, -1);
 		} else if (!strcmp(value, "MapWord")) { //to keep backwards compatibility
-			word->Mod = Map.Info.Filename;
+			word->Mod = CMap::Map.Info.Filename;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

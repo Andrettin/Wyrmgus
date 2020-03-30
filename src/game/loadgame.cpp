@@ -158,8 +158,8 @@ void CleanModules()
 	CleanButtons();
 	CButtonLevel::ClearButtonLevels();
 	CleanMissileTypes();
-	Map.Clean();
-	Map.CleanFogOfWar();
+	CMap::Map.Clean();
+	CMap::Map.CleanFogOfWar();
 	CTerrainType::ClearTerrainTypes();
 	CTimeOfDay::ClearTimesOfDay();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
@@ -208,7 +208,7 @@ void InitModules()
 
 	InitAiModule();
 
-	Map.Init();
+	CMap::Map.Init();
 }
 
 /**

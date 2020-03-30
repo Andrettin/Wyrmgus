@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -110,14 +108,14 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 */
 void MapMarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
-	Assert(Map.Field(index, z)->playerInfo.Radar[player.Index] != 255);
-	Map.Field(index, z)->playerInfo.Radar[player.Index]++;
+	Assert(CMap::Map.Field(index, z)->playerInfo.Radar[player.Index] != 255);
+	CMap::Map.Field(index, z)->playerInfo.Radar[player.Index]++;
 }
 
 void MapMarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(Map.Info.IsPointOnMap(x, y, z));
-	MapMarkTileRadar(player, Map.getIndex(x, y, z), z);
+	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
+	MapMarkTileRadar(player, CMap::Map.getIndex(x, y, z), z);
 }
 
 
@@ -132,8 +130,8 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
 	// Reduce radar coverage if it exists.
 	//Wyrmgus start
-//	unsigned char *v = &(Map.Field(index)->playerInfo.Radar[player.Index]);
-	unsigned char *v = &(Map.Field(index, z)->playerInfo.Radar[player.Index]);
+//	unsigned char *v = &(CMap::Map.Field(index)->playerInfo.Radar[player.Index]);
+	unsigned char *v = &(CMap::Map.Field(index, z)->playerInfo.Radar[player.Index]);
 	//Wyrmgus end
 	if (*v) {
 		--*v;
@@ -142,8 +140,8 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 
 void MapUnmarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(Map.Info.IsPointOnMap(x, y, z));
-	MapUnmarkTileRadar(player, Map.getIndex(x, y, z), z);
+	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
+	MapUnmarkTileRadar(player, CMap::Map.getIndex(x, y, z), z);
 }
 
 
@@ -160,17 +158,17 @@ void MapMarkTileRadarJammer(const CPlayer &player, const unsigned int index, int
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	Assert(Map.Field(index)->playerInfo.RadarJammer[player.Index] != 255);
-//	Map.Field(index)->playerInfo.RadarJammer[player.Index]++;
-	Assert(Map.Field(index, z)->playerInfo.RadarJammer[player.Index] != 255);
-	Map.Field(index, z)->playerInfo.RadarJammer[player.Index]++;
+//	Assert(CMap::Map.Field(index)->playerInfo.RadarJammer[player.Index] != 255);
+//	CMap::Map.Field(index)->playerInfo.RadarJammer[player.Index]++;
+	Assert(CMap::Map.Field(index, z)->playerInfo.RadarJammer[player.Index] != 255);
+	CMap::Map.Field(index, z)->playerInfo.RadarJammer[player.Index]++;
 	//Wyrmgus end
 }
 
 void MapMarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(Map.Info.IsPointOnMap(x, y, z));
-	MapMarkTileRadarJammer(player, Map.getIndex(x, y, z), z);
+	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
+	MapMarkTileRadarJammer(player, CMap::Map.getIndex(x, y, z), z);
 }
 
 /**
@@ -187,8 +185,8 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 {
 	// Reduce radar coverage if it exists.
 	//Wyrmgus start
-//	unsigned char *v = &(Map.Field(index)->playerInfo.RadarJammer[player.Index]);
-	unsigned char *v = &(Map.Field(index, z)->playerInfo.RadarJammer[player.Index]);
+//	unsigned char *v = &(CMap::Map.Field(index)->playerInfo.RadarJammer[player.Index]);
+	unsigned char *v = &(CMap::Map.Field(index, z)->playerInfo.RadarJammer[player.Index]);
 	//Wyrmgus end
 	if (*v) {
 		--*v;
@@ -197,8 +195,8 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 
 void MapUnmarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(Map.Info.IsPointOnMap(x, y, z));
-	MapUnmarkTileRadarJammer(player, Map.getIndex(x, y, z), z);
+	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
+	MapUnmarkTileRadarJammer(player, CMap::Map.getIndex(x, y, z), z);
 }
 
 void MapMarkTileOwnership(const CPlayer &player, const unsigned int index, int z)
@@ -207,8 +205,8 @@ void MapMarkTileOwnership(const CPlayer &player, const unsigned int index, int z
 
 void MapMarkTileOwnership(const CPlayer &player, int x, int y, int z)
 {
-	Assert(Map.Info.IsPointOnMap(x, y, z));
-	MapMarkTileOwnership(player, Map.getIndex(x, y, z), z);
+	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
+	MapMarkTileOwnership(player, CMap::Map.getIndex(x, y, z), z);
 }
 
 void MapUnmarkTileOwnership(const CPlayer &player, const unsigned int index, int z)
@@ -217,6 +215,6 @@ void MapUnmarkTileOwnership(const CPlayer &player, const unsigned int index, int
 
 void MapUnmarkTileOwnership(const CPlayer &player, int x, int y, int z)
 {
-	Assert(Map.Info.IsPointOnMap(x, y, z));
-	MapUnmarkTileOwnership(player, Map.getIndex(x, y, z), z);
+	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
+	MapUnmarkTileOwnership(player, CMap::Map.getIndex(x, y, z), z);
 }

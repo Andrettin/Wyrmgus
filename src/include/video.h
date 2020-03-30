@@ -10,8 +10,8 @@
 //
 /**@name video.h - The video headerfile. */
 //
-//      (c) Copyright 1999-2011 by Lutz Sammer, Nehal Mistry, Jimmy Salmon and
-//                                 Pali Rohár
+//      (c) Copyright 1999-2020 by Lutz Sammer, Nehal Mistry, Jimmy Salmon,
+//                                 Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,10 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __VIDEO_H__
-#define __VIDEO_H__
-
-//@{
+#pragma once
 
 #include "SDL.h"
 
@@ -684,7 +681,3 @@ extern void RestoreColorCyclingSurface();
 
 /// Does ColorCycling..
 extern void ColorCycle();
-
-//@}
-
-#endif // !__VIDEO_H__

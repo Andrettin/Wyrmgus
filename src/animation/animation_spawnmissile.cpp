@@ -10,7 +10,7 @@
 //
 /**@name animation_spawnmissile.cpp - The animation SpawnMissile. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -71,11 +69,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
-		start.y = goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
+		start.x = goal->tilePos.x * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
+		start.y = goal->tilePos.y * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
-		start.y = (goal->tilePos.y + starty) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
+		start.x = (goal->tilePos.x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
+		start.y = (goal->tilePos.y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -90,24 +88,24 @@
 				return;
 			} else if (goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::AttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
 			} else if (goal->CurrentAction() == UnitAction::SpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
 				dest.y += desty;
 			} else {
-				dest.x += destx * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-				dest.y += desty * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+				dest.x += destx * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
+				dest.y += desty * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
 			}
 		} else if (flags & SM_Pixel) {
 			dest.x = target->GetMapPixelPosCenter().x + destx;
 			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
-			dest.y = (target->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
+			dest.x = (target->tilePos.x + destx) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
+			dest.y = (target->tilePos.y + desty) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
 			dest += target->GetTilePixelSize() / 2;
 		}
 	} else {
@@ -115,12 +113,12 @@
 			dest.x = goal->GetMapPixelPosCenter().x + destx;
 			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-			dest.y = (goal->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+			dest.x = (goal->tilePos.x + destx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
+			dest.y = (goal->tilePos.y + desty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
 			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
-	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest, unit.MapLayer->ID);
+	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest, unit.MapLayer->ID);
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)
@@ -179,5 +177,3 @@
 	end = std::min(len, str.find(' ', begin));
 	this->offsetNumStr.assign(str, begin, end - begin);
 }
-
-//@}

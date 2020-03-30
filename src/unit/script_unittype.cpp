@@ -10,7 +10,7 @@
 //
 /**@name script_unittype.cpp - The unit-type ccl functions. */
 //
-//      (c) Copyright 1999-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -3537,9 +3537,9 @@ void UpdateUnitVariables(CUnit &unit)
 	// Target Position
 	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
-	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
+	unit.Variable[TARGETPOSX_INDEX].Max = CMap::Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
-	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
+	unit.Variable[TARGETPOSY_INDEX].Max = CMap::Map.Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
 
 	// RadarRange
 	unit.Variable[RADAR_INDEX].Value = unit.Stats->Variables[RADAR_INDEX].Value;

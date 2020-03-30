@@ -10,7 +10,7 @@
 //
 /**@name action_unload.cpp - The unload action. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				*res = pos;
 				return true;
@@ -199,7 +199,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addx; i--; ++pos.x) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				*res = pos;
 				return true;
@@ -210,7 +210,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addy; i--; --pos.y) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				*res = pos;
 				return true;
@@ -221,7 +221,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addx; i--; --pos.x) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				*res = pos;
 				return true;

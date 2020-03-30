@@ -10,7 +10,7 @@
 //
 /**@name action_repair.cpp - The repair action. */
 //
-//      (c) Copyright 1999-2019 by Vladi Shabanski, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2020 by Vladi Shabanski, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@
 /* static */ COrder *COrder::NewActionRepair(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	COrder_Repair *order = new COrder_Repair;
 
@@ -322,7 +322,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {

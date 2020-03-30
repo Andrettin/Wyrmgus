@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2019 by Lutz Sammer, Jimmy Salmon and
+//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and
 //		Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -199,9 +197,9 @@ static EditorSliderListener *editorSliderListener;
 static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 	
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = *CMap::Map.Tileset;
 	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
@@ -267,8 +265,8 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
 
 	//Wyrmgus start
-//	Map.FixSelectionArea(minPos, maxPos);
-	Map.FixSelectionArea(minPos, maxPos, UI.CurrentMapLayer->ID);
+//	CMap::Map.FixSelectionArea(minPos, maxPos);
+	CMap::Map.FixSelectionArea(minPos, maxPos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -279,7 +277,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
 			//Wyrmgus start
-			if (Map.GetTileTopTerrain(itPos, false, UI.CurrentMapLayer->ID) == terrain) {
+			if (CMap::Map.GetTileTopTerrain(itPos, false, UI.CurrentMapLayer->ID) == terrain) {
 				continue;
 			}
 //			EditTile(itPos, tile);
@@ -292,10 +290,10 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, UI.CurrentMapLayer->ID);
+		CTerrainType *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, UI.CurrentMapLayer->ID);
 		
-		Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
-		Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
+		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
+		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
 
 		bool has_transitions = terrain->Overlay ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
@@ -305,10 +303,10 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
-						if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 									
-							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
+							CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
 							if (tile_terrain->Overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
@@ -329,7 +327,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 							if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
 								continue;
 							}
-							if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+							if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 								EditTile(adjacent_pos, terrain);
 								changed_tiles.push_back(adjacent_pos);
 							}
@@ -351,21 +349,21 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						continue;
 					}
 					
-					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
-							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
-							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
+							CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+							if (!adjacent_terrain || adjacent_terrain == CMap::Map.GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
 								continue;
 							}
-							Map.CalculateTileTransitions(adjacent_pos, overlay == 1, UI.CurrentMapLayer->ID);
+							CMap::Map.CalculateTileTransitions(adjacent_pos, overlay == 1, UI.CurrentMapLayer->ID);
 							bool has_transitions = overlay ? (UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(adjacent_pos)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
-							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) == adjacent_terrain->BorderTerrains.end()) {
+							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), CMap::Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) == adjacent_terrain->BorderTerrains.end()) {
 								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
 									CTerrainType *border_terrain = adjacent_terrain->BorderTerrains[j];
-									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
-										Map.SetTileTerrain(adjacent_pos, border_terrain, UI.CurrentMapLayer->ID);
+									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), CMap::Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
+										CMap::Map.SetTileTerrain(adjacent_pos, border_terrain, UI.CurrentMapLayer->ID);
 										changed_tiles.push_back(adjacent_pos);
 										break;
 									}
@@ -375,8 +373,8 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
-											if (Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
-												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+											if (CMap::Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
+												CTerrainType *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
@@ -391,9 +389,9 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									
 								if (!solid_tile && !has_transitions) {
 									if (overlay) {
-										Map.RemoveTileOverlayTerrain(adjacent_pos, UI.CurrentMapLayer->ID);
+										CMap::Map.RemoveTileOverlayTerrain(adjacent_pos, UI.CurrentMapLayer->ID);
 									} else {
-										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID);
+										CMap::Map.SetTileTerrain(adjacent_pos, CMap::Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID);
 									}
 									changed_tiles.push_back(adjacent_pos);
 								}
@@ -406,8 +404,8 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	}
 	
 	for (size_t i = 0; i != changed_tiles.size(); ++i) {
-		Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
-		Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
+		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
+		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
 		UI.Minimap.UpdateXY(changed_tiles[i], UI.CurrentMapLayer->ID);
 		
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -419,9 +417,9 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						continue;
 					}
 					
-					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-						Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
-						Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+						CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
+						CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 						UI.Minimap.UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
 					}
 				}
@@ -481,7 +479,7 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 */
 static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
 {
-	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	if (type.Neutral) {
 		player = &Players[PlayerNumNeutral];
@@ -752,13 +750,13 @@ static void DrawPlayers()
 		//Wyrmgus end
 			y += 20;
 		}
-		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
+		if (i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 		}
 		Video.DrawRectangle(
-			i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
+			i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
-		if (Map.Info.PlayerType[i] != PlayerNobody) {
+		if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
 		if (i == Editor.SelectedPlayer) {
@@ -786,7 +784,7 @@ static void DrawPlayers()
 		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
-		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
+		switch (CMap::Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
 				strcat_s(buf, sizeof(buf), "Neutral");
 				break;
@@ -937,21 +935,21 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	Video.DrawVLine(color, x + 3, y + 3, Map.GetCurrentPixelTileSize().y + 3);
 	Video.DrawVLine(color, x + 4, y + 3, Map.GetCurrentPixelTileSize().y + 3);
 	*/
-	Video.DrawVLine(ColorGray, x + Map.GetCurrentPixelTileSize().x + 4 - 1, y + 5 - 1, Map.GetCurrentPixelTileSize().y - 1 - 1); // _|
-	Video.DrawVLine(ColorGray, x + Map.GetCurrentPixelTileSize().x + 5 - 1, y + 5 - 1, Map.GetCurrentPixelTileSize().y - 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + Map.GetCurrentPixelTileSize().y + 4 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + Map.GetCurrentPixelTileSize().y + 5 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawVLine(ColorGray, x + CMap::Map.GetCurrentPixelTileSize().x + 4 - 1, y + 5 - 1, CMap::Map.GetCurrentPixelTileSize().y - 1 - 1); // _|
+	Video.DrawVLine(ColorGray, x + CMap::Map.GetCurrentPixelTileSize().x + 5 - 1, y + 5 - 1, CMap::Map.GetCurrentPixelTileSize().y - 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + CMap::Map.GetCurrentPixelTileSize().y + 4 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + CMap::Map.GetCurrentPixelTileSize().y + 5 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
 
 	Uint32 color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
-	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
-	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, Map.GetCurrentPixelTileSize().y + 3 - 1);
-	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, Map.GetCurrentPixelTileSize().y + 3 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, CMap::Map.GetCurrentPixelTileSize().y + 3 - 1);
+	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, CMap::Map.GetCurrentPixelTileSize().y + 3 - 1);
 	
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, Map.GetCurrentPixelTileSize().x + 7, Map.GetCurrentPixelTileSize().y + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, Map.GetCurrentPixelTileSize().x + 5, Map.GetCurrentPixelTileSize().y + 5);
+	Video.DrawRectangleClip(color, x, y, CMap::Map.GetCurrentPixelTileSize().x + 7, CMap::Map.GetCurrentPixelTileSize().y + 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, CMap::Map.GetCurrentPixelTileSize().x + 5, CMap::Map.GetCurrentPixelTileSize().y + 5);
 	//Wyrmgus end
 
 	if (flags & IconClicked) {
@@ -970,7 +968,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
-		Video.DrawRectangleClip(ColorGreen, x, y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
+		Video.DrawRectangleClip(ColorGreen, x, y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
 	}
 }
 
@@ -1060,7 +1058,7 @@ static void DrawTileIcons()
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24;
-	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - Map.GetCurrentPixelTileSize().y) {
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - CMap::Map.GetCurrentPixelTileSize().y) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
@@ -1068,7 +1066,7 @@ static void DrawTileIcons()
 //		x = UI.ButtonPanel.X + 10;
 		x = UI.ButtonPanel.X + 10 + 6;
 		//Wyrmgus end
-		while (x < UI.ButtonPanel.X + ButtonPanelWidth - Map.GetCurrentPixelTileSize().x) {
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - CMap::Map.GetCurrentPixelTileSize().x) {
 			if (i >= (int) Editor.ShownTileTypes.size()) {
 				break;
 			}
@@ -1083,28 +1081,28 @@ static void DrawTileIcons()
 				terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
 			}
 			//Wyrmgus end
-			Video.DrawRectangleClip(ColorGray, x, y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
+			Video.DrawRectangleClip(ColorGray, x, y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
 
 			if (i == Editor.SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-										Map.GetCurrentPixelTileSize().x - 2, Map.GetCurrentPixelTileSize().y - 2);
+					CMap::Map.GetCurrentPixelTileSize().x - 2, CMap::Map.GetCurrentPixelTileSize().y - 2);
 			}
 			if (i == Editor.CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-										Map.GetCurrentPixelTileSize().x + 2, Map.GetCurrentPixelTileSize().y + 2);
+					CMap::Map.GetCurrentPixelTileSize().x + 2, CMap::Map.GetCurrentPixelTileSize().y + 2);
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
 
 			//Wyrmgus start
-//			x += Map.GetCurrentPixelTileSize().x + 8;
-			x += Map.GetCurrentPixelTileSize().x + 30; // to allow 5 tile types per row with the new UI
+//			x += CMap::Map.GetCurrentPixelTileSize().x + 8;
+			x += CMap::Map.GetCurrentPixelTileSize().x + 30; // to allow 5 tile types per row with the new UI
 			//Wyrmgus end
 			++i;
 		}
 		//Wyrmgus start
-//		y += Map.GetCurrentPixelTileSize().y + 2;
-		y += Map.GetCurrentPixelTileSize().y + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
+//		y += CMap::Map.GetCurrentPixelTileSize().y + 2;
+		y += CMap::Map.GetCurrentPixelTileSize().y + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
 		//Wyrmgus end
 	}
 }
@@ -1298,12 +1296,12 @@ static void DrawMapCursor()
 
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
-				screenPosIt.y = screenPos.y + j * Map.GetCurrentPixelTileSize().y;
+				screenPosIt.y = screenPos.y + j * CMap::Map.GetCurrentPixelTileSize().y;
 				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
-					screenPosIt.x = screenPos.x + i * Map.GetCurrentPixelTileSize().x;
+					screenPosIt.x = screenPos.x + i * CMap::Map.GetCurrentPixelTileSize().x;
 					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
@@ -1316,7 +1314,7 @@ static void DrawMapCursor()
 					//Wyrmgus end
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.GetCurrentPixelTileSize().x * TileCursorSize, Map.GetCurrentPixelTileSize().y * TileCursorSize);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, CMap::Map.GetCurrentPixelTileSize().x * TileCursorSize, CMap::Map.GetCurrentPixelTileSize().y * TileCursorSize);
 			PopClipping();
 		} else {
 			// If there is an unit under the cursor, it's selection thing
@@ -1324,7 +1322,7 @@ static void DrawMapCursor()
 			if (UnitUnderCursor != nullptr) {
 				PushClipping();
 				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
+				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
 				PopClipping();
 			}
 		}
@@ -1353,13 +1351,13 @@ static void DrawStartLocations()
 		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
-			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
+			if (CMap::Map.Info.PlayerType[i] != PlayerNobody && CMap::Map.Info.PlayerType[i] != PlayerNeutral && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, Map.GetCurrentPixelTileSize(), Players[i].Color);
+					DrawCross(startScreenPos, CMap::Map.GetCurrentPixelTileSize(), Players[i].Color);
 				}
 			}
 		}
@@ -1412,7 +1410,7 @@ static void DrawEditorInfo()
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);
 
 	// Tile info
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = *CMap::Map.Tileset;
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 //	Assert(index != -1);
@@ -1631,7 +1629,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
-			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
+			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
 		}
 		return;
 	}
@@ -1695,7 +1693,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (Editor.CursorPlayer != -1) {
-			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
+			if (CMap::Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
 				Editor.SelectedPlayer = Editor.CursorPlayer;
 				ThisPlayer = Players + Editor.SelectedPlayer;
 			}
@@ -1920,7 +1918,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
 		case '9':
-			if (UnitUnderCursor != nullptr && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
+			if (UnitUnderCursor != nullptr && CMap::Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
@@ -2024,7 +2022,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			by += 20;
 		}
 		if (bx < screenPos.x && screenPos.x < bx + 20 && by < screenPos.y && screenPos.y < by + 20) {
-			if (Map.Info.PlayerType[i] != PlayerNobody) {
+			if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
 				char buf[256];
 				//Wyrmgus start
 //				snprintf(buf, sizeof(buf), _("Select player #%d"), i);
@@ -2125,7 +2123,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 
 	int i = Editor.TileIndex;
 	by = UI.ButtonPanel.Y + 24;
-	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - Map.GetCurrentPixelTileSize().y) {
+	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - CMap::Map.GetCurrentPixelTileSize().y) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
@@ -2133,12 +2131,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 //		bx = UI.ButtonPanel.X + 10;
 		bx = UI.ButtonPanel.X + 10 + 6;
 		//Wyrmgus end
-		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - Map.GetCurrentPixelTileSize().x) {
+		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - CMap::Map.GetCurrentPixelTileSize().x) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
 				break;
 			}
-			if (bx < screenPos.x && screenPos.x < bx + Map.GetCurrentPixelTileSize().x
-				&& by < screenPos.y && screenPos.y < by + Map.GetCurrentPixelTileSize().y) {
+			if (bx < screenPos.x && screenPos.x < bx + CMap::Map.GetCurrentPixelTileSize().x
+				&& by < screenPos.y && screenPos.y < by + CMap::Map.GetCurrentPixelTileSize().y) {
 				//Wyrmgus start
 //				const int tile = Editor.ShownTileTypes[i];
 //				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
@@ -2150,14 +2148,14 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				return true;
 			}
 			//Wyrmgus start
-//			bx += Map.GetCurrentPixelTileSize().x + 8;
-			bx += Map.GetCurrentPixelTileSize().x + 30;
+//			bx += CMap::Map.GetCurrentPixelTileSize().x + 8;
+			bx += CMap::Map.GetCurrentPixelTileSize().x + 30;
 			//Wyrmgus end
 			i++;
 		}
 		//Wyrmgus start
-//		by += Map.GetCurrentPixelTileSize().y + 2;
-		by += Map.GetCurrentPixelTileSize().y + 18;
+//		by += CMap::Map.GetCurrentPixelTileSize().y + 2;
+		by += CMap::Map.GetCurrentPixelTileSize().y + 18;
 		//Wyrmgus end
 	}
 	return false;
@@ -2207,7 +2205,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			}
 		}
 		UI.MouseWarpPos = CursorStartScreenPos;
-		UI.MouseViewport->Set(tilePos, Map.GetCurrentPixelTileSize() / 2);
+		UI.MouseViewport->Set(tilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
 		return;
 	}
 
@@ -2226,18 +2224,18 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
-			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
 		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
-			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
 		}
 
 		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
-			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
 		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
-			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
 		}
 
 		// Scroll the map, if cursor moves outside the viewport.
@@ -2263,7 +2261,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToMinimap();
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
 		return;
 	}
 
@@ -2335,10 +2333,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 //		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
 //			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + Map.GetCurrentPixelTileSize().x + 7
 		if (UI.InfoPanel.X + 11 + TILE_ICON_X < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + Map.GetCurrentPixelTileSize().x + 7
+			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + CMap::Map.GetCurrentPixelTileSize().x + 7
 		//Wyrmgus end
 			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorScreenPos.y
-			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + Map.GetCurrentPixelTileSize().y + 7) {
+			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + CMap::Map.GetCurrentPixelTileSize().y + 7) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = cursor_on::button;
@@ -2347,10 +2345,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		}
 	}
 
-	int StartUnitWidth = Editor.StartUnit ?
-						 Editor.StartUnit->Icon.Icon->G->Width : Map.GetCurrentPixelTileSize().x + 7;
-	int StartUnitHeight = Editor.StartUnit ?
-						  Editor.StartUnit->Icon.Icon->G->Height : Map.GetCurrentPixelTileSize().y + 7;
+	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Width : CMap::Map.GetCurrentPixelTileSize().x + 7;
+	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Height : CMap::Map.GetCurrentPixelTileSize().y + 7;
 	//Wyrmgus start
 //	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
 //		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
@@ -2456,7 +2452,7 @@ void CEditor::Init()
 	ThisPlayer = &Players[0];
 
 	FlagRevealMap = 1; // editor without fog and all visible
-	Map.NoFogOfWar = true;
+	CMap::Map.NoFogOfWar = true;
 
 	//Wyrmgus start
 //	if (!*CurrentMapPath) { // new map!
@@ -2470,42 +2466,42 @@ void CEditor::Init()
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
-				Map.Info.PlayerType[i] = PlayerNeutral;
+				CMap::Map.Info.PlayerType[i] = PlayerNeutral;
 				//Wyrmgus start
-//				Map.Info.PlayerSide[i] = Players[i].Race = 0;
+//				CMap::Map.Info.PlayerSide[i] = Players[i].Race = 0;
 				Players[i].SetCivilization(0);
-				Map.Info.PlayerSide[i] = Players[i].Race;
+				CMap::Map.Info.PlayerSide[i] = Players[i].Race;
 				//Wyrmgus end
 			} else {
 				CreatePlayer(PlayerNobody);
-				Map.Info.PlayerType[i] = PlayerNobody;
+				CMap::Map.Info.PlayerType[i] = PlayerNobody;
 			}
 		}
 
 		//Wyrmgus start
 //		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
-		Map.ClearMapLayers();
-		CMapLayer *map_layer = new CMapLayer(Map.Info.MapWidth, Map.Info.MapHeight);
-		map_layer->ID = Map.MapLayers.size();
-		Map.MapLayers.push_back(map_layer);
-		Map.Info.MapWidths.clear();
-		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
-		Map.Info.MapHeights.clear();
-		Map.Info.MapHeights.push_back(Map.Info.MapHeight);
+		CMap::Map.ClearMapLayers();
+		CMapLayer *map_layer = new CMapLayer(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+		map_layer->ID = CMap::Map.MapLayers.size();
+		CMap::Map.MapLayers.push_back(map_layer);
+		CMap::Map.Info.MapWidths.clear();
+		CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
+		CMap::Map.Info.MapHeights.clear();
+		CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
 		//Wyrmgus end
 
-		const int defaultTile = Map.Tileset->getDefaultTileIndex();
+		const int defaultTile = CMap::Map.Tileset->getDefaultTileIndex();
 		//Wyrmgus start
-		const CTileset &tileset = *Map.Tileset;
+		const CTileset &tileset = *CMap::Map.Tileset;
 		//Wyrmgus end
 
 		//Wyrmgus start
-		for (CMapLayer *map_layer : Map.MapLayers) {
+		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
 			int max_tile_index = map_layer->GetWidth() * map_layer->GetHeight();
 			for (int i = 0; i < max_tile_index; ++i) {
 				//Wyrmgus start
 	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-				map_layer->Field(i)->setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
+				map_layer->Field(i)->setTileIndex(*CMap::Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
 				//Wyrmgus end
 			}
 		}
@@ -2517,10 +2513,10 @@ void CEditor::Init()
 	//Wyrmgus start
 	}
 	if (!*CurrentMapPath) {
-		CreateGame("", &Map, IsMod);
+		CreateGame("", &CMap::Map, IsMod);
 	//Wyrmgus end
 	} else {
-		CreateGame(CurrentMapPath, &Map, IsMod);
+		CreateGame(CurrentMapPath, &CMap::Map, IsMod);
 	}
 
 	ReplayRevealMap = 1;
@@ -2529,7 +2525,7 @@ void CEditor::Init()
 
 	// Place the start points, which the loader discarded.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] != PlayerNobody) {
+		if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
 			if (Editor.SelectedPlayer == PlayerNumNeutral) {
 				Editor.SelectedPlayer = i;
@@ -2560,7 +2556,7 @@ void CEditor::Init()
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (size_t i = 0; i < CTerrainType::TerrainTypes.size(); ++i) {
-		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelTileSize == Map.GetCurrentPixelTileSize()) {
+		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
 			Editor.ShownTileTypes.push_back(CTerrainType::TerrainTypes[i]);
 		}
 	}
@@ -2635,8 +2631,8 @@ int EditorSaveMap(const std::string &file, bool is_mod)
 		}
 	}
 	
-//	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
-	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable && !is_mod, is_mod) == -1) {
+//	if (SaveStratagusMap(fullName, CMap::Map, Editor.TerrainEditable) == -1) {
+	if (SaveStratagusMap(fullName, CMap::Map, Editor.TerrainEditable && !is_mod, is_mod) == -1) {
 	//Wyrmgus end
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
@@ -2827,5 +2823,3 @@ void StartEditor(const char *filename, bool is_mod)
 
 	SetDefaultTextColors(nc, rc);
 }
-
-//@}

@@ -10,7 +10,7 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi,
 //		Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -418,9 +416,9 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 */
 static char CalculateStereo(const CUnit &unit)
 {
-	int stereo = ((unit.tilePos.x * Map.GetCurrentPixelTileSize().x + unit.Type->TileSize.x * Map.GetCurrentPixelTileSize().x / 2 +
-				   unit.IX - UI.SelectedViewport->MapPos.x * Map.GetCurrentPixelTileSize().x) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * Map.GetCurrentPixelTileSize().x)) - 128;
+	int stereo = ((unit.tilePos.x * CMap::Map.GetCurrentPixelTileSize().x + unit.Type->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 2 +
+				   unit.IX - UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
 	clamp(&stereo, -128, 127);
 	return stereo;
 }
@@ -525,8 +523,8 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 		return;
 	}
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
-				   UI.SelectedViewport->MapPos.x * Map.GetCurrentPixelTileSize().x) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * Map.GetCurrentPixelTileSize().x)) - 128;
+				   UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
@@ -776,8 +774,8 @@ void InitSoundClient()
 		GameSounds.ChatMessage.MapSound();
 	}
 
-	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + Map.GetCurrentPixelTileSize().x) / Map.GetCurrentPixelTileSize().x;
-	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + Map.GetCurrentPixelTileSize().y) / Map.GetCurrentPixelTileSize().y;
+	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + CMap::Map.GetCurrentPixelTileSize().x) / CMap::Map.GetCurrentPixelTileSize().x;
+	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + CMap::Map.GetCurrentPixelTileSize().y) / CMap::Map.GetCurrentPixelTileSize().y;
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }
@@ -840,5 +838,3 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 		SetSoundRange(sound, range);
 	}
 }
-
-//@}

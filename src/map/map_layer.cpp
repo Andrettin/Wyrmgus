@@ -10,7 +10,7 @@
 //
 /**@name map_layer.cpp - The map layer source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -161,7 +159,7 @@ void CMapLayer::RegenerateForest()
 */
 void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 {
-	Assert(Map.Info.IsPointOnMap(pos, this->ID));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
 	
 	CMapField &mf = *this->Field(pos);
 
@@ -202,18 +200,18 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
-				Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
-				&& Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
-				&& Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
+				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
+				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
+				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
 				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
 				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
 				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
-				Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
-				Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
-				Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
-				Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
 				
 				return;
 			}
@@ -467,5 +465,3 @@ CSeason *CMapLayer::GetSeason() const
 	
 	return this->Season->Season;
 }
-
-//@}

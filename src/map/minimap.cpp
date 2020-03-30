@@ -10,7 +10,7 @@
 //
 /**@name minimap.cpp - The minimap source file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer and Jimmy Salmon, Pali Rohár and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer and Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -232,19 +230,19 @@ void CMinimap::Create()
 	UpdateTerrain();
 	*/
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	MinimapTexture.resize(Map.MapLayers.size());
-	MinimapTextureWidth.resize(Map.MapLayers.size());
-	MinimapTextureHeight.resize(Map.MapLayers.size());
+	MinimapTexture.resize(CMap::Map.MapLayers.size());
+	MinimapTextureWidth.resize(CMap::Map.MapLayers.size());
+	MinimapTextureHeight.resize(CMap::Map.MapLayers.size());
 #endif
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		// Scale to biggest value.
-		const int n = std::max(std::max(Map.Info.MapWidths[z], Map.Info.MapHeights[z]), 32);
+		const int n = std::max(std::max(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]), 32);
 
 		MinimapScaleX.push_back((W * MINIMAP_FAC + n - 1) / n);
 		MinimapScaleY.push_back((H * MINIMAP_FAC + n - 1) / n);
 
-		XOffset.push_back((W - (Map.Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
-		YOffset.push_back((H - (Map.Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
+		XOffset.push_back((W - (CMap::Map.Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
+		YOffset.push_back((H - (CMap::Map.Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
 
 		DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 				   MinimapScaleX[z] / MINIMAP_FAC _C_ MinimapScaleY[z] / MINIMAP_FAC _C_
@@ -262,16 +260,16 @@ void CMinimap::Create()
 			Minimap2MapX[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
 		}
 		for (int i = YOffset[z]; i < H - YOffset[z]; ++i) {
-			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * Map.Info.MapWidths[z];
+			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::Map.Info.MapWidths[z];
 		}
-		Map2MinimapX.push_back(new int[Map.Info.MapWidths[z]]);
-		memset(Map2MinimapX[z], 0, Map.Info.MapWidths[z] * sizeof(int));
-		Map2MinimapY.push_back(new int[Map.Info.MapHeights[z]]);
-		memset(Map2MinimapY[z], 0, Map.Info.MapHeights[z] * sizeof(int));
-		for (int i = 0; i < Map.Info.MapWidths[z]; ++i) {
+		Map2MinimapX.push_back(new int[CMap::Map.Info.MapWidths[z]]);
+		memset(Map2MinimapX[z], 0, CMap::Map.Info.MapWidths[z] * sizeof(int));
+		Map2MinimapY.push_back(new int[CMap::Map.Info.MapHeights[z]]);
+		memset(Map2MinimapY[z], 0, CMap::Map.Info.MapHeights[z] * sizeof(int));
+		for (int i = 0; i < CMap::Map.Info.MapWidths[z]; ++i) {
 			Map2MinimapX[z][i] = (i * MinimapScaleX[z]) / MINIMAP_FAC;
 		}
-		for (int i = 0; i < Map.Info.MapHeights[z]; ++i) {
+		for (int i = 0; i < CMap::Map.Info.MapHeights[z]; ++i) {
 			Map2MinimapY[z][i] = (i * MinimapScaleY[z]) / MINIMAP_FAC;
 		}
 
@@ -323,7 +321,7 @@ void CMinimap::Reload()
 {
 	//Wyrmgus start
 //	CreateMinimapTexture();
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		CreateMinimapTexture(z);
 	}
 	//Wyrmgus end
@@ -376,7 +374,7 @@ void CMinimap::UpdateTerrain(int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 	
-	const CSeason *season = Map.MapLayers[z]->GetSeason();
+	const CSeason *season = CMap::Map.MapLayers[z]->GetSeason();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -398,7 +396,7 @@ void CMinimap::UpdateTerrain(int z)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		SDL_LockSurface(Map.TileGraphic->Surface);
+		SDL_LockSurface(CMap::Map.TileGraphic->Surface);
 		//Wyrmgus start
 		for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
 			if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
@@ -415,7 +413,7 @@ void CMinimap::UpdateTerrain(int z)
 		//Wyrmgus end
 	}
 
-	const CMapLayer *map_layer = Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -441,19 +439,19 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->Surface->w / Map.GetCurrentPixelTileSize().x;
+			int tilepitch = terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
 			const int bpp = terrain->GetGraphics(season)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / Map.GetCurrentPixelTileSize().x;
+			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
 			//assumes the BPP for the base terrain is the same as for the top terrain (which may be an overlay)
 			//Wyrmgus end
 	
-			const int xofs = Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
-			const int yofs = Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
+			const int xofs = CMap::Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
+			const int yofs = CMap::Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
-			const int base_yofs = Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
+			const int base_xofs = CMap::Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
+			const int base_yofs = CMap::Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -547,7 +545,7 @@ void CMinimap::UpdateTerrain(int z)
 		SDL_UnlockSurface(MinimapTerrainSurface[z]);
 		//Wyrmgus end
 	}
-	SDL_UnlockSurface(Map.TileGraphic->Surface);
+	SDL_UnlockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
 	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
 		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
@@ -604,7 +602,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 
-	const CSeason *season = Map.MapLayers[z]->GetSeason();
+	const CSeason *season = CMap::Map.MapLayers[z]->GetSeason();
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -618,7 +616,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 		SDL_LockSurface(MinimapTerrainSurface[z]);
 		//Wyrmgus end
 	}
-	SDL_LockSurface(Map.TileGraphic->Surface);
+	SDL_LockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
 	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
 		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
@@ -628,8 +626,8 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	const int ty = pos.y * Map.Info.MapWidth;
-	const int ty = pos.y * Map.Info.MapWidths[z];
+//	const int ty = pos.y * CMap::Map.Info.MapWidth;
+	const int ty = pos.y * CMap::Map.Info.MapWidths[z];
 	//Wyrmgus end
 	const int tx = pos.x;
 	//Wyrmgus start
@@ -670,7 +668,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
 			*/
-			const CMapField &mf = *Map.MapLayers[z]->Field(x + y);
+			const CMapField &mf = *CMap::Map.MapLayers[z]->Field(x + y);
 			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
@@ -687,18 +685,18 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->Surface->w / Map.GetCurrentPixelTileSize().x;
+			int tilepitch = terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
 			const int bpp = terrain->GetGraphics(season)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / Map.GetCurrentPixelTileSize().x;
+			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
 			//Wyrmgus end
 	
-			const int xofs = Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
-			const int yofs = Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
+			const int xofs = CMap::Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
+			const int yofs = CMap::Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
-			const int base_yofs = Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
+			const int base_xofs = CMap::Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
+			const int base_yofs = CMap::Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -796,7 +794,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 		SDL_UnlockSurface(MinimapTerrainSurface[z]);
 		//Wyrmgus end
 	}
-	SDL_UnlockSurface(Map.TileGraphic->Surface);
+	SDL_UnlockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
 	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
 		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
@@ -1026,7 +1024,7 @@ void CMinimap::Update()
 //				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 //				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
 				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->GetWidth());
-				visiontype = Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
+				visiontype = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
 				//Wyrmgus end
 			}
 
@@ -1208,8 +1206,8 @@ Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	Map.Clamp(tilePos);
-	Map.Clamp(tilePos, UI.CurrentMapLayer->ID);
+//	CMap::Map.Clamp(tilePos);
+	CMap::Map.Clamp(tilePos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 	return tilePos;
 }
@@ -1365,14 +1363,14 @@ void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 		MinimapEvents[NumMinimapEvents].Color = color;
 		++NumMinimapEvents;
 	} else {
-		CMapLayer *event_map_layer = Map.MapLayers[z];
-		if (event_map_layer->Plane != nullptr && Map.GetCurrentPlane() != event_map_layer->Plane && UI.PlaneButtons[event_map_layer->Plane->ID].X != -1) {
+		CMapLayer *event_map_layer = CMap::Map.MapLayers[z];
+		if (event_map_layer->Plane != nullptr && CMap::Map.GetCurrentPlane() != event_map_layer->Plane && UI.PlaneButtons[event_map_layer->Plane->ID].X != -1) {
 			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[event_map_layer->Plane->ID].X + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Width / 2);
 			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[event_map_layer->Plane->ID].Y + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Height / 2);
-		} else if (event_map_layer->World != nullptr && Map.GetCurrentWorld() != event_map_layer->World && UI.WorldButtons[event_map_layer->World->ID].X != -1) {
+		} else if (event_map_layer->World != nullptr && CMap::Map.GetCurrentWorld() != event_map_layer->World && UI.WorldButtons[event_map_layer->World->ID].X != -1) {
 			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[event_map_layer->World->ID].X + (UI.WorldButtons[event_map_layer->World->ID].Style->Width / 2);
 			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[event_map_layer->World->ID].Y + (UI.WorldButtons[event_map_layer->World->ID].Style->Height / 2);
-		} else if (Map.GetCurrentSurfaceLayer() != event_map_layer->SurfaceLayer && UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].X != -1) {
+		} else if (CMap::Map.GetCurrentSurfaceLayer() != event_map_layer->SurfaceLayer && UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].X != -1) {
 			MinimapEvents[NumMinimapEvents].pos.x = UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].X + (UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].Style->Width / 2);
 			MinimapEvents[NumMinimapEvents].pos.y = UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].Y + (UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].Style->Height / 2);
 		} else {
@@ -1389,5 +1387,3 @@ bool CMinimap::Contains(const PixelPos &screenPos) const
 	return this->X <= screenPos.x && screenPos.x < this->X + this->W
 		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->H;
 }
-
-//@}

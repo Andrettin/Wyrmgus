@@ -10,7 +10,7 @@
 //
 /**@name unit_find.cpp - The find/select for units. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ bool IsBuiltUnit::operator()(const CUnit *unit) const
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
-	CUnitCache &cache = Map.Field(pos, z)->UnitCache;
+	CUnitCache &cache = CMap::Map.Field(pos, z)->UnitCache;
 
 	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
 		CUnit *unit = *it;
@@ -75,7 +75,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
+	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult::DeadEnd;
 	}
 	// Look if found what was required.
@@ -123,12 +123,12 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
+	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult::DeadEnd;
 	}
 	
 	//Wyrmgus start
-	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != player.Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != player.Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
@@ -136,7 +136,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) {
-	if ((!landmass || Map.GetTileLandmass(pos, z) == landmass) && (!resource || Map.Field(pos, z)->GetResource() == resource)) {
+	if ((!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass) && (!resource || CMap::Map.Field(pos, z)->GetResource() == resource)) {
 	//Wyrmgus end
 		if (resPos) {
 			*resPos = pos;
@@ -180,7 +180,7 @@ bool FindTerrainType(int movemask, int resource, int range,
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 	terrainTraversal.Init();
 
 	terrainTraversal.PushPos(startPos);
@@ -837,8 +837,8 @@ static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type, c
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return Map.Field(index)->UnitCache.find(CUnitTypeFinder(type));
-	return Map.Field(index, z)->UnitCache.find(CUnitTypeFinder(type));
+//	return CMap::Map.Field(index)->UnitCache.find(CUnitTypeFinder(type));
+	return CMap::Map.Field(index, z)->UnitCache.find(CUnitTypeFinder(type));
 	//Wyrmgus end
 }
 
@@ -856,8 +856,8 @@ CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return UnitOnMapTile(Map.getIndex(pos), type);
-	return UnitOnMapTile(Map.getIndex(pos, z), type, z);
+//	return UnitOnMapTile(CMap::Map.getIndex(pos), type);
+	return UnitOnMapTile(CMap::Map.getIndex(pos, z), type, z);
 	//Wyrmgus end
 }
 
@@ -914,8 +914,8 @@ CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestabl
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
-	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false, only_same));
+//	return CMap::Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
+	return CMap::Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false, only_same));
 	//Wyrmgus end
 }
 
@@ -945,8 +945,8 @@ CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
-	return Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
+//	return CMap::Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
+	return CMap::Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
 	//Wyrmgus end
 }
 
@@ -1020,7 +1020,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
+		if (CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1266,7 +1266,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {
@@ -1477,12 +1477,12 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 			pos.y += sign.y;
 		}
 
-		if (Map.Info.IsPointOnMap(pos, z) == false) {
+		if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
 //		} else if (Map.Field(pos)->Flags & flags) {
 		} else if (
-			((Map.Field(pos, z)->Flags & flags) || (player != -1 && Map.Field(pos, z)->Owner != player && Map.Field(pos, z)->Owner != -1))
+			((CMap::Map.Field(pos, z)->Flags & flags) || (player != -1 && CMap::Map.Field(pos, z)->Owner != player && CMap::Map.Field(pos, z)->Owner != -1))
 			&& pos != goalPos
 			&& (abs(pos.x - goalPos.x) > max_difference || abs(pos.y - goalPos.y) > max_difference)
 		) { // the goal's tile itself shouldn't be checked for an obstacle

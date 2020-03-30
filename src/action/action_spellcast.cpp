@@ -10,7 +10,7 @@
 //
 /**@name action_spellcast.cpp - The spell cast action. */
 //
-//      (c) Copyright 2000-2019 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      (c) Copyright 2000-2020 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -152,7 +152,7 @@
 	if (this->HasGoal()) {
 		return this->GetGoal()->IsAliveOnMap();
 	} else {
-		return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+		return CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
 	}
 }
 
@@ -189,7 +189,7 @@
 	//Wyrmgus start
 //	input.SetMaxRange(this->Range);
 	int distance = this->Range;
-	if (Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
+	if (CMap::Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
 		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
 			distance = 1;
 		}
@@ -219,7 +219,7 @@
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
-		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, Map.MapLayers[this->MapLayer]);
+		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, CMap::Map.MapLayers[this->MapLayer]);
 	}
 }
 
@@ -335,7 +335,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 	
 	//Wyrmgus start
-	bool obstacle_check = !Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
+	bool obstacle_check = !CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -345,7 +345,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize());
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
@@ -405,7 +405,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
-			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, Map.MapLayers[order.MapLayer])) {
+			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, CMap::Map.MapLayers[order.MapLayer])) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -494,7 +494,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, Map.MapLayers[order.MapLayer]);
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, CMap::Map.MapLayers[order.MapLayer]);
 				}
 			}
 

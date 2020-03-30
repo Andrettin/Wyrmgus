@@ -10,8 +10,8 @@
 //
 /**@name spell_demolish.cpp - The spell demolish. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -108,8 +108,8 @@
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	Map.FixSelectionArea(minpos, maxpos);
-	Map.FixSelectionArea(minpos, maxpos, z);
+//	CMap::Map.FixSelectionArea(minpos, maxpos);
+	CMap::Map.FixSelectionArea(minpos, maxpos, z);
 	//Wyrmgus end
 
 	//
@@ -140,8 +140,8 @@
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 				//Wyrmgus start
-//				const CMapField &mf = *Map.Field(ipos);
-				const CMapField &mf = *Map.Field(ipos, z);
+//				const CMapField &mf = *CMap::Map.Field(ipos);
+				const CMapField &mf = *CMap::Map.Field(ipos, z);
 				//Wyrmgus end
 				//Wyrmgus start
 //				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
@@ -151,8 +151,8 @@
 					continue;
 				} else if (mf.RockOnMap() || mf.ForestOnMap() || mf.isAWall()) {
 					//Wyrmgus start
-//					Map.ClearOverlayTile(ipos);
-					Map.ClearOverlayTile(ipos, z);
+//					CMap::Map.ClearOverlayTile(ipos);
+					CMap::Map.ClearOverlayTile(ipos, z);
 					//Wyrmgus end
 				}
 			}

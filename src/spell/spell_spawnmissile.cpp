@@ -10,7 +10,7 @@
 //
 /**@name spell_spawnmissile.cpp - The spell SpawnMissile. */
 //
-//      (c) Copyright 1998-2018 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 #include "stratagus.h"
 
@@ -250,7 +248,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		if (target) {
 			*res = target->GetMapPixelPosCenter();
 		} else {
-			*res = Map.TilePosToMapPixelPos_Center(goalPos, caster.MapLayer);
+			*res = CMap::Map.TilePosToMapPixelPos_Center(goalPos, caster.MapLayer);
 		}
 	}
 	res->x += location.AddX;
@@ -359,6 +357,3 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 
 	return 1;
 }
-
-
-//@}

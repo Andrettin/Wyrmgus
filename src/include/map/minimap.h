@@ -10,7 +10,7 @@
 //
 /**@name minimap.h - The minimap headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MINIMAP_H__
-#define __MINIMAP_H__
-
-//@{
+#pragma once
 
 #include "color.h"
 #include "vec2i.h"
@@ -122,7 +119,3 @@ extern std::vector<SDL_Surface *> MinimapSurface;
 //extern SDL_Surface *MinimapTerrainSurface;
 extern std::vector<SDL_Surface *> MinimapTerrainSurface;
 //Wyrmgus end
-
-//@}
-
-#endif // !__MINIMAP_H__

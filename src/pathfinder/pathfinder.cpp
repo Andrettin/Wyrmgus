@@ -29,8 +29,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -236,7 +234,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		int temp_i = PF_FAILED;
 		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
 			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
-				if (!Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
+				if (!CMap::Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
 					continue;
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
@@ -335,16 +333,16 @@ void PathFinderInput::SetUnit(CUnit &_unit)
 
 void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	Assert(unit);
 	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
-	if (newPos.x + unit->Type->TileSize.x - 1 >= Map.Info.MapWidths[z]) {
-		newPos.x = Map.Info.MapWidths[z] - unit->Type->TileSize.x;
+	if (newPos.x + unit->Type->TileSize.x - 1 >= CMap::Map.Info.MapWidths[z]) {
+		newPos.x = CMap::Map.Info.MapWidths[z] - unit->Type->TileSize.x;
 	}
-	if (newPos.y + unit->Type->TileSize.y - 1 >= Map.Info.MapHeights[z]) {
-		newPos.y = Map.Info.MapHeights[z] - unit->Type->TileSize.y;
+	if (newPos.y + unit->Type->TileSize.y - 1 >= CMap::Map.Info.MapHeights[z]) {
+		newPos.y = CMap::Map.Info.MapHeights[z] - unit->Type->TileSize.y;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
@@ -504,5 +502,3 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	}
 	return result;
 }
-
-//@}
