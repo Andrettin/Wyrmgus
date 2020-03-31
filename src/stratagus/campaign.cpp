@@ -241,6 +241,21 @@ std::string CCampaign::GetSpecies() const
 	return std::string();
 }
 
+bool CCampaign::IsAvailable() const
+{
+	if (this->IsHidden()) {
+		return false;
+	}
+
+	for (CQuest *quest : this->RequiredQuests) {
+		if (!quest->IsCompleted()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 /**
 **	@brief	Set the current campaign
 **

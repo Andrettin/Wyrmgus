@@ -33,10 +33,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-#include <tuple>
-
 #include "icons.h"
+
+#include <tuple>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -96,6 +96,11 @@ class CQuest
 public:
 	~CQuest();
 	
+	bool IsCompleted() const
+	{
+		return this->Completed;
+	}
+
 	std::string Ident;				/// Ident of the quest
 	std::string Name;				/// Name of the quest
 	std::string Description;		/// Description of the quest

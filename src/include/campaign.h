@@ -85,6 +85,13 @@ public:
 
 	std::string GetSpecies() const;
 
+	bool IsHidden() const
+	{
+		return this->Hidden;
+	}
+
+	bool IsAvailable() const;
+
 private:
 	std::string Name;				/// Name of the campaign
 	std::string Description;		/// Description of the campaign
