@@ -10,7 +10,7 @@
 //
 /**@name character.cpp - The character source file. */
 //
-//      (c) Copyright 2015-2019 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -1317,4 +1315,3 @@ bool IsMinisterialTitle(int title)
 {
 	return (title == CharacterTitleHeadOfState || title == CharacterTitleHeadOfGovernment || title == CharacterTitleEducationMinister || title == CharacterTitleFinanceMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleInteriorMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleWarMinister);
 }
-//@}

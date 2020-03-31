@@ -10,7 +10,7 @@
 //
 /**@name script_character.cpp - The character ccl functions. */
 //
-//      (c) Copyright 2015-2019 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -160,8 +158,8 @@ static int CclDefineCharacter(lua_State *l)
 			std::string father_ident = LuaToString(l, -1);
 			CCharacter *father = CCharacter::GetCharacter(father_ident);
 			if (father) {
-				if (father->Gender == MaleGender) {
-					character->Father = const_cast<CCharacter *>(&(*father));
+				if (father->Gender == MaleGender || !father->Initialized) {
+					character->Father = father;
 					if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(character);
 					}
@@ -186,8 +184,8 @@ static int CclDefineCharacter(lua_State *l)
 			std::string mother_ident = LuaToString(l, -1);
 			CCharacter *mother = CCharacter::GetCharacter(mother_ident);
 			if (mother) {
-				if (mother->Gender == FemaleGender) {
-					character->Mother = const_cast<CCharacter *>(&(*mother));
+				if (mother->Gender == FemaleGender || !mother->Initialized) {
+					character->Mother = mother;
 					if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(character);
 					}
@@ -1201,5 +1199,3 @@ void CharacterCclRegister()
 	lua_register(Lua, "GetGrandStrategyHeroes", CclGetGrandStrategyHeroes);
 	lua_register(Lua, "Character", CclCharacter);
 }
-
-//@}
