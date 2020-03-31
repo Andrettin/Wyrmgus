@@ -10,7 +10,7 @@
 //
 /**@name plane.h - The plane header file. */
 //
-//      (c) Copyright 2016-2019 by Andrettin
+//      (c) Copyright 2016-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PLANE_H__
-#define __PLANE_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,33 +52,24 @@ class CTimeOfDaySchedule;
 class CPlane : public CDataType
 {
 public:
-	CPlane() :
-		ID(-1), TimeOfDaySchedule(nullptr), SeasonSchedule(nullptr)
-	{
-	}
-	
 	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
 	static CPlane *GetOrAddPlane(const std::string &ident);
 	static void ClearPlanes();
 	
-	static std::vector<CPlane *> Planes;								/// Planes
+	static std::vector<CPlane *> Planes; //planes
 	static std::map<std::string, CPlane *> PlanesByIdent;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	int ID;																/// ID of this plane
+	int ID = -1; //ID of this plane
 	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	CTimeOfDaySchedule *TimeOfDaySchedule;								/// this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule;									/// this plane's season schedule
-	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// Schools of magic empowered in this plane
-	std::vector<CSpecies *> Species;									/// Species in this plane
+	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
+	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
+	std::vector<CDeityDomain *> EmpoweredDeityDomains; ///deity domains empowered in this plane
+	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic; ///schools of magic empowered in this plane
+	std::vector<CSpecies *> Species; ///species in this plane
 };
-
-//@}
-
-#endif // !__PLANE_H__

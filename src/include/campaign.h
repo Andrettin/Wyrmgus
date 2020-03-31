@@ -83,6 +83,8 @@ public:
 		return this->Faction;
 	}
 
+	std::string GetSpecies() const;
+
 private:
 	std::string Name;				/// Name of the campaign
 	std::string Description;		/// Description of the campaign
