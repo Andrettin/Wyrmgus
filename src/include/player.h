@@ -33,12 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
-
-//Wyrmgus start
-#include <map>
-#include <tuple>
-
 //Wyrmgus start
 #include "character.h" // because of "MaxCharacterTitles"
 #include "color.h"
@@ -55,17 +49,25 @@
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
+//Wyrmgus start
+#include <map>
+//Wyrmgus end
+#include <string>
+//Wyrmgus start
+#include <tuple>
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define STORE_OVERALL 0
-#define STORE_BUILDING 1
-#define STORE_BOTH 2
+static constexpr int STORE_OVERALL = 0;
+static constexpr int STORE_BUILDING = 1;
+static constexpr int STORE_BOTH = 2;
 
-#define SPEEDUP_FACTOR 100
+static constexpr int SPEEDUP_FACTOR = 100;
 
-#define DefaultTradeCost 30
+static constexpr int DefaultTradeCost = 30;
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -118,6 +120,9 @@ class CPlayer
 public:
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();
+	static CPlayer *GetPlayer(const int index);
+
+	static std::vector<CPlayer *> Players;	//all players
 
 private:
 	static CPlayer *ThisPlayer; //player on local computer
@@ -236,6 +241,7 @@ public:
 	void SetName(const std::string &name);
 	
 	//Wyrmgus start
+	const CCivilization *GetCivilization() const;
 	void SetCivilization(int civilization);
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
@@ -903,7 +909,6 @@ enum NotifyType {
 ----------------------------------------------------------------------------*/
 
 extern int NumPlayers; //how many player slots used
-extern CPlayer Players[PlayerMax]; //all players
 extern bool NoRescueCheck; //disable rescue check
 //Wyrmgus start
 //extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors

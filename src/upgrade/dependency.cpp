@@ -755,7 +755,7 @@ static int CclCheckDependency(lua_State *l)
 	if (plynr == -1) {
 		LuaError(l, "bad player: %i" _C_ plynr);
 	}
-	const CPlayer *player = &Players[plynr];
+	const CPlayer *player = CPlayer::Players[plynr];
 	
 	if (!strncmp(object, "unit-", 5)) {
 		const CUnitType *unit_type = UnitTypeByIdent(object);

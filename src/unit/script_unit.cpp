@@ -318,7 +318,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "seen-type")) {
 			seentype = UnitTypeByIdent(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "player")) {
-			player = &Players[LuaToNumber(l, 2, j + 1)];
+			player = CPlayer::Players[LuaToNumber(l, 2, j + 1)];
 
 			// During a unit's death animation (when action is "die" but the
 			// unit still has its original type, i.e. it's still not a corpse)
@@ -511,7 +511,7 @@ static int CclUnit(lua_State *l)
 			unit->MineLow = 1;
 			--j;
 		} else if (!strcmp(value, "rescued-from")) {
-			unit->RescuedFrom = &Players[LuaToNumber(l, 2, j + 1)];
+			unit->RescuedFrom = CPlayer::Players[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "seen-by-player")) {
 			const char *s = LuaToString(l, 2, j + 1);
 			unit->Seen.ByPlayer = 0;
@@ -870,12 +870,12 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (Players[playerno].Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
 	}
-	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno]);
 	if (unit == nullptr) {
 		fprintf(stderr, "CreateUnit: Unable to allocate unit.\n");
 		DebugPrint("Unable to allocate unit");
@@ -945,12 +945,12 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (Players[playerno].Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
 	}
-	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno]);
 	if (unit == nullptr || !CanTransport(*transporter, *unit)) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
@@ -1019,12 +1019,12 @@ static int CclCreateUnitOnTop(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (Players[playerno].Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
 	}
-	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno]);
 	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
@@ -1074,7 +1074,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (Players[playerno].Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
@@ -1083,10 +1083,10 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer->ID);
 	
 	if (!CMap::Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
-		new_pos = Players[playerno].StartPos;
+		new_pos = CPlayer::Players[playerno]->StartPos;
 	}
 	
-	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno]);
 	
 	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
@@ -1347,7 +1347,7 @@ static int CclKillUnit(lua_State *l)
 			return 1;
 		}
 	} else {
-		CPlayer &player = Players[plynr];
+		CPlayer &player = *CPlayer::Players[plynr];
 		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), HasSameUnitTypeAs(unittype));
 
 		if (it != player.UnitEnd()) {
@@ -1446,7 +1446,7 @@ static int CclChangeUnitOwner(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const int value = LuaToNumber(l, 2);
-	unit->ChangeOwner(Players[value], true);
+	unit->ChangeOwner(*CPlayer::Players[value], true);
 
 	return 0;
 }
@@ -1545,8 +1545,8 @@ static int CclGetUnits(lua_State *l)
 			lua_rawseti(l, -2, i + 1);
 		}
 	} else {
-		for (int i = 0; i < Players[plynr].GetUnitCount(); ++i) {
-			lua_pushnumber(l, UnitNumber(Players[plynr].GetUnit(i)));
+		for (int i = 0; i < CPlayer::Players[plynr]->GetUnitCount(); ++i) {
+			lua_pushnumber(l, UnitNumber(CPlayer::Players[plynr]->GetUnit(i)));
 			lua_rawseti(l, -2, i + 1);
 		}
 	}
@@ -1578,7 +1578,7 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 	std::vector<CUnit *> table;
 	if (allUnits) {
 		//Wyrmgus start
-//		SelectAroundUnit(unit, range, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+//		SelectAroundUnit(unit, range, table, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		SelectAroundUnit(unit, range, table);
 		//Wyrmgus end
 	} else {
@@ -1614,7 +1614,7 @@ static int CclGetPlayersAroundUnit(lua_State *l)
 	const int range = LuaToNumber(l, 2);
 	lua_newtable(l);
 	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, range, table, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasNotSamePlayerAs(*unit.Player)));
+	SelectAroundUnit(unit, range, table, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasNotSamePlayerAs(*unit.Player)));
 	std::vector<int> players_around;
 	for (size_t i = 0; i < table.size(); ++i) {
 		if (table[i]->IsAliveOnMap() && std::find(players_around.begin(), players_around.end(), table[i]->Player->Index) == players_around.end()) {
@@ -1923,7 +1923,7 @@ static int CclSetUnitVariable(lua_State *l)
 	//Wyrmgus end
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
-		unit->AssignToPlayer(Players[value]);
+		unit->AssignToPlayer(*CPlayer::Players[value]);
 	//Wyrmgus start
 	} else if (!strcmp(name, "Name")) {
 		unit->Name = LuaToString(l, 3);
@@ -2045,7 +2045,7 @@ static int CclSetUnitVariable(lua_State *l)
 		bool always_magic = false;
 		if (nargs >= 3) {
 			int dropper_player_index = LuaToNumber(l, 3);
-			dropper_player = &Players[dropper_player_index];
+			dropper_player = CPlayer::Players[dropper_player_index];
 		}
 		if (nargs >= 4) {
 			always_magic = LuaToBoolean(l, 4);

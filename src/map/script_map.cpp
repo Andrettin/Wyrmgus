@@ -390,12 +390,12 @@ static int CclSetStartView(lua_State *l)
 	//Wyrmgus end
 
 	const int p = LuaToNumber(l, 1);
-	Players[p].StartPos.x = LuaToNumber(l, 2);
-	Players[p].StartPos.y = LuaToNumber(l, 3);
+	CPlayer::Players[p]->StartPos.x = LuaToNumber(l, 2);
+	CPlayer::Players[p]->StartPos.y = LuaToNumber(l, 3);
 	
 	//Wyrmgus start
 	if (nargs >= 4) {
-		Players[p].StartMapLayer = LuaToNumber(l, 4);
+		CPlayer::Players[p]->StartMapLayer = LuaToNumber(l, 4);
 	}
 	//Wyrmgus end
 

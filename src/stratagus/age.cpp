@@ -230,8 +230,8 @@ void CAge::CheckCurrentAge()
 	CAge *best_age = CAge::CurrentAge;
 	
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Age && (!best_age || Players[p].Age->Priority > best_age->Priority)) {
-			best_age = Players[p].Age;
+		if (CPlayer::Players[p]->Age && (!best_age || CPlayer::Players[p]->Age->Priority > best_age->Priority)) {
+			best_age = CPlayer::Players[p]->Age;
 		}
 	}
 	

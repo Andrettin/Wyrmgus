@@ -73,7 +73,7 @@
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	Players[player].SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].GetUnitStock(&type) != 0);
+	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].GetUnitStock(&type) != 0);
 	//Wyrmgus end
 
 	return order;
@@ -128,7 +128,7 @@
 	DebugPrint("Cancel training\n");
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
-	CPlayer &player = *(&Players[this->Player]);
+	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -154,7 +154,7 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 {
 	//Wyrmgus start
 //	const CPlayer &player = *unit.Player;
-	const CPlayer &player = *(&Players[this->Player]);
+	const CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
 	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
@@ -243,7 +243,7 @@ static void AnimateActionTrain(CUnit &unit)
 	//Wyrmgus end
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
-	CPlayer &player = *(&Players[this->Player]);
+	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
@@ -377,13 +377,13 @@ static void AnimateActionTrain(CUnit &unit)
 		
 		//Wyrmgus start
 //		CUnit *newUnit = MakeUnit(nType, &player);
-		CUnit *newUnit = MakeUnit(nType, &Players[owner_player]);
+		CUnit *newUnit = MakeUnit(nType, CPlayer::Players[owner_player]);
 		//Wyrmgus end
 
 		if (newUnit == nullptr) { // No more memory :/
 			//Wyrmgus start
 	//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
+			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return ;
@@ -411,7 +411,7 @@ static void AnimateActionTrain(CUnit &unit)
 		DropOutOnSide(*newUnit, LookingW, &unit);
 
 		//Wyrmgus start
-		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && Players[this->Player].HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
+		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
 			unit.Player->ChangeResource(CopperCost, newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
@@ -492,5 +492,4 @@ static void AnimateActionTrain(CUnit &unit)
 	if (IsOnlySelected(unit)) {
 		UI.ButtonPanel.Update();
 	}
-
 }

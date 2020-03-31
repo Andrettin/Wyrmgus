@@ -10,7 +10,7 @@
 //
 /**@name civilization.cpp - The civilization source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -258,5 +256,3 @@ std::vector<std::string> &CCivilization::GetShipNames()
 	
 	return this->ShipNames;
 }
-
-//@}

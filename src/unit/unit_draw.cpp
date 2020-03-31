@@ -176,7 +176,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					color = Players[i].Color;
+					color = CPlayer::Players[i]->Color;
 				}
 			}
 		}
@@ -726,7 +726,7 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos)
 {
 	if (!sprite) {
 		return;

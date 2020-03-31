@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -54,35 +52,35 @@
 int GetPlayerData(const int player, const char *prop, const char *arg)
 {
 	if (!strcmp(prop, "RaceName")) {
-		return Players[player].Race;
+		return CPlayer::Players[player]->Race;
 	} else if (!strcmp(prop, "Resources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].Resources[resId] + Players[player].StoredResources[resId];
+		return CPlayer::Players[player]->Resources[resId] + CPlayer::Players[player]->StoredResources[resId];
 	} else if (!strcmp(prop, "StoredResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].StoredResources[resId];
+		return CPlayer::Players[player]->StoredResources[resId];
 	} else if (!strcmp(prop, "MaxResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].MaxResources[resId];
+		return CPlayer::Players[player]->MaxResources[resId];
 	} else if (!strcmp(prop, "Incomes")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].Incomes[resId];
+		return CPlayer::Players[player]->Incomes[resId];
 	//Wyrmgus start
 	} else if (!strcmp(prop, "Prices")) {
 		const int resId = GetResourceIdByName(arg);
@@ -90,97 +88,97 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].GetResourcePrice(resId);
+		return CPlayer::Players[player]->GetResourcePrice(resId);
 	} else if (!strcmp(prop, "ResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].ResourceDemand[resId];
+		return CPlayer::Players[player]->ResourceDemand[resId];
 	} else if (!strcmp(prop, "StoredResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].StoredResourceDemand[resId];
+		return CPlayer::Players[player]->StoredResourceDemand[resId];
 	} else if (!strcmp(prop, "EffectiveResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].GetEffectiveResourceDemand(resId);
+		return CPlayer::Players[player]->GetEffectiveResourceDemand(resId);
 	} else if (!strcmp(prop, "EffectiveResourceBuyPrice")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].GetEffectiveResourceBuyPrice(resId);
+		return CPlayer::Players[player]->GetEffectiveResourceBuyPrice(resId);
 	} else if (!strcmp(prop, "EffectiveResourceSellPrice")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].GetEffectiveResourceSellPrice(resId);
+		return CPlayer::Players[player]->GetEffectiveResourceSellPrice(resId);
 	} else if (!strcmp(prop, "TradeCost")) {
-		return Players[player].TradeCost;
+		return CPlayer::Players[player]->TradeCost;
 	//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);
 		CUnitType *type = UnitTypeByIdent(unit);
 		Assert(type);
-		return Players[player].GetUnitTypeCount(type);
+		return CPlayer::Players[player]->GetUnitTypeCount(type);
 	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
 		const std::string unit(arg);
 		CUnitType *type = UnitTypeByIdent(unit);
 		Assert(type);
-		return Players[player].GetUnitTypeUnderConstructionCount(type);
+		return CPlayer::Players[player]->GetUnitTypeUnderConstructionCount(type);
 	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
 		const std::string unit(arg);
 		CUnitType *type = UnitTypeByIdent(unit);
 		Assert(type);
-		return Players[player].GetUnitTypeAiActiveCount(type);
+		return CPlayer::Players[player]->GetUnitTypeAiActiveCount(type);
 	} else if (!strcmp(prop, "AiEnabled")) {
-		return Players[player].AiEnabled;
+		return CPlayer::Players[player]->AiEnabled;
 	} else if (!strcmp(prop, "TotalNumUnits")) {
-		return Players[player].GetUnitCount();
+		return CPlayer::Players[player]->GetUnitCount();
 	} else if (!strcmp(prop, "NumBuildings")) {
-		return Players[player].NumBuildings;
+		return CPlayer::Players[player]->NumBuildings;
 	//Wyrmgus start
 	} else if (!strcmp(prop, "NumBuildingsUnderConstruction")) {
-		return Players[player].NumBuildingsUnderConstruction;
+		return CPlayer::Players[player]->NumBuildingsUnderConstruction;
 	//Wyrmgus end
 	} else if (!strcmp(prop, "Supply")) {
-		return Players[player].Supply;
+		return CPlayer::Players[player]->Supply;
 	} else if (!strcmp(prop, "Demand")) {
-		return Players[player].Demand;
+		return CPlayer::Players[player]->Demand;
 	} else if (!strcmp(prop, "UnitLimit")) {
-		return Players[player].UnitLimit;
+		return CPlayer::Players[player]->UnitLimit;
 	} else if (!strcmp(prop, "BuildingLimit")) {
-		return Players[player].BuildingLimit;
+		return CPlayer::Players[player]->BuildingLimit;
 	} else if (!strcmp(prop, "TotalUnitLimit")) {
-		return Players[player].TotalUnitLimit;
+		return CPlayer::Players[player]->TotalUnitLimit;
 	} else if (!strcmp(prop, "Score")) {
-		return Players[player].Score;
+		return CPlayer::Players[player]->Score;
 	} else if (!strcmp(prop, "TotalUnits")) {
-		return Players[player].TotalUnits;
+		return CPlayer::Players[player]->TotalUnits;
 	} else if (!strcmp(prop, "TotalBuildings")) {
-		return Players[player].TotalBuildings;
+		return CPlayer::Players[player]->TotalBuildings;
 	} else if (!strcmp(prop, "TotalResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].TotalResources[resId];
+		return CPlayer::Players[player]->TotalResources[resId];
 	} else if (!strcmp(prop, "TotalRazings")) {
-		return Players[player].TotalRazings;
+		return CPlayer::Players[player]->TotalRazings;
 	} else if (!strcmp(prop, "TotalKills")) {
-		return Players[player].TotalKills;
+		return CPlayer::Players[player]->TotalKills;
 	} else {
 		fprintf(stderr, "Invalid field: %s" _C_ prop);
 		Exit(1);
@@ -195,8 +193,8 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 {
 	if (!strcmp(prop, "RaceName")) {
 		//Wyrmgus start
-//		Players[player].Race = value;
-		Players[player].SetCivilization(value);
+//		CPlayer::Players[player]->Race = value;
+		CPlayer::Players[player]->SetCivilization(value);
 		//Wyrmgus end
 	} else if (!strcmp(prop, "Resources")) {
 		const int resId = GetResourceIdByName(arg);
@@ -204,37 +202,37 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		Players[player].SetResource(resId, value, STORE_BOTH);
+		CPlayer::Players[player]->SetResource(resId, value, STORE_BOTH);
 	} else if (!strcmp(prop, "StoredResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		Players[player].SetResource(resId, value, STORE_BUILDING);
+		CPlayer::Players[player]->SetResource(resId, value, STORE_BUILDING);
 	} else if (!strcmp(prop, "UnitLimit")) {
-		Players[player].UnitLimit = value;
+		CPlayer::Players[player]->UnitLimit = value;
 	} else if (!strcmp(prop, "BuildingLimit")) {
-		Players[player].BuildingLimit = value;
+		CPlayer::Players[player]->BuildingLimit = value;
 	} else if (!strcmp(prop, "TotalUnitLimit")) {
-		Players[player].TotalUnitLimit = value;
+		CPlayer::Players[player]->TotalUnitLimit = value;
 	} else if (!strcmp(prop, "Score")) {
-		Players[player].Score = value;
+		CPlayer::Players[player]->Score = value;
 	} else if (!strcmp(prop, "TotalUnits")) {
-		Players[player].TotalUnits = value;
+		CPlayer::Players[player]->TotalUnits = value;
 	} else if (!strcmp(prop, "TotalBuildings")) {
-		Players[player].TotalBuildings = value;
+		CPlayer::Players[player]->TotalBuildings = value;
 	} else if (!strcmp(prop, "TotalResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		Players[player].TotalResources[resId] = value;
+		CPlayer::Players[player]->TotalResources[resId] = value;
 	} else if (!strcmp(prop, "TotalRazings")) {
-		Players[player].TotalRazings = value;
+		CPlayer::Players[player]->TotalRazings = value;
 	} else if (!strcmp(prop, "TotalKills")) {
-		Players[player].TotalKills = value;
+		CPlayer::Players[player]->TotalKills = value;
 	} else {
 		fprintf(stderr, "Invalid field: %s" _C_ prop);
 		Exit(1);
@@ -346,5 +344,3 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 	end = std::min(len, str.find(' ', begin));
 	this->argStr.assign(str, begin, end - begin);
 }
-
-//@}

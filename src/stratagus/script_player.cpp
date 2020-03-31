@@ -90,7 +90,7 @@ extern CUnit *CclGetUnitFromRef(lua_State *l);
 */
 static CPlayer *CclGetPlayer(lua_State *l)
 {
-	return &Players[LuaToNumber(l, -1)];
+	return CPlayer::Players[LuaToNumber(l, -1)];
 }
 
 /**
@@ -102,7 +102,7 @@ static int CclPlayer(lua_State *l)
 {
 	int i = LuaToNumber(l, 1);
 
-	CPlayer &player = Players[i];
+	CPlayer &player = *CPlayer::Players[i];
 	player.Index = i;
 
 	if (NumPlayers <= i) {
@@ -203,7 +203,7 @@ void CPlayer::Load(lua_State *l)
 			this->StartMapLayer = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "overlord")) {
 			int overlord_id = LuaToNumber(l, j + 1);
-			this->SetOverlord(&Players[overlord_id]);
+			this->SetOverlord(CPlayer::Players[overlord_id]);
 		//Wyrmgus end
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
@@ -594,11 +594,11 @@ static int CclChangeUnitsOwner(lua_State *l)
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
-//	Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
-	Select(pos1, pos2, table, 0, HasSamePlayerAs(Players[oldp]));
+//	Select(pos1, pos2, table, HasSamePlayerAs(*CPlayer::Players[oldp]));
+	Select(pos1, pos2, table, 0, HasSamePlayerAs(*CPlayer::Players[oldp]));
 	//Wyrmgus end
 	for (size_t i = 0; i != table.size(); ++i) {
-		table[i]->ChangeOwner(Players[newp]);
+		table[i]->ChangeOwner(*CPlayer::Players[newp]);
 	}
 	return 0;
 }
@@ -612,7 +612,7 @@ static int CclGetThisPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	if (CPlayer::GetThisPlayer()) {
-		lua_pushnumber(l, CPlayer::GetThisPlayer() - Players);
+		lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
 	} else {
 		lua_pushnumber(l, 0);
 	}
@@ -629,7 +629,7 @@ static int CclSetThisPlayer(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int plynr = LuaToNumber(l, 1);
 
-	CPlayer::SetThisPlayer(&Players[plynr]);
+	CPlayer::SetThisPlayer(CPlayer::Players[plynr]);
 	
 	//Wyrmgus start
 	UI.Load();
@@ -662,7 +662,7 @@ static int CclSetAllPlayersUnitLimit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].UnitLimit = LuaToNumber(l, 1);
+		CPlayer::Players[i]->UnitLimit = LuaToNumber(l, 1);
 	}
 
 	lua_pushnumber(l, lua_tonumber(l, 1));
@@ -678,7 +678,7 @@ static int CclSetAllPlayersBuildingLimit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].BuildingLimit = LuaToNumber(l, 1);
+		CPlayer::Players[i]->BuildingLimit = LuaToNumber(l, 1);
 	}
 
 	lua_pushnumber(l, lua_tonumber(l, 1));
@@ -694,7 +694,7 @@ static int CclSetAllPlayersTotalUnitLimit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].TotalUnitLimit = LuaToNumber(l, 1);
+		CPlayer::Players[i]->TotalUnitLimit = LuaToNumber(l, 1);
 	}
 
 	lua_pushnumber(l, lua_tonumber(l, 1));
@@ -807,6 +807,8 @@ static int CclDefineCivilization(lua_State *l)
 			civilization->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Adjective")) {
 			civilization->Adjective = LuaToString(l, -1);
+		} else if (!strcmp(value, "Interface")) {
+			civilization->Interface = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -1085,6 +1087,10 @@ static int CclDefineCivilization(lua_State *l)
 	if (civilization->ParentCivilization) {
 		const CCivilization *parent_civilization = civilization->ParentCivilization;
 		int parent_civilization_id = parent_civilization->ID;
+
+		if (civilization->Interface.empty()) {
+			civilization->Interface = parent_civilization->Interface;
+		}
 
 		if (PlayerRaces.CivilizationUpgrades[civilization_id].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization_id].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
 			PlayerRaces.CivilizationUpgrades[civilization_id] = PlayerRaces.CivilizationUpgrades[parent_civilization_id];
@@ -1593,6 +1599,9 @@ static int CclGetCivilizationData(lua_State *l)
 		} else {
 			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		}
+		return 1;
+	} else if (!strcmp(data, "Interface")) {
+		lua_pushstring(l, civilization->Interface.c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);
@@ -3126,14 +3135,14 @@ static int CclGetPlayerData(lua_State *l)
 		
 		int other_player = LuaToNumber(l, 3);;
 
-		lua_pushnumber(l, p->GetTotalPriceDifferenceWith(Players[other_player]));
+		lua_pushnumber(l, p->GetTotalPriceDifferenceWith(*CPlayer::Players[other_player]));
 		return 1;
 	} else if (!strcmp(data, "TradePotentialWith")) {
 		LuaCheckArgs(l, 3);
 		
 		int other_player = LuaToNumber(l, 3);;
 
-		lua_pushnumber(l, p->GetTradePotentialWith(Players[other_player]));
+		lua_pushnumber(l, p->GetTradePotentialWith(*CPlayer::Players[other_player]));
 		return 1;
 	} else if (!strcmp(data, "HasHero")) {
 		LuaCheckArgs(l, 3);
@@ -3275,17 +3284,17 @@ static int CclGetPlayerData(lua_State *l)
 		const char *ident = LuaToString(l, 3);
 		if (!strncmp(ident, "unit-", 5)) {
 			int id = UnitTypeIdByIdent(ident);
-			if (UnitIdAllowed(Players[p->Index], id) > 0) {
+			if (UnitIdAllowed(*CPlayer::Players[p->Index], id) > 0) {
 				lua_pushstring(l, "A");
-			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {
+			} else if (UnitIdAllowed(*CPlayer::Players[p->Index], id) == 0) {
 				lua_pushstring(l, "F");
 			}
 		} else if (!strncmp(ident, "upgrade-", 8)) {
-			if (UpgradeIdentAllowed(Players[p->Index], ident) == 'A') {
+			if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'A') {
 				lua_pushstring(l, "A");
-			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'R') {
+			} else if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'R') {
 				lua_pushstring(l, "R");
-			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'F') {
+			} else if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'F') {
 				lua_pushstring(l, "F");
 			}
 		} else {
@@ -3296,7 +3305,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "HasContactWith")) {
 		LuaCheckArgs(l, 3);
 		int second_player = LuaToNumber(l, 3);
-		lua_pushboolean(l, p->HasContactWith(Players[second_player]));
+		lua_pushboolean(l, p->HasContactWith(*CPlayer::Players[second_player]));
 		return 1;
 	} else if (!strcmp(data, "HasQuest")) {
 		LuaCheckArgs(l, 3);

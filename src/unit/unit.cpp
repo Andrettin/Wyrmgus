@@ -1029,7 +1029,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
-		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral], this->MapLayer->ID);
+		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		if (this->Character->Items[i]->Prefix != nullptr) {
 			item->SetPrefix(this->Character->Items[i]->Prefix);
 		}
@@ -1797,7 +1797,7 @@ void CUnit::ApplyAura(int aura_index)
 	}
 	
 	table.clear();
-	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(Players[PlayerNumNeutral])), true);
+	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])), true);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;
@@ -2088,7 +2088,7 @@ void CUnit::GenerateDrop()
 {
 	bool base_based_mission = false;
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].NumTownHalls > 0 || Players[p].LostTownHallTimer) {
+		if (CPlayer::Players[p]->NumTownHalls > 0 || CPlayer::Players[p]->LostTownHallTimer) {
 			base_based_mission = true;
 		}
 	}
@@ -2131,9 +2131,9 @@ void CUnit::GenerateDrop()
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->MapLayer->Field(drop_pos)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
-			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer->ID);
+			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		} else {
-			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer->ID);
+			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		}
 			
 		if (droppedUnit != nullptr) {
@@ -2403,12 +2403,12 @@ void CUnit::UpdateSoldUnits()
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
 			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->Type, &Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
 			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, &Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
 			if (new_unit->Unique && this->Player == CPlayer::GetThisPlayer()) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
@@ -2431,15 +2431,15 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
 	DropOutOnSide(*sold_unit, sold_unit->Direction, this);
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
-		sold_unit->ChangeOwner(Players[player]);
+		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
-	Players[player].ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
-	if (Players[player].AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
-		Players[player].Ai->Force.RemoveDeadUnit();
-		Players[player].Ai->Force.Assign(*sold_unit, -1, true);
+	CPlayer::Players[player]->ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
+	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
+		CPlayer::Players[player]->Ai->Force.RemoveDeadUnit();
+		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
 	}
 	if (sold_unit->Character) {
-		Players[player].HeroCooldownTimer = HeroCooldownCycles;
+		CPlayer::Players[player]->HeroCooldownTimer = HeroCooldownCycles;
 		sold_unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	}
 	if (IsOnlySelected(*this)) {
@@ -2488,12 +2488,12 @@ void CUnit::ProduceResource(const int resource)
 */
 void CUnit::SellResource(const int resource, const int player)
 {
-	if ((Players[player].Resources[resource] + Players[player].StoredResources[resource]) < 100) {
+	if ((CPlayer::Players[player]->Resources[resource] + CPlayer::Players[player]->StoredResources[resource]) < 100) {
 		return;
 	}
 
-	Players[player].ChangeResource(resource, -100, true);
-	Players[player].ChangeResource(CopperCost, this->Player->GetEffectiveResourceSellPrice(resource), true);
+	CPlayer::Players[player]->ChangeResource(resource, -100, true);
+	CPlayer::Players[player]->ChangeResource(CopperCost, this->Player->GetEffectiveResourceSellPrice(resource), true);
 	
 	this->Player->DecreaseResourcePrice(resource);
 }
@@ -2505,12 +2505,12 @@ void CUnit::SellResource(const int resource, const int player)
 */
 void CUnit::BuyResource(const int resource, const int player)
 {
-	if ((Players[player].Resources[CopperCost] + Players[player].StoredResources[CopperCost]) < this->Player->GetEffectiveResourceBuyPrice(resource)) {
+	if ((CPlayer::Players[player]->Resources[CopperCost] + CPlayer::Players[player]->StoredResources[CopperCost]) < this->Player->GetEffectiveResourceBuyPrice(resource)) {
 		return;
 	}
 
-	Players[player].ChangeResource(resource, 100, true);
-	Players[player].ChangeResource(CopperCost, -this->Player->GetEffectiveResourceBuyPrice(resource), true);
+	CPlayer::Players[player]->ChangeResource(resource, 100, true);
+	CPlayer::Players[player]->ChangeResource(CopperCost, -this->Player->GetEffectiveResourceBuyPrice(resource), true);
 	
 	this->Player->IncreaseResourcePrice(resource);
 }
@@ -3418,11 +3418,11 @@ void CUnit::UpdateBuildingSettlementAssignment(CSite *old_settlement)
 	}
 		
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (!Players[p].HasNeutralFactionType() && this->Player->Index != Players[p].Index) {
+		if (!CPlayer::Players[p]->HasNeutralFactionType() && this->Player->Index != CPlayer::Players[p]->Index) {
 			continue;
 		}
-		for (int i = 0; i < Players[p].GetUnitCount(); ++i) {
-			CUnit *settlement_unit = &Players[p].GetUnit(i);
+		for (int i = 0; i < CPlayer::Players[p]->GetUnitCount(); ++i) {
+			CUnit *settlement_unit = &CPlayer::Players[p]->GetUnit(i);
 			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->Type == SettlementSiteUnitType || this->MapLayer != settlement_unit->MapLayer) {
 				continue;
 			}
@@ -3684,7 +3684,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 
 CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique)
 {
-	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral], z, true);
+	CUnit *unit = CreateUnit(pos, type, CPlayer::Players[PlayerNumNeutral], z, true);
 	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
 			
 	// create metal rocks near metal resources
@@ -3703,7 +3703,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileSize - 1) / 2);
 		for (int i = 0; i < 9; ++i) {
-			CUnit *metal_rock_unit = CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, &Players[PlayerNumNeutral], z);
+			CUnit *metal_rock_unit = CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
 	}
 			
@@ -3976,10 +3976,10 @@ void UnitLost(CUnit &unit)
 			if (lost_town_hall && CPlayer::GetThisPlayer()->HasContactWith(player)) {
 				player.LostTownHallTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 				for (int j = 0; j < NumPlayers; ++j) {
-					if (player.Index != j && Players[j].Type != PlayerNobody) {
-						Players[j].Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.Name.c_str());
+					if (player.Index != j && CPlayer::Players[j]->Type != PlayerNobody) {
+						CPlayer::Players[j]->Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.Name.c_str());
 					} else {
-						Players[j].Notify("%s", _("You have lost your last town hall, and will be revealed in thirty seconds!"));
+						CPlayer::Players[j]->Notify("%s", _("You have lost your last town hall, and will be revealed in thirty seconds!"));
 					}
 				}
 			}
@@ -4002,7 +4002,7 @@ void UnitLost(CUnit &unit)
 //		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 		if (b->ReplaceOnDie && (!type.GivesResource || unit.ResourcesHeld != 0)) {
 		//Wyrmgus end
-			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral], unit.MapLayer->ID);
+			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -4100,10 +4100,10 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 		player.LostTownHallTimer = 0;
 		player.Revealed = false;
 		for (int j = 0; j < NumPlayers; ++j) {
-			if (player.Index != j && Players[j].Type != PlayerNobody) {
-				Players[j].Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.Name.c_str());
+			if (player.Index != j && CPlayer::Players[j]->Type != PlayerNobody) {
+				CPlayer::Players[j]->Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.Name.c_str());
 			} else {
-				Players[j].Notify("%s", _("You have rebuilt a town hall, and will no longer be revealed!"));
+				CPlayer::Players[j]->Notify("%s", _("You have rebuilt a town hall, and will no longer be revealed!"));
 			}
 		}
 	}
@@ -4300,8 +4300,8 @@ void UnitCountSeen(CUnit &unit)
 	//  unit before this calc.
 	int oldv[PlayerMax];
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
-			oldv[p] = unit.IsVisible(Players[p]);
+		if (CPlayer::Players[p]->Type != PlayerNobody) {
+			oldv[p] = unit.IsVisible(*CPlayer::Players[p]);
 		}
 	}
 
@@ -4310,7 +4310,7 @@ void UnitCountSeen(CUnit &unit)
 	const int width = unit.Type->TileSize.x;
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (CPlayer::Players[p]->Type != PlayerNobody) {
 			int newv = 0;
 			int y = height;
 			unsigned int index = unit.Offset;
@@ -4318,18 +4318,18 @@ void UnitCountSeen(CUnit &unit)
 				CMapField *mf = unit.MapLayer->Field(index);
 				int x = width;
 				do {
-					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
+					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != CPlayer::Players[p]) {
 						if (mf->playerInfo.VisCloak[p]) {
 							newv++;
 						}
 					//Wyrmgus start
-					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != &Players[p]) {
+					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != CPlayer::Players[p]) {
 						if (mf->playerInfo.VisEthereal[p]) {
 							newv++;
 						}
 					//Wyrmgus end
 					} else {
-						if (mf->playerInfo.IsVisible(Players[p])) {
+						if (mf->playerInfo.IsVisible(*CPlayer::Players[p])) {
 							newv++;
 						}
 					}
@@ -4346,18 +4346,18 @@ void UnitCountSeen(CUnit &unit)
 	// for players. Hopefully this works with shared vision just great.
 	//
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
-			int newv = unit.IsVisible(Players[p]);
+		if (CPlayer::Players[p]->Type != PlayerNobody) {
+			int newv = unit.IsVisible(*CPlayer::Players[p]);
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
 				// be released
 				if (!unit.Type) {
 					break;
 				}
-				UnitGoesOutOfFog(unit, Players[p]);
+				UnitGoesOutOfFog(unit, *CPlayer::Players[p]);
 			}
 			if (oldv[p] && !newv) {
-				UnitGoesUnderFog(unit, Players[p]);
+				UnitGoesUnderFog(unit, *CPlayer::Players[p]);
 			}
 		}
 	}
@@ -4378,8 +4378,8 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
 		//Wyrmgus start
-//		if (p != player.Index && player.IsBothSharedVision(Players[p])) {
-		if (p != player.Index && (player.IsBothSharedVision(Players[p]) || Players[p].Revealed)) {
+//		if (p != player.Index && player.IsBothSharedVision(*CPlayer::Players[p])) {
+		if (p != player.Index && (player.IsBothSharedVision(*CPlayer::Players[p]) || CPlayer::Players[p]->Revealed)) {
 		//Wyrmgus end
 			if (VisCount[p]) {
 				return true;
@@ -4721,7 +4721,7 @@ void RescueUnits()
 	NoRescueCheck = true;
 
 	//  Look if player could be rescued.
-	for (CPlayer *p = Players; p < Players + NumPlayers; ++p) {
+	for (CPlayer *p : CPlayer::Players) {
 		if (p->Type != PlayerRescuePassive && p->Type != PlayerRescueActive) {
 			continue;
 		}
@@ -5196,7 +5196,7 @@ CUnit *UnitOnScreen(int x, int y)
 			candidate = &unit;
 			//Wyrmgus start
 			std::vector<CUnit *> table;
-			Select(candidate->tilePos, candidate->tilePos, table, candidate->MapLayer->ID, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			Select(candidate->tilePos, candidate->tilePos, table, candidate->MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 //			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size()) || !candidate->IsAlive()) { // don't select a neutral unit if there's a player-owned unit there as well; don't selected a dead unit
 			//Wyrmgus end
@@ -6157,7 +6157,7 @@ bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
 		civilization_id = type->Civilization;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && civilization_id == Players[p].Race && CheckDependencies(type, &Players[p], true) && Players[p].StartMapLayer == this->MapLayer->ID) {
+		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && CheckDependencies(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
 			return true;
 		}
 	}

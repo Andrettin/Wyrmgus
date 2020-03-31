@@ -303,11 +303,11 @@ static void AiCheckUnits()
 			if (i == AiPlayer->Player->Index) {
 				continue;
 			}
-			if (Players[i].Type != PlayerComputer || !AiPlayer->Player->HasBuildingAccess(Players[i])) {
+			if (CPlayer::Players[i]->Type != PlayerComputer || !AiPlayer->Player->HasBuildingAccess(*CPlayer::Players[i])) {
 				continue;
 			}
-			for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
-				CUnit *mercenary_building = &Players[i].GetUnit(j);
+			for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
+				CUnit *mercenary_building = &CPlayer::Players[i]->GetUnit(j);
 				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
 					continue;
 				}
@@ -330,7 +330,7 @@ static void AiCheckUnits()
 					if (
 						iterator->second
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
-						&& CheckDependencies(mercenary_type, &Players[i])
+						&& CheckDependencies(mercenary_type, CPlayer::Players[i])
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
 						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
 					) {
@@ -607,8 +607,8 @@ void SaveAi(CFile &file)
 	file.printf("\n--- -----------------------------------------\n");
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Players[i].Ai) {
-			SaveAiPlayer(file, i, *Players[i].Ai);
+		if (CPlayer::Players[i]->Ai) {
+			SaveAiPlayer(file, i, *CPlayer::Players[i]->Ai);
 		}
 	}
 
@@ -690,18 +690,16 @@ void InitAiModule()
 	AiResetUnitTypeEquiv();
 }
 
-
 /**
 **  Cleanup the AI in order to enable to restart a game.
 */
 void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
-		delete Players[p].Ai;
-		Players[p].Ai = nullptr;
+		delete CPlayer::Players[p]->Ai;
+		CPlayer::Players[p]->Ai = nullptr;
 	}
 }
-
 
 /**
 **  Free all AI resources.

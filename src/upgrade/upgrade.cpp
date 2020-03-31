@@ -10,7 +10,7 @@
 //
 /**@name upgrade.cpp - The upgrade/allow source file. */
 //
-//      (c) Copyright 1999-2019 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -465,7 +463,7 @@ void SaveUpgrades(CFile &file)
 			if (p) {
 				file.printf(", ");
 			}
-			file.printf("%d", Players[p].Allow.Units[i]);
+			file.printf("%d", CPlayer::Players[p]->Allow.Units[i]);
 		}
 		file.printf(")\n");
 	}
@@ -477,7 +475,7 @@ void SaveUpgrades(CFile &file)
 	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
 		file.printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
-			file.printf("%c", Players[p].Allow.Upgrades[j]);
+			file.printf("%c", CPlayer::Players[p]->Allow.Upgrades[j]);
 		}
 		file.printf("\")\n");
 	}
@@ -998,7 +996,7 @@ static int CclDefineUnitAllow(lua_State *l)
 
 	int i = 0;
 	for (int j = 1; j < args && i < PlayerMax; ++j) {
-		AllowUnitId(Players[i], id, LuaToNumber(l, j + 1));
+		AllowUnitId(*CPlayer::Players[i], id, LuaToNumber(l, j + 1));
 		++i;
 	}
 	return 0;
@@ -1027,15 +1025,15 @@ static int CclDefineAllow(lua_State *l)
 			int id = UnitTypeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
-					AllowUnitId(Players[i], id, UnitMax);
+					AllowUnitId(*CPlayer::Players[i], id, UnitMax);
 				} else if (ids[i] == 'F') {
-					AllowUnitId(Players[i], id, 0);
+					AllowUnitId(*CPlayer::Players[i], id, 0);
 				}
 			}
 		} else if (!strncmp(ident, "upgrade-", 8)) {
 			int id = UpgradeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
-				AllowUpgradeId(Players[i], id, ids[i]);
+				AllowUpgradeId(*CPlayer::Players[i], id, ids[i]);
 			}
 		} else {
 			DebugPrint(" wrong ident %s\n" _C_ ident);
@@ -2402,13 +2400,13 @@ void ApplyUpgrades()
 		CUpgrade *upgrade = AllUpgrades[j];
 		if (upgrade) {
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Allow.Upgrades[j] == 'R') {
+				if (CPlayer::Players[p]->Allow.Upgrades[j] == 'R') {
 					int id = upgrade->ID;
-					Players[p].UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
-					AllowUpgradeId(Players[p], id, 'R');  // research done
+					CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+					AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
 
 					for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-						ApplyUpgradeModifier(Players[p], upgrade->UpgradeModifiers[z]);
+						ApplyUpgradeModifier(*CPlayer::Players[p], upgrade->UpgradeModifiers[z]);
 					}
 				}
 			}
@@ -2416,7 +2414,7 @@ void ApplyUpgrades()
 	}
 	
 	for (int p = 0; p < PlayerMax; ++p) {
-		Players[p].CheckAge();
+		CPlayer::Players[p]->CheckAge();
 	}
 }
 
@@ -2896,5 +2894,3 @@ std::string GetVariableDisplayName(int var, bool increase)
 	return _(variable_name.c_str());
 }
 //Wyrmgus end
-
-//@}

@@ -32,8 +32,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <deque>
-
 #include "stratagus.h"
 
 #include "editor.h"
@@ -68,6 +66,7 @@
 #include "video.h"
 #include "widgets.h"
 
+#include <deque>
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
@@ -482,7 +481,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	if (type.Neutral) {
-		player = &Players[PlayerNumNeutral];
+		player = CPlayer::Players[PlayerNumNeutral];
 	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
@@ -757,7 +756,7 @@ static void DrawPlayers()
 			i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
 		if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.FillRectangle(CPlayer::Players[i]->Color, x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
@@ -778,7 +777,7 @@ static void DrawPlayers()
 		//Wyrmgus start
 //		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
 //				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
-		std::string civ_str = PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str();
+		std::string civ_str = PlayerRaces.Name[CPlayer::Players[Editor.SelectedPlayer]->Race].c_str();
 		civ_str[0] = toupper(civ_str[0]);
 		snprintf(buf, sizeof(buf), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end
@@ -863,7 +862,7 @@ static void DrawUnitIcons()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index);
+		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->Index);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -1207,7 +1206,7 @@ static void DrawEditorPanel_StartIcon()
 		const PixelPos rb(x + IconHeight - 2, y + IconHeight - 2);
 		//Wyrmgus start
 //		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
-		const Uint32 color = Players[Editor.SelectedPlayer].Color;
+		const Uint32 color = CPlayer::Players[Editor.SelectedPlayer]->Color;
 
 		//Wyrmgus end
 
@@ -1351,13 +1350,13 @@ static void DrawStartLocations()
 		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
-			if (CMap::Map.Info.PlayerType[i] != PlayerNobody && CMap::Map.Info.PlayerType[i] != PlayerNeutral && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
-				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
+			if (CMap::Map.Info.PlayerType[i] != PlayerNobody && CMap::Map.Info.PlayerType[i] != PlayerNeutral && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
+				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
 
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, CMap::Map.GetCurrentPixelTileSize(), Players[i].Color);
+					DrawCross(startScreenPos, CMap::Map.GetCurrentPixelTileSize(), CPlayer::Players[i]->Color);
 				}
 			}
 		}
@@ -1695,7 +1694,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (Editor.CursorPlayer != -1) {
 			if (CMap::Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
 				Editor.SelectedPlayer = Editor.CursorPlayer;
-				CPlayer::SetThisPlayer(Players + Editor.SelectedPlayer);
+				CPlayer::SetThisPlayer(CPlayer::Players[Editor.SelectedPlayer]);
 			}
 			return;
 		}
@@ -1775,7 +1774,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
 						PlayGameSound(GameSounds.PlacementSuccess[CPlayer::GetThisPlayer()->Race].Sound,
 									  MaxSampleVolume);
-						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
+						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[Editor.SelectedPlayer]);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
@@ -1785,8 +1784,8 @@ static void EditorCallbackButtonDown(unsigned button)
 					}
 				}
 			} else if (Editor.State == EditorSetStartLocation) {
-				Players[Editor.SelectedPlayer].StartPos = tilePos;
-				Players[Editor.SelectedPlayer].StartMapLayer = UI.CurrentMapLayer->ID;
+				CPlayer::Players[Editor.SelectedPlayer]->StartPos = tilePos;
+				CPlayer::Players[Editor.SelectedPlayer]->StartMapLayer = UI.CurrentMapLayer->ID;
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1910,7 +1909,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 		case '0':
 			if (UnitUnderCursor != nullptr) {
-				UnitUnderCursor->ChangeOwner(Players[PlayerNumNeutral]);
+				UnitUnderCursor->ChangeOwner(*CPlayer::Players[PlayerNumNeutral]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 			}
 			break;
@@ -1919,7 +1918,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '6': case '7': case '8':
 		case '9':
 			if (UnitUnderCursor != nullptr && CMap::Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
-				UnitUnderCursor->ChangeOwner(Players[(int) key - '1']);
+				UnitUnderCursor->ChangeOwner(*CPlayer::Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
 			}
@@ -2247,7 +2246,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
-					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
+					EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[Editor.SelectedPlayer]);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}
@@ -2449,7 +2448,7 @@ void CEditor::Init()
 	}
 	//Wyrmgus end
 
-	CPlayer::SetThisPlayer(&Players[0]);
+	CPlayer::SetThisPlayer(CPlayer::Players[0]);
 
 	FlagRevealMap = 1; // editor without fog and all visible
 	CMap::Map.NoFogOfWar = true;
@@ -2468,9 +2467,9 @@ void CEditor::Init()
 				CreatePlayer(PlayerNeutral);
 				CMap::Map.Info.PlayerType[i] = PlayerNeutral;
 				//Wyrmgus start
-//				CMap::Map.Info.PlayerSide[i] = Players[i].Race = 0;
-				Players[i].SetCivilization(0);
-				CMap::Map.Info.PlayerSide[i] = Players[i].Race;
+//				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race = 0;
+				CPlayer::Players[i]->SetCivilization(0);
+				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race;
 				//Wyrmgus end
 			} else {
 				CreatePlayer(PlayerNobody);

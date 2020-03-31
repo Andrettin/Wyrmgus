@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_spawnportal.h"
@@ -88,8 +86,8 @@
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
 								  //Wyrmgus start
-//								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
-								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral], z);
+//								  CurrentPlayer ? caster.Player : CPlayer::Players[PlayerNumNeutral]);
+								  CurrentPlayer ? caster.Player : CPlayer::Players[PlayerNumNeutral], z);
 								  //Wyrmgus end
 		portal->Summoned = 1;
 	}
@@ -99,7 +97,3 @@
 	//FIXME: setting destination circle of power should use mana
 	return 0;
 }
-
-
-
-//@}

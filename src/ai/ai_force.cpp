@@ -100,8 +100,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			tile_owner != -1
 			&& (
-				unit.IsEnemy(Players[tile_owner])
-				|| (include_neutral && !unit.IsAllied(Players[tile_owner]) && unit.Player->Index != tile_owner && !unit.Player->HasBuildingAccess(Players[tile_owner]))
+				unit.IsEnemy(*CPlayer::Players[tile_owner])
+				|| (include_neutral && !unit.IsAllied(*CPlayer::Players[tile_owner]) && unit.Player->Index != tile_owner && !unit.Player->HasBuildingAccess(*CPlayer::Players[tile_owner]))
 			)
 		) {
 			*result_enemy_wall_pos = pos;
@@ -124,7 +124,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	std::vector<CUnit *> table;
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
 	Vec2i maxpos = pos + Vec2i(unit.Type->TileSize - 1 + attackrange);
-	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
 		const CUnitType &dtype = *dest->Type;
@@ -203,7 +203,7 @@ public:
 		if (FIND_TYPE == AIATTACK_RANGE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInReactRange(*unit);
-			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(Players[PlayerNumNeutral]), IncludeNeutral);
+			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IncludeNeutral);
 			//Wyrmgus end
 		//Wyrmgus start
 		} else {
@@ -225,12 +225,12 @@ public:
 		/*
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), false, IncludeNeutral);
 			//Wyrmgus end
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IsBuildingType()), false, IncludeNeutral);
 			//Wyrmgus end
 			//Wyrmgus start
 			//why make sure the enemy is null?
@@ -239,13 +239,13 @@ public:
 			if (*enemy == nullptr || !(*enemy)->Type->BoolFlag[BUILDING_INDEX].value) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), false, IncludeNeutral);
 				//Wyrmgus end
 			}
 		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsAggresiveUnit()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IsAggresiveUnit()), false, IncludeNeutral);
 			//Wyrmgus end
 			//Wyrmgus start
 			//why ask that the enemy be null?
@@ -254,7 +254,7 @@ public:
 			if (*enemy == nullptr) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), false, IncludeNeutral);
 				//Wyrmgus end
 			}
 		*/
@@ -870,10 +870,10 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			goalPos = enemy_wall_pos;
 			z = enemy_wall_map_layer;
 			int enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->Owner;
-			if (!AiPlayer->Player->IsEnemy(Players[enemy_wall_owner]) && Players[enemy_wall_owner].Type != PlayerNeutral) {
-				AiPlayer->Player->SetDiplomacyEnemyWith(Players[enemy_wall_owner]);
-				if (AiPlayer->Player->IsSharedVision(Players[enemy_wall_owner])) {
-					CommandSharedVision(AiPlayer->Player->Index, false, Players[enemy_wall_owner].Index);
+			if (!AiPlayer->Player->IsEnemy(*CPlayer::Players[enemy_wall_owner]) && CPlayer::Players[enemy_wall_owner]->Type != PlayerNeutral) {
+				AiPlayer->Player->SetDiplomacyEnemyWith(*CPlayer::Players[enemy_wall_owner]);
+				if (AiPlayer->Player->IsSharedVision(*CPlayer::Players[enemy_wall_owner])) {
+					CommandSharedVision(AiPlayer->Player->Index, false, CPlayer::Players[enemy_wall_owner]->Index);
 				}
 			}
 		} else {
@@ -1664,10 +1664,10 @@ void AiForce::Update()
 				this->GoalPos = enemy_wall_pos;
 				this->GoalMapLayer = enemy_wall_map_layer;
 				int enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->Owner;
-				if (!AiPlayer->Player->IsEnemy(Players[enemy_wall_owner]) && Players[enemy_wall_owner].Type != PlayerNeutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(Players[enemy_wall_owner]);
-					if (AiPlayer->Player->IsSharedVision(Players[enemy_wall_owner])) {
-						CommandSharedVision(AiPlayer->Player->Index, false, Players[enemy_wall_owner].Index);
+				if (!AiPlayer->Player->IsEnemy(*CPlayer::Players[enemy_wall_owner]) && CPlayer::Players[enemy_wall_owner]->Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(*CPlayer::Players[enemy_wall_owner]);
+					if (AiPlayer->Player->IsSharedVision(*CPlayer::Players[enemy_wall_owner])) {
+						CommandSharedVision(AiPlayer->Player->Index, false, CPlayer::Players[enemy_wall_owner]->Index);
 					}
 				}
 			}
@@ -1778,10 +1778,10 @@ void AiForce::Update()
 				this->GoalPos = resultPos;
 				this->GoalMapLayer = enemy_wall_map_layer;
 				int enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->Owner;
-				if (!AiPlayer->Player->IsEnemy(Players[enemy_wall_owner]) && Players[enemy_wall_owner].Type != PlayerNeutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(Players[enemy_wall_owner]);
-					if (AiPlayer->Player->IsSharedVision(Players[enemy_wall_owner])) {
-						CommandSharedVision(AiPlayer->Player->Index, false, Players[enemy_wall_owner].Index);
+				if (!AiPlayer->Player->IsEnemy(*CPlayer::Players[enemy_wall_owner]) && CPlayer::Players[enemy_wall_owner]->Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(*CPlayer::Players[enemy_wall_owner]);
+					if (AiPlayer->Player->IsSharedVision(*CPlayer::Players[enemy_wall_owner])) {
+						CommandSharedVision(AiPlayer->Player->Index, false, CPlayer::Players[enemy_wall_owner]->Index);
 					}
 				}
 			}

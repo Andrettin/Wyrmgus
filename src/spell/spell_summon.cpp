@@ -122,7 +122,7 @@ public:
 	if (cansummon) {
 		//Wyrmgus start
 //		DebugPrint("Summoning a %s\n" _C_ unittype.Name.c_str());
-		DebugPrint("Summoning a %s\n" _C_ unittype.GetDefaultName(*caster.Player).c_str());
+		DebugPrint("Summoning a %s\n" _C_ unittype.GetDefaultName(caster.Player).c_str());
 		//Wyrmgus end
 
 		//

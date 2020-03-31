@@ -10,7 +10,7 @@
 //
 /**@name civilization.h - The civilization header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,21 +27,18 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CIVILIZATION_H__
-#define __CIVILIZATION_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "player.h" //for certain enums
+#include "time/date.h"
+
 #include <map>
 #include <string>
 #include <vector>
-
-#include "player.h" //for certain enums
-#include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -70,6 +67,12 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
+
+	const std::string &GetInterface() const
+	{
+		return this->Interface;
+	}
+
 	CCalendar *GetCalendar() const;
 	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
@@ -85,6 +88,7 @@ public:
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
+	std::string Interface;			/// the string identifier for the civilization's interface
 	CUnitSound UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
@@ -104,7 +108,3 @@ public:
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 };
-
-//@}
-
-#endif // !__CIVILIZATION_H__

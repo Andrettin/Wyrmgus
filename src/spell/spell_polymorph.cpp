@@ -10,8 +10,8 @@
 //
 /**@name spell_polymorph.cpp - The spell Polymorph. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 #include "stratagus.h"
 
@@ -178,8 +176,8 @@
 	//Wyrmgus end
 	if (this->PlayerNeutral == 1) {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, type, Players + PlayerNumNeutral);
-		target->ChangeOwner(Players[PlayerNumNeutral]);
+//		MakeUnitAndPlace(resPos, type, CPlayer::[PlayerNumNeutral]);
+		target->ChangeOwner(*CPlayer::Players[PlayerNumNeutral]);
 		//Wyrmgus end
 	} else if (this->PlayerNeutral == 2) {
 		//Wyrmgus start
@@ -208,5 +206,3 @@
 	//Wyrmgus end
 	return 1;
 }
-
-//@}

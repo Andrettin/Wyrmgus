@@ -216,7 +216,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		return VisitResult::DeadEnd;
 	}
 	
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
 		return VisitResult::DeadEnd;
 	}
 	
@@ -392,7 +392,7 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -530,7 +530,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != worker.Player->Index && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -633,7 +633,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
    //Wyrmgus end
 			   //Wyrmgus start
 //			   _C_ type.Ident.c_str() _C_ type.Name.c_str());
-			   _C_ type.Ident.c_str() _C_ type.GetDefaultName(*worker.Player).c_str());
+			   _C_ type.Ident.c_str() _C_ type.GetDefaultName(worker.Player).c_str());
 			   //Wyrmgus end
 
 	//Wyrmgus start

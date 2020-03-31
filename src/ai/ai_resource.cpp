@@ -2160,7 +2160,7 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
-						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), *test_worker_type, &Players[PlayerNumNeutral], unit.MapLayer->ID);
+						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), *test_worker_type, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 						char worker_path[64];
 						
 						//make the first path

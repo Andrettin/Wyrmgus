@@ -10,7 +10,7 @@
 //
 /**@name unittype.h - The unit type header file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -842,11 +842,11 @@ public:
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
-	CUnitTypeVariation *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
+	const CUnitTypeVariation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
 	CUnitTypeVariation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
-	std::string GetDefaultName(CPlayer &player) const;
-	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
+	const std::string &GetDefaultName(const CPlayer *player) const;
+	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(CFaction *faction, int gender) const;

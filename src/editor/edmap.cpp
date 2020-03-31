@@ -410,14 +410,14 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		TileFill(mirror, tile, z * 2);
 
 		// FIXME: can overlap units
-		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		CUnit *unit = MakeUnitAndPlace(rpos, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->SetResourcesHeld(value);
 		}
 
-		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		unit = MakeUnitAndPlace(tmirrorh, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
@@ -428,7 +428,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 			//Wyrmgus end
 		}
 
-		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		unit = MakeUnitAndPlace(tmirrorv, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
@@ -436,7 +436,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 			unit->SetResourcesHeld(value);
 		}
 
-		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		unit = MakeUnitAndPlace(tmirror, type, CPlayer::Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
 		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");

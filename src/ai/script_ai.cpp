@@ -10,7 +10,7 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2019 by Lutz Sammer, Ludovic Pollet,
+//      (c) Copyright 2000-2020 by Lutz Sammer, Ludovic Pollet,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -747,10 +747,10 @@ static int CclAiDebugPlayer(lua_State *l)
 		}
 		if (item && !strcmp(item, "none")) {
 			for (int i = 0; i != NumPlayers; ++i) {
-				if (!Players[i].AiEnabled || !Players[i].Ai) {
+				if (!CPlayer::Players[i]->AiEnabled || !CPlayer::Players[i]->Ai) {
 					continue;
 				}
-				Players[i].Ai->ScriptDebug = 0;
+				CPlayer::Players[i]->Ai->ScriptDebug = 0;
 			}
 		} else {
 			int playerid;
@@ -763,10 +763,10 @@ static int CclAiDebugPlayer(lua_State *l)
 				playerid = LuaToNumber(l, j + 1);
 			}
 
-			if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
+			if (!CPlayer::Players[playerid]->AiEnabled || !CPlayer::Players[playerid]->Ai) {
 				continue;
 			}
-			Players[playerid].Ai->ScriptDebug = 1;
+			CPlayer::Players[playerid]->Ai->ScriptDebug = 1;
 		}
 	}
 	return 0;
@@ -1370,7 +1370,7 @@ static int CclAiDump(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	for (int p = 0; p < PlayerMax - 1; ++p) {
-		CPlayer &aip = Players[p];
+		CPlayer &aip = *CPlayer::Players[p];
 		if (aip.AiEnabled) {
 			//
 			// Script
@@ -1510,12 +1510,12 @@ static int CclDefineAiPlayer(lua_State *l)
 	const unsigned int playerIdx = LuaToNumber(l, 0 + 1);
 
 	Assert(playerIdx <= PlayerMax);
-	DebugPrint("%p %d\n" _C_(void *)Players[playerIdx].Ai _C_ Players[playerIdx].AiEnabled);
+	DebugPrint("%p %d\n" _C_(void *)CPlayer::Players[playerIdx]->Ai _C_ CPlayer::Players[playerIdx]->AiEnabled);
 	// FIXME: lose this:
 	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 
-	PlayerAi *ai = Players[playerIdx].Ai = new PlayerAi;
-	ai->Player = &Players[playerIdx];
+	PlayerAi *ai = CPlayer::Players[playerIdx]->Ai = new PlayerAi;
+	ai->Player = CPlayer::Players[playerIdx];
 
 	// Parse the list: (still everything could be changed!)
 	const int args = lua_gettop(l);

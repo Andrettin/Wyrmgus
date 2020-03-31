@@ -739,29 +739,29 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	this->ApplyUnits(template_start_pos, map_start_pos, z, true);
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer && Players[i].Type != PlayerRescueActive) {
+		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer && CPlayer::Players[i]->Type != PlayerRescueActive) {
 			continue;
 		}
-		if (CMap::Map.IsPointInASubtemplateArea(Players[i].StartPos, z)) {
+		if (CMap::Map.IsPointInASubtemplateArea(CPlayer::Players[i]->StartPos, z)) {
 			continue;
 		}
-		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
+		if (CPlayer::Players[i]->StartPos.x < map_start_pos.x || CPlayer::Players[i]->StartPos.y < map_start_pos.y || CPlayer::Players[i]->StartPos.x >= map_end.x || CPlayer::Players[i]->StartPos.y >= map_end.y || CPlayer::Players[i]->StartMapLayer != z) {
 			continue;
 		}
-		if (Players[i].StartPos.x == 0 && Players[i].StartPos.y == 0) {
+		if (CPlayer::Players[i]->StartPos.x == 0 && CPlayer::Players[i]->StartPos.y == 0) {
 			continue;
 		}
 		// add five workers at the player's starting location
-		if (Players[i].NumTownHalls > 0) {
-			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Faction, GetUnitTypeClassIndexByName("worker"));
-			if (worker_type_id != -1 && Players[i].GetUnitTypeCount(UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
+		if (CPlayer::Players[i]->NumTownHalls > 0) {
+			int worker_type_id = PlayerRaces.GetFactionClassUnitType(CPlayer::Players[i]->Faction, GetUnitTypeClassIndexByName("worker"));
+			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileSize - 1) / 2);
 				
-				Vec2i worker_pos(Players[i].StartPos);
+				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
 
 				bool start_pos_has_town_hall = false;
 				std::vector<CUnit *> table;
-				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(Players[i]));
+				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(*CPlayer::Players[i]));
 				for (size_t j = 0; j < table.size(); ++j) {
 					if (table[j]->Type->BoolFlag[TOWNHALL_INDEX].value) {
 						start_pos_has_town_hall = true;
@@ -770,8 +770,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 				}
 				
 				if (!start_pos_has_town_hall) { //if the start pos doesn't have a town hall, create the workers in the position of a town hall the player has
-					for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
-						CUnit *town_hall_unit = &Players[i].GetUnit(j);
+					for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
+						CUnit *town_hall_unit = &CPlayer::Players[i]->GetUnit(j);
 						if (!town_hall_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
 							continue;
 						}
@@ -783,14 +783,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CUnit *worker_unit = CreateUnit(worker_pos, *UnitTypes[worker_type_id], &Players[i], Players[i].StartMapLayer);
+					CUnit *worker_unit = CreateUnit(worker_pos, *UnitTypes[worker_type_id], CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
 				}
 			}
 		}
 		
-		if (Players[i].NumTownHalls > 0 || Players[i].Index == CPlayer::GetThisPlayer()->Index) {
+		if (CPlayer::Players[i]->NumTownHalls > 0 || CPlayer::Players[i]->Index == CPlayer::GetThisPlayer()->Index) {
 			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
-				CMap::Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
+				CMap::Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - Vec2i(8, 8), CPlayer::Players[i]->StartPos + Vec2i(8, 8), true, z);
 			}
 		}
 	}
@@ -978,7 +978,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileSize - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
 			}
-			CUnit *unit = CreateUnit(site_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z, true);
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *SettlementSiteUnitType, CPlayer::Players[PlayerNumNeutral], z, true);
 			unit->Settlement = site;
 			unit->Settlement->SiteUnit = unit;
 			CMap::Map.SiteUnits.push_back(unit);
@@ -1210,7 +1210,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z, true);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->PlaneConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->PlaneConnectors[i]));
 		}
@@ -1253,7 +1253,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z, true);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->WorldConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->WorldConnectors[i]));
 		}
@@ -1336,7 +1336,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z, true);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
 		if (unique) {
 			unit->SetUnique(unique);
 		}
@@ -1413,7 +1413,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 					player->SetStartView(unit_pos, z);
 				}
 			} else {
-				player = &Players[PlayerNumNeutral];
+				player = CPlayer::Players[PlayerNumNeutral];
 			}
 
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z, type->BoolFlag[BUILDING_INDEX].value && type->TileSize.x > 1 && type->TileSize.y > 1);
@@ -1458,7 +1458,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 					player->SetStartView(unit_pos, z);
 				}
 			} else {
-				player = &Players[PlayerNumNeutral];
+				player = CPlayer::Players[PlayerNumNeutral];
 			}
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
 			unit->SetCharacter(hero->Ident);
@@ -1515,7 +1515,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 				unit_player->SetStartView(unit_pos, z);
 			}
 		} else {
-			unit_player = &Players[PlayerNumNeutral];
+			unit_player = CPlayer::Players[PlayerNumNeutral];
 		}
 		for (int i = 0; i < historical_unit->Quantity; ++i) {
 			CUnit *unit = CreateUnit(unit_pos - historical_unit->UnitType->GetTileCenterPosOffset(), *historical_unit->UnitType, unit_player, z);
@@ -1581,7 +1581,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 				hero_player->SetStartView(hero_pos, z);
 			}
 		} else {
-			hero_player = &Players[PlayerNumNeutral];
+			hero_player = CPlayer::Players[PlayerNumNeutral];
 		}
 		CUnit *unit = CreateUnit(hero_pos - character->Type->GetTileCenterPosOffset(), *character->Type, hero_player, z);
 		unit->SetCharacter(character->Ident);

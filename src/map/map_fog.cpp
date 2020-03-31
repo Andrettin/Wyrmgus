@@ -166,11 +166,11 @@ public:
 				for (int pi = 0; pi < PlayerMax; ++pi) {
 					if ((pi == p /*player->Index*/)
 						//Wyrmgus start
-//						|| player->IsBothSharedVision(Players[pi])) {
-						|| player->IsBothSharedVision(Players[pi]) || player->Revealed) {
+//						|| player->IsBothSharedVision(*CPlayer::Players[pi])) {
+						|| player->IsBothSharedVision(*CPlayer::Players[pi]) || player->Revealed) {
 						//Wyrmgus end
-						if (!unit->IsVisible(Players[pi])) {
-							UnitGoesOutOfFog(*unit, Players[pi]);
+						if (!unit->IsVisible(*CPlayer::Players[pi])) {
+							UnitGoesOutOfFog(*unit, *CPlayer::Players[pi]);
 						}
 					}
 				}
@@ -196,11 +196,11 @@ public:
 				for (int pi = 0; pi < PlayerMax; ++pi) {
 					if (pi == p/*player->Index*/ ||
 						//Wyrmgus start
-//						player->IsBothSharedVision(Players[pi])) {
-						player->IsBothSharedVision(Players[pi]) || player->Revealed) {
+//						player->IsBothSharedVision(*CPlayer::Players[pi])) {
+						player->IsBothSharedVision(*CPlayer::Players[pi]) || player->Revealed) {
 						//Wyrmgus end
-						if (!unit->IsVisible(Players[pi])) {
-							UnitGoesUnderFog(*unit, Players[pi]);
+						if (!unit->IsVisible(*CPlayer::Players[pi])) {
+							UnitGoesUnderFog(*unit, *CPlayer::Players[pi]);
 						}
 					}
 				}
