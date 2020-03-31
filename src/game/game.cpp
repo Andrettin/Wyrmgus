@@ -196,10 +196,10 @@ void StartMap(const std::string &filename, bool clean)
 //	SetMessage("%s", _("Do it! Do it now!"));
 	//Wyrmgus end
 	
-	if (ThisPlayer->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[ThisPlayer->StartMapLayer];
+	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
+		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 	}
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
 
 	//  Play the game.
 	GameMainLoop();
@@ -1517,8 +1517,8 @@ void CalculateItemsToLoad()
 	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad+= GetIconsCount();
-		if (ThisPlayer) {
-			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+		if (CPlayer::GetThisPlayer()) {
+			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[CPlayer::GetThisPlayer()->Race]);
 		}
 		itemsToLoad+= GetUnitTypesCount();
 		itemsToLoad+= GetDecorationsCount();
@@ -1859,11 +1859,11 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	if (ThisPlayer->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[ThisPlayer->StartMapLayer];
+	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
+		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 	}
 	UpdateSurfaceLayerButtons();
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
 
 	//
 	// Various hacks which must be done after the map is loaded.

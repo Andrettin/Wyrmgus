@@ -10,7 +10,7 @@
 //
 /**@name player.h - The player header file. */
 //
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -118,6 +115,13 @@ enum _diplomacy_ {
 ///  Player structure
 class CPlayer
 {
+public:
+	static void SetThisPlayer(CPlayer *player);
+	static CPlayer *GetThisPlayer();
+
+private:
+	static CPlayer *ThisPlayer; //player on local computer
+
 public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
@@ -898,10 +902,9 @@ enum NotifyType {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int NumPlayers;             /// How many player slots used
-extern CPlayer Players[PlayerMax];  /// All players
-extern CPlayer *ThisPlayer;         /// Player on local computer
-extern bool NoRescueCheck;          /// Disable rescue check
+extern int NumPlayers; //how many player slots used
+extern CPlayer Players[PlayerMax]; //all players
+extern bool NoRescueCheck; //disable rescue check
 //Wyrmgus start
 //extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
 //extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors
@@ -972,7 +975,10 @@ void FreePlayerColors();
 extern void PlayerCclRegister();
 
 /// Allowed to select multiple units, maybe not mine
-inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == ThisPlayer || ThisPlayer->IsTeamed(player); }
+inline bool CanSelectMultipleUnits(const CPlayer &player)
+{
+	return &player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(player);
+}
 
 //Wyrmgus start
 extern void SetFactionStringToIndex(const std::string &faction_name, int faction_id);
@@ -1014,7 +1020,3 @@ extern bool IsNameValidForWord(const std::string &word_name);
 
 extern std::map<std::string, CLanguage *> LanguageIdentToPointer;
 //Wyrmgus end
-
-//@}
-
-#endif // !__PLAYER_H__

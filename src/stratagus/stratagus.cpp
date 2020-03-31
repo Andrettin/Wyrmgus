@@ -803,7 +803,7 @@ int stratagusMain(int argc, char **argv)
 	ShowTitleScreens();
 
 	// Init player data
-	ThisPlayer = nullptr;
+	CPlayer::SetThisPlayer(nullptr);
 	//Don't clear the Players structure as it would erase the allowed units.
 	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;

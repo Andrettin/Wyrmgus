@@ -794,7 +794,7 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		return true;
 	}
 	
-	if (GodMode && attacker.Player == ThisPlayer && (!goal || goal->Player != ThisPlayer)) {
+	if (GodMode && attacker.Player == CPlayer::GetThisPlayer() && (!goal || goal->Player != CPlayer::GetThisPlayer())) {
 		return true; //always hit if in god mode
 	}
 
@@ -1075,7 +1075,7 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 		for (pos.y = boxmin.y; pos.y <= boxmax.y; ++pos.y) {
 			//Wyrmgus start
 //			if (ReplayRevealMap || CMap::Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			if (ReplayRevealMap || CMap::Map.Field(pos, missile.MapLayer)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || CMap::Map.Field(pos, missile.MapLayer)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			//Wyrmgus end
 				return 1;
 			}

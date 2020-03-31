@@ -614,7 +614,7 @@ static void DumpUnitInfo(CUnit &unit)
 		char buf[256];
 
 		//TODO should the filename be changed to reflect the new engine name?
-		snprintf(buf, sizeof(buf), "log_of_stratagus_%d.log", ThisPlayer->Index);
+		snprintf(buf, sizeof(buf), "log_of_stratagus_%d.log", CPlayer::GetThisPlayer()->Index);
 		logf = fopen(buf, "wb");
 		if (!logf) {
 			return ;
@@ -647,7 +647,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			continue;
 		}
 
-		if (!ReplayRevealMap && unit.Selected && !unit.IsVisible(*ThisPlayer)) {
+		if (!ReplayRevealMap && unit.Selected && !unit.IsVisible(*CPlayer::GetThisPlayer())) {
 			UnSelectUnit(unit);
 			SelectionChanged();
 		}

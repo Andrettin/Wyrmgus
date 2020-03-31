@@ -223,7 +223,7 @@ enum {
 					unit.Remove(nullptr);
 					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
 					RestoreSelection();
-					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
+					if (unit.Player == CPlayer::GetThisPlayer() && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}
@@ -232,23 +232,23 @@ enum {
 					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
 					unit.ReadWork(goal->Work);
-					if (unit.Player == ThisPlayer) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
 					}
 				} else if (goal->Elixir != nullptr) {
 					unit.ConsumeElixir(goal->Elixir);
-					if (unit.Player == ThisPlayer) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->Ident).c_str());
 					}
 				} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
-					if (unit.Player == ThisPlayer) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
 					}
 					unit.Player->ChangeResource(goal->Type->GivesResource, goal->ResourcesHeld);
 					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
-					if (unit.Player == ThisPlayer) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
 					}
 					unit.Variable[HP_INDEX].Value += hp_healed;
@@ -257,18 +257,18 @@ enum {
 						unit.HealingItemAutoUse();
 					}
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow) {
-					if (unit.Player == ThisPlayer) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 					}
 					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
 				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow) {
 					unit.Variable[SLOW_INDEX].Value = 1000;
-					if (unit.Player == ThisPlayer) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
 					}
 				}
 			} else { //cannot use
-				if (unit.Player == ThisPlayer) {
+				if (unit.Player == CPlayer::GetThisPlayer()) {
 					unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
 				}
 				this->Finished = true;

@@ -755,10 +755,10 @@ static int CclAiDebugPlayer(lua_State *l)
 		} else {
 			int playerid;
 			if (item && !strcmp(item, "self")) {
-				if (!ThisPlayer) {
+				if (!CPlayer::GetThisPlayer()) {
 					continue;
 				}
-				playerid = ThisPlayer->Index;
+				playerid = CPlayer::GetThisPlayer()->Index;
 			} else {
 				playerid = LuaToNumber(l, j + 1);
 			}

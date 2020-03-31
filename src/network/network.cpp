@@ -381,7 +381,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 	// Build packet of up to MaxNetworkCommands messages.
 	int numcommands = 0;
 	packet.Header.Cycle = ncq[0].Time & 0xFF;
-	packet.Header.OrigPlayer = ThisPlayer->Index;
+	packet.Header.OrigPlayer = CPlayer::GetThisPlayer()->Index;
 	int i;
 	for (i = 0; i < MaxNetworkCommands && ncq[i].Type != MessageNone; ++i) {
 		packet.Header.Type[i] = ncq[i].Type;
@@ -466,7 +466,7 @@ void ExitNetwork1()
 */
 void NetworkOnStartGame()
 {
-	ThisPlayer->SetName(Parameters::Instance.LocalPlayerName);
+	CPlayer::GetThisPlayer()->SetName(Parameters::Instance.LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
@@ -602,7 +602,7 @@ void NetworkSendSelection(CUnit **units, int count)
 	// Check if we have any teammates to send to
 	bool hasteammates = false;
 	for (int i = 0; i < HostsCount; ++i) {
-		if (Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) {
+		if (Players[Hosts[i].PlyNr].Team == CPlayer::GetThisPlayer()->Team) {
 			hasteammates = true;
 			break;
 		}
@@ -699,11 +699,11 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	const unsigned long gameNetCycle = n;
 	// FIXME: not necessary to send this packet multiple times!!!!
 	// other side sends re-send until it gets an answer.
-	if (n != NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index][0].Time) {
+	if (n != NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->Index][0].Time) {
 		// Asking for a cycle we haven't gotten to yet, ignore for now
 		return;
 	}
-	NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index]);
+	NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->Index]);
 	// Check if a player quit this cycle
 	for (int j = 0; j < HostsCount; ++j) {
 		for (int c = 0; c < MaxNetworkCommands; ++c) {
@@ -884,15 +884,15 @@ void NetworkEvent()
 */
 void NetworkQuitGame()
 {
-	if (!ThisPlayer || IsNetworkGame() == false) {
+	if (!CPlayer::GetThisPlayer() || IsNetworkGame() == false) {
 		return;
 	}
 	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
 	const int n = (GameCycle + gameCyclesPerUpdate) / gameCyclesPerUpdate * gameCyclesPerUpdate + NetworkLag;
-	CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][ThisPlayer->Index];
+	CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][CPlayer::GetThisPlayer()->Index];
 	CNetworkCommandQuit nc;
-	nc.player = ThisPlayer->Index;
+	nc.player = CPlayer::GetThisPlayer()->Index;
 	ncqs[0].Type = MessageQuit;
 	ncqs[0].Time = n;
 	ncqs[0].Data.resize(nc.Size());
@@ -933,7 +933,7 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 	CNetworkSelection ns;
 
 	ns.Deserialize(&ncq.Data[0]);
-	if (Players[ns.player].Team != ThisPlayer->Team) {
+	if (Players[ns.player].Team != CPlayer::GetThisPlayer()->Team) {
 		return;
 	}
 	std::vector<CUnit *> units;
@@ -1013,7 +1013,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 {
 	// No command available, send sync.
 	int numcommands = 0;
-	CNetworkCommandQueue(&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index];
+	CNetworkCommandQueue(&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->Index];
 	ncq[0].Clear();
 	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		CNetworkCommandSync nc;

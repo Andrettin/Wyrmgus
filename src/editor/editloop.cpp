@@ -1695,7 +1695,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (Editor.CursorPlayer != -1) {
 			if (CMap::Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
 				Editor.SelectedPlayer = Editor.CursorPlayer;
-				ThisPlayer = Players + Editor.SelectedPlayer;
+				CPlayer::SetThisPlayer(Players + Editor.SelectedPlayer);
 			}
 			return;
 		}
@@ -1773,14 +1773,14 @@ static void EditorCallbackButtonDown(unsigned button)
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
-						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
+						PlayGameSound(GameSounds.PlacementSuccess[CPlayer::GetThisPlayer()->Race].Sound,
 									  MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit cannot be placed here."));
-						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
+						PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound,
 									  MaxSampleVolume);
 					}
 				}
@@ -2449,7 +2449,7 @@ void CEditor::Init()
 	}
 	//Wyrmgus end
 
-	ThisPlayer = &Players[0];
+	CPlayer::SetThisPlayer(&Players[0]);
 
 	FlagRevealMap = 1; // editor without fog and all visible
 	CMap::Map.NoFogOfWar = true;

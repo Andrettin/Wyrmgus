@@ -129,7 +129,7 @@ static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 	for (int j = 0; j < unit.Type->TileSize.y; ++j) {
 		for (int i = 0; i < unit.Type->TileSize.x; ++i) {
 			const Vec2i tempPos(i, j);
-			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*ThisPlayer)) {
+			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				return false;
 			}
 		}
@@ -142,7 +142,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 	CUnit &unit = *Selected[0];
 
 	if (unit.Player->Index != PlayerNumNeutral || dest == nullptr
-		|| !(dest->Player == ThisPlayer || dest->IsTeamed(*ThisPlayer))) {
+		|| !(dest->Player == CPlayer::GetThisPlayer() || dest->IsTeamed(*CPlayer::GetThisPlayer()))) {
 		return;
 	}
 	// tell to go and harvest from a unit
@@ -178,7 +178,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 	// dest is the transporter
 	if (dest->Type->CanTransport()) {
 		// Let the transporter move to the unit. And QUEUE!!!
-		if (dest->CanMove() && CanTransport(*dest, unit) && dest->Player == ThisPlayer) {
+		if (dest->CanMove() && CanTransport(*dest, unit) && dest->Player == CPlayer::GetThisPlayer()) {
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
@@ -188,7 +188,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			SendCommandFollow(*dest, unit, 0);
 		}
 		// FIXME : manage correctly production units.
-		if ((!unit.CanMove() && dest->Player == ThisPlayer) || CanTransport(*dest, unit)) {
+		if ((!unit.CanMove() && dest->Player == CPlayer::GetThisPlayer()) || CanTransport(*dest, unit)) {
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
@@ -215,7 +215,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Want to transport but no unit can move\n");
 			return true;
 		}
-		if (dest->Player == ThisPlayer) {
+		if (dest->Player == CPlayer::GetThisPlayer()) {
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
@@ -350,7 +350,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								break;
 							}
 						} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-							ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+							CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
 					}
@@ -372,7 +372,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
 								break;
 							} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-								ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+								CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
 						}
@@ -665,7 +665,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || ThisPlayer->IsEnemy(Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
+	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || CPlayer::GetThisPlayer()->IsEnemy(Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
 		if (!UI.CurrentMapLayer->Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
@@ -922,7 +922,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//  Handle resource workers.
 //	if (action == MouseActionHarvest) {
-	if (action == MouseActionHarvest && (!dest || !dest->Type->CanTransport() || dest->Player == ThisPlayer || dest->Player->Type != PlayerNeutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
+	if (action == MouseActionHarvest && (!dest || !dest->Type->CanTransport() || dest->Player == CPlayer::GetThisPlayer() || dest->Player->Type != PlayerNeutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
 	//Wyrmgus end
 		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
@@ -1252,21 +1252,21 @@ static void HandleMouseOn(const PixelPos screenPos)
 	}
 
 	//Wyrmgus start
-	if (UI.IdleWorkerButton && UI.IdleWorkerButton->Contains(screenPos) && !ThisPlayer->FreeWorkers.empty()) {
+	if (UI.IdleWorkerButton && UI.IdleWorkerButton->Contains(screenPos) && !CPlayer::GetThisPlayer()->FreeWorkers.empty()) {
 		ButtonAreaUnderCursor = ButtonAreaIdleWorker;
 		ButtonUnderCursor = 0;
 		CursorOn = cursor_on::button;
 		return;
 	}
 	
-	if (UI.LevelUpUnitButton && UI.LevelUpUnitButton->Contains(screenPos) && !ThisPlayer->LevelUpUnits.empty()) {
+	if (UI.LevelUpUnitButton && UI.LevelUpUnitButton->Contains(screenPos) && !CPlayer::GetThisPlayer()->LevelUpUnits.empty()) {
 		ButtonAreaUnderCursor = ButtonAreaLevelUpUnit;
 		ButtonUnderCursor = 0;
 		CursorOn = cursor_on::button;
 		return;
 	}
 	
-	for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < ThisPlayer->Heroes.size(); ++i) {
+	for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < CPlayer::GetThisPlayer()->Heroes.size(); ++i) {
 		if (UI.HeroUnitButtons[i].Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaHeroUnit;
 			ButtonUnderCursor = i;
@@ -1520,8 +1520,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf.playerInfo.IsTeamExplored(Players[i])
 					//Wyrmgus start
-//					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer))) {
-					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer) || Players[i].Revealed)) {
+//					&& (i == CPlayer::GetThisPlayer()->Index || Players[i].IsBothSharedVision(*CPlayer::GetThisPlayer()))) {
+					&& (i == CPlayer::GetThisPlayer()->Index || Players[i].IsBothSharedVision(*CPlayer::GetThisPlayer()) || Players[i].Revealed)) {
 					//Wyrmgus end
 					show = true;
 					break;
@@ -1535,7 +1535,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		}
 		
 		//Wyrmgus start
-		if (show && Selected.size() >= 1 && Selected[0]->Player == ThisPlayer) {
+		if (show && Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer()) {
 			bool has_terrain_resource = false;
 			const CViewport &vp = *UI.MouseViewport;
 			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
@@ -1557,7 +1557,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	} else if (CursorOn == cursor_on::minimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
-		if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
+		if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
 			//Wyrmgus start
 //			UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None);
 			UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID);
@@ -1566,7 +1566,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
-	if (UnitUnderCursor != nullptr && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
+	if (UnitUnderCursor != nullptr && !UnitUnderCursor->IsVisibleAsGoal(*CPlayer::GetThisPlayer()) &&
 		!ReplayRevealMap) {
 		UnitUnderCursor = nullptr;
 	}
@@ -1580,8 +1580,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				GameCursor = UI.YellowHair.Cursor;
 			}
 			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
-				if (UnitUnderCursor->Player == ThisPlayer ||
-					ThisPlayer->IsAllied(*UnitUnderCursor)) {
+				if (UnitUnderCursor->Player == CPlayer::GetThisPlayer() ||
+					CPlayer::GetThisPlayer()->IsAllied(*UnitUnderCursor)) {
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
 					} else {
@@ -1592,7 +1592,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					}
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
+				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
@@ -1618,19 +1618,19 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	if (CursorOn == cursor_on::map) {
 		//  Map
 		if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
-			&& (UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
+			&& (UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap)) {
 			//Wyrmgus start
 //			GameCursor = UI.Glass.Cursor;
 			if (
-				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer && UnitUnderCursor->Player != ThisPlayer
+				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() && UnitUnderCursor->Player != CPlayer::GetThisPlayer()
 				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
-				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
+				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() &&
 				(
 					Selected[0]->CanHarvest(UnitUnderCursor, false)
-					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != ThisPlayer))
+					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
 				)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
@@ -1673,7 +1673,7 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 	if (dest && dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableMax)
 	//Wyrmgus end
 		&& dest->Type->RepairHP
-		&& (dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
+		&& (dest->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*dest))) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
@@ -2392,7 +2392,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, UI.CurrentMapLayer->ID) && (explored || ReplayRevealMap)) {
 			//Wyrmgus end
 				const int flush = !(KeyModifiers & ModifierShift);
-				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.PlacementSuccess[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 				PlayUnitSound(*Selected[0], VoiceBuild);
 				for (size_t i = 0; i != Selected.size(); ++i) {
 					//Wyrmgus start
@@ -2404,10 +2404,10 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != ThisPlayer->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[ThisPlayer->StartMapLayer]->Plane || UI.CurrentMapLayer->World != CMap::Map.MapLayers[ThisPlayer->StartMapLayer]->World)) {
-					ThisPlayer->Notify("%s", _("Cannot build in another plane or world"));
+				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->Plane || UI.CurrentMapLayer->World != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->World)) {
+					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
 				}
-				PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			}
 		} else {
 			CancelBuildingMode();
@@ -2419,7 +2419,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		UnitUnderCursor = nullptr;
 		GameCursor = UI.Point.Cursor;  // Reset
 		CursorStartScreenPos = CursorScreenPos;
-		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CurrentCursorState == CursorState::Point) {
+		if (!Selected.empty() && Selected[0]->Player == CPlayer::GetThisPlayer() && CurrentCursorState == CursorState::Point) {
 			CurrentCursorState = CursorState::PieMenu;
 		}
 #ifdef USE_TOUCHSCREEN
@@ -2617,8 +2617,8 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		//Wyrmgus end
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
-//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
+//			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
@@ -2681,7 +2681,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()) {
 					size_t j = 0;
@@ -2716,7 +2716,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			}
 			//  clicked on upgrading button
 		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
 					SendCommandCancelUpgradeTo(*Selected[0]);
@@ -2724,7 +2724,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			}
 			//  clicked on researching button
 		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
 					SendCommandCancelResearch(*Selected[0]);
@@ -2735,21 +2735,21 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			//  for transporter
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->IsAllied(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
 					size_t j = 0;
 
 					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 							continue;
 						}
 						if (ButtonAreaUnderCursor == ButtonAreaTransporting
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
 								Assert(uins->Boarded);
 								const int flush = !(KeyModifiers & ModifierShift);
-								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
 									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
 								}
 						}
@@ -2760,25 +2760,25 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		//Wyrmgus start
 		} else if (ButtonAreaUnderCursor == ButtonAreaInventory) {
 			//  for inventory unit
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (Selected[0]->InsideCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
 					size_t j = 0;
 
 					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-						if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+						if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 							continue;
 						}
 						if (ButtonAreaUnderCursor == ButtonAreaInventory
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
 								Assert(uins->Type->BoolFlag[ITEM_INDEX].value);
 								const int flush = !(KeyModifiers & ModifierShift);
-								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
 									if ((1 << button) == LeftButton) {
 										if  (!uins->Bound) {
 											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
 										} else {
-											if (Selected[0]->Player == ThisPlayer) {
+											if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
 												std::string item_name = uins->GetMessageName();
 												if (!uins->Unique) {
 													item_name = "the " + item_name;
@@ -2799,7 +2799,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
@@ -3076,7 +3076,7 @@ void UIHandleButtonUp(unsigned button)
 		
 		//Wyrmgus start
 //		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
-		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
+		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player))) {
 		//Wyrmgus end
 			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
@@ -3150,7 +3150,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			CUnit *unit = nullptr;
-			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
@@ -3174,7 +3174,7 @@ void UIHandleButtonUp(unsigned button)
 					// Don't allow to select own and enemy units.
 					// Don't allow mixing buildings
 				} else if (KeyModifiers & ModifierShift
-						   && (unit->Player == ThisPlayer || ThisPlayer->IsTeamed(*unit))
+						   && (unit->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*unit))
 						   //Wyrmgus start
 //						   && !unit->Type->BoolFlag[BUILDING_INDEX].value
 						   && (!Selected.size() || UnitCanBeSelectedWith(*Selected[0], *unit))
@@ -3182,7 +3182,7 @@ void UIHandleButtonUp(unsigned button)
 						   //Wyrmgus start
 //						   && (Selected.size() != 1 || !Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)
 						   //Wyrmgus end
-						   && (Selected.size() != 1 || Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]))) {
+						   && (Selected.size() != 1 || Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]))) {
 					num = ToggleSelectUnit(*unit);
 					if (!num) {
 						SelectionChanged();
@@ -3209,13 +3209,13 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (Selected.size() == 1) {
-				if (Selected[0]->CurrentAction() == UnitAction::Built && Selected[0]->Player->Index == ThisPlayer->Index) {
+				if (Selected[0]->CurrentAction() == UnitAction::Built && Selected[0]->Player->Index == CPlayer::GetThisPlayer()->Index) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
-				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0])
-						   || ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) {
+				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
+						   || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) {
 					PlayUnitSound(*Selected[0], VoiceSelected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
@@ -3318,7 +3318,7 @@ void DrawPieMenu()
 			if (gray) {
 				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 			} else {
-				buttons[i].Icon.Icon->DrawIcon(pos, ThisPlayer->Index);
+				buttons[i].Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->Index);
 			}
 
 			// Tutorial show command key in icons

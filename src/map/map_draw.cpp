@@ -396,7 +396,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	CLabel label(font, "white", "red");
 	int x;
 	int y = std::min<int>(GameCursor->G->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
-	const CPlayer *tplayer = ThisPlayer;
+	const CPlayer *tplayer = CPlayer::GetThisPlayer();
 
 	if (unit && unit->IsAliveOnMap()) {
 		int backgroundColor;

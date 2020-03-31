@@ -293,9 +293,9 @@ static void AnimateActionTrain(CUnit &unit)
 	
 	//Wyrmgus start
 	if (nType.BoolFlag[RAIL_INDEX].value && !unit.HasAdjacentRailForUnitType(&nType)) {
-		if (&player == ThisPlayer) {
-			ThisPlayer->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
-			PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
+		if (&player == CPlayer::GetThisPlayer()) {
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
+			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		}
 		unit.Wait = CYCLES_PER_SECOND * 10;
 		return;
@@ -419,7 +419,7 @@ static void AnimateActionTrain(CUnit &unit)
 		//we don't need to send the player a message every time a new unit is ready
 		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 
-		if (&player == ThisPlayer) {
+		if (&player == CPlayer::GetThisPlayer()) {
 			PlayUnitSound(*newUnit, VoiceReady);
 		}
 		if (newUnit->Player->AiEnabled) {

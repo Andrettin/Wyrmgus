@@ -2339,7 +2339,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (&player == ThisPlayer) {
+	if (&player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2386,7 +2386,7 @@ void UpgradeLost(CPlayer &player, int id)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (&player == ThisPlayer) {
+	if (&player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2487,7 +2487,7 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (unit.Player == ThisPlayer) {
+	if (unit.Player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2549,7 +2549,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (unit.Player == ThisPlayer) {
+	if (unit.Player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 }
@@ -2603,7 +2603,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	//
 	//  Upgrades could change the buttons displayed.
 	//
-	if (unit.Player == ThisPlayer) {
+	if (unit.Player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 	

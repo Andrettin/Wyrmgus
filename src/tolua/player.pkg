@@ -9,6 +9,8 @@ enum PlayerTypes {
 
 class CPlayer
 {
+	static CPlayer *GetThisPlayer();
+	
 	int Index;
 	string Name;
 
@@ -83,7 +85,6 @@ class CPlayer
 };
 
 extern CPlayer Players[PlayerMax];
-extern CPlayer *ThisPlayer;
 
 //Wyrmgus start
 extern bool LanguageCacheOutdated;

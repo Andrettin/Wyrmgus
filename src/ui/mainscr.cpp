@@ -293,9 +293,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
 		|| (unit.Player->Type == PlayerNeutral && condition->HideNeutral)
-		|| (unit.Player != ThisPlayer && !ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && condition->HideNeutral)
-		|| (ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent)
-		|| (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && condition->HideAllied)
+		|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && condition->HideNeutral)
+		|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !condition->ShowOpponent)
+		|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && condition->HideAllied)
 		|| (condition->ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
 	) {
 		return false;
@@ -449,17 +449,17 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 
 	switch (t) {
 		case 0: // Unit:
-			var = &type.Stats[ThisPlayer->Index].Variables[index];;
+			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];;
 			break;
 		case 1: // Type:
 			var = &type.MapDefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
-			var = &type.Stats[ThisPlayer->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
 			break;
 		default:
 			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
-			var = &type.Stats[ThisPlayer->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
 			break;
 	}
 	switch (e) {
@@ -480,7 +480,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent:
-			Assert(type.Stats[ThisPlayer->Index].Variables[index].Max != 0);
+			Assert(type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
@@ -516,7 +516,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
-			CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
+			CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*CPlayer::GetThisPlayer());
 //			CIcon &icon = *order.GetUnitType().Icon.Icon;
 			CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 			//Wyrmgus end
@@ -555,7 +555,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
+					CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*CPlayer::GetThisPlayer());
 					CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -703,7 +703,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
 		//Wyrmgus start
 //		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
-		if (!uins->Boarded || j >= UI.TransportingButtons.size() || (unit.Player != ThisPlayer && uins->Player != ThisPlayer)) {
+		if (!uins->Boarded || j >= UI.TransportingButtons.size() || (unit.Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 		//Wyrmgus end
 			continue;
 		}
@@ -800,8 +800,8 @@ static void DrawUnitInfo(CUnit &unit)
 	DrawUnitInfo_portrait(unit);
 
 	//Wyrmgus start
-//	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player)) {
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) && !ThisPlayer->HasBuildingAccess(*unit.Player)) {
+//	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player)) {
+	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*unit.Player)) {
 	//Wyrmgus end
 		return;
 	}
@@ -849,12 +849,12 @@ void DrawResources()
 	}
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].TextX != -1) {
-			const int resourceAmount = ThisPlayer->Resources[i];
+			const int resourceAmount = CPlayer::GetThisPlayer()->Resources[i];
 
-			if (ThisPlayer->MaxResources[i] != -1) {
-				const int resAmount = ThisPlayer->StoredResources[i] + ThisPlayer->Resources[i];
+			if (CPlayer::GetThisPlayer()->MaxResources[i] != -1) {
+				const int resAmount = CPlayer::GetThisPlayer()->StoredResources[i] + CPlayer::GetThisPlayer()->Resources[i];
 				char tmp[256];
-				snprintf(tmp, sizeof(tmp), "%d (%d)", resAmount, ThisPlayer->MaxResources[i] - ThisPlayer->StoredResources[i]);
+				snprintf(tmp, sizeof(tmp), "%d (%d)", resAmount, CPlayer::GetThisPlayer()->MaxResources[i] - CPlayer::GetThisPlayer()->StoredResources[i]);
 				
 				UI.Resources[i].Text = tmp;
 				UI.Resources[i].Font = &GetSmallFont();
@@ -872,18 +872,18 @@ void DrawResources()
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
 		char tmp[256];
-		snprintf(tmp, sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
+		snprintf(tmp, sizeof(tmp), "%d/%d", CPlayer::GetThisPlayer()->Demand, CPlayer::GetThisPlayer()->Supply);
 		UI.Resources[FoodCost].Text = tmp;
 		UI.Resources[FoodCost].Font = &GetGameFont();
 		label.SetFont(*UI.Resources[FoodCost].Font);
-		if (ThisPlayer->Supply < ThisPlayer->Demand) {
+		if (CPlayer::GetThisPlayer()->Supply < CPlayer::GetThisPlayer()->Demand) {
 			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);
 		} else {
 			label.Draw(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);
 		}
 	}
 	if (UI.Resources[ScoreCost].TextX != -1) {
-		const int score = ThisPlayer->Score;
+		const int score = CPlayer::GetThisPlayer()->Score;
 
 		UI.Resources[ScoreCost].Text = FormatNumber(score);
 		UI.Resources[ScoreCost].Font = score > 99999 ? &GetSmallFont() : &GetGameFont();
@@ -892,7 +892,7 @@ void DrawResources()
 		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, UI.Resources[ScoreCost].Text);
 	}
 	if (UI.Resources[FreeWorkersCount].TextX != -1) {
-		const int workers = ThisPlayer->FreeWorkers.size();
+		const int workers = CPlayer::GetThisPlayer()->FreeWorkers.size();
 
 		label.SetFont(GetGameFont());
 		label.Draw(UI.Resources[FreeWorkersCount].TextX, UI.Resources[FreeWorkersCount].TextY, workers);
@@ -931,8 +931,8 @@ void DrawTime() {
 		UI.SeasonPanel.G->DrawFrameClip(UI.SeasonPanel.IconFrame, UI.SeasonPanel.IconX, UI.SeasonPanel.IconY);
 	}
 	
-	if (ThisPlayer) {
-		CCalendar *calendar = CCivilization::Civilizations[ThisPlayer->Race]->GetCalendar();
+	if (CPlayer::GetThisPlayer()) {
+		CCalendar *calendar = CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race]->GetCalendar();
 		
 		if (calendar) {
 			if (UI.DatePanel.TextX != -1) {
@@ -948,7 +948,8 @@ void DrawTime() {
 /**
 **	@brief	Draw the age
 */
-void DrawAge() {
+void DrawAge()
+{
 	if (UI.AgePanel.G) {
 		UI.AgePanel.G->DrawFrameClip(UI.AgePanel.IconFrame, UI.AgePanel.IconX, UI.AgePanel.IconY);
 	}
@@ -1018,7 +1019,7 @@ void DrawPopups()
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
 			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
-			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*ThisPlayer);
+			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
@@ -1079,7 +1080,7 @@ void DrawPopups()
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
+		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 
@@ -1148,7 +1149,7 @@ void DrawPopups()
 		}
 	}
 	
-	if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
+	if (UI.IdleWorkerButton && !CPlayer::GetThisPlayer()->FreeWorkers.empty()) {
 		if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
 			std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
 			if (!Preference.NoStatusLineTooltips) {
@@ -1159,7 +1160,7 @@ void DrawPopups()
 		}
 	}
 		
-	if (UI.LevelUpUnitButton && !ThisPlayer->LevelUpUnits.empty()) {
+	if (UI.LevelUpUnitButton && !CPlayer::GetThisPlayer()->LevelUpUnits.empty()) {
 		if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
 			std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
 			if (!Preference.NoStatusLineTooltips) {
@@ -1170,10 +1171,10 @@ void DrawPopups()
 		}
 	}
 
-	for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < ThisPlayer->Heroes.size(); ++i) {
+	for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < CPlayer::GetThisPlayer()->Heroes.size(); ++i) {
 		if (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) { //if the mouse is hovering over the level up unit button, draw a tooltip
 			std::string custom_hero_unit_tooltip = _("Select");
-			custom_hero_unit_tooltip += " " + ThisPlayer->Heroes[i]->GetMessageName();
+			custom_hero_unit_tooltip += " " + CPlayer::GetThisPlayer()->Heroes[i]->GetMessageName();
 			if (!Preference.NoStatusLineTooltips) {
 				CLabel label(GetGameFont());
 				label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
@@ -1483,8 +1484,8 @@ void MessagesDisplay::DrawMessages()
 				}
 			}
 			
-			for (size_t i = 0; i < ThisPlayer->CurrentQuests.size(); ++i) {
-				const CQuest *quest = ThisPlayer->CurrentQuests[i];
+			for (size_t i = 0; i < CPlayer::GetThisPlayer()->CurrentQuests.size(); ++i) {
+				const CQuest *quest = CPlayer::GetThisPlayer()->CurrentQuests[i];
 
 				if (z == 0) {
 					PushClipping();
@@ -1498,8 +1499,8 @@ void MessagesDisplay::DrawMessages()
 				
 				++z;
 				
-				for (size_t j = 0; j < ThisPlayer->QuestObjectives.size(); ++j) {
-					const CPlayerQuestObjective *objective = ThisPlayer->QuestObjectives[j];
+				for (size_t j = 0; j < CPlayer::GetThisPlayer()->QuestObjectives.size(); ++j) {
+					const CPlayerQuestObjective *objective = CPlayer::GetThisPlayer()->QuestObjectives[j];
 					if (objective->Quest != quest) {
 						continue;
 					}
@@ -1896,7 +1897,7 @@ static void DrawInfoPanelBackground(unsigned frame)
 static void InfoPanel_draw_no_selection()
 {
 	DrawInfoPanelBackground(0);
-	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*ThisPlayer)
+	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		// FIXME: not correct for enemies units
 		DrawUnitInfo(*UnitUnderCursor);
@@ -1924,11 +1925,11 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
 //			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && !Players[i].HasNeutralFactionType() && ThisPlayer->HasContactWith(Players[i]) && Players[i].GetUnitCount() > 0) {
+			if (Players[i].Type != PlayerNobody && !Players[i].HasNeutralFactionType() && CPlayer::GetThisPlayer()->HasContactWith(Players[i]) && Players[i].GetUnitCount() > 0) {
 			//Wyrmgus end
-				if (ThisPlayer->IsAllied(Players[i])) {
+				if (CPlayer::GetThisPlayer()->IsAllied(Players[i])) {
 					label.SetNormalColor(FontGreen);
-				} else if (ThisPlayer->IsEnemy(Players[i])) {
+				} else if (CPlayer::GetThisPlayer()->IsEnemy(Players[i])) {
 					label.SetNormalColor(FontRed);
 				} else {
 					label.SetNormalColor(nc);
@@ -1964,9 +1965,9 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	int panelIndex;
 
 	// FIXME: not correct for enemy's units
-	if (unit.Player == ThisPlayer
-		|| ThisPlayer->IsTeamed(unit)
-		|| ThisPlayer->IsAllied(unit)
+	if (unit.Player == CPlayer::GetThisPlayer()
+		|| CPlayer::GetThisPlayer()->IsTeamed(unit)
+		|| CPlayer::GetThisPlayer()->IsAllied(unit)
 		|| ReplayRevealMap) {
 		if (unit.Orders[0]->Action == UnitAction::Built
 			|| unit.Orders[0]->Action == UnitAction::Research
@@ -1993,7 +1994,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
 		&& unit.CurrentAction() != UnitAction::Built
-		&& !unit.IsEnemy(*ThisPlayer)
+		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
 	) {
 		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4, UI.InfoPanel.Y + 93);
@@ -2082,7 +2083,7 @@ static void InfoPanel_draw_multiple_selection()
 void CInfoPanel::Draw()
 {
 	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value
-		&& (ReplayRevealMap || UnitUnderCursor->IsVisible(*ThisPlayer))) {
+		&& (ReplayRevealMap || UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer()))) {
 			InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {
 		switch (Selected.size()) {

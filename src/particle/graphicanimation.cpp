@@ -95,8 +95,8 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	for (p.x = minPos.x; p.x <= maxPos.x; ++p.x) {
 		for (p.y = minPos.y; p.y <= maxPos.y; ++p.y) {
 			//Wyrmgus start
-//			if (ReplayRevealMap || CMap::Map.Field(p)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			if (ReplayRevealMap || CMap::Map.Field(p, z)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+//			if (ReplayRevealMap || CMap::Map.Field(p)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			if (ReplayRevealMap || CMap::Map.Field(p, z)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			//Wyrmgus end
 				return true;
 			}

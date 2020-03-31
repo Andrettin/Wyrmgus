@@ -349,12 +349,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int NumPlayers;                  /// How many player slots used
-CPlayer Players[PlayerMax];       /// All players in play
-CPlayer *ThisPlayer;              /// Player on this computer
-PlayerRace PlayerRaces;          /// Player races
+int NumPlayers; //how many player slots used
+CPlayer Players[PlayerMax]; //all players in play
+PlayerRace PlayerRaces; //player races
+CPlayer *CPlayer::ThisPlayer = nullptr;
 
-bool NoRescueCheck;               /// Disable rescue check
+bool NoRescueCheck; //disable rescue check
 
 /**
 **  Colors used for minimap.
@@ -834,7 +834,7 @@ void InitPlayers()
 */
 void CleanPlayers()
 {
-	ThisPlayer = nullptr;
+	CPlayer::SetThisPlayer(nullptr);
 	for (unsigned int i = 0; i < PlayerMax; ++i) {
 		Players[i].Clear();
 	}
@@ -876,9 +876,18 @@ void SavePlayers(CFile &file)
 		Players[i].Save(file);
 	}
 
-	file.printf("SetThisPlayer(%d)\n\n", ThisPlayer->Index);
+	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->Index);
 }
 
+void CPlayer::SetThisPlayer(CPlayer *player)
+{
+	CPlayer::ThisPlayer = player;
+}
+
+CPlayer *CPlayer::GetThisPlayer()
+{
+	return CPlayer::ThisPlayer;
+}
 
 void CPlayer::Save(CFile &file) const
 {
@@ -1274,14 +1283,14 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
 	if (type == PlayerPerson && !NetPlayers) {
-		if (!ThisPlayer) {
-			ThisPlayer = this;
+		if (!CPlayer::GetThisPlayer()) {
+			CPlayer::SetThisPlayer(this);
 		} else {
 			type = PlayerComputer;
 		}
 	}
 	if (NetPlayers && NumPlayers == NetLocalPlayerNumber) {
-		ThisPlayer = &Players[NetLocalPlayerNumber];
+		CPlayer::SetThisPlayer(&Players[NetLocalPlayerNumber]);
 	}
 
 	if (NumPlayers == PlayerMax) {
@@ -1465,7 +1474,7 @@ void CPlayer::SetCivilization(int civilization)
 	this->Race = civilization;
 
 	//if the civilization of the person player changed, update the UI
-	if ((ThisPlayer && ThisPlayer->Index == this->Index) || (!ThisPlayer && this->Index == 0)) {
+	if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
 		//load proper UI
 		char buf[256];
 		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
@@ -1532,7 +1541,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 	
 	this->Faction = faction_id;
 
-	if (this->Index == ThisPlayer->Index) {
+	if (this->Index == CPlayer::GetThisPlayer()->Index) {
 		UI.Load();
 	}
 	
@@ -1716,7 +1725,7 @@ void CPlayer::SetAge(CAge *age)
 	
 	this->Age = age;
 	
-	if (this == ThisPlayer) {
+	if (this == CPlayer::GetThisPlayer()) {
 		if (this->Age) {
 			UI.AgePanel.Text = this->Age->Name;
 			UI.AgePanel.G = this->Age->G;
@@ -1789,7 +1798,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		if (!chosen_upgrade->Name.empty()) {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->Name.c_str(), this->Name.c_str());
 		}
-		if (&player == ThisPlayer) {
+		if (&player == CPlayer::GetThisPlayer()) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
 
 			if (sound) {
@@ -2664,8 +2673,8 @@ void CPlayer::UpdateQuestPool()
 	this->AvailableQuestsChanged();
 
 	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
-	if (this == ThisPlayer && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0) {
-		ThisPlayer->Notify("%s", _("New quests available"));
+	if (this == CPlayer::GetThisPlayer() && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0) {
+		CPlayer::GetThisPlayer()->Notify("%s", _("New quests available"));
 	}
 	
 	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
@@ -2680,7 +2689,7 @@ void CPlayer::UpdateQuestPool()
 
 void CPlayer::AvailableQuestsChanged()
 {
-	if (this == ThisPlayer) {
+	if (this == CPlayer::GetThisPlayer()) {
 		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
 			if (UnitButtonTable[i]->Action != ButtonCmd::Quest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
 				continue;
@@ -2804,7 +2813,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 		quest->CompletionEffects->run();
 	}
 	
-	if (this == ThisPlayer) {
+	if (this == CPlayer::GetThisPlayer()) {
 		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
 		SaveQuestCompletion();
 		std::string rewards_string;
@@ -2826,7 +2835,7 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 		quest->FailEffects->run();
 	}
 	
-	if (this == ThisPlayer) {
+	if (this == CPlayer::GetThisPlayer()) {
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
@@ -3541,14 +3550,11 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 			const char *name = DefaultResourceNames[i].c_str();
 			const char *actionName = CResource::Resources[i]->ActionName.c_str();
 
-			//Wyrmgus start
-//			Notify(_("Not enough %s...%s more %s."), _(name), _(actionName), _(name));
-			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name)); //added extra space to look better
-			//Wyrmgus end
+			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name));
 
 			//Wyrmgus start
-//			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
-			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound && !sound_played) {
+//			if (this == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[this->Race][i].Sound) {
+			if (this == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[this->Race][i].Sound && !sound_played) {
 				sound_played = true;
 			//Wyrmgus end
 				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
@@ -3955,7 +3961,7 @@ void PlayersEachCycle()
 		CPlayer &p = Players[player];
 		
 		//Wyrmgus start
-		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < ((int) GameCycle) && ThisPlayer->HasContactWith(p)) {
+		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(p)) {
 			p.Revealed = true;
 			for (int j = 0; j < NumPlayers; ++j) {
 				if (player != j && Players[j].Type != PlayerNobody) {
@@ -4151,7 +4157,7 @@ void DebugPlayers()
 			default : playertype = "?unknown?   "; break;
 		}
 		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
-				   ThisPlayer == &Players[i] ? '*' :
+		           CPlayer::GetThisPlayer() == &Players[i] ? '*' :
 				   Players[i].AiEnabled ? '+' : ' ' _C_
 				   Players[i].Name.c_str() _C_ playertype _C_
 				   PlayerRaces.Name[Players[i].Race].c_str() _C_
@@ -4178,7 +4184,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 	va_list va;
 
 	// Notify me, and my TEAM members
-	if (this != ThisPlayer && !IsTeamed(*ThisPlayer)) {
+	if (this != CPlayer::GetThisPlayer() && !IsTeamed(*CPlayer::GetThisPlayer())) {
 		return;
 	}
 
@@ -4202,7 +4208,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 //	UI.Minimap.AddEvent(pos, color);
 	UI.Minimap.AddEvent(pos, z, color);
 	//Wyrmgus end
-	if (this == ThisPlayer) {
+	if (this == CPlayer::GetThisPlayer()) {
 		//Wyrmgus start
 //		SetMessageEvent(pos, "%s", temp);
 		SetMessageEvent(pos, z, "%s", temp);
@@ -4228,7 +4234,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 void CPlayer::Notify(const char *fmt, ...) const
 {
 	// Notify me, and my TEAM members
-	if (this != ThisPlayer && !IsTeamed(*ThisPlayer)) {
+	if (this != CPlayer::GetThisPlayer() && !IsTeamed(*CPlayer::GetThisPlayer())) {
 		return;
 	}
 	char temp[128];
@@ -4238,7 +4244,7 @@ void CPlayer::Notify(const char *fmt, ...) const
 	temp[sizeof(temp) - 1] = '\0';
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
-	if (this == ThisPlayer) {
+	if (this == CPlayer::GetThisPlayer()) {
 		SetMessage("%s", temp);
 	} else {
 		SetMessage("(%s): %s", Name.c_str(), temp);
@@ -4251,8 +4257,8 @@ void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 	this->Allied &= ~(1 << player.Index);
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
-		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->Name.c_str()));
+	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
 }
@@ -4263,8 +4269,8 @@ void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 	this->Allied |= 1 << player.Index;
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
-		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
+	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
 }
@@ -4278,8 +4284,8 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 	this->Allied &= ~(1 << player.Index);
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
-		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
+	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
 	}
 	
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
@@ -4297,8 +4303,8 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 	this->Allied |= 1 << player.Index;
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
-		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));
+	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
 }
@@ -4308,8 +4314,8 @@ void CPlayer::ShareVisionWith(const CPlayer &player)
 	this->SharedVision |= (1 << player.Index);
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
-		ThisPlayer->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
+	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+		CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
 }
@@ -4319,8 +4325,8 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 	this->SharedVision &= ~(1 << player.Index);
 	
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
-		ThisPlayer->Notify(_("%s is no longer sharing vision with us"), _(this->Name.c_str()));
+	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
+		CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
 }

@@ -276,7 +276,7 @@ static void UiAddGroupToSelection(unsigned group)
 static void UiDefineGroup(unsigned group)
 {
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player == ThisPlayer && Selected[i]->GroupId) {
+		if (Selected[i]->Player == CPlayer::GetThisPlayer() && Selected[i]->GroupId) {
 			RemoveUnitFromGroups(*Selected[i]);
 		}
 	}
@@ -510,17 +510,17 @@ void UiToggleTerrain()
 */
 void UiFindIdleWorker()
 {
-	if (ThisPlayer->FreeWorkers.empty()) {
+	if (CPlayer::GetThisPlayer()->FreeWorkers.empty()) {
 		return;
 	}
-	CUnit *unit = ThisPlayer->FreeWorkers[0];
+	CUnit *unit = CPlayer::GetThisPlayer()->FreeWorkers[0];
 	if (LastIdleWorker) {
-		const std::vector<CUnit *> &freeWorkers = ThisPlayer->FreeWorkers;
+		const std::vector<CUnit *> &freeWorkers = CPlayer::GetThisPlayer()->FreeWorkers;
 		std::vector<CUnit *>::const_iterator it = std::find(freeWorkers.begin(),
 															freeWorkers.end(),
 															LastIdleWorker);
-		if (it != ThisPlayer->FreeWorkers.end()) {
-			if (*it != ThisPlayer->FreeWorkers.back()) {
+		if (it != CPlayer::GetThisPlayer()->FreeWorkers.end()) {
+			if (*it != CPlayer::GetThisPlayer()->FreeWorkers.back()) {
 				unit = *(++it);
 			}
 		}
@@ -547,17 +547,17 @@ void UiFindIdleWorker()
 */
 void UiFindLevelUpUnit()
 {
-	if (ThisPlayer->LevelUpUnits.empty()) {
+	if (CPlayer::GetThisPlayer()->LevelUpUnits.empty()) {
 		return;
 	}
-	CUnit *unit = ThisPlayer->LevelUpUnits[0];
+	CUnit *unit = CPlayer::GetThisPlayer()->LevelUpUnits[0];
 	if (LastLevelUpUnit) {
-		const std::vector<CUnit *> &levelUpUnits = ThisPlayer->LevelUpUnits;
+		const std::vector<CUnit *> &levelUpUnits = CPlayer::GetThisPlayer()->LevelUpUnits;
 		std::vector<CUnit *>::const_iterator it = std::find(levelUpUnits.begin(),
 															levelUpUnits.end(),
 															LastLevelUpUnit);
-		if (it != ThisPlayer->LevelUpUnits.end()) {
-			if (*it != ThisPlayer->LevelUpUnits.back()) {
+		if (it != CPlayer::GetThisPlayer()->LevelUpUnits.end()) {
+			if (*it != CPlayer::GetThisPlayer()->LevelUpUnits.back()) {
 				unit = *(++it);
 			}
 		}
@@ -583,10 +583,10 @@ void UiFindLevelUpUnit()
 */
 void UiFindHeroUnit(int hero_index)
 {
-	if ((int) ThisPlayer->Heroes.size() <= hero_index) {
+	if (static_cast<int>(CPlayer::GetThisPlayer()->Heroes.size()) <= hero_index) {
 		return;
 	}
-	CUnit *unit = ThisPlayer->Heroes[hero_index];
+	CUnit *unit = CPlayer::GetThisPlayer()->Heroes[hero_index];
 
 	SelectSingleUnit(*unit);
 	UI.StatusLine.Clear();
@@ -1119,19 +1119,19 @@ static int InputKey(int key)
 				//Wyrmgus start
 				/*
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
-						 PlayerColorNames[ThisPlayer->Index].c_str(),
+						 PlayerColorNames[CPlayer::GetThisPlayer()->Index].c_str(),
 				*/
 				int player_color; // make the player color be correct for the faction
 				for (int j = 0; j < PlayerColorMax; ++j) {
-					if (PlayerColors[j][0] == ThisPlayer->Color) {
+					if (PlayerColors[j][0] == CPlayer::GetThisPlayer()->Color) {
 						player_color = j;
 						break;
 					}
 				}
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
-						 PlayerColorNames[player_color].c_str(),
+					PlayerColorNames[player_color].c_str(),
 				//Wyrmgus end
-						 ThisPlayer->Name.c_str(), Input);
+					CPlayer::GetThisPlayer()->Name.c_str(), Input);
 				// FIXME: only to selected players ...
 				NetworkSendChatMessage(chatMessage);
 			}

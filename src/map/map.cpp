@@ -1082,7 +1082,7 @@ void PreprocessMap()
 				CMap::Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
-				if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+				if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf, z);
 				}
 			}
@@ -1226,7 +1226,7 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 */
 void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const int z)
 {
-	if (z >= CMap::Map.MapLayers.size()) {
+	if (z >= static_cast<int>(CMap::Map.MapLayers.size())) {
 		fprintf(stderr, "Error in CMap::SetTimeOfDaySchedule: the given map layer index (%d) is not valid given the map layer quantity (%d).\n", z, CMap::Map.MapLayers.size());
 		return;
 	}
@@ -1753,7 +1753,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	this->CalculateTileTransitions(pos, true, z);
 	this->CalculateTileTerrainFeature(pos, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -1772,7 +1772,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 					this->CalculateTileTransitions(adjacent_pos, false, z);
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
-					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+					if (adjacent_mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
@@ -1817,7 +1817,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	this->CalculateTileTransitions(pos, true, z);
 	this->CalculateTileTerrainFeature(pos, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -1831,7 +1831,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
-					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+					if (adjacent_mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
@@ -1898,7 +1898,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	this->CalculateTileTransitions(pos, true, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -1916,7 +1916,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
-					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+					if (adjacent_mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
@@ -1953,7 +1953,7 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 	
 	this->CalculateTileTransitions(pos, true, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);

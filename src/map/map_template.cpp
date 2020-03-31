@@ -642,12 +642,12 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	
 	if (current_campaign) {
 		CFaction* current_faction = current_campaign->GetFaction();
-		if (current_faction != nullptr && !this->IsSubtemplateArea() && ThisPlayer->Faction != current_faction->ID) {
-			ThisPlayer->SetCivilization(current_faction->Civilization->ID);
-			ThisPlayer->SetFaction(current_faction);
-			ThisPlayer->Resources[CopperCost] = 2500; // give the player enough resources to start up
-			ThisPlayer->Resources[WoodCost] = 2500;
-			ThisPlayer->Resources[StoneCost] = 2500;
+		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->Faction != current_faction->ID) {
+			CPlayer::GetThisPlayer()->SetCivilization(current_faction->Civilization->ID);
+			CPlayer::GetThisPlayer()->SetFaction(current_faction);
+			CPlayer::GetThisPlayer()->Resources[CopperCost] = 2500; // give the player enough resources to start up
+			CPlayer::GetThisPlayer()->Resources[WoodCost] = 2500;
+			CPlayer::GetThisPlayer()->Resources[StoneCost] = 2500;
 		}
 	}
 	
@@ -788,7 +788,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 			}
 		}
 		
-		if (Players[i].NumTownHalls > 0 || Players[i].Index == ThisPlayer->Index) {
+		if (Players[i].NumTownHalls > 0 || Players[i].Index == CPlayer::GetThisPlayer()->Index) {
 			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
 				CMap::Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
 			}

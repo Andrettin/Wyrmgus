@@ -1541,7 +1541,7 @@ std::string EvalString(const StringDesc *s)
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[ThisPlayer->Index].ImproveIncomes[res] > CResource::Resources[res]->DefaultIncome) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > CResource::Resources[res]->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1549,7 +1549,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += IdentToName(DefaultResourceNames[res]);
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) (**type).Stats[ThisPlayer->Index].ImproveIncomes[res] - CResource::Resources[res]->DefaultIncome);
+						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - CResource::Resources[res]->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}
@@ -1563,7 +1563,7 @@ std::string EvalString(const StringDesc *s)
 				std::string luxury_demand;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[ThisPlayer->Index].ResourceDemand[res]) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]) {
 						if (!first) {
 							luxury_demand += "\n";
 						} else {
@@ -1571,7 +1571,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						luxury_demand += IdentToName(DefaultResourceNames[res]);
 						luxury_demand += " Demand: ";
-						luxury_demand += std::to_string((long long) (**type).Stats[ThisPlayer->Index].ResourceDemand[res]);
+						luxury_demand += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]);
 					}
 				}
 				return luxury_demand;
@@ -1638,11 +1638,11 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == ThisPlayer && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitAction::Built;
+					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == CPlayer::GetThisPlayer() && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitAction::Built;
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->GetCulturalName(ThisPlayer->Race != -1 ? CCivilization::Civilizations[ThisPlayer->Race] : nullptr);
+					settlements_string += (**faction).Cores[i]->GetCulturalName(CPlayer::GetThisPlayer()->Race != -1 ? CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race] : nullptr);
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}
@@ -1695,18 +1695,18 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (ThisPlayer->Incomes[(**resource)] > CResource::Resources[(**resource)]->DefaultIncome) {
+				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > CResource::Resources[(**resource)]->DefaultIncome) {
 					first = false;
 					improve_incomes += CResource::Resources[(**resource)]->Name;
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string((long long) ThisPlayer->Incomes[(**resource)] - CResource::Resources[(**resource)]->DefaultIncome);
+					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - CResource::Resources[(**resource)]->DefaultIncome);
 					improve_incomes += "%";
 				}
 				for (const CResource *child_resource : CResource::Resources[(**resource)]->ChildResources) {
 					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}
-					if (ThisPlayer->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
+					if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1714,7 +1714,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += child_resource->Name;
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) ThisPlayer->Incomes[child_resource->ID] - child_resource->DefaultIncome);
+						improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[child_resource->ID] - child_resource->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}

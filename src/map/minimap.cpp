@@ -811,7 +811,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 {
 	const CUnitType *type;
 
-	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*ThisPlayer)) {
+	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*CPlayer::GetThisPlayer())) {
 		type = unit.Type;
 	} else {
 		type = unit.Seen.Type;
@@ -835,7 +835,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
 	//Wyrmgus end
 		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
-	} else if (unit.Player == ThisPlayer && !Editor.Running) {
+	} else if (unit.Player == CPlayer::GetThisPlayer() && !Editor.Running) {
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
@@ -1024,7 +1024,7 @@ void CMinimap::Update()
 //				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 //				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
 				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->GetWidth());
-				visiontype = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
+				visiontype = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
 				//Wyrmgus end
 			}
 
