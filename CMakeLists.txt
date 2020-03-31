@@ -1068,6 +1068,9 @@ if(BEOS)
 	set(stratagus_SRCS ${stratagus_SRCS} ${beos_SRCS})
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
 if(CMAKE_COMPILER_IS_GNUCXX)
