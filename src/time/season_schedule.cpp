@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name season_schedule.cpp - The season schedule source file. */
-//
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -39,6 +35,7 @@
 
 #include "config.h"
 #include "time/season.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -131,7 +128,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "default_schedule") {
-			const bool is_default_schedule = StringToBool(value);
+			const bool is_default_schedule = string::to_bool(value);
 			if (is_default_schedule) {
 				CSeasonSchedule::DefaultSeasonSchedule = this;
 			}
@@ -207,5 +204,3 @@ int CSeasonSchedule::GetDefaultHourMultiplier() const
 {
 	return DEFAULT_DAY_MULTIPLIER_PER_YEAR;
 }
-
-//@}

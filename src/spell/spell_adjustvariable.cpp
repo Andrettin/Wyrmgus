@@ -38,6 +38,7 @@
 #include "config.h"
 #include "script.h"
 #include "unit/unit.h"
+#include "util/string_util.h"
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -83,7 +84,7 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "enable") {
-					this->Var[index].Enable = StringToBool(value);
+					this->Var[index].Enable = string::to_bool(value);
 					this->Var[index].ModifEnable = 1;
 				} else if (key == "value") {
 					this->Var[index].Value = std::stoi(value);
@@ -95,7 +96,7 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 					this->Var[index].Increase = std::stoi(value);
 					this->Var[index].ModifIncrease = 1;
 				} else if (key == "invert_enable") {
-					this->Var[index].InvertEnable = StringToBool(value);
+					this->Var[index].InvertEnable = string::to_bool(value);
 				} else if (key == "add_value") {
 					this->Var[index].AddValue = std::stoi(value);
 				} else if (key == "add_max") {

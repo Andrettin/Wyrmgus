@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile.cpp - The missile source file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -60,6 +58,7 @@
 #include "unit/unittype.h"
 #include "unit/unit_type_type.h"
 #include "unitsound.h"
+#include "util/string_util.h"
 #include "video.h"
 
 #include <cmath>
@@ -123,7 +122,7 @@ void MissileType::ProcessConfigData(const CConfigData *config_data)
 		if (key == "frames") {
 			this->SpriteFrames = std::stoi(value);
 		} else if (key == "flip") {
-			this->Flip = StringToBool(value);
+			this->Flip = string::to_bool(value);
 		} else if (key == "num_directions") {
 			this->NumDirections = std::stoi(value);
 		} else if (key == "transparency") {
@@ -179,27 +178,27 @@ void MissileType::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->Smoke.Name = value;
 		} else if (key == "can_hit_owner") {
-			this->CanHitOwner = StringToBool(value);
+			this->CanHitOwner = string::to_bool(value);
 		} else if (key == "always_fire") {
-			this->AlwaysFire = StringToBool(value);
+			this->AlwaysFire = string::to_bool(value);
 		} else if (key == "pierce") {
-			this->Pierce = StringToBool(value);
+			this->Pierce = string::to_bool(value);
 		} else if (key == "pierce_once") {
-			this->PierceOnce = StringToBool(value);
+			this->PierceOnce = string::to_bool(value);
 		} else if (key == "pierce_ignore_before_goal") {
-			this->PierceIgnoreBeforeGoal = StringToBool(value);
+			this->PierceIgnoreBeforeGoal = string::to_bool(value);
 		} else if (key == "ignore_walls") {
-			this->IgnoreWalls = StringToBool(value);
+			this->IgnoreWalls = string::to_bool(value);
 		} else if (key == "kill_first_unit") {
-			this->KillFirstUnit = StringToBool(value);
+			this->KillFirstUnit = string::to_bool(value);
 		} else if (key == "friendly_fire") {
-			this->FriendlyFire = StringToBool(value);
+			this->FriendlyFire = string::to_bool(value);
 		} else if (key == "always_hits") {
-			this->AlwaysHits = StringToBool(value);
+			this->AlwaysHits = string::to_bool(value);
 		} else if (key == "splash_factor") {
 			this->SplashFactor = std::stoi(value);
 		} else if (key == "correct_sphash_damage") {
-			this->CorrectSphashDamage = StringToBool(value);
+			this->CorrectSphashDamage = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid missile type property: \"%s\".\n", key.c_str());
 		}

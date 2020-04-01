@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade.cpp - The upgrade/allow source file. */
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //		and Andrettin
 //
@@ -42,7 +40,7 @@
 #include "action/action_train.h"
 //Wyrmgus start
 #include "action/action_upgradeto.h"
-#include "../ai/ai_local.h"
+#include "ai/ai_local.h"
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
@@ -80,11 +78,12 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
 #include "util/util.h"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -281,15 +280,15 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "ability") {
-			this->Ability = StringToBool(value);
+			this->Ability = string::to_bool(value);
 		} else if (key == "weapon") {
-			this->Weapon = StringToBool(value);
+			this->Weapon = string::to_bool(value);
 		} else if (key == "shield") {
-			this->Shield = StringToBool(value);
+			this->Shield = string::to_bool(value);
 		} else if (key == "boots") {
-			this->Boots = StringToBool(value);
+			this->Boots = string::to_bool(value);
 		} else if (key == "arrows") {
-			this->Arrows = StringToBool(value);
+			this->Arrows = string::to_bool(value);
 		} else if (key == "item") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *item = UnitTypeByIdent(value);

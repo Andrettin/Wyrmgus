@@ -32,10 +32,22 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <string>
 
 namespace string {
 
 static inline const std::string empty_str;
+
+inline bool to_bool(const std::string &str)
+{
+	if (str == "true" || str == "yes" || str == "1") {
+		return true;
+	} else if (str == "false" || str == "no" || str == "0") {
+		return false;
+	}
+
+	throw std::runtime_error("Invalid string used for conversion to boolean: \"" + str + "\".");
+}
 
 }

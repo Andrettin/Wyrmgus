@@ -57,6 +57,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -409,11 +410,11 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 				this->Range = std::stoi(value);
 			}
 		} else if (key == "repeat_cast") {
-			this->RepeatCast = StringToBool(value);
+			this->RepeatCast = string::to_bool(value);
 		} else if (key == "stackable") {
-			this->Stackable = StringToBool(value);
+			this->Stackable = string::to_bool(value);
 		} else if (key == "force_use_animation") {
-			this->ForceUseAnimation = StringToBool(value);
+			this->ForceUseAnimation = string::to_bool(value);
 		} else if (key == "target") {
 			if (value == "self") {
 				this->Target = TargetType::Self;
@@ -1042,7 +1043,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 				} else if (key == "max_value_percent") {
 					this->Variable[index].MaxValuePercent = std::stoi(value);
 				} else if (key == "condition_apply_on_caster") {
-					this->Variable[index].ConditionApplyOnCaster = StringToBool(value);
+					this->Variable[index].ConditionApplyOnCaster = string::to_bool(value);
 				} else {
 					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.c_str());
 				}
@@ -1100,7 +1101,7 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", value.c_str());
 					}
 				} else if (key == "reverse_sort") {
-					this->ReverseSort = StringToBool(value);
+					this->ReverseSort = string::to_bool(value);
 				} else {
 					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", key.c_str());
 				}

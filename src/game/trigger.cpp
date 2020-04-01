@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger.cpp - The trigger source file. */
-//
 //      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -54,6 +52,7 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "upgrade/dependency.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -794,9 +793,9 @@ void CTrigger::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "only_once") {
-			this->OnlyOnce = StringToBool(value);
+			this->OnlyOnce = string::to_bool(value);
 		} else if (key == "campaign_only") {
-			this->CampaignOnly = StringToBool(value);
+			this->CampaignOnly = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
 		}

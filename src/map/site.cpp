@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name site.cpp - The site source file. */
-//
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -41,6 +39,7 @@
 #include "player.h" //for factions
 #include "province.h" //for regions
 #include "unit/unittype.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -122,7 +121,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "major") {
-			this->Major = StringToBool(value);
+			this->Major = string::to_bool(value);
 		} else if (key == "position_x") {
 			this->Position.x = std::stoi(value);
 		} else if (key == "position_y") {

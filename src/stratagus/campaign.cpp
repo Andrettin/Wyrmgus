@@ -40,6 +40,7 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
+#include "util/string_util.h"
 
 #include <mutex>
 
@@ -157,9 +158,9 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "hidden") {
-			this->Hidden = StringToBool(value);
+			this->Hidden = string::to_bool(value);
 		} else if (key == "sandbox") {
-			this->Sandbox = StringToBool(value);
+			this->Sandbox = string::to_bool(value);
 		} else if (key == "start_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->StartDate = CDate::FromString(value);

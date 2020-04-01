@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name button_level.cpp - The button level source file. */
-//
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -38,6 +34,7 @@
 #include "ui/button_level.h"
 
 #include "config.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -124,12 +121,12 @@ void CButtonLevel::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "cancel_button_level") {
-			const bool is_cancel_button_level = StringToBool(value);
+			const bool is_cancel_button_level = string::to_bool(value);
 			if (is_cancel_button_level) {
 				CButtonLevel::CancelButtonLevel = this;
 			}
 		} else if (key == "inventory_button_level") {
-			const bool is_inventory_button_level = StringToBool(value);
+			const bool is_inventory_button_level = string::to_bool(value);
 			if (is_inventory_button_level) {
 				CButtonLevel::InventoryButtonLevel = this;
 			}
@@ -138,5 +135,3 @@ void CButtonLevel::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
-
-//@}

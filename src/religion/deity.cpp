@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity.cpp - The deity source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -44,6 +42,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "upgrade/upgrade.h"
+#include "util/string_util.h"
 
 #include <algorithm>
 
@@ -154,7 +153,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "major") {
-			this->Major = StringToBool(value);
+			this->Major = string::to_bool(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
 			CCivilization *civilization = CCivilization::GetCivilization(value);

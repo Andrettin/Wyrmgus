@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name time_of_day.cpp - The time of day source file. */
-//
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -39,6 +35,7 @@
 
 #include "config.h"
 #include "mod.h"
+#include "util/string_util.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -122,13 +119,13 @@ void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "dawn") {
-			this->Dawn = StringToBool(value);
+			this->Dawn = string::to_bool(value);
 		} else if (key == "day") {
-			this->Day = StringToBool(value);
+			this->Day = string::to_bool(value);
 		} else if (key == "dusk") {
-			this->Dusk = StringToBool(value);
+			this->Dusk = string::to_bool(value);
 		} else if (key == "night") {
-			this->Night = StringToBool(value);
+			this->Night = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid time of day property: \"%s\".\n", key.c_str());
 		}
@@ -189,5 +186,3 @@ bool CTimeOfDay::HasColorModification() const
 {
 	return this->ColorModification.R != 0 || this->ColorModification.G != 0 || this->ColorModification.B != 0;
 }
-
-//@}

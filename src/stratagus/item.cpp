@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name item.cpp - The items. */
-//
-//      (c) Copyright 2015-2019 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -36,11 +32,6 @@
 #include "stratagus.h"
 
 #include "item.h"
-
-#include <ctype.h>
-
-#include <string>
-#include <map>
 
 #include "character.h"
 #include "config.h"
@@ -54,6 +45,11 @@
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
+
+#include <cctype>
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -455,11 +451,11 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "bound") {
-			this->Bound = StringToBool(value);
+			this->Bound = string::to_bool(value);
 		} else if (key == "identified") {
-			this->Identified = StringToBool(value);
+			this->Identified = string::to_bool(value);
 		} else if (key == "equipped") {
-			is_equipped = StringToBool(value);
+			is_equipped = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
 		}
@@ -761,5 +757,3 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 	
 	return "";
 }
-
-//@}

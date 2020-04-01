@@ -303,11 +303,6 @@ std::vector<std::string> SplitString(const std::string &str, const char *separat
 	return output;
 }
 
-bool StringToBool(const std::string &str)
-{
-	return str == "true" || str == "1";
-}
-
 bool IsStringNumber(const std::string &str)
 {
 	for (size_t i = 0; i < str.length(); ++i) {

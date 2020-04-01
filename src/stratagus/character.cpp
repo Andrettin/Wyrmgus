@@ -35,11 +35,7 @@
 
 #include "character.h"
 
-#include <ctype.h>
-
-#include <string>
-#include <map>
-
+#include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "config.h"
 #include "game.h"
@@ -60,8 +56,11 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
 
-#include "../ai/ai_local.h" //for using AiHelpers
+#include <cctype>
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -241,7 +240,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->DeathDate = CDate::FromString(value);
 		} else if (key == "violent_death") {
-			this->ViolentDeath = StringToBool(value);
+			this->ViolentDeath = string::to_bool(value);
 		} else if (key == "father") {
 			value = FindAndReplaceString(value, "_", "-");
 			CCharacter *father = CCharacter::GetCharacter(value);

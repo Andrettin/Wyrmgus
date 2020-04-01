@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.cpp - The unit type source file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -36,7 +34,7 @@
 #include "unit/unittype.h"
 
 //Wyrmgus start
-#include "../ai/ai_local.h" //for using AiHelpers
+#include "ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end
 #include "animation.h"
 #include "animation/animation_exactframe.h"
@@ -69,6 +67,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/string_util.h"
 #include "util/util.h"
 #include "video.h"
 
@@ -852,23 +851,23 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid right mouse action: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "can_attack") {
-			this->CanAttack = StringToBool(value);
+			this->CanAttack = string::to_bool(value);
 		} else if (key == "can_target_land") {
-			const bool can_target_land = StringToBool(value);
+			const bool can_target_land = string::to_bool(value);
 			if (can_target_land) {
 				this->CanTarget |= CanTargetLand;
 			} else {
 				this->CanTarget &= ~CanTargetLand;
 			}
 		} else if (key == "can_target_sea") {
-			const bool can_target_sea = StringToBool(value);
+			const bool can_target_sea = string::to_bool(value);
 			if (can_target_sea) {
 				this->CanTarget |= CanTargetSea;
 			} else {
 				this->CanTarget &= ~CanTargetSea;
 			}
 		} else if (key == "can_target_air") {
-			const bool can_target_air = StringToBool(value);
+			const bool can_target_air = string::to_bool(value);
 			if (can_target_air) {
 				this->CanTarget |= CanTargetAir;
 			} else {
@@ -914,7 +913,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					this->DefaultStat.Variables[index].Value = std::stoi(value);
 					this->DefaultStat.Variables[index].Max = std::stoi(value);
 				} else if (IsStringBool(value)) {
-					this->DefaultStat.Variables[index].Enable = StringToBool(value);
+					this->DefaultStat.Variables[index].Enable = string::to_bool(value);
 				} else { // error
 					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->Ident.c_str());
 				}
@@ -928,7 +927,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					if (IsStringNumber(value)) {
 						this->BoolFlag[index].value = (std::stoi(value) != 0);
 					} else {
-						this->BoolFlag[index].value = StringToBool(value);
+						this->BoolFlag[index].value = string::to_bool(value);
 					}
 				} else {
 					fprintf(stderr, "Invalid unit type property: \"%s\".\n", key.c_str());
@@ -1108,7 +1107,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					std::string value = child_config_data->Properties[j].second;
 					
 					if (key == "enable") {
-						this->DefaultStat.Variables[index].Enable = StringToBool(value);
+						this->DefaultStat.Variables[index].Enable = string::to_bool(value);
 					} else if (key == "value") {
 						this->DefaultStat.Variables[index].Value = std::stoi(value);
 					} else if (key == "max") {

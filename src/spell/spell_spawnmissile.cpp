@@ -38,6 +38,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "util/string_util.h"
 
 struct CompareUnitDistance {
 	const CUnit *referenceunit;
@@ -147,11 +148,11 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "lightning_damage") {
 			this->LightningDamage = std::stoi(value);
 		} else if (key == "use_unit_var") {
-			this->UseUnitVar = StringToBool(value);
+			this->UseUnitVar = string::to_bool(value);
 		} else if (key == "always_hits") {
-			this->AlwaysHits = StringToBool(value);
+			this->AlwaysHits = string::to_bool(value);
 		} else if (key == "always_critical") {
-			this->AlwaysCritical = StringToBool(value);
+			this->AlwaysCritical = string::to_bool(value);
 		} else if (key == "delay") {
 			this->Delay = std::stoi(value);
 		} else if (key == "ttl") {

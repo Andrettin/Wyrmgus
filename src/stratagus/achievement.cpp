@@ -34,6 +34,7 @@
 #include "player.h"
 #include "quest.h"
 #include "unit/unittype.h"
+#include "util/string_util.h"
 
 /**
 **	@brief	Get an achievement
@@ -132,9 +133,9 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "difficulty") {
 			this->Difficulty = std::stoi(value);
 		} else if (key == "hidden") {
-			this->hidden = StringToBool(value);
+			this->hidden = string::to_bool(value);
 		} else if (key == "unobtainable") {
-			this->Unobtainable = StringToBool(value);
+			this->Unobtainable = string::to_bool(value);
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;

@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name time_of_day_schedule.cpp - The time of day schedule source file. */
-//
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -40,6 +36,7 @@
 #include "config.h"
 #include "time/season.h"
 #include "time/time_of_day.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -132,7 +129,7 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "default_schedule") {
-			const bool is_default_schedule = StringToBool(value);
+			const bool is_default_schedule = string::to_bool(value);
 			if (is_default_schedule) {
 				CTimeOfDaySchedule::DefaultTimeOfDaySchedule = this;
 			}
@@ -263,5 +260,3 @@ int CScheduledTimeOfDay::GetHours(const CSeason *season) const
 	
 	return this->Hours;
 }
-
-//@}

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name calendar.cpp - The calendar source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -36,6 +34,7 @@
 #include "time/calendar.h"
 
 #include "config.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -178,7 +177,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "base_calendar") {
-			bool is_base_calendar = StringToBool(value);
+			bool is_base_calendar = string::to_bool(value);
 			if (is_base_calendar) {
 				CCalendar::BaseCalendar = this;
 			}

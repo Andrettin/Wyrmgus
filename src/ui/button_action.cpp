@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name button_action.cpp - The button action source file. */
-//
-//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon, Pali Rohár and Andrettin
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +39,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/string_util.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -71,7 +68,7 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			ba.Level = CButtonLevel::GetButtonLevel(value);
 		} else if (key == "always_show") {
-			ba.AlwaysShow = StringToBool(value);
+			ba.AlwaysShow = string::to_bool(value);
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			ba.Icon.Name = value;
@@ -433,5 +430,3 @@ bool IsNeutralUsableButtonAction(const ButtonCmd button_action)
 {
 	return button_action == ButtonCmd::Train || button_action == ButtonCmd::CancelTrain || button_action == ButtonCmd::Buy || button_action == ButtonCmd::SellResource || button_action == ButtonCmd::BuyResource || button_action == ButtonCmd::Research;
 }
-
-//@}

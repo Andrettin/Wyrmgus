@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_template.cpp - The map template source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -34,8 +32,6 @@
 #include "stratagus.h"
 
 #include "map/map_template.h"
-
-#include <fstream>
 
 #include "campaign.h"
 #include "civilization.h"
@@ -63,8 +59,11 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "util/string_util.h"
 #include "video.h"
 #include "world.h"
+
+#include <fstream>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -242,7 +241,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (key == "overland") {
-			this->Overland = StringToBool(value);
+			this->Overland = string::to_bool(value);
 		} else if (key == "base_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
@@ -260,7 +259,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "output_terrain_image") {
-			this->OutputTerrainImage = StringToBool(value);
+			this->OutputTerrainImage = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
 		}
@@ -1674,9 +1673,9 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "max_percent") {
 			this->MaxPercent = std::stoi(value);
 		} else if (key == "use_existing_as_seeds") {
-			this->UseExistingAsSeeds = StringToBool(value);
+			this->UseExistingAsSeeds = string::to_bool(value);
 		} else if (key == "use_subtemplate_borders_as_seeds") {
-			this->UseSubtemplateBordersAsSeeds = StringToBool(value);
+			this->UseSubtemplateBordersAsSeeds = string::to_bool(value);
 		} else if (key == "target_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);

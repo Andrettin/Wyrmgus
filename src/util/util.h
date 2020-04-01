@@ -116,7 +116,6 @@ extern size_t strnlen(const char *str, size_t strsize);
 #endif // !HAVE_STRNLEN
 
 extern std::vector<std::string> SplitString(const std::string &str, const char *separators);
-extern bool StringToBool(const std::string &str);
 extern bool IsStringNumber(const std::string &str);
 extern bool IsStringBool(const std::string &str);
 extern std::string NumberToRomanNumeral(unsigned number);

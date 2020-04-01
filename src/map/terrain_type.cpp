@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name terrain_type.cpp - The terrain types. */
-//
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +39,7 @@
 #include "map/tileset.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/string_util.h"
 #include "video.h"
 
 #include <algorithm>
@@ -252,13 +249,13 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			}
 			CTerrainType::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
 		} else if (key == "overlay") {
-			this->Overlay = StringToBool(value);
+			this->Overlay = string::to_bool(value);
 		} else if (key == "buildable") {
-			this->Buildable = StringToBool(value);
+			this->Buildable = string::to_bool(value);
 		} else if (key == "allow_single") {
-			this->AllowSingle = StringToBool(value);
+			this->AllowSingle = string::to_bool(value);
 		} else if (key == "hidden") {
-			this->Hidden = StringToBool(value);
+			this->Hidden = string::to_bool(value);
 		} else if (key == "resource") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Resource = GetResourceIdByName(value.c_str());
@@ -434,5 +431,3 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 		return this->Graphics;
 	}
 }
-
-//@}
