@@ -1,5 +1,6 @@
 $#include "stratagus.h"
 
+$#include "achievement.h"
 $#include "age.h"
 $#include "ai.h"
 //Wyrmgus start
@@ -34,7 +35,7 @@ $#include "unit/unit_manager.h"
 $#include "unit/unittype.h"
 //Wyrmgus start
 $#include "upgrade/upgrade.h"
-$#include "util.h"
+$#include "util/util.h"
 //Wyrmgus end
 $#include "video.h"
 $#include "widgets.h"
@@ -183,7 +184,7 @@ extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
 extern void SetQuestCompleted(std::string quest_ident, int difficulty = DifficultyNormal, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, bool save);
-extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);
+extern void SetAchievementObtained(std::string achievement_ident, const bool save = true, const bool display = true);
 
 extern void CallDialogue(std::string dialogue_ident, int player);
 extern void CallDialogueNode(std::string dialogue_ident, int node, int player);

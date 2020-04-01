@@ -1493,9 +1493,6 @@ void CPlayer::SetCivilization(int civilization)
 		}
 	}
 
-	int old_civilization = this->Race;
-	int old_faction = this->Faction;
-
 	if (GameRunning) {
 		this->SetFaction(nullptr);
 	} else {

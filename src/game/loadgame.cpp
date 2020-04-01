@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name loadgame.cpp - Load game. */
-//
 //      (c) Copyright 2001-2020 by Lutz Sammer, Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -33,6 +31,7 @@
 
 #include "stratagus.h"
 
+#include "achievement.h"
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
@@ -119,6 +118,7 @@ void CleanModules()
 	CTrigger::ClearTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
+	CAchievement::ClearAchievements();
 	CAge::ClearAges();
 	CCalendar::ClearCalendars();
 	CCampaign::ClearCampaigns();

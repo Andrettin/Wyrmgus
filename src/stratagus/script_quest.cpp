@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_quest.cpp - The quest ccl functions. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -35,6 +33,7 @@
 
 #include "quest.h"
 
+#include "achievement.h"
 #include "campaign.h"
 #include "character.h"
 #include "civilization.h"
@@ -600,21 +599,16 @@ static int CclDefineAchievement(lua_State *l)
 	}
 
 	std::string achievement_ident = LuaToString(l, 1);
-	CAchievement *achievement = GetAchievement(achievement_ident);
-	if (!achievement) {
-		achievement = new CAchievement;
-		Achievements.push_back(achievement);
-		achievement->Ident = achievement_ident;
-	}
+	CAchievement *achievement = CAchievement::GetOrAddAchievement(achievement_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			achievement->Name = LuaToString(l, -1);
+			achievement->name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
-			achievement->Description = LuaToString(l, -1);
+			achievement->description = LuaToString(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
 			int color = GetPlayerColorIndexByName(color_name);
@@ -637,7 +631,7 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Load();
 			achievement->Icon.Icon->Load();
 		} else if (!strcmp(value, "Character")) {
-			std::string character_name = TransliterateText(LuaToString(l, -1));
+			std::string character_name = LuaToString(l, -1);
 			CCharacter *character = CCharacter::GetCharacter(character_name);
 			if (character) {
 				achievement->Character = character;
@@ -646,7 +640,7 @@ static int CclDefineAchievement(lua_State *l)
 			}
 		} else if (!strcmp(value, "CharacterType")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+			const int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
 				achievement->CharacterType = UnitTypes[unit_type_id];
 			} else {
@@ -674,10 +668,10 @@ static int CclDefineAchievement(lua_State *l)
 
 static int CclGetAchievements(lua_State *l)
 {
-	lua_createtable(l, Achievements.size(), 0);
-	for (size_t i = 1; i <= Achievements.size(); ++i)
+	lua_createtable(l, CAchievement::Achievements.size(), 0);
+	for (size_t i = 1; i <= CAchievement::Achievements.size(); ++i)
 	{
-		lua_pushstring(l, Achievements[i-1]->Ident.c_str());
+		lua_pushstring(l, CAchievement::Achievements[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -694,17 +688,17 @@ static int CclGetAchievementData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string achievement_ident = LuaToString(l, 1);
-	const CAchievement *achievement = GetAchievement(achievement_ident);
+	const CAchievement *achievement = CAchievement::GetAchievement(achievement_ident);
 	if (!achievement) {
 		LuaError(l, "Achievement \"%s\" doesn't exist." _C_ achievement_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, achievement->Name.c_str());
+		lua_pushstring(l, achievement->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, achievement->Description.c_str());
+		lua_pushstring(l, achievement->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, PlayerColorNames[achievement->PlayerColor].c_str());

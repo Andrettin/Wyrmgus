@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.cpp - The unit source file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -35,12 +33,12 @@
 
 #include "unit/unit.h"
 
+#include "achievement.h"
 #include "action/action_attack.h"
 //Wyrmgus start
 #include "action/action_resource.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
-
 #include "actions.h"
 #include "ai.h"
 //Wyrmgus start
@@ -96,8 +94,7 @@
 //Wyrmgus end
 #include "video.h"
 
-#include <math.h>
-
+#include <cmath>
 
 /*----------------------------------------------------------------------------
 -- Documentation
@@ -849,7 +846,7 @@ void CUnit::Retrain()
 								if (Player->AiEnabled == false) {
 									Character->Type = UnitTypes[i];
 									SaveHero(Character);
-									CheckAchievements();
+									CAchievement::CheckAchievements();
 								}
 							}
 						}

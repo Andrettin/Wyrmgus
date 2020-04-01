@@ -56,6 +56,7 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
+	src/stratagus
 	src/xbrz/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -302,6 +303,7 @@ set(spell_SRCS
 source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
+	src/stratagus/achievement.cpp
 	src/stratagus/age.cpp
 	src/stratagus/campaign.cpp
 	src/stratagus/character.cpp
@@ -744,6 +746,7 @@ set(stratagus_generic_HDRS
 	src/include/widgets.h
 	src/include/world.h
 	src/include/SetupConsole_win32.h
+	src/stratagus/achievement.h
 )
 
 source_group(include FILES ${stratagus_generic_HDRS})

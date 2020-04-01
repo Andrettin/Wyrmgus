@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name quest.h - The quest header file. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -144,36 +142,12 @@ public:
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };
 
-class CAchievement
-{
-public:
-	void Obtain(bool save = true, bool display = true);
-	bool CanObtain() const;
-	int GetProgress() const;
-	int GetProgressMax() const;
-	
-	std::string Ident;				/// Ident of the achievement
-	std::string Name;				/// Name of the achievement
-	std::string Description;		/// Description of the achievement
-	int PlayerColor = 0;			/// Player color used for the achievement's icon
-	int CharacterLevel = 0;			/// Character level required for the achievement
-	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
-	bool Hidden = false;			/// Whether the achievement is hidden
-	bool Obtained = false;			/// Whether the achievement has been obtained
-	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
-	IconConfig Icon;				/// Achievement's icon
-	CCharacter *Character = nullptr;	/// Character related to the achievement's requirements
-	CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
-	std::vector<CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
-};
-
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CQuest *> Quests;
 extern CQuest *CurrentQuest;
-extern std::vector<CAchievement *> Achievements;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -181,16 +155,13 @@ extern std::vector<CAchievement *> Achievements;
 
 extern void CleanQuests();
 extern void SaveQuestCompletion();
-extern void CheckAchievements();
 std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type);
 extern ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type);
 extern CQuest *GetQuest(const std::string &quest_ident);
-extern CAchievement *GetAchievement(const std::string &achievement_ident);
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();
 extern void SetQuestCompleted(const std::string &quest_ident, int difficulty = 2, bool save = true);
 extern void SetQuestCompleted(const std::string &quest_ident, bool save);
-extern void SetAchievementObtained(const std::string &achievement_ident, bool save = true, bool display = true);
 
 extern void QuestCclRegister();
