@@ -246,6 +246,7 @@ public:
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
+	const std::string &get_interface() const;
 	void CheckAge();
 	void SetAge(CAge *age);
 	CCurrency *GetCurrency() const;

@@ -52,6 +52,7 @@ class CForceTemplate;
 class CLanguage;
 class CQuest;
 class CUpgrade;
+struct lua_State;
 
 class CCivilization
 {
@@ -68,9 +69,9 @@ public:
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
 
-	const std::string &GetInterface() const
+	const std::string &get_interface() const
 	{
-		return this->Interface;
+		return this->interface;
 	}
 
 	CCalendar *GetCalendar() const;
@@ -88,7 +89,9 @@ public:
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
-	std::string Interface;			/// the string identifier for the civilization's interface
+private:
+	std::string interface;			/// the string identifier for the civilization's interface
+public:
 	CUnitSound UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
@@ -107,4 +110,6 @@ public:
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
+
+	friend int CclDefineCivilization(lua_State *l);
 };

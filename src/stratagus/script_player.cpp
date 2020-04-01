@@ -808,7 +808,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Adjective")) {
 			civilization->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Interface")) {
-			civilization->Interface = LuaToString(l, -1);
+			civilization->interface = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -1088,8 +1088,8 @@ static int CclDefineCivilization(lua_State *l)
 		const CCivilization *parent_civilization = civilization->ParentCivilization;
 		int parent_civilization_id = parent_civilization->ID;
 
-		if (civilization->Interface.empty()) {
-			civilization->Interface = parent_civilization->Interface;
+		if (civilization->get_interface().empty()) {
+			civilization->interface = parent_civilization->interface;
 		}
 
 		if (PlayerRaces.CivilizationUpgrades[civilization_id].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization_id].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
@@ -1601,7 +1601,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Interface")) {
-		lua_pushstring(l, civilization->Interface.c_str());
+		lua_pushstring(l, civilization->get_interface().c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);

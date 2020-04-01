@@ -41,7 +41,7 @@
 #include "age.h"
 #include "ai.h"
 //Wyrmgus start
-#include "../ai/ai_local.h" //for using AiHelpers
+#include "ai/ai_local.h" //for using AiHelpers
 #include "campaign.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
@@ -87,6 +87,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
 #include "video.h"
 #include "world.h"
 
@@ -1721,6 +1722,16 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 		CUnit &unit = this->GetUnit(i);
 		unit.UpdateSoldUnits(); //in case conditions changed (i.e. some heroes may require a certain dynasty)
 	}
+}
+
+const std::string &CPlayer::get_interface() const
+{
+	const CCivilization *civilization = this->GetCivilization();
+	if (civilization != nullptr) {
+		return civilization->get_interface();
+	}
+
+	return string::empty_str;
 }
 
 /**
