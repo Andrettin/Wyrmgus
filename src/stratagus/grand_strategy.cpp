@@ -51,7 +51,7 @@
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util.h"
+#include "util/util.h"
 #include "video.h"
 
 #include <ctype.h>

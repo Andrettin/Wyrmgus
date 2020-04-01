@@ -45,7 +45,7 @@
 #include "script.h"
 #include "spells.h"
 #include "title.h"
-#include "util.h"
+#include "util/util.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"

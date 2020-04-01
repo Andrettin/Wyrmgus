@@ -67,7 +67,7 @@
 #include "ui/button_level.h"
 #include "unit/historical_unit.h"
 #include "unit/unittype.h"
-#include "util.h"
+#include "util/util.h"
 #include "world.h"
 
 #include <boost/tokenizer.hpp>

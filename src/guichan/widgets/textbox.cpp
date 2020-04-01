@@ -64,7 +64,7 @@
 #include "guichan/widgets/scrollarea.h"
 #include "guichan/widgets/textbox.h"
 #include "guichan/exception.h"
-#include "util.h"
+#include "util/util.h"
 
 namespace gcn
 {

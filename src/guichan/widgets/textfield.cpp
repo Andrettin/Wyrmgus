@@ -60,7 +60,7 @@
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"
 #include "guichan/exception.h"
-#include "util.h"
+#include "util/util.h"
 
 namespace gcn
 {

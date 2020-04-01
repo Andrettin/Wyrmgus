@@ -134,7 +134,7 @@ extern void PrintOnStdOut(const char *format, ...);
 
 #include <string.h>
 
-#include "util.h"
+#include "util/util.h"
 
 inline char *new_strdup(const char *str)
 {

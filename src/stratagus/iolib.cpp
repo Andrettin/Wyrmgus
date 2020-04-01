@@ -45,7 +45,7 @@
 //Wyrmgus start
 #include "script.h"
 //Wyrmgus end
-#include "util.h"
+#include "util/util.h"
 
 #include <stdarg.h>
 #include <stdio.h>

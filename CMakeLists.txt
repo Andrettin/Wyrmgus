@@ -339,7 +339,6 @@ set(stratagusmain_SRCS
 	src/stratagus/text.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
-	src/stratagus/util.cpp
 	src/stratagus/world.cpp
 )
 source_group(stratagusmain FILES ${stratagus_SRCS})
@@ -399,6 +398,11 @@ set(upgrade_SRCS
 	src/upgrade/upgrade_modifier.cpp
 )
 source_group(upgrade FILES ${upgrade_SRCS})
+
+set(util_SRCS
+	src/util/util.cpp
+)
+source_group(util FILES ${util_SRCS})
 
 set(video_SRCS
 	src/video/color.cpp
@@ -477,6 +481,7 @@ set(stratagus_SRCS
 	${ui_SRCS}
 	${unit_SRCS}
 	${upgrade_SRCS}
+	${util_SRCS}
 	${video_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
@@ -655,6 +660,10 @@ set(stratagus_upgrade_HDRS
 	src/include/upgrade/upgrade_structs.h
 )
 
+set(stratagus_util_HDRS
+	src/util/util.h
+)
+
 set(stratagus_xbrz_HDRS
 	src/xbrz/include/config.h
 	src/xbrz/include/xbrz.h
@@ -726,7 +735,6 @@ set(stratagus_generic_HDRS
 	src/include/trigger.h
 	src/include/trigger_effect.h
 	src/include/unitsound.h
-	src/include/util.h
 	src/include/vec2i.h
 	src/include/version.h
 	src/include/video.h
@@ -748,6 +756,7 @@ source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
 source_group(include\\unit FILES ${stratagus_unit_HDRS})
 source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
+source_group(include\\util FILES ${stratagus_util_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 
 

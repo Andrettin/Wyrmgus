@@ -68,7 +68,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus start
 #include "ui/ui.h"
-#include "util.h"
+#include "util/util.h"
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

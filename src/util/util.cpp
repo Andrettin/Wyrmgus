@@ -29,7 +29,7 @@
 
 #include "stratagus.h"
 
-#include "util.h"
+#include "util/util.h"
 
 //Wyrmgus start
 #include "network.h"

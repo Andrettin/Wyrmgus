@@ -93,7 +93,7 @@
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus start
-#include "util.h"
+#include "util/util.h"
 //Wyrmgus end
 #include "version.h"
 #include "video.h"

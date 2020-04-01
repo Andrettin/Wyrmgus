@@ -69,7 +69,7 @@
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 //Wyrmgus start
-#include "util.h"
+#include "util/util.h"
 //Wyrmgus end
 #include "upgrade/upgrade.h"
 #include "version.h"

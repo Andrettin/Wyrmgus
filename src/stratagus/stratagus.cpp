@@ -205,7 +205,7 @@ extern void beos_init(int argc, char **argv);
 #include "version.h"
 #include "video.h"
 #include "widgets.h"
-#include "util.h"
+#include "util/util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames
 

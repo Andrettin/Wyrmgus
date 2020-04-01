@@ -36,7 +36,7 @@
 #include "font.h"
 
 #include "intern_video.h"
-#include "util.h"
+#include "util/util.h"
 #include "video.h"
 
 #include <vector>

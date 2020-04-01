@@ -69,7 +69,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "util.h"
+#include "util/util.h"
 #include "video.h"
 
 #include <cctype>

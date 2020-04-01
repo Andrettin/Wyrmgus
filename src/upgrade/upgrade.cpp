@@ -80,7 +80,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util.h"
+#include "util/util.h"
 
 #include <string>
 #include <vector>

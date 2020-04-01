@@ -92,7 +92,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 //Wyrmgus start
-#include "util.h"
+#include "util/util.h"
 //Wyrmgus end
 #include "video.h"
 
