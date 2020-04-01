@@ -775,6 +775,10 @@ int stratagusMain(int argc, char **argv)
 	InitLua();
 	LuaRegisterModules();
 
+	for (size_t p = CPlayer::Players.size(); p < PlayerMax; ++p) {
+		CPlayer::Players.push_back(new CPlayer);
+	}
+
 	// Initialise AI module
 	InitAiModule();
 
@@ -806,10 +810,6 @@ int stratagusMain(int argc, char **argv)
 	CPlayer::SetThisPlayer(nullptr);
 	//Don't clear the Players structure as it would erase the allowed units.
 	// memset(Players, 0, sizeof(Players));
-
-	for (size_t p = CPlayer::Players.size(); p < PlayerMax; ++p) {
-		CPlayer::Players.push_back(new CPlayer);
-	}
 
 	NumPlayers = 0;
 
