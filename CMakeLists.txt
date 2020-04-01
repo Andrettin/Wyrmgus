@@ -661,6 +661,7 @@ set(stratagus_upgrade_HDRS
 )
 
 set(stratagus_util_HDRS
+	src/util/string_util.h
 	src/util/util.h
 )
 
