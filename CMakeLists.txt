@@ -756,7 +756,7 @@ source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
 source_group(include\\unit FILES ${stratagus_unit_HDRS})
 source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
-source_group(include\\util FILES ${stratagus_util_HDRS})
+source_group(util FILES ${stratagus_util_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 
 
@@ -772,6 +772,7 @@ set(stratagus_HDRS
 	${stratagus_ui_HDRS}
 	${stratagus_unit_HDRS}
 	${stratagus_upgrade_HDRS}
+	${stratagus_util_HDRS}
 	${stratagus_xbrz_HDRS}
 )
 

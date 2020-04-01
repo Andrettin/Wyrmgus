@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#pragma once
 
 #ifdef USE_WIN32
 #ifndef _WIN32_WINNT
