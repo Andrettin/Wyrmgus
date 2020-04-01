@@ -668,10 +668,10 @@ static int CclDefineAchievement(lua_State *l)
 
 static int CclGetAchievements(lua_State *l)
 {
-	lua_createtable(l, CAchievement::Achievements.size(), 0);
-	for (size_t i = 1; i <= CAchievement::Achievements.size(); ++i)
+	lua_createtable(l, CAchievement::GetAchievements().size(), 0);
+	for (size_t i = 1; i <= CAchievement::GetAchievements().size(); ++i)
 	{
-		lua_pushstring(l, CAchievement::Achievements[i-1]->Ident.c_str());
+		lua_pushstring(l, CAchievement::GetAchievements()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

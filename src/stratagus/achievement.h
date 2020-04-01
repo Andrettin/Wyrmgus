@@ -44,11 +44,12 @@ class CAchievement : public CDataType
 public:
 	static CAchievement *GetAchievement(const std::string &ident, const bool should_find = true);
 	static CAchievement *GetOrAddAchievement(const std::string &ident);
+	static const std::vector<CAchievement *> &GetAchievements();
 	static void ClearAchievements();
 	static void CheckAchievements();
 
-	static inline std::vector<CAchievement *> Achievements;
 private:
+	static inline std::vector<CAchievement *> Achievements;
 	static inline std::map<std::string, CAchievement *> AchievementsByIdent;
 
 public:
