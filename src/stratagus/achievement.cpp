@@ -92,7 +92,7 @@ void CAchievement::ClearAchievements()
 void CAchievement::CheckAchievements()
 {
 	for (CAchievement *achievement : CAchievement::Achievements) {
-		if (achievement->Obtained) {
+		if (achievement->is_obtained()) {
 			continue;
 		}
 
@@ -130,7 +130,7 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "difficulty") {
 			this->Difficulty = std::stoi(value);
 		} else if (key == "hidden") {
-			this->Hidden = StringToBool(value);
+			this->hidden = StringToBool(value);
 		} else if (key == "unobtainable") {
 			this->Unobtainable = StringToBool(value);
 		} else if (key == "icon") {
@@ -167,27 +167,9 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-
-void CAchievement::Obtain(const bool save, const bool display)
-{
-	if (this->Obtained) {
-		return;
-	}
-
-	this->Obtained = true;
-
-	if (save) {
-		SaveQuestCompletion();
-	}
-
-	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + PlayerColorNames[this->PlayerColor] + "\") end;");
-	}
-}
-
 bool CAchievement::CanObtain() const
 {
-	if (this->Obtained || this->Unobtainable) {
+	if (this->is_obtained() || this->Unobtainable) {
 		return false;
 	}
 
@@ -222,6 +204,23 @@ bool CAchievement::CanObtain() const
 	}
 
 	return true;
+}
+
+void CAchievement::Obtain(const bool save, const bool display)
+{
+	if (this->is_obtained()) {
+		return;
+	}
+
+	this->obtained = true;
+
+	if (save) {
+		SaveQuestCompletion();
+	}
+
+	if (display) {
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + PlayerColorNames[this->PlayerColor] + "\") end;");
+	}
 }
 
 int CAchievement::GetProgress() const

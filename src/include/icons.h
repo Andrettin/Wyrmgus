@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name icons.h - The icons headerfile. */
-//
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2020 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +25,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ICONS_H__
-#define __ICONS_H__
-
-//@{
+#pragma once
 
 #include "vec2i.h"
 #include <string>
@@ -140,11 +135,11 @@ public:
 	const std::string &GetIdent() const { return this->Ident; }
 
 public:
-	CPlayerColorGraphic *G;              /// Graphic data
-	CPlayerColorGraphic *GScale;         /// Icon when drawn grayscaled
-	int Frame;                /// Frame number in graphic
+	CPlayerColorGraphic *G = nullptr; //graphic data
+	CPlayerColorGraphic *GScale = nullptr; //icon when drawn grayscaled
+	int Frame = 0; //frame number in graphic
 	//Wyrmgus start
-	bool Loaded;
+	bool Loaded = false;
 	//Wyrmgus end
 private:
 	std::string Ident;        /// Icon identifier
@@ -175,7 +170,3 @@ extern void CleanIcons();  /// Cleanup icons
 typedef std::map<std::string, CIcon *> IconMap;
 extern IconMap Icons;
 //Wyrmgus end
-
-//@}
-
-#endif // !__ICONS_H__

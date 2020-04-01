@@ -64,8 +64,18 @@ public:
 		return this->description;
 	}
 
-	void Obtain(bool save = true, bool display = true);
+	bool is_hidden() const
+	{
+		return this->hidden;
+	}
+
+	bool is_obtained() const
+	{
+		return this->obtained;
+	}
+
 	bool CanObtain() const;
+	void Obtain(bool save = true, bool display = true);
 	int GetProgress() const;
 	int GetProgressMax() const;
 
@@ -77,8 +87,10 @@ public:
 	int PlayerColor = 0;			/// Player color used for the achievement's icon
 	int CharacterLevel = 0;			/// Character level required for the achievement
 	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
-	bool Hidden = false;			/// Whether the achievement is hidden
-	bool Obtained = false;			/// Whether the achievement has been obtained
+private:
+	bool hidden = false;			/// Whether the achievement is hidden
+	bool obtained = false;			/// Whether the achievement has been obtained
+public:
 	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
 	const CCharacter *Character = nullptr;	/// Character related to the achievement's requirements

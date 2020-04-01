@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name icons.cpp - The icons. */
-//
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +24,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -63,19 +59,10 @@ IconMap Icons;   /// Map of ident to icon.
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  CIcon constructor
-*/
-//Wyrmgus start
-//CIcon::CIcon(const std::string &ident) : G(nullptr), GScale(nullptr), Frame(0), Ident(ident)
-CIcon::CIcon(const std::string &ident) : G(nullptr), GScale(nullptr), Frame(0), Ident(ident), Loaded(false)
-//Wyrmgus end
+CIcon::CIcon(const std::string &ident) : Ident(ident)
 {
 }
 
-/**
-**  CIcon destructor
-*/
 CIcon::~CIcon()
 {
 	CPlayerColorGraphic::Free(this->G);
@@ -454,5 +441,3 @@ void CleanIcons()
 	}
 	Icons.clear();
 }
-
-//@}
