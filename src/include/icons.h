@@ -86,13 +86,13 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define IconActive   1  /// cursor on icon
-#define IconClicked  2  /// mouse button down on icon
-#define IconSelected 4  /// this the selected icon
-#define IconDisabled 8  /// icon disabled
-#define IconAutoCast 16 /// auto cast icon
+static constexpr int IconActive = 1; //cursor on icon
+static constexpr int IconClicked = 2; //mouse button down on icon
+static constexpr int IconSelected = 4; //this the selected icon
+static constexpr int IconDisabled = 8; //icon disabled
+static constexpr int IconAutoCast = 16; //auto cast icon
 //Wyrmgus start
-#define IconCommandButton 32 /// is the icon a command button
+static constexpr int IconCommandButton = 32; //if the icon is a command button
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -104,6 +104,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 class CPlayer;
 class ButtonStyle;
+struct lua_State;
 
 /// Icon: rectangle image used in menus
 class CIcon
@@ -132,17 +133,31 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
-	const std::string &GetIdent() const { return this->Ident; }
+	const std::string &GetIdent() const
+	{
+		return this->Ident;
+	}
 
+	const std::string &get_file() const
+	{
+		return this->file;
+	}
+
+private:
+	std::string Ident;        /// Icon identifier
 public:
 	CPlayerColorGraphic *G = nullptr; //graphic data
 	CPlayerColorGraphic *GScale = nullptr; //icon when drawn grayscaled
+private:
+	std::string file;
+	Vec2i size = Vec2i(0, 0);
+public:
 	int Frame = 0; //frame number in graphic
 	//Wyrmgus start
 	bool Loaded = false;
 	//Wyrmgus end
-private:
-	std::string Ident;        /// Icon identifier
+
+	friend int CclDefineIcon(lua_State *l);
 };
 
 /// Icon reference (used in config tables)

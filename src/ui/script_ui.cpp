@@ -1245,7 +1245,75 @@ static int CclDefineMapSetup(lua_State *l)
 	return 0;
 }
 
-//Wyrmgus start
+
+/**
+**  Define an icon.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineIcon(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string ident;
+	std::string file;
+	Vec2i size(0, 0);
+	int frame = 0;
+
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+
+		if (!strcmp(value, "Name")) {
+			ident = LuaToString(l, -1);
+		} else if (!strcmp(value, "File")) {
+			file = LuaToString(l, -1);
+		} else if (!strcmp(value, "Size")) {
+			CclGetPos(l, &size.x, &size.y);
+		} else if (!strcmp(value, "Frame")) {
+			frame = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	CIcon *icon = CIcon::New(ident);
+	icon->file = file;
+	icon->size = size;
+	icon->Frame = frame;
+	icon->G = CPlayerColorGraphic::New(icon->get_file(), icon->size.x, icon->size.y);
+
+	return 0;
+}
+
+static int CclGetIconData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string icon_ident = LuaToString(l, 1);
+	const CIcon *icon = CIcon::Get(icon_ident);
+	if (!icon) {
+		LuaError(l, "Icon \"%s\" doesn't exist." _C_ icon_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "File")) {
+		lua_pushstring(l, icon->get_file().c_str());
+		return 1;
+	} if (!strcmp(data, "Frame")) {
+		lua_pushnumber(l, icon->Frame);
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
 static int CclGetIcons(lua_State *l)
 {
 	std::vector<std::string> icons;
@@ -1261,7 +1329,6 @@ static int CclGetIcons(lua_State *l)
 	}
 	return 1;
 }
-//Wyrmgus end
 
 /**
 **  Register CCL features for UI.
@@ -1320,7 +1387,7 @@ void UserInterfaceCclRegister()
 
 	lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
 	
-	//Wyrmgus start
+	lua_register(Lua, "DefineIcon", CclDefineIcon);
+	lua_register(Lua, "GetIconData", CclGetIconData);
 	lua_register(Lua, "GetIcons", CclGetIcons);
-	//Wyrmgus end
 }
