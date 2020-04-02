@@ -48,11 +48,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//typedef std::map<std::string, CIcon *> IconMap;
-//static IconMap Icons;   /// Map of ident to icon.
 IconMap Icons;   /// Map of ident to icon.
-//Wyrmgus end
 
 
 /*----------------------------------------------------------------------------
@@ -78,11 +74,13 @@ CIcon::~CIcon()
 */
 CIcon *CIcon::New(const std::string &ident)
 {
-	CIcon *&icon = Icons[ident];
+	CIcon *icon = CIcon::Get(ident);
 
 	if (icon == nullptr) {
 		icon = new CIcon(ident);
+		Icons[ident] = icon;
 	}
+
 	return icon;
 }
 
@@ -98,6 +96,7 @@ CIcon *CIcon::Get(const std::string &ident)
 	IconMap::iterator it = Icons.find(ident);
 	if (it == Icons.end()) {
 		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
+		return nullptr;
 	}
 	return it->second;
 }
@@ -421,10 +420,10 @@ void LoadIcons()
 	ShowLoadProgress("%s", _("Loading Icons"));
 		
 	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon &icon = *(*it).second;
+		CIcon *icon = (*it).second;
 
 		UpdateLoadProgress();
-		icon.Load();
+		icon->Load();
 
 		IncItemsLoaded();
 	}

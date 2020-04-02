@@ -181,7 +181,5 @@ extern void LoadIcons();   /// Load icons
 extern int  GetIconsCount();
 extern void CleanIcons();  /// Cleanup icons
 
-//Wyrmgus start
-typedef std::map<std::string, CIcon *> IconMap;
+using IconMap = std::map<std::string, CIcon *>;
 extern IconMap Icons;
-//Wyrmgus end
