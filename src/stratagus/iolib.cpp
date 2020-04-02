@@ -553,7 +553,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 {
 	const std::filesystem::path filepath = file;
 
-	if (std::filesystem::exists(filepath) && std::filesystem::is_regular_file(filepath)) {
+	if (std::filesystem::exists(filepath)) {
 		return true;
 	}
 
@@ -561,7 +561,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 	std::filesystem::path filepath_gz = filepath;
 	filepath_gz += ".gz";
 
-	if (std::filesystem::exists(filepath_gz) && std::filesystem::is_regular_file(filepath_gz)) {
+	if (std::filesystem::exists(filepath_gz)) {
 		strcpy_s(file, PATH_MAX, filepath_gz.string().c_str());
 		return true;
 	}
@@ -571,7 +571,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 	std::filesystem::path filepath_bz2 = filepath;
 	filepath_bz2 += ".bz2";
 
-	if (std::filesystem::exists(filepath_bz2) && std::filesystem::is_regular_file(filepath_bz2)) {
+	if (std::filesystem::exists(filepath_bz2)) {
 		strcpy_s(file, PATH_MAX, filepath_bz2.string().c_str());
 		return true;
 	}
@@ -719,7 +719,7 @@ bool CanAccessFile(const char *filename)
 		}
 
 		const std::filesystem::path filepath = name;
-		if (std::filesystem::exists(filepath) && std::filesystem::is_regular_file(filepath)) {
+		if (std::filesystem::exists(filepath)) {
 			return true;
 		}
 
