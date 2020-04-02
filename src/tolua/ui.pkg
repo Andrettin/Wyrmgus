@@ -222,7 +222,6 @@ extern CUserInterface UI;
 
 class CIcon
 {
-	static CIcon *New(const std::string ident);
 	static CIcon *Get(const std::string ident);
 
 	tolua_readonly tolua_property__s std::string Ident;
