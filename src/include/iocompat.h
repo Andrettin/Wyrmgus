@@ -56,7 +56,6 @@
 #define S_ISREG(x) ((x) & _S_IFREG)
 
 #define mkdir _mkdir
-#define access _access
 
 #else
 

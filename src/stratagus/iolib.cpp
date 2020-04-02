@@ -10,8 +10,8 @@
 //
 /**@name iolib.cpp - Compression-IO helper functions. */
 //
-//      (c) Copyright 2000-2011 by Andreas Arens, Lutz Sammer Jimmy Salmon and
-//                                 Pali Rohár
+//      (c) Copyright 2000-2020 by Andreas Arens, Lutz Sammer Jimmy Salmon,
+//                                 Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -47,9 +45,6 @@
 //Wyrmgus end
 #include "util/util.h"
 
-#include <stdarg.h>
-#include <stdio.h>
-
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif
@@ -61,6 +56,10 @@
 #ifdef USE_PHYSFS
 #include <physfs.h>
 #endif
+
+#include <cstdarg>
+#include <cstdio>
+#include <filesystem>
 
 #ifdef __MORPHOS__
 #undef tell
@@ -552,30 +551,38 @@ long CFile::PImpl::tell()
 */
 static bool FindFileWithExtension(char(&file)[PATH_MAX])
 {
-	if (!access(file, R_OK)) {
+	const std::filesystem::path filepath = file;
+
+	if (std::filesystem::exists(filepath) && std::filesystem::is_regular_file(filepath)) {
 		return true;
 	}
-#if defined(USE_ZLIB) || defined(USE_BZ2LIB)
-	char buf[PATH_MAX];
-#endif
+
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
-	sprintf(buf, "%s.gz", file);
-	if (!access(buf, R_OK)) {
-		strcpy_s(file, PATH_MAX, buf);
+	std::filesystem::path filepath_gz = filepath;
+	filepath_gz += ".gz";
+
+	if (std::filesystem::exists(filepath_gz) && std::filesystem::is_regular_file(filepath_gz)) {
+		strcpy_s(file, PATH_MAX, filepath_gz.string().c_str());
 		return true;
 	}
 #endif
+
 #ifdef USE_BZ2LIB
-	sprintf(buf, "%s.bz2", file);
-	if (!access(buf, R_OK)) {
-		strcpy_s(file, PATH_MAX, buf);
+	std::filesystem::path filepath_bz2 = filepath;
+	filepath_bz2 += ".bz2";
+
+	if (std::filesystem::exists(filepath_bz2) && std::filesystem::is_regular_file(filepath_bz2)) {
+		strcpy_s(file, PATH_MAX, filepath_bz2.string().c_str());
 		return true;
 	}
 #endif
+
 #ifdef USE_PHYSFS
-	if (PHYSFS_isInit() && PHYSFS_exists(file))
+	if (PHYSFS_isInit() && PHYSFS_exists(file)) {
 		return true;
+	}
 #endif
+
 	return false;
 }
 
@@ -707,16 +714,22 @@ bool CanAccessFile(const char *filename)
 		char name[PATH_MAX];
 		name[0] = '\0';
 		LibraryFileName(filename, name);
-		if (name[0] == '\0')
+		if (name[0] == '\0') {
 			return false;
+		}
 
-		if (access(name, R_OK) == 0)
+		const std::filesystem::path filepath = name;
+		if (std::filesystem::exists(filepath) && std::filesystem::is_regular_file(filepath)) {
 			return true;
+		}
+
 #ifdef USE_PHYSFS
-		if (PHYSFS_isInit() && PHYSFS_exists(name))
+		if (PHYSFS_isInit() && PHYSFS_exists(name)) {
 			return true;
+		}
 #endif
 	}
+
 	return false;
 }
 
@@ -867,5 +880,3 @@ FileWriter *CreateFileWriter(const std::string &filename)
 		return new RawFileWriter(filename);
 	}
 }
-
-//@}
