@@ -10,7 +10,7 @@
 //
 /**@name trigger.h - The trigger header file. */
 //
-//      (c) Copyright 2002-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

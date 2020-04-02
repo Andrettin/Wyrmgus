@@ -10,7 +10,7 @@
 //
 /**@name age.h - The age header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

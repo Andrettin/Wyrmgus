@@ -10,7 +10,7 @@
 //
 /**@name script_spell.cpp - The spell script functions.. */
 //
-//      (c) Copyright 1998-2019 by Joris Dauphin, Crestez Leonard and Andrettin
+//      (c) Copyright 1998-2020 by Joris Dauphin, Crestez Leonard and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
