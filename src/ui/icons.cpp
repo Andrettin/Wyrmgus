@@ -164,14 +164,14 @@ void CIcon::Load()
 		return;
 	}
 	//Wyrmgus end
-	Assert(G);
-	G->Load();
+	Assert(this->G);
+	this->G->Load();
 	if (Preference.GrayscaleIcons) {
-		GScale = G->Clone(true);
+		this->GScale = this->G->Clone(true);
 	}
-	if (Frame >= G->NumFrames) {
-		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
-		Frame = 0;
+	if (this->Frame >= G->NumFrames) {
+		DebugPrint("Invalid icon frame: %s - %d\n" _C_ this->GetIdent().c_str() _C_ this->Frame);
+		this->Frame = 0;
 	}
 	//Wyrmgus start
 	this->Loaded = true;
