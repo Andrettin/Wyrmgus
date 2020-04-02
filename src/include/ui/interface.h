@@ -95,28 +95,28 @@ enum _key_state_ {
 };                        /// current keyboard state
 
 /// Key modifier
-#define ModifierShift 1        /// any shift key pressed
-#define ModifierControl 2      /// any control key pressed
-#define ModifierAlt 4          /// any alt key pressed
-#define ModifierSuper 8        /// super key (reserved for WM)
-#define ModifierDoublePress 16 /// key double pressed
+static constexpr int ModifierShift = 1;        /// any shift key pressed
+static constexpr int ModifierControl = 2;      /// any control key pressed
+static constexpr int ModifierAlt = 4;          /// any alt key pressed
+static constexpr int ModifierSuper = 8;        /// super key (reserved for WM)
+static constexpr int ModifierDoublePress = 16; /// key double pressed
 
-#define MouseDoubleShift 8   /// shift for double click button
-#define MouseDragShift   16  /// shift for drag button
-#define MouseHoldShift   24  /// shift for hold button
+static constexpr int MouseDoubleShift = 8;   /// shift for double click button
+static constexpr int MouseDragShift = 16;  /// shift for drag button
+static constexpr int MouseHoldShift = 24;  /// shift for hold button
 
 /// pressed mouse button flags
-#define NoButton 0      /// No button
-#define LeftButton 2    /// Left button on mouse
-#define MiddleButton 4  /// Middle button on mouse
-#define RightButton 8   /// Right button on mouse
+static constexpr int NoButton = 0;      /// No button
+static constexpr int LeftButton = 2;    /// Left button on mouse
+static constexpr int MiddleButton = 4;  /// Middle button on mouse
+static constexpr int RightButton = 8;   /// Right button on mouse
 
-#define UpButton 16    /// Scroll up button on mouse
-#define DownButton 32  /// Scroll down button on mouse
+static constexpr int UpButton = 16;    /// Scroll up button on mouse
+static constexpr int DownButton = 32;  /// Scroll down button on mouse
 
-#define LeftAndMiddleButton  (LeftButton | MiddleButton)  /// Left + Middle button on mouse
-#define LeftAndRightButton   (LeftButton | RightButton)   /// Left + Right button on mouse
-#define MiddleAndRightButton (MiddleButton | RightButton) /// Middle + Right button on mouse
+static constexpr int LeftAndMiddleButton = (LeftButton | MiddleButton); /// Left + Middle button on mouse
+static constexpr int LeftAndRightButton = (LeftButton | RightButton);   /// Left + Right button on mouse
+static constexpr int MiddleAndRightButton = (MiddleButton | RightButton); /// Middle + Right button on mouse
 
 /// Where is our cursor ?
 enum class cursor_on {
