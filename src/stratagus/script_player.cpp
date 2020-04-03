@@ -159,7 +159,7 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "dynasty")) {
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
-			this->Age = CAge::GetAge(LuaToString(l, j + 1));
+			this->Age = CAge::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "color")) {
 			int color_id = LuaToNumber(l, j + 1);
 			this->Color = PlayerColors[color_id][0];

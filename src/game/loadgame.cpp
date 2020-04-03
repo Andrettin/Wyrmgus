@@ -119,7 +119,7 @@ void CleanModules()
 	FreeAi();
 	PlayerRaces.Clean();
 	CAchievement::ClearAchievements();
-	CAge::ClearAges();
+	CAge::clear();
 	CCalendar::ClearCalendars();
 	CCampaign::ClearCampaigns();
 	CCharacter::ClearCharacters();

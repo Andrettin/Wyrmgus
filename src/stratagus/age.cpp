@@ -49,71 +49,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CAge *> CAge::Ages;
-std::map<std::string, CAge *> CAge::AgesByIdent;
 CAge *CAge::CurrentAge = nullptr;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Get an age
-**
-**	@param	ident	The age's string identifier
-**
-**	@return	The age if found, or null otherwise
-*/
-CAge *CAge::GetAge(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CAge *>::const_iterator find_iterator = AgesByIdent.find(ident);
-	
-	if (find_iterator != AgesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid age: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add an age
-**
-**	@param	ident	The age's string identifier
-**
-**	@return	The age if found, otherwise a new age is created and returned
-*/
-CAge *CAge::GetOrAddAge(const std::string &ident)
-{
-	CAge *age = GetAge(ident, false);
-	
-	if (!age) {
-		age = new CAge;
-		age->Ident = ident;
-		Ages.push_back(age);
-		AgesByIdent[ident] = age;
-	}
-	
-	return age;
-}
-
-/**
-**	@brief	Remove the existing ages
-*/
-void CAge::ClearAges()
-{
-	for (CAge *age : Ages) {
-		delete age;
-	}
-	Ages.clear();
-}
-
-/**
-**	@brief	Destructor
-*/
 CAge::~CAge()
 {
 	if (this->G) {
@@ -192,7 +133,7 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	std::sort(CAge::Ages.begin(), CAge::Ages.end(), [](CAge *a, CAge *b) {
+	CAge::sort_instances([](CAge *a, CAge *b) {
 		if (a->Priority != b->Priority) {
 			return a->Priority > b->Priority;
 		} else {
@@ -201,9 +142,6 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 	});
 }
 
-/**
-**	@brief	Set the current age
-*/
 void CAge::SetCurrentAge(CAge *age)
 {
 	if (age == CAge::CurrentAge) {
@@ -247,7 +185,7 @@ void CAge::CheckCurrentAge()
 */
 void SetCurrentAge(const std::string &age_ident)
 {
-	CAge *age = CAge::GetAge(age_ident);
+	CAge *age = CAge::get(age_ident);
 	
 	if (!age) {
 		return;

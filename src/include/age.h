@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name age.h - The age header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,40 +25,34 @@
 //      02111-1307, USA.
 //
 
-#ifndef __AGE_H__
-#define __AGE_H__
+#pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "data_type.h"
 
 #include <map>
 #include <string>
 #include <vector>
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CDependency;
 class CGraphic;
 class CUpgrade;
 
-class CAge : public CDataType
+class CAge : public CDataType, public stratagus::data_entry, public stratagus::data_type<CAge>
 {
 public:
-	~CAge();
+	static constexpr const char *class_identifier = "age";
+
+	CAge(const std::string &identifier) : CDataType(identifier), stratagus::data_entry(identifier)
+	{
+	}
+
+	virtual ~CAge() override;
 	
-	static CAge *GetAge(const std::string &ident, const bool should_find = true);
-	static CAge *GetOrAddAge(const std::string &ident);
-	static void ClearAges();
 	static void SetCurrentAge(CAge *age);
 	static void CheckCurrentAge();
 	
-	static std::vector<CAge *> Ages;
-	static std::map<std::string, CAge *> AgesByIdent;
 	static CAge *CurrentAge;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
@@ -74,10 +66,4 @@ public:
 	CDependency *Dependency = nullptr;
 };
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 extern void SetCurrentAge(const std::string &age_ident);
-
-#endif

@@ -1738,7 +1738,7 @@ void CPlayer::CheckAge()
 {
 	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
-	for (CAge *potential_age : CAge::Ages) {
+	for (CAge *potential_age : CAge::get_all()) {
 		if (!CheckDependencies(potential_age, this)) {
 			continue;
 		}
