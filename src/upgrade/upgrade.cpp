@@ -1242,6 +1242,9 @@ static int CclGetUpgradeData(lua_State *l)
 	} else if (!strcmp(data, "RequirementsString")) {
 		lua_pushstring(l, upgrade->RequirementsString.c_str());
 		return 1;
+	} else if (!strcmp(data, "Ability")) {
+		lua_pushboolean(l, upgrade->Ability);
+		return 1;
 	} else if (!strcmp(data, "ItemPrefix")) {
 		if (nargs == 2) { //check if the upgrade is a prefix for any item type
 			if (upgrade->MagicPrefix) {
