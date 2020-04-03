@@ -45,10 +45,6 @@ $#pragma warning(disable:4800)
 $#endif
 
 $[
-mt = { __index = function(t, key) return CUpgrade:Get(key) end }
-Upgrades = {}
-setmetatable(Upgrades, mt)
-
 mt = { __index = function(t, key) return CFont:Get(key) end }
 Fonts = {}
 setmetatable(Fonts, mt)
