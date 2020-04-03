@@ -156,47 +156,47 @@ extern const char NameLine[];
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//#define PlayerMax    16                 /// How many players are supported
-#define PlayerMax    32                 /// How many players are supported
+//static constexpr int PlayerMax = 16;                 /// How many players are supported
+static constexpr int PlayerMax = 32;                 /// How many players are supported
 //Wyrmgus end
-#define UnitTypeMax  2048                /// How many unit types supported
-#define UpgradeMax   2048                /// How many upgrades supported
+static constexpr int UnitTypeMax = 2048;                /// How many unit types supported
+static constexpr int UpgradeMax = 2048;                /// How many upgrades supported
 //Wyrmgus start
-//#define MAX_RACES 8
-#define MAX_RACES 128
-#define FactionMax 128				/// Maximum number of factions a civilization can have
-#define PlayerColorMax 32			/// How many player colors are supported
+//static constexpr int MAX_RACES = 8;
+static constexpr int MAX_RACES = 128;
+static constexpr int FactionMax = 128;	/// Maximum number of factions a civilization can have
+static constexpr int PlayerColorMax = 32;			/// How many player colors are supported
 
-#define AuraRange 6					/// Range of auras
-#define PlayerHeroMax 4				/// Maximum heroes per player
-#define PlayerMajorDeityMax 1		/// Maximum major deities per player/character
-//#define PlayerMinorDeityMax 3		/// Maximum minor deities per player/character
-#define PlayerMinorDeityMax 1		/// Maximum minor deities per player/character
-#define PlayerDeityMax (PlayerMajorDeityMax + PlayerMinorDeityMax)
+static constexpr int AuraRange = 6;					/// Range of auras
+static constexpr int PlayerHeroMax = 4;				/// Maximum heroes per player
+static constexpr int PlayerMajorDeityMax = 1;	/// Maximum major deities per player/character
+//static constexpr int PlayerMinorDeityMax = 3;	/// Maximum minor deities per player/character
+static constexpr int PlayerMinorDeityMax = 1;	/// Maximum minor deities per player/character
+static constexpr int PlayerDeityMax = (PlayerMajorDeityMax + PlayerMinorDeityMax);
 
-#define PopulationPerUnit 1000		/// Number of people a unit represents
+static constexpr int PopulationPerUnit = 1000;		/// Number of people a unit represents
 
-#define DEFAULT_HOURS_PER_DAY 24
-#define DEFAULT_DAYS_PER_MONTH 30
-#define DEFAULT_DAYS_PER_YEAR 365
-#define DEFAULT_DAYS_PER_WEEK 7
+static constexpr int DEFAULT_HOURS_PER_DAY = 24;
+static constexpr int DEFAULT_DAYS_PER_MONTH = 30;
+static constexpr int DEFAULT_DAYS_PER_YEAR = 365;
+static constexpr int DEFAULT_DAYS_PER_WEEK = 7;
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
-#define FRAMES_PER_SECOND  30  // 1/30s
+static constexpr int FRAMES_PER_SECOND = 30;  // 1/30s
 /// Game cycles per second to simulate (original 30-40)
-#define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
-#define CYCLES_PER_MINUTE  (CYCLES_PER_SECOND * 60)
+static constexpr int CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
+static constexpr int CYCLES_PER_MINUTE = (CYCLES_PER_SECOND * 60);
 
-#define CYCLES_PER_IN_GAME_HOUR (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
+static constexpr int CYCLES_PER_IN_GAME_HOUR = (CYCLES_PER_SECOND * 10); // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
 
-#define DEFAULT_DAY_MULTIPLIER_PER_YEAR (DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY * CYCLES_PER_IN_GAME_HOUR / CYCLES_PER_SECOND / 60 / 60) //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
+static constexpr int DEFAULT_DAY_MULTIPLIER_PER_YEAR = (DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY * CYCLES_PER_IN_GAME_HOUR / CYCLES_PER_SECOND / 60 / 60); //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
 
-#define HOUR_MULTIPLIER_DIVIDER 4 //for calculating the multipliers for schedules; the maximum duration length will be the default multiplier * the HOUR_MULTIPLIER_DIVIDER
+static constexpr int HOUR_MULTIPLIER_DIVIDER = 4; //for calculating the multipliers for schedules; the maximum duration length will be the default multiplier * the HOUR_MULTIPLIER_DIVIDER
 
-#define HeroCooldownCycles CYCLES_PER_MINUTE	/// Cooldown (in cycles) for recruiting a hero
+static constexpr int HeroCooldownCycles = CYCLES_PER_MINUTE; /// Cooldown (in cycles) for recruiting a hero
 
-#define DefaultTileMovementCost 8
+static constexpr int DefaultTileMovementCost = 8;
 
 /*----------------------------------------------------------------------------
 --  stratagus.cpp

@@ -532,7 +532,7 @@ void UiFindIdleWorker()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], VoiceSelected);
+		PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -569,7 +569,7 @@ void UiFindLevelUpUnit()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], VoiceSelected);
+		PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -592,7 +592,7 @@ void UiFindHeroUnit(int hero_index)
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
-	PlayUnitSound(*Selected[0], VoiceSelected);
+	PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);
 	SelectionChanged();
 	if (unit->MapLayer != UI.CurrentMapLayer) {
 		ChangeCurrentMapLayer(unit->MapLayer->ID);

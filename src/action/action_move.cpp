@@ -263,9 +263,9 @@ int DoActionMove(CUnit &unit)
 			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
-				PlayUnitSound(unit, VoiceDocking);
+				PlayUnitSound(unit, UnitVoiceGroup::Docking);
 			} else if (mf_cur.CoastOnMap() && mf_next.WaterOnMap()) {
-				PlayUnitSound(unit, VoiceDocking); // undocking
+				PlayUnitSound(unit, UnitVoiceGroup::Docking); // undocking
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;
@@ -290,7 +290,7 @@ int DoActionMove(CUnit &unit)
 		unit.StepCount = std::min(unit.StepCount, (unsigned char) 10);
 		//Wyrmgus end
 		//Wyrmgus start
-		PlayUnitSound(unit, VoiceStep);			
+		PlayUnitSound(unit, UnitVoiceGroup::Step);
 		//Wyrmgus end
 
 		// Remove unit from the current selection

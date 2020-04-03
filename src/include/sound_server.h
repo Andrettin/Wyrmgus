@@ -108,7 +108,7 @@ extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);
 //Wyrmgus start
 /// Set the channel voice group
-extern int SetChannelVoiceGroup(int channel, UnitVoiceGroup voice);
+extern void SetChannelVoiceGroup(int channel, UnitVoiceGroup voice);
 //Wyrmgus end
 /// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));

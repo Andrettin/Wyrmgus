@@ -292,26 +292,26 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		//Wyrmgus start
 		/*
 		if (type.MapSound.Ready.Sound) {
-			PlayUnitSound(unit, VoiceReady);
+			PlayUnitSound(unit, UnitVoiceGroup::Ready);
 		} else if (worker) {
-			PlayUnitSound(*worker, VoiceWorkCompleted);
+			PlayUnitSound(*worker, UnitVoiceGroup::WorkCompleted);
 		*/
 		if (type.MapSound.Ready.Sound) {
-			PlayUnitSound(unit, VoiceReady);
+			PlayUnitSound(unit, UnitVoiceGroup::Ready);
 		}
 		if (worker) {
 			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
-				PlayUnitSound(*worker, VoiceWorkCompleted);
+				PlayUnitSound(*worker, UnitVoiceGroup::WorkCompleted);
 			}
 		//Wyrmgus end
 		} else {
 			//Wyrmgus start
 			// why play the under-construction sound if the building has just been completed?
-//			PlayUnitSound(unit, VoiceBuilding);
+//			PlayUnitSound(unit, UnitVoiceGroup::Building);
 			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
 				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
-						PlayUnitSound(*table[i], VoiceWorkCompleted);
+						PlayUnitSound(*table[i], UnitVoiceGroup::WorkCompleted);
 						break;
 					}
 				}

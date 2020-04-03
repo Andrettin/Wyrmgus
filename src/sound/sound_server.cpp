@@ -82,7 +82,7 @@ struct SoundChannel {
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 	//Wyrmgus start
-	int Voice;  /// Voice group of this channel (for identifying voice types)
+	UnitVoiceGroup Voice;  /// Voice group of this channel (for identifying voice types)
 	//Wyrmgus end
 
 	bool Playing;          /// channel is currently playing
@@ -417,8 +417,8 @@ bool UnitSoundIsPlaying(Origin *origin)
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
 		if (
 			origin && Channels[i].Playing
-			&& Channels[i].Voice != -1
-			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceFireMissile && Channels[i].Voice != VoiceStep
+			&& Channels[i].Voice != UnitVoiceGroup::None
+			&& Channels[i].Voice != UnitVoiceGroup::Hit && Channels[i].Voice != UnitVoiceGroup::Miss && Channels[i].Voice != UnitVoiceGroup::FireMissile && Channels[i].Voice != UnitVoiceGroup::Step
 			&& Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			&& origin->Id == Channels[i].Unit->Id
 		) {
@@ -447,7 +447,7 @@ static void ChannelFinished(int channel)
 	Channels[channel].Unit = nullptr;
 	
 	//Wyrmgus start
-	Channels[channel].Voice = -1;
+	Channels[channel].Voice = UnitVoiceGroup::None;
 	//Wyrmgus end
 	Channels[channel].Playing = false;
 	Channels[channel].Point = NextFreeChannel;
@@ -467,7 +467,7 @@ static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origi
 	Channels[NextFreeChannel].Volume = volume;
 	Channels[NextFreeChannel].Point = 0;
 	//Wyrmgus start
-	Channels[NextFreeChannel].Voice = -1;
+	Channels[NextFreeChannel].Voice = UnitVoiceGroup::None;
 	//Wyrmgus end
 	Channels[NextFreeChannel].Playing = true;
 	Channels[NextFreeChannel].Sample = sample;
@@ -546,20 +546,16 @@ int SetChannelStereo(int channel, int stereo)
 **  Set the channel voice group
 **
 **  @param channel  Channel to set
-**
-**  @return         Current stereo of the channel, -1 for error
 */
-int SetChannelVoiceGroup(int channel, UnitVoiceGroup voice)
+void SetChannelVoiceGroup(int channel, UnitVoiceGroup voice)
 {
 	if (channel < 0 || channel >= MaxChannels) {
-		return -1;
+		return;
 	}
 
 	SDL_LockMutex(Audio.Lock);
 	Channels[channel].Voice = voice;
 	SDL_UnlockMutex(Audio.Lock);
-	
-	return voice;
 }
 //Wyrmgus end
 
@@ -1094,7 +1090,7 @@ int InitSound()
 		Channels[i].Unit = nullptr;
 		Channels[i].Volume = 0;
 		Channels[i].Stereo = 0;
-		Channels[i].Voice = -1;
+		Channels[i].Voice = UnitVoiceGroup::None;
 		Channels[i].Playing = false;
 		//Wyrmgus end
 	}

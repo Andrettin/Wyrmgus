@@ -532,7 +532,7 @@ bool AutoAttack(CUnit &unit)
 				UnitShowAnimation(unit, unit.GetAnimations()->Still);
 			}
 			if (SyncRand(100000) == 0) {
-				PlayUnitSound(unit, VoiceIdle);
+				PlayUnitSound(unit, UnitVoiceGroup::Idle);
 			}
 			unit.StepCount = 0;
 			//Wyrmgus end

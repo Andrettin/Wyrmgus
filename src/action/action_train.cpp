@@ -420,7 +420,7 @@ static void AnimateActionTrain(CUnit &unit)
 		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 
 		if (&player == CPlayer::GetThisPlayer()) {
-			PlayUnitSound(*newUnit, VoiceReady);
+			PlayUnitSound(*newUnit, UnitVoiceGroup::Ready);
 		}
 		if (newUnit->Player->AiEnabled) {
 			AiTrainingComplete(unit, *newUnit);

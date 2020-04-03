@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name main.cpp - The main file. */
-//
 //      (c) Copyright 2013 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,7 +26,8 @@
 //
 
 #include "stratagus.h"
-#include "SDL.h"
+
+#include <SDL.h>
 
 int main(int argc, char **argv)
 {

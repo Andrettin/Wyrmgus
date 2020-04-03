@@ -8,7 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound.cpp - The sound. */
 //
 //      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi,
 //		Jimmy Salmon and Andrettin
@@ -167,7 +166,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 	//Wyrmgus end
 	switch (voice) {
-		case VoiceAcknowledging:
+		case UnitVoiceGroup::Acknowledging:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Acknowledgement.Sound;
 			if (unit.Type->MapSound.Acknowledgement.Sound) {
@@ -182,7 +181,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return nullptr;
 			}
 			//Wyrmgus end
-		case VoiceAttack:
+		case UnitVoiceGroup::Attack:
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			//Wyrmgus start
@@ -194,29 +193,29 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				if (CCivilization::Civilizations[civilization]->UnitSounds.Attack.Sound) {
 					return CCivilization::Civilizations[civilization]->UnitSounds.Attack.Sound;
 				} else {
-					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				}
 			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return unit.Type->MapSound.Acknowledgement.Sound;
-				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				//Wyrmgus end
 			}
 		//Wyrmgus start
-		case VoiceIdle:
+		case UnitVoiceGroup::Idle:
 			return unit.Type->MapSound.Idle.Sound;
-		case VoiceHit:
+		case UnitVoiceGroup::Hit:
 			return unit.Type->MapSound.Hit.Sound;
-		case VoiceMiss:
+		case UnitVoiceGroup::Miss:
 			if (unit.Type->MapSound.Miss.Sound) {
 				return unit.Type->MapSound.Miss.Sound;
 			} else {
 				return unit.Type->MapSound.Hit.Sound;
 			}
-		case VoiceFireMissile:
+		case UnitVoiceGroup::FireMissile:
 			return unit.Type->MapSound.FireMissile.Sound;
-		case VoiceStep:
+		case UnitVoiceGroup::Step:
 			if (unit.Type->MapSound.StepMud.Sound && ((mf.getFlag() & MapFieldMud) || (mf.getFlag() & MapFieldSnow))) {
 				return unit.Type->MapSound.StepMud.Sound;
 			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.getFlag() & MapFieldDirt) || (mf.getFlag() & MapFieldIce))) {
@@ -230,10 +229,10 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			} else {
 				return unit.Type->MapSound.Step.Sound;
 			}
-		case VoiceUsed:
+		case UnitVoiceGroup::Used:
 			return unit.Type->MapSound.Used.Sound;
 		//Wyrmgus end
-		case VoiceBuild:
+		case UnitVoiceGroup::Build:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Build.Sound;
 			if (unit.Type->MapSound.Build.Sound) {
@@ -247,14 +246,14 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				if (CCivilization::Civilizations[civilization]->UnitSounds.Build.Sound) {
 					return CCivilization::Civilizations[civilization]->UnitSounds.Build.Sound;
 				} else {
-					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				}
 			//Wyrmgus end
 			} else {
-				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 			}
 			//Wyrmgus end
-		case VoiceReady:
+		case UnitVoiceGroup::Ready:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Ready.Sound;
 			if (unit.Type->MapSound.Ready.Sound) {
@@ -269,7 +268,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return nullptr;
 			}
 			//Wyrmgus end
-		case VoiceSelected:
+		case UnitVoiceGroup::Selected:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Selected.Sound;
 			if (unit.Type->MapSound.Selected.Sound) {
@@ -284,7 +283,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return nullptr;
 			}
 			//Wyrmgus end
-		case VoiceHelpMe:
+		case UnitVoiceGroup::HelpMe:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Help.Sound;
 			if (unit.Type->MapSound.Help.Sound) {
@@ -303,19 +302,19 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return nullptr;
 			}
 			//Wyrmgus end
-		case VoiceDying:
+		case UnitVoiceGroup::Dying:
 			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
 			} else {
 				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
-		case VoiceWorkCompleted:
+		case UnitVoiceGroup::WorkCompleted:
 			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
-		case VoiceBuilding:
+		case UnitVoiceGroup::Building:
 			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
-		case VoiceDocking:
+		case UnitVoiceGroup::Docking:
 			return GameSounds.Docking.Sound;
-		case VoiceRepairing:
+		case UnitVoiceGroup::Repairing:
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			//Wyrmgus start
@@ -327,16 +326,16 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				if (CCivilization::Civilizations[civilization]->UnitSounds.Repair.Sound) {
 					return CCivilization::Civilizations[civilization]->UnitSounds.Repair.Sound;
 				} else {
-					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				}
 			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return unit.Type->MapSound.Acknowledgement.Sound;
-				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				//Wyrmgus end
 			}
-		case VoiceHarvesting:
+		case UnitVoiceGroup::Harvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitAction::Resource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
@@ -351,13 +350,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 						if (CCivilization::Civilizations[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
 							return CCivilization::Civilizations[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
 						} else {
-							return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+							return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 						}
 					//Wyrmgus end
 					} else {
 						//Wyrmgus start
 //						return unit.Type->MapSound.Acknowledgement.Sound;
-						return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+						return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 						//Wyrmgus end
 					}
 				}
@@ -437,7 +436,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		return;
 	}
 	
-	if (unit.Variable[STUN_INDEX].Value > 0 && voice != VoiceHit && voice != VoiceMiss && voice != VoiceFireMissile && voice != VoiceStep && voice != VoiceDying) { //don't speak if stunned
+	if (unit.Variable[STUN_INDEX].Value > 0 && voice != UnitVoiceGroup::Hit && voice != UnitVoiceGroup::Miss && voice != UnitVoiceGroup::FireMissile && voice != UnitVoiceGroup::Step && voice != UnitVoiceGroup::Dying) { //don't speak if stunned
 		return;
 	}
 	
@@ -446,12 +445,12 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		return;
 	}
 
-	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
+	bool selection = (voice == UnitVoiceGroup::Selected || voice == UnitVoiceGroup::Building);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	
 	//Wyrmgus start
 //	if (UnitSoundIsPlaying(&source)) {
-	if (voice != VoiceHit && voice != VoiceMiss && voice != VoiceFireMissile && voice != VoiceStep && UnitSoundIsPlaying(&source)) {
+	if (voice != UnitVoiceGroup::Hit && voice != UnitVoiceGroup::Miss && voice != UnitVoiceGroup::FireMissile && voice != UnitVoiceGroup::Step && UnitSoundIsPlaying(&source)) {
 	//Wyrmgus end
 		return;
 	}

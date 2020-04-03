@@ -222,7 +222,7 @@ enum {
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}
-					PlayUnitSound(*goal->ConnectingDestination, VoiceUsed);
+					PlayUnitSound(*goal->ConnectingDestination, UnitVoiceGroup::Used);
 				} else if (goal->Spell != nullptr) {
 					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
@@ -269,7 +269,7 @@ enum {
 				this->Finished = true;
 				return;
 			}
-			PlayUnitSound(*goal, VoiceUsed);
+			PlayUnitSound(*goal, UnitVoiceGroup::Used);
 			if (goal->Type->BoolFlag[POWERUP_INDEX].value || IsItemClassConsumable(goal->Type->ItemClass)) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);

@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound.h - The sound header file. */
-//
-//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi, Jimmy Salmon
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +26,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SOUND_H__
-#define __SOUND_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -39,8 +35,8 @@
 #include "unitsound.h"
 
 //Wyrmgus start
-#include <string>
 #include <map>
+#include <string>
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -57,33 +53,34 @@ class Missile;
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define MaxSampleVolume 255  /// Maximum sample volume
-#define NO_SOUND 0           /// No valid sound ID
+static constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
+static constexpr int NO_SOUND = 0;           /// No valid sound ID
 
 /**
 **  Voice groups for a unit
 */
-enum UnitVoiceGroup {
-	VoiceSelected,          /// If selected
-	VoiceAcknowledging,     /// Acknowledge command
-	VoiceReady,             /// Command completed
-	VoiceHelpMe,            /// If attacked
-	VoiceDying,             /// If killed
-	VoiceWorkCompleted,     /// only worker, work completed
-	VoiceBuilding,          /// only for building under construction
-	VoiceDocking,           /// only for transport reaching coast
-	VoiceRepairing,         /// repairing
-	VoiceHarvesting,        /// harvesting
-	VoiceAttack,            /// Attack command
+enum class UnitVoiceGroup {
+	None = -1,
+	Selected,          /// If selected
+	Acknowledging,     /// Acknowledge command
+	Ready,             /// Command completed
+	HelpMe,            /// If attacked
+	Dying,             /// If killed
+	WorkCompleted,     /// only worker, work completed
+	Building,          /// only for building under construction
+	Docking,           /// only for transport reaching coast
+	Repairing,         /// repairing
+	Harvesting,        /// harvesting
+	Attack,            /// Attack command
 	//Wyrmgus start
-	VoiceIdle,				/// Idle sound
-	VoiceHit,				/// Hit another unit
-	VoiceMiss,				/// Attacked another unit, but missed
-	VoiceFireMissile,		/// Fire a missile at another unit
-	VoiceStep,				/// Stepped
-	VoiceUsed,				/// Used (for items)
+	Idle,				/// Idle sound
+	Hit,				/// Hit another unit
+	Miss,				/// Attacked another unit, but missed
+	FireMissile,		/// Fire a missile at another unit
+	Step,				/// Stepped
+	Used,				/// Used (for items)
 	//Wyrmgus end
-	VoiceBuild              /// worker goes to build a building
+	Build              /// worker goes to build a building
 };
 
 
@@ -112,10 +109,7 @@ public:
 class CSound
 {
 public:
-	//Wyrmgus start
-//	CSound() : Mapref(0), Range(0), Number(0)
-	CSound() : Mapref(0), Range(0), Number(0), VolumePercent(0)
-	//Wyrmgus end
+	CSound()
 	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
@@ -123,18 +117,18 @@ public:
 	
 	static void ProcessConfigData(const CConfigData *config_data);
 		
-	unsigned int Mapref;
+	unsigned int Mapref = 0;
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	unsigned char Range;        /// Range is a multiplier for DistanceSilent
+	unsigned char Range = 0;    /// Range is a multiplier for DistanceSilent
 	//Wyrmgus start
-//	unsigned char Number;       /// single, group, or table of sounds.
-	unsigned int Number;       /// single, group, or table of sounds.
+//	unsigned char Number = 0;       /// single, group, or table of sounds.
+	unsigned int Number = 0;       /// single, group, or table of sounds.
 	//Wyrmgus end
 	//Wyrmgus start
-	int VolumePercent;
+	int VolumePercent = 0;
 	//Wyrmgus end
 	union {
 		CSample *OneSound;       /// if it's only a simple sound
@@ -149,21 +143,21 @@ public:
 /**
 ** A possible value for Number in the Sound struct: means a simple sound
 */
-#define ONE_SOUND 0
+static constexpr int ONE_SOUND = 0;
 /**
 ** A possible value for Number in the Sound struct: means a double group (for
 ** selection/annoyed sounds)
 */
-#define TWO_GROUPS 1
+static constexpr int TWO_GROUPS = 1;
 
 /**
 ** the range value that makes a sound volume distance independent
 */
-#define INFINITE_SOUND_RANGE 255
+static constexpr int INFINITE_SOUND_RANGE = 255;
 /**
 ** the maximum range value
 */
-#define MAX_SOUND_RANGE 254
+static constexpr int MAX_SOUND_RANGE = 254;
 
 /**
 **  Origin of a sound
@@ -270,8 +264,3 @@ extern void FreeSounds();
 
 /// register ccl features
 extern void SoundCclRegister();
-
-
-//@}
-
-#endif  // !__SOUND_H__

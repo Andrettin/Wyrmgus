@@ -6461,7 +6461,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		return;
 	}
 
-	PlayUnitSound(unit, VoiceDying);
+	PlayUnitSound(unit, UnitVoiceGroup::Dying);
 
 	//
 	// Catapults,... explodes.
@@ -6533,7 +6533,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
 				table[i]->Anim.Unbreakable = 0;
-				PlayUnitSound(*table[i], VoiceDying);
+				PlayUnitSound(*table[i], UnitVoiceGroup::Dying);
 				table[i]->Remove(nullptr);
 				UnitLost(*table[i]);
 				UnitClearOrders(*table[i]);
@@ -6719,7 +6719,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
-				PlayUnitSound(target, VoiceHelpMe);
+				PlayUnitSound(target, UnitVoiceGroup::HelpMe);
 				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
 			}
 		}
