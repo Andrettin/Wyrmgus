@@ -585,6 +585,11 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_wait.h
 )
 
+set(stratagus_database_HDRS
+	src/database/data_entry.h
+	src/database/data_type.h
+)
+
 set(stratagus_map_HDRS
 	src/include/map/historical_location.h
 	src/include/map/map.h
@@ -753,6 +758,7 @@ set(stratagus_generic_HDRS
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
+source_group(database FILES ${stratagus_database_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(include\\map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
@@ -769,6 +775,7 @@ set(stratagus_HDRS
 	${stratagus_generic_HDRS}
 	${stratagus_action_HDRS}
 	${stratagus_animation_HDRS}
+	${stratagus_database_HDRS}
 	${stratagus_guichan_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_religion_HDRS}
