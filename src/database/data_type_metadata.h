@@ -43,7 +43,7 @@ class data_type_metadata
 {
 public:
 	data_type_metadata(const std::string &class_identifier, const std::set<std::string> &database_dependencies, const std::function<void(const std::filesystem::path &)> &parsing_function, const std::function<void(bool)> &processing_function, const std::function<void()> &initialization_function, const std::function<void()> &checking_function)
-		: class_identifier(class_identifier), database_dependencies(database_dependencies), parsing_function(parsing_function), processing_function(processing_function), checking_function(checking_function), initialization_function(initialization_function)
+		: class_identifier(class_identifier), database_dependencies(database_dependencies), parsing_function(parsing_function), processing_function(processing_function), initialization_function(initialization_function), checking_function(checking_function)
 	{
 	}
 
