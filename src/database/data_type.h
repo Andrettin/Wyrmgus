@@ -33,6 +33,8 @@
 
 #include "util/qunique_ptr.h"
 
+#include <QApplication>
+
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -112,6 +114,7 @@ public:
 
 		T *instance = data_type::instances_by_identifier.find(identifier)->second.get();
 		data_type::instances.push_back(instance);
+		instance->moveToThread(QApplication::instance()->thread());
 
 		return instance;
 	}

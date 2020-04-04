@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2013 by Joris Dauphin
+//      (c) Copyright 2013-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,9 +27,32 @@
 
 #include "stratagus.h"
 
+#include "util/exception_util.h"
+
 #include <SDL.h>
+
+#include <QApplication>
+
+#include <thread>
 
 int main(int argc, char **argv)
 {
-	return stratagusMain(argc, argv);
+	using namespace stratagus;
+
+	try {
+		QApplication app(argc, argv);
+
+		std::thread stratagus_thread([argc, argv]() {
+			stratagusMain(argc, argv);
+		});
+
+		const int result = app.exec();
+
+		stratagus_thread.join();
+
+		return result;
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return -1;
+	}
 }
