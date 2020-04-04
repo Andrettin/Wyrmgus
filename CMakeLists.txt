@@ -131,6 +131,13 @@ set(beos_SRCS
 )
 source_group(beos FILES ${beos_SRCS})
 
+set(database_SRCS
+	src/database/sml_data.cpp
+	src/database/sml_parser.cpp
+	src/database/sml_property.cpp
+)
+source_group(database FILES ${database_SRCS})
+
 set(editor_SRCS
 	src/editor/editloop.cpp
 	src/editor/editor.cpp
@@ -467,6 +474,7 @@ set(stratagus_SRCS
 	${action_SRCS}
 	${animation_SRCS}
 	${ai_SRCS}
+	${database_SRCS}
 	${editor_SRCS}
 	${game_SRCS}
 	${guichan_SRCS}
@@ -588,6 +596,13 @@ set(stratagus_animation_HDRS
 set(stratagus_database_HDRS
 	src/database/data_entry.h
 	src/database/data_type.h
+	src/database/sml_data.h
+	src/database/sml_data_visitor.h
+	src/database/sml_element_visitor.h
+	src/database/sml_operator.h
+	src/database/sml_parser.h
+	src/database/sml_property.h
+	src/database/sml_property_visitor.h
 )
 
 set(stratagus_map_HDRS
