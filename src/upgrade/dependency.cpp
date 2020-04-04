@@ -85,6 +85,16 @@ void CDependency::ProcessConfigDataSection(const CConfigData *section)
 	fprintf(stderr, "Invalid dependency property: \"%s\".\n", section->Tag.c_str());
 }
 
+void CDependency::process_sml_property(const stratagus::sml_property &property)
+{
+	throw std::runtime_error("Invalid dependency property: \"" + property.get_key() + "\".");
+}
+
+void CDependency::process_sml_scope(const stratagus::sml_data &scope)
+{
+	throw std::runtime_error("Invalid dependency scope: \"" + scope.get_tag() + "\".");
+}
+
 bool CDependency::Check(const CUnit *unit, bool ignore_units) const
 {
 	//dependencies check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
@@ -113,10 +123,39 @@ void CAndDependency::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "trigger") {
 		dependency = new CTriggerDependency;
 	} else {
-		fprintf(stderr, "Invalid and dependency property: \"%s\".\n", section->Tag.c_str());
-		return;
+		throw std::runtime_error("Invalid and dependency property: \"" + section->Tag + "\".");
 	}
 	dependency->ProcessConfigData(section);
+	this->Dependencies.push_back(dependency);
+}
+
+void CAndDependency::process_sml_scope(const stratagus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	CDependency *dependency = nullptr;
+	if (tag == "and") {
+		dependency = new CAndDependency;
+	} else if (tag == "or") {
+		dependency = new COrDependency;
+	} else if (tag == "not") {
+		dependency = new CNotDependency;
+	} else if (tag == "unit_type") {
+		dependency = new CUnitTypeDependency;
+	} else if (tag == "upgrade") {
+		dependency = new CUpgradeDependency;
+	} else if (tag == "age") {
+		dependency = new CAgeDependency;
+	} else if (tag == "character") {
+		dependency = new CCharacterDependency;
+	} else if (tag == "season") {
+		dependency = new CSeasonDependency;
+	} else if (tag == "trigger") {
+		dependency = new CTriggerDependency;
+	} else {
+		throw std::runtime_error("Invalid and dependency property: \"" + tag + "\".");
+	}
+	stratagus::database::process_sml_data(dependency, scope);
 	this->Dependencies.push_back(dependency);
 }
 
@@ -168,6 +207,34 @@ void COrDependency::ProcessConfigDataSection(const CConfigData *section)
 		return;
 	}
 	dependency->ProcessConfigData(section);
+	this->Dependencies.push_back(dependency);
+}
+
+void COrDependency::process_sml_scope(const stratagus::sml_data &scope)
+{
+	CDependency *dependency = nullptr;
+	if (scope.get_tag() == "and") {
+		dependency = new CAndDependency;
+	} else if (scope.get_tag() == "or") {
+		dependency = new COrDependency;
+	} else if (scope.get_tag() == "not") {
+		dependency = new CNotDependency;
+	} else if (scope.get_tag() == "unit_type") {
+		dependency = new CUnitTypeDependency;
+	} else if (scope.get_tag() == "upgrade") {
+		dependency = new CUpgradeDependency;
+	} else if (scope.get_tag() == "age") {
+		dependency = new CAgeDependency;
+	} else if (scope.get_tag() == "character") {
+		dependency = new CCharacterDependency;
+	} else if (scope.get_tag() == "season") {
+		dependency = new CSeasonDependency;
+	} else if (scope.get_tag() == "trigger") {
+		dependency = new CTriggerDependency;
+	} else {
+		throw std::runtime_error("Invalid or dependency property: \""+ scope.get_tag() + "\".");
+	}
+	stratagus::database::process_sml_data(dependency, scope);
 	this->Dependencies.push_back(dependency);
 }
 
@@ -298,6 +365,21 @@ void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, 
 	}
 }
 
+void CUpgradeDependency::process_sml_property(const stratagus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	std::string value = property.get_value();
+	if (key == "upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Upgrade = CUpgrade::Get(value);
+		if (this->Upgrade == nullptr) {
+			throw std::runtime_error("Invalid upgrade: \"" + value + "\".");
+		}
+	} else {
+		throw std::runtime_error("Invalid upgrade dependency property: \"" + property.get_key() + "\".");
+	}
+}
+
 bool CUpgradeDependency::Check(const CPlayer *player, bool ignore_units) const
 {
 	return UpgradeIdAllowed(*player, this->Upgrade->ID) == 'R';
@@ -333,7 +415,7 @@ bool CAgeDependency::Check(const CPlayer *player, bool ignore_units) const
 
 std::string CAgeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Age->Name + '\n';
+	std::string str = prefix + this->Age->get_name() + '\n';
 	return str;
 }
 

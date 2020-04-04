@@ -243,12 +243,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			continue;
 		}
 		
-		if (config_data->Tag == CAge::class_identifier) {
-			CAge *age = CAge::get_or_add(ident);
-			if (!define_only) {
-				age->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "animations") {
+		if (config_data->Tag == "animations") {
 			CAnimations *animations = AnimationsByIdent(ident);
 			if (!animations) {
 				animations = new CAnimations;

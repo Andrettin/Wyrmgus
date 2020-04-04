@@ -178,7 +178,7 @@ int SaveGame(const std::string &filename)
 		}
 	}
 	if (CAge::CurrentAge) {
-		file.printf("SetCurrentAge(\"%s\")\n", CAge::CurrentAge->Ident.c_str());
+		file.printf("SetCurrentAge(\"%s\")\n", CAge::CurrentAge->get_identifier().c_str());
 	}
 
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");

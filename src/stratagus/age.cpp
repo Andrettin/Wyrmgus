@@ -45,99 +45,17 @@
 #include "upgrade/upgrade_structs.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 CAge *CAge::CurrentAge = nullptr;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-CAge::~CAge()
+void CAge::initialize_all()
 {
-	if (this->G) {
-		CGraphic::Free(this->G);
-	}
-}
+	data_type::initialize_all();
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CAge::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "priority") {
-			this->Priority = std::stoi(value);
-		} else if (key == "year_boost") {
-			this->YearBoost = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid age property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "image") {
-			std::string file;
-			Vec2i size(0, 0);
-				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					size.x = std::stoi(value);
-				} else if (key == "height") {
-					size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
-			
-			if (size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CGraphic::New(file, size.x, size.y);
-			this->G->Load();
-			this->G->UseDisplayFormat();
-		} else if (child_config_data->Tag == "predependencies") {
-			this->Predependency = new CAndDependency;
-			this->Predependency->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
-			this->Dependency->ProcessConfigData(child_config_data);
-		} else {
-			fprintf(stderr, "Invalid age property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-	
 	CAge::sort_instances([](CAge *a, CAge *b) {
-		if (a->Priority != b->Priority) {
-			return a->Priority > b->Priority;
+		if (a->priority != b->priority) {
+			return a->priority > b->priority;
 		} else {
-			return a->Ident < b->Ident;
+			return a->get_identifier() < b->get_identifier();
 		}
 	});
 }
@@ -147,34 +65,88 @@ void CAge::SetCurrentAge(CAge *age)
 	if (age == CAge::CurrentAge) {
 		return;
 	}
-	
+
 	CAge::CurrentAge = age;
-	
+
 	if (GameCycle > 0 && !SaveGameLoading) {
-		if (CAge::CurrentAge && CAge::CurrentAge->YearBoost > 0) {
+		if (CAge::CurrentAge && CAge::CurrentAge->year_boost > 0) {
 			//boost the current date's year by a certain amount; this is done so that we can both have a slower passage of years in-game (for seasons and character lifetimes to be more sensible), while still not having overly old dates in later ages
 			for (CCalendar *calendar : CCalendar::Calendars) {
-				calendar->CurrentDate.AddHours(calendar, (long long) CAge::CurrentAge->YearBoost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
+				calendar->CurrentDate.AddHours(calendar, (long long) CAge::CurrentAge->year_boost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
 			}
 		}
 	}
 }
 
-/**
-**	@brief	Check which age fits the current overall situation best, out of the ages each player is in
-*/
+//check which age fits the current overall situation best, out of the ages each player is in
 void CAge::CheckCurrentAge()
 {
 	CAge *best_age = CAge::CurrentAge;
-	
+
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Age && (!best_age || CPlayer::Players[p]->Age->Priority > best_age->Priority)) {
+		if (CPlayer::Players[p]->Age && (!best_age || CPlayer::Players[p]->Age->priority > best_age->priority)) {
 			best_age = CPlayer::Players[p]->Age;
 		}
 	}
-	
+
 	if (best_age != CAge::CurrentAge) {
 		CAge::SetCurrentAge(best_age);
+	}
+}
+
+CAge::~CAge()
+{
+	if (this->graphics) {
+		CGraphic::Free(this->graphics);
+	}
+}
+
+void CAge::process_sml_scope(const stratagus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "image") {
+		std::string file;
+		Vec2i size(0, 0);
+
+		scope.for_each_property([&](const stratagus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			if (key == "file") {
+				file = CMod::GetCurrentModPath() + value;
+			} else if (key == "width") {
+				size.x = std::stoi(value);
+			} else if (key == "height") {
+				size.y = std::stoi(value);
+			} else {
+				throw std::runtime_error("Invalid image property: \"" + key + "\".");
+			}
+		});
+
+		if (file.empty()) {
+			throw std::runtime_error("Image has no file.");
+		}
+
+		if (size.x == 0) {
+			throw std::runtime_error("Image has no width.");
+		}
+
+		if (size.y == 0) {
+			throw std::runtime_error("Image has no height.");
+		}
+
+		this->graphics = CGraphic::New(file, size.x, size.y);
+		this->graphics->Load();
+		this->graphics->UseDisplayFormat();
+	} else if (tag == "predependencies") {
+		this->predependency = new CAndDependency;
+		stratagus::database::process_sml_data(this->predependency, scope);
+	} else if (tag == "dependencies") {
+		this->dependency = new CAndDependency;
+		stratagus::database::process_sml_data(this->dependency, scope);
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 

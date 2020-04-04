@@ -39,32 +39,77 @@ class CDependency;
 class CGraphic;
 class CUpgrade;
 
-class CAge : public CDataType, public stratagus::data_entry, public stratagus::data_type<CAge>
+class CAge : public stratagus::data_entry, public stratagus::data_type<CAge>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(int priority MEMBER priority)
+	Q_PROPERTY(int year_boost MEMBER year_boost)
+
 public:
 	static constexpr const char *class_identifier = "age";
 	static constexpr const char *database_folder = "ages";
 
-	CAge(const std::string &identifier) : CDataType(identifier), stratagus::data_entry(identifier)
+	static void initialize_all();
+
+	static void SetCurrentAge(CAge *age);
+	static void CheckCurrentAge();
+
+	static CAge *CurrentAge;
+
+	CAge(const std::string &identifier) : stratagus::data_entry(identifier)
 	{
 	}
 
 	virtual ~CAge() override;
 	
-	static void SetCurrentAge(CAge *age);
-	static void CheckCurrentAge();
-	
-	static CAge *CurrentAge;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-public:
-	std::string Name;
-	CGraphic *G = nullptr;
-	int Priority = 0;
-	int YearBoost = 0;
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
+
+	virtual void check() const override
+	{
+		if (this->get_graphics() == nullptr) {
+			throw std::runtime_error("Age \"" + this->get_identifier() + "\" has no icon.");
+		}
+	}
+
+	const std::string &get_name() const
+	{
+		return this->name;
+	}
+
+	QString get_name_qstring() const
+	{
+		return QString::fromStdString(this->get_name());
+	}
+
+	void set_name_qstring(const QString &name)
+	{
+		this->name = name.toStdString();
+	}
+
+	CGraphic *get_graphics() const
+	{
+		return this->graphics;
+	}
+
+	CDependency *get_predependency() const
+	{
+		return this->predependency;
+	}
+
+	CDependency *get_dependency() const
+	{
+		return this->dependency;
+	}
+
+private:
+	std::string name;
+	CGraphic *graphics = nullptr;
+	int priority = 0;
+	int year_boost = 0;
+	CDependency *predependency = nullptr;
+	CDependency *dependency = nullptr;
 };
 
 extern void SetCurrentAge(const std::string &age_ident);

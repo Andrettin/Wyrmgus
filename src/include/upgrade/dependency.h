@@ -107,6 +107,11 @@ class CUnit;
 class CUpgrade;
 class ButtonAction;
 
+namespace stratagus {
+	class sml_data;
+	class sml_property;
+}
+
 /// Dependency rule
 class CDependency
 {
@@ -114,6 +119,8 @@ public:
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
+	virtual void process_sml_property(const stratagus::sml_property &property);
+	virtual void process_sml_scope(const stratagus::sml_data &scope);
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const = 0;
 	virtual bool Check(const CUnit *unit, bool ignore_units = false) const;
 	virtual std::string GetString(const std::string &prefix = "") const = 0; //get the dependency as a string
@@ -126,6 +133,7 @@ public:
 	CAndDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
 	
@@ -166,6 +174,7 @@ public:
 	COrDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
 	
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
 	
@@ -262,6 +271,7 @@ public:
 	CUpgradeDependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
 	
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual void process_sml_property(const stratagus::sml_property &property);
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
 	virtual std::string GetString(const std::string &prefix = "") const override;
@@ -338,10 +348,18 @@ extern bool CheckDependencies(const T *target, const CPlayer *player, bool ignor
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->Check(player, ignore_units);
+	if constexpr (std::is_same_v<CAge, T>) {
+		if (is_predependency) {
+			return !target->get_predependency() || target->get_predependency()->Check(player, ignore_units);
+		} else {
+			return !target->get_dependency() || target->get_dependency()->Check(player, ignore_units);
+		}
 	} else {
-		return !target->Dependency || target->Dependency->Check(player, ignore_units);
+		if (is_predependency) {
+			return !target->Predependency || target->Predependency->Check(player, ignore_units);
+		} else {
+			return !target->Dependency || target->Dependency->Check(player, ignore_units);
+		}
 	}
 }
 

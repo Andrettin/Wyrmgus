@@ -924,7 +924,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf(" \"dynasty\", \"%s\",", p.Dynasty->Ident.c_str());
 	}
 	if (p.Age) {
-		file.printf(" \"age\", \"%s\",", p.Age->Ident.c_str());
+		file.printf(" \"age\", \"%s\",", p.Age->get_identifier().c_str());
 	}
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == this->Color) {
@@ -1765,11 +1765,11 @@ void CPlayer::SetAge(CAge *age)
 	
 	if (this == CPlayer::GetThisPlayer()) {
 		if (this->Age) {
-			UI.AgePanel.Text = this->Age->Name;
-			UI.AgePanel.G = this->Age->G;
+			UI.AgePanel.Text = this->Age->get_name();
+			UI.AgePanel.G = this->Age->get_graphics();
 			
 			if (GameCycle > 0 && !SaveGameLoading) {
-				this->Notify(_("The %s has dawned upon us."), this->Age->Name.c_str());
+				this->Notify(_("The %s has dawned upon us."), _(this->Age->get_name().c_str()));
 			}
 		} else {
 			UI.AgePanel.Text.clear();
