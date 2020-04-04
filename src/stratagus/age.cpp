@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "age.h"
@@ -45,13 +41,15 @@
 #include "upgrade/upgrade_structs.h"
 #include "video.h"
 
-CAge *CAge::CurrentAge = nullptr;
+namespace stratagus {
 
-void CAge::initialize_all()
+age *age::current_age = nullptr;
+
+void age::initialize_all()
 {
 	data_type::initialize_all();
 
-	CAge::sort_instances([](CAge *a, CAge *b) {
+	age::sort_instances([](age *a, age *b) {
 		if (a->priority != b->priority) {
 			return a->priority > b->priority;
 		} else {
@@ -60,48 +58,48 @@ void CAge::initialize_all()
 	});
 }
 
-void CAge::SetCurrentAge(CAge *age)
+void age::set_current_age(age *age)
 {
-	if (age == CAge::CurrentAge) {
+	if (age == age::current_age) {
 		return;
 	}
 
-	CAge::CurrentAge = age;
+	age::current_age = age;
 
 	if (GameCycle > 0 && !SaveGameLoading) {
-		if (CAge::CurrentAge && CAge::CurrentAge->year_boost > 0) {
+		if (age::current_age && age::current_age->year_boost > 0) {
 			//boost the current date's year by a certain amount; this is done so that we can both have a slower passage of years in-game (for seasons and character lifetimes to be more sensible), while still not having overly old dates in later ages
 			for (CCalendar *calendar : CCalendar::Calendars) {
-				calendar->CurrentDate.AddHours(calendar, (long long) CAge::CurrentAge->year_boost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
+				calendar->CurrentDate.AddHours(calendar, (long long) age::current_age->year_boost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
 			}
 		}
 	}
 }
 
 //check which age fits the current overall situation best, out of the ages each player is in
-void CAge::CheckCurrentAge()
+void age::check_current_age()
 {
-	CAge *best_age = CAge::CurrentAge;
+	age *best_age = age::current_age;
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Age && (!best_age || CPlayer::Players[p]->Age->priority > best_age->priority)) {
-			best_age = CPlayer::Players[p]->Age;
+		if (CPlayer::Players[p]->age && (!best_age || CPlayer::Players[p]->age->priority > best_age->priority)) {
+			best_age = CPlayer::Players[p]->age;
 		}
 	}
 
-	if (best_age != CAge::CurrentAge) {
-		CAge::SetCurrentAge(best_age);
+	if (best_age != age::current_age) {
+		age::set_current_age(best_age);
 	}
 }
 
-CAge::~CAge()
+age::~age()
 {
 	if (this->graphics) {
 		CGraphic::Free(this->graphics);
 	}
 }
 
-void CAge::process_sml_scope(const stratagus::sml_data &scope)
+void age::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -110,7 +108,7 @@ void CAge::process_sml_scope(const stratagus::sml_data &scope)
 		std::string file;
 		Vec2i size(0, 0);
 
-		scope.for_each_property([&](const stratagus::sml_property &property) {
+		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			if (key == "file") {
@@ -141,13 +139,15 @@ void CAge::process_sml_scope(const stratagus::sml_data &scope)
 		this->graphics->UseDisplayFormat();
 	} else if (tag == "predependencies") {
 		this->predependency = new CAndDependency;
-		stratagus::database::process_sml_data(this->predependency, scope);
+		database::process_sml_data(this->predependency, scope);
 	} else if (tag == "dependencies") {
 		this->dependency = new CAndDependency;
-		stratagus::database::process_sml_data(this->dependency, scope);
+		database::process_sml_data(this->dependency, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
+}
+
 }
 
 /**
@@ -157,11 +157,11 @@ void CAge::process_sml_scope(const stratagus::sml_data &scope)
 */
 void SetCurrentAge(const std::string &age_ident)
 {
-	CAge *age = CAge::get(age_ident);
+	stratagus::age *age = stratagus::age::get(age_ident);
 	
 	if (!age) {
 		return;
 	}
 	
-	CAge::CurrentAge = age;
+	stratagus::age::current_age = age;
 }

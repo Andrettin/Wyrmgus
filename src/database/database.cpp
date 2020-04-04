@@ -160,8 +160,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			throw std::runtime_error("Only the assignment operator is available for object reference properties.");
 		}
 
-		if (property_class_name == "stratagus::CAge*") {
-			new_property_value = QVariant::fromValue(CAge::get(property.get_value()));
+		if (property_class_name == "stratagus::age*") {
+			new_property_value = QVariant::fromValue(age::get(property.get_value()));
 		} else if (property_class_name == "stratagus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
 		} else {

@@ -96,7 +96,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CAge;
 class CCharacter;
 class CConfigData;
 class CPlayer;
@@ -108,6 +107,7 @@ class CUpgrade;
 class ButtonAction;
 
 namespace stratagus {
+	class age;
 	class sml_data;
 	class sml_property;
 }
@@ -288,7 +288,7 @@ public:
 	virtual std::string GetString(const std::string &prefix = "") const override;
 
 private:
-	const CAge *Age = nullptr;
+	const stratagus::age *age = nullptr;
 };
 
 class CCharacterDependency : public CDependency
@@ -348,7 +348,7 @@ extern bool CheckDependencies(const T *target, const CPlayer *player, bool ignor
 		return false;
 	}
 	
-	if constexpr (std::is_same_v<CAge, T>) {
+	if constexpr (std::is_same_v<stratagus::age, T>) {
 		if (is_predependency) {
 			return !target->get_predependency() || target->get_predependency()->Check(player, ignore_units);
 		} else {

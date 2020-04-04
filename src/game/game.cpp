@@ -1658,7 +1658,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
 	}
 	
-	CAge::CurrentAge = nullptr;
+	stratagus::age::current_age = nullptr;
 	//Wyrmgus end
 
 	if (CMap::Map.Info.Filename.empty() && !filename.empty()) {

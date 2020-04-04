@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "upgrade/dependency.h"
@@ -54,10 +50,6 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "upgrade/upgrade_structs.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -402,7 +394,7 @@ void CAgeDependency::ProcessConfigDataProperty(const std::pair<std::string, std:
 	std::string value = property.second;
 	if (key == "age") {
 		value = FindAndReplaceString(value, "_", "-");
-		this->Age = CAge::get(value);
+		this->age = stratagus::age::get(value);
 	} else {
 		fprintf(stderr, "Invalid age dependency property: \"%s\".\n", key.c_str());
 	}
@@ -410,12 +402,12 @@ void CAgeDependency::ProcessConfigDataProperty(const std::pair<std::string, std:
 
 bool CAgeDependency::Check(const CPlayer *player, bool ignore_units) const
 {
-	return player->Age == this->Age;
+	return player->age == this->age;
 }
 
 std::string CAgeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Age->get_name() + '\n';
+	std::string str = prefix + this->age->get_name() + '\n';
 	return str;
 }
 

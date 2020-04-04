@@ -2341,7 +2341,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 		ApplyUpgradeModifier(player, upgrade->UpgradeModifiers[z]);
 	}
 
-	player.CheckAge();
+	player.check_age();
 	
 	//
 	//  Upgrades could change the buttons displayed.
@@ -2423,7 +2423,7 @@ void ApplyUpgrades()
 	}
 	
 	for (int p = 0; p < PlayerMax; ++p) {
-		CPlayer::Players[p]->CheckAge();
+		CPlayer::Players[p]->check_age();
 	}
 }
 

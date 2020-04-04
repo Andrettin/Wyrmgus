@@ -177,8 +177,8 @@ int SaveGame(const std::string &filename)
 			file.printf("SetCurrentDate(\"%s\", \"%s\")\n", calendar->Ident.c_str(), calendar->CurrentDate.ToString(CCalendar::BaseCalendar).c_str());
 		}
 	}
-	if (CAge::CurrentAge) {
-		file.printf("SetCurrentAge(\"%s\")\n", CAge::CurrentAge->get_identifier().c_str());
+	if (stratagus::age::current_age) {
+		file.printf("SetCurrentAge(\"%s\")\n", stratagus::age::current_age->get_identifier().c_str());
 	}
 
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");

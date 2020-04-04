@@ -923,8 +923,8 @@ void CPlayer::Save(CFile &file) const
 	if (p.Dynasty) {
 		file.printf(" \"dynasty\", \"%s\",", p.Dynasty->Ident.c_str());
 	}
-	if (p.Age) {
-		file.printf(" \"age\", \"%s\",", p.Age->get_identifier().c_str());
+	if (p.age) {
+		file.printf(" \"age\", \"%s\",", p.age->get_identifier().c_str());
 	}
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == this->Color) {
@@ -1357,7 +1357,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Faction = -1;
 	this->Religion = nullptr;
 	this->Dynasty = nullptr;
-	this->Age = nullptr;
+	this->age = nullptr;
 	this->Overlord = nullptr;
 	this->Team = team;
 	this->Enemy = 0;
@@ -1734,20 +1734,20 @@ const std::string &CPlayer::get_interface() const
 /**
 **	@brief	Check which age fits the player's current situation best, and set it as the player's age
 */
-void CPlayer::CheckAge()
+void CPlayer::check_age()
 {
 	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
-	for (CAge *potential_age : CAge::get_all()) {
+	for (stratagus::age *potential_age : stratagus::age::get_all()) {
 		if (!CheckDependencies(potential_age, this)) {
 			continue;
 		}
 		
-		this->SetAge(potential_age);
+		this->set_age(potential_age);
 		return;
 	}
 	
-	this->SetAge(nullptr);
+	this->set_age(nullptr);
 }
 
 /**
@@ -1755,21 +1755,21 @@ void CPlayer::CheckAge()
 **
 **	@param	age	The age to be set for the player
 */
-void CPlayer::SetAge(CAge *age)
+void CPlayer::set_age(stratagus::age *age)
 {
-	if (this->Age == age) {
+	if (this->age == age) {
 		return;
 	}
 	
-	this->Age = age;
+	this->age = age;
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		if (this->Age) {
-			UI.AgePanel.Text = this->Age->get_name();
-			UI.AgePanel.G = this->Age->get_graphics();
+		if (this->age) {
+			UI.AgePanel.Text = this->age->get_name();
+			UI.AgePanel.G = this->age->get_graphics();
 			
 			if (GameCycle > 0 && !SaveGameLoading) {
-				this->Notify(_("The %s has dawned upon us."), _(this->Age->get_name().c_str()));
+				this->Notify(_("The %s has dawned upon us."), _(this->age->get_name().c_str()));
 			}
 		} else {
 			UI.AgePanel.Text.clear();
@@ -1777,7 +1777,7 @@ void CPlayer::SetAge(CAge *age)
 		}
 	}
 	
-	CAge::CheckCurrentAge();
+	stratagus::age::check_current_age();
 }
 
 /**
@@ -2416,7 +2416,7 @@ void CPlayer::Clear()
 	Faction = -1;
 	Religion = nullptr;
 	Dynasty = nullptr;
-	Age = nullptr;
+	this->age = nullptr;
 	Overlord = nullptr;
 	Vassals.clear();
 	AiName.clear();

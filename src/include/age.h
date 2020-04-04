@@ -39,7 +39,9 @@ class CDependency;
 class CGraphic;
 class CUpgrade;
 
-class CAge : public stratagus::data_entry, public stratagus::data_type<CAge>
+namespace stratagus {
+
+class age : public data_entry, public data_type<age>
 {
 	Q_OBJECT
 
@@ -53,18 +55,18 @@ public:
 
 	static void initialize_all();
 
-	static void SetCurrentAge(CAge *age);
-	static void CheckCurrentAge();
+	static void set_current_age(age *age);
+	static void check_current_age();
 
-	static CAge *CurrentAge;
+	static age *current_age;
 
-	CAge(const std::string &identifier) : stratagus::data_entry(identifier)
+	age(const std::string &identifier) : data_entry(identifier)
 	{
 	}
 
-	virtual ~CAge() override;
+	virtual ~age() override;
 	
-	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 
 	virtual void check() const override
 	{
@@ -111,5 +113,7 @@ private:
 	CDependency *predependency = nullptr;
 	CDependency *dependency = nullptr;
 };
+
+}
 
 extern void SetCurrentAge(const std::string &age_ident);

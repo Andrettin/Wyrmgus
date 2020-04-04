@@ -73,7 +73,6 @@ static constexpr int DefaultTradeCost = 30;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CAge;
 class CCalendar;
 class CCharacter;
 class CCivilization;
@@ -98,6 +97,10 @@ class CFiller;
 class LuaCallback;
 //Wyrmgus end
 struct lua_State;
+
+namespace stratagus {
+	class age;
+}
 
 /*----------------------------------------------------------------------------
 --  Player type
@@ -131,13 +134,13 @@ public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
 
-	int   Type;         /// type of player (human,computer,...)
-	int   Race;         /// race of player (orc,human,...)
-	int Faction;		/// faction of the player
-	CReligion *Religion;	/// religion of the player
-	CDynasty *Dynasty;		/// ruling dynasty of the player
-	CAge *Age;			/// The current age the player/faction is in
-	std::string AiName; /// AI for computer
+	int   Type; //type of player (human,computer,...)
+	int   Race; //race of player (orc,human,...)
+	int Faction; //faction of the player
+	CReligion *Religion; //religion of the player
+	CDynasty *Dynasty; //ruling dynasty of the player
+	stratagus::age *age; //the current age the player/faction is in
+	std::string AiName; //AI for computer
 
 	// friend enemy detection
 	int      Team;          /// team of player
@@ -247,8 +250,8 @@ public:
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
 	const std::string &get_interface() const;
-	void CheckAge();
-	void SetAge(CAge *age);
+	void check_age();
+	void set_age(stratagus::age *age);
 	CCurrency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
