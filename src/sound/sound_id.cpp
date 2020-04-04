@@ -119,7 +119,7 @@ CSound *MakeSound(const std::string &name, const std::vector<std::string> &files
 	}
 
 	sound = RegisterSound(files);
-	if (sound != NO_SOUND) {
+	if (sound != nullptr) {
 		MapSound(name, sound);
 	}
 	return sound;
@@ -148,7 +148,7 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 	}
 
 	sound = RegisterTwoGroups(first, second);
-	if (sound != NO_SOUND) {
+	if (sound != nullptr) {
 		MapSound(name, sound);
 	}
 	return sound;

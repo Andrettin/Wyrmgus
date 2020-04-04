@@ -54,7 +54,6 @@ class Missile;
 ----------------------------------------------------------------------------*/
 
 static constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
-static constexpr int NO_SOUND = 0;           /// No valid sound ID
 
 /**
 **  Voice groups for a unit
@@ -103,9 +102,6 @@ public:
 	SoundConfig NotEnoughFood[MAX_RACES];         /// not enough food message
 };
 
-/**
-**  Sound definition.
-*/
 class CSound
 {
 public:

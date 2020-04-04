@@ -363,7 +363,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			}
 	}
 
-	return NO_SOUND;
+	return nullptr;
 }
 
 /**
@@ -619,8 +619,8 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 */
 void SetSoundRange(CSound *sound, unsigned char range)
 {
-	if (sound != NO_SOUND) {
 		sound->Range = range;
+	if (sound != nullptr) {
 	}
 }
 
@@ -633,7 +633,7 @@ void SetSoundRange(CSound *sound, unsigned char range)
 */
 void SetSoundVolumePercent(CSound *sound, int volume_percent)
 {
-	if (sound != NO_SOUND) {
+	if (sound != nullptr) {
 		sound->VolumePercent = volume_percent;
 	}
 }
@@ -665,14 +665,14 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 			if (!id->Sound.OneGroup[i]) {
 				//delete[] id->Sound.OneGroup;
 				delete id;
-				return NO_SOUND;
+				return nullptr;
 			}
 		}
 	} else { // load a unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
 			delete id;
-			return NO_SOUND;
+			return nullptr;
 		}
 		id->Number = ONE_SOUND;
 	}
@@ -693,8 +693,8 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 */
 CSound *RegisterTwoGroups(CSound *first, CSound *second)
 {
-	if (first == NO_SOUND || second == NO_SOUND) {
-		return NO_SOUND;
+	if (first == nullptr || second == nullptr) {
+		return nullptr;
 	}
 	CSound *id = new CSound;
 	id->Number = TWO_GROUPS;
