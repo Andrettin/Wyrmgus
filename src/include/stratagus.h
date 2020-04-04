@@ -258,3 +258,5 @@ extern int GetDirectionIdByName(const std::string &direction);
 extern int GetDirectionFromOffset(int x, int y);
 extern Vec2i GetDirectionOffset(int direction);
 //Wyrmgus end
+
+extern void load_database();

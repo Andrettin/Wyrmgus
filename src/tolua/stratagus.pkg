@@ -182,3 +182,5 @@ extern void CallDialogue(std::string dialogue_ident, int player);
 extern void CallDialogueNode(std::string dialogue_ident, int node, int player);
 extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player);
 //Wyrmgus end
+
+extern void load_database();

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name stratagus.cpp - The main file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Francois Beerten,
 //      Jimmy Salmon, Pali Rohár, cybermind and Andrettin
 //
@@ -181,6 +179,7 @@ extern void beos_init(int argc, char **argv);
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
+#include "database/database.h"
 #include "editor.h"
 #include "game.h"
 #include "guichan.h"
@@ -205,6 +204,7 @@ extern void beos_init(int argc, char **argv);
 #include "version.h"
 #include "video.h"
 #include "widgets.h"
+#include "util/exception_util.h"
 #include "util/util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames
@@ -941,3 +941,12 @@ Vec2i GetDirectionOffset(int direction)
 	return offset;
 }
 //Wyrmgus end
+
+void load_database()
+{
+	try {
+		stratagus::database::get()->load();
+	} catch (const std::exception &exception) {
+		stratagus::exception::report(exception);
+	}
+}
