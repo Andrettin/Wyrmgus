@@ -31,19 +31,31 @@
 
 #pragma once
 
+#include "database/data_type_metadata.h"
+#include "database/database.h"
+#include "database/sml_data.h"
+#include "database/sml_operator.h"
 #include "util/qunique_ptr.h"
 
 #include <QApplication>
 
+#include <filesystem>
 #include <map>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace stratagus {
 
+class data_type_base
+{
+public:
+	static inline const std::set<std::string> database_dependencies; //the other classes on which this one depends, i.e. after which this class' database can be processed
+};
+
 template <typename T>
-class data_type
+class data_type : public data_type_base
 {
 public:
 	static T *get(const std::string &identifier)
@@ -158,10 +170,105 @@ public:
 		std::sort(data_type::instances.begin(), data_type::instances.end(), function);
 	}
 
+	static void parse_database(const std::filesystem::path &data_path)
+	{
+		if (std::string(T::database_folder).empty()) {
+			return;
+		}
+
+		const std::filesystem::path database_path(data_path / T::database_folder);
+
+		if (!std::filesystem::exists(database_path)) {
+			return;
+		}
+
+		database::parse_folder(database_path, data_type::sml_data_to_process);
+	}
+
+	static void process_database(const bool definition)
+	{
+		if (std::string(T::database_folder).empty()) {
+			return;
+		}
+
+		for (const sml_data &data : T::sml_data_to_process) {
+			data.for_each_child([&](const sml_data &data_entry) {
+				const std::string &identifier = data_entry.get_tag();
+
+				T *instance = nullptr;
+				if (definition) {
+					if (data_entry.get_operator() != sml_operator::addition) { //addition operators for data entry scopes mean modifying already-defined entries
+						instance = T::add(identifier);
+					} else {
+						instance = T::get(identifier);
+					}
+
+					for (const sml_property *alias_property : data_entry.try_get_properties("aliases")) {
+						if (alias_property->get_operator() != sml_operator::addition) {
+							throw std::runtime_error("Only the addition operator is supported for data entry aliases.");
+						}
+
+						const std::string &alias = alias_property->get_value();
+						T::add_instance_alias(instance, alias);
+					}
+				} else {
+					try {
+						instance = T::get(identifier);
+						database::process_sml_data<T>(instance, data_entry);
+					} catch (...) {
+						std::throw_with_nested(std::runtime_error("Error processing or loading data for " + std::string(T::class_identifier) + " instance \"" + identifier + "\"."));
+					}
+				}
+			});
+		}
+
+		if (!definition) {
+			data_type::sml_data_to_process.clear();
+		}
+	}
+
+	static void initialize_all()
+	{
+		for (T *instance : T::get_all()) {
+			if (instance->is_initialized()) {
+				continue; //the instance might have been initialized already, e.g. in the initialization function of another instance which needs it to be initialized
+			}
+
+			instance->initialize();
+		}
+	}
+
+	static void check_all()
+	{
+		for (const T *instance : T::get_all()) {
+			try {
+				instance->check();
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("The " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\" is in an invalid state."));
+			}
+		}
+	}
+
 private:
+	static inline bool initialize_class()
+	{
+		//initialize the metadata (including database parsing/processing functions) for this data type
+		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::check_all, T::initialize_all);
+		database::get()->register_metadata(std::move(metadata));
+
+		return true;
+	}
+
 	static inline std::vector<T *> instances;
 	static inline std::map<std::string, qunique_ptr<T>> instances_by_identifier;
 	static inline std::map<std::string, T *> instances_by_alias;
+	static inline std::vector<sml_data> sml_data_to_process;
+#ifdef __GNUC__
+	//the "used" attribute is needed under GCC, or else this variable will be optimized away (even in debug builds)
+	static inline bool class_initialized [[gnu::used]] = data_type::initialize_class();
+#else
+	static inline bool class_initialized = data_type::initialize_class();
+#endif
 };
 
 }

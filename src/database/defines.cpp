@@ -29,72 +29,33 @@
 //      TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //      SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "database/defines.h"
 
-#include <QObject>
-#include <QString>
-
-#include <set>
-#include <string>
+#include "database/database.h"
+#include "database/sml_data.h"
+#include "database/sml_parser.h"
 
 namespace stratagus {
 
-class sml_data;
-class sml_property;
-
-//a de(serializable) and identifiable entry to the database
-class data_entry : public QObject
+void defines::load(const std::filesystem::path &data_path)
 {
-	Q_OBJECT
+	std::filesystem::path defines_path(data_path / "defines.txt");
 
-	Q_PROPERTY(QString identifier READ get_identifier_qstring CONSTANT)
-
-public:
-	data_entry(const std::string &identifier) : identifier(identifier)
-	{
+	if (!std::filesystem::exists(defines_path)) {
+		return;
 	}
 
-	virtual ~data_entry() {}
+	sml_parser parser(defines_path);
+	const sml_data sml_data = parser.parse();
 
-	const std::string &get_identifier() const
-	{
-		return this->identifier;
-	}
+	sml_data.for_each_property([&](const sml_property &property) {
+		this->process_sml_property(property);
+	});
+}
 
-	QString get_identifier_qstring() const
-	{
-		return QString::fromStdString(this->get_identifier());
-	}
-
-	const std::set<std::string> &get_aliases() const
-	{
-		return this->aliases;
-	}
-
-	void add_alias(const std::string &alias)
-	{
-		this->aliases.insert(alias);
-	}
-
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
-
-	bool is_initialized() const
-	{
-		return this->initialized;
-	}
-
-	virtual void initialize()
-	{
-		this->initialized = true;
-	}
-
-	virtual void check() const {}
-
-private:
-	std::string identifier;
-	std::set<std::string> aliases;
-	bool initialized = false;
-};
+void defines::process_sml_property(const sml_property &property)
+{
+	database::process_sml_property_for_object(this, property);
+}
 
 }

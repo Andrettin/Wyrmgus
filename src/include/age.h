@@ -43,6 +43,7 @@ class CAge : public CDataType, public stratagus::data_entry, public stratagus::d
 {
 public:
 	static constexpr const char *class_identifier = "age";
+	static constexpr const char *database_folder = "ages";
 
 	CAge(const std::string &identifier) : CDataType(identifier), stratagus::data_entry(identifier)
 	{

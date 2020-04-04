@@ -31,70 +31,21 @@
 
 #pragma once
 
-#include <QObject>
-#include <QString>
+#include "util/singleton.h"
 
-#include <set>
-#include <string>
+#include <filesystem>
 
 namespace stratagus {
 
-class sml_data;
 class sml_property;
 
-//a de(serializable) and identifiable entry to the database
-class data_entry : public QObject
+class defines final : public QObject, public singleton<defines>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString identifier READ get_identifier_qstring CONSTANT)
-
 public:
-	data_entry(const std::string &identifier) : identifier(identifier)
-	{
-	}
-
-	virtual ~data_entry() {}
-
-	const std::string &get_identifier() const
-	{
-		return this->identifier;
-	}
-
-	QString get_identifier_qstring() const
-	{
-		return QString::fromStdString(this->get_identifier());
-	}
-
-	const std::set<std::string> &get_aliases() const
-	{
-		return this->aliases;
-	}
-
-	void add_alias(const std::string &alias)
-	{
-		this->aliases.insert(alias);
-	}
-
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
-
-	bool is_initialized() const
-	{
-		return this->initialized;
-	}
-
-	virtual void initialize()
-	{
-		this->initialized = true;
-	}
-
-	virtual void check() const {}
-
-private:
-	std::string identifier;
-	std::set<std::string> aliases;
-	bool initialized = false;
+	void load(const std::filesystem::path &base_path);
+	void process_sml_property(const sml_property &property);
 };
 
 }

@@ -32,8 +32,9 @@
 #pragma once
 
 #include <QObject>
-#include <QString>
+#include <QVariantList>
 
+#include <filesystem>
 #include <set>
 #include <string>
 
@@ -42,59 +43,103 @@ namespace stratagus {
 class sml_data;
 class sml_property;
 
-//a de(serializable) and identifiable entry to the database
-class data_entry : public QObject
+class module final : public QObject
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString identifier READ get_identifier_qstring CONSTANT)
+	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(QVariantList dependencies READ get_dependencies_qvariant_list)
 
 public:
-	data_entry(const std::string &identifier) : identifier(identifier)
+	module(const std::string &identifier, const std::filesystem::path &path, module *parent_module)
+		: identifier(identifier), path(path), parent_module(parent_module)
 	{
 	}
 
-	virtual ~data_entry() {}
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope) { Q_UNUSED(scope) }
 
 	const std::string &get_identifier() const
 	{
 		return this->identifier;
 	}
 
-	QString get_identifier_qstring() const
+	const std::string &get_name() const
 	{
-		return QString::fromStdString(this->get_identifier());
+		return this->name;
 	}
 
-	const std::set<std::string> &get_aliases() const
+	QString get_name_qstring() const
 	{
-		return this->aliases;
+		return QString::fromStdString(this->get_name());
 	}
 
-	void add_alias(const std::string &alias)
+	void set_name_qstring(const QString &name)
 	{
-		this->aliases.insert(alias);
+		this->name = name.toStdString();
 	}
 
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
-
-	bool is_initialized() const
+	const std::filesystem::path &get_path() const
 	{
-		return this->initialized;
+		return this->path;
 	}
 
-	virtual void initialize()
+	QVariantList get_dependencies_qvariant_list() const;
+
+	Q_INVOKABLE void add_dependency(module *module)
 	{
-		this->initialized = true;
+		if (module->depends_on(this)) {
+			throw std::runtime_error("Cannot make module \"" + this->identifier + "\" depend on module \"" + module->identifier + "\", as that would create a circular dependency.");
+		}
+
+		this->dependencies.insert(module);
 	}
 
-	virtual void check() const {}
+	Q_INVOKABLE void remove_dependency(module *module)
+	{
+		this->dependencies.erase(module);
+	}
+
+	bool depends_on(module *module) const
+	{
+		if (module == this->parent_module) {
+			return true;
+		}
+
+		if (this->dependencies.contains(module)) {
+			return true;
+		}
+
+		for (const stratagus::module *dependency : this->dependencies) {
+			if (dependency->depends_on(module)) {
+				return true;
+			}
+		}
+
+		if (this->parent_module != nullptr) {
+			return this->parent_module->depends_on(module);
+		}
+
+		return false;
+	}
+
+	size_t get_dependency_count() const
+	{
+		size_t count = this->dependencies.size();
+
+		for (const stratagus::module *dependency : this->dependencies) {
+			count += dependency->get_dependency_count();
+		}
+
+		return count;
+	}
 
 private:
 	std::string identifier;
-	std::set<std::string> aliases;
-	bool initialized = false;
+	std::string name;
+	std::filesystem::path path; //the module's path
+	module *parent_module = nullptr;
+	std::set<module *> dependencies; //modules on which this one is dependent
 };
 
 }

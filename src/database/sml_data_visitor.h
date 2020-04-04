@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include <qglobal.h>
+#include <QtGlobal>
 
 namespace stratagus {
 
