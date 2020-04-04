@@ -948,5 +948,6 @@ void load_database()
 		stratagus::database::get()->load();
 	} catch (const std::exception &exception) {
 		stratagus::exception::report(exception);
+		exit(-1);
 	}
 }
