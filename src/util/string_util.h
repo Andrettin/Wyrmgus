@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include <QDateTime>
+
 #include <stdexcept>
 #include <string>
 
@@ -65,6 +67,40 @@ inline bool to_bool(const std::string &str)
 	}
 
 	throw std::runtime_error("Invalid string used for conversion to boolean: \"" + str + "\".");
+}
+
+inline QDateTime to_date(const std::string &date_str)
+{
+	const std::vector<std::string> date_string_list = string::split(date_str, '.');
+
+	int years = 0;
+	int months = 1;
+	int days = 1;
+	int hours = 12;
+
+	if (date_string_list.size() >= 1) {
+		years = std::stoi(date_string_list[0]);
+
+		if (date_string_list.size() >= 2) {
+			months = std::stoi(date_string_list[1]);
+
+			if (date_string_list.size() >= 3) {
+				days = std::stoi(date_string_list[2]);
+
+				if (date_string_list.size() >= 4) {
+					hours = std::stoi(date_string_list[3]);
+				}
+			}
+		}
+	}
+
+	QDateTime date(QDate(years, months, days), QTime(hours, 0), Qt::UTC);
+
+	if (!date.isValid()) {
+		throw std::runtime_error("Date \"" + date_str + "\" is not a valid date.");
+	}
+
+	return date;
 }
 
 }
