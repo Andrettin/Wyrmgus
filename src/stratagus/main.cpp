@@ -32,6 +32,7 @@
 #include <SDL.h>
 
 #include <QApplication>
+#include <QQmlApplicationEngine>
 
 #include <thread>
 
@@ -45,6 +46,17 @@ int main(int argc, char **argv)
 		std::thread stratagus_thread([argc, argv]() {
 			stratagusMain(argc, argv);
 		});
+
+		QQmlApplicationEngine engine;
+		engine.addImportPath("./interface");
+
+		const QUrl url(QStringLiteral("./interface/Main.qml"));
+		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
+			if (!obj && url == objUrl) {
+				QCoreApplication::exit(-1);
+			}
+			}, Qt::QueuedConnection);
+		engine.load(url);
 
 		const int result = app.exec();
 
