@@ -886,7 +886,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 			} else {
 				//Wyrmgus start
 //				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
-				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
+				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
 				//Wyrmgus end
 			}
 		//Wyrmgus start
@@ -894,7 +894,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 			if (spell.Target == TargetType::Self) {
 				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
 			} else {
-				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->Range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
+				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
 			}
 		//Wyrmgus end
 		}
