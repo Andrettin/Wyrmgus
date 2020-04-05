@@ -313,6 +313,14 @@ void database::initialize()
 	}
 }
 
+void database::clear()
+{
+	//clear data entries for each data type
+	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
+		metadata->get_clearing_function()();
+	}
+}
+
 void database::register_metadata(std::unique_ptr<data_type_metadata> &&metadata)
 {
 	this->metadata.push_back(std::move(metadata));

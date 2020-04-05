@@ -125,6 +125,7 @@ public:
 
 	void load();
 	void initialize();
+	void clear();
 	void register_metadata(std::unique_ptr<data_type_metadata> &&metadata);
 
 	void process_modules();

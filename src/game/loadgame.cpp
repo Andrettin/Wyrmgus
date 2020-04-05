@@ -33,7 +33,6 @@
 
 #include "achievement.h"
 #include "actions.h"
-#include "age.h"
 #include "ai.h"
 #include "campaign.h"
 #include "character.h"
@@ -41,6 +40,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "currency.h"
+#include "database/database.h"
 #include "dialogue.h"
 #include "font.h"
 //Wyrmgus start
@@ -111,6 +111,7 @@ void CleanModules()
 	EndReplayLog();
 	CleanMessages();
 
+	stratagus::database::get()->clear();
 	CleanIcons();
 	CleanCursors();
 	CleanUserInterface();

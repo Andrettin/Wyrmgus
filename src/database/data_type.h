@@ -253,7 +253,7 @@ private:
 	static inline bool initialize_class()
 	{
 		//initialize the metadata (including database parsing/processing functions) for this data type
-		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::check_all);
+		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::check_all, T::clear);
 		database::get()->register_metadata(std::move(metadata));
 
 		return true;

@@ -42,8 +42,8 @@ namespace stratagus {
 class data_type_metadata
 {
 public:
-	data_type_metadata(const std::string &class_identifier, const std::set<std::string> &database_dependencies, const std::function<void(const std::filesystem::path &)> &parsing_function, const std::function<void(bool)> &processing_function, const std::function<void()> &initialization_function, const std::function<void()> &checking_function)
-		: class_identifier(class_identifier), database_dependencies(database_dependencies), parsing_function(parsing_function), processing_function(processing_function), initialization_function(initialization_function), checking_function(checking_function)
+	data_type_metadata(const std::string &class_identifier, const std::set<std::string> &database_dependencies, const std::function<void(const std::filesystem::path &)> &parsing_function, const std::function<void(bool)> &processing_function, const std::function<void()> &initialization_function, const std::function<void()> &checking_function, const std::function<void()> &clearing_function)
+		: class_identifier(class_identifier), database_dependencies(database_dependencies), parsing_function(parsing_function), processing_function(processing_function), initialization_function(initialization_function), checking_function(checking_function), clearing_function(clearing_function)
 	{
 	}
 
@@ -87,6 +87,11 @@ public:
 		return this->checking_function;
 	}
 
+	const std::function<void()> &get_clearing_function() const
+	{
+		return this->clearing_function;
+	}
+
 private:
 	std::string class_identifier;
 	const std::set<std::string> &database_dependencies;
@@ -94,6 +99,7 @@ private:
 	std::function<void(bool)> processing_function; //processing functions for each data type
 	std::function<void()> initialization_function; //functions for each data type, to initialize their entries
 	std::function<void()> checking_function; //functions for each data type, to check if data entries are valid
+	std::function<void()> clearing_function; //functions for each data type, to clear the data entries
 };
 
 }
