@@ -10,8 +10,8 @@
 //
 /**@name sound_server.cpp - The sound server (hardware layer and so on) */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Fabrice Rossi, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi,
+//                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,12 +53,15 @@
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
+#include "util/qunique_ptr.h"
 
 #include "SDL.h"
 
 #ifdef USE_OAML
 #include <oaml.h>
 #endif
+
+#include <QAudioDecoder>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -276,7 +277,7 @@ static int MixChannelsToStereo32(int *buffer, int size)
 		if (Channels[channel].Playing && Channels[channel].Sample) {
 			//Wyrmgus start
 			if ((Channels[channel].Point & 1)) {
-				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d, Sample Filename: \"%s\"\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->Len, Channels[channel].Sample->File.c_str());
+				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->Len);
 			}
 			//Wyrmgus end
 			int i = MixSampleToStereo32(Channels[channel].Sample,
@@ -616,30 +617,42 @@ void StopAllChannels()
 
 static CSample *LoadSample(const std::filesystem::path &filepath, enum _play_audio_flags_ flag)
 {
-	CSample *sampleWav = LoadWav(filepath.string().c_str(), flag);
+	auto decoder = stratagus::make_qunique<QAudioDecoder>();
+	decoder->moveToThread(QApplication::instance()->thread());
+	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
 
-	if (sampleWav) {
-		return sampleWav;
+	CSample *sample = new CSample;
+
+	QEventLoop loop;
+	loop.connect(decoder.get(), &QAudioDecoder::bufferReady, [&]() {
+		const QAudioBuffer buffer = decoder->read();
+
+		unsigned char *new_buffer = new unsigned char[sample->Len + buffer.byteCount()];
+		memcpy(new_buffer, sample->Buffer, sample->Len);
+		delete[] sample->Buffer;
+		sample->Buffer = new_buffer;
+		memcpy(sample->Buffer + sample->Len, buffer.constData(), buffer.byteCount());
+		sample->Len += buffer.byteCount();
+	});
+	loop.connect(decoder.get(), &QAudioDecoder::finished, &loop, &QEventLoop::quit);
+	loop.connect(decoder.get(), qOverload<QAudioDecoder::Error>(&QAudioDecoder::error), &loop, &QEventLoop::quit);
+
+	decoder->start();
+	loop.exec();
+
+	if (decoder->error() != QAudioDecoder::NoError) {
+		fprintf(stderr, decoder->errorString().toStdString().c_str());
+		return nullptr;
 	}
-#ifdef USE_VORBIS
-	CSample *sampleVorbis = LoadVorbis(filepath.string().c_str(), flag);
-	if (sampleVorbis) {
-		return sampleVorbis;
-	}
-#endif
-#ifdef USE_MIKMOD
-	CSample *sampleMikMod = LoadMikMod(filepath.string().c_str(), flag);
-	if (sampleMikMod) {
-		return sampleMikMod;
-	}
-#endif
-#ifdef USE_FLUIDSYNTH
-	CSample *sampleFluidSynth = LoadFluidSynth(filepath.string().c_str(), flag);
-	if (sampleFluidSynth) {
-		return sampleFluidSynth;
-	}
-#endif
-	return nullptr;
+
+	const QAudioFormat format = decoder->audioFormat();
+	sample->Channels = format.channelCount();
+	sample->SampleSize = format.sampleSize();
+	sample->Frequency = format.sampleRate();
+	sample->BitsPerSample = format.bytesPerFrame() * 8;
+	sample->Pos = 0;
+
+	return sample;
 }
 
 
@@ -1138,5 +1151,3 @@ void QuitSound()
 	CleanFluidSynth();
 #endif
 }
-
-//@}

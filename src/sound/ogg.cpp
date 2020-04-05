@@ -424,9 +424,6 @@ CSample *LoadVorbis(const char *name, int flags)
 	sample->Channels = info->channels;
 	sample->SampleSize = 16;
 	sample->Frequency = info->rate;
-	//Wyrmgus start
-	sample->File = name;
-	//Wyrmgus end
 
 	sample->Len = 0;
 	sample->Pos = 0;

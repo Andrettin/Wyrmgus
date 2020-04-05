@@ -10,8 +10,8 @@
 //
 /**@name sound_server.h - The sound server header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi,
+//                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,10 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SOUND_SERVER_H__
-#define __SOUND_SERVER_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -43,8 +40,8 @@
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define MaxVolume 255
-#define SOUND_BUFFER_SIZE 65536
+static constexpr int MaxVolume = 255;
+static constexpr int SOUND_BUFFER_SIZE = 65536;
 
 /**
 **  RAW samples.
@@ -52,23 +49,18 @@
 class CSample
 {
 public:
-	CSample() : Channels(0), SampleSize(0), Frequency(0), BitsPerSample(0),
-		Buffer(nullptr), Pos(0), Len(0) {}
 	virtual ~CSample() {}
 
-	virtual int Read(void *buf, int len) = 0;
+	virtual int Read(void *buf, int len) { return 0; }
 
-	unsigned char Channels;       /// mono or stereo
-	unsigned char SampleSize;     /// sample size in bits
-	unsigned int Frequency;       /// frequency in hz
-	unsigned short BitsPerSample; /// bits in a sample 8/16/32
+	unsigned char Channels = 0; //mono or stereo
+	unsigned char SampleSize = 0; //sample size in bits
+	unsigned int Frequency = 0; //frequency in hz
+	unsigned short BitsPerSample = 0; //bits in a sample 8/16/32
 
-	unsigned char *Buffer;        /// sample buffer
-	int Pos;                      /// buffer position
-	int Len;                      /// length of filled buffer
-	//Wyrmgus start
-	std::string File;			  /// for debugging
-	//Wyrmgus end
+	unsigned char *Buffer = nullptr; //sample buffer
+	int Pos = 0; //buffer position
+	int Len = 0; //length of filled buffer
 };
 
 /**
@@ -187,7 +179,3 @@ extern int InitFluidSynth();
 // Cleans all FluidSynth data
 extern void CleanFluidSynth(bool reinit = false);
 #endif
-
-//@}
-
-#endif  // !__SOUND_SERVER_H__
