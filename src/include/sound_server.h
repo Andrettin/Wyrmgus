@@ -89,7 +89,6 @@ enum SynthState
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CSample *LoadWav(const char *name, int flags);			/// Load a wav file
 extern CSample *LoadVorbis(const char *name, int flags);		/// Load a vorbis file
 extern CSample *LoadMikMod(const char *name, int flags);		/// Load a module file
 extern CSample *LoadFluidSynth(const char *name, int flags);	/// Load a MIDI file

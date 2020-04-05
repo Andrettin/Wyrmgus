@@ -289,7 +289,6 @@ set(sound_SRCS
 	src/sound/sound_id.cpp
 	src/sound/sound_server.cpp
 	src/sound/unitsound.cpp
-	src/sound/wav.cpp
 )
 source_group(sound FILES ${sound_SRCS})
 
@@ -776,7 +775,6 @@ set(stratagus_generic_HDRS
 	src/include/version.h
 	src/include/video.h
 	src/include/viewport.h
-	src/include/wav.h
 	src/include/widgets.h
 	src/include/world.h
 	src/include/SetupConsole_win32.h
