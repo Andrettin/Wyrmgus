@@ -232,6 +232,15 @@ QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaPro
 	return new_property_value;
 }
 
+std::filesystem::path database::get_base_path(const module *module)
+{
+	if (module != nullptr) {
+		return module->get_path();
+	}
+
+	return database::get_root_path();
+}
+
 void database::parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list)
 {
 	std::filesystem::recursive_directory_iterator dir_iterator(path);
@@ -273,7 +282,7 @@ void database::load()
 
 		//parse the files in each data type's folder
 		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-			metadata->get_parsing_function()(path);
+			metadata->get_parsing_function()(path, module);
 		}
 
 		try {

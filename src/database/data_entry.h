@@ -39,6 +39,7 @@
 
 namespace stratagus {
 
+class module;
 class sml_data;
 class sml_property;
 
@@ -91,10 +92,25 @@ public:
 
 	virtual void check() const {}
 
+	const module *get_module() const
+	{
+		return this->module;
+	}
+
+	void set_module(const module *module)
+	{
+		if (module == this->get_module()) {
+			return;
+		}
+
+		this->module = module;
+	}
+
 private:
 	std::string identifier;
 	std::set<std::string> aliases;
 	bool initialized = false;
+	const module *module = nullptr; //the module to which the data entry belongs, if any
 };
 
 }

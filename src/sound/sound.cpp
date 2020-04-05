@@ -653,7 +653,7 @@ void SetSoundVolumePercent(CSound *sound, int volume_percent)
 */
 CSound *RegisterSound(const std::string &identifier, const std::vector<std::string> &files)
 {
-	CSound *id = CSound::add(identifier);
+	CSound *id = CSound::add(identifier, nullptr);
 	size_t number = files.size();
 
 	if (number > 1) { // load a sound group
@@ -696,7 +696,7 @@ CSound *RegisterTwoGroups(const std::string &identifier, CSound *first, CSound *
 	if (first == nullptr || second == nullptr) {
 		return nullptr;
 	}
-	CSound *id = CSound::add(identifier);
+	CSound *id = CSound::add(identifier, nullptr);
 	id->Number = TWO_GROUPS;
 	id->Sound.TwoGroups.First = first;
 	id->Sound.TwoGroups.Second = second;
@@ -802,7 +802,6 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	ident = FindAndReplaceString(ident, "_", "-");
 	std::vector<std::string> files;
 	std::vector<CSound *> group_sounds; //sounds for sound group
-	unsigned char range = 0;
 	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -829,9 +828,5 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 		sound = MakeSoundGroup(ident, group_sounds[0], group_sounds[1]);
 	} else {
 		sound = MakeSound(ident, files);
-	}
-	
-	if (range != 0) {
-		SetSoundRange(sound, range);
 	}
 }

@@ -112,7 +112,7 @@ void age::process_sml_scope(const sml_data &scope)
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			if (key == "file") {
-				file = CMod::GetCurrentModPath() + value;
+				file = database::get_graphics_path(this->get_module()).string() + value;
 			} else if (key == "width") {
 				size.x = std::stoi(value);
 			} else if (key == "height") {

@@ -48,6 +48,8 @@
 
 namespace stratagus {
 
+class module;
+
 class data_type_base
 {
 public:
@@ -92,14 +94,14 @@ public:
 		return nullptr;
 	}
 
-	static T *get_or_add(const std::string &identifier)
+	static T *get_or_add(const std::string &identifier, const module *module)
 	{
 		T *instance = T::try_get(identifier);
 		if (instance != nullptr) {
 			return instance;
 		}
 
-		return T::add(identifier);
+		return T::add(identifier, module);
 	}
 
 	static const std::vector<T *> &get_all()
@@ -112,7 +114,7 @@ public:
 		return data_type::instances_by_identifier.contains(identifier) || data_type::instances_by_alias.contains(identifier);
 	}
 
-	static T *add(const std::string &identifier)
+	static T *add(const std::string &identifier, const module *module)
 	{
 		if (identifier.empty()) {
 			throw std::runtime_error("Tried to add a " + std::string(T::class_identifier) + " instance with an empty string identifier.");
@@ -127,6 +129,7 @@ public:
 		T *instance = data_type::instances_by_identifier.find(identifier)->second.get();
 		data_type::instances.push_back(instance);
 		instance->moveToThread(QApplication::instance()->thread());
+		instance->set_module(module);
 
 		return instance;
 	}
@@ -170,7 +173,7 @@ public:
 		std::sort(data_type::instances.begin(), data_type::instances.end(), function);
 	}
 
-	static void parse_database(const std::filesystem::path &data_path)
+	static void parse_database(const std::filesystem::path &data_path, const module *module)
 	{
 		if (std::string(T::database_folder).empty()) {
 			return;
@@ -182,7 +185,7 @@ public:
 			return;
 		}
 
-		database::parse_folder(database_path, data_type::sml_data_to_process);
+		database::parse_folder(database_path, data_type::sml_data_to_process[module]);
 	}
 
 	static void process_database(const bool definition)
@@ -191,35 +194,39 @@ public:
 			return;
 		}
 
-		for (const sml_data &data : T::sml_data_to_process) {
-			data.for_each_child([&](const sml_data &data_entry) {
-				const std::string &identifier = data_entry.get_tag();
+		for (const auto &kv_pair : data_type::sml_data_to_process) {
+			const module *module = kv_pair.first;
+			const std::vector<sml_data> &sml_data_list = kv_pair.second;
+			for (const sml_data &data : sml_data_list) {
+				data.for_each_child([&](const sml_data &data_entry) {
+					const std::string &identifier = data_entry.get_tag();
 
-				T *instance = nullptr;
-				if (definition) {
-					if (data_entry.get_operator() != sml_operator::addition) { //addition operators for data entry scopes mean modifying already-defined entries
-						instance = T::add(identifier);
-					} else {
-						instance = T::get(identifier);
-					}
-
-					for (const sml_property *alias_property : data_entry.try_get_properties("aliases")) {
-						if (alias_property->get_operator() != sml_operator::addition) {
-							throw std::runtime_error("Only the addition operator is supported for data entry aliases.");
+					T *instance = nullptr;
+					if (definition) {
+						if (data_entry.get_operator() != sml_operator::addition) { //addition operators for data entry scopes mean modifying already-defined entries
+							instance = T::add(identifier, module);
+						} else {
+							instance = T::get(identifier);
 						}
 
-						const std::string &alias = alias_property->get_value();
-						T::add_instance_alias(instance, alias);
+						for (const sml_property *alias_property : data_entry.try_get_properties("aliases")) {
+							if (alias_property->get_operator() != sml_operator::addition) {
+								throw std::runtime_error("Only the addition operator is supported for data entry aliases.");
+							}
+
+							const std::string &alias = alias_property->get_value();
+							T::add_instance_alias(instance, alias);
+						}
+					} else {
+						try {
+							instance = T::get(identifier);
+							database::process_sml_data<T>(instance, data_entry);
+						} catch (...) {
+							std::throw_with_nested(std::runtime_error("Error processing or loading data for " + std::string(T::class_identifier) + " instance \"" + identifier + "\"."));
+						}
 					}
-				} else {
-					try {
-						instance = T::get(identifier);
-						database::process_sml_data<T>(instance, data_entry);
-					} catch (...) {
-						std::throw_with_nested(std::runtime_error("Error processing or loading data for " + std::string(T::class_identifier) + " instance \"" + identifier + "\"."));
-					}
-				}
-			});
+				});
+			}
 		}
 
 		if (!definition) {
@@ -262,7 +269,7 @@ private:
 	static inline std::vector<T *> instances;
 	static inline std::map<std::string, qunique_ptr<T>> instances_by_identifier;
 	static inline std::map<std::string, T *> instances_by_alias;
-	static inline std::vector<sml_data> sml_data_to_process;
+	static inline std::map<const module *, std::vector<sml_data>> sml_data_to_process;
 #ifdef __GNUC__
 	//the "used" attribute is needed under GCC, or else this variable will be optimized away (even in debug builds)
 	static inline bool class_initialized [[gnu::used]] = data_type::initialize_class();

@@ -54,6 +54,9 @@ class module;
 class database final : public singleton<database>
 {
 public:
+	static constexpr const char *data_folder = "data";
+	static constexpr const char *graphics_folder = "graphics";
+
 	template <typename T>
 	static void process_sml_data(T *instance, const sml_data &data)
 	{
@@ -117,6 +120,13 @@ public:
 		return documents_path;
 	}
 
+	static std::filesystem::path get_base_path(const module *module);
+
+	static std::filesystem::path get_graphics_path(const module *module)
+	{
+		return database::get_base_path(module) / database::graphics_folder;
+	}
+
 	static void parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list);
 
 public:
@@ -170,7 +180,7 @@ public:
 		std::vector<std::filesystem::path> paths = this->get_base_paths();
 
 		for (std::filesystem::path &path : paths) {
-			path /= "data";
+			path /= database::data_folder;
 		}
 
 		return paths;
@@ -182,7 +192,7 @@ public:
 
 		for (auto &kv_pair : paths) {
 			std::filesystem::path &path = kv_pair.first;
-			path /= "data";
+			path /= database::data_folder;
 		}
 
 		return paths;
@@ -193,7 +203,7 @@ public:
 		std::vector<std::filesystem::path> paths = this->get_base_paths();
 
 		for (std::filesystem::path &path : paths) {
-			path /= "graphics";
+			path /= database::graphics_folder;
 		}
 
 		return paths;
