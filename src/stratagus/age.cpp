@@ -105,14 +105,14 @@ void age::process_sml_scope(const sml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "image") {
-		std::string file;
+		std::filesystem::path filepath;
 		Vec2i size(0, 0);
 
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			if (key == "file") {
-				file = database::get_graphics_path(this->get_module()).string() + value;
+				filepath = database::get_graphics_path(this->get_module()) / value;
 			} else if (key == "width") {
 				size.x = std::stoi(value);
 			} else if (key == "height") {
@@ -122,7 +122,7 @@ void age::process_sml_scope(const sml_data &scope)
 			}
 		});
 
-		if (file.empty()) {
+		if (filepath.empty()) {
 			throw std::runtime_error("Image has no file.");
 		}
 
@@ -134,7 +134,7 @@ void age::process_sml_scope(const sml_data &scope)
 			throw std::runtime_error("Image has no height.");
 		}
 
-		this->graphics = CGraphic::New(file, size.x, size.y);
+		this->graphics = CGraphic::New(filepath.string(), size.x, size.y);
 		this->graphics->Load();
 		this->graphics->UseDisplayFormat();
 	} else if (tag == "predependencies") {
