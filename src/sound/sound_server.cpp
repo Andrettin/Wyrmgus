@@ -614,27 +614,27 @@ void StopAllChannels()
 	SDL_UnlockMutex(Audio.Lock);
 }
 
-static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
+static CSample *LoadSample(const std::filesystem::path &filepath, enum _play_audio_flags_ flag)
 {
-	CSample *sampleWav = LoadWav(name, flag);
+	CSample *sampleWav = LoadWav(filepath.string().c_str(), flag);
 
 	if (sampleWav) {
 		return sampleWav;
 	}
 #ifdef USE_VORBIS
-	CSample *sampleVorbis = LoadVorbis(name, flag);
+	CSample *sampleVorbis = LoadVorbis(filepath.string().c_str(), flag);
 	if (sampleVorbis) {
 		return sampleVorbis;
 	}
 #endif
 #ifdef USE_MIKMOD
-	CSample *sampleMikMod = LoadMikMod(name, flag);
+	CSample *sampleMikMod = LoadMikMod(filepath.string().c_str(), flag);
 	if (sampleMikMod) {
 		return sampleMikMod;
 	}
 #endif
 #ifdef USE_FLUIDSYNTH
-	CSample *sampleFluidSynth = LoadFluidSynth(name, flag);
+	CSample *sampleFluidSynth = LoadFluidSynth(filepath.string().c_str(), flag);
 	if (sampleFluidSynth) {
 		return sampleFluidSynth;
 	}
@@ -652,13 +652,13 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 **
 **  @todo  Add streaming, caching support.
 */
-CSample *LoadSample(const std::string &name)
+CSample *LoadSample(const std::filesystem::path &filepath)
 {
-	const std::string filename = LibraryFileName(name.c_str());
-	CSample *sample = LoadSample(filename.c_str(), PlayAudioLoadInMemory);
+	const std::string filename = LibraryFileName(filepath.string().c_str());
+	CSample *sample = LoadSample(filename, PlayAudioLoadInMemory);
 
 	if (sample == nullptr) {
-		fprintf(stderr, "Can't load the sound '%s'\n", name.c_str());
+		fprintf(stderr, "Can't load the sound '%s'\n", filepath.string().c_str());
 	}
 	return sample;
 }
@@ -779,7 +779,7 @@ int PlayMusic(const std::string &file)
 	}
 	const std::string name = LibraryFileName(file.c_str());
 	DebugPrint("play music %s\n" _C_ name.c_str());
-	CSample *sample = LoadSample(name.c_str(), PlayAudioStream);
+	CSample *sample = LoadSample(name, PlayAudioStream);
 
 	if (sample) {
 		StopMusic();

@@ -109,6 +109,7 @@ class CSound : public stratagus::data_entry, public stratagus::data_type<CSound>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QVariantList files)
 	Q_PROPERTY(int range MEMBER range)
 
 public:
@@ -121,8 +122,22 @@ public:
 	}
 
 	~CSound();
-	
+
+	virtual void initialize() override;
+
 	static void ProcessConfigData(const CConfigData *config_data);
+
+	const std::vector<std::filesystem::path> &get_files() const
+	{
+		return this->files;
+	}
+
+	Q_INVOKABLE void add_file(const std::filesystem::path &filepath)
+	{
+		this->files.push_back(filepath);
+	}
+		
+	Q_INVOKABLE void remove_file(const std::filesystem::path &filepath);
 		
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
@@ -144,6 +159,11 @@ public:
 			CSound *Second;      /// second group: annoyed sound
 		} TwoGroups;             /// when it's a double group
 	} Sound;
+
+private:
+	std::vector<std::filesystem::path> files; //the paths to the sound files
+
+	friend CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 };
 
 /**
@@ -215,7 +235,7 @@ extern void SetSoundVolumePercent(CSound *sound, int volume_percent);
 //Wyrmgus end
 
 /// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const std::string &identifier, const std::vector<std::string> &files);
+extern CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 
 ///  Create a special sound group with two sounds
 extern CSound *RegisterTwoGroups(const std::string &identifier, CSound *first, CSound *second);
@@ -254,7 +274,7 @@ extern void ShutdownMusicOAML();
 /// Map sound to identifier
 extern void MapSound(const std::string &sound_name, CSound *id);
 /// Make a sound bound to identifier
-extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
+extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::filesystem::path> &files);
 /// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
 

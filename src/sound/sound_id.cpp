@@ -75,7 +75,7 @@ void MapSound(const std::string &name, CSound *id)
 **
 **  @return      the sound id of the created group
 */
-CSound *MakeSound(const std::string &name, const std::vector<std::string> &files)
+CSound *MakeSound(const std::string &name, const std::vector<std::filesystem::path> &files)
 {
 	CSound *sound = CSound::try_get(name);
 

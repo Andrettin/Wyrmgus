@@ -46,6 +46,7 @@
 #include "sound_server.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/vector_util.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -595,10 +596,10 @@ static void PlaySoundFileCallback(int channel)
 **
 **  @return          Channel number the sound is playing on, -1 for error
 */
-int PlayFile(const std::string &name, LuaActionListener *listener)
+int PlayFile(const std::string &filepath, LuaActionListener *listener)
 {
 	int channel = -1;
-	CSample *sample = LoadSample(name);
+	CSample *sample = LoadSample(filepath);
 
 	if (sample) {
 		channel = PlaySample(sample);
@@ -651,35 +652,19 @@ void SetSoundVolumePercent(CSound *sound, int volume_percent)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const std::string &identifier, const std::vector<std::string> &files)
+CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
 {
 	CSound *id = CSound::add(identifier, nullptr);
 	size_t number = files.size();
 
-	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = new CSample *[number];
-		memset(id->Sound.OneGroup, 0, sizeof(CSample *) * number);
-		id->Number = number;
-		for (unsigned int i = 0; i < number; ++i) {
-			id->Sound.OneGroup[i] = LoadSample(files[i]);
-			if (!id->Sound.OneGroup[i]) {
-				//delete[] id->Sound.OneGroup;
-				delete id;
-				return nullptr;
-			}
-		}
-	} else { // load a unique sound
-		id->Sound.OneSound = LoadSample(files[0]);
-		if (!id->Sound.OneSound) {
-			delete id;
-			return nullptr;
-		}
-		id->Number = ONE_SOUND;
-	}
+	id->files = files;
 	id->range = MAX_SOUND_RANGE;
 	//Wyrmgus start
 	id->VolumePercent = 100;
 	//Wyrmgus end
+
+	id->initialize();
+
 	return id;
 }
 
@@ -796,11 +781,28 @@ CSound::~CSound()
 	}
 }
 
+void CSound::initialize()
+{
+	if (this->files.size() > 1) { // load a sound group
+		this->Sound.OneGroup = new CSample * [this->files.size()];
+		memset(this->Sound.OneGroup, 0, sizeof(CSample *) * this->files.size());
+		this->Number = this->files.size();
+		for (unsigned int i = 0; i < this->files.size(); ++i) {
+			this->Sound.OneGroup[i] = LoadSample(this->files[i]);
+		}
+	} else if (this->files.size() == 1) { // load a unique sound
+		this->Sound.OneSound = LoadSample(this->files[0]);
+		this->Number = ONE_SOUND;
+	}
+
+	data_entry::initialize();
+}
+
 void CSound::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string ident = config_data->Ident;
 	ident = FindAndReplaceString(ident, "_", "-");
-	std::vector<std::string> files;
+	std::vector<std::filesystem::path> files;
 	std::vector<CSound *> group_sounds; //sounds for sound group
 	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -829,4 +831,9 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	} else {
 		sound = MakeSound(ident, files);
 	}
+}
+
+void CSound::remove_file(const std::filesystem::path &filepath)
+{
+	stratagus::vector::remove(this->files, filepath);
 }

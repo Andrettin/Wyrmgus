@@ -124,7 +124,7 @@ extern bool UnitSoundIsPlaying(Origin *origin);
 /// Check, if this sample is already playing
 extern bool SampleIsPlaying(CSample *sample);
 /// Load a sample
-extern CSample *LoadSample(const std::string &name);
+extern CSample *LoadSample(const std::filesystem::path &filepath);
 /// Play a sample
 extern int PlaySample(CSample *sample, Origin *origin = nullptr);
 /// Play a sound file

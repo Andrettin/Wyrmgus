@@ -118,7 +118,7 @@ static int CclMakeSound(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	std::string c_name = LuaToString(l, 1);
-	std::vector<std::string> files;
+	std::vector<std::filesystem::path> files;
 	CSound *id;
 	if (lua_isstring(l, 2)) {
 		// only one file
