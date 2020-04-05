@@ -64,7 +64,7 @@
 bool SoundConfig::MapSound()
 {
 	if (!this->Name.empty()) {
-		this->Sound = SoundForName(this->Name);
+		this->Sound = CSound::get(this->Name);
 	}
 	return this->Sound != nullptr;
 }

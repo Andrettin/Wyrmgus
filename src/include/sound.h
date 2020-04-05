@@ -32,6 +32,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database/data_entry.h"
+#include "database/data_type.h"
+#include "stratagus.h"
 #include "unitsound.h"
 
 //Wyrmgus start
@@ -102,23 +105,30 @@ public:
 	SoundConfig NotEnoughFood[MAX_RACES];         /// not enough food message
 };
 
-class CSound
+class CSound : public stratagus::data_entry, public stratagus::data_type<CSound>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(int range MEMBER range)
+
 public:
-	CSound()
+	static constexpr const char *class_identifier = "sound";
+	static constexpr const char *database_folder = "sounds";
+
+	CSound(const std::string &identifier) : data_entry(identifier)
 	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
+
 	~CSound();
 	
 	static void ProcessConfigData(const CConfigData *config_data);
 		
-	unsigned int Mapref = 0;
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	unsigned char Range = 0;    /// Range is a multiplier for DistanceSilent
+	int range = 0; //range is a multiplier for DistanceSilent
 	//Wyrmgus start
 //	unsigned char Number = 0;       /// single, group, or table of sounds.
 	unsigned int Number = 0;       /// single, group, or table of sounds.
@@ -178,10 +188,6 @@ extern bool CallbackMusic;  /// flag true callback ccl if stops
 /// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
-//Wyrmgus start
-extern std::map<std::string, CSound *> SoundMap;
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -209,10 +215,10 @@ extern void SetSoundVolumePercent(CSound *sound, int volume_percent);
 //Wyrmgus end
 
 /// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const std::vector<std::string> &files);
+extern CSound *RegisterSound(const std::string &identifier, const std::vector<std::string> &files);
 
 ///  Create a special sound group with two sounds
-extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
+extern CSound *RegisterTwoGroups(const std::string &identifier, CSound *first, CSound *second);
 
 /// Initialize client side of the sound layer.
 extern void InitSoundClient();
@@ -247,14 +253,10 @@ extern void ShutdownMusicOAML();
 
 /// Map sound to identifier
 extern void MapSound(const std::string &sound_name, CSound *id);
-/// Get the sound id bound to an identifier
-extern CSound *SoundForName(const std::string &sound_name);
 /// Make a sound bound to identifier
 extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
 /// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
-
-extern void FreeSounds();
 
 // script_sound.cpp
 

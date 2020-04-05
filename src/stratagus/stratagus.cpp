@@ -418,7 +418,6 @@ void Exit(int err)
 	ExitNetwork1();
 	CleanModules();
 	FreeBurningBuildingFrames();
-	FreeSounds();
 	FreeGraphics();
 	FreePlayerColors();
 	FreeButtonStyles();

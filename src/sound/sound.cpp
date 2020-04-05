@@ -461,7 +461,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	}
 	//Wyrmgus start
 //	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range) * sound->VolumePercent / 100);
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->range) * sound->VolumePercent / 100);
 	//Wyrmgus end
 	SetChannelStereo(channel, CalculateStereo(unit));
 	//Wyrmgus start
@@ -496,7 +496,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	//Wyrmgus start
 //	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range) * sound->VolumePercent / 100;
+	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->range) * sound->VolumePercent / 100;
 	//Wyrmgus end
 	if (volume == 0) {
 		return;
@@ -529,7 +529,7 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 	Origin source = {nullptr, 0};
 	//Wyrmgus start
 //	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range) * sound->VolumePercent / 100;
+	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->range) * sound->VolumePercent / 100;
 	//Wyrmgus end
 	if (volume == 0) {
 		return;
@@ -568,7 +568,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	}
 	//Wyrmgus start
 //	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
-	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range) * sound->VolumePercent / 100);
+	SetChannelVolume(channel, CalculateVolume(true, volume, sound->range) * sound->VolumePercent / 100);
 	//Wyrmgus end
 }
 
@@ -619,8 +619,8 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 */
 void SetSoundRange(CSound *sound, unsigned char range)
 {
-		sound->Range = range;
 	if (sound != nullptr) {
+		sound->range = range;
 	}
 }
 
@@ -651,9 +651,9 @@ void SetSoundVolumePercent(CSound *sound, int volume_percent)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const std::vector<std::string> &files)
+CSound *RegisterSound(const std::string &identifier, const std::vector<std::string> &files)
 {
-	CSound *id = new CSound;
+	CSound *id = CSound::add(identifier);
 	size_t number = files.size();
 
 	if (number > 1) { // load a sound group
@@ -676,7 +676,7 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 		}
 		id->Number = ONE_SOUND;
 	}
-	id->Range = MAX_SOUND_RANGE;
+	id->range = MAX_SOUND_RANGE;
 	//Wyrmgus start
 	id->VolumePercent = 100;
 	//Wyrmgus end
@@ -691,16 +691,16 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 **
 **  @return        the special sound unique identifier
 */
-CSound *RegisterTwoGroups(CSound *first, CSound *second)
+CSound *RegisterTwoGroups(const std::string &identifier, CSound *first, CSound *second)
 {
 	if (first == nullptr || second == nullptr) {
 		return nullptr;
 	}
-	CSound *id = new CSound;
+	CSound *id = CSound::add(identifier);
 	id->Number = TWO_GROUPS;
 	id->Sound.TwoGroups.First = first;
 	id->Sound.TwoGroups.Second = second;
-	id->Range = MAX_SOUND_RANGE;
+	id->range = MAX_SOUND_RANGE;
 	//Wyrmgus start
 	id->VolumePercent = first->VolumePercent + second->VolumePercent / 2;
 	//Wyrmgus end
@@ -813,14 +813,12 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 			files.push_back(file);
 		} else if (key == "group_sound") {
 			value = FindAndReplaceString(value, "_", "-");
-			CSound *group_sound = SoundForName(value);
+			CSound *group_sound = CSound::get(value);
 			if (group_sound) {
 				group_sounds.push_back(group_sound);
 			} else {
 				fprintf(stderr, "Invalid sound: \"%s\".\n", value.c_str());
 			}
-		} else if (key == "range") {
-			range = std::stoi(value);
 		} else {
 			fprintf(stderr, "Invalid sound property: \"%s\".\n", key.c_str());
 		}

@@ -64,7 +64,7 @@ static int CclSoundForName(lua_State *l)
 	LuaUserData *data;
 
 	sound_name = LuaToString(l, -1);
-	id = SoundForName(sound_name);
+	id = CSound::get(sound_name);
 
 	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
@@ -371,11 +371,10 @@ static int CclSetSoundVolumePercent(lua_State *l)
 */
 static int CclGetSounds(lua_State *l)
 {
-	lua_createtable(l, SoundMap.size(), 0);
-	std::map<std::string, CSound *>::iterator i;
+	lua_createtable(l, CSound::get_all().size(), 0);
 	int j = 1;
-	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
-		lua_pushstring(l, (*i).first.c_str());
+	for (auto it = CSound::get_all().begin(); it != CSound::get_all().end(); ++it) {
+		lua_pushstring(l, (*it)->get_identifier().c_str());
 		lua_rawseti(l, -2, j);
 		++j;
 	}
