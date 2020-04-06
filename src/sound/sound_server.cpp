@@ -176,12 +176,11 @@ static void MixMusicToStereo32(int *buffer, int size)
 		int len = size * sizeof(short);
 		char *tmp = new char[len];
 
-		int div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8) * MusicChannel.Sample->Channels);
+		int div = 176400 / (MusicChannel.Sample->get_format().sampleRate() * (MusicChannel.Sample->get_format().sampleSize() / 8) * MusicChannel.Sample->get_format().channelCount());
 
 		size = MusicChannel.Sample->Read(tmp, len / div);
 
-		int n = ConvertToStereo32(tmp, (char *)buf, MusicChannel.Sample->Frequency,
-								  MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
+		int n = ConvertToStereo32(tmp, (char *)buf, MusicChannel.Sample->get_format().sampleRate(), MusicChannel.Sample->get_format().sampleSize() / 8, MusicChannel.Sample->get_format().channelCount(), size);
 
 		for (int i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
@@ -228,7 +227,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 	unsigned char left;
 	unsigned char right;
 
-	int div = 176400 / (sample->Frequency * (sample->SampleSize / 8) * sample->Channels);
+	int div = 176400 / (sample->get_format().sampleRate() * (sample->get_format().sampleSize() / 8) * sample->get_format().channelCount());
 	int local_volume = (int)volume * EffectsVolume / MaxVolume;
 
 	if (stereo < 0) {
@@ -243,9 +242,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 
 	size = std::min((sample->Len - index) * div / 2, size);
 
-	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->Frequency,
-							 sample->SampleSize / 8, sample->Channels,
-							 size * 2 / div);
+	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->get_format().sampleRate(), sample->get_format().sampleSize() / 8, sample->get_format().channelCount(), size * 2 / div);
 
 	size /= 2;
 	for (int i = 0; i < size; i += 2) {
@@ -611,7 +608,7 @@ void StopAllChannels()
 	SDL_UnlockMutex(Audio.Lock);
 }
 
-static CSample *LoadSample(const std::filesystem::path &filepath, enum _play_audio_flags_ flag)
+static CSample *load_sample_internal(const std::filesystem::path &filepath)
 {
 	auto decoder = stratagus::make_qunique<QAudioDecoder>();
 	decoder->moveToThread(QApplication::instance()->thread());
@@ -642,11 +639,7 @@ static CSample *LoadSample(const std::filesystem::path &filepath, enum _play_aud
 	}
 
 	const QAudioFormat format = decoder->audioFormat();
-	sample->Channels = format.channelCount();
-	sample->SampleSize = format.sampleSize();
-	sample->Frequency = format.sampleRate();
-	sample->BitsPerSample = format.bytesPerFrame() * 8;
-	sample->Pos = 0;
+	sample->set_format(decoder->audioFormat());
 
 	return sample;
 }
@@ -664,11 +657,12 @@ static CSample *LoadSample(const std::filesystem::path &filepath, enum _play_aud
 CSample *LoadSample(const std::filesystem::path &filepath)
 {
 	const std::string filename = LibraryFileName(filepath.string().c_str());
-	CSample *sample = LoadSample(filename, PlayAudioLoadInMemory);
+	CSample *sample = load_sample_internal(filename);
 
 	if (sample == nullptr) {
-		fprintf(stderr, "Can't load the sound '%s'\n", filepath.string().c_str());
+		fprintf(stderr, "Can't load the \"%s\" sound.\n", filepath.string().c_str());
 	}
+
 	return sample;
 }
 
@@ -788,7 +782,7 @@ int PlayMusic(const std::string &file)
 	}
 	const std::string name = LibraryFileName(file.c_str());
 	DebugPrint("play music %s\n" _C_ name.c_str());
-	CSample *sample = LoadSample(name, PlayAudioStream);
+	CSample *sample = LoadSample(name);
 
 	if (sample) {
 		StopMusic();

@@ -36,6 +36,8 @@
 
 #include "sound.h"
 
+#include <QAudioFormat>
+
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
@@ -53,24 +55,25 @@ public:
 
 	virtual int Read(void *buf, int len) { return 0; }
 
-	unsigned char Channels = 0; //mono or stereo
-	unsigned char SampleSize = 0; //sample size in bits
-	unsigned int Frequency = 0; //frequency in hz
-	unsigned short BitsPerSample = 0; //bits in a sample 8/16/32
-
 	unsigned char *Buffer = nullptr; //sample buffer
-	int Pos = 0; //buffer position
 	int Len = 0; //length of filled buffer
-};
 
-/**
-**  Play audio flags.
-*/
-enum _play_audio_flags_ {
-	PlayAudioStream = 1,        /// Stream the file from medium
-	PlayAudioPreLoad = 2,       /// Load compressed in memory
-	PlayAudioLoadInMemory = 4,  /// Preload file into memory
-	PlayAudioLoadOnDemand = 8   /// Load only if needed.
+	const QAudioFormat &get_format() const
+	{
+		return this->format;
+	}
+
+	void set_format(const QAudioFormat &format)
+	{
+		if (format == this->get_format()) {
+			return;
+		}
+
+		this->format = format;
+	}
+
+private:
+	QAudioFormat format;
 };
 
 /*----------------------------------------------------------------------------

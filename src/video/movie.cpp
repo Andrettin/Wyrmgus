@@ -235,7 +235,7 @@ int PlayMovie(const std::string &name)
 	StopMusic();
 	CSample *sample = LoadVorbis(filename.c_str(), PlayAudioStream);
 	if (sample) {
-		if ((sample->Channels != 1 && sample->Channels != 2) || sample->SampleSize != 16) {
+		if ((sample->get_format().channelCount() != 1 && sample->get_format().channelCount() != 2) || sample->get_format().sampleSize() != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");
 			delete sample;
 			SDL_FreeYUVOverlay(yuv_overlay);
