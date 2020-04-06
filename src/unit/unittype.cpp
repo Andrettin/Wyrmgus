@@ -1461,7 +1461,6 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
 			res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
 			res->LoseResources = parent_type->ResInfo[i]->LoseResources;
-			res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
 			res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
 			res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
 		}

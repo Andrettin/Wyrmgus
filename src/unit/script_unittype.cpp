@@ -1558,9 +1558,6 @@ static int CclDefineUnitType(lua_State *l)
 						--k;
 					*/
 					//Wyrmgus end
-					} else if (!strcmp(value, "refinery-harvester")) {
-						res->RefineryHarvester = 1;
-						--k;
 					} else if (!strcmp(value, "file-when-empty")) {
 						res->FileWhenEmpty = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
