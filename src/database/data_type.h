@@ -131,6 +131,13 @@ public:
 		instance->moveToThread(QApplication::instance()->thread());
 		instance->set_module(module);
 
+		//for backwards compatibility, change instances of "_" in the identifier with "-" and add that as an alias
+		if (identifier.find("_") != std::string::npos) {
+			std::string alias = identifier;
+			std::replace(alias.begin(), alias.end(), '_', '-');
+			T::add_instance_alias(instance, alias);
+		}
+
 		return instance;
 	}
 
