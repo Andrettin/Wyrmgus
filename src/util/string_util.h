@@ -58,6 +58,15 @@ inline std::vector<std::string> split(const std::string &str, const char delimit
 	return string_list;
 }
 
+inline void replace(std::string &str, const std::string &find, const std::string &replace)
+{
+	size_t pos = 0;
+	while ((pos = str.find(find, pos)) != std::string::npos) {
+		str.replace(pos, find.length(), replace);
+		pos += replace.length();
+	}
+}
+
 inline bool to_bool(const std::string &str)
 {
 	if (str == "true" || str == "yes" || str == "1") {
