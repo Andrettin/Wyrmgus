@@ -2702,12 +2702,12 @@ void EditorMainLoop()
 			//Wyrmgus end
 		}
 		//ProcessMenu("menu-editor-tips", 1);
-		InterfaceState = IfaceStateNormal;
+		current_interface_state = interface_state::normal;
 
 		SetVideoSync();
 
 		GameCursor = UI.Point.Cursor;
-		InterfaceState = IfaceStateNormal;
+		current_interface_state = interface_state::normal;
 		Editor.State = EditorSelecting;
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
@@ -2752,7 +2752,7 @@ void EditorMainLoop()
 
 		PreMenuSetup();
 
-		InterfaceState = IfaceStateMenu;
+		current_interface_state = interface_state::menu;
 		GameCursor = UI.Point.Cursor;
 
 		Video.ClearScreen();

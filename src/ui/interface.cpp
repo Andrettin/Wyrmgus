@@ -100,7 +100,7 @@ bool GameObserve;								/// Observe mode
 bool GameEstablishing;							/// Game establishing mode
 char SkipGameCycle;								/// Skip the next game cycle
 char BigMapMode;								/// Show only the map
-enum _iface_state_ InterfaceState;				/// Current interface state
+enum interface_state current_interface_state;	/// Current interface state
 bool GodMode;									/// Invincibility cheat
 enum _key_state_ KeyState;						/// current key state
 CUnit *LastIdleWorker;							/// Last called idle worker
@@ -1253,7 +1253,7 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 		case SDLK_RMETA:
 			KeyModifiers |= ModifierAlt;
 			// maxy: disabled
-			if (InterfaceState == IfaceStateNormal) {
+			if (current_interface_state == interface_state::normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;
@@ -1299,7 +1299,7 @@ int HandleKeyModifiersUp(unsigned key, unsigned)
 		case SDLK_RMETA:
 			KeyModifiers &= ~ModifierAlt;
 			// maxy: disabled
-			if (InterfaceState == IfaceStateNormal) {
+			if (current_interface_state == interface_state::normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;

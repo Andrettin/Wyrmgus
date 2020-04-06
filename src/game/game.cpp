@@ -174,7 +174,7 @@ void StartMap(const std::string &filename, bool clean)
 	Gui->setTop(container);
 
 	NetConnectRunning = 0;
-	InterfaceState = IfaceStateNormal;
+	current_interface_state = interface_state::normal;
 
 	//  Create the game.
 	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
@@ -209,7 +209,7 @@ void StartMap(const std::string &filename, bool clean)
 	Invalidate();
 
 	CleanGame();
-	InterfaceState = IfaceStateMenu;
+	current_interface_state = interface_state::menu;
 	SetDefaultTextColors(nc, rc);
 
 	Gui->setTop(oldTop);
