@@ -37,10 +37,6 @@
 
 #include "sound_server.h"
 
-#ifdef USE_FLUIDSYNTH
-#include "fluidsynth.h"
-#endif
-
 #include "civilization.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -1147,7 +1143,4 @@ void QuitSound()
 	Audio.MixerBuffer = nullptr;
 	delete[] Audio.Buffer;
 	Audio.Buffer = nullptr;
-#ifdef USE_FLUIDSYNTH
-	CleanFluidSynth();
-#endif
 }

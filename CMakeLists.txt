@@ -280,8 +280,6 @@ set(religion_SRCS
 source_group(religion FILES ${religion_SRCS})
 
 set(sound_SRCS
-	src/sound/fluidsynth.cpp
-	src/sound/mikmod.cpp
 	src/sound/music.cpp
 	src/sound/ogg.cpp
 	src/sound/script_sound.cpp
@@ -869,9 +867,7 @@ if(WIN32)
 endif()
 
 find_package(BZip2)
-find_package(FluidSynth)
 find_package(StackTrace)
-find_package(Mikmod)
 find_package(MNG)
 find_package(OggVorbis)
 find_package(Theora)
@@ -915,8 +911,6 @@ option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
-option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" OFF)
-option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
@@ -984,22 +978,6 @@ if(WITH_PHYSFS AND PHYSFS_FOUND)
 	add_definitions(-DPHYSFS_DATAFILE="data.zip")
 	include_directories(${PHYSFS_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${PHYSFS_LIBRARY})
-endif()
-
-if(WITH_FLUIDSYNTH AND FLUIDSYNTH_FOUND)
-	add_definitions(-DUSE_FLUIDSYNTH ${FLUIDSYNTH_DEFINITIONS})
-	include_directories(${FLUIDSYNTH_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${FLUIDSYNTH_LIBRARY})
-	find_file(FLUIDSYNTH_DLL libfluidsynth.dll HINTS ${CMAKE_PREFIX_PATH}/bin)
-	find_file(GLIB_DLL libglib-2.0-0.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
-	find_file(GTHREAD_DLL libgthread-2.0-0.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
-	set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DFLUID -DFLUIDDLL=libfluidsynth.dll -DGTHREADDLL=libglib-2.0-0.dll -DGLIBDLL=libgthread-2.0-0.dll)
-endif()
-
-if(WITH_MIKMOD AND MIKMOD_FOUND)
-	add_definitions(-DUSE_MIKMOD ${MIKMOD_DEFINITIONS})
-	include_directories(${MIKMOD_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${MIKMOD_LIBRARY})
 endif()
 
 if(WITH_MNG AND MNG_FOUND)
@@ -1343,8 +1321,6 @@ endif()
 
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
-log_package("FluidSynth" "FLUIDSYNTH")
-log_package("MikMod" "MIKMOD")
 log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
@@ -1493,11 +1469,6 @@ endif()
 if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	if(WITH_FLUIDSYNTH AND FLUIDSYNTH_FOUND)
-		file(COPY ${FLUIDSYNTH_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-		file(COPY ${GLIB_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-		file(COPY ${GTHREAD_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	endif()
 	# also ship lua51.dll
 	find_file(LUA_DLL lua51.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
 	file(COPY ${LUA_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
