@@ -42,9 +42,6 @@
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
 
-#include <QMetaProperty>
-#include <QObject>
-
 namespace stratagus {
 
 /**

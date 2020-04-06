@@ -37,11 +37,6 @@
 #include "color.h"
 #include "data_type.h"
 
-#include <map>
-#include <string>
-#include <tuple>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/

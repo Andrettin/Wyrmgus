@@ -55,9 +55,6 @@
 #ifndef GCN_WIDGET_HPP
 #define GCN_WIDGET_HPP
 
-#include <list>
-#include <string>
-
 #include "guichan/actionlistener.h"
 #include "guichan/color.h"
 #include "guichan/defaultfont.h"

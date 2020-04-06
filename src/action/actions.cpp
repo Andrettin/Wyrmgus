@@ -31,8 +31,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <time.h>
-
 #include "stratagus.h"
 #include "version.h"
 

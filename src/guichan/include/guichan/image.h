@@ -55,8 +55,6 @@
 #ifndef GCN_IMAGE_HPP
 #define GCN_IMAGE_HPP
 
-#include <string>
-
 #include "guichan/imageloader.h"
 #include "guichan/platform.h"
 

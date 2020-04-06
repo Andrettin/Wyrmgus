@@ -28,10 +28,6 @@
 #pragma once
 
 #include "vec2i.h"
-#include <string>
-//Wyrmgus start
-#include <map>
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Documentation

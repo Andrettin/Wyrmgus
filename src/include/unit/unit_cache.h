@@ -26,17 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __UNIT_CACHE_H__
-#define __UNIT_CACHE_H__
-
-//@{
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include <vector>
-#include <algorithm>
+#pragma once
 
 #ifdef __MORPHOS__
 #undef Insert
@@ -234,9 +224,3 @@ public:
 public:
 	std::vector<CUnit *> Units;
 };
-
-
-//@}
-
-#endif // !__UNIT_CACHE_H__
-

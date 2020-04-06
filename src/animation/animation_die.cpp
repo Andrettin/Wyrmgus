@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -38,8 +36,6 @@
 #include "animation/animation_die.h"
 
 #include "unit/unit.h"
-
-#include <stdio.h>
 
 /* virtual */ void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
@@ -63,6 +59,3 @@ void AnimationDie_OnCatch(CUnit &unit)
 {
 	LetUnitDie(unit);
 }
-
-
-//@}

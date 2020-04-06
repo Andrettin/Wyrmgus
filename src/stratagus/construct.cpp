@@ -37,8 +37,6 @@
 
 #include "construct.h"
 
-#include <vector>
-
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"

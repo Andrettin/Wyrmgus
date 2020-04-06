@@ -27,15 +27,10 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 #include "particle.h"
 #include "ui/ui.h"
 #include "video.h"
-
-#include <algorithm>
-
 
 CParticleManager ParticleManager;
 
@@ -130,5 +125,3 @@ CPosition CParticleManager::getScreenPos(const CPosition &pos) const
 
 	return CPosition(screenPixelPos.x, screenPixelPos.y);
 }
-
-//@}

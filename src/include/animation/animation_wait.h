@@ -30,9 +30,6 @@
 #ifndef ANIMATION_WAIT_H
 #define ANIMATION_WAIT_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Wait : public CAnimation
@@ -46,7 +43,5 @@ public:
 private:
 	std::string wait;
 };
-
-//@}
 
 #endif // ANIMATION_WAIT_H

@@ -55,9 +55,6 @@
 #ifndef GCN_RADIOBUTTON_HPP
 #define GCN_RADIOBUTTON_HPP
 
-#include <map>
-#include <string>
-
 #include "guichan/keylistener.h"
 #include "guichan/mouselistener.h"
 #include "guichan/platform.h"

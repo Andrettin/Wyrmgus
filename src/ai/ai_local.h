@@ -36,11 +36,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-//Wyrmgus start
-#include <tuple>
-//Wyrmgus end
-
 #include "unit/unit_cache.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"

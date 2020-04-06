@@ -26,10 +26,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef GAME_H
-#define GAME_H
-
-#include <string>
+#pragma once
 
 class CFile;
 //Wyrmgus start
@@ -61,6 +58,3 @@ extern CGraphic *loadingBackground;
 extern bool LoadingHistory;
 extern bool DefiningData;
 //Wyrmgus end
-
-#endif // GAME_H
-

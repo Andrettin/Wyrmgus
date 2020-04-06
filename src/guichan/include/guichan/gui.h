@@ -55,8 +55,6 @@
 #ifndef GCN_GUI_HPP
 #define GCN_GUI_HPP
 
-#include <string>
-
 #include "guichan/input.h"
 #include "guichan/platform.h"
 #include "guichan/widget.h"

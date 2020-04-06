@@ -42,8 +42,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 
-#include <stdio.h>
-
 
 /* virtual */ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

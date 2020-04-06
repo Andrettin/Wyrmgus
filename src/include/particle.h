@@ -29,10 +29,6 @@
 #ifndef __PARTICLE_H__
 #define __PARTICLE_H__
 
-//@{
-
-#include <vector>
-
 class CGraphic;
 class CViewport;
 
@@ -255,7 +251,5 @@ private:
 };
 
 extern CParticleManager ParticleManager;
-
-//@}
 
 #endif // !__PARTICLE_H__

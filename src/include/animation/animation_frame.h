@@ -30,9 +30,6 @@
 #ifndef ANIMATION_FRAME_H
 #define ANIMATION_FRAME_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Frame : public CAnimation
@@ -47,7 +44,5 @@ public:
 private:
 	std::string frame;
 };
-
-//@}
 
 #endif // ANIMATION_FRAME_H

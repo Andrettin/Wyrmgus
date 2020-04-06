@@ -66,8 +66,6 @@
 #include "video.h"
 #include "widgets.h"
 
-#include <deque>
-
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
 extern void CleanGame();

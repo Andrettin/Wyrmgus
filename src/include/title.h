@@ -29,11 +29,6 @@
 #ifndef __TITLE_H__
 #define __TITLE_H__
 
-//@{
-
-#include <string>
-
-
 class CFont;
 
 enum {
@@ -83,7 +78,5 @@ public:
 extern TitleScreen **TitleScreens;          /// File for title screen
 
 extern void ShowTitleScreens();
-
-//@}
 
 #endif // !__TITLE_H__

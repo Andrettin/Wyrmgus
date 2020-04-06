@@ -55,8 +55,6 @@
 #ifndef GCN_SCROLLAREA_HPP
 #define GCN_SCROLLAREA_HPP
 
-#include <string>
-
 #include "guichan/basiccontainer.h"
 #include "guichan/mouselistener.h"
 #include "guichan/platform.h"

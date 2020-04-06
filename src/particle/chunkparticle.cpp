@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
-#include <math.h>
-
 #include "stratagus.h"
 #include "particle.h"
 #include "video.h"
@@ -173,5 +169,3 @@ CParticle *CChunkParticle::clone()
 	particle->destroyDrawLevel = destroyDrawLevel;
 	return particle;
 }
-
-//@}

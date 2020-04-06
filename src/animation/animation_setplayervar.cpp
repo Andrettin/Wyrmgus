@@ -38,8 +38,6 @@
 #include "animation.h"
 #include "unit/unit.h"
 
-#include <stdio.h>
-
 /**
 **  Gets the player data.
 **

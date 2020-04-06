@@ -220,7 +220,6 @@
 #include "stratagus.h"
 
 #include <stddef.h>
-#include <list>
 
 #include "network.h"
 
@@ -240,8 +239,6 @@
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
 #include "video.h"
-
-#include <deque>
 
 //----------------------------------------------------------------------------
 //  Declaration

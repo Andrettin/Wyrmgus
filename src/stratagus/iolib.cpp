@@ -57,10 +57,6 @@
 #include <physfs.h>
 #endif
 
-#include <cstdarg>
-#include <cstdio>
-#include <filesystem>
-
 #ifdef __MORPHOS__
 #undef tell
 #endif

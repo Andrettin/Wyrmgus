@@ -55,8 +55,6 @@
 #ifndef GCN_BUTTON_HPP
 #define GCN_BUTTON_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 #include "guichan/widget.h"
 

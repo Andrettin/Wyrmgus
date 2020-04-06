@@ -33,10 +33,6 @@
 
 #include <png.h>
 
-//Wyrmgus start
-#include <fstream>
-//Wyrmgus end
-
 #include "stratagus.h"
 #include "map/map.h"
 #include "map/map_layer.h"

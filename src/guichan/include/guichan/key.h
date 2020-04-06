@@ -55,8 +55,6 @@
 #ifndef GCN_KEY_HPP
 #define GCN_KEY_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 
 namespace gcn

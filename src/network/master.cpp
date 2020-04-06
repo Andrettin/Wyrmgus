@@ -31,11 +31,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <errno.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <limits.h>
-
 #include "stratagus.h"
 
 #include "master.h"

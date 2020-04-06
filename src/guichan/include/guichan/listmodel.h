@@ -55,8 +55,6 @@
 #ifndef GCN_LISTMODEL_HPP
 #define GCN_LISTMODEL_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 
 namespace gcn

@@ -49,14 +49,6 @@
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
-//Wyrmgus start
-#include <map>
-//Wyrmgus end
-#include <string>
-//Wyrmgus start
-#include <tuple>
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/

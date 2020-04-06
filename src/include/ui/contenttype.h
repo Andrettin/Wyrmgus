@@ -30,11 +30,8 @@
 #ifndef __CONTENT_TYPE_H__
 #define __CONTENT_TYPE_H__
 
-//@{
-
 #include "script.h"
 #include "vec2i.h"
-#include <vector>
 
 class CUnit;
 class CFont;
@@ -186,8 +183,5 @@ private:
 	bool hasBorder;  /// True for additional border.
 	int colorIndex;  /// Index of Color to show.
 };
-
-
-//@}
 
 #endif // __CONTENT_TYPE_H__

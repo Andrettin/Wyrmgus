@@ -30,10 +30,6 @@
 #ifndef MISSILE_CONFIG_H
 #define MISSILE_CONFIG_H
 
-//@{
-
-#include <string>
-
 class MissileType;
 
 /**
@@ -54,7 +50,5 @@ public:
 	std::string Name;        /// Config missile name
 	MissileType *Missile;    /// Identifier to use to run time
 };
-
-//@}
 
 #endif // MISSILE_CONFIG_H

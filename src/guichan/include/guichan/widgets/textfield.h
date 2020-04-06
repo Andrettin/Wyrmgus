@@ -58,8 +58,6 @@
 #include "guichan/platform.h"
 #include "guichan/widget.h"
 
-#include <string>
-
 namespace gcn
 {
     /**

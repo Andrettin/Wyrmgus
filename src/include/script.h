@@ -36,10 +36,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
-//Wyrmgus start
-#include <map>
-//Wyrmgus end
 #ifdef __cplusplus
 extern "C" {
 #endif

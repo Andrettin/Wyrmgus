@@ -30,9 +30,6 @@
 #ifndef ANIMATION_RANDOMWAIT_H
 #define ANIMATION_RANDOMWAIT_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_RandomWait : public CAnimation
@@ -47,7 +44,5 @@ private:
 	std::string minWait;
 	std::string maxWait;
 };
-
-//@}
 
 #endif // ANIMATION_RANDOMWAIT_H

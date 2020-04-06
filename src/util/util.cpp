@@ -37,23 +37,11 @@
 
 #include <boost/tokenizer.hpp>
 
-#include <ctype.h>
-#include <cctype>
-#include <errno.h>
-#include <map>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-//Wyrmgus start
-#include <time.h>
-//Wyrmgus end
-
 #ifdef WIN32
 #include <windows.h>
 #endif
 
 #ifdef USE_STACKTRACE
-#include <stdexcept>
 #include <stacktrace/call_stack.hpp>
 #include <stacktrace/stack_exception.hpp>
 #endif
@@ -401,8 +389,6 @@ std::string SnakeCaseToPascalCase(const std::string &str)
 **  This makes it easier to differentiate between an 'illegal option' and
 **  an 'argument required' error.
 */
-
-#include <string.h>
 
 int opterr = 1;
 int optind = 1;

@@ -30,9 +30,6 @@
 #ifndef ANIMATION_ROTATE_H
 #define ANIMATION_ROTATE_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Rotate : public CAnimation
@@ -48,7 +45,5 @@ private:
 };
 
 extern void UnitRotate(CUnit &unit, int rotate);
-
-//@}
 
 #endif // ANIMATION_ROTATE_H

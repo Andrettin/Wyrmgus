@@ -36,17 +36,6 @@
 #include "database/sml_property.h"
 #include "database/sml_property_visitor.h"
 
-#include <QColor>
-#include <QPoint>
-
-#include <algorithm>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <variant>
-#include <vector>
-
 namespace stratagus {
 
 class sml_parser;

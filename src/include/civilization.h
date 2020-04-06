@@ -36,10 +36,6 @@
 #include "player.h" //for certain enums
 #include "time/date.h"
 
-#include <map>
-#include <string>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/

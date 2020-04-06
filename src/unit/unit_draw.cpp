@@ -32,8 +32,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "stratagus.h"
 
 #include "actions.h"

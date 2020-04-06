@@ -34,10 +34,6 @@
 
 #include "stratagus.h"
 
-#include <string>
-#include <map>
-#include <list>
-
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

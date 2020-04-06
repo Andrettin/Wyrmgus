@@ -55,8 +55,6 @@
 #ifndef GCN_CONTAINER_HPP
 #define GCN_CONTAINER_HPP
 
-#include <list>
-
 #include "guichan/basiccontainer.h"
 #include "guichan/graphics.h"
 #include "guichan/platform.h"

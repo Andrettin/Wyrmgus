@@ -55,9 +55,6 @@
 #ifndef GCN_IMAGEFONT_HPP
 #define GCN_IMAGEFONT_HPP
 
-#include <map>
-#include <string>
-
 #include "guichan/font.h"
 #include "guichan/graphics.h"
 #include "guichan/image.h"

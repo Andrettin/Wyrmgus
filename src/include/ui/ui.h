@@ -36,10 +36,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-#include <string>
-#include <map>
-
 #include "color.h"
 #include "cursor.h"
 #include "map/minimap.h"

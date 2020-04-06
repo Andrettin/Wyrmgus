@@ -30,11 +30,6 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
-//@{
-
-#include <string>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -139,7 +134,5 @@ extern void CreateGame(const std::string &filename, CMap *map, bool is_mod = fal
 //Wyrmgus end
 /// Init Setting to default values
 extern void InitSettings();
-
-//@}
 
 #endif // !__SETTINGS_H__

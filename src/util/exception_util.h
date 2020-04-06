@@ -31,9 +31,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <stdexcept>
-
 namespace stratagus::exception {
 
 inline void report(const std::exception &exception)

@@ -31,8 +31,6 @@
 
 #pragma once
 
-#include <vector>
-
 namespace stratagus::vector {
 
 template <typename T, typename U>

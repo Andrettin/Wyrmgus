@@ -55,8 +55,6 @@
 #ifndef GCN_ACTIONLISTENER_HPP
 #define GCN_ACTIONLISTENER_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 
 namespace gcn

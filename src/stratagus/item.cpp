@@ -47,10 +47,6 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 
-#include <cctype>
-#include <map>
-#include <string>
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/

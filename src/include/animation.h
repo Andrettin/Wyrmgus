@@ -33,9 +33,6 @@
 #include "data_type.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 
-#include <string>
-#include <map>
-
 #define ANIMATIONS_DEATHTYPES 40
 
 class CFile;

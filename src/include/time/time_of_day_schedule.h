@@ -37,10 +37,6 @@
 #include "data_type.h"
 #include "time/time_period_schedule.h"
 
-#include <map>
-#include <string>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/

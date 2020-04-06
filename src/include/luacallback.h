@@ -29,9 +29,6 @@
 #ifndef LUA_CALLBACK_HEADER_FILE
 #define LUA_CALLBACK_HEADER_FILE
 
-#include <string>
-#include <vector>
-
 typedef int lua_Object; // from tolua++.h
 struct lua_State;
 

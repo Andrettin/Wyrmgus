@@ -30,9 +30,6 @@
 #ifndef ANIMATION_SPAWNUNIT_H
 #define ANIMATION_SPAWNUNIT_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 //SpawnUnit flags
@@ -58,7 +55,5 @@ private:
 	std::string playerStr;
 	std::string flagsStr;
 };
-
-//@}
 
 #endif // ANIMATION_SPAWNUNIT_H

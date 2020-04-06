@@ -31,9 +31,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 namespace stratagus {
 
 enum class sml_operator;

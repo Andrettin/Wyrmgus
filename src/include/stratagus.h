@@ -36,12 +36,6 @@
 // Dynamic loading.
 //#define DYNAMIC_LOAD
 
-//the following is necessary to include shared_mutex without errors
-#undef SIZE_MAX
-#include <wchar.h>
-#define __STDC_LIMIT_MACROS
-#include <cstdint>
-
 /*============================================================================
 ==  Compiler repairs
 ============================================================================*/
@@ -50,11 +44,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define WINDOWS_IGNORE_PACKING_MISMATCH //for SDL
-
-#if _MSC_VER >= 1800
-// From VS2013 onwards, std::min/max are only defined if algorithm is included
-#include <algorithm>
-#endif
 
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
@@ -131,8 +120,6 @@ extern void PrintOnStdOut(const char *format, ...);
 /*============================================================================
 ==  Definitions
 ============================================================================*/
-
-#include <string.h>
 
 #include "util/util.h"
 

@@ -31,10 +31,6 @@
 
 #pragma once
 
-#include <QObject>
-
-#include <memory>
-
 namespace stratagus {
 
 struct qobject_deleter

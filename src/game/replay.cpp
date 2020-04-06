@@ -58,9 +58,6 @@
 #include "unit/unittype.h"
 #include "version.h"
 
-#include <sstream>
-#include <time.h>
-
 extern void ExpandPath(std::string &newpath, const std::string &path);
 extern void StartMap(const std::string &filename, bool clean);
 

@@ -82,8 +82,6 @@
 
 #include "stratagus.h"
 
-#include <vector>
-
 #include "video.h"
 #include "intern_video.h"
 

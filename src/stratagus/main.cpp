@@ -29,12 +29,7 @@
 
 #include "util/exception_util.h"
 
-#include <SDL.h>
-
-#include <QApplication>
 #include <QQmlApplicationEngine>
-
-#include <thread>
 
 int main(int argc, char **argv)
 {

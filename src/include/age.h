@@ -30,10 +30,6 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-#include <map>
-#include <string>
-#include <vector>
-
 class CDependency;
 class CGraphic;
 class CUpgrade;

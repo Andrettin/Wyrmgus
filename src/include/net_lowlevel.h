@@ -29,13 +29,9 @@
 #ifndef __NET_LOWLEVEL_H
 #define __NET_LOWLEVEL_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-
-#include <vector>
 
 // Include system network headers
 #ifdef USE_WIN32
@@ -144,7 +140,5 @@ extern Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *client
 extern int NetSetNonBlocking(Socket sockfd);
 /// Wait for socket ready.
 extern int NetSocketReady(Socket sockfd, int timeout);
-
-//@}
 
 #endif // !__NET_LOWLEVEL_H

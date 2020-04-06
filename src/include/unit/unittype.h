@@ -42,12 +42,6 @@
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
-#include <algorithm>
-#include <climits>
-#include <cstring>
-#include <map>
-#include <vector>
-
 #ifdef __MORPHOS__
 #undef Enable
 #endif

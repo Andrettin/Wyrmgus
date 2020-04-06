@@ -31,10 +31,6 @@
 
 #pragma once
 
-#include <QVariant>
-
-#include <vector>
-
 namespace stratagus::container {
 
 template <typename T>

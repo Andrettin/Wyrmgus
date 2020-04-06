@@ -27,13 +27,9 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "parameters.h"
-
-#include <stdlib.h>
 
 /* static */ Parameters Parameters::Instance;
 
@@ -93,6 +89,3 @@ void Parameters::SetLocalPlayerNameFromEnv()
 {
 	LocalPlayerName = GetLocalPlayerNameFromEnv();
 }
-
-
-//@}

@@ -37,10 +37,6 @@
 #include "map/map.h"
 
 //Wyrmgus start
-#include <fstream>
-//Wyrmgus end
-
-//Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
 //Wyrmgus end

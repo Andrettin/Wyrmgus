@@ -37,9 +37,7 @@
 
 #include "net_lowlevel.h"
 
-#include <stdio.h>
 #include <fcntl.h>
-#include <errno.h>
 
 //----------------------------------------------------------------------------
 //  Declarations

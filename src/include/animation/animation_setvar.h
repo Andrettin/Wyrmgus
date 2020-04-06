@@ -30,9 +30,6 @@
 #ifndef ANIMATION_SETVAR_H
 #define ANIMATION_SETVAR_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_SetVar : public CAnimation
@@ -49,7 +46,5 @@ private:
 	std::string valueStr;
 	std::string unitSlotStr;
 };
-
-//@}
 
 #endif // ANIMATION_SETVAR_H

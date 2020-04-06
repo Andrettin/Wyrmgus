@@ -17,8 +17,6 @@
 #define XBRZ_HEADER_3847894708239054
 
 #include <cstddef> //size_t
-#include <cstdint> //uint32_t
-#include <limits>
 #include "config.h"
 
 namespace xbrz

@@ -55,8 +55,6 @@
 #ifndef GCN_KEYLISTENER_HPP
 #define GCN_KEYLISTENER_HPP
 
-#include <string>
-
 #include "guichan/key.h"
 #include "guichan/platform.h"
 

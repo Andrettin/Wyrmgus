@@ -55,9 +55,6 @@
 #ifndef GCN_GRAPHICS_HPP
 #define GCN_GRAPHICS_HPP
 
-#include <stack>
-#include <string>
-
 #include "guichan/cliprectangle.h"
 #include "guichan/color.h"
 #include "guichan/image.h"

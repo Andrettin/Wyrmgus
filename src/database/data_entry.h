@@ -31,12 +31,6 @@
 
 #pragma once
 
-#include <QObject>
-#include <QString>
-
-#include <set>
-#include <string>
-
 namespace stratagus {
 
 class module;

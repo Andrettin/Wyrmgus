@@ -37,9 +37,7 @@
 #include "time/date.h"
 #include "vec2i.h"
 
-#include <map>
 #include <shared_mutex>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations

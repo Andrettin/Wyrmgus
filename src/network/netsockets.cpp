@@ -38,8 +38,6 @@
 #include "network/netsockets.h"
 #include "net_lowlevel.h"
 
-#include <stdio.h>
-
 #ifdef __MORPHOS__
 #undef socket
 #endif

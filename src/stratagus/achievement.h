@@ -30,10 +30,6 @@
 #include "data_type.h"
 #include "icons.h"
 
-#include <map>
-#include <string>
-#include <vector>
-
 class CCharacter;
 class CQuest;
 class CUnitType;

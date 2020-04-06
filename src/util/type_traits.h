@@ -31,8 +31,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 template<typename T, template<typename...> class T2>
 struct is_specialization_of : std::false_type {};
 

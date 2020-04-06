@@ -31,13 +31,6 @@
 
 #pragma once
 
-#include <QObject>
-#include <QVariantList>
-
-#include <filesystem>
-#include <set>
-#include <string>
-
 namespace stratagus {
 
 class sml_data;

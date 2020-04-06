@@ -37,11 +37,6 @@
 #include "stratagus.h"
 #include "unitsound.h"
 
-//Wyrmgus start
-#include <map>
-#include <string>
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/

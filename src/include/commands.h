@@ -27,14 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __COMMANDS_H__
-#define __COMMANDS_H__
-
-//@{
-	
-//Wyrmgus start
-#include <vector>
-//Wyrmgus end
+#pragma once
 
 #include "vec2i.h"
 
@@ -319,7 +312,3 @@ extern void ExecExtendedCommand(unsigned char type, int status, unsigned char ar
 								unsigned short arg4);
 
 #define FlushCommands 1          /// Flush commands in queue
-
-//@}
-
-#endif // !__COMMANDS_H__

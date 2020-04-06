@@ -30,9 +30,6 @@
 #ifndef ANIMATION_RANDOMGOTO_H
 #define ANIMATION_RANDOMGOTO_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_RandomGoto : public CAnimation
@@ -47,7 +44,5 @@ private:
 	std::string randomStr;
 	CAnimation *gotoLabel;
 };
-
-//@}
 
 #endif // ANIMATION_RANDOMGOTO_H

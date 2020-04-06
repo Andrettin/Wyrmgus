@@ -79,9 +79,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
-#include <string>
-
 #include "color.h"
 #include "map/tile.h"
 #include "time/date.h"

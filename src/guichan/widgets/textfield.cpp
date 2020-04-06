@@ -55,7 +55,6 @@
 /*
  * For comments regarding functions please see the header file.
  */
-#include <assert.h>
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"

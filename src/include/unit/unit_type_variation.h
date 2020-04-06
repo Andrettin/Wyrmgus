@@ -38,10 +38,6 @@
 #include "unit/unittype.h" //for the image layers enum
 #include "upgrade/upgrade_structs.h" //for the costs enum
 
-#include <map>
-#include <string>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/

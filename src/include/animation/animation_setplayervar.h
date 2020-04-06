@@ -30,9 +30,6 @@
 #ifndef ANIMATION_SETPLAYERVAR_H
 #define ANIMATION_SETPLAYERVAR_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_SetPlayerVar : public CAnimation
@@ -52,7 +49,5 @@ private:
 };
 
 extern int GetPlayerData(const int player, const char *prop, const char *arg);
-
-//@}
 
 #endif // ANIMATION_SETPLAYERVAR_H

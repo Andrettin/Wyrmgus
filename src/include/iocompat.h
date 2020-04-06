@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __IOCOMPAT_H__
-#define __IOCOMPAT_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Platform dependent IO-related Includes and Definitions
@@ -38,10 +35,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <errno.h>
 
 #ifdef _MSC_VER
 
@@ -73,7 +66,3 @@
 #else
 #define makedir(dir, permissions) mkdir(dir, permissions)
 #endif
-
-//@}
-
-#endif // !__IOCOMPAT_H__

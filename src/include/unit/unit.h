@@ -30,13 +30,9 @@
 #ifndef __UNIT_H__
 #define __UNIT_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-
-#include <vector>
 
 #include "player.h"
 #include "unit/unittype.h"
@@ -952,7 +948,5 @@ extern void SelectionCclRegister();
 
 /// register CCL units features
 extern void UnitCclRegister();
-
-//@}
 
 #endif // !__UNIT_H__

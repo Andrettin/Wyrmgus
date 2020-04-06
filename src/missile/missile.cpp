@@ -61,8 +61,6 @@
 #include "util/string_util.h"
 #include "video.h"
 
-#include <cmath>
-
 #ifdef __MORPHOS__
 #undef Wait
 #endif

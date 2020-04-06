@@ -34,8 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "map/map.h"
 #include "province.h"
 #include "character.h"

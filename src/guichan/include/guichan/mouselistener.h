@@ -55,8 +55,6 @@
 #ifndef GCN_MOUSELISTENER_HPP
 #define GCN_MOUSELISTENER_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 
 namespace gcn

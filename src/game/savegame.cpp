@@ -57,8 +57,6 @@
 #include "upgrade/upgrade.h"
 #include "version.h"
 
-#include <time.h>
-
 extern void StartMap(const std::string &filename, bool clean);
 
 

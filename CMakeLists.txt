@@ -1348,6 +1348,57 @@ add_custom_command(OUTPUT tolua.cpp
 )
 
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+
+target_precompile_headers(stratagus PRIVATE
+	<SDL.h>
+	<QApplication>
+	<QAudioFormat>
+	<QColor>
+	<QDateTime>
+	<QMetaProperty>
+	<QObject>
+	<QPoint>
+	<QStandardPaths>
+	<QString>
+	<QThread>
+	<QVariant>
+	<QVariantList>
+	<algorithm>
+	<cassert>
+	<cctype>
+	<cerrno>
+	<climits>
+	<cmath>
+	<cstdarg>
+	<cstdint>
+	<cstdio>
+	<cstdlib>
+	<cstring>
+	<ctime>
+	<deque>
+	<filesystem>
+	<fstream>
+	<functional>
+	<iostream>
+	<list>
+	<map>
+	<memory>
+	<mutex>
+	<queue>
+	<set>
+	<shared_mutex>
+	<sstream>
+	<stack>
+	<stdexcept>
+	<string>
+	<thread>
+	<tuple>
+	<type_traits>
+	<typeinfo>
+	<variant>
+	<vector>
+)
+
 target_link_libraries(stratagus ${stratagus_LIBS})
 if(stratagus_LIBS_RELEASE)
 	target_link_libraries(stratagus ${stratagus_LIBS_RELEASE})

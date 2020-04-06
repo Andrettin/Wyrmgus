@@ -31,14 +31,6 @@
 
 #pragma once
 
-#include <QApplication>
-#include <QObject>
-#include <QThread>
-
-#include <memory>
-#include <mutex>
-#include <type_traits>
-
 namespace stratagus {
 
 template <typename T>

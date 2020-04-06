@@ -55,8 +55,6 @@
 #ifndef GCN_FOCUSHANDLER_HPP
 #define GCN_FOCUSHANDLER_HPP
 
-#include <vector>
-
 #include "guichan/platform.h"
 #include "guichan/widget.h"
 

@@ -29,10 +29,6 @@
 #ifndef NETSOCKETS_H
 #define NETSOCKETS_H
 
-#include <string>
-
-//@{
-
 class CHost
 {
 public:
@@ -115,7 +111,5 @@ public:
 private:
 	CTCPSocket_Impl *m_impl;
 };
-
-//@}
 
 #endif // !NETSOCKETS_H

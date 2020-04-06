@@ -55,8 +55,6 @@
 #ifndef GCN_LABEL_HPP
 #define GCN_LABEL_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 #include "guichan/widget.h"
 

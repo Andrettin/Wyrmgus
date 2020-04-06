@@ -30,9 +30,6 @@
 #ifndef ANIMATION_MOVE_H
 #define ANIMATION_MOVE_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Move : public CAnimation
@@ -46,7 +43,5 @@ public:
 private:
 	std::string moveStr;
 };
-
-//@}
 
 #endif // ANIMATION_MOVE_H

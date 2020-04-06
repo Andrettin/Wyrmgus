@@ -55,8 +55,6 @@
 #ifndef GCN_IMAGELOADER_HPP
 #define GCN_IMAGELOADER_HPP
 
-#include <string>
-
 #include "guichan/color.h"
 #include "guichan/platform.h"
 

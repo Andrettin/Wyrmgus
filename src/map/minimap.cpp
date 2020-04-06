@@ -31,8 +31,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-
 #include "stratagus.h"
 
 #include "map/minimap.h"

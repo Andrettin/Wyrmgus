@@ -36,15 +36,6 @@
 #include "util/singleton.h"
 #include "util/type_traits.h"
 
-#include <QStandardPaths>
-
-#include <filesystem>
-#include <functional>
-#include <memory>
-#include <mutex>
-#include <variant>
-#include <vector>
-
 namespace stratagus {
 
 class data_entry;

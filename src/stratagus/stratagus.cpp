@@ -154,8 +154,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <cctype>
-
 #ifdef USE_BEOS
 #include <fcntl.h>
 #include <sys/types.h>
@@ -210,13 +208,9 @@ extern void beos_init(int argc, char **argv);
 #include "missile.h" //for FreeBurningBuildingFrames
 
 #ifdef USE_STACKTRACE
-#include <stdexcept>
 #include <stacktrace/call_stack.hpp>
 #include <stacktrace/stack_exception.hpp>
 #endif
-
-#include <stdlib.h>
-#include <stdio.h>
 
 #ifdef USE_WIN32
 #include <windows.h>

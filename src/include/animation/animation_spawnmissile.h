@@ -30,9 +30,6 @@
 #ifndef ANIMATION_SPAWNMISSILE_H
 #define ANIMATION_SPAWNMISSILE_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 //SpawnMissile flags
@@ -64,7 +61,5 @@ private:
 	std::string flagsStr;
 	std::string offsetNumStr;
 };
-
-//@}
 
 #endif // ANIMATION_SPAWNMISSILE_H

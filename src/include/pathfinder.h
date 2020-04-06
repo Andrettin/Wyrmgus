@@ -42,7 +42,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#include <queue>
 #include "vec2i.h"
 
 class CUnit;

@@ -31,11 +31,6 @@
 
 #pragma once
 
-#include <QDateTime>
-
-#include <stdexcept>
-#include <string>
-
 namespace string {
 
 static inline const std::string empty_str;

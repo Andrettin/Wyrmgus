@@ -30,9 +30,6 @@
 #ifndef __ANIMATION_DIE_H__
 #define __ANIMATION_DIE_H__
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Die : public CAnimation
@@ -53,7 +50,5 @@ class AnimationDie_Exception
 };
 
 extern void AnimationDie_OnCatch(CUnit &unit);
-
-//@}
 
 #endif // !__ANIMATION_DIE_H__

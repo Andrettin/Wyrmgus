@@ -30,14 +30,6 @@
 #ifndef __TEXT_H__
 #define __TEXT_H__
 
-//@{
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -91,7 +83,5 @@ extern std::vector<CText *> Texts;
 extern void CleanTexts();
 extern CText *GetText(const std::string &text_name);
 extern void TextCclRegister();
-
-//@}
 
 #endif // !__QUEST_H__

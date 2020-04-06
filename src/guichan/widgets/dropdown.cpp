@@ -52,7 +52,6 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/widgets/dropdown.h"
 

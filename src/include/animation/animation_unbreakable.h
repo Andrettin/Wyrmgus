@@ -30,9 +30,6 @@
 #ifndef ANIMATION_UNBREAKABLE_H
 #define ANIMATION_UNBREAKABLE_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Unbreakable : public CAnimation
@@ -46,7 +43,5 @@ public:
 private:
 	int state;
 };
-
-//@}
 
 #endif // ANIMATION_UNBREAKABLE_H

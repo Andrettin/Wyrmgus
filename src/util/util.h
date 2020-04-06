@@ -35,15 +35,9 @@
 #endif
 #endif
 
-#include <cstdlib>
-#include <string>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
-
-#include <cmath>
 
 extern unsigned SyncRandSeed;           /// Sync random seed value
 
@@ -82,8 +76,6 @@ void clamp(T *value, T minValue, T maxValue)
 /*----------------------------------------------------------------------------
 --  Strings
 ----------------------------------------------------------------------------*/
-
-#include <string.h>
 
 #ifndef _TRUNCATE
 #define _TRUNCATE ((size_t)-1)
@@ -137,8 +129,6 @@ int getopt(int argc, char *const argv[], const char *optstring);
 /*----------------------------------------------------------------------------
 --  Clipboard
 ----------------------------------------------------------------------------*/
-
-#include <string>
 
 int GetClipboard(std::string &str);
 

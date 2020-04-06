@@ -55,8 +55,6 @@
 #ifndef GCN_CHECKBOX_HPP
 #define GCN_CHECKBOX_HPP
 
-#include <string>
-
 #include "guichan/keylistener.h"
 #include "guichan/mouselistener.h"
 #include "guichan/platform.h"

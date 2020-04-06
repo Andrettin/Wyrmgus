@@ -31,8 +31,6 @@
 
 #pragma once
 
-#include <QtGlobal>
-
 namespace stratagus {
 
 class sml_data;

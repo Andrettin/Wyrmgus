@@ -56,8 +56,6 @@
  * For comments regarding functions please see the header file.
  */
 
-#include <typeinfo>
-
 #include "guichan/basiccontainer.h"
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"

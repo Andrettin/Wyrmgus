@@ -31,11 +31,6 @@
 
 #pragma once
 
-#include <filesystem>
-#include <functional>
-#include <set>
-#include <string>
-
 namespace stratagus {
 
 class module;

@@ -55,8 +55,6 @@
 #ifndef GCN_EXCEPTION_HPP
 #define GCN_EXCEPTION_HPP
 
-#include <string>
-
 #include "guichan/platform.h"
 
 

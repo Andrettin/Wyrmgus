@@ -33,8 +33,6 @@
 
 #include "util/singleton.h"
 
-#include <filesystem>
-
 namespace stratagus {
 
 class sml_property;

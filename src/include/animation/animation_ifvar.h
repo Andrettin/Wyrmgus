@@ -30,9 +30,6 @@
 #ifndef ANIMATION_IFVAR_H
 #define ANIMATION_IFVAR_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_IfVar : public CAnimation
@@ -52,7 +49,5 @@ private:
 	BinOpFunc *binOpFunc;
 	CAnimation *gotoLabel;
 };
-
-//@}
 
 #endif // ANIMATION_IFVAR_H

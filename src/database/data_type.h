@@ -37,15 +37,6 @@
 #include "database/sml_operator.h"
 #include "util/qunique_ptr.h"
 
-#include <QApplication>
-
-#include <filesystem>
-#include <map>
-#include <set>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
 namespace stratagus {
 
 class module;

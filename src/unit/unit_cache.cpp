@@ -45,8 +45,6 @@
 #include "unit/unit.h"
 #include "unit/unittype.h"
 
-#include <string.h>
-
 /**
 **  Insert new unit into cache.
 **

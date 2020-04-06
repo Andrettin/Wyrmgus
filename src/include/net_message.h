@@ -29,11 +29,6 @@
 #ifndef NET_MESSAGE_H
 #define NET_MESSAGE_H
 
-//@{
-
-#include <stdint.h>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -487,7 +482,5 @@ public:
 	CNetworkPacketHeader Header;  /// Packet Header Info
 	std::vector<unsigned char> Command[MaxNetworkCommands];
 };
-
-//@}
 
 #endif // !NET_MESSAGE_H

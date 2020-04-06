@@ -30,9 +30,6 @@
 #ifndef ANIMATION_ATTACK_H
 #define ANIMATION_ATTACK_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_Attack : public CAnimation
@@ -44,7 +41,5 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 };
-
-//@}
 
 #endif // ANIMATION_ATTACK_H

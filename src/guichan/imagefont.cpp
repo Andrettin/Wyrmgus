@@ -56,8 +56,6 @@
  * For comments regarding functions please see the header file.
  */
 
-#include <sstream>
-#include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/imagefont.h"
 #include "guichan/image.h"

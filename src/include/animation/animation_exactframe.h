@@ -30,9 +30,6 @@
 #ifndef ANIMATION_EXACTFRAME_H
 #define ANIMATION_EXACTFRAME_H
 
-//@{
-
-#include <string>
 #include "animation.h"
 
 class CAnimation_ExactFrame : public CAnimation
@@ -48,7 +45,5 @@ public:
 private:
 	std::string frame;
 };
-
-//@}
 
 #endif // ANIMATION_EXACTFRAME_H

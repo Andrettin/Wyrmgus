@@ -55,7 +55,6 @@
 /*
  * For comments regarding functions please see the header file.
  */
-#include <assert.h>
 #include "guichan/font.h"
 #include "guichan/exception.h"
 

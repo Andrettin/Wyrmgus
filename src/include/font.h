@@ -56,7 +56,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
 #include "color.h"
 #include "guichan/font.h"
 

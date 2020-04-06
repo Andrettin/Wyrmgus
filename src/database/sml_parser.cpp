@@ -34,9 +34,6 @@
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 
-#include <fstream>
-#include <stdexcept>
-
 namespace stratagus {
 
 sml_parser::sml_parser(const std::filesystem::path &filepath)

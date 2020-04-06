@@ -36,11 +36,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "vec2i.h"
-#include <vector>
 //Wyrmgus start
-#include <map>
-#include <tuple>
-
 #include "color.h"
 //Wyrmgus end
 

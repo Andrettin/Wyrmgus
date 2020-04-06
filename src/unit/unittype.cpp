@@ -71,11 +71,6 @@
 #include "util/util.h"
 #include "video.h"
 
-#include <cctype>
-#include <cstring>
-#include <map>
-#include <string>
-
 /*----------------------------------------------------------------------------
 -- Documentation
 ----------------------------------------------------------------------------*/

@@ -55,8 +55,6 @@
 #ifndef GCN_SDLIMAGELOADER_HPP
 #define GCN_SDLIMAGELOADER_HPP
 
-#include <map>
-
 #include "SDL.h"
 
 #include "guichan/image.h"

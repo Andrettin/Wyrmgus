@@ -136,8 +136,6 @@ public:
 };
 
 
-#include <vector>
-
 class CUnitColors
 {
 public:
@@ -147,8 +145,6 @@ public:
 	std::vector<CColor> Colors;
 };
 
-
-#include <stdint.h>
 
 typedef uint32_t IntColor; // Uint32 in SDL
 

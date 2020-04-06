@@ -30,9 +30,6 @@
 #ifndef __MASTER_H__
 #define __MASTER_H__
 
-//@{
-
-#include <list>
 #include "network/netsockets.h"
 
 /*----------------------------------------------------------------------------
@@ -77,7 +74,5 @@ private:
 ----------------------------------------------------------------------------*/
 // Metaserver itself
 extern CMetaClient MetaClient;
-
-//@}
 
 #endif // !__MASTER_H__

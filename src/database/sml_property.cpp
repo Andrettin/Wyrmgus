@@ -33,9 +33,6 @@
 
 #include "database/sml_operator.h"
 
-#include <fstream>
-#include <stdexcept>
-
 namespace stratagus {
 
 void sml_property::print(std::ofstream &ofstream, const size_t indentation) const

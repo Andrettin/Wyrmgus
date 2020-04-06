@@ -56,8 +56,6 @@
  * For comments regarding functions please see the header file.
  */
 
-#include <ctype.h>  // for isascii
-#include <assert.h>
 #include "guichan/focushandler.h"
 #include "guichan/exception.h"
 

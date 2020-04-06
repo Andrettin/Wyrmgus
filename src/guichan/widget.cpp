@@ -61,9 +61,6 @@
 #include "guichan/focushandler.h"
 #include "guichan/widget.h"
 
-#include <iostream>
-#include <assert.h>
-
 #include "guichan/sdl/sdlinput.h"
 #include "SDL.h"
 extern int Str2SdlKey(const char *str);

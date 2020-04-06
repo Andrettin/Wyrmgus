@@ -27,13 +27,10 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <sstream>
 #include <iomanip>
 
 #include "stratagus.h"
@@ -52,8 +49,6 @@
 #include "player.h"
 #include "spells.h"
 #include "unit/unittype.h"
-
-#include <stdio.h>
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -451,5 +446,3 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("})\n");
 }
-
-//@}
