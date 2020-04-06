@@ -105,6 +105,25 @@ public:
 	SoundConfig NotEnoughFood[MAX_RACES];         /// not enough food message
 };
 
+/**
+** A possible value for Number in the Sound struct: means a simple sound
+*/
+static constexpr int ONE_SOUND = 0;
+/**
+** A possible value for Number in the Sound struct: means a double group (for
+** selection/annoyed sounds)
+*/
+static constexpr int TWO_GROUPS = 1;
+
+/**
+** the range value that makes a sound volume distance independent
+*/
+static constexpr int INFINITE_SOUND_RANGE = 255;
+/**
+** the maximum range value
+*/
+static constexpr int MAX_SOUND_RANGE = 254;
+
 class CSound : public stratagus::data_entry, public stratagus::data_type<CSound>
 {
 	Q_OBJECT
@@ -143,13 +162,13 @@ public:
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	int range = 0; //range is a multiplier for DistanceSilent
+	int range = MAX_SOUND_RANGE; //range is a multiplier for DistanceSilent
 	//Wyrmgus start
 //	unsigned char Number = 0;       /// single, group, or table of sounds.
 	unsigned int Number = 0;       /// single, group, or table of sounds.
 	//Wyrmgus end
 	//Wyrmgus start
-	int VolumePercent = 0;
+	int VolumePercent = 100;
 	//Wyrmgus end
 	union {
 		CSample *OneSound;       /// if it's only a simple sound
@@ -165,25 +184,6 @@ private:
 
 	friend CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 };
-
-/**
-** A possible value for Number in the Sound struct: means a simple sound
-*/
-static constexpr int ONE_SOUND = 0;
-/**
-** A possible value for Number in the Sound struct: means a double group (for
-** selection/annoyed sounds)
-*/
-static constexpr int TWO_GROUPS = 1;
-
-/**
-** the range value that makes a sound volume distance independent
-*/
-static constexpr int INFINITE_SOUND_RANGE = 255;
-/**
-** the maximum range value
-*/
-static constexpr int MAX_SOUND_RANGE = 254;
 
 /**
 **  Origin of a sound

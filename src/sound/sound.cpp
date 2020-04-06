@@ -658,11 +658,6 @@ CSound *RegisterSound(const std::string &identifier, const std::vector<std::file
 	size_t number = files.size();
 
 	id->files = files;
-	id->range = MAX_SOUND_RANGE;
-	//Wyrmgus start
-	id->VolumePercent = 100;
-	//Wyrmgus end
-
 	id->initialize();
 
 	return id;
