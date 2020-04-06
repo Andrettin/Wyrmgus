@@ -28,8 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UPGRADE_STRUCTS_H__
-#define __UPGRADE_STRUCTS_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -40,6 +39,7 @@
 #include "item.h"
 //Wyrmgus end
 #include "resource.h"
+#include "stratagus.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -208,5 +208,3 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades
-
-#endif
