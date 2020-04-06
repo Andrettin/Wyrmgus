@@ -92,6 +92,7 @@
 #include "unit/unittype.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
+#include "util/exception_util.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
@@ -164,57 +165,62 @@ void SaveGameSettings(CFile &file)
 
 void StartMap(const std::string &filename, bool clean)
 {
-	std::string nc, rc;
+	try {
+		std::string nc, rc;
 
-	gcn::Widget *oldTop = Gui->getTop();
-	gcn::Container *container = new gcn::Container();
-	Containers.push_back(container);
-	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
-	container->setOpaque(false);
-	Gui->setTop(container);
+		gcn::Widget *oldTop = Gui->getTop();
+		gcn::Container *container = new gcn::Container();
+		Containers.push_back(container);
+		container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
+		container->setOpaque(false);
+		Gui->setTop(container);
 
-	NetConnectRunning = 0;
-	current_interface_state = interface_state::normal;
+		NetConnectRunning = 0;
+		current_interface_state = interface_state::normal;
 
-	//  Create the game.
-	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
-	if (clean) {
-		CleanPlayers();
+		//  Create the game.
+		DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
+		if (clean) {
+			CleanPlayers();
+		}
+		GetDefaultTextColors(nc, rc);
+
+		//Wyrmgus start
+		GameEstablishing = true;
+		//Wyrmgus end
+		CreateGame(filename, &CMap::Map);
+
+		//Wyrmgus start
+	//	UI.StatusLine.Set(NameLine);
+		//Wyrmgus end
+		//Wyrmgus start
+		//commented this out because it seemed superfluous
+	//	SetMessage("%s", _("Do it! Do it now!"));
+		//Wyrmgus end
+
+		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
+			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
+		}
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
+
+		//  Play the game.
+		GameMainLoop();
+
+		//  Clear screen
+		Video.ClearScreen();
+		Invalidate();
+
+		CleanGame();
+		current_interface_state = interface_state::menu;
+		SetDefaultTextColors(nc, rc);
+
+		Gui->setTop(oldTop);
+		Containers.erase(std::find(Containers.begin(), Containers.end(), container));
+		delete container;
+	} catch (const std::exception &exception) {
+		stratagus::exception::report(exception);
+		exit(-1);
 	}
-	GetDefaultTextColors(nc, rc);
-
-	//Wyrmgus start
-	GameEstablishing = true;
-	//Wyrmgus end
-	CreateGame(filename, &CMap::Map);
-
-	//Wyrmgus start
-//	UI.StatusLine.Set(NameLine);
-	//Wyrmgus end
-	//Wyrmgus start
-	//commented this out because it seemed superfluous
-//	SetMessage("%s", _("Do it! Do it now!"));
-	//Wyrmgus end
-	
-	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
-	}
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
-
-	//  Play the game.
-	GameMainLoop();
-
-	//  Clear screen
-	Video.ClearScreen();
-	Invalidate();
-
-	CleanGame();
-	current_interface_state = interface_state::menu;
-	SetDefaultTextColors(nc, rc);
-
-	Gui->setTop(oldTop);
-	Containers.erase(std::find(Containers.begin(), Containers.end(), container));
-	delete container;
 }
 
 void FreeAllContainers()
