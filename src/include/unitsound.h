@@ -45,7 +45,9 @@
 
 #define ANIMATIONS_DEATHTYPES 40
 
-class CSound;
+namespace stratagus {
+	class sound;
+}
 
 /**
 **  Sound definition
@@ -61,7 +63,7 @@ public:
 
 public:
 	std::string Name;     /// config sound name
-	CSound *Sound;        /// identifier send to sound server
+	stratagus::sound *Sound;        /// identifier send to sound server
 };
 
 /**
@@ -114,7 +116,7 @@ public:
 extern void LoadUnitSounds();
 
 /**
-**  Performs the mapping between sound names and CSound* for each unit type.
+**  Performs the mapping between sound names and sound* for each unit type.
 **  Set ranges for some sounds (infinite range for acknowledge and help sounds).
 */
 extern void MapUnitSounds();

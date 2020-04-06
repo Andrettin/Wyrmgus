@@ -48,7 +48,7 @@
 **  @param name  Name of the sound (now freed by caller!).
 **  @param id    Sound identifier.
 */
-void MapSound(const std::string &name, CSound *id)
+void MapSound(const std::string &name, stratagus::sound *id)
 {
 	if (!id) {
 		DebugPrint("Null Sound for %s is not acceptable by sound table\n" _C_ name.c_str());
@@ -56,7 +56,7 @@ void MapSound(const std::string &name, CSound *id)
 	}
 
 	if (name != id->get_identifier()) {
-		CSound::add_instance_alias(id, name);
+		stratagus::sound::add_instance_alias(id, name);
 	}
 }
 
@@ -72,9 +72,9 @@ void MapSound(const std::string &name, CSound *id)
 **
 **  @return      the sound id of the created group
 */
-CSound *MakeSound(const std::string &name, const std::vector<std::filesystem::path> &files)
+stratagus::sound *MakeSound(const std::string &name, const std::vector<std::filesystem::path> &files)
 {
-	CSound *sound = CSound::try_get(name);
+	stratagus::sound *sound = stratagus::sound::try_get(name);
 
 	if (sound) {
 		DebugPrint("re-register sound '%s'\n" _C_ name.c_str());
@@ -98,9 +98,9 @@ CSound *MakeSound(const std::string &name, const std::vector<std::filesystem::pa
 **
 **  @return        Registered sound identifier.
 */
-CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
+stratagus::sound *MakeSoundGroup(const std::string &name, stratagus::sound *first, stratagus::sound *second)
 {
-	CSound *sound = CSound::try_get(name);
+	stratagus::sound *sound = stratagus::sound::try_get(name);
 
 	if (sound) {
 		DebugPrint("re-register sound '%s'\n" _C_ name.c_str());

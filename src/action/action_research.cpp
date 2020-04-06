@@ -169,8 +169,8 @@
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start
-//			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
-			CSound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
+//			stratagus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			stratagus::sound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
 			//Wyrmgus end
 
 			if (sound) {

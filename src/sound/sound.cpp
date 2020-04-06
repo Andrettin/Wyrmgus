@@ -65,7 +65,7 @@ GameSound GameSounds;
 */
 struct SelectionHandling {
 	Origin Source;         /// origin of the sound
-	CSound *Sound;         /// last sound played by this unit
+	stratagus::sound *sound;         /// last sound played by this unit
 	unsigned char HowMany; /// number of sound played in this group
 };
 
@@ -82,7 +82,7 @@ int DistanceSilent;              /// silent distance
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static CSample *SimpleChooseSample(const CSound &sound)
+static CSample *SimpleChooseSample(const stratagus::sound &sound)
 {
 	if (sound.Number == ONE_SOUND) {
 		return sound.Sound.OneSound;
@@ -96,7 +96,7 @@ static CSample *SimpleChooseSample(const CSound &sound)
 /**
 **  Choose the sample to play
 */
-static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
+static CSample *ChooseSample(stratagus::sound *sound, bool selection, Origin &source)
 {
 	CSample *result = nullptr;
 
@@ -106,37 +106,37 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 
 	if (sound->Number == TWO_GROUPS) {
 		// handle a special sound (selection)
-		if (SelectionHandler.Sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
-			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
-				result = SimpleChooseSample(*SelectionHandler.Sound);
+		if (SelectionHandler.sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
+			if (SelectionHandler.sound == sound->Sound.TwoGroups.First) {
+				result = SimpleChooseSample(*SelectionHandler.sound);
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= 3) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups.Second;
+					SelectionHandler.sound = sound->Sound.TwoGroups.Second;
 				}
 			} else {
 				//FIXME: checks for error
 				// check whether the second group is really a group
-				if (SelectionHandler.Sound->Number > 1) {
+				if (SelectionHandler.sound->Number > 1) {
 					//Wyrmgus start
 //					result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
-					result = SimpleChooseSample(*SelectionHandler.Sound);
+					result = SimpleChooseSample(*SelectionHandler.sound);
 					//Wyrmgus end
 					SelectionHandler.HowMany++;
-					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
+					if (SelectionHandler.HowMany >= SelectionHandler.sound->Number) {
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+						SelectionHandler.sound = sound->Sound.TwoGroups.First;
 					}
 				} else {
-					result = SelectionHandler.Sound->Sound.OneSound;
+					result = SelectionHandler.sound->Sound.OneSound;
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+					SelectionHandler.sound = sound->Sound.TwoGroups.First;
 				}
 			}
 		} else {
 			SelectionHandler.Source = source;
-			SelectionHandler.Sound = sound->Sound.TwoGroups.First;
-			result = SimpleChooseSample(*SelectionHandler.Sound);
+			SelectionHandler.sound = sound->Sound.TwoGroups.First;
+			result = SimpleChooseSample(*SelectionHandler.sound);
 			SelectionHandler.HowMany = 1;
 		}
 	} else {
@@ -144,7 +144,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 		result = SimpleChooseSample(*sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
 			SelectionHandler.HowMany = 0;
-			SelectionHandler.Sound = nullptr;
+			SelectionHandler.sound = nullptr;
 		}
 		if (selection) {
 			SelectionHandler.Source = source;
@@ -155,14 +155,14 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 }
 
 /**
-**  Maps a UnitVoiceGroup to a CSound*.
+**  Maps a UnitVoiceGroup to a sound*.
 **
 **  @param unit    Sound initiator
 **  @param voice   Type of sound wanted
 **
 **  @return        Sound identifier
 */
-static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
+static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	//Wyrmgus start
 	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
@@ -442,7 +442,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		return;
 	}
 	
-	CSound *sound = ChooseUnitVoiceSound(unit, voice);
+	stratagus::sound *sound = ChooseUnitVoiceSound(unit, voice);
 	if (!sound) {
 		return;
 	}
@@ -479,7 +479,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 **  @param unit   Sound initiator, unit speaking
 **  @param sound  Sound to be generated
 */
-void PlayUnitSound(const CUnit &unit, CSound *sound)
+void PlayUnitSound(const CUnit &unit, stratagus::sound *sound)
 {
 	//Wyrmgus start
 	if (!&unit) {
@@ -518,7 +518,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 **  @param missile  Sound initiator, missile exploding
 **  @param sound    Sound to be generated
 */
-void PlayMissileSound(const Missile &missile, CSound *sound)
+void PlayMissileSound(const Missile &missile, stratagus::sound *sound)
 {
 	if (!sound) {
 		return;
@@ -551,7 +551,7 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 **  @param sound   Sound to play
 **  @param volume  Volume level to play the sound
 */
-void PlayGameSound(CSound *sound, unsigned char volume, bool always)
+void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always)
 {
 	if (!sound) {
 		return;
@@ -619,7 +619,7 @@ int PlayFile(const std::string &filepath, LuaActionListener *listener)
 **  @param sound  the id of the sound to modify.
 **  @param range  the new range for this sound.
 */
-void SetSoundRange(CSound *sound, unsigned char range)
+void SetSoundRange(stratagus::sound *sound, unsigned char range)
 {
 	if (sound != nullptr) {
 		sound->range = range;
@@ -633,7 +633,7 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **  @param sound  the id of the sound to modify.
 **  @param volume_percent  the new volume percent for this sound.
 */
-void SetSoundVolumePercent(CSound *sound, int volume_percent)
+void SetSoundVolumePercent(stratagus::sound *sound, int volume_percent)
 {
 	if (sound != nullptr) {
 		sound->VolumePercent = volume_percent;
@@ -653,9 +653,9 @@ void SetSoundVolumePercent(CSound *sound, int volume_percent)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
+stratagus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
 {
-	CSound *id = CSound::add(identifier, nullptr);
+	stratagus::sound *id = stratagus::sound::add(identifier, nullptr);
 	size_t number = files.size();
 
 	id->files = files;
@@ -672,12 +672,12 @@ CSound *RegisterSound(const std::string &identifier, const std::vector<std::file
 **
 **  @return        the special sound unique identifier
 */
-CSound *RegisterTwoGroups(const std::string &identifier, CSound *first, CSound *second)
+stratagus::sound *RegisterTwoGroups(const std::string &identifier, stratagus::sound *first, stratagus::sound *second)
 {
 	if (first == nullptr || second == nullptr) {
 		return nullptr;
 	}
-	CSound *id = CSound::add(identifier, nullptr);
+	stratagus::sound *id = stratagus::sound::add(identifier, nullptr);
 	id->Number = TWO_GROUPS;
 	id->Sound.TwoGroups.First = first;
 	id->Sound.TwoGroups.Second = second;
@@ -760,7 +760,9 @@ void InitSoundClient()
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }
 
-CSound::~CSound()
+namespace stratagus {
+
+sound::~sound()
 {
 	if (this->Number == ONE_SOUND) {
 		delete Sound.OneSound;
@@ -777,7 +779,7 @@ CSound::~CSound()
 	}
 }
 
-void CSound::initialize()
+void sound::initialize()
 {
 	const size_t file_count = this->get_files().size();
 	if (file_count > 1) { // load a sound group
@@ -795,12 +797,12 @@ void CSound::initialize()
 	data_entry::initialize();
 }
 
-void CSound::ProcessConfigData(const CConfigData *config_data)
+void sound::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string ident = config_data->Ident;
 	ident = FindAndReplaceString(ident, "_", "-");
 	std::vector<std::filesystem::path> files;
-	std::vector<CSound *> group_sounds; //sounds for sound group
+	std::vector<sound *> group_sounds; //sounds for sound group
 	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -811,7 +813,7 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 			files.push_back(file);
 		} else if (key == "group_sound") {
 			value = FindAndReplaceString(value, "_", "-");
-			CSound *group_sound = CSound::get(value);
+			sound *group_sound = sound::get(value);
 			if (group_sound) {
 				group_sounds.push_back(group_sound);
 			} else {
@@ -822,7 +824,7 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	CSound *sound = nullptr;
+	sound *sound = nullptr;
 	if (group_sounds.size() >= 2) {
 		sound = MakeSoundGroup(ident, group_sounds[0], group_sounds[1]);
 	} else {
@@ -830,17 +832,19 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-QVariantList CSound::get_files_qvariant_list() const
+QVariantList sound::get_files_qvariant_list() const
 {
-	return stratagus::container::to_qvariant_list(this->get_files());
+	return container::to_qvariant_list(this->get_files());
 }
 
-void CSound::add_file(const std::filesystem::path &filepath)
+void sound::add_file(const std::filesystem::path &filepath)
 {
-	this->files.push_back(stratagus::database::get_sounds_path(this->get_module()) / filepath);
+	this->files.push_back(database::get_sounds_path(this->get_module()) / filepath);
 }
 
-void CSound::remove_file(const std::filesystem::path &filepath)
+void sound::remove_file(const std::filesystem::path &filepath)
 {
-	stratagus::vector::remove(this->files, filepath);
+	vector::remove(this->files, filepath);
+}
+
 }

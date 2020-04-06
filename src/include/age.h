@@ -36,7 +36,7 @@ class CUpgrade;
 
 namespace stratagus {
 
-class age : public data_entry, public data_type<age>
+class age final : public data_entry, public data_type<age>
 {
 	Q_OBJECT
 

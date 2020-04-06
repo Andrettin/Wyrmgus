@@ -59,12 +59,12 @@
 */
 static int CclSoundForName(lua_State *l)
 {
-	CSound *id;
+	stratagus::sound *id;
 	const char *sound_name;
 	LuaUserData *data;
 
 	sound_name = LuaToString(l, -1);
-	id = CSound::get(sound_name);
+	id = stratagus::sound::get(sound_name);
 
 	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
@@ -79,7 +79,7 @@ static int CclSoundForName(lua_State *l)
 **
 **  @return   The C sound id.
 */
-static CSound *CclGetSound(lua_State *l)
+static stratagus::sound *CclGetSound(lua_State *l)
 {
 	LuaUserData *data;
 	int pop;
@@ -95,7 +95,7 @@ static CSound *CclGetSound(lua_State *l)
 			if (pop) {
 				lua_pop(l, 1);
 			}
-			return (CSound *)data->Data;
+			return static_cast<stratagus::sound *>(data->Data);
 		}
 	}
 	LuaError(l, "CclGetSound: not a sound");
@@ -119,7 +119,7 @@ static int CclMakeSound(lua_State *l)
 
 	std::string c_name = LuaToString(l, 1);
 	std::vector<std::filesystem::path> files;
-	CSound *id;
+	stratagus::sound *id;
 	if (lua_isstring(l, 2)) {
 		// only one file
 		files.push_back(LuaToString(l, 2));
@@ -152,10 +152,10 @@ static int CclMakeSound(lua_State *l)
 */
 static int CclMakeSoundGroup(lua_State *l)
 {
-	CSound *id;
+	stratagus::sound *id;
 	std::string c_name;
-	CSound *first;
-	CSound *second;
+	stratagus::sound *first;
+	stratagus::sound *second;
 	LuaUserData *data;
 
 	LuaCheckArgs(l, 3);
@@ -205,7 +205,7 @@ static int CclPlaySound(lua_State *l)
 	}
 
 	lua_pushvalue(l, 1);
-	CSound *id = CclGetSound(l);
+	stratagus::sound *id = CclGetSound(l);
 	lua_pop(l, 1);
 	bool always = false;
 	if (args == 2) {
@@ -232,7 +232,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "Sound id expected");
 	}
 	lua_pop(l, 1);
-	soundConfigs[civilization->ID].Sound = (CSound *)data->Data;
+	soundConfigs[civilization->ID].Sound = static_cast<stratagus::sound *>(data->Data);
 }
 
 /**
@@ -258,13 +258,13 @@ static int CclDefineGameSounds(lua_State *l)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.Click.Sound = (CSound *)data->Data;
+			GameSounds.Click.Sound = static_cast<stratagus::sound *>(data->Data);
 		} else if (!strcmp(value, "transport-docking")) {
 			if (!lua_isuserdata(l, j + 1)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.Docking.Sound = (CSound *)data->Data;
+			GameSounds.Docking.Sound = static_cast<stratagus::sound *>(data->Data);
 		} else if (!strcmp(value, "placement-error")) {
 			SetSoundConfigRace(l, j, GameSounds.PlacementError);
 		} else if (!strcmp(value, "placement-success")) {
@@ -290,7 +290,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.NotEnoughRes[civilization->ID][resId].Sound = (CSound *)data->Data;
+			GameSounds.NotEnoughRes[civilization->ID][resId].Sound = static_cast<stratagus::sound *>(data->Data);
 		} else if (!strcmp(value, "not-enough-food")) {
 			SetSoundConfigRace(l, j, GameSounds.NotEnoughFood);
 		} else if (!strcmp(value, "rescue")) {
@@ -302,7 +302,7 @@ static int CclDefineGameSounds(lua_State *l)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.ChatMessage.Sound = (CSound *)data->Data;
+			GameSounds.ChatMessage.Sound = static_cast<stratagus::sound *>(data->Data);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -334,7 +334,6 @@ static int CclSetGlobalSoundRange(lua_State *l)
 */
 static int CclSetSoundRange(lua_State *l)
 {
-
 	LuaCheckArgs(l, 2);
 
 	int tmp = LuaToNumber(l, 2);
@@ -342,7 +341,7 @@ static int CclSetSoundRange(lua_State *l)
 	const unsigned char theRange = static_cast<unsigned char>(tmp);
 
 	lua_pushvalue(l, 1);
-	CSound *id = CclGetSound(l);
+	stratagus::sound *id = CclGetSound(l);
 	SetSoundRange(id, theRange);
 	return 1;
 }
@@ -355,11 +354,10 @@ static int CclSetSoundRange(lua_State *l)
 */
 static int CclSetSoundVolumePercent(lua_State *l)
 {
-
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
-	CSound *id = CclGetSound(l);
+	stratagus::sound *id = CclGetSound(l);
 	SetSoundVolumePercent(id, LuaToNumber(l, 2));
 	return 1;
 }
@@ -371,9 +369,9 @@ static int CclSetSoundVolumePercent(lua_State *l)
 */
 static int CclGetSounds(lua_State *l)
 {
-	lua_createtable(l, CSound::get_all().size(), 0);
+	lua_createtable(l, stratagus::sound::get_all().size(), 0);
 	int j = 1;
-	for (auto it = CSound::get_all().begin(); it != CSound::get_all().end(); ++it) {
+	for (auto it = stratagus::sound::get_all().begin(); it != stratagus::sound::get_all().end(); ++it) {
 		lua_pushstring(l, (*it)->get_identifier().c_str());
 		lua_rawseti(l, -2, j);
 		++j;

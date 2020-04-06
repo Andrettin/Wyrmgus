@@ -119,7 +119,12 @@ static constexpr int INFINITE_SOUND_RANGE = 255;
 */
 static constexpr int MAX_SOUND_RANGE = 254;
 
-class CSound : public stratagus::data_entry, public stratagus::data_type<CSound>
+/// Register a sound (can be a simple sound or a group)
+extern stratagus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
+
+namespace stratagus {
+
+class sound final : public data_entry, public data_type<sound>
 {
 	Q_OBJECT
 
@@ -130,12 +135,12 @@ public:
 	static constexpr const char *class_identifier = "sound";
 	static constexpr const char *database_folder = "sounds";
 
-	CSound(const std::string &identifier) : data_entry(identifier)
+	sound(const std::string &identifier) : data_entry(identifier)
 	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
 
-	~CSound();
+	~sound();
 
 	virtual void initialize() override;
 
@@ -167,16 +172,18 @@ public:
 		CSample *OneSound;       /// if it's only a simple sound
 		CSample **OneGroup;      /// when it's a simple group
 		struct {
-			CSound *First;       /// first group: selected sound
-			CSound *Second;      /// second group: annoyed sound
+			sound *First;       /// first group: selected sound
+			sound *Second;      /// second group: annoyed sound
 		} TwoGroups;             /// when it's a double group
 	} Sound;
 
 private:
 	std::vector<std::filesystem::path> files; //the paths to the sound files
 
-	friend CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
+	friend sound *::RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 };
+
+}
 
 /**
 **  Origin of a sound
@@ -210,28 +217,25 @@ extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char ran
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, CSound *sound);
+extern void PlayUnitSound(const CUnit &unit, stratagus::sound *sound);
 /// Play a missile sound
-extern void PlayMissileSound(const Missile &missile, CSound *sound);
+extern void PlayMissileSound(const Missile &missile, stratagus::sound *sound);
 /// Play a game sound
-extern void PlayGameSound(CSound *sound, unsigned char volume, bool always = false);
+extern void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always = false);
 
 /// Play a sound file
 extern int PlayFile(const std::string &name, LuaActionListener *listener = nullptr);
 
 /// Modify the range of a given sound.
-extern void SetSoundRange(CSound *sound, unsigned char range);
+extern void SetSoundRange(stratagus::sound *sound, unsigned char range);
 
 //Wyrmgus start
 /// Modify the volume percent of a given sound.
-extern void SetSoundVolumePercent(CSound *sound, int volume_percent);
+extern void SetSoundVolumePercent(stratagus::sound *sound, int volume_percent);
 //Wyrmgus end
 
-/// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
-
 ///  Create a special sound group with two sounds
-extern CSound *RegisterTwoGroups(const std::string &identifier, CSound *first, CSound *second);
+extern stratagus::sound *RegisterTwoGroups(const std::string &identifier, stratagus::sound *first, stratagus::sound *second);
 
 /// Initialize client side of the sound layer.
 extern void InitSoundClient();
@@ -265,11 +269,11 @@ extern void ShutdownMusicOAML();
 // sound_id.cpp
 
 /// Map sound to identifier
-extern void MapSound(const std::string &sound_name, CSound *id);
+extern void MapSound(const std::string &sound_name, stratagus::sound *id);
 /// Make a sound bound to identifier
-extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::filesystem::path> &files);
+extern stratagus::sound *MakeSound(const std::string &sound_name, const std::vector<std::filesystem::path> &files);
 /// Make a sound group bound to identifier
-extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
+extern stratagus::sound *MakeSoundGroup(const std::string &name, stratagus::sound *first, stratagus::sound *second);
 
 // script_sound.cpp
 

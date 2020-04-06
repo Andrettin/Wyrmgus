@@ -359,7 +359,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 		} else if (config_data->Tag == "sound") {
 			if (!define_only) {
-				CSound::ProcessConfigData(config_data);
+				stratagus::sound::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "spell") {
 			CSpell *spell = CSpell::GetOrAddSpell(ident);

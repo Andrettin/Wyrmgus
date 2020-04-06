@@ -3210,7 +3210,7 @@ void UIHandleButtonUp(unsigned button)
 					PlayUnitSound(*Selected[0], UnitVoiceGroup::Building);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
-					PlayGameSound(CSound::get("burning"), MaxSampleVolume);
+					PlayGameSound(stratagus::sound::get("burning"), MaxSampleVolume);
 				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
 						   || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) {
 					PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);

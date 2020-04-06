@@ -64,7 +64,7 @@
 bool SoundConfig::MapSound()
 {
 	if (!this->Name.empty()) {
-		this->Sound = CSound::get(this->Name);
+		this->Sound = stratagus::sound::get(this->Name);
 	}
 	return this->Sound != nullptr;
 }
