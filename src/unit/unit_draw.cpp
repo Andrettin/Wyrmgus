@@ -50,7 +50,8 @@
 #include "map/tileset.h"
 #include "player.h"
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
@@ -59,7 +60,6 @@
 #include "unit/unittype.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

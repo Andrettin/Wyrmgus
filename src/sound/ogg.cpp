@@ -48,7 +48,7 @@
 
 #include "iolib.h"
 #include "movie.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -629,6 +629,13 @@ set(stratagus_religion_HDRS
 	src/include/religion/religion.h
 )
 
+set(stratagus_sound_HDRS
+	src/sound/script_sound.h
+	src/sound/sound.h
+	src/sound/sound_server.h
+	src/sound/unitsound.h
+)
+
 set(stratagus_spell_HDRS
 	src/include/spell/spell_adjustvariable.h
 	src/include/spell/spell_adjustvital.h
@@ -756,11 +763,8 @@ set(stratagus_generic_HDRS
 	src/include/results.h
 	src/include/school_of_magic.h
 	src/include/script.h
-	src/include/script_sound.h
 	src/include/settings.h
 	src/include/shaders.h
-	src/include/sound.h
-	src/include/sound_server.h
 	src/include/spells.h
 	src/include/stratagus.h
 	src/include/text.h
@@ -768,7 +772,6 @@ set(stratagus_generic_HDRS
 	src/include/translate.h
 	src/include/trigger.h
 	src/include/trigger_effect.h
-	src/include/unitsound.h
 	src/include/vec2i.h
 	src/include/version.h
 	src/include/video.h
@@ -786,6 +789,7 @@ source_group(database FILES ${stratagus_database_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(include\\map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
+source_group(sound FILES ${stratagus_sound_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
@@ -803,6 +807,7 @@ set(stratagus_HDRS
 	${stratagus_guichan_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_religion_HDRS}
+	${stratagus_sound_HDRS}
 	${stratagus_spell_HDRS}
 	${stratagus_time_HDRS}
 	${stratagus_ui_HDRS}

@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "sound.h"
+#include "sound/sound.h"
 
 #include "action/action_resource.h"
 #include "civilization.h"
@@ -43,7 +43,7 @@
 #include "map/tileset.h"
 #include "mod.h"
 #include "missile.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/container_util.h"

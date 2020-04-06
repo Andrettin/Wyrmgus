@@ -47,7 +47,7 @@
 #include "pathfinder.h"
 #include "script.h"
 #include "settings.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

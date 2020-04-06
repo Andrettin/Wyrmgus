@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "sound_server.h"
+#include "sound/sound_server.h"
 
 #include "civilization.h"
 #include "iocompat.h"

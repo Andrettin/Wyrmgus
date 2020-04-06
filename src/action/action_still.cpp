@@ -55,7 +55,7 @@
 #include "script.h"
 #include "settings.h"
 //Wyrmgus start
-#include "sound.h"
+#include "sound/sound.h"
 //Wyrmgus end
 #include "spells.h"
 #include "unit/unit.h"

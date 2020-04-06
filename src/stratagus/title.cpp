@@ -27,14 +27,12 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 #include "title.h"
 #include "video.h"
 #include "movie.h"
 #include "font.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 #include "editor.h"
 
 
@@ -205,5 +203,3 @@ void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond)
 
 	titleScreen.ShowTitleImage();
 }
-
-//@}

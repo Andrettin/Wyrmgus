@@ -42,15 +42,11 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "network.h"
-#include "sound.h"
-#include "sound_server.h"
+#include "sound/sound.h"
+#include "sound/sound_server.h"
 #include "video.h"
 
 #include "SDL.h"
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Variables

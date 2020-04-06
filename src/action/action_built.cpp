@@ -44,7 +44,7 @@
 #include "player.h"
 #include "quest.h"
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "translate.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

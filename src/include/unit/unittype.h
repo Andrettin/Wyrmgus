@@ -37,7 +37,7 @@
 #include "data_type.h"
 #include "icons.h"
 #include "missileconfig.h"
-#include "unitsound.h"
+#include "sound/unitsound.h"
 #include "ui/button_cmd.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"

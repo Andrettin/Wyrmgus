@@ -232,7 +232,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit/unit.h"

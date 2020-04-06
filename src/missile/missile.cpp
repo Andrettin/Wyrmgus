@@ -49,7 +49,8 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "spells.h"
 #include "trigger.h"
 #include "ui/ui.h"
@@ -57,7 +58,6 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "unit/unit_type_type.h"
-#include "unitsound.h"
 #include "util/string_util.h"
 #include "video.h"
 

@@ -54,7 +54,7 @@
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "school_of_magic.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "spells.h"
 #include "time/calendar.h"
 #include "time/season.h"

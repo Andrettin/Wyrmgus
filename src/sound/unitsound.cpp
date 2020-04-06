@@ -35,27 +35,19 @@
 
 #include "stratagus.h"
 
-#include "unitsound.h"
+#include "sound/unitsound.h"
 
 #include "animation/animation_randomsound.h"
 #include "animation/animation_sound.h"
 #include "civilization.h"
 #include "map/map.h"
 #include "player.h"
-#include "sound.h"
-#include "sound_server.h"
+#include "sound/sound.h"
+#include "sound/sound_server.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
 #include "unit/unit_type_variation.h"
 #include "video.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

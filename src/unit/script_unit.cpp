@@ -49,7 +49,7 @@
 #include "player.h"
 #include "script.h"
 //Wyrmgus start
-#include "sound.h"
+#include "sound/sound.h"
 //Wyrmgus end
 #include "spells.h"
 //Wyrmgus start

@@ -64,8 +64,8 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "sound.h"
-#include "sound_server.h"
+#include "sound/sound.h"
+#include "sound/sound_server.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"

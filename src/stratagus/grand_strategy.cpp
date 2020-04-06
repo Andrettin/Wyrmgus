@@ -44,7 +44,7 @@
 #include "menus.h"
 #include "player.h"
 #include "results.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

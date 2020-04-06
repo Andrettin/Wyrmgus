@@ -33,8 +33,7 @@
 //@{
 
 #include "animation.h"
-#include "unitsound.h"
-
+#include "sound/unitsound.h"
 
 class CAnimation_Sound : public CAnimation
 {

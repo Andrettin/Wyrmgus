@@ -37,7 +37,7 @@
 
 #include "data_type.h"
 #include "luacallback.h"
-#include "unitsound.h"
+#include "sound/unitsound.h"
 #include "vec2i.h"
 
 #ifdef __MORPHOS__

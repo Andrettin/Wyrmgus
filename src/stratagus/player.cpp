@@ -69,7 +69,8 @@
 #include "religion/religion.h"
 #include "settings.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
@@ -81,7 +82,6 @@
 #include "unit/unittype.h"
 //Wyrmgus end
 #include "unit/unit_type_type.h"
-#include "unitsound.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"

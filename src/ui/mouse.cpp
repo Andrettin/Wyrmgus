@@ -58,7 +58,8 @@
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
@@ -68,7 +69,6 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "unit/unit_type_type.h"
-#include "unitsound.h"
 #include "upgrade/dependency.h"
 #include "video.h"
 #include "widgets.h"

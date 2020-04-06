@@ -52,7 +52,7 @@
 #include "province.h"
 #include "quest.h"
 #include "settings.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 //Wyrmgus end
 #include "time/calendar.h"
 #include "time/season.h"

@@ -51,7 +51,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "spell/spell_adjustvariable.h"
 #include "spell/spell_spawnmissile.h"
 #include "unit/unit.h"

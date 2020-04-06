@@ -27,18 +27,15 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
 
-
 #include "SDL.h"
 
-#include "sound_server.h"
+#include "sound/sound_server.h"
 #include "script.h"
 #include "iolib.h"
 
@@ -195,5 +192,3 @@ void ShutdownMusicOAML()
 }
 
 #endif
-
-//@}

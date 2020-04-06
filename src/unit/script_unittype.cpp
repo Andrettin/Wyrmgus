@@ -58,7 +58,8 @@
 #include "quest.h" //for updating levels
 //Wyrmgus end
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "spells.h"
 #include "time/season.h"
 #include "ui/button_action.h"
@@ -68,7 +69,6 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

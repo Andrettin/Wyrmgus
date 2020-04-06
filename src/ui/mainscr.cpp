@@ -52,7 +52,8 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "spells.h"
 #include "time/calendar.h"
 #include "time/season.h"
@@ -67,7 +68,6 @@
 #include "unit/unit.h"
 #include "unit/unittype.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end

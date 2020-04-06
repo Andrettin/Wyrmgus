@@ -50,7 +50,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "settings.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit/unit.h"

@@ -43,14 +43,14 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "player.h"
-#include "sound.h"
+#include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
-#include "unitsound.h"
 #include "unit/unittype.h"
 #include "unit/unit_type_type.h"
 
