@@ -587,7 +587,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	if (units.empty()) {
 		return 0;
 	}
-	if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
+	if (mode == GroupSelectionMode::SELECT_ALL || !IsGroupTainted(group_number)) {
 		ChangeSelectedUnits(const_cast<CUnit **>(&units[0]), units.size());
 		return Selected.size();
 	}

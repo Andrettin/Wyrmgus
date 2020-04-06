@@ -83,7 +83,7 @@ enum class UnitTypeType;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
-enum GroupSelectionMode {
+enum class GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
 	NON_SELECTABLE_BY_RECTANGLE_ONLY,
 	SELECT_ALL
@@ -827,7 +827,7 @@ public:
 	//Wyrmgus end
 	bool CanMove() const;
 
-	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
+	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
 	void SetParent(CUnitType *parent_type);

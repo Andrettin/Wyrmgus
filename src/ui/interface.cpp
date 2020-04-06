@@ -210,7 +210,7 @@ static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_g
 **  @todo Improve this function, try to show all selected units
 **        or the most possible units.
 */
-static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
+static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY)
 {
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
 
@@ -236,7 +236,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 **
 **  @param group  Group number to select.
 */
-static void UiSelectGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
+static void UiSelectGroup(unsigned group, GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY)
 {
 	SelectGroup(group, mode);
 	SelectionChanged();
@@ -681,9 +681,9 @@ static void CommandKey_Group(int group)
 	if (KeyModifiers & ModifierShift) {
 		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
 			if (KeyModifiers & ModifierDoublePress) {
-				UiCenterOnGroup(group, SELECT_ALL);
+				UiCenterOnGroup(group, GroupSelectionMode::SELECT_ALL);
 			} else {
-				UiSelectGroup(group, SELECT_ALL);
+				UiSelectGroup(group, GroupSelectionMode::SELECT_ALL);
 			}
 		} else if (KeyModifiers & ModifierControl) {
 			UiAddToGroup(group);
@@ -694,9 +694,9 @@ static void CommandKey_Group(int group)
 		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
 			if (KeyModifiers & ModifierAlt) {
 				if (KeyModifiers & ModifierDoublePress) {
-					UiCenterOnGroup(group, NON_SELECTABLE_BY_RECTANGLE_ONLY);
+					UiCenterOnGroup(group, GroupSelectionMode::NON_SELECTABLE_BY_RECTANGLE_ONLY);
 				} else {
-					UiSelectGroup(group, NON_SELECTABLE_BY_RECTANGLE_ONLY);
+					UiSelectGroup(group, GroupSelectionMode::NON_SELECTABLE_BY_RECTANGLE_ONLY);
 				}
 			} else {
 				UiCenterOnGroup(group);

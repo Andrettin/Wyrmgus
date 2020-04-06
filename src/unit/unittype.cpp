@@ -1335,9 +1335,9 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 {
 	if (!BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		switch (mode) {
-			case SELECTABLE_BY_RECTANGLE_ONLY:
+			case GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY:
 				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
-			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
+			case GroupSelectionMode::NON_SELECTABLE_BY_RECTANGLE_ONLY:
 				return !BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
 			default:
 				return true;
