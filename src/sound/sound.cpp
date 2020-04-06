@@ -778,15 +778,16 @@ CSound::~CSound()
 
 void CSound::initialize()
 {
-	if (this->files.size() > 1) { // load a sound group
-		this->Sound.OneGroup = new CSample * [this->files.size()];
-		memset(this->Sound.OneGroup, 0, sizeof(CSample *) * this->files.size());
-		this->Number = this->files.size();
-		for (unsigned int i = 0; i < this->files.size(); ++i) {
+	const size_t file_count = this->get_files().size();
+	if (file_count > 1) { // load a sound group
+		this->Sound.OneGroup = new CSample * [file_count];
+		memset(this->Sound.OneGroup, 0, sizeof(CSample *) * file_count);
+		this->Number = file_count;
+		for (size_t i = 0; i < file_count; ++i) {
 			this->Sound.OneGroup[i] = LoadSample(this->files[i]);
 		}
-	} else if (this->files.size() == 1) { // load a unique sound
-		this->Sound.OneSound = LoadSample(this->files[0]);
+	} else if (file_count == 1) { // load a unique sound
+		this->Sound.OneSound = LoadSample(this->files.front());
 		this->Number = ONE_SOUND;
 	}
 
@@ -826,6 +827,11 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	} else {
 		sound = MakeSound(ident, files);
 	}
+}
+
+void CSound::add_file(const std::filesystem::path &filepath)
+{
+	this->files.push_back(stratagus::database::get_sounds_path(this->get_module()) / filepath);
 }
 
 void CSound::remove_file(const std::filesystem::path &filepath)

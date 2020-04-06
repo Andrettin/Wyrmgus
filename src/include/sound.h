@@ -151,11 +151,7 @@ public:
 		return this->files;
 	}
 
-	Q_INVOKABLE void add_file(const std::filesystem::path &filepath)
-	{
-		this->files.push_back(filepath);
-	}
-		
+	Q_INVOKABLE void add_file(const std::filesystem::path &filepath);
 	Q_INVOKABLE void remove_file(const std::filesystem::path &filepath);
 		
 	/**
