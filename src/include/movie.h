@@ -82,8 +82,6 @@ extern int OggInit(CFile *f, OggData *data);
 extern void OggFree(OggData *data);
 extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f);
 
-extern int VorbisProcessData(OggData *data, char *buffer);
-
 #endif // USE_VORBIS
 
 /// Play a movie file

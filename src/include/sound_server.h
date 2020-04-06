@@ -80,8 +80,6 @@ private:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CSample *LoadVorbis(const char *name, int flags);		/// Load a vorbis file
-
 /// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);
 /// Set the channel stereo

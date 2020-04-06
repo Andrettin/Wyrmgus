@@ -233,7 +233,7 @@ int PlayMovie(const std::string &name)
 	}
 
 	StopMusic();
-	CSample *sample = LoadVorbis(filename.c_str(), PlayAudioStream);
+	CSample *sample = LoadSample(filename);
 	if (sample) {
 		if ((sample->get_format().channelCount() != 1 && sample->get_format().channelCount() != 2) || sample->get_format().sampleSize() != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");
