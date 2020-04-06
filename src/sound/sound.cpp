@@ -46,6 +46,7 @@
 #include "sound_server.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/container_util.h"
 #include "util/vector_util.h"
 #include "video.h"
 #include "widgets.h"
@@ -827,6 +828,11 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	} else {
 		sound = MakeSound(ident, files);
 	}
+}
+
+QVariantList CSound::get_files_qvariant_list() const
+{
+	return stratagus::container::to_qvariant_list(this->get_files());
 }
 
 void CSound::add_file(const std::filesystem::path &filepath)

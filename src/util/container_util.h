@@ -39,7 +39,13 @@ inline QVariantList to_qvariant_list(const T &container)
 	QVariantList list;
 
 	for (const typename T::value_type &element : container) {
-		list.append(QVariant::fromValue(element));
+		if constexpr (std::is_same_v<T::value_type, std::filesystem::path>) {
+			list.append(QVariant::fromValue(QString::fromStdString(element.string())));
+		} else if constexpr (std::is_same_v<T::value_type, std::string>) {
+			list.append(QVariant::fromValue(QString::fromStdString(element)));
+		} else {
+			list.append(QVariant::fromValue(element));
+		}
 	}
 
 	return list;

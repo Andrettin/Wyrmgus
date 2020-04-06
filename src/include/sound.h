@@ -123,7 +123,7 @@ class CSound : public stratagus::data_entry, public stratagus::data_type<CSound>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QVariantList files)
+	Q_PROPERTY(QVariantList files READ get_files_qvariant_list)
 	Q_PROPERTY(int range MEMBER range)
 
 public:
@@ -145,6 +145,8 @@ public:
 	{
 		return this->files;
 	}
+
+	QVariantList get_files_qvariant_list() const;
 
 	Q_INVOKABLE void add_file(const std::filesystem::path &filepath);
 	Q_INVOKABLE void remove_file(const std::filesystem::path &filepath);
