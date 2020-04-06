@@ -34,8 +34,8 @@
 
 #include "database/data_entry.h"
 #include "database/data_type.h"
+#include "sound/unitsound.h"
 #include "stratagus.h"
-#include "unitsound.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
