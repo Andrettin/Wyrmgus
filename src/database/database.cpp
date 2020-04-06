@@ -66,35 +66,10 @@ void database::process_sml_property_for_object(QObject *object, const sml_proper
 			continue;
 		}
 
-		QVariant::Type property_type = meta_property.type();
+		const QVariant::Type property_type = meta_property.type();
 
 		if (property_type == QVariant::Type::List) {
-			if (property.get_operator() == sml_operator::assignment) {
-				throw std::runtime_error("The assignment operator is not available for list properties.");
-			}
-
-			std::string method_name;
-			if (property.get_operator() == sml_operator::addition) {
-				method_name = "add_to_";
-			} else if (property.get_operator() == sml_operator::subtraction) {
-				method_name = "remove_from_";
-			}
-
-			method_name += property.get_key();
-
-			bool success = false;
-
-			if (property.get_key() == "dependencies") {
-				module *module_value = database::get()->get_module(property.get_value());
-				success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(module *, module_value));
-			} else {
-				throw std::runtime_error("Unknown type for list property \"" + std::string(property_name) + "\" (in class \"" + class_name + "\").");
-			}
-
-			if (!success) {
-				throw std::runtime_error("Failed to add or remove value for list property \"" + std::string(property_name) + "\".");
-			}
-
+			database::modify_list_property_for_object(object, property_name, property.get_operator(), property.get_value());
 			return;
 		} else {
 			QVariant new_property_value = database::process_sml_property_value(property, meta_property, object);
@@ -187,12 +162,20 @@ void database::process_sml_scope_for_object(QObject *object, const sml_data &sco
 			continue;
 		}
 
+		const QVariant::Type property_type = meta_property.type();
+
+		if (property_type == QVariant::Type::List && !scope.get_values().empty()) {
+			for (const std::string &value : scope.get_values()) {
+				database::modify_list_property_for_object(object, property_name, sml_operator::addition, value);
+			}
+			return;
+		}
+
 		QVariant new_property_value = database::process_sml_scope_value(scope, meta_property);
 		const bool success = object->setProperty(property_name, new_property_value);
 		if (!success) {
 			throw std::runtime_error("Failed to set value for scope property \"" + std::string(property_name) + "\".");
 		}
-
 		return;
 	}
 
@@ -230,6 +213,41 @@ QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaPro
 	}
 
 	return new_property_value;
+}
+
+void database::modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const std::string &value)
+{
+	const QMetaObject *meta_object = object->metaObject();
+	const std::string class_name = meta_object->className();
+
+	if (sml_operator == sml_operator::assignment) {
+		throw std::runtime_error("The assignment operator is not available for list properties.");
+	}
+
+	std::string method_name;
+	if (sml_operator == sml_operator::addition) {
+		method_name = "add_";
+	} else if (sml_operator == sml_operator::subtraction) {
+		method_name = "remove_";
+	}
+
+	method_name += string::get_singular_form(property_name);
+
+	bool success = false;
+
+	if (property_name == "dependencies") {
+		module *module_value = database::get()->get_module(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(module *, module_value));
+	} else if (property_name == "files") {
+		const std::filesystem::path filepath(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::filesystem::path &, filepath));
+	} else {
+		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
+	}
+
+	if (!success) {
+		throw std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\".");
+	}
 }
 
 std::filesystem::path database::get_base_path(const module *module)
