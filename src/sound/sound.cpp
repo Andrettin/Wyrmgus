@@ -8,7 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi,
 //		Jimmy Salmon and Andrettin
 //
@@ -107,12 +106,12 @@ static CSample *ChooseSample(stratagus::sound *sound, bool selection, Origin &so
 	if (sound->Number == TWO_GROUPS) {
 		// handle a special sound (selection)
 		if (SelectionHandler.sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
-			if (SelectionHandler.sound == sound->Sound.TwoGroups.First) {
+			if (SelectionHandler.sound == sound->get_first_sound()) {
 				result = SimpleChooseSample(*SelectionHandler.sound);
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= 3) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.sound = sound->Sound.TwoGroups.Second;
+					SelectionHandler.sound = sound->get_second_sound();
 				}
 			} else {
 				//FIXME: checks for error
@@ -125,17 +124,17 @@ static CSample *ChooseSample(stratagus::sound *sound, bool selection, Origin &so
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= SelectionHandler.sound->Number) {
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.sound = sound->Sound.TwoGroups.First;
+						SelectionHandler.sound = sound->get_first_sound();
 					}
 				} else {
 					result = SelectionHandler.sound->Sound.OneSound;
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.sound = sound->Sound.TwoGroups.First;
+					SelectionHandler.sound = sound->get_first_sound();
 				}
 			}
 		} else {
 			SelectionHandler.Source = source;
-			SelectionHandler.sound = sound->Sound.TwoGroups.First;
+			SelectionHandler.sound = sound->get_first_sound();
 			result = SimpleChooseSample(*SelectionHandler.sound);
 			SelectionHandler.HowMany = 1;
 		}
@@ -679,8 +678,8 @@ stratagus::sound *RegisterTwoGroups(const std::string &identifier, stratagus::so
 	}
 	stratagus::sound *id = stratagus::sound::add(identifier, nullptr);
 	id->Number = TWO_GROUPS;
-	id->Sound.TwoGroups.First = first;
-	id->Sound.TwoGroups.Second = second;
+	id->set_first_sound(first);
+	id->set_second_sound(second);
 	id->range = MAX_SOUND_RANGE;
 	//Wyrmgus start
 	id->VolumePercent = first->VolumePercent + second->VolumePercent / 2;
@@ -795,41 +794,6 @@ void sound::initialize()
 	}
 
 	data_entry::initialize();
-}
-
-void sound::ProcessConfigData(const CConfigData *config_data)
-{
-	std::string ident = config_data->Ident;
-	ident = FindAndReplaceString(ident, "_", "-");
-	std::vector<std::filesystem::path> files;
-	std::vector<sound *> group_sounds; //sounds for sound group
-	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "file") {
-			std::string file = CMod::GetCurrentModPath() + value;
-			files.push_back(file);
-		} else if (key == "group_sound") {
-			value = FindAndReplaceString(value, "_", "-");
-			sound *group_sound = sound::get(value);
-			if (group_sound) {
-				group_sounds.push_back(group_sound);
-			} else {
-				fprintf(stderr, "Invalid sound: \"%s\".\n", value.c_str());
-			}
-		} else {
-			fprintf(stderr, "Invalid sound property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	sound *sound = nullptr;
-	if (group_sounds.size() >= 2) {
-		sound = MakeSoundGroup(ident, group_sounds[0], group_sounds[1]);
-	} else {
-		sound = MakeSound(ident, files);
-	}
 }
 
 QVariantList sound::get_files_qvariant_list() const

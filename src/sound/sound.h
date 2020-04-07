@@ -130,6 +130,8 @@ class sound final : public data_entry, public data_type<sound>
 
 	Q_PROPERTY(QVariantList files READ get_files_qvariant_list)
 	Q_PROPERTY(int range MEMBER range)
+	Q_PROPERTY(stratagus::sound* first_sound MEMBER first_sound READ get_first_sound)
+	Q_PROPERTY(stratagus::sound* second_sound MEMBER second_sound READ get_second_sound)
 
 public:
 	static constexpr const char *class_identifier = "sound";
@@ -144,8 +146,6 @@ public:
 
 	virtual void initialize() override;
 
-	static void ProcessConfigData(const CConfigData *config_data);
-
 	const std::vector<std::filesystem::path> &get_files() const
 	{
 		return this->files;
@@ -155,7 +155,35 @@ public:
 
 	Q_INVOKABLE void add_file(const std::filesystem::path &filepath);
 	Q_INVOKABLE void remove_file(const std::filesystem::path &filepath);
-		
+
+	sound *get_first_sound() const
+	{
+		return this->first_sound;
+	}
+
+	void set_first_sound(sound *sound)
+	{
+		if (sound == this->get_first_sound()) {
+			return;
+		}
+
+		this->first_sound = sound;
+	}
+
+	sound *get_second_sound() const
+	{
+		return this->second_sound;
+	}
+
+	void set_second_sound(sound *sound)
+	{
+		if (sound == this->get_second_sound()) {
+			return;
+		}
+
+		this->second_sound = sound;
+	}
+
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
@@ -171,14 +199,12 @@ public:
 	union {
 		CSample *OneSound;       /// if it's only a simple sound
 		CSample **OneGroup;      /// when it's a simple group
-		struct {
-			sound *First;       /// first group: selected sound
-			sound *Second;      /// second group: annoyed sound
-		} TwoGroups;             /// when it's a double group
 	} Sound;
 
 private:
 	std::vector<std::filesystem::path> files; //the paths to the sound files
+	sound *first_sound = nullptr; //selected sound
+	sound *second_sound = nullptr; //annoyed sound
 
 	friend sound *::RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 };
@@ -195,7 +221,6 @@ struct Origin {
 	//Wyrmgus end
 	unsigned Id;        /// unique identifier (if the pointer has been shared)
 };
-
 
 /*----------------------------------------------------------------------------
 --  Variables
