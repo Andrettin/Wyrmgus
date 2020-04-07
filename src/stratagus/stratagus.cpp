@@ -938,3 +938,13 @@ void load_database()
 		exit(-1);
 	}
 }
+
+void initialize_database()
+{
+	try {
+		stratagus::database::get()->initialize();
+	} catch (const std::exception &exception) {
+		stratagus::exception::report(exception);
+		exit(-1);
+	}
+}

@@ -323,8 +323,6 @@ void database::load()
 			}
 		}
 	}
-
-	this->initialize();
 }
 
 void database::initialize()

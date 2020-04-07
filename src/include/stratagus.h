@@ -247,3 +247,4 @@ extern Vec2i GetDirectionOffset(int direction);
 //Wyrmgus end
 
 extern void load_database();
+extern void initialize_database();

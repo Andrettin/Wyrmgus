@@ -184,3 +184,4 @@ extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, i
 //Wyrmgus end
 
 extern void load_database();
+extern void initialize_database();
