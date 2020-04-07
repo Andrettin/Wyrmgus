@@ -74,11 +74,7 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 	} else if (!strcmp(data, "Modifier")) {
 		LuaCheckArgs(l, 3);
 
-		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
-		if (modifier == nullptr) {
-			LuaError(l, "Modifier doesn't exist.");
-		}
-		
+		CUpgrade *modifier = CUpgrade::get(LuaToString(l, 3));
 		lua_pushboolean(l, province->HasModifier(modifier));
 		return 1;
 	} else if (!strcmp(data, "Modifiers")) {
@@ -92,11 +88,7 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 	} else if (!strcmp(data, "BordersModifier")) {
 		LuaCheckArgs(l, 3);
 
-		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
-		if (modifier == nullptr) {
-			LuaError(l, "Modifier doesn't exist.");
-		}
-		
+		CUpgrade *modifier = CUpgrade::get(LuaToString(l, 3));
 		lua_pushboolean(l, province->BordersModifier(modifier));
 		return 1;
 	} else if (!strcmp(data, "Governor")) {

@@ -228,7 +228,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 
 	std::string work_name;
 	if (work != nullptr) {
-		work_name = work->Name;
+		work_name = work->get_name();
 	} else {
 		work_name = province->GenerateWorkName();
 		if (work_name.empty()) {
@@ -660,14 +660,14 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	int change = has_technology ? 1 : -1;
 		
 	//add military score bonuses
-	for (size_t z = 0; z < AllUpgrades[upgrade_id]->UpgradeModifiers.size(); ++z) {
+	for (size_t z = 0; z < CUpgrade::get_all()[upgrade_id]->UpgradeModifiers.size(); ++z) {
 		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 				
-			Assert(AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == '?' || AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X');
+			Assert(CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == '?' || CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X');
 
-			if (AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
-				if (AllUpgrades[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
-					this->MilitaryScoreBonus[i] += AllUpgrades[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
+			if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+				if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
+					this->MilitaryScoreBonus[i] += CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
 				}
 			}
 		}
@@ -675,9 +675,9 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	
 	if (!secondary_setting) { //if this technology is not being set as a result of another technology of the same class being researched
 		if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
-			if (AllUpgrades[upgrade_id]->Class != -1) {
-				for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-					if (AllUpgrades[upgrade_id]->Class == AllUpgrades[i]->Class) {
+			if (CUpgrade::get_all()[upgrade_id]->Class != -1) {
+				for (size_t i = 0; i < CUpgrade::get_all().size(); ++i) {
+					if (CUpgrade::get_all()[upgrade_id]->Class == CUpgrade::get_all()[i]->Class) {
 						this->SetTechnology(i, has_technology, true);
 					}
 				}
@@ -747,7 +747,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 				new_minister_message += " has been appointed, ";
 			}
 			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
-			new_minister_message += "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->Name + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
+			new_minister_message += "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->get_name() + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
 			new_minister_message += "\") end;";
 			CclCommand(new_minister_message);	
 		}
@@ -1297,12 +1297,12 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 void InitializeGrandStrategyGame(bool show_loading)
 {
 	//initialize literary works
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->Work == -1 || AllUpgrades[i]->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
+	for (CUpgrade *upgrade : CUpgrade::get_all()) {
+		if (upgrade->Work == -1 || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
 			continue;
 		}
 		
-		GrandStrategyGame.UnpublishedWorks.push_back(AllUpgrades[i]);
+		GrandStrategyGame.UnpublishedWorks.push_back(upgrade);
 	}
 }
 
@@ -1629,12 +1629,8 @@ bool GrandStrategyHeroIsAlive(std::string hero_full_name)
 
 void GrandStrategyWorkCreated(std::string work_ident)
 {
-	CUpgrade *work = CUpgrade::Get(work_ident);
-	if (work) {
-		GrandStrategyGame.UnpublishedWorks.erase(std::remove(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), work), GrandStrategyGame.UnpublishedWorks.end()); // remove work from the vector, so that it doesn't get created again
-	} else {
-		fprintf(stderr, "Work \"%s\" doesn't exist.\n", work_ident.c_str());
-	}
+	CUpgrade *work = CUpgrade::get(work_ident);
+	GrandStrategyGame.UnpublishedWorks.erase(std::remove(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), work), GrandStrategyGame.UnpublishedWorks.end()); // remove work from the vector, so that it doesn't get created again
 }
 
 void MakeGrandStrategyEventAvailable(std::string event_name)

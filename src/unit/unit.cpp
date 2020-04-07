@@ -797,7 +797,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						AbilityAcquire(*this, chosen_ability);
 						upgrade_found = true;
 						if (this->Player == CPlayer::GetThisPlayer()) {
-							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->Name.c_str());
+							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->get_name().c_str());
 						}
 					}
 				}
@@ -813,12 +813,12 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 void CUnit::Retrain()
 {
 	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (this->GetIndividualUpgrade(AllUpgrades[i])) {
-			if (AllUpgrades[i]->Ability && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), AllUpgrades[i]) == this->Type->StartingAbilities.end()) {
-				AbilityLost(*this, AllUpgrades[i], true);
-			} else if (!strncmp(AllUpgrades[i]->Ident.c_str(), "upgrade-deity-", 14) && strncmp(AllUpgrades[i]->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
-				IndividualUpgradeLost(*this, AllUpgrades[i], true);
+	for (CUpgrade *upgrade : CUpgrade::get_all()) {
+		if (this->GetIndividualUpgrade(upgrade)) {
+			if (upgrade->Ability && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), upgrade) == this->Type->StartingAbilities.end()) {
+				AbilityLost(*this, upgrade, true);
+			} else if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
+				IndividualUpgradeLost(*this, upgrade, true);
 			}
 		}
 	}
@@ -948,13 +948,13 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->Trait = nullptr;
 	
 	if (this->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Type->Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Type->Civilization]);
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[this->Type->Civilization]);
 		if (civilization_upgrade) {
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
 	if (this->Type->Civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
+		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -1362,11 +1362,9 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		}
 	}
 
-	int all_upgrades_size = AllUpgrades.size();
-	
 	for (int i = (CUpgradeModifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
 		const CUpgradeModifier *modifier = CUpgradeModifier::UpgradeModifiers[i];
-		const CUpgrade *upgrade = AllUpgrades[modifier->UpgradeId];
+		const CUpgrade *upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
 			if (
 				(
@@ -1461,7 +1459,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (
 				(modifier_upgrade->Weapon && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
 				|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
@@ -1488,7 +1486,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1496,7 +1494,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1504,7 +1502,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1663,7 +1661,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (
 				(modifier_upgrade->Weapon && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
 				|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
@@ -1690,7 +1688,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1698,7 +1696,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1706,7 +1704,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -2060,17 +2058,17 @@ void CUnit::UpdateItemName()
 	}
 	
 	if (Prefix != nullptr) {
-		Name += _(Prefix->Name.c_str());
+		Name += _(Prefix->get_name().c_str());
 		Name += " ";
 	}
 	if (Work != nullptr) {
-		Name += _(Work->Name.c_str());
+		Name += _(Work->get_name().c_str());
 	} else {
 		Name += GetTypeName();
 	}
 	if (Suffix != nullptr) {
 		Name += " ";
-		Name += _(Suffix->Name.c_str());
+		Name += _(Suffix->get_name().c_str());
 	} else if (Spell != nullptr) {
 		Name += " ";
 		Name += _("of");
@@ -2216,9 +2214,9 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 		}
 	}
 	if (dropper_player != nullptr) {
-		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependencies(AllUpgrades[i], dropper)) {
-				potential_prefixes.push_back(AllUpgrades[i]);
+		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (this->Type->ItemClass != -1 && upgrade->ItemPrefix[Type->ItemClass] && CheckDependencies(upgrade, dropper)) {
+				potential_prefixes.push_back(upgrade);
 			}
 		}
 	}
@@ -2239,10 +2237,10 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 		}
 	}
 	if (dropper_player != nullptr) {
-		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependencies(AllUpgrades[i], dropper)) {
-				if (Prefix == nullptr || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-					potential_suffixes.push_back(AllUpgrades[i]);
+		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (this->Type->ItemClass != -1 && upgrade->ItemSuffix[Type->ItemClass] && CheckDependencies(upgrade, dropper)) {
+				if (Prefix == nullptr || !upgrade->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+					potential_suffixes.push_back(upgrade);
 				}
 			}
 		}
@@ -2278,9 +2276,9 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 		}
 	}
 	if (dropper_player != nullptr) {
-		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependencies(AllUpgrades[i], dropper) && !AllUpgrades[i]->UniqueOnly) {
-				potential_works.push_back(AllUpgrades[i]);
+		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (this->Type->ItemClass != -1 && upgrade->Work == this->Type->ItemClass && CheckDependencies(upgrade, dropper) && !upgrade->UniqueOnly) {
+				potential_works.push_back(upgrade);
 			}
 		}
 	}
@@ -2844,13 +2842,13 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	//Wyrmgus start
 	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
 	if (unit->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[unit->Type->Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[unit->Type->Civilization]);
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[unit->Type->Civilization]);
 		if (civilization_upgrade) {
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
 	if (unit->Type->Civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
+		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -4575,7 +4573,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-		const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+		const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, modifier);
@@ -5455,7 +5453,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 		} else if (EquippedItems[item_slot].size() == 0 && (item_slot == WeaponItemSlot || item_slot == ShieldItemSlot || item_slot == BootsItemSlot || item_slot == ArrowsItemSlot)) {
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
-				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+				const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 				if (
 					(
 						(
@@ -6223,7 +6221,7 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 bool CUnit::IsSpellEmpowered(const CSpell *spell) const
 {
 	if (spell->DependencyId != -1) {
-		return this->IsAbilityEmpowered(AllUpgrades[spell->DependencyId]);
+		return this->IsAbilityEmpowered(CUpgrade::get_all()[spell->DependencyId]);
 	} else {
 		return false;
 	}

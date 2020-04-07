@@ -88,12 +88,8 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "remove_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *removed_upgrade = CUpgrade::Get(value);
-			if (removed_upgrade) {
-				this->RemoveUpgrades.push_back(removed_upgrade);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			CUpgrade *removed_upgrade = CUpgrade::get(value);
+			this->RemoveUpgrades.push_back(removed_upgrade);
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			
@@ -104,7 +100,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 					this->Modifier.Variables[index].Value = std::stoi(value);
 					this->Modifier.Variables[index].Max = std::stoi(value);
 				} else { // error
-					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.c_str(), key.c_str(), AllUpgrades[this->UpgradeId]->Ident.c_str());
+					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.c_str(), key.c_str(), CUpgrade::get_all()[this->UpgradeId]->Ident.c_str());
 				}
 			} else {
 				fprintf(stderr, "Invalid upgrade modifier property: \"%s\".\n", key.c_str());

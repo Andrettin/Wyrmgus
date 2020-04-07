@@ -1393,7 +1393,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Trait != nullptr) {
-				return _(unit->Trait->Name.c_str());
+				return _(unit->Trait->get_name().c_str());
 			} else {
 				return std::string("");
 			}
@@ -1437,7 +1437,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitUniqueSet : // name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
-				return unit->Unique->Set->Name;
+				return unit->Unique->Set->get_name();
 			} else {
 				return std::string("");
 			}

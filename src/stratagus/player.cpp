@@ -1207,19 +1207,19 @@ void CPlayer::Save(CFile &file) const
 	//Wyrmgus start
 	bool first = true;
 	//Wyrmgus end
-	for (int j = 0; j < UpgradeMax; ++j) {
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 		//Wyrmgus start
-//		if (j) {
+//		if (upgrade->ID) {
 //			file.printf(" ,");
 //		}
-//		file.printf("%d", p.UpgradeTimers.Upgrades[j]);
-		if (p.UpgradeTimers.Upgrades[j]) {
+//		file.printf("%d", p.UpgradeTimers.Upgrades[upgrade->ID]);
+		if (p.UpgradeTimers.Upgrades[upgrade->ID]) {
 			if (first) {
 				first = false;
 			} else {
 				file.printf(", ");
 			}
-			file.printf("\"%s\", %d", AllUpgrades[j]->Ident.c_str(), p.UpgradeTimers.Upgrades[j]);
+			file.printf("\"%s\", %d", upgrade->Ident.c_str(), p.UpgradeTimers.Upgrades[upgrade->ID]);
 		}
 		//Wyrmgus end
 	}
@@ -1486,8 +1486,8 @@ const CCivilization *CPlayer::GetCivilization() const
 void CPlayer::SetCivilization(int civilization)
 {
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
-		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
+		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
+			UpgradeLost(*this, CUpgrade::get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
 		}
 	}
 
@@ -1511,7 +1511,7 @@ void CPlayer::SetCivilization(int civilization)
 	}
 	
 	if (this->Race != -1) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race]);
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[this->Race]);
 		if (civilization_upgrade && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
@@ -1532,8 +1532,8 @@ void CPlayer::SetFaction(const CFaction *faction)
 	}
 
 	if (this->Faction != -1) {
-		if (!PlayerRaces.Factions[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID);
+		if (!PlayerRaces.Factions[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID] == 'R') {
+			UpgradeLost(*this, CUpgrade::get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID);
 		}
 
 		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(PlayerRaces.Factions[this->Faction]->Type));
@@ -1551,7 +1551,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 					UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(old_faction_id, i));
 
 					if (PlayerRaces.GetFactionClassUpgrade(faction_id, i) != -1) {
-						UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(faction_id, i)]);
+						UpgradeAcquire(*this, CUpgrade::get_all()[PlayerRaces.GetFactionClassUpgrade(faction_id, i)]);
 					}
 				}
 			}
@@ -1603,7 +1603,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 		}
 	
 		if (!PlayerRaces.Factions[this->Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade);
+			CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[this->Faction]->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
@@ -1618,7 +1618,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
 			} else {
-				UpgradeAcquire(*this, AllUpgrades[faction_type_upgrade_id]);
+				UpgradeAcquire(*this, CUpgrade::get_all()[faction_type_upgrade_id]);
 			}
 		}
 	} else {
@@ -1815,7 +1815,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		CUpgrade *upgrade = AllUpgrades[upgrade_id];
+		CUpgrade *upgrade = CUpgrade::get_all()[upgrade_id];
 		
 		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, &player)) {
 			continue;
@@ -1831,8 +1831,8 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	if (potential_upgrades.size() > 0) {
 		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
-		if (!chosen_upgrade->Name.empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->Name.c_str(), this->Name.c_str());
+		if (!chosen_upgrade->get_name().empty()) {
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->Name.c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			stratagus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
@@ -2020,14 +2020,9 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	}
 	
 	if (!faction->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(faction->FactionUpgrade);
-		
-		if (faction_upgrade) {
-			if (!CheckDependencies(faction_upgrade, this, false, pre)) {
-				return false;
-			}
-		} else {
-			fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", faction->FactionUpgrade.c_str());
+		CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
+		if (!CheckDependencies(faction_upgrade, this, false, pre)) {
+			return false;
 		}
 	}
 

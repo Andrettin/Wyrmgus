@@ -409,7 +409,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.ResearchedUpgrades, (**j).Slot, *AllUpgrades[researchId]);
+					AiHelperInsert(aiHelper.ResearchedUpgrades, (**j).Slot, *CUpgrade::get_all()[researchId]);
 				}
 				break;
 			}
@@ -447,7 +447,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::LearnAbility : {
-				CUpgrade *ability = CUpgrade::Get(button.ValueStr);
+				CUpgrade *ability = CUpgrade::get(button.ValueStr);
 
 				if (ability->Ability) {
 					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -939,7 +939,6 @@ static int CclAiWait(lua_State *l)
 			return 1;
 		}
 	} else if (!strncmp(ident, "upgrade-", 8)) {
-		CUpgrade *upgrade = CUpgrade::Get(ident);
 		if (UpgradeIdentAllowed(*AiPlayer->Player, ident) == 'R') {
 			lua_pushboolean(l, 0);
 			return 1;
@@ -1239,7 +1238,7 @@ static int CclAiResearch(lua_State *l)
 	CUpgrade *upgrade;
 
 	if (str) {
-		upgrade = CUpgrade::Get(str);
+		upgrade = CUpgrade::get(str);
 	} else {
 		LuaError(l, "Upgrade needed");
 		upgrade = nullptr;
@@ -1747,7 +1746,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
-				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
+				ai->ResearchRequests.push_back(CUpgrade::get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
 			CclParseBuildQueue(l, ai, j + 1);

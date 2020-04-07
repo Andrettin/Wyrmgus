@@ -163,7 +163,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus end
 	
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
-	for (const CUpgrade *upgrade : AllUpgrades) {
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 		if (upgrade->Ability) {
 			if (unit.GetIndividualUpgrade(upgrade) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), upgrade) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) == newtype.StartingAbilities.end()) {
 				IndividualUpgradeLost(unit, upgrade);
@@ -250,25 +250,25 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
 	if (oldtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[oldtype.Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[oldtype.Civilization]);
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[oldtype.Civilization]);
 		if (civilization_upgrade) {
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
 	if (oldtype.Civilization != -1 && oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
+		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
 	}
 	if (newtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[newtype.Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[newtype.Civilization]);
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[newtype.Civilization]);
 		if (civilization_upgrade) {
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
 	if (newtype.Civilization != -1 && newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
+		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 1);
 		}

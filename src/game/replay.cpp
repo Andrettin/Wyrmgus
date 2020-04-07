@@ -947,14 +947,14 @@ static void DoNextReplay()
 	//Wyrmgus end
 	} else if (!strcmp(action, "research")) {
 		//Wyrmgus start
-//		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
-		SendCommandResearch(*unit, *CUpgrade::Get(val), num, flags);
+//		SendCommandResearch(*unit, *CUpgrade::get(val), flags);
+		SendCommandResearch(*unit, *CUpgrade::get(val), num, flags);
 		//Wyrmgus end
 	} else if (!strcmp(action, "cancel-research")) {
 		SendCommandCancelResearch(*unit);
 	//Wyrmgus start
 	} else if (!strcmp(action, "learn-ability")) {
-		SendCommandLearnAbility(*unit, *CUpgrade::Get(val));
+		SendCommandLearnAbility(*unit, *CUpgrade::get(val));
 	//Wyrmgus end
 	} else if (!strcmp(action, "spell-cast")) {
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);

@@ -218,7 +218,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->HairVariation = value;
 		} else if (key == "trait") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Trait = upgrade;
 			} else {
@@ -322,7 +322,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "ability") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *ability_upgrade = CUpgrade::Get(value);
+			CUpgrade *ability_upgrade = CUpgrade::try_get(value);
 			if (ability_upgrade) {
 				this->Abilities.push_back(ability_upgrade);
 			} else {
@@ -330,7 +330,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "read_work") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->ReadWorks.push_back(upgrade);
 			} else {
@@ -338,7 +338,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "consumed_elixir") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->ConsumedElixirs.push_back(upgrade);
 			} else {
@@ -832,7 +832,7 @@ void CCharacter::UpdateAttributes()
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			if (
 				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
-				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[modifier->UpgradeId]) != this->Abilities.end()
+				|| std::find(this->Abilities.begin(), this->Abilities.end(), CUpgrade::get_all()[modifier->UpgradeId]) != this->Abilities.end()
 			) {
 				if (modifier->Modifier.Variables[var].Value != 0) {
 					this->Attributes[i] += modifier->Modifier.Variables[var].Value;

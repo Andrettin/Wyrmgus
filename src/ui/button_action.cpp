@@ -176,11 +176,11 @@ void ButtonAction::SetTriggerData() const
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
 	}
 	if (this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[this->Value];
+		TriggerData.Upgrade = CUpgrade::get_all()[this->Value];
 	} else if (this->Action == ButtonCmd::Faction) {
 		TriggerData.Faction = PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
 		if (!PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+			TriggerData.Upgrade = CUpgrade::try_get(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
 }

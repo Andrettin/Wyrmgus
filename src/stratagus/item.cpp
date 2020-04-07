@@ -389,7 +389,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "prefix") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Prefix = upgrade;
 			} else {
@@ -397,7 +397,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "suffix") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Suffix = upgrade;
 			} else {
@@ -413,7 +413,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "work") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Work = upgrade;
 			} else {
@@ -421,7 +421,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "elixir") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Elixir = upgrade;
 			} else {

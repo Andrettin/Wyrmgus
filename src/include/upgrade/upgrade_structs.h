@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "data_type.h"
 //Wyrmgus start
 #include "item.h"
@@ -89,23 +91,47 @@ public:
 	std::map<CUnitType *, int> UnitStock;	/// Units in stock
 };
 
-/**
-**  The main useable upgrades.
-*/
-class CUpgrade : public CDataType
+class CUpgrade final : public stratagus::data_entry, public stratagus::data_type<CUpgrade>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+
 public:
-	CUpgrade(const std::string &ident);
+	static constexpr const char *class_identifier = "upgrade";
+	static constexpr const char *database_folder = "upgrades";
+
+	static CUpgrade *add(const std::string &identifier, const stratagus::module *module)
+	{
+		CUpgrade *upgrade = data_type::add(identifier, module);
+		upgrade->ID = CUpgrade::get_all().size() - 1;
+		return upgrade;
+	}
+
+	CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
-	static CUpgrade *New(const std::string &ident);
-	static CUpgrade *Get(const std::string &ident);
-
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	void SetIcon(CIcon *icon);
+	virtual void process_sml_property(const stratagus::sml_property &property) override;
 
-	std::string Name;                 /// upgrade label
+	const std::string &get_name() const
+	{
+		return this->name;
+	}
+
+	QString get_name_qstring() const
+	{
+		return QString::fromStdString(this->get_name());
+	}
+
+	void set_name_qstring(const QString &name)
+	{
+		this->name = name.toStdString();
+	}
+
+private:
+	std::string name;
+public:
 	//Wyrmgus start
 	int Class = -1;					/// upgrade class (i.e. siege weapon projectile I)
 	int Civilization = -1;			/// which civilization this upgrade belongs to, if any
@@ -152,6 +178,8 @@ public:
 	CIcon *Icon = nullptr;					/// icon to display to the user
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
+
+	friend int CclDefineUpgrade(lua_State *l);
 };
 
 /**
@@ -202,9 +230,3 @@ public:
 	*/
 	int Upgrades[UpgradeMax];       /// counter for each upgrade
 };
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades

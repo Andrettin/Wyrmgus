@@ -351,17 +351,17 @@ static int CclUnit(lua_State *l)
 				CMap::Map.SiteUnits.push_back(unit);
 			}
 		} else if (!strcmp(value, "trait")) {
-			unit->Trait = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			unit->Trait = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "prefix")) {
-			unit->Prefix = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			unit->Prefix = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "suffix")) {
-			unit->Suffix = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			unit->Suffix = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "spell")) {
 			unit->Spell = CSpell::GetSpell(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "work")) {
-			unit->Work = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			unit->Work = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "elixir")) {
-			unit->Elixir = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			unit->Elixir = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
@@ -717,12 +717,10 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "custom-hero")) {
 			unit->SetCharacter(LuaToString(l, 2, j + 1), true);
 		} else if (!strcmp(value, "individual-upgrade")) {
-			CUpgrade *individual_upgrade = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			CUpgrade *individual_upgrade = CUpgrade::get(LuaToString(l, 2, j + 1));
 			++j;
 			int individual_upgrade_quantity = LuaToNumber(l, 2, j + 1);
-			if (individual_upgrade) {
-				unit->SetIndividualUpgrade(individual_upgrade, individual_upgrade_quantity);
-			}
+			unit->SetIndividualUpgrade(individual_upgrade, individual_upgrade_quantity);
 		} else if (!strcmp(value, "rally-point")) {
 			int rally_point_x = LuaToNumber(l, 2, j + 1);
 			++j;
@@ -1808,12 +1806,8 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
-		CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
-		if (upgrade) {
-			lua_pushnumber(l, unit->GetIndividualUpgrade(upgrade));
-		} else {
-			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
-		}
+		CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
+		lua_pushnumber(l, unit->GetIndividualUpgrade(upgrade));
 		return 1;
 	} else if (!strcmp(value, "Active")) {
 		lua_pushboolean(l, unit->Active);
@@ -1935,14 +1929,10 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 4);
 		std::string upgrade_ident = LuaToString(l, 3);
 		bool has_upgrade = LuaToBoolean(l, 4);
-		if (CUpgrade::Get(upgrade_ident)) {
-			if (has_upgrade && unit->GetIndividualUpgrade(CUpgrade::Get(upgrade_ident)) == 0) {
-				IndividualUpgradeAcquire(*unit, CUpgrade::Get(upgrade_ident));
-			} else if (!has_upgrade && unit->GetIndividualUpgrade(CUpgrade::Get(upgrade_ident))) {
-				IndividualUpgradeLost(*unit, CUpgrade::Get(upgrade_ident));
-			}
-		} else {
-			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		if (has_upgrade && unit->GetIndividualUpgrade(CUpgrade::get(upgrade_ident)) == 0) {
+			IndividualUpgradeAcquire(*unit, CUpgrade::get(upgrade_ident));
+		} else if (!has_upgrade && unit->GetIndividualUpgrade(CUpgrade::get(upgrade_ident))) {
+			IndividualUpgradeLost(*unit, CUpgrade::get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Active")) {
 		bool ai_active = LuaToBoolean(l, 3);
@@ -1985,20 +1975,16 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
 			unit->SetPrefix(nullptr);
-		} else if (CUpgrade::Get(upgrade_ident)) {
-			unit->SetPrefix(CUpgrade::Get(upgrade_ident));
 		} else {
-			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			unit->SetPrefix(CUpgrade::get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Suffix")) { //add an item suffix to the unit
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
 			unit->SetSuffix(nullptr);
-		} else if (CUpgrade::Get(upgrade_ident)) {
-			unit->SetSuffix(CUpgrade::Get(upgrade_ident));
 		} else {
-			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			unit->SetSuffix(CUpgrade::get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Spell")) { //add a spell to the item unit
 		LuaCheckArgs(l, 3);
@@ -2015,20 +2001,16 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
 			unit->SetWork(nullptr);
-		} else if (CUpgrade::Get(upgrade_ident)) {
-			unit->SetWork(CUpgrade::Get(upgrade_ident));
 		} else {
-			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			unit->SetWork(CUpgrade::get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Elixir")) { //add an elixir property to the unit
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
 			unit->SetElixir(nullptr);
-		} else if (CUpgrade::Get(upgrade_ident)) {
-			unit->SetElixir(CUpgrade::Get(upgrade_ident));
 		} else {
-			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			unit->SetElixir(CUpgrade::get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Unique")) { //set the unit to a particular unique unit
 		LuaCheckArgs(l, 3);

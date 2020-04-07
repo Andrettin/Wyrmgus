@@ -586,7 +586,7 @@ void GameMainLoop()
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 								if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
 									if (second_iterator->second && UpgradeIdentAllowed(*CPlayer::Players[i], iterator->first.c_str()) != 'R') {
-										UpgradeAcquire(*CPlayer::Players[i], AllUpgrades[upgrade_id]);
+										UpgradeAcquire(*CPlayer::Players[i], CUpgrade::get_all()[upgrade_id]);
 									} else if (!second_iterator->second) {
 										break;
 									}
@@ -603,7 +603,7 @@ void GameMainLoop()
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 								if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
 									if (second_iterator->second && UpgradeIdentAllowed(*CPlayer::Players[i], iterator->first.c_str()) != 'R') {
-										UpgradeAcquire(*CPlayer::Players[i], AllUpgrades[upgrade_id]);
+										UpgradeAcquire(*CPlayer::Players[i], CUpgrade::get_all()[upgrade_id]);
 									} else if (!second_iterator->second) {
 										break;
 									}

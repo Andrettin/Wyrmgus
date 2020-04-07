@@ -90,17 +90,8 @@
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CUpgrade *> AllUpgrades;           /// The main user useable upgrades
-
-std::map<std::string, CUpgrade *> Upgrades;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
 
 CUnitStats::~CUnitStats()
 {
@@ -206,10 +197,8 @@ void CUnitStats::ChangeUnitStock(CUnitType *unit_type, int quantity)
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-CUpgrade::CUpgrade(const std::string &ident)
+CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), data_entry(identifier)
 {
-	this->Ident = ident;
-
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
 	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
@@ -222,10 +211,6 @@ CUpgrade::CUpgrade(const std::string &ident)
 
 CUpgrade::~CUpgrade()
 {
-	//Wyrmgus start
-	WeaponClasses.clear();
-	Epithets.clear();
-	//Wyrmgus end
 }
 
 /**
@@ -240,7 +225,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->name = value;
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			CIcon *icon = CIcon::Get(value);
@@ -361,9 +346,9 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here
-		if (this->IncompatibleAffixes[i]) {
-			AllUpgrades[i]->IncompatibleAffixes[this->ID] = true;
+	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
+		if (this->IncompatibleAffixes[other_upgrade->ID]) {
+			other_upgrade->IncompatibleAffixes[this->ID] = true;
 		}
 	}
 	
@@ -375,39 +360,21 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
-/**
-**  Create a new upgrade
-**
-**  @param ident  Upgrade identifier
-*/
-CUpgrade *CUpgrade::New(const std::string &ident)
+void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 {
-	CUpgrade *upgrade = Upgrades[ident];
-	if (upgrade) {
-		return upgrade;
-	} else {
-		upgrade = new CUpgrade(ident);
-		Upgrades[ident] = upgrade;
-		upgrade->ID = AllUpgrades.size();
-		AllUpgrades.push_back(upgrade);
-		return upgrade;
-	}
-}
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
 
-/**
-**  Get an upgrade
-**
-**  @param ident  Upgrade identifier
-**
-**  @return       Upgrade pointer or null if not found.
-*/
-CUpgrade *CUpgrade::Get(const std::string &ident)
-{
-	CUpgrade *upgrade = Upgrades[ident];
-	if (!upgrade) {
-		DebugPrint("upgrade not found: %s\n" _C_ ident.c_str());
+	if (key == "icon") {
+		CIcon *icon = CIcon::Get(value);
+		if (icon != nullptr) {
+			this->Icon = icon;
+		} else {
+			fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
+		}
+	} else {
+		data_entry::process_sml_property(property);
 	}
-	return upgrade;
 }
 
 /**
@@ -420,16 +387,8 @@ void InitUpgrades()
 /**
 **  Cleanup the upgrade module.
 */
-void CleanUpgrades()
+void CleanUpgradeModifiers()
 {
-	//  Free the upgrades.
-	while (AllUpgrades.empty() == false) {
-		CUpgrade *upgrade = AllUpgrades.back();
-		AllUpgrades.pop_back();
-		delete upgrade;
-	}
-	Upgrades.clear();
-
 	//
 	//  Free the upgrade modifiers.
 	//
@@ -467,10 +426,10 @@ void SaveUpgrades(CFile &file)
 	//
 	//  Save the upgrades
 	//
-	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
-		file.printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident.c_str());
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+		file.printf("DefineAllow(\"%s\", \"", upgrade->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
-			file.printf("%c", CPlayer::Players[p]->Allow.Upgrades[j]);
+			file.printf("%c", CPlayer::Players[p]->Allow.Upgrades[upgrade->ID]);
 		}
 		file.printf("\")\n");
 	}
@@ -494,53 +453,50 @@ static int CclDefineUpgrade(lua_State *l)
 	}
 
 	std::string upgrade_ident = LuaToString(l, 1);
-	CUpgrade *upgrade = CUpgrade::New(upgrade_ident);
+	CUpgrade *upgrade = CUpgrade::get_or_add(upgrade_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Parent")) {
-			CUpgrade *parent_upgrade = CUpgrade::Get(LuaToString(l, -1));
-			if (parent_upgrade != nullptr) {
-				upgrade->Name = parent_upgrade->Name;
-				upgrade->Icon = parent_upgrade->Icon;
-				upgrade->Class = parent_upgrade->Class;
-				upgrade->Description = parent_upgrade->Description;
-				upgrade->Quote = parent_upgrade->Quote;
-				upgrade->Background = parent_upgrade->Background;
-				upgrade->EffectsString = parent_upgrade->EffectsString;
-				upgrade->RequirementsString = parent_upgrade->RequirementsString;
-				for (int i = 0; i < MaxCosts; ++i) {
-					upgrade->Costs[i] = parent_upgrade->Costs[i];
-					upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
-					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
-				}
-				for (int i = 0; i < MaxItemClasses; ++i) {
-					upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
-					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
-				}
-				upgrade->MaxLimit = parent_upgrade->MaxLimit;
-				upgrade->MagicLevel = parent_upgrade->MagicLevel;
-				upgrade->Ability = parent_upgrade->Ability;
-				upgrade->Weapon = parent_upgrade->Weapon;
-				upgrade->Shield = parent_upgrade->Shield;
-				upgrade->Boots = parent_upgrade->Boots;
-				upgrade->Arrows = parent_upgrade->Arrows;
-				upgrade->Item = parent_upgrade->Item;
-				upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
-				upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
-				upgrade->RunicAffix = parent_upgrade->RunicAffix;
-				upgrade->Work = parent_upgrade->Work;
-				upgrade->UniqueOnly = parent_upgrade->UniqueOnly;
-				for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
-					upgrade->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
-				}
-			} else {
-				LuaError(l, "Parent upgrade doesn't exist.");
+			CUpgrade *parent_upgrade = CUpgrade::get(LuaToString(l, -1));
+
+			upgrade->name = parent_upgrade->get_name();
+			upgrade->Icon = parent_upgrade->Icon;
+			upgrade->Class = parent_upgrade->Class;
+			upgrade->Description = parent_upgrade->Description;
+			upgrade->Quote = parent_upgrade->Quote;
+			upgrade->Background = parent_upgrade->Background;
+			upgrade->EffectsString = parent_upgrade->EffectsString;
+			upgrade->RequirementsString = parent_upgrade->RequirementsString;
+			for (int i = 0; i < MaxCosts; ++i) {
+				upgrade->Costs[i] = parent_upgrade->Costs[i];
+				upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
+				upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
+			}
+			for (int i = 0; i < MaxItemClasses; ++i) {
+				upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
+				upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
+			}
+			upgrade->MaxLimit = parent_upgrade->MaxLimit;
+			upgrade->MagicLevel = parent_upgrade->MagicLevel;
+			upgrade->Ability = parent_upgrade->Ability;
+			upgrade->Weapon = parent_upgrade->Weapon;
+			upgrade->Shield = parent_upgrade->Shield;
+			upgrade->Boots = parent_upgrade->Boots;
+			upgrade->Arrows = parent_upgrade->Arrows;
+			upgrade->Item = parent_upgrade->Item;
+			upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
+			upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
+			upgrade->RunicAffix = parent_upgrade->RunicAffix;
+			upgrade->Work = parent_upgrade->Work;
+			upgrade->UniqueOnly = parent_upgrade->UniqueOnly;
+			for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
+				upgrade->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
 			}
 		} else if (!strcmp(value, "Name")) {
-			upgrade->Name = LuaToString(l, -1);
+			upgrade->name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			CIcon *icon = CIcon::Get(LuaToString(l, -1));
 			if (icon != nullptr) {
@@ -796,9 +752,9 @@ static int CclDefineUpgrade(lua_State *l)
 		}
 	}
 	
-	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here
-		if (upgrade->IncompatibleAffixes[i]) {
-			AllUpgrades[i]->IncompatibleAffixes[upgrade->ID] = true;
+	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
+		if (upgrade->IncompatibleAffixes[other_upgrade->ID]) {
+			other_upgrade->IncompatibleAffixes[upgrade->ID] = true;
 		}
 	}
 	
@@ -829,7 +785,7 @@ static int CclDefineModifier(lua_State *l)
 	}
 	
 	//Wyrmgus start
-	AllUpgrades[um->UpgradeId]->UpgradeModifiers.push_back(um);
+	CUpgrade::get_all()[um->UpgradeId]->UpgradeModifiers.push_back(um);
 	//Wyrmgus end
 
 	for (int j = 1; j < args; ++j) {
@@ -898,12 +854,8 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "remove-upgrade")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			if (!strncmp(value, "upgrade-", 8)) {
-				CUpgrade *removed_upgrade = CUpgrade::Get(value);
-				if (removed_upgrade) {
-					um->RemoveUpgrades.push_back(removed_upgrade);
-				} else {
-					LuaError(l, "Upgrade \"%s\" doesn't exist.'" _C_ value);
-				}
+				CUpgrade *removed_upgrade = CUpgrade::get(value);
+				um->RemoveUpgrades.push_back(removed_upgrade);
 			} else {
 				LuaError(l, "upgrade expected");
 			}
@@ -1054,7 +1006,7 @@ static int CclAcquireAbility(lua_State *l)
 	lua_pop(l, 1);
 	const char *ident = LuaToString(l, 2);
 	if (!strncmp(ident, "upgrade-", 8)) {
-		AbilityAcquire(*unit, CUpgrade::Get(ident));
+		AbilityAcquire(*unit, CUpgrade::get(ident));
 	} else {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 	}
@@ -1077,7 +1029,7 @@ static int CclAcquireTrait(lua_State *l)
 	lua_pop(l, 1);
 	const char *ident = LuaToString(l, 2);
 	if (!strncmp(ident, "upgrade-", 8)) {
-		TraitAcquire(*unit, CUpgrade::Get(ident));
+		TraitAcquire(*unit, CUpgrade::get(ident));
 	} else if (strlen(ident) == 0) {
 		if (unit->Trait != nullptr) { //remove previous trait, if any
 			if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
@@ -1093,10 +1045,10 @@ static int CclAcquireTrait(lua_State *l)
 
 static int CclGetUpgrades(lua_State *l)
 {
-	lua_createtable(l, AllUpgrades.size(), 0);
-	for (size_t i = 1; i <= AllUpgrades.size(); ++i)
+	lua_createtable(l, CUpgrade::get_all().size(), 0);
+	for (size_t i = 1; i <= CUpgrade::get_all().size(); ++i)
 	{
-		lua_pushstring(l, AllUpgrades[i-1]->Ident.c_str());
+		lua_pushstring(l, CUpgrade::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -1104,10 +1056,10 @@ static int CclGetUpgrades(lua_State *l)
 
 static int CclGetItemPrefixes(lua_State *l)
 {
-	std::vector<CUpgrade *> item_prefixes;
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->MagicPrefix) {
-			item_prefixes.push_back(AllUpgrades[i]);
+	std::vector<const CUpgrade *> item_prefixes;
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+		if (upgrade->MagicPrefix) {
+			item_prefixes.push_back(upgrade);
 		}
 	}
 		
@@ -1122,10 +1074,10 @@ static int CclGetItemPrefixes(lua_State *l)
 
 static int CclGetItemSuffixes(lua_State *l)
 {
-	std::vector<CUpgrade *> item_suffixes;
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->MagicSuffix && !AllUpgrades[i]->RunicAffix) {
-			item_suffixes.push_back(AllUpgrades[i]);
+	std::vector<const CUpgrade *> item_suffixes;
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+		if (upgrade->MagicSuffix && !upgrade->RunicAffix) {
+			item_suffixes.push_back(upgrade);
 		}
 	}
 		
@@ -1140,10 +1092,10 @@ static int CclGetItemSuffixes(lua_State *l)
 
 static int CclGetRunicSuffixes(lua_State *l)
 {
-	std::vector<CUpgrade *> item_suffixes;
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->MagicSuffix && AllUpgrades[i]->RunicAffix) {
-			item_suffixes.push_back(AllUpgrades[i]);
+	std::vector<const CUpgrade *> item_suffixes;
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+		if (upgrade->MagicSuffix && upgrade->RunicAffix) {
+			item_suffixes.push_back(upgrade);
 		}
 	}
 		
@@ -1158,10 +1110,10 @@ static int CclGetRunicSuffixes(lua_State *l)
 
 static int CclGetLiteraryWorks(lua_State *l)
 {
-	std::vector<CUpgrade *> literary_works;
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->Work != -1) {
-			literary_works.push_back(AllUpgrades[i]);
+	std::vector<const CUpgrade *> literary_works;
+	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+		if (upgrade->Work != -1) {
+			literary_works.push_back(upgrade);
 		}
 	}
 		
@@ -1186,14 +1138,11 @@ static int CclGetUpgradeData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string upgrade_ident = LuaToString(l, 1);
-	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
-	if (!upgrade) {
-		LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
-	}
+	const CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, upgrade->Name.c_str());
+		lua_pushstring(l, upgrade->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
 		if (upgrade->Class != -1) {
@@ -1370,7 +1319,7 @@ int UnitTypeIdByIdent(const std::string &ident)
 */
 int UpgradeIdByIdent(const std::string &ident)
 {
-	const CUpgrade *upgrade = CUpgrade::Get(ident);
+	const CUpgrade *upgrade = CUpgrade::try_get(ident);
 
 	if (upgrade) {
 		return upgrade->ID;
@@ -1682,15 +1631,15 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(AllUpgrades[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
 					
-					if (unit.Character && !strncmp(AllUpgrades[um->UpgradeId]->Ident.c_str(), "upgrade-deity-", 14)) { //heroes choose their own deities
+					if (unit.Character && !strncmp(CUpgrade::get_all()[um->UpgradeId]->Ident.c_str(), "upgrade-deity-", 14)) { //heroes choose their own deities
 						continue;
 					}
 					//Wyrmgus end
@@ -1981,10 +1930,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(AllUpgrades[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}
@@ -2367,7 +2316,7 @@ void UpgradeLost(CPlayer &player, int id)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CUpgrade *upgrade = AllUpgrades[id];
+	CUpgrade *upgrade = CUpgrade::get_all()[id];
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		CDeity *upgrade_deity = CDeity::GetDeityByUpgrade(upgrade);
 		if (upgrade_deity) {
@@ -2381,7 +2330,7 @@ void UpgradeLost(CPlayer &player, int id)
 		}
 	}
 
-	for (const CUpgradeModifier *modifier : AllUpgrades[id]->UpgradeModifiers) {
+	for (const CUpgradeModifier *modifier : upgrade->UpgradeModifiers) {
 		RemoveUpgradeModifier(player, modifier);
 	}
 	//Wyrmgus end
@@ -2401,18 +2350,15 @@ void UpgradeLost(CPlayer &player, int id)
 */
 void ApplyUpgrades()
 {
-	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
-		CUpgrade *upgrade = AllUpgrades[j];
-		if (upgrade) {
-			for (int p = 0; p < PlayerMax; ++p) {
-				if (CPlayer::Players[p]->Allow.Upgrades[j] == 'R') {
-					int id = upgrade->ID;
-					CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
-					AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
+	for (CUpgrade *upgrade : CUpgrade::get_all()) {
+		for (int p = 0; p < PlayerMax; ++p) {
+			if (CPlayer::Players[p]->Allow.Upgrades[upgrade->ID] == 'R') {
+				int id = upgrade->ID;
+				CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+				AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
 
-					for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-						ApplyUpgradeModifier(*CPlayer::Players[p], upgrade->UpgradeModifiers[z]);
-					}
+				for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+					ApplyUpgradeModifier(*CPlayer::Players[p], upgrade->UpgradeModifiers[z]);
 				}
 			}
 		}
@@ -2471,7 +2417,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	}
 }
 
-void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
+void TraitAcquire(CUnit &unit, CUpgrade *upgrade)
 {
 	if (unit.Trait != nullptr) { //remove previous trait, if any
 		if (!GameSettings.NoRandomness) { // if in no randomness setting, don't change trait modifiers
@@ -2479,7 +2425,7 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 		}
 	}
 
-	unit.Trait = CUpgrade::Get(upgrade->Ident);
+	unit.Trait = upgrade;
 
 	if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
 		IndividualUpgradeAcquire(unit, upgrade);
@@ -2701,7 +2647,7 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 //Wyrmgus start
 std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand_strategy, bool multiline)
 {
-	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+	const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
 	
 	std::string padding_string = ", ";
 	if (multiline) {

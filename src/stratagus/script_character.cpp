@@ -131,12 +131,8 @@ static int CclDefineCharacter(lua_State *l)
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(trait_ident);
-			if (upgrade_id != -1) {
-				character->Trait = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(trait_ident);
+			character->Trait = upgrade;
 		} else if (!strcmp(value, "BirthDate")) {
 			CclGetDate(l, &character->BirthDate);
 		} else if (!strcmp(value, "StartDate")) {
@@ -268,9 +264,9 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string ability_ident = LuaToString(l, -1, j + 1);
-				int ability_id = UpgradeIdByIdent(ability_ident);
-				if (ability_id != -1) {
-					character->Abilities.push_back(AllUpgrades[ability_id]);
+				CUpgrade *ability = CUpgrade::try_get(ability_ident);
+				if (ability != nullptr) {
+					character->Abilities.push_back(ability);
 				} else {
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
@@ -290,9 +286,9 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string work_ident = LuaToString(l, -1, j + 1);
-				int work_id = UpgradeIdByIdent(work_ident);
-				if (work_id != -1) {
-					character->ReadWorks.push_back(AllUpgrades[work_id]);
+				CUpgrade *work = CUpgrade::try_get(work_ident);
+				if (work != nullptr) {
+					character->ReadWorks.push_back(work);
 				} else {
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
@@ -302,10 +298,10 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string work_ident = LuaToString(l, -1, j + 1);
-				int work_id = UpgradeIdByIdent(work_ident);
-				if (work_id != -1) {
-					character->AuthoredWorks.push_back(AllUpgrades[work_id]);
-					AllUpgrades[work_id]->Author = character;
+				CUpgrade *work = CUpgrade::try_get(work_ident);
+				if (work != nullptr) {
+					character->AuthoredWorks.push_back(work);
+					work->Author = character;
 				} else {
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
@@ -315,10 +311,10 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string work_ident = LuaToString(l, -1, j + 1);
-				int work_id = UpgradeIdByIdent(work_ident);
-				if (work_id != -1) {
-					character->LiteraryAppearances.push_back(AllUpgrades[work_id]);
-					AllUpgrades[work_id]->Characters.push_back(character);
+				CUpgrade *work = CUpgrade::try_get(work_ident);
+				if (work != nullptr) {
+					character->LiteraryAppearances.push_back(work);
+					work->Characters.push_back(character);
 				} else {
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
@@ -328,9 +324,9 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string elixir_ident = LuaToString(l, -1, j + 1);
-				int elixir_id = UpgradeIdByIdent(elixir_ident);
-				if (elixir_id != -1) {
-					character->ConsumedElixirs.push_back(AllUpgrades[elixir_id]);
+				CUpgrade *elixir = CUpgrade::try_get(elixir_ident);
+				if (elixir != nullptr) {
+					character->ConsumedElixirs.push_back(elixir);
 				} else {
 					fprintf(stderr, "Elixir \"%s\" doesn't exist.", elixir_ident.c_str());
 				}
@@ -363,17 +359,17 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					} else if (!strcmp(value, "prefix")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Prefix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Prefix = upgrade;
 						} else {
 							fprintf(stderr, "Item prefix \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
 					} else if (!strcmp(value, "suffix")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Suffix = upgrade;
 						} else {
 							fprintf(stderr, "Item suffix \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
@@ -387,17 +383,17 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					} else if (!strcmp(value, "work")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Work = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Work = upgrade;
 						} else {
 							fprintf(stderr, "Literary work \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
 					} else if (!strcmp(value, "elixir")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Elixir = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Elixir = upgrade;
 						} else {
 							fprintf(stderr, "Elixir \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
@@ -636,12 +632,8 @@ static int CclDefineCustomHero(lua_State *l)
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(trait_ident);
-			if (upgrade_id != -1) {
-				hero->Trait = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(trait_ident);
+			hero->Trait = upgrade;
 		} else if (!strcmp(value, "Civilization")) {
 			hero->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
@@ -655,9 +647,9 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string ability_ident = LuaToString(l, -1, j + 1);
-				int ability_id = UpgradeIdByIdent(ability_ident);
-				if (ability_id != -1) {
-					hero->Abilities.push_back(AllUpgrades[ability_id]);
+				CUpgrade *ability = CUpgrade::try_get(ability_ident);
+				if (ability != nullptr) {
+					hero->Abilities.push_back(ability);
 				} else {
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
@@ -677,9 +669,9 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string work_ident = LuaToString(l, -1, j + 1);
-				int work_id = UpgradeIdByIdent(work_ident);
-				if (work_id != -1) {
-					hero->ReadWorks.push_back(AllUpgrades[work_id]);
+				CUpgrade *work = CUpgrade::try_get(work_ident);
+				if (work != nullptr) {
+					hero->ReadWorks.push_back(work);
 				} else {
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
@@ -689,9 +681,9 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string elixir_ident = LuaToString(l, -1, j + 1);
-				int elixir_id = UpgradeIdByIdent(elixir_ident);
-				if (elixir_id != -1) {
-					hero->ConsumedElixirs.push_back(AllUpgrades[elixir_id]);
+				CUpgrade *elixir = CUpgrade::try_get(elixir_ident);
+				if (elixir != nullptr) {
+					hero->ConsumedElixirs.push_back(elixir);
 				} else {
 					fprintf(stderr, "Elixir \"%s\" doesn't exist.", elixir_ident.c_str());
 				}
@@ -723,17 +715,17 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 					} else if (!strcmp(value, "prefix")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Prefix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Prefix = upgrade;
 						} else {
 							fprintf(stderr, "Item prefix \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
 					} else if (!strcmp(value, "suffix")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Suffix = upgrade;
 						} else {
 							fprintf(stderr, "Item suffix \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
@@ -747,17 +739,17 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 					} else if (!strcmp(value, "work")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Work = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Work = upgrade;
 						} else {
 							fprintf(stderr, "Literary work \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
 					} else if (!strcmp(value, "elixir")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-						if (upgrade_id != -1) {
-							item->Elixir = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
+						if (upgrade != nullptr) {
+							item->Elixir = upgrade;
 						} else {
 							fprintf(stderr, "Elixir \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}

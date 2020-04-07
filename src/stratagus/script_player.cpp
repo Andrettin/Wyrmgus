@@ -484,10 +484,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
-						CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, n + 1));
-						if (!upgrade) {
-							LuaError(l, "Upgrade doesn't exist.");
-						}
+						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, n + 1));
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
 						CCharacter *character = CCharacter::GetCharacter(LuaToString(l, -1, n + 1));
@@ -525,12 +522,10 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CUpgrade *modifier_upgrade = CUpgrade::Get(LuaToString(l, j + 1, k + 1));
+				CUpgrade *modifier_upgrade = CUpgrade::get(LuaToString(l, j + 1, k + 1));
 				++k;
 				int end_cycle = LuaToNumber(l, j + 1, k + 1);
-				if (modifier_upgrade) {
-					this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier_upgrade, end_cycle));
-				}
+				this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier_upgrade, end_cycle));
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "autosell-resources")) {
@@ -557,11 +552,9 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				//Wyrmgus start
 //				this->UpgradeTimers.Upgrades[k] = LuaToNumber(l, j + 1, k + 1);
-				CUpgrade *timer_upgrade = CUpgrade::Get(LuaToString(l, j + 1, k + 1));
+				CUpgrade *timer_upgrade = CUpgrade::get(LuaToString(l, j + 1, k + 1));
 				++k;
-				if (timer_upgrade) {
-					this->UpgradeTimers.Upgrades[timer_upgrade->ID] = LuaToNumber(l, j + 1, k + 1);
-				}
+				this->UpgradeTimers.Upgrades[timer_upgrade->ID] = LuaToNumber(l, j + 1, k + 1);
 				//Wyrmgus end
 			}
 		} else {
@@ -1724,7 +1717,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 		if (civilization && class_id != -1) {
 			int upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(civilization->ID, class_id);
 			if (upgrade_id != -1) {
-				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
+				unit_type_ident = CUpgrade::get_all()[upgrade_id]->Ident;
 			}
 		}
 	}
@@ -1776,7 +1769,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 		if (class_id != -1) {
 			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(faction_id, class_id);
 			if (upgrade_id != -1) {
-				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
+				unit_type_ident = CUpgrade::get_all()[upgrade_id]->Ident;
 			}
 		}
 	}
@@ -2295,7 +2288,7 @@ static int CclDefineDynasty(lua_State *l)
 				faction->Dynasties.push_back(dynasty);
 			}
 		} else if (!strcmp(value, "DynastyUpgrade")) {
-			dynasty->DynastyUpgrade = CUpgrade::Get(LuaToString(l, -1));
+			dynasty->DynastyUpgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Conditions")) {
 			dynasty->Conditions = new LuaCallback(l, -1);
 		} else {
@@ -2394,17 +2387,11 @@ static int CclDefineDeity(lua_State *l)
 			}
 			deity->HomePlane = plane;
 		} else if (!strcmp(value, "DeityUpgrade")) {
-			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
-			if (!upgrade) {
-				LuaError(l, "Upgrade doesn't exist.");
-			}
+			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->DeityUpgrade = upgrade;
 			CDeity::DeitiesByUpgrade[upgrade] = deity;
 		} else if (!strcmp(value, "CharacterUpgrade")) {
-			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
-			if (!upgrade) {
-				LuaError(l, "Upgrade doesn't exist.");
-			}
+			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->CharacterUpgrade = upgrade;
 		} else if (!strcmp(value, "Icon")) {
 			deity->Icon.Name = LuaToString(l, -1);
@@ -2465,9 +2452,9 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (!ability || !ability->Ability) {
-					LuaError(l, "Ability doesn't exist.");
+				CUpgrade *ability = CUpgrade::get(LuaToString(l, -1, j + 1));
+				if (!ability->Ability) {
+					LuaError(l, "Ability upgrade is not actually an ability.");
 				}
 
 				if (std::find(deity->Abilities.begin(), deity->Abilities.end(), ability) == deity->Abilities.end()) {
@@ -3482,10 +3469,10 @@ static int CclSetPlayerData(lua_State *l)
 
 		if (!strncmp(ident, "upgrade-", 8)) {
 			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {
-				UpgradeAcquire(*p, CUpgrade::Get(ident));
+				UpgradeAcquire(*p, CUpgrade::get(ident));
 			} else if (acquire == "F" || acquire == "A") {
 				if (UpgradeIdentAllowed(*p, ident) == 'R') {
-					UpgradeLost(*p, CUpgrade::Get(ident)->ID);
+					UpgradeLost(*p, CUpgrade::get(ident)->ID);
 				}
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}
@@ -3524,11 +3511,9 @@ static int CclSetPlayerData(lua_State *l)
 		}
 	} else if (!strcmp(data, "AddModifier")) {
 		LuaCheckArgs(l, 4);
-		CUpgrade *modifier_upgrade = CUpgrade::Get(LuaToString(l, 3));
+		CUpgrade *modifier_upgrade = CUpgrade::get(LuaToString(l, 3));
 		int cycles = LuaToNumber(l, 4);
-		if (modifier_upgrade) {
-			p->AddModifier(modifier_upgrade, cycles);
-		}
+		p->AddModifier(modifier_upgrade, cycles);
 	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

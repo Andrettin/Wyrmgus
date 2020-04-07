@@ -92,29 +92,17 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->Icon.Icon->Load();
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(affix_ident);
-			if (upgrade_id != -1) {
-				item->Prefix = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(affix_ident);
+			item->Prefix = upgrade;
 		} else if (!strcmp(value, "Suffix")) {
 			std::string affix_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(affix_ident);
-			if (upgrade_id != -1) {
-				item->Suffix = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(affix_ident);
+			item->Suffix = upgrade;
 		} else if (!strcmp(value, "Set")) {
 			std::string set_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(set_ident);
-			if (upgrade_id != -1) {
-				item->Set = AllUpgrades[upgrade_id];
-				item->Set->UniqueItems.push_back(item);
-			} else {
-				LuaError(l, "Set upgrade \"%s\" doesn't exist." _C_ set_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(set_ident);
+			item->Set = upgrade;
+			item->Set->UniqueItems.push_back(item);
 		} else if (!strcmp(value, "Spell")) {
 			std::string spell_ident = LuaToString(l, -1);
 			CSpell *spell = CSpell::GetSpell(spell_ident);
@@ -125,20 +113,12 @@ static int CclDefineUniqueItem(lua_State *l)
 			}
 		} else if (!strcmp(value, "Work")) {
 			std::string upgrade_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-			if (upgrade_id != -1) {
-				item->Work = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Literary work upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
+			item->Work = upgrade;
 		} else if (!strcmp(value, "Elixir")) {
 			std::string upgrade_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(upgrade_ident);
-			if (upgrade_id != -1) {
-				item->Elixir = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Elixir upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
+			item->Elixir = upgrade;
 		} else if (!strcmp(value, "Description")) {
 			item->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {

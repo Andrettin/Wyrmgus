@@ -810,19 +810,19 @@ static int CclDefineUnitType(lua_State *l)
 						variation->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {
 						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+						const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
 						if (upgrade != nullptr) {
 							variation->UpgradesRequired.push_back(upgrade);
 						} else {
-							variation->UpgradesRequired.push_back(CUpgrade::New(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+							variation->UpgradesRequired.push_back(CUpgrade::add(upgrade_ident, nullptr)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "upgrade-forbidden")) {
 						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
-						const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+						const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
 						if (upgrade != nullptr) {
 							variation->UpgradesForbidden.push_back(upgrade);
 						} else {
-							variation->UpgradesForbidden.push_back(CUpgrade::New(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+							variation->UpgradesForbidden.push_back(CUpgrade::add(upgrade_ident, nullptr)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "item-class-equipped")) {
 						std::string item_class_ident = LuaToString(l, -1, k + 1);
@@ -1804,13 +1804,8 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "CostModifier")) {
 			type->CostModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Elixir")) {
-			std::string elixir_ident = LuaToString(l, -1);
-			int elixir_id = UpgradeIdByIdent(elixir_ident);
-			if (elixir_id != -1) {
-				type->Elixir = AllUpgrades[elixir_id];
-			} else {
-				type->Elixir = CUpgrade::New(elixir_ident); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
-			}
+			const std::string elixir_ident = LuaToString(l, -1);
+			type->Elixir = CUpgrade::get_or_add(elixir_ident, nullptr); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -1864,35 +1859,20 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string affix_ident = LuaToString(l, -1, j + 1);
-				int affix_id = UpgradeIdByIdent(affix_ident);
-				if (affix_id != -1) {
-					type->Affixes.push_back(AllUpgrades[affix_id]);
-				} else {
-					type->Affixes.push_back(CUpgrade::New(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
-				}
+				type->Affixes.push_back(CUpgrade::get_or_add(affix_ident, nullptr)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 			}
 		} else if (!strcmp(value, "Traits")) {
 			type->Traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string trait_ident = LuaToString(l, -1, j + 1);
-				int trait_id = UpgradeIdByIdent(trait_ident);
-				if (trait_id != -1) {
-					type->Traits.push_back(AllUpgrades[trait_id]);
-				} else {
-					type->Traits.push_back(CUpgrade::New(trait_ident)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
-				}
+				type->Traits.push_back(CUpgrade::get_or_add(trait_ident, nullptr)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 			}
 		} else if (!strcmp(value, "StartingAbilities")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string ability_ident = LuaToString(l, -1, j + 1);
-				int ability_id = UpgradeIdByIdent(ability_ident);
-				if (ability_id != -1) {
-					type->StartingAbilities.push_back(AllUpgrades[ability_id]);
-				} else {
-					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
-				}
+				type->StartingAbilities.push_back(CUpgrade::get(ability_ident));
 			}
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
@@ -2894,9 +2874,9 @@ static int CclGetUnitTypeData(lua_State *l)
 			}
 		}
 		if (type->ItemClass != -1) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[i]->MagicPrefix && AllUpgrades[i]->ItemPrefix[type->ItemClass]) {
-					prefixes.push_back(AllUpgrades[i]);
+			for (CUpgrade *upgrade : CUpgrade::get_all()) {
+				if (upgrade->MagicPrefix && upgrade->ItemPrefix[type->ItemClass]) {
+					prefixes.push_back(upgrade);
 				}
 			}
 		}
@@ -2917,9 +2897,9 @@ static int CclGetUnitTypeData(lua_State *l)
 			}
 		}
 		if (type->ItemClass != -1) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[i]->MagicSuffix && AllUpgrades[i]->ItemSuffix[type->ItemClass]) {
-					suffixes.push_back(AllUpgrades[i]);
+			for (CUpgrade *upgrade : CUpgrade::get_all()) {
+				if (upgrade->MagicSuffix && upgrade->ItemSuffix[type->ItemClass]) {
+					suffixes.push_back(upgrade);
 				}
 			}
 		}
@@ -2934,9 +2914,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Works")) {
 		std::vector<CUpgrade *> works;
 		if (type->ItemClass != -1) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[i]->Work == type->ItemClass && !AllUpgrades[i]->UniqueOnly) {
-					works.push_back(AllUpgrades[i]);
+			for (CUpgrade *upgrade : CUpgrade::get_all()) {
+				if (upgrade->Work == type->ItemClass && !upgrade->UniqueOnly) {
+					works.push_back(upgrade);
 				}
 			}
 		}
@@ -3475,7 +3455,7 @@ void UpdateUnitVariables(CUnit &unit)
 	
 	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != nullptr && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
-		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->Species->ChildUpgrade));
+		IndividualUpgradeLost(unit, CUpgrade::get(unit.Type->Species->ChildUpgrade));
 	}
 	//Wyrmgus end
 

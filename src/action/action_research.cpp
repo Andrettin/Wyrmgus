@@ -97,7 +97,7 @@
 {
 	if (!strcmp(value, "upgrade")) {
 		++j;
-		this->Upgrade = CUpgrade::Get(LuaToString(l, -1, j + 1));
+		this->Upgrade = CUpgrade::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "player")) {
 		++j;
@@ -159,13 +159,13 @@
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
-		if (upgrade.Name.empty()) {
+		if (upgrade.get_name().empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 		} else {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.get_name().c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start

@@ -28,8 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UPGRADE_H__
-#define __UPGRADE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -50,7 +49,7 @@ extern void InitUpgrades();
 /// save the upgrades
 extern void SaveUpgrades(CFile &file);
 /// cleanup upgrade module
-extern void CleanUpgrades();
+extern void CleanUpgradeModifiers();
 
 /// Register CCL features for upgrades
 extern void UpgradesCclRegister();
@@ -82,7 +81,7 @@ extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *
 extern void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um);
 extern void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save = true);
 extern void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all = false);
-extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
+extern void TraitAcquire(CUnit &unit, CUpgrade *upgrade);
 //Wyrmgus end
 extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade); /// Make a unit acquire in individual upgrade
 extern void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all = false); /// Make a unit lose in individual upgrade
@@ -112,5 +111,3 @@ extern bool IsKnowledgeVariable(int var);
 extern bool IsPotentiallyNegativeVariable(int var);
 extern std::string GetVariableDisplayName(int var, bool increase = false);
 //Wyrmgus end
-
-#endif

@@ -143,22 +143,14 @@ void CDeityDomain::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->Upgrade = upgrade;
-				CDeityDomain::DeityDomainsByUpgrade[upgrade] = this;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(value);
+			this->Upgrade = upgrade;
+			CDeityDomain::DeityDomainsByUpgrade[upgrade] = this;
 		} else if (key == "ability") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *ability = CUpgrade::Get(value);
-			if (ability) {
-				this->Abilities.push_back(ability);
-				ability->DeityDomains.push_back(this);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			CUpgrade *ability = CUpgrade::get(value);
+			this->Abilities.push_back(ability);
+			ability->DeityDomains.push_back(this);
 		} else if (key == "description") {
 			this->Description = value;
 		} else if (key == "background") {

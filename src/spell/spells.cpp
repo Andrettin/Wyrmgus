@@ -786,7 +786,7 @@ bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 
 	//Wyrmgus start
 //	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-	return dependencyId == -1 || unit.GetIndividualUpgrade(AllUpgrades[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::get_all()[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
 	//Wyrmgus end
 }
 

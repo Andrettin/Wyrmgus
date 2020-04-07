@@ -348,10 +348,7 @@ void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, 
 	std::string value = property.second;
 	if (key == "upgrade") {
 		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::Get(value);
-		if (!this->Upgrade) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-		}
+		this->Upgrade = CUpgrade::get(value);
 	} else {
 		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.c_str());
 	}
@@ -363,10 +360,7 @@ void CUpgradeDependency::process_sml_property(const stratagus::sml_property &pro
 	std::string value = property.get_value();
 	if (key == "upgrade") {
 		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::Get(value);
-		if (this->Upgrade == nullptr) {
-			throw std::runtime_error("Invalid upgrade: \"" + value + "\".");
-		}
+		this->Upgrade = CUpgrade::get(value);
 	} else {
 		throw std::runtime_error("Invalid upgrade dependency property: \"" + property.get_key() + "\".");
 	}
@@ -384,7 +378,7 @@ bool CUpgradeDependency::Check(const CUnit *unit, bool ignore_units) const
 
 std::string CUpgradeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Upgrade->Name + '\n';
+	std::string str = prefix + this->Upgrade->get_name() + '\n';
 	return str;
 }
 
@@ -514,7 +508,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		}
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
-		const CUpgrade *upgrade = CUpgrade::Get(button.ValueStr);
+		const CUpgrade *upgrade = CUpgrade::get(button.ValueStr);
 		if (upgrade->Dependency) {
 			rules = upgrade->Dependency->GetString();
 		}
@@ -664,10 +658,7 @@ static int CclDefineDependency(lua_State *l)
 				}
 				dependency = new CUnitTypeDependency(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade-", 8)) {
-				const CUpgrade *upgrade = CUpgrade::Get(required);
-				if (!upgrade) {
-					LuaError(l, "Invalid upgrade: \"%s\"" _C_ required);
-				}
+				const CUpgrade *upgrade = CUpgrade::get(required);
 				dependency = new CUpgradeDependency(upgrade);
 			} else {
 				LuaError(l, "Invalid required type for dependency: \"%s\"" _C_ required);
@@ -707,10 +698,7 @@ static int CclDefineDependency(lua_State *l)
 		}
 		unit_type->Dependency = dependency;
 	} else if (!strncmp(target, "upgrade-", 8)) {
-		CUpgrade *upgrade = CUpgrade::Get(target);
-		if (!upgrade) {
-			LuaError(l, "Invalid upgrade: \"%s\"" _C_ target);
-		}
+		CUpgrade *upgrade = CUpgrade::get(target);
 		upgrade->Dependency = dependency;
 	} else {
 		LuaError(l, "Invalid dependency target: \"%s\"" _C_ target);
@@ -756,10 +744,7 @@ static int CclDefinePredependency(lua_State *l)
 				}
 				dependency = new CUnitTypeDependency(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade-", 8)) {
-				const CUpgrade *upgrade = CUpgrade::Get(required);
-				if (!upgrade) {
-					LuaError(l, "Invalid upgrade: \"%s\"" _C_ required);
-				}
+				const CUpgrade *upgrade = CUpgrade::get(required);
 				dependency = new CUpgradeDependency(upgrade);
 			} else {
 				LuaError(l, "Invalid required type for dependency: \"%s\"" _C_ required);
@@ -799,10 +784,7 @@ static int CclDefinePredependency(lua_State *l)
 		}
 		unit_type->Predependency = dependency;
 	} else if (!strncmp(target, "upgrade-", 8)) {
-		CUpgrade *upgrade = CUpgrade::Get(target);
-		if (!upgrade) {
-			LuaError(l, "Invalid upgrade: \"%s\"" _C_ target);
-		}
+		CUpgrade *upgrade = CUpgrade::get(target);
 		upgrade->Predependency = dependency;
 	} else {
 		LuaError(l, "Invalid dependency target: \"%s\"" _C_ target);
@@ -838,10 +820,7 @@ static int CclCheckDependency(lua_State *l)
 		}
 		lua_pushboolean(l, CheckDependencies(unit_type, player));
 	} else if (!strncmp(object, "upgrade-", 8)) {
-		const CUpgrade *upgrade = CUpgrade::Get(object);
-		if (!upgrade) {
-			LuaError(l, "Invalid upgrade: \"%s\"" _C_ object);
-		}
+		const CUpgrade *upgrade = CUpgrade::get(object);
 		lua_pushboolean(l, CheckDependencies(upgrade, player));
 	} else {
 		LuaError(l, "Invalid target of dependency check: \"%s\"" _C_ object);

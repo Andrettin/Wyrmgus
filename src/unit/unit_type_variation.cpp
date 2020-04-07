@@ -126,20 +126,12 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "required_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade != nullptr) {
-				this->UpgradesRequired.push_back(upgrade);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			const CUpgrade *upgrade = CUpgrade::get(value);
+			this->UpgradesRequired.push_back(upgrade);
 		} else if (key == "forbidden_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade != nullptr) {
-				this->UpgradesForbidden.push_back(upgrade);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			const CUpgrade *upgrade = CUpgrade::try_get(value);
+			this->UpgradesForbidden.push_back(upgrade);
 		} else if (key == "item_class_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
 			const int item_class = GetItemClassIdByName(value);

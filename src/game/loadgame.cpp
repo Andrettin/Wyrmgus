@@ -154,7 +154,7 @@ void CleanModules()
 	CleanPlayers();
 	CleanSelections();
 	CleanGroups();
-	CleanUpgrades();
+	CleanUpgradeModifiers();
 	CleanButtons();
 	CButtonLevel::ClearButtonLevels();
 	CleanMissileTypes();

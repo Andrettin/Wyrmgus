@@ -339,10 +339,7 @@ static int CclDefineProvince(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string upgrade_ident = LuaToString(l, -1, j + 1);
-				CUpgrade *modifier = CUpgrade::Get(upgrade_ident);
-				if (modifier == nullptr) {
-					LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
-				}
+				CUpgrade *modifier = CUpgrade::get(upgrade_ident);
 				++j;
 				province->HistoricalModifiers[modifier][year] = LuaToBoolean(l, -1, j + 1);
 			}

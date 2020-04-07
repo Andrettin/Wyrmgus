@@ -1072,12 +1072,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
 					   //Wyrmgus start
-//					   AllUpgrades[arg1]->Ident.c_str(), -1);
-					   AllUpgrades[arg1]->Ident.c_str(), arg2);
+//					   CUpgrade::get_all()[arg1]->Ident.c_str(), -1);
+					   CUpgrade::get_all()[arg1]->Ident.c_str(), arg2);
 					   //Wyrmgus end
 			//Wyrmgus start
-//			CommandResearch(unit, *AllUpgrades[arg1], status);
-			CommandResearch(unit, *AllUpgrades[arg1], arg2, status);
+//			CommandResearch(unit, *CUpgrade::get_all()[arg1], status);
+			CommandResearch(unit, *CUpgrade::get_all()[arg1], arg2, status);
 			//Wyrmgus end
 			break;
 		case MessageCommandCancelResearch:
@@ -1087,8 +1087,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandLearnAbility:
 			CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP,
-					   AllUpgrades[arg1]->Ident.c_str(), -1);
-			CommandLearnAbility(unit, *AllUpgrades[arg1]);
+					   CUpgrade::get_all()[arg1]->Ident.c_str(), -1);
+			CommandLearnAbility(unit, *CUpgrade::get_all()[arg1]);
 			break;
 		case MessageCommandQuest: {
 			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, Quests[arg1]->Ident.c_str(), -1);

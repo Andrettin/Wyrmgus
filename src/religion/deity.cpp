@@ -191,21 +191,13 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "deity_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->DeityUpgrade = upgrade;
-				CDeity::DeitiesByUpgrade[upgrade] = this;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(value);
+			this->DeityUpgrade = upgrade;
+			CDeity::DeitiesByUpgrade[upgrade] = this;
 		} else if (key == "character_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->CharacterUpgrade = upgrade;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			CUpgrade *upgrade = CUpgrade::get(value);
+			this->CharacterUpgrade = upgrade;
 		} else if (key == "holy_order") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *holy_order = PlayerRaces.GetFaction(value);

@@ -28,8 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UPGRADE_MODIFIER_H__
-#define __UPGRADE_MODIFIER_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -96,9 +95,3 @@ public:
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end
 };
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-#endif

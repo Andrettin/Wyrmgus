@@ -763,7 +763,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			condition->FactionCoreSettlements = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgrade")) {
-			condition->ResearchedUpgrade = CUpgrade::Get(LuaToString(l, -1));
+			condition->ResearchedUpgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgradeClass")) {
 			condition->ResearchedUpgradeClass = GetUpgradeClassIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "UpgradeResearched")) {

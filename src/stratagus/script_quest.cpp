@@ -226,10 +226,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
-						CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, k + 1));
-						if (!upgrade) {
-							LuaError(l, "Upgrade doesn't exist.");
-						}
+						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
 						CCharacter *character = CCharacter::GetCharacter(LuaToString(l, -1, k + 1));
