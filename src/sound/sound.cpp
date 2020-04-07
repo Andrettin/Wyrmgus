@@ -752,6 +752,10 @@ void sound::initialize()
 		this->Number = file_count;
 	} else if (file_count == 1) { // unique sound
 		this->Number = ONE_SOUND;
+	} else if (this->get_first_sound() != nullptr && this->get_second_sound() != nullptr) {
+		this->Number = TWO_GROUPS;
+	} else {
+		throw std::runtime_error("Sound \"" + this->get_identifier() + "\" is neither a sound group, nor does it have any files.");
 	}
 
 	for (const std::filesystem::path &filepath : this->get_files()) {
