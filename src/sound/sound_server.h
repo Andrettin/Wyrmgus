@@ -100,11 +100,9 @@ extern bool UnitSoundIsPlaying(Origin *origin);
 /// Check, if this sample is already playing
 extern bool SampleIsPlaying(CSample *sample);
 /// Load a sample
-extern CSample *LoadSample(const std::filesystem::path &filepath);
+extern std::unique_ptr<CSample> LoadSample(const std::filesystem::path &filepath);
 /// Play a sample
 extern int PlaySample(CSample *sample, Origin *origin = nullptr);
-/// Play a sound file
-extern int PlaySoundFile(const std::string &name);
 
 /// Set effects volume
 extern void SetEffectsVolume(int volume);

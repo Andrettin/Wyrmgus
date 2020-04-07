@@ -608,13 +608,13 @@ void StopAllChannels()
 	SDL_UnlockMutex(Audio.Lock);
 }
 
-static CSample *load_sample_internal(const std::filesystem::path &filepath)
+static std::unique_ptr<CSample> load_sample_internal(const std::filesystem::path &filepath)
 {
 	auto decoder = stratagus::make_qunique<QAudioDecoder>();
 	decoder->moveToThread(QApplication::instance()->thread());
 	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
 
-	CSample *sample = new CSample;
+	auto sample = std::make_unique<CSample>();
 
 	QEventLoop loop;
 	loop.connect(decoder.get(), &QAudioDecoder::bufferReady, [&]() {
@@ -654,10 +654,10 @@ static CSample *load_sample_internal(const std::filesystem::path &filepath)
 **
 **  @todo  Add streaming, caching support.
 */
-CSample *LoadSample(const std::filesystem::path &filepath)
+std::unique_ptr<CSample> LoadSample(const std::filesystem::path &filepath)
 {
 	const std::string filename = LibraryFileName(filepath.string().c_str());
-	CSample *sample = load_sample_internal(filename);
+	std::unique_ptr<CSample> sample = load_sample_internal(filename);
 
 	if (sample == nullptr) {
 		fprintf(stderr, "Can't load the \"%s\" sound.\n", filepath.string().c_str());
@@ -683,22 +683,6 @@ int PlaySample(CSample *sample, Origin *origin)
 	}
 	SDL_UnlockMutex(Audio.Lock);
 	return channel;
-}
-
-/**
-**  Play a sound file
-**
-**  @param name  Filename of a sound to play
-**
-**  @return      Channel number the sound is playing on, -1 for error
-*/
-int PlaySoundFile(const std::string &name)
-{
-	CSample *sample = LoadSample(name);
-	if (sample) {
-		return PlaySample(sample);
-	}
-	return -1;
 }
 
 /**
@@ -782,7 +766,7 @@ int PlayMusic(const std::string &file)
 	}
 	const std::string name = LibraryFileName(file.c_str());
 	DebugPrint("play music %s\n" _C_ name.c_str());
-	CSample *sample = LoadSample(name);
+	CSample *sample = LoadSample(name).release();
 
 	if (sample) {
 		StopMusic();

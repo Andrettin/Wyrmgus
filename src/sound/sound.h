@@ -137,12 +137,8 @@ public:
 	static constexpr const char *class_identifier = "sound";
 	static constexpr const char *database_folder = "sounds";
 
-	sound(const std::string &identifier) : data_entry(identifier)
-	{
-		memset(&Sound, 0, sizeof(Sound));
-	}
-
-	~sound();
+	sound(const std::string &identifier);
+	virtual ~sound() override;
 
 	virtual void initialize() override;
 
@@ -155,6 +151,11 @@ public:
 
 	Q_INVOKABLE void add_file(const std::filesystem::path &filepath);
 	Q_INVOKABLE void remove_file(const std::filesystem::path &filepath);
+
+	const std::vector<std::unique_ptr<CSample>> &get_samples() const
+	{
+		return this->samples;
+	}
 
 	sound *get_first_sound() const
 	{
@@ -196,13 +197,10 @@ public:
 	//Wyrmgus start
 	int VolumePercent = 100;
 	//Wyrmgus end
-	union {
-		CSample *OneSound;       /// if it's only a simple sound
-		CSample **OneGroup;      /// when it's a simple group
-	} Sound;
 
 private:
 	std::vector<std::filesystem::path> files; //the paths to the sound files
+	std::vector<std::unique_ptr<CSample>> samples; //the sound's samples, one for each file
 	sound *first_sound = nullptr; //selected sound
 	sound *second_sound = nullptr; //annoyed sound
 
@@ -247,9 +245,6 @@ extern void PlayUnitSound(const CUnit &unit, stratagus::sound *sound);
 extern void PlayMissileSound(const Missile &missile, stratagus::sound *sound);
 /// Play a game sound
 extern void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always = false);
-
-/// Play a sound file
-extern int PlayFile(const std::string &name, LuaActionListener *listener = nullptr);
 
 /// Modify the range of a given sound.
 extern void SetSoundRange(stratagus::sound *sound, unsigned char range);

@@ -84,11 +84,11 @@ int DistanceSilent;              /// silent distance
 static CSample *SimpleChooseSample(const stratagus::sound &sound)
 {
 	if (sound.Number == ONE_SOUND) {
-		return sound.Sound.OneSound;
+		return sound.get_samples().front().get();
 	} else {
 		//FIXME: check for errors
 		//FIXME: valid only in shared memory context (FrameCounter)
-		return sound.Sound.OneGroup[FrameCounter % sound.Number];
+		return sound.get_samples()[FrameCounter % sound.Number].get();
 	}
 }
 
@@ -127,7 +127,7 @@ static CSample *ChooseSample(stratagus::sound *sound, bool selection, Origin &so
 						SelectionHandler.sound = sound->get_first_sound();
 					}
 				} else {
-					result = SelectionHandler.sound->Sound.OneSound;
+					result = SelectionHandler.sound->get_samples().front().get();
 					SelectionHandler.HowMany = 0;
 					SelectionHandler.sound = sound->get_first_sound();
 				}
@@ -589,30 +589,6 @@ static void PlaySoundFileCallback(int channel)
 }
 
 /**
-**  Play a sound file
-**
-**  @param name      Filename of a sound to play
-**  @param listener  Optional lua callback
-**
-**  @return          Channel number the sound is playing on, -1 for error
-*/
-int PlayFile(const std::string &filepath, LuaActionListener *listener)
-{
-	int channel = -1;
-	CSample *sample = LoadSample(filepath);
-
-	if (sample) {
-		channel = PlaySample(sample);
-		if (channel != -1) {
-			SetChannelVolume(channel, MaxVolume);
-			SetChannelFinishedCallback(channel, PlaySoundFileCallback);
-			ChannelMap[channel] = listener;
-		}
-	}
-	return channel;
-}
-
-/**
 **  Ask the sound server to change the range of a sound.
 **
 **  @param sound  the id of the sound to modify.
@@ -761,36 +737,25 @@ void InitSoundClient()
 
 namespace stratagus {
 
+sound::sound(const std::string &identifier) : data_entry(identifier)
+{
+}
+
 sound::~sound()
 {
-	if (this->Number == ONE_SOUND) {
-		delete Sound.OneSound;
-	} else if (this->Number == TWO_GROUPS) {
-	} else {
-		//Wyrmgus start
-//		for (int i = 0; i < this->Number; ++i) {
-		for (unsigned int i = 0; i < this->Number; ++i) {
-		//Wyrmgus end
-			delete this->Sound.OneGroup[i];
-			this->Sound.OneGroup[i] = nullptr;
-		}
-		delete[] this->Sound.OneGroup;
-	}
 }
 
 void sound::initialize()
 {
 	const size_t file_count = this->get_files().size();
-	if (file_count > 1) { // load a sound group
-		this->Sound.OneGroup = new CSample * [file_count];
-		memset(this->Sound.OneGroup, 0, sizeof(CSample *) * file_count);
+	if (file_count > 1) { // sound group
 		this->Number = file_count;
-		for (size_t i = 0; i < file_count; ++i) {
-			this->Sound.OneGroup[i] = LoadSample(this->files[i]);
-		}
-	} else if (file_count == 1) { // load a unique sound
-		this->Sound.OneSound = LoadSample(this->files.front());
+	} else if (file_count == 1) { // unique sound
 		this->Number = ONE_SOUND;
+	}
+
+	for (const std::filesystem::path &filepath : this->get_files()) {
+		this->samples.push_back(LoadSample(filepath));
 	}
 
 	data_entry::initialize();

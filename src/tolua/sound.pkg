@@ -8,13 +8,6 @@ extern bool IsEffectsEnabled(void);
 extern void SetMusicEnabled(bool enabled);
 extern bool IsMusicEnabled(void);
 
-extern int PlayFile(const std::string name, LuaActionListener *listener = nullptr);
-$[
-function PlaySoundFile(file, callback)
-  return PlayFile(file, LuaActionListener:new(callback))
-end
-$]
-
 extern int PlayMusic(const std::string name);
 extern void PlayMusicName(const std::string name);
 extern void PlayMusicByGroupRandom(const std::string group);
