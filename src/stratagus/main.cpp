@@ -39,7 +39,11 @@ int main(int argc, char **argv)
 		QApplication app(argc, argv);
 
 		std::thread stratagus_thread([argc, argv]() {
-			stratagusMain(argc, argv);
+			try {
+				stratagusMain(argc, argv);
+			} catch (const std::exception &exception) {
+				exception::report(exception);
+			}
 		});
 
 		QQmlApplicationEngine engine;
