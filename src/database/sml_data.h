@@ -251,6 +251,17 @@ public:
 		return QPointF(x, y);
 	}
 
+	QSize to_size() const
+	{
+		if (this->get_values().size() != 2) {
+			throw std::runtime_error("Size scopes need to contain exactly two values.");
+		}
+
+		const int width = std::stoi(this->get_values()[0]);
+		const int height = std::stoi(this->get_values()[1]);
+		return QSize(width, height);
+	}
+
 	void print_to_dir(const std::filesystem::path &directory) const
 	{
 		std::filesystem::path filepath(directory / (this->get_tag() + ".txt"));
