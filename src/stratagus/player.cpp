@@ -1836,6 +1836,9 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			stratagus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			if (sound == nullptr) {
+				sound = GameSounds.WorkComplete[player.Race].Sound;
+			}
 
 			if (sound != nullptr) {
 				PlayGameSound(sound, MaxSampleVolume);

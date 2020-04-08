@@ -171,9 +171,12 @@
 			//Wyrmgus start
 //			stratagus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
 			stratagus::sound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
+			if (sound == nullptr) {
+				sound = GameSounds.WorkComplete[unit.Player->Race].Sound;
+			}
 			//Wyrmgus end
 
-			if (sound) {
+			if (sound != nullptr) {
 				PlayGameSound(sound, MaxSampleVolume);
 			}
 		}
