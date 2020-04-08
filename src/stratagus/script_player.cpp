@@ -2453,7 +2453,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CUpgrade *ability = CUpgrade::get(LuaToString(l, -1, j + 1));
-				if (!ability->Ability) {
+				if (!ability->is_ability()) {
 					LuaError(l, "Ability upgrade is not actually an ability.");
 				}
 

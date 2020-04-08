@@ -1220,7 +1220,7 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
 	}
 	
 	//Wyrmgus start
-	if (what.Ability) {
+	if (what.is_ability()) {
 		AbilityAcquire(unit, &what);
 		return;
 	}
@@ -1278,7 +1278,7 @@ void CommandLearnAbility(CUnit &unit, CUpgrade &what)
 		return ;
 	}
 	
-	if (what.Ability) {
+	if (what.is_ability()) {
 		AbilityAcquire(unit, &what);
 	} else { //an individual upgrade of some other kind (i.e. a deity choice)
 		IndividualUpgradeAcquire(unit, &what);

@@ -213,11 +213,6 @@ CUpgrade::~CUpgrade()
 {
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -261,15 +256,15 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "ability") {
-			this->Ability = string::to_bool(value);
+			this->ability = string::to_bool(value);
 		} else if (key == "weapon") {
-			this->Weapon = string::to_bool(value);
+			this->weapon = string::to_bool(value);
 		} else if (key == "shield") {
-			this->Shield = string::to_bool(value);
+			this->shield = string::to_bool(value);
 		} else if (key == "boots") {
-			this->Boots = string::to_bool(value);
+			this->boots = string::to_bool(value);
 		} else if (key == "arrows") {
-			this->Arrows = string::to_bool(value);
+			this->arrows = string::to_bool(value);
 		} else if (key == "item") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *item = UnitTypeByIdent(value);
@@ -481,11 +476,11 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			upgrade->MaxLimit = parent_upgrade->MaxLimit;
 			upgrade->MagicLevel = parent_upgrade->MagicLevel;
-			upgrade->Ability = parent_upgrade->Ability;
-			upgrade->Weapon = parent_upgrade->Weapon;
-			upgrade->Shield = parent_upgrade->Shield;
-			upgrade->Boots = parent_upgrade->Boots;
-			upgrade->Arrows = parent_upgrade->Arrows;
+			upgrade->ability = parent_upgrade->is_ability();
+			upgrade->weapon = parent_upgrade->is_weapon();
+			upgrade->shield = parent_upgrade->is_shield();
+			upgrade->boots = parent_upgrade->is_boots();
+			upgrade->arrows = parent_upgrade->is_arrows();
 			upgrade->Item = parent_upgrade->Item;
 			upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
 			upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
@@ -546,15 +541,15 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Year")) {
 			upgrade->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Ability")) {
-			upgrade->Ability = LuaToBoolean(l, -1);
+			upgrade->ability = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Weapon")) {
-			upgrade->Weapon = LuaToBoolean(l, -1);
+			upgrade->weapon = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Shield")) {
-			upgrade->Shield = LuaToBoolean(l, -1);
+			upgrade->shield = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Boots")) {
-			upgrade->Boots = LuaToBoolean(l, -1);
+			upgrade->boots = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Arrows")) {
-			upgrade->Arrows = LuaToBoolean(l, -1);
+			upgrade->arrows = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "MagicPrefix")) {
 			upgrade->MagicPrefix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "MagicSuffix")) {
@@ -1188,7 +1183,7 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->RequirementsString.c_str());
 		return 1;
 	} else if (!strcmp(data, "Ability")) {
-		lua_pushboolean(l, upgrade->Ability);
+		lua_pushboolean(l, upgrade->is_ability());
 		return 1;
 	} else if (!strcmp(data, "ItemPrefix")) {
 		if (nargs == 2) { //check if the upgrade is a prefix for any item type
@@ -1631,10 +1626,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[WeaponItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[ShieldItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[BootsItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[ArrowsItemSlot].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
@@ -1930,10 +1925,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[WeaponItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[ShieldItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[BootsItemSlot].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[ArrowsItemSlot].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}
@@ -2475,7 +2470,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 		}
 	}
 	*/
-	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
+	if (!(upgrade->is_ability() && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
@@ -2529,7 +2524,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	}
 
 	//Wyrmgus start
-	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
+	if (!(upgrade->is_ability() && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;

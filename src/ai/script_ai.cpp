@@ -449,7 +449,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::LearnAbility : {
 				CUpgrade *ability = CUpgrade::get(button.ValueStr);
 
-				if (ability->Ability) {
+				if (ability->is_ability()) {
 					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 						AiHelperInsert(aiHelper.LearnableAbilities, (**j).Slot, *ability);
 					}

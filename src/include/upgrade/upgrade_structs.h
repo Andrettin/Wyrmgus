@@ -96,6 +96,11 @@ class CUpgrade final : public stratagus::data_entry, public stratagus::data_type
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
+	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
+	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
+	Q_PROPERTY(bool boots MEMBER boots READ is_boots)
+	Q_PROPERTY(bool arrows MEMBER arrows READ is_arrows)
 
 public:
 	static constexpr const char *class_identifier = "upgrade";
@@ -129,6 +134,31 @@ public:
 		this->name = name.toStdString();
 	}
 
+	bool is_ability() const
+	{
+		return this->ability;
+	}
+
+	bool is_weapon() const
+	{
+		return this->weapon;
+	}
+
+	bool is_shield() const
+	{
+		return this->shield;
+	}
+
+	bool is_boots() const
+	{
+		return this->boots;
+	}
+
+	bool is_arrows() const
+	{
+		return this->arrows;
+	}
+
 private:
 	std::string name;
 public:
@@ -141,11 +171,13 @@ public:
 	std::string Background;			/// Encyclopedia entry for the upgrade
 	std::string EffectsString;		/// Effects string of the upgrade
 	std::string RequirementsString;	/// Requirements string of the upgrade
-	bool Ability = false;
-	bool Weapon = false;
-	bool Shield = false;
-	bool Boots = false;
-	bool Arrows = false;
+private:
+	bool ability = false;
+	bool weapon = false;
+	bool shield = false;
+	bool boots = false;
+	bool arrows = false;
+public:
 	bool MagicPrefix = false;
 	bool MagicSuffix = false;
 	bool RunicAffix = false;

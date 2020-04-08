@@ -553,7 +553,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->Ability != CONDITION_TRUE) {
-		if ((condition->Ability == CONDITION_ONLY) ^ (upgrade && upgrade->Ability)) {
+		if ((condition->Ability == CONDITION_ONLY) ^ (upgrade && upgrade->is_ability())) {
 			return false;
 		}
 	}
