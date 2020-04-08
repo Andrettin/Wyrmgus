@@ -1522,7 +1522,7 @@ void CalculateItemsToLoad()
 	}
 	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
-		itemsToLoad+= GetIconsCount();
+		itemsToLoad += GetIconsCount();
 		if (CPlayer::GetThisPlayer()) {
 			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[CPlayer::GetThisPlayer()->Race]);
 		}

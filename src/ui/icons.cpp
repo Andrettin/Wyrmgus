@@ -34,6 +34,7 @@
 #include "icons.h"
 
 #include "config.h"
+#include "database/defines.h"
 #include "menus.h"
 #include "mod.h"
 #include "player.h"
@@ -43,17 +44,10 @@
 #include "video.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-IconMap Icons;   /// Map of ident to icon.
-
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CIcon::CIcon(const std::string &ident) : Ident(ident)
+CIcon::CIcon(const std::string &identifier) : data_entry(identifier)
 {
 }
 
@@ -63,40 +57,12 @@ CIcon::~CIcon()
 	CPlayerColorGraphic::Free(this->GScale);
 }
 
-/**
-**  Create a new icon
-**
-**  @param ident  Icon identifier
-**
-**  @return       New icon
-*/
-CIcon *CIcon::New(const std::string &ident)
+void CIcon::initialize()
 {
-	CIcon *icon = CIcon::Get(ident);
-
-	if (icon == nullptr) {
-		icon = new CIcon(ident);
-		Icons[ident] = icon;
+	if (!this->get_file().empty() && this->G == nullptr) {
+		const QSize &icon_size = stratagus::defines::get()->get_icon_size();
+		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size.width(), icon_size.height());
 	}
-
-	return icon;
-}
-
-/**
-**  Get an icon
-**
-**  @param ident  Icon identifier
-**
-**  @return       The icon
-*/
-CIcon *CIcon::Get(const std::string &ident)
-{
-	IconMap::iterator it = Icons.find(ident);
-	if (it == Icons.end()) {
-		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
-		return nullptr;
-	}
-	return it->second;
 }
 
 void CIcon::ProcessConfigData(const CConfigData *config_data)
@@ -106,7 +72,7 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "frame") {
-			this->Frame = std::stoi(value);
+			this->frame = std::stoi(value);
 		} else {
 			fprintf(stderr, "Invalid icon property: \"%s\".\n", key.c_str());
 		}
@@ -114,7 +80,6 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "image") {
-			std::string file;
 			Vec2i size(0, 0);
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -122,7 +87,7 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
+					this->file = CMod::GetCurrentModPath() + value;
 				} else if (key == "width") {
 					size.x = std::stoi(value);
 				} else if (key == "height") {
@@ -130,11 +95,6 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 				} else {
 					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
 				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
 			}
 			
 			if (size.x == 0) {
@@ -147,28 +107,45 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->G = CPlayerColorGraphic::New(file, size.x, size.y);
+			this->G = CPlayerColorGraphic::New(this->get_file().string(), size.x, size.y);
 		} else {
 			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
 }
 
+void CIcon::set_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_file()) {
+		return;
+	}
+
+	this->file = stratagus::database::get_graphics_path(this->get_module()) / filepath;
+}
+
 void CIcon::Load()
 {
+	if (!this->is_initialized()) {
+		this->initialize();
+	}
+
 	//Wyrmgus start
 	if (this->Loaded) {
 		return;
 	}
 	//Wyrmgus end
-	Assert(this->G);
+
+	if (this->G == nullptr) {
+		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
+	}
+
 	this->G->Load();
 	if (Preference.GrayscaleIcons) {
 		this->GScale = this->G->Clone(true);
 	}
-	if (this->Frame >= G->NumFrames) {
-		DebugPrint("Invalid icon frame: %s - %d\n" _C_ this->GetIdent().c_str() _C_ this->Frame);
-		this->Frame = 0;
+	if (this->get_frame() >= G->NumFrames) {
+		DebugPrint("Invalid icon frame: %s - %d\n" _C_ this->get_identifier().c_str() _C_ this->get_frame());
+		this->frame = 0;
 	}
 	//Wyrmgus start
 	this->Loaded = true;
@@ -185,11 +162,11 @@ void CIcon::DrawIcon(const PixelPos &pos, const int player) const
 {
 	if (player != -1 ) {
 		//Wyrmgus start
-//		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
-		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y, true);
+//		this->G->DrawPlayerColorFrameClip(player, this->get_frame(), pos.x, pos.y);
+		this->G->DrawPlayerColorFrameClip(player, this->get_frame(), pos.x, pos.y, true);
 		//Wyrmgus end
 	} else {
-		this->G->DrawFrameClip(this->Frame, pos.x, pos.y);
+		this->G->DrawFrameClip(this->get_frame(), pos.x, pos.y);
 	}
 }
 
@@ -202,9 +179,9 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const int player) const
 {
 	if (this->GScale) {
 		if (player != -1) {
-			this->GScale->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
+			this->GScale->DrawPlayerColorFrameClip(player, this->get_frame(), pos.x, pos.y);
 		} else {
-			this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+			this->GScale->DrawFrameClip(this->get_frame(), pos.x, pos.y);
 		}
 	}
 }
@@ -219,9 +196,9 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 {
 	// TO-DO: implement more effect types (clock-like)
 	if (this->GScale) {
-		this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+		this->GScale->DrawFrameClip(this->get_frame(), pos.x, pos.y);
 		const int height = (G->Height * (100 - percent)) / 100;
-		this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height,
+		this->G->DrawSubClip(G->frame_map[this->get_frame()].x, G->frame_map[this->get_frame()].y + G->Height - height,
 							 G->Width, height, pos.x, pos.y + G->Height - height);
 	} else {
 		DebugPrint("Enable grayscale icon drawing in your game to achieve special effects for cooldown spell icons");
@@ -253,7 +230,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
 	}
 	//Wyrmgus end
-	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->Frame;
+	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->get_frame();
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
@@ -382,9 +359,9 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 */
 bool IconConfig::LoadNoLog()
 {
-	Assert(!Name.empty());
+	Assert(!this->Name.empty());
 
-	Icon = CIcon::Get(Name);
+	Icon = CIcon::try_get(this->Name);
 	return Icon != nullptr;
 }
 
@@ -407,7 +384,7 @@ bool IconConfig::Load()
 */
 int GetIconsCount()
 {
-	return Icons.size();
+	return CIcon::get_all().size();
 }
 
 /**
@@ -417,24 +394,10 @@ void LoadIcons()
 {
 	ShowLoadProgress("%s", _("Loading Icons"));
 		
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon *icon = (*it).second;
-
+	for (CIcon *icon : CIcon::get_all()) {
 		UpdateLoadProgress();
 		icon->Load();
 
 		IncItemsLoaded();
 	}
-}
-
-/**
-**  Clean up memory used by the icons.
-*/
-void CleanIcons()
-{
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon *icon = (*it).second;
-		delete icon;
-	}
-	Icons.clear();
 }

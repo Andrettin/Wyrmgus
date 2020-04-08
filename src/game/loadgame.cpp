@@ -112,7 +112,6 @@ void CleanModules()
 	CleanMessages();
 
 	stratagus::database::get()->clear();
-	CleanIcons();
 	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();

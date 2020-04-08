@@ -46,16 +46,23 @@ void defines::load(const std::filesystem::path &data_path)
 	}
 
 	sml_parser parser(defines_path);
-	const sml_data sml_data = parser.parse();
+	const sml_data data = parser.parse();
 
-	sml_data.for_each_property([&](const sml_property &property) {
+	data.for_each_element([&](const sml_property &property) {
 		this->process_sml_property(property);
+	}, [&](const sml_data &scope) {
+		this->process_sml_scope(scope);
 	});
 }
 
 void defines::process_sml_property(const sml_property &property)
 {
 	database::process_sml_property_for_object(this, property);
+}
+
+void defines::process_sml_scope(const sml_data &scope)
+{
+	database::process_sml_scope_for_object(this, scope);
 }
 
 }

@@ -223,12 +223,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			this->name = value;
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
-			CIcon *icon = CIcon::Get(value);
-			if (icon != nullptr) {
-				this->Icon = icon;
-			} else {
-				fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
-			}
+			CIcon *icon = CIcon::get(value);
+			this->Icon = icon;
 		} else if (key == "class") {
 			value = FindAndReplaceString(value, "_", "-");
 			const std::string &class_name = value;
@@ -346,13 +342,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			other_upgrade->IncompatibleAffixes[this->ID] = true;
 		}
 	}
-	
-	//load icon here
-	if (this->Icon != nullptr && !this->Icon->Loaded) {
-		this->Icon->Load();
-	}
-	
-	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+
+	this->initialize();
 }
 
 void CUpgrade::process_sml_property(const stratagus::sml_property &property)
@@ -361,7 +352,7 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "icon") {
-		CIcon *icon = CIcon::Get(value);
+		CIcon *icon = CIcon::get(value);
 		if (icon != nullptr) {
 			this->Icon = icon;
 		} else {
@@ -370,6 +361,16 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	} else {
 		data_entry::process_sml_property(property);
 	}
+}
+
+void CUpgrade::initialize()
+{
+	//load icon here
+	if (this->Icon != nullptr && !this->Icon->Loaded) {
+		this->Icon->Load();
+	}
+
+	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
 /**
@@ -493,12 +494,8 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Name")) {
 			upgrade->name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			CIcon *icon = CIcon::Get(LuaToString(l, -1));
-			if (icon != nullptr) {
-				upgrade->Icon = icon;
-			} else {
-				LuaError(l, "Icon doesn't exist.");
-			}
+			CIcon *icon = CIcon::get(LuaToString(l, -1));
+			upgrade->Icon = icon;
 		} else if (!strcmp(value, "Class")) {
 			std::string class_name = LuaToString(l, -1);
 			
@@ -1148,7 +1145,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		if (upgrade->Icon) {
-			lua_pushstring(l, upgrade->Icon->GetIdent().c_str());
+			lua_pushstring(l, upgrade->Icon->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -118,6 +118,7 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void process_sml_property(const stratagus::sml_property &property) override;
+	virtual void initialize() override;
 
 	const std::string &get_name() const
 	{

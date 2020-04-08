@@ -1280,11 +1280,10 @@ static int CclDefineIcon(lua_State *l)
 		}
 	}
 
-	CIcon *icon = CIcon::New(ident);
+	CIcon *icon = CIcon::add(ident, nullptr);
 	icon->file = file;
-	icon->size = size;
-	icon->Frame = frame;
-	icon->G = CPlayerColorGraphic::New(icon->get_file(), icon->size.x, icon->size.y);
+	icon->frame = frame;
+	icon->G = CPlayerColorGraphic::New(icon->get_file().string(), size.x, size.y);
 
 	return 0;
 }
@@ -1295,17 +1294,14 @@ static int CclGetIconData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string icon_ident = LuaToString(l, 1);
-	const CIcon *icon = CIcon::Get(icon_ident);
-	if (!icon) {
-		LuaError(l, "Icon \"%s\" doesn't exist." _C_ icon_ident.c_str());
-	}
+	const CIcon *icon = CIcon::get(icon_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "File")) {
-		lua_pushstring(l, icon->get_file().c_str());
+		lua_pushstring(l, icon->get_file().string().c_str());
 		return 1;
 	} if (!strcmp(data, "Frame")) {
-		lua_pushnumber(l, icon->Frame);
+		lua_pushnumber(l, icon->get_frame());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -1317,8 +1313,8 @@ static int CclGetIconData(lua_State *l)
 static int CclGetIcons(lua_State *l)
 {
 	std::vector<std::string> icons;
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		icons.push_back(it->first);
+	for (const CIcon *icon : CIcon::get_all()) {
+		icons.push_back(icon->get_identifier());
 	}
 		
 	lua_createtable(l, icons.size(), 0);

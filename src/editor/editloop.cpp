@@ -843,7 +843,7 @@ static void DrawUnitIcons()
 		}
 		//Wyrmgus start
 //		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::Get("icon-level-up");
+		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::get("icon-level-up");
 		//Wyrmgus end
 		const PixelPos pos(x, y);
 

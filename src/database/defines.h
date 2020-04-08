@@ -35,15 +35,27 @@
 
 namespace stratagus {
 
+class sml_data;
 class sml_property;
 
 class defines final : public QObject, public singleton<defines>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
+
 public:
 	void load(const std::filesystem::path &base_path);
 	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	const QSize &get_icon_size() const
+	{
+		return this->icon_size;
+	}
+
+private:
+	QSize icon_size;
 };
 
 }

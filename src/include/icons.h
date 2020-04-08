@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -103,17 +105,59 @@ class ButtonStyle;
 struct lua_State;
 
 /// Icon: rectangle image used in menus
-class CIcon
+class CIcon final : public stratagus::data_entry, public stratagus::data_type<CIcon>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(int frame MEMBER frame READ get_frame)
+	Q_PROPERTY(QString file READ get_file_qstring WRITE set_file_qstring)
+
 public:
-	CIcon(const std::string &ident);
+	static constexpr const char *class_identifier = "icon";
+	static constexpr const char *database_folder = "icons";
+
+	//needed by scripts via tolua++ for now
+	static CIcon *Get(const std::string &ident)
+	{
+		return CIcon::get(ident);
+	}
+
+	CIcon(const std::string &identifier);
 	~CIcon();
 
-	static CIcon *New(const std::string &ident);
-	static CIcon *Get(const std::string &ident);
+	virtual void initialize() override;
+
+	virtual void check() const override
+	{
+		if (this->get_file().empty()) {
+			throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no image file associated with it.");
+		}
+	}
 
 	void ProcessConfigData(const CConfigData *config_data);
 	
+	const std::filesystem::path &get_file() const
+	{
+		return this->file;
+	}
+
+	void set_file(const std::filesystem::path &filepath);
+
+	QString get_file_qstring() const
+	{
+		return QString::fromStdString(this->get_file().string());
+	}
+
+	void set_file_qstring(const QString &file)
+	{
+		this->set_file(file.toStdString());
+	}
+
+	int get_frame() const
+	{
+		return this->frame;
+	}
+
 	void Load();
 
 	/// Draw icon
@@ -129,26 +173,13 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
-	const std::string &GetIdent() const
-	{
-		return this->Ident;
-	}
-
-	const std::string &get_file() const
-	{
-		return this->file;
-	}
-
-private:
-	std::string Ident;        /// Icon identifier
 public:
 	CPlayerColorGraphic *G = nullptr; //graphic data
 	CPlayerColorGraphic *GScale = nullptr; //icon when drawn grayscaled
 private:
-	std::string file;
-	Vec2i size = Vec2i(0, 0);
+	std::filesystem::path file;
+	int frame = 0; //frame number in the icon's image
 public:
-	int Frame = 0; //frame number in graphic
 	//Wyrmgus start
 	bool Loaded = false;
 	//Wyrmgus end
@@ -175,7 +206,3 @@ public:
 
 extern void LoadIcons();   /// Load icons
 extern int  GetIconsCount();
-extern void CleanIcons();  /// Cleanup icons
-
-using IconMap = std::map<std::string, CIcon *>;
-extern IconMap Icons;
