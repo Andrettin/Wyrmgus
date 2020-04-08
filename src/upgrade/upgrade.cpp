@@ -837,23 +837,15 @@ static int CclDefineModifier(lua_State *l)
 			}
 		} else if (!strcmp(key, "allow")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			if (!strncmp(value, "upgrade-", 8)) {
-				//Wyrmgus start
-//				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
-				um->ChangeUpgrades[UpgradeIdByIdent(value)] = *strdup(LuaToString(l, j + 1, 3));
-				//Wyrmgus end
-			} else {
-				LuaError(l, "upgrade expected");
-			}
+			//Wyrmgus start
+//			um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
+			um->ChangeUpgrades[CUpgrade::get(value)->ID] = *strdup(LuaToString(l, j + 1, 3));
+			//Wyrmgus end
 		//Wyrmgus start
 		} else if (!strcmp(key, "remove-upgrade")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			if (!strncmp(value, "upgrade-", 8)) {
-				CUpgrade *removed_upgrade = CUpgrade::get(value);
-				um->RemoveUpgrades.push_back(removed_upgrade);
-			} else {
-				LuaError(l, "upgrade expected");
-			}
+			CUpgrade *removed_upgrade = CUpgrade::get(value);
+			um->RemoveUpgrades.push_back(removed_upgrade);
 		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
@@ -1000,11 +992,7 @@ static int CclAcquireAbility(lua_State *l)
 	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
 	const char *ident = LuaToString(l, 2);
-	if (!strncmp(ident, "upgrade-", 8)) {
-		AbilityAcquire(*unit, CUpgrade::get(ident));
-	} else {
-		DebugPrint(" wrong ident %s\n" _C_ ident);
-	}
+	AbilityAcquire(*unit, CUpgrade::get(ident));
 	return 0;
 }
 
@@ -1022,18 +1010,16 @@ static int CclAcquireTrait(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
-	const char *ident = LuaToString(l, 2);
-	if (!strncmp(ident, "upgrade-", 8)) {
+	const std::string ident = LuaToString(l, 2);
+	if (!ident.empty()) {
 		TraitAcquire(*unit, CUpgrade::get(ident));
-	} else if (strlen(ident) == 0) {
+	} else {
 		if (unit->Trait != nullptr) { //remove previous trait, if any
 			if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
 				IndividualUpgradeLost(*unit, unit->Trait);
 			}
 		}
 		unit->Trait = nullptr;
-	} else {
-		DebugPrint(" wrong ident %s\n" _C_ ident);
 	}
 	return 0;
 }

@@ -440,7 +440,7 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	if (!CheckDependencies(CUpgrade::get(button.ValueStr), unit.Player, false, true)) {
 		return false;
 	}
-	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)
+	if (button.Action == ButtonCmd::Research
 		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A' && UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'R') {
 		return false;
 	}
