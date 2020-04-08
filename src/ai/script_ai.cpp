@@ -938,7 +938,7 @@ static int CclAiWait(lua_State *l)
 			lua_pushboolean(l, 0);
 			return 1;
 		}
-	} else if (!strncmp(ident, "upgrade-", 8)) {
+	} else if (!strncmp(ident, "upgrade", 7)) {
 		if (UpgradeIdentAllowed(*AiPlayer->Player, ident) == 'R') {
 			lua_pushboolean(l, 0);
 			return 1;

@@ -506,7 +506,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		if (unit_type->Dependency) {
 			rules = unit_type->Dependency->GetString();
 		}
-	} else if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)) {
+	} else if (!strncmp(button.ValueStr.c_str(), "upgrade", 7)) {
 		// target string refers to upgrade-XXX
 		const CUpgrade *upgrade = CUpgrade::get(button.ValueStr);
 		if (upgrade->Dependency) {
@@ -657,7 +657,7 @@ static int CclDefineDependency(lua_State *l)
 					LuaError(l, "Invalid unit type: \"%s\"" _C_ required);
 				}
 				dependency = new CUnitTypeDependency(unit_type, count > 0 ? count : 1);
-			} else if (!strncmp(required, "upgrade-", 8)) {
+			} else if (!strncmp(required, "upgrade", 7)) {
 				const CUpgrade *upgrade = CUpgrade::get(required);
 				dependency = new CUpgradeDependency(upgrade);
 			} else {
@@ -697,7 +697,7 @@ static int CclDefineDependency(lua_State *l)
 			LuaError(l, "Invalid unit type: \"%s\"" _C_ target);
 		}
 		unit_type->Dependency = dependency;
-	} else if (!strncmp(target, "upgrade-", 8)) {
+	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
 		upgrade->Dependency = dependency;
 	} else {
@@ -743,7 +743,7 @@ static int CclDefinePredependency(lua_State *l)
 					LuaError(l, "Invalid unit type: \"%s\"" _C_ required);
 				}
 				dependency = new CUnitTypeDependency(unit_type, count > 0 ? count : 1);
-			} else if (!strncmp(required, "upgrade-", 8)) {
+			} else if (!strncmp(required, "upgrade", 7)) {
 				const CUpgrade *upgrade = CUpgrade::get(required);
 				dependency = new CUpgradeDependency(upgrade);
 			} else {
@@ -783,7 +783,7 @@ static int CclDefinePredependency(lua_State *l)
 			LuaError(l, "Invalid unit type: \"%s\"" _C_ target);
 		}
 		unit_type->Predependency = dependency;
-	} else if (!strncmp(target, "upgrade-", 8)) {
+	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
 		upgrade->Predependency = dependency;
 	} else {
@@ -819,7 +819,7 @@ static int CclCheckDependency(lua_State *l)
 			LuaError(l, "Invalid unit type: \"%s\"" _C_ object);
 		}
 		lua_pushboolean(l, CheckDependencies(unit_type, player));
-	} else if (!strncmp(object, "upgrade-", 8)) {
+	} else if (!strncmp(object, "upgrade", 7)) {
 		const CUpgrade *upgrade = CUpgrade::get(object);
 		lua_pushboolean(l, CheckDependencies(upgrade, player));
 	} else {

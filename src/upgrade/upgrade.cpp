@@ -964,7 +964,7 @@ static int CclDefineAllow(lua_State *l)
 					AllowUnitId(*CPlayer::Players[i], id, 0);
 				}
 			}
-		} else if (!strncmp(ident, "upgrade-", 8)) {
+		} else if (!strncmp(ident, "upgrade", 7)) {
 			int id = UpgradeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
 				AllowUpgradeId(*CPlayer::Players[i], id, ids[i]);
