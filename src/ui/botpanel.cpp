@@ -1185,8 +1185,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
 		} else if (buttons[i].Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
-		} else if (buttons[i].Action == ButtonCmd::Research && buttons[i].Icon.Name.empty() && CUpgrade::get_all()[buttons[i].Value]->Icon) {
-			button_icon = CUpgrade::get_all()[buttons[i].Value]->Icon;
+		} else if (buttons[i].Action == ButtonCmd::Research && buttons[i].Icon.Name.empty() && CUpgrade::get_all()[buttons[i].Value]->get_icon()) {
+			button_icon = CUpgrade::get_all()[buttons[i].Value]->get_icon();
 		} else if (buttons[i].Action == ButtonCmd::Faction && buttons[i].Icon.Name.empty() && !PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
 			button_icon = PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttons[i].Value]->Icon.Icon;
 		}

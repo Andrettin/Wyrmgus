@@ -96,6 +96,7 @@ class CUpgrade final : public stratagus::data_entry, public stratagus::data_type
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
 	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
@@ -130,9 +131,19 @@ public:
 		return QString::fromStdString(this->get_name());
 	}
 
+	CIcon *get_icon() const
+	{
+		return this->icon;
+	}
+
 	void set_name_qstring(const QString &name)
 	{
 		this->name = name.toStdString();
+	}
+
+	int get_class() const
+	{
+		return this->upgrade_class;
 	}
 
 	bool is_ability() const
@@ -162,9 +173,9 @@ public:
 
 private:
 	std::string name;
-public:
 	//Wyrmgus start
-	int Class = -1;					/// upgrade class (i.e. siege weapon projectile I)
+	int upgrade_class = -1;			/// upgrade class (e.g. siege weapon projectile I)
+public:
 	int Civilization = -1;			/// which civilization this upgrade belongs to, if any
 	int Faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string Description;		/// Description of the upgrade
@@ -173,6 +184,7 @@ public:
 	std::string EffectsString;		/// Effects string of the upgrade
 	std::string RequirementsString;	/// Requirements string of the upgrade
 private:
+	CIcon *icon = nullptr;					/// icon to display to the user
 	bool ability = false;
 	bool weapon = false;
 	bool shield = false;
@@ -208,7 +220,6 @@ public:
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
-	CIcon *Icon = nullptr;					/// icon to display to the user
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 

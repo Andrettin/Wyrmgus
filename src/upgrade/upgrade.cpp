@@ -224,7 +224,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			CIcon *icon = CIcon::get(value);
-			this->Icon = icon;
+			this->icon = icon;
 		} else if (key == "class") {
 			value = FindAndReplaceString(value, "_", "-");
 			const std::string &class_name = value;
@@ -236,7 +236,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				UpgradeClasses.push_back(class_name);
 			}
 			
-			this->Class = class_id;
+			this->upgrade_class = class_id;
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CCivilization *civilization = CCivilization::GetCivilization(value);
@@ -318,25 +318,6 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	//set the upgrade's civilization and class here
-	if (this->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = this->Class;
-		if (this->Civilization != -1) {
-			int civilization_id = this->Civilization;
-			
-			if (this->Faction != -1) {
-				int faction_id = this->Faction;
-				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
-				}
-			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = this->ID;
-				}
-			}
-		}
-	}
-	
 	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
 		if (this->IncompatibleAffixes[other_upgrade->ID]) {
 			other_upgrade->IncompatibleAffixes[this->ID] = true;
@@ -351,13 +332,15 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "icon") {
-		CIcon *icon = CIcon::get(value);
-		if (icon != nullptr) {
-			this->Icon = icon;
-		} else {
-			fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
+	if (key == "class") {
+		int class_id = GetUpgradeClassIndexByName(value);
+		if (class_id == -1) {
+			SetUpgradeClassStringToIndex(value, UpgradeClasses.size());
+			class_id = UpgradeClasses.size();
+			UpgradeClasses.push_back(value);
 		}
+
+		this->upgrade_class = class_id;
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -365,9 +348,28 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 
 void CUpgrade::initialize()
 {
+
+	if (this->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		int class_id = this->get_class();
+		if (this->Civilization != -1) {
+			int civilization_id = this->Civilization;
+
+			if (this->Faction != -1) {
+				int faction_id = this->Faction;
+				if (faction_id != -1 && class_id != -1) {
+					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
+				}
+			} else {
+				if (civilization_id != -1 && class_id != -1) {
+					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = this->ID;
+				}
+			}
+		}
+	}
+
 	//load icon here
-	if (this->Icon != nullptr && !this->Icon->Loaded) {
-		this->Icon->Load();
+	if (this->get_icon() != nullptr && !this->get_icon()->Loaded) {
+		this->get_icon()->Load();
 	}
 
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
@@ -459,8 +461,8 @@ static int CclDefineUpgrade(lua_State *l)
 			CUpgrade *parent_upgrade = CUpgrade::get(LuaToString(l, -1));
 
 			upgrade->name = parent_upgrade->get_name();
-			upgrade->Icon = parent_upgrade->Icon;
-			upgrade->Class = parent_upgrade->Class;
+			upgrade->icon = parent_upgrade->get_icon();
+			upgrade->upgrade_class = parent_upgrade->get_class();
 			upgrade->Description = parent_upgrade->Description;
 			upgrade->Quote = parent_upgrade->Quote;
 			upgrade->Background = parent_upgrade->Background;
@@ -495,7 +497,7 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			CIcon *icon = CIcon::get(LuaToString(l, -1));
-			upgrade->Icon = icon;
+			upgrade->icon = icon;
 		} else if (!strcmp(value, "Class")) {
 			std::string class_name = LuaToString(l, -1);
 			
@@ -506,7 +508,7 @@ static int CclDefineUpgrade(lua_State *l)
 				UpgradeClasses.push_back(class_name);
 			}
 			
-			upgrade->Class = class_id;
+			upgrade->upgrade_class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
@@ -726,8 +728,8 @@ static int CclDefineUpgrade(lua_State *l)
 	}
 	
 	//set the upgrade's civilization and class here
-	if (upgrade->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = upgrade->Class;
+	if (upgrade->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		int class_id = upgrade->get_class();
 		if (upgrade->Civilization != -1) {
 			int civilization_id = upgrade->Civilization;
 			
@@ -751,8 +753,8 @@ static int CclDefineUpgrade(lua_State *l)
 	}
 	
 	//load icon here
-	if (upgrade->Icon != nullptr && !upgrade->Icon->Loaded) {
-		upgrade->Icon->Load();
+	if (upgrade->get_icon() != nullptr && !upgrade->get_icon()->Loaded) {
+		upgrade->get_icon()->Load();
 	}
 	
 	return 0;
@@ -1123,8 +1125,8 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		if (upgrade->Class != -1) {
-			lua_pushstring(l, UpgradeClasses[upgrade->Class].c_str());
+		if (upgrade->get_class() != -1) {
+			lua_pushstring(l, UpgradeClasses[upgrade->get_class()].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1144,8 +1146,8 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		if (upgrade->Icon) {
-			lua_pushstring(l, upgrade->Icon->get_identifier().c_str());
+		if (upgrade->get_icon()) {
+			lua_pushstring(l, upgrade->get_icon()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -1806,11 +1806,11 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		if (upgrade_list[i]->Class == -1) {
+		if (upgrade_list[i]->get_class() == -1) {
 			continue;
 		}
 		
-		int upgrade_id = PlayerRaces.GetFactionClassUpgrade(player.Faction, upgrade_list[i]->Class);
+		int upgrade_id = PlayerRaces.GetFactionClassUpgrade(player.Faction, upgrade_list[i]->get_class());
 		if (upgrade_id == -1) {
 			continue;
 		}

@@ -675,7 +675,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 				
-				CIcon &icon = *order.GetUpgrade().Icon;
+				CIcon &icon = *order.GetUpgrade().get_icon();
 				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;

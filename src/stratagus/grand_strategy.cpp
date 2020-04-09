@@ -675,9 +675,9 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	
 	if (!secondary_setting) { //if this technology is not being set as a result of another technology of the same class being researched
 		if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
-			if (CUpgrade::get_all()[upgrade_id]->Class != -1) {
+			if (CUpgrade::get_all()[upgrade_id]->get_class() != -1) {
 				for (size_t i = 0; i < CUpgrade::get_all().size(); ++i) {
-					if (CUpgrade::get_all()[upgrade_id]->Class == CUpgrade::get_all()[i]->Class) {
+					if (CUpgrade::get_all()[upgrade_id]->get_class() == CUpgrade::get_all()[i]->get_class()) {
 						this->SetTechnology(i, has_technology, true);
 					}
 				}
