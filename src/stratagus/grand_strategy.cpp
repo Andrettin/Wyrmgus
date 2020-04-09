@@ -252,11 +252,11 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 			work_creation_message += "the foreign lands of ";
 		}
 		work_creation_message += province->Name + "!";
-		if (work != nullptr && !work->Description.empty()) {
-			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->Description, "\"", "\\\""), "\n", "\\n");
+		if (work != nullptr && !work->get_description().empty()) {
+			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->get_description(), "\"", "\\\""), "\n", "\\n");
 		}
-		if (work != nullptr && !work->Quote.empty()) {
-			work_creation_message += "\\n\\n" + FindAndReplaceString(FindAndReplaceString(work->Quote, "\"", "\\\""), "\n", "\\n");
+		if (work != nullptr && !work->get_quote().empty()) {
+			work_creation_message += "\\n\\n" + FindAndReplaceString(FindAndReplaceString(work->get_quote(), "\"", "\\\""), "\n", "\\n");
 		}
 		work_creation_message += "\"";
 		if (province->Owner == GrandStrategyGame.PlayerFaction) {

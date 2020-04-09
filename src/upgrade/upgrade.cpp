@@ -270,11 +270,11 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "description") {
-			this->Description = value;
+			this->description = value;
 		} else if (key == "quote") {
-			this->Quote = value;
+			this->quote = value;
 		} else if (key == "background") {
-			this->Background = value;
+			this->background = value;
 		} else if (key == "effects_string") {
 			this->EffectsString = value;
 		} else if (key == "requirements_string") {
@@ -475,9 +475,9 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->name = parent_upgrade->get_name();
 			upgrade->icon = parent_upgrade->get_icon();
 			upgrade->upgrade_class = parent_upgrade->get_class();
-			upgrade->Description = parent_upgrade->Description;
-			upgrade->Quote = parent_upgrade->Quote;
-			upgrade->Background = parent_upgrade->Background;
+			upgrade->description = parent_upgrade->get_description();
+			upgrade->quote = parent_upgrade->get_quote();
+			upgrade->background = parent_upgrade->get_background();
 			upgrade->EffectsString = parent_upgrade->EffectsString;
 			upgrade->RequirementsString = parent_upgrade->RequirementsString;
 			for (int i = 0; i < MaxCosts; ++i) {
@@ -536,11 +536,11 @@ static int CclDefineUpgrade(lua_State *l)
 				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 			}
 		} else if (!strcmp(value, "Description")) {
-			upgrade->Description = LuaToString(l, -1);
+			upgrade->description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
-			upgrade->Quote = LuaToString(l, -1);
+			upgrade->quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
-			upgrade->Background = LuaToString(l, -1);
+			upgrade->background = LuaToString(l, -1);
 		} else if (!strcmp(value, "EffectsString")) {
 			upgrade->EffectsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
@@ -1165,13 +1165,13 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, upgrade->Description.c_str());
+		lua_pushstring(l, upgrade->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, upgrade->Background.c_str());
+		lua_pushstring(l, upgrade->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, upgrade->Quote.c_str());
+		lua_pushstring(l, upgrade->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "EffectsString")) {
 		lua_pushstring(l, upgrade->EffectsString.c_str());

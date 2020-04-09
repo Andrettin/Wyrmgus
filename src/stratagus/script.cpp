@@ -1411,9 +1411,9 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr) {
 				if (!unit->Unique) {
 					if (unit->Work != nullptr) {
-						return unit->Work->Quote;
+						return unit->Work->get_quote();
 					} else if (unit->Elixir != nullptr) {
-						return unit->Elixir->Quote;
+						return unit->Elixir->get_quote();
 					} else {
 						return unit->Type->Quote;
 					}
