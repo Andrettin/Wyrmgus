@@ -136,7 +136,7 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 
 		if (property_class_name == "stratagus::age*") {
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
-		} else if (property_class_name == "stratagus::CIcon*") {
+		} else if (property_class_name == "CIcon*") {
 			new_property_value = QVariant::fromValue(CIcon::get(property.get_value()));
 		} else if (property_class_name == "stratagus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
