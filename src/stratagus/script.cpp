@@ -1579,8 +1579,8 @@ std::string EvalString(const StringDesc *s)
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				if ((**upgrade).get_civilization() != -1) {
-					return PlayerRaces.Display[(**upgrade).get_civilization()];
+				if ((**upgrade).get_civilization() != nullptr) {
+					return PlayerRaces.Display[(**upgrade).get_civilization()->ID];
 				} else {
 					return std::string("");
 				}

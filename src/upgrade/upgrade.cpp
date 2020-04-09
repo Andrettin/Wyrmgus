@@ -239,8 +239,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			this->upgrade_class = class_id;
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			const stratagus::civilization *civilization = stratagus::civilization::get(value);
-			this->civilization = civilization->ID;
+			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			this->civilization = civilization;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CFaction *faction = PlayerRaces.GetFaction(value);
@@ -339,9 +339,6 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 		}
 
 		this->upgrade_class = class_id;
-	} else if (key == "civilization") {
-		const stratagus::civilization *civilization = stratagus::civilization::get(value);
-		this->civilization = civilization->ID;
 	} else if (key == "faction") {
 		const CFaction *faction = PlayerRaces.GetFaction(value);
 		if (faction != nullptr) {
@@ -378,8 +375,8 @@ void CUpgrade::initialize()
 
 	if (this->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = this->get_class();
-		if (this->get_civilization() != -1) {
-			int civilization_id = this->get_civilization();
+		if (this->get_civilization() != nullptr) {
+			int civilization_id = this->get_civilization()->ID;
 
 			if (this->get_faction() != -1) {
 				int faction_id = this->get_faction();
@@ -539,7 +536,7 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-			upgrade->civilization = civilization->ID;
+			upgrade->civilization = civilization;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			CFaction *faction = PlayerRaces.GetFaction(faction_name);
@@ -752,8 +749,8 @@ static int CclDefineUpgrade(lua_State *l)
 	//set the upgrade's civilization and class here
 	if (upgrade->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = upgrade->get_class();
-		if (upgrade->get_civilization() != -1) {
-			int civilization_id = upgrade->get_civilization();
+		if (upgrade->get_civilization() != nullptr) {
+			int civilization_id = upgrade->get_civilization()->ID;
 			
 			if (upgrade->get_faction() != -1) {
 				int faction_id = upgrade->get_faction();
@@ -1152,8 +1149,8 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (upgrade->get_civilization() != -1) {
-			lua_pushstring(l, stratagus::civilization::get_all()[upgrade->get_civilization()]->get_identifier().c_str());
+		if (upgrade->get_civilization() != nullptr) {
+			lua_pushstring(l, upgrade->get_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

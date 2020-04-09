@@ -58,6 +58,10 @@ class CUpgradeModifier;
 class CVariable;
 struct lua_State;
 
+namespace stratagus {
+	class civilization;
+}
+
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.
 */
@@ -96,6 +100,7 @@ class CUpgrade final : public stratagus::data_entry, public stratagus::data_type
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(QString description READ get_description_qstring WRITE set_description_qstring)
 	Q_PROPERTY(QString quote READ get_quote_qstring WRITE set_quote_qstring)
@@ -150,7 +155,7 @@ public:
 		return this->upgrade_class;
 	}
 
-	int get_civilization() const
+	stratagus::civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
@@ -232,9 +237,8 @@ public:
 
 private:
 	std::string name;
-	//Wyrmgus start
 	int upgrade_class = -1;			/// upgrade class (e.g. siege weapon projectile I)
-	int civilization = -1;			/// which civilization this upgrade belongs to, if any
+	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
 	int faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string description;		/// description of the upgrade
 	std::string quote;				/// quote of the upgrade
@@ -258,6 +262,7 @@ public:
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];
 	std::vector<int> WeaponClasses;		/// if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
+	//Wyrmgus start
 	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
 	CUnitType *Item = nullptr;
 	//Wyrmgus end

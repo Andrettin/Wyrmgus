@@ -162,7 +162,7 @@ void CGrandStrategyGame::DoTurn()
 			continue;
 		}
 		
-		int civilization = this->UnpublishedWorks[i]->get_civilization();
+		int civilization = this->UnpublishedWorks[i]->get_civilization()->ID;
 		if (
 			(author != nullptr && author->ProvinceOfOrigin != nullptr)
 			|| (civilization != -1 && this->CultureProvinces.find(civilization) != this->CultureProvinces.end() && this->CultureProvinces[civilization].size() > 0)
