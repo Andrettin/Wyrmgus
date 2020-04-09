@@ -142,7 +142,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			character->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
+			character->Civilization = CCivilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1));
 			if (faction != nullptr) {
@@ -635,7 +635,7 @@ static int CclDefineCustomHero(lua_State *l)
 			CUpgrade *upgrade = CUpgrade::get(trait_ident);
 			hero->Trait = upgrade;
 		} else if (!strcmp(value, "Civilization")) {
-			hero->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
+			hero->Civilization = CCivilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
@@ -895,7 +895,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->Civilization) {
-			lua_pushstring(l, PlayerRaces.Name[character->Civilization->ID].c_str());
+			lua_pushstring(l, character->Civilization->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1060,7 +1060,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->Civilization) {
-			lua_pushstring(l, PlayerRaces.Name[character->Civilization->ID].c_str());
+			lua_pushstring(l, character->Civilization->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

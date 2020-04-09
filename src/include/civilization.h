@@ -33,6 +33,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "player.h" //for certain enums
 #include "time/date.h"
 
@@ -50,17 +52,26 @@ class CQuest;
 class CUpgrade;
 struct lua_State;
 
-class CCivilization
+class CCivilization final : public stratagus::data_entry, public stratagus::data_type<CCivilization>
 {
+	Q_OBJECT
+
 public:
+	static constexpr const char *class_identifier = "civilization";
+	static constexpr const char *database_folder = "civilizations";
+
+	static CCivilization *add(const std::string &identifier, const stratagus::module *module)
+	{
+		CCivilization *civilization = data_type::add(identifier, module);
+		civilization->ID = CCivilization::get_all().size() - 1;
+		return civilization;
+	}
+
+	CCivilization(const std::string &identifier) : data_entry(identifier)
+	{
+	}
+
 	~CCivilization();
-	
-	static CCivilization *GetCivilization(const std::string &ident, const bool should_find = true);
-	static CCivilization *GetOrAddCivilization(const std::string &ident);
-	static void ClearCivilizations();
-	
-	static std::vector<CCivilization *> Civilizations;    					/// civilizations
-	static std::map<std::string, CCivilization *> CivilizationsByIdent;
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
@@ -72,6 +83,12 @@ public:
 
 	CCalendar *GetCalendar() const;
 	CCurrency *GetCurrency() const;
+
+	bool is_playable() const
+	{
+		return this->playable;
+	}
+
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
@@ -80,7 +97,6 @@ public:
 	
 	int ID = -1;
 	CCivilization *ParentCivilization = nullptr;
-	std::string Ident;				/// ident of the civilization
 	std::string Description;		/// civilization description
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
@@ -92,6 +108,9 @@ public:
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
+private:
+	bool playable = true; //civilizations are playable by default
+public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type

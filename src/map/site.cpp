@@ -166,11 +166,8 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const CCivilization *civilization = CCivilization::GetCivilization(key);
-				
-				if (civilization) {
-					this->CulturalNames[civilization] = value;
-				}
+				const CCivilization *civilization = CCivilization::get(key);
+				this->CulturalNames[civilization] = value;
 			}
 		} else if (child_config_data->Tag == "historical_owner") {
 			CDate date;

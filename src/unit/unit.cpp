@@ -3345,7 +3345,7 @@ void CUnit::UpdateSettlement()
 			}
 			const CCivilization *civilization = nullptr;
 			if (civilization_id != -1) {
-				civilization = CCivilization::Civilizations[civilization_id];
+				civilization = CCivilization::get_all()[civilization_id];
 			}
 			
 			int faction_id = this->Type->Faction;
@@ -6365,7 +6365,7 @@ std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race]);
+			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]);
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;

@@ -117,10 +117,8 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Hint")) {
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1));
-			if (civilization) {
-				quest->Civilization = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(LuaToString(l, -1));
+			quest->Civilization = civilization->ID;
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
 			int color = GetPlayerColorIndexByName(color_name);
@@ -274,8 +272,8 @@ static int CclDefineQuest(lua_State *l)
 		}
 	}
 	
-	if (!quest->Hidden && quest->Civilization != -1 && std::find(CCivilization::Civilizations[quest->Civilization]->Quests.begin(), CCivilization::Civilizations[quest->Civilization]->Quests.end(), quest) == CCivilization::Civilizations[quest->Civilization]->Quests.end()) {
-		CCivilization::Civilizations[quest->Civilization]->Quests.push_back(quest);
+	if (!quest->Hidden && quest->Civilization != -1 && std::find(CCivilization::get_all()[quest->Civilization]->Quests.begin(), CCivilization::get_all()[quest->Civilization]->Quests.end(), quest) == CCivilization::get_all()[quest->Civilization]->Quests.end()) {
+		CCivilization::get_all()[quest->Civilization]->Quests.push_back(quest);
 	}
 	
 	return 0;
@@ -361,7 +359,7 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (quest->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[quest->Civilization].c_str());
+			lua_pushstring(l, CCivilization::get_all()[quest->Civilization]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

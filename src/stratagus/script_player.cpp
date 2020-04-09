@@ -149,10 +149,8 @@ void CPlayer::Load(lua_State *l)
 			}
 		} else if (!strcmp(value, "race")) {
 			const char *civilization_ident = LuaToString(l, j + 1);
-			CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
-			if (civilization) {
-				this->Race = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(civilization_ident);
+			this->Race = civilization->ID;
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			this->Faction = LuaToNumber(l, j + 1);
@@ -784,7 +782,7 @@ static int CclDefineCivilization(lua_State *l)
 	}
 
 	std::string civilization_name = LuaToString(l, 1);
-	CCivilization *civilization = CCivilization::GetOrAddCivilization(civilization_name);
+	CCivilization *civilization = CCivilization::get_or_add(civilization_name, nullptr);
 	int civilization_id = civilization->ID;
 	
 	//  Parse the list:
@@ -805,11 +803,11 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
-			PlayerRaces.Playable[civilization_id] = LuaToBoolean(l, -1);
+			civilization->playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
 			PlayerRaces.Species[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentCivilization")) {
-			civilization->ParentCivilization = CCivilization::GetCivilization(LuaToString(l, -1));
+			civilization->ParentCivilization = CCivilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
 			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
 			if (language) {
@@ -836,11 +834,9 @@ static int CclDefineCivilization(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string originary_civilization_name = LuaToString(l, -1, j + 1);
-				CCivilization *originary_civilization = CCivilization::GetCivilization(originary_civilization_name);
-				if (originary_civilization) {
-					PlayerRaces.DevelopsFrom[civilization_id].push_back(originary_civilization->ID);
-					PlayerRaces.DevelopsTo[originary_civilization->ID].push_back(civilization_id);
-				}
+				CCivilization *originary_civilization = CCivilization::get(originary_civilization_name);
+				PlayerRaces.DevelopsFrom[civilization_id].push_back(originary_civilization->ID);
+				PlayerRaces.DevelopsTo[originary_civilization->ID].push_back(civilization_id);
 			}
 		} else if (!strcmp(value, "ButtonIcons")) {
 			if (!lua_istable(l, -1)) {
@@ -900,7 +896,7 @@ static int CclDefineCivilization(lua_State *l)
 						int unit_quantity = LuaToNumber(l, -1, k + 1);
 						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
 					} else {
-						printf("\n%s\n", civilization->Ident.c_str());
+						printf("\n%s\n", civilization->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -932,7 +928,7 @@ static int CclDefineCivilization(lua_State *l)
 					} else if (!strcmp(value, "per-settlement")) {
 						building_template->PerSettlement = LuaToBoolean(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", civilization->Ident.c_str());
+						printf("\n%s\n", civilization->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1175,7 +1171,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
 		button_definition += "\tHint = _(\"~!Move\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1187,7 +1183,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
 		button_definition += "\tHint = _(\"~!Stop\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1199,7 +1195,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
 		button_definition += "\tHint = _(\"~!Attack\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1211,7 +1207,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
 		button_definition += "\tHint = _(\"~!Patrol\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1223,7 +1219,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
 		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1566,7 +1562,7 @@ static int CclGetCivilizationData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string civilization_name = LuaToString(l, 1);
-	CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
+	CCivilization *civilization = CCivilization::get(civilization_name);
 	if (!civilization) {
 		return 0;
 	}
@@ -1597,14 +1593,14 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, civilization->get_interface().c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);
+		lua_pushboolean(l, civilization->is_playable());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
 		lua_pushstring(l, PlayerRaces.Species[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "ParentCivilization")) {
 		if (civilization->ParentCivilization) {
-			lua_pushstring(l, PlayerRaces.Name[civilization->ParentCivilization->ID].c_str());
+			lua_pushstring(l, civilization->ParentCivilization->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1627,7 +1623,7 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization_id].size(), 0);
 		for (size_t i = 1; i <= PlayerRaces.DevelopsFrom[civilization_id].size(); ++i)
 		{
-			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsFrom[civilization_id][i-1]].c_str());
+			lua_pushstring(l, CCivilization::get_all()[PlayerRaces.DevelopsFrom[civilization_id][i-1]]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -1635,7 +1631,7 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_createtable(l, PlayerRaces.DevelopsTo[civilization_id].size(), 0);
 		for (size_t i = 1; i <= PlayerRaces.DevelopsTo[civilization_id].size(); ++i)
 		{
-			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsTo[civilization_id][i-1]].c_str());
+			lua_pushstring(l, CCivilization::get_all()[PlayerRaces.DevelopsTo[civilization_id][i-1]]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -1703,7 +1699,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	LuaCheckArgs(l, 2);
 	std::string class_name = LuaToString(l, 1);
 	int class_id = GetUnitTypeClassIndexByName(class_name);
-	CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 2));
+	CCivilization *civilization = CCivilization::get(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization && class_id != -1) {
 		int unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization->ID, class_id);
@@ -1816,10 +1812,8 @@ static int CclDefineFaction(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Civilization")) {
-			CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1));
-			if (civilization) {
-				faction->Civilization = civilization;
-			}
+			CCivilization *civilization = CCivilization::get(LuaToString(l, -1));
+			faction->Civilization = civilization;
 		} else if (!strcmp(value, "Name")) {
 			faction->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -2257,10 +2251,8 @@ static int CclDefineDynasty(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Civilization")) {
-			CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1));
-			if (civilization) {
-				dynasty->Civilization = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(LuaToString(l, -1));
+			dynasty->Civilization = civilization->ID;
 		} else if (!strcmp(value, "Name")) {
 			dynasty->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -2404,11 +2396,9 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
-				if (civilization) {
-					deity->Civilizations.push_back(civilization);
-					civilization->Deities.push_back(deity);
-				}
+				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				deity->Civilizations.push_back(civilization);
+				civilization->Deities.push_back(deity);
 			}
 		} else if (!strcmp(value, "Religions")) {
 			if (!lua_istable(l, -1)) {
@@ -2477,11 +2467,8 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				const CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
 				++j;
-				if (!civilization) {
-					continue;
-				}
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				deity->CulturalNames[civilization] = cultural_name;
@@ -2648,9 +2635,9 @@ static int CclGetCivilizations(lua_State *l)
 	}
 
 	std::vector<std::string> civilization_idents;
-	for (int i = 0; i < MAX_RACES; ++i) {
-		if (!PlayerRaces.Name[i].empty() && (!only_visible || PlayerRaces.Visible[i])) {
-			civilization_idents.push_back(PlayerRaces.Name[i]);
+	for (const CCivilization *civilization : CCivilization::get_all()) {
+		if (!only_visible || PlayerRaces.Visible[civilization->ID]) {
+			civilization_idents.push_back(civilization->get_identifier());
 		}
 	}
 
@@ -2673,7 +2660,7 @@ static int CclGetFactions(lua_State *l)
 {
 	CCivilization *civilization = nullptr;
 	if (lua_gettop(l) >= 1) {
-		civilization = CCivilization::GetCivilization(LuaToString(l, 1));
+		civilization = CCivilization::try_get(LuaToString(l, 1));
 	}
 	
 	int faction_type = -1;
@@ -2704,44 +2691,6 @@ static int CclGetFactions(lua_State *l)
 	for (size_t i = 1; i <= factions.size(); ++i)
 	{
 		lua_pushstring(l, factions[i-1].c_str());
-		lua_rawseti(l, -2, i);
-	}
-	
-	return 1;
-}
-
-/**
-**  Get the dynasties.
-**
-**  @param l  Lua state.
-*/
-static int CclGetDynasties(lua_State *l)
-{
-	int civilization_id = -1;
-	if (lua_gettop(l) >= 1) {
-		CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 1));
-		if (civilization) {
-			civilization_id = civilization->ID;
-		}
-	}
-	
-	std::vector<std::string> dynasties;
-	if (civilization_id != -1) {
-		for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
-			if (PlayerRaces.Dynasties[i]->Civilization == civilization_id) {
-				dynasties.push_back(PlayerRaces.Dynasties[i]->Ident);
-			}
-		}
-	} else {
-		for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
-			dynasties.push_back(PlayerRaces.Dynasties[i]->Ident);
-		}
-	}
-		
-	lua_createtable(l, dynasties.size(), 0);
-	for (size_t i = 1; i <= dynasties.size(); ++i)
-	{
-		lua_pushstring(l, dynasties[i-1].c_str());
 		lua_rawseti(l, -2, i);
 	}
 	
@@ -2813,7 +2762,7 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (faction->Civilization != nullptr) {
-			lua_pushstring(l, PlayerRaces.Name[faction->Civilization->ID].c_str());
+			lua_pushstring(l, faction->Civilization->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2878,7 +2827,7 @@ static int CclGetDynastyData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (dynasty->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[dynasty->Civilization].c_str());
+			lua_pushstring(l, CCivilization::get_all()[dynasty->Civilization]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3036,7 +2985,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "RaceName")) {
-		lua_pushstring(l, PlayerRaces.Name[p->Race].c_str());
+		lua_pushstring(l, CCivilization::get_all()[p->Race]->get_identifier().c_str());
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Color")) {
@@ -3335,7 +3284,7 @@ static int CclGetPlayerData(lua_State *l)
 		std::string site_ident = LuaToString(l, 3);
 		const CSite *site = CSite::GetSite(site_ident);
 		if (site) {
-			lua_pushstring(l, site->GetCulturalName(p->Race != -1 ? CCivilization::Civilizations[p->Race] : nullptr).c_str());
+			lua_pushstring(l, site->GetCulturalName(p->Race != -1 ? CCivilization::get_all()[p->Race] : nullptr).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3386,10 +3335,8 @@ static int CclSetPlayerData(lua_State *l)
 		}
 
 		const char *civilization_ident = LuaToString(l, 3);
-		CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
-		if (civilization) {
-			p->SetCivilization(civilization->ID);
-		}
+		CCivilization *civilization = CCivilization::get(civilization_ident);
+		p->SetCivilization(civilization->ID);
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		std::string faction_name = LuaToString(l, 3);
@@ -3839,7 +3786,7 @@ static int CclGetDeityData(lua_State *l)
 		lua_createtable(l, deity->Civilizations.size(), 0);
 		for (size_t i = 1; i <= deity->Civilizations.size(); ++i)
 		{
-			lua_pushstring(l, PlayerRaces.Name[deity->Civilizations[i-1]->ID].c_str());
+			lua_pushstring(l, deity->Civilizations[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3872,7 +3819,7 @@ static int CclGetDeityData(lua_State *l)
 			LuaError(l, "incorrect argument");
 		}
 		
-		const CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 3));
+		const CCivilization *civilization = CCivilization::get(LuaToString(l, 3));
 		lua_pushstring(l, deity->GetCulturalName(civilization).c_str());
 		
 		return 1;
@@ -3923,7 +3870,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetFactions", CclGetFactions);
-	lua_register(Lua, "GetDynasties", CclGetDynasties);
 	lua_register(Lua, "GetPlayerColors", CclGetPlayerColors);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
 	lua_register(Lua, "GetDynastyData", CclGetDynastyData);

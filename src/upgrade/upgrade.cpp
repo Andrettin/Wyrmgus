@@ -239,10 +239,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			this->upgrade_class = class_id;
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::GetCivilization(value);
-			if (civilization) {
-				this->civilization = civilization->ID;
-			}
+			const CCivilization *civilization = CCivilization::get(value);
+			this->civilization = civilization->ID;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CFaction *faction = PlayerRaces.GetFaction(value);
@@ -342,10 +340,8 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 
 		this->upgrade_class = class_id;
 	} else if (key == "civilization") {
-		const CCivilization *civilization = CCivilization::GetCivilization(value);
-		if (civilization != nullptr) {
-			this->civilization = civilization->ID;
-		}
+		const CCivilization *civilization = CCivilization::get(value);
+		this->civilization = civilization->ID;
 	} else if (key == "faction") {
 		const CFaction *faction = PlayerRaces.GetFaction(value);
 		if (faction != nullptr) {
@@ -542,10 +538,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->upgrade_class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
-			if (civilization) {
-				upgrade->civilization = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(civilization_name);
+			upgrade->civilization = civilization->ID;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			CFaction *faction = PlayerRaces.GetFaction(faction_name);
@@ -651,11 +645,8 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string civilization_ident = LuaToString(l, -1, j + 1);
-				CCivilization *priority_civilization = CCivilization::GetCivilization(civilization_ident);
+				CCivilization *priority_civilization = CCivilization::get(civilization_ident);
 				++j;
-				if (!priority_civilization) {
-					continue;
-				}
 
 				int priority = LuaToNumber(l, -1, j + 1);
 
@@ -888,10 +879,8 @@ static int CclDefineModifier(lua_State *l)
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
-			if (civilization) {
-				um->ChangeCivilizationTo = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(civilization_ident);
+			um->ChangeCivilizationTo = civilization->ID;
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
 			um->ChangeFactionTo = PlayerRaces.GetFaction(faction_ident);
@@ -1164,7 +1153,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (upgrade->get_civilization() != -1) {
-			lua_pushstring(l, PlayerRaces.Name[upgrade->get_civilization()].c_str());
+			lua_pushstring(l, CCivilization::get_all()[upgrade->get_civilization()]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

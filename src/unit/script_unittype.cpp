@@ -1771,10 +1771,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
-			if (civilization) {
-				type->Civilization = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(civilization_name);
+			type->Civilization = civilization->ID;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			CFaction *faction = PlayerRaces.GetFaction(faction_name);
@@ -2414,7 +2412,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (type->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[type->Civilization].c_str());
+			lua_pushstring(l, CCivilization::get_all()[type->Civilization]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

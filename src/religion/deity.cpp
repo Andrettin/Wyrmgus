@@ -154,11 +154,9 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Major = string::to_bool(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCivilization *civilization = CCivilization::GetCivilization(value);
-			if (civilization != nullptr) {
-				this->Civilizations.push_back(civilization);
-				civilization->Deities.push_back(this);
-			}
+			CCivilization *civilization = CCivilization::get(value);
+			this->Civilizations.push_back(civilization);
+			civilization->Deities.push_back(this);
 		} else if (key == "religion") {
 			value = FindAndReplaceString(value, "_", "-");
 			CReligion *religion = CReligion::GetReligion(value.c_str());
@@ -220,11 +218,8 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const CCivilization *civilization = CCivilization::GetCivilization(key);
-				
-				if (civilization) {
-					this->CulturalNames[civilization] = value;
-				}
+				const CCivilization *civilization = CCivilization::get(key);
+				this->CulturalNames[civilization] = value;
 			}
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", child_config_data->Tag.c_str());

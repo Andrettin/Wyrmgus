@@ -1793,11 +1793,8 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
 				++j;
-				if (!civilization) {
-					continue;
-				}
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
@@ -2088,11 +2085,8 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
 				++j;
-				if (!civilization) {
-					continue;
-				}
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				

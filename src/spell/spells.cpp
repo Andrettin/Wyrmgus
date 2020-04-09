@@ -990,10 +990,8 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			this->FactionUnit = StringToCondition(value);
 		} else if (key == "civilization_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::GetCivilization(value);
-			if (civilization) {
-				this->CivilizationEquivalent = civilization->ID;
-			}
+			const CCivilization *civilization = CCivilization::get(value);
+			this->CivilizationEquivalent = civilization->ID;
 		} else if (key == "faction_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);

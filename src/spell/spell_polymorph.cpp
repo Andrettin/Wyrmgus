@@ -70,10 +70,8 @@
 		//Wyrmgus start
 		} else if (!strcmp(value, "civilization")) {
 			value = LuaToString(l, -1, j + 1);
-			CCivilization *civilization = CCivilization::GetCivilization(value);
-			if (civilization) {
-				this->Civilization = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(value);
+			this->Civilization = civilization->ID;
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
 			this->Faction = PlayerRaces.GetFactionIndexByName(value);
@@ -129,7 +127,7 @@
 		}
 	}
 	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != -1 && this->Civilization != target->Character->Civilization->ID) {
-		target->Character->Civilization = CCivilization::Civilizations[this->Civilization];
+		target->Character->Civilization = CCivilization::get_all()[this->Civilization];
 		SaveHero(target->Character);
 	}
 	if (type == nullptr) {

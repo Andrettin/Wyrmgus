@@ -122,7 +122,6 @@ void CleanModules()
 	CCalendar::ClearCalendars();
 	CCampaign::ClearCampaigns();
 	CCharacter::ClearCharacters();
-	CCivilization::ClearCivilizations();
 	CleanConstructions();
 	CCurrency::ClearCurrencies();
 	CleanDecorations();

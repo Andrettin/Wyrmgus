@@ -201,7 +201,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Civilization = CCivilization::GetCivilization(value);
+			this->Civilization = CCivilization::get(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
@@ -950,7 +950,7 @@ void SaveHero(CCharacter *hero)
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
 		}
 		if (hero->Civilization) {
-			fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[hero->Civilization->ID].c_str());
+			fprintf(fd, "\tCivilization = \"%s\",\n", hero->Civilization->get_identifier().c_str());
 		}
 	}
 	if (hero->Type != nullptr) {
@@ -1183,38 +1183,36 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 		if (!hero) {
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
-		
-		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
-		if (civilization) {
-			//delete old hero save file
-			std::string path = Parameters::Instance.GetUserDirectory();
-			if (!GameName.empty()) {
-				path += "/";
-				path += GameName;
-			}
+
+		CCivilization *civilization = CCivilization::get(civilization_name);
+		//delete old hero save file
+		std::string path = Parameters::Instance.GetUserDirectory();
+		if (!GameName.empty()) {
 			path += "/";
-			path += "heroes/";
-			if (hero->Custom) {
-				path += "custom/";
-			}
-			path += hero->Ident;
-			path += ".lua";	
-			if (CanAccessFile(path.c_str())) {
-				unlink(path.c_str());
-			}
-			
-			//now, update the hero
-			hero->Civilization = civilization;
-			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization->ID, hero->Type->Class);
-			if (new_unit_type_id != -1) {
-				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
-				hero->Name = new_hero_name;
-				hero->FamilyName = new_hero_family_name;
-				SaveHero(hero);
-				
-				CustomHeroes.erase(hero_full_name);
-				CustomHeroes[hero->Ident] = hero;
-			}
+			path += GameName;
+		}
+		path += "/";
+		path += "heroes/";
+		if (hero->Custom) {
+			path += "custom/";
+		}
+		path += hero->Ident;
+		path += ".lua";
+		if (CanAccessFile(path.c_str())) {
+			unlink(path.c_str());
+		}
+
+		//now, update the hero
+		hero->Civilization = civilization;
+		int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization->ID, hero->Type->Class);
+		if (new_unit_type_id != -1) {
+			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
+			hero->Name = new_hero_name;
+			hero->FamilyName = new_hero_family_name;
+			SaveHero(hero);
+
+			CustomHeroes.erase(hero_full_name);
+			CustomHeroes[hero->Ident] = hero;
 		}
 	}
 }

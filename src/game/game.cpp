@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
+#include "civilization.h"
 #include "commands.h"
 #include "construct.h"
 #include "editor.h"
@@ -573,29 +574,29 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-			if (PlayerRaces.Factions[i]->Mod != CMap::Map.Info.Filename) {
+		for (const CFaction *faction : PlayerRaces.Factions) {
+			if (faction->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
 				
-			f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i]->Ident.c_str());
-			f->printf("\tName = \"%s\",\n", PlayerRaces.Factions[i]->Name.c_str());
-			f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
-			if (PlayerRaces.Factions[i]->Type != FactionTypeNoFactionType) {
-				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(PlayerRaces.Factions[i]->Type).c_str());
+			f->printf("DefineFaction(\"%s\", {\n", faction->Ident.c_str());
+			f->printf("\tName = \"%s\",\n", faction->Name.c_str());
+			f->printf("\tCivilization = \"%s\",\n", faction->Civilization->get_identifier().c_str());
+			if (faction->Type != FactionTypeNoFactionType) {
+				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
-			if (PlayerRaces.Factions[i]->ParentFaction != -1) {
-				f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[PlayerRaces.Factions[i]->ParentFaction]->Ident.c_str());
+			if (faction->ParentFaction != -1) {
+				f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[faction->ParentFaction]->Ident.c_str());
 			}
-			if (PlayerRaces.Factions[i]->Colors.size() > 0) {
+			if (faction->Colors.size() > 0) {
 				f->printf("\tColors = {");
-				for (size_t k = 0; k < PlayerRaces.Factions[i]->Colors.size(); ++k) {
-					f->printf("\"%s\", ", PlayerColorNames[PlayerRaces.Factions[i]->Colors[k]].c_str());
+				for (size_t k = 0; k < faction->Colors.size(); ++k) {
+					f->printf("\"%s\", ", PlayerColorNames[faction->Colors[k]].c_str());
 				}
 				f->printf("},\n");
 			}
-			if (!PlayerRaces.Factions[i]->FactionUpgrade.empty()) {
-				f->printf("\tFactionUpgrade = \"%s\",\n", PlayerRaces.Factions[i]->FactionUpgrade.c_str());
+			if (!faction->FactionUpgrade.empty()) {
+				f->printf("\tFactionUpgrade = \"%s\",\n", faction->FactionUpgrade.c_str());
 			}
 			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
 			f->printf("})\n\n");
@@ -616,7 +617,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tName = \"%s\",\n", type.Name.c_str());
 			}
 			if (type.Civilization != -1) {
-				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[type.Civilization].c_str());
+				f->printf("\tCivilization = \"%s\",\n", CCivilization::get_all()[type.Civilization]->get_identifier().c_str());
 			}
 			if (type.Faction != -1) {
 				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Faction]->Ident.c_str());
@@ -852,7 +853,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, DefaultResourceNames[StoneCost].c_str(),
 						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
+						  i, CCivilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
 							  i, PlayerRaces.Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
@@ -1524,7 +1525,7 @@ void CalculateItemsToLoad()
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad += GetIconsCount();
 		if (CPlayer::GetThisPlayer()) {
-			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[CPlayer::GetThisPlayer()->Race]);
+			itemsToLoad+= GetCursorsCount(CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier());
 		}
 		itemsToLoad+= GetUnitTypesCount();
 		itemsToLoad+= GetDecorationsCount();

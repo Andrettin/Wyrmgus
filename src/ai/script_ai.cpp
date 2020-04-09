@@ -37,6 +37,7 @@
 #include "ai.h"
 #include "ai_local.h"
 
+#include "civilization.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "pathfinder.h"
@@ -690,7 +691,7 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 static int CclAiGetRace(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, PlayerRaces.Name[AiPlayer->Player->Race].c_str());
+	lua_pushstring(l, CCivilization::get_all()[AiPlayer->Player->Race]->get_identifier().c_str());
 	return 1;
 }
 

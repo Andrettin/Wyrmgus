@@ -295,8 +295,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
-					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[newtype.Civilization]->GetUnitClassNames(newtype.Class))
-					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
+					|| (CCivilization::get_all()[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::get_all()[newtype.Civilization]->GetUnitClassNames(newtype.Class))
+					|| (CCivilization::get_all()[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::get_all()[player.Race]->GetUnitClassNames(newtype.Class))
 				)
 			)
 		)

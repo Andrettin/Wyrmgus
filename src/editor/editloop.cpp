@@ -36,6 +36,7 @@
 
 #include "editor.h"
 
+#include "civilization.h"
 #include "commands.h"
 #include "font.h"
 #include "game.h"
@@ -775,7 +776,7 @@ static void DrawPlayers()
 		//Wyrmgus start
 //		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
 //				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
-		std::string civ_str = PlayerRaces.Name[CPlayer::Players[Editor.SelectedPlayer]->Race].c_str();
+		std::string civ_str = CCivilization::get_all()[CPlayer::Players[Editor.SelectedPlayer]->Race]->get_identifier().c_str();
 		civ_str[0] = toupper(civ_str[0]);
 		snprintf(buf, sizeof(buf), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end

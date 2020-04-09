@@ -39,76 +39,9 @@
 #include "time/calendar.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CCivilization *> CCivilization::Civilizations;
-std::map<std::string, CCivilization *> CCivilization::CivilizationsByIdent;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Get a civilization
-**
-**	@param	ident		The civilization's string identifier
-**	@param	should_find	Whether it is an error if the civilization could not be found; this is true by default
-**
-**	@return	The civilization if found, or null otherwise
-*/
-CCivilization *CCivilization::GetCivilization(const std::string &ident, const bool should_find)
-{
-	if (CivilizationsByIdent.find(ident) != CivilizationsByIdent.end()) {
-		return CivilizationsByIdent.find(ident)->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid civilization: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a civilization
-**
-**	@param	ident	The civilization's string identifier
-**
-**	@return	The civilization if found, or a newly-created one otherwise
-*/
-CCivilization *CCivilization::GetOrAddCivilization(const std::string &ident)
-{
-	CCivilization *civilization = GetCivilization(ident, false);
-	
-	if (!civilization) {
-		civilization = new CCivilization;
-		civilization->Ident = ident;
-		civilization->ID = Civilizations.size();
-		Civilizations.push_back(civilization);
-		CivilizationsByIdent[ident] = civilization;
-		
-		PlayerRaces.Name[civilization->ID] = ident;
-		PlayerRaces.Playable[civilization->ID] = true; //civilizations are playable by default
-	}
-	
-	return civilization;
-}
-
-/**
-**	@brief	Remove the existing civilizations
-*/
-void CCivilization::ClearCivilizations()
-{
-	for (size_t i = 0; i < Civilizations.size(); ++i) {
-		delete Civilizations[i];
-	}
-	Civilizations.clear();
-}
-
-/**
-**	@brief	Destructor
-*/
 CCivilization::~CCivilization()
 {
 	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
@@ -152,11 +85,6 @@ int CCivilization::GetForceTypeWeight(int force_type) const
 	return 1;
 }
 
-/**
-**	@brief	Get the calendar for the civilization
-**
-**	@return	The civilization's calendar
-*/
 CCalendar *CCivilization::GetCalendar() const
 {
 	if (this->Calendar) {
@@ -170,11 +98,6 @@ CCalendar *CCivilization::GetCalendar() const
 	return CCalendar::BaseCalendar;
 }
 
-/**
-**	@brief	Get the civilization's currency
-**
-**	@return	The civilization's currency
-*/
 CCurrency *CCivilization::GetCurrency() const
 {
 	if (this->Currency) {

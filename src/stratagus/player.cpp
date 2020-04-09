@@ -395,7 +395,7 @@ bool LanguageCacheOutdated = false;
 void PlayerRace::Clean()
 {
 	//Wyrmgus start
-	if (!CCivilization::Civilizations.empty()) { //don't clean the languages if first defining the civilizations
+	if (!CCivilization::get_all().empty()) { //don't clean the languages if first defining the civilizations
 		for (size_t i = 0; i < this->Languages.size(); ++i) {
 			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
 				for (size_t k = 0; k < this->Languages[i]->Dialects.size(); ++k) { //remove word from dialects, so that they don't try to delete it too
@@ -410,15 +410,13 @@ void PlayerRace::Clean()
 		}
 	}
 	//Wyrmgus end
-	for (size_t i = 0; i != CCivilization::Civilizations.size(); ++i) {
-		this->Name[i].clear();
+	for (size_t i = 0; i != CCivilization::get_all().size(); ++i) {
 		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
 		this->CivilizationUpgrades[i].clear();
 		this->CivilizationClassUnitTypes[i].clear();
 		this->CivilizationClassUpgrades[i].clear();
-		this->Playable[i] = false;
 		this->Species[i].clear();
 		this->DefaultColor[i].clear();
 		this->DevelopsFrom[i].clear();
@@ -496,8 +494,8 @@ int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 		return CivilizationClassUnitTypes[civilization][class_id];
 	}
 	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationClassUnitType(CCivilization::Civilizations[civilization]->ParentCivilization->ID, class_id);
+	if (CCivilization::get_all()[civilization]->ParentCivilization) {
+		return GetCivilizationClassUnitType(CCivilization::get_all()[civilization]->ParentCivilization->ID, class_id);
 	}
 	
 	return -1;
@@ -513,8 +511,8 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 		return CivilizationClassUpgrades[civilization][class_id];
 	}
 	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationClassUpgrade(CCivilization::Civilizations[civilization]->ParentCivilization->ID, class_id);
+	if (CCivilization::get_all()[civilization]->ParentCivilization) {
+		return GetCivilizationClassUpgrade(CCivilization::get_all()[civilization]->ParentCivilization->ID, class_id);
 	}
 	
 	return -1;
@@ -560,12 +558,12 @@ CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
 		return nullptr;
 	}
 	
-	if (CCivilization::Civilizations[civilization] && CCivilization::Civilizations[civilization]->Language) {
-		return CCivilization::Civilizations[civilization]->Language;
+	if (CCivilization::get_all()[civilization]->Language) {
+		return CCivilization::get_all()[civilization]->Language;
 	}
 	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationLanguage(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
+	if (CCivilization::get_all()[civilization]->ParentCivilization) {
+		return GetCivilizationLanguage(CCivilization::get_all()[civilization]->ParentCivilization->ID);
 	}
 	
 	return nullptr;
@@ -581,8 +579,8 @@ std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
 		return CivilizationUIFillers[civilization];
 	}
 	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationUIFillers(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
+	if (CCivilization::get_all()[civilization]->ParentCivilization) {
+		return GetCivilizationUIFillers(CCivilization::get_all()[civilization]->ParentCivilization->ID);
 	}
 	
 	return std::vector<CFiller>();
@@ -914,7 +912,7 @@ void CPlayer::Save(CFile &file) const
 	const CPlayer &p = *this;
 	file.printf("Player(%d,\n", this->Index);
 	//Wyrmgus start
-	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
+	file.printf(" \"race\", \"%s\",", CCivilization::get_all()[p.Race]->get_identifier().c_str());
 	if (p.Faction != -1) {
 		file.printf(" \"faction\", %d,", p.Faction);
 	}
@@ -1476,7 +1474,7 @@ void CPlayer::SetName(const std::string &name)
 const CCivilization *CPlayer::GetCivilization() const
 {
 	if (this->Race != -1) {
-		return CCivilization::Civilizations[this->Race];
+		return CCivilization::get_all()[this->Race];
 	}
 
 	return nullptr;
@@ -1503,7 +1501,7 @@ void CPlayer::SetCivilization(int civilization)
 	if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
 		//load proper UI
 		char buf[256];
-		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
+		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", CCivilization::get_all()[this->Race]->get_identifier().c_str());
 		CclCommand(buf);
 		
 		UI.Load();
@@ -1622,7 +1620,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->Name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->Name.c_str(), this->Index, CCivilization::get_all()[this->Race]->get_identifier().c_str());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1790,7 +1788,7 @@ CCurrency *CPlayer::GetCurrency() const
 	}
 	
 	if (this->Race != -1) {
-		return CCivilization::Civilizations[this->Race]->GetCurrency();
+		return CCivilization::get_all()[this->Race]->GetCurrency();
 	}
 	
 	return nullptr;
@@ -2199,7 +2197,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 		return "";
 	}
 	
-	CCivilization *civilization = CCivilization::Civilizations[this->Race];
+	CCivilization *civilization = CCivilization::get_all()[this->Race];
 	CFaction *faction = PlayerRaces.Factions[this->Faction];
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;

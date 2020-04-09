@@ -574,7 +574,7 @@ void GameMainLoop()
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->Faction != -1) {
 					if (start_date.Year) {
-						CCivilization *civilization = CCivilization::Civilizations[CPlayer::Players[i]->Race];
+						CCivilization *civilization = CCivilization::get_all()[CPlayer::Players[i]->Race];
 						CFaction *faction = PlayerRaces.Factions[CPlayer::Players[i]->Faction];
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
@@ -638,7 +638,7 @@ void GameMainLoop()
 		//if the person player has no faction, bring up the faction choice interface
 		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction == -1) {
 			char buf[256];
-			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? PlayerRaces.Name[CPlayer::GetThisPlayer()->Race].c_str() : "", "");
+			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
 			CclCommand(buf);
 		}
 		

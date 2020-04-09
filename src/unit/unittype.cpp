@@ -712,10 +712,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->SetParent(parent_type);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCivilization *civilization = CCivilization::GetCivilization(value);
-			if (civilization) {
-				this->Civilization = civilization->ID;
-			}
+			CCivilization *civilization = CCivilization::get(value);
+			this->Civilization = civilization->ID;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
@@ -1862,7 +1860,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 			if (faction && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
 				civilization_id = faction->Civilization->ID;
 			}
-			CCivilization *civilization = CCivilization::Civilizations[civilization_id];
+			CCivilization *civilization = CCivilization::get_all()[civilization_id];
 			if (faction && faction->Civilization != civilization) {
 				faction = nullptr;
 			}
