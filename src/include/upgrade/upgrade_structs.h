@@ -146,6 +146,16 @@ public:
 		return this->upgrade_class;
 	}
 
+	int get_civilization() const
+	{
+		return this->civilization;
+	}
+
+	int get_faction() const
+	{
+		return this->faction;
+	}
+
 	bool is_ability() const
 	{
 		return this->ability;
@@ -175,9 +185,9 @@ private:
 	std::string name;
 	//Wyrmgus start
 	int upgrade_class = -1;			/// upgrade class (e.g. siege weapon projectile I)
+	int civilization = -1;			/// which civilization this upgrade belongs to, if any
+	int faction = -1;				/// which faction this upgrade belongs to, if any
 public:
-	int Civilization = -1;			/// which civilization this upgrade belongs to, if any
-	int Faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string Description;		/// Description of the upgrade
 	std::string Quote;				/// Quote of the upgrade
 	std::string Background;			/// Encyclopedia entry for the upgrade

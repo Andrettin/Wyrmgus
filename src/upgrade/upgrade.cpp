@@ -241,13 +241,13 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			const CCivilization *civilization = CCivilization::GetCivilization(value);
 			if (civilization) {
-				this->Civilization = civilization->ID;
+				this->civilization = civilization->ID;
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CFaction *faction = PlayerRaces.GetFaction(value);
 			if (faction) {
-				this->Faction = faction->ID;
+				this->faction = faction->ID;
 			} else {
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
@@ -341,6 +341,18 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 		}
 
 		this->upgrade_class = class_id;
+	} else if (key == "civilization") {
+		const CCivilization *civilization = CCivilization::GetCivilization(value);
+		if (civilization != nullptr) {
+			this->civilization = civilization->ID;
+		}
+	} else if (key == "faction") {
+		const CFaction *faction = PlayerRaces.GetFaction(value);
+		if (faction != nullptr) {
+			this->faction = faction->ID;
+		} else {
+			fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
+		}
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -351,11 +363,11 @@ void CUpgrade::initialize()
 
 	if (this->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = this->get_class();
-		if (this->Civilization != -1) {
-			int civilization_id = this->Civilization;
+		if (this->get_civilization() != -1) {
+			int civilization_id = this->get_civilization();
 
-			if (this->Faction != -1) {
-				int faction_id = this->Faction;
+			if (this->get_faction() != -1) {
+				int faction_id = this->get_faction();
 				if (faction_id != -1 && class_id != -1) {
 					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
 				}
@@ -513,13 +525,13 @@ static int CclDefineUpgrade(lua_State *l)
 			std::string civilization_name = LuaToString(l, -1);
 			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
 			if (civilization) {
-				upgrade->Civilization = civilization->ID;
+				upgrade->civilization = civilization->ID;
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			CFaction *faction = PlayerRaces.GetFaction(faction_name);
 			if (faction) {
-				upgrade->Faction = faction->ID;
+				upgrade->faction = faction->ID;
 			} else {
 				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 			}
@@ -730,11 +742,11 @@ static int CclDefineUpgrade(lua_State *l)
 	//set the upgrade's civilization and class here
 	if (upgrade->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = upgrade->get_class();
-		if (upgrade->Civilization != -1) {
-			int civilization_id = upgrade->Civilization;
+		if (upgrade->get_civilization() != -1) {
+			int civilization_id = upgrade->get_civilization();
 			
-			if (upgrade->Faction != -1) {
-				int faction_id = upgrade->Faction;
+			if (upgrade->get_faction() != -1) {
+				int faction_id = upgrade->get_faction();
 				if (faction_id != -1 && class_id != -1) {
 					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
 				}
@@ -1132,15 +1144,15 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (upgrade->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[upgrade->Civilization].c_str());
+		if (upgrade->get_civilization() != -1) {
+			lua_pushstring(l, PlayerRaces.Name[upgrade->get_civilization()].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (upgrade->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[upgrade->Faction]->Ident.c_str());
+		if (upgrade->get_faction() != -1) {
+			lua_pushstring(l, PlayerRaces.Factions[upgrade->get_faction()]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
