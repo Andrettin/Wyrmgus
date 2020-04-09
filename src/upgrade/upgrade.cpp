@@ -358,6 +358,25 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	}
 }
 
+void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "costs") {
+		scope.for_each_property([&](const stratagus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const int resource = GetResourceIdByName(key.c_str());
+			if (resource != -1) {
+				this->Costs[resource] = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+			}
+		});
+	}
+}
+
 void CUpgrade::initialize()
 {
 
