@@ -640,7 +640,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	if (current_campaign) {
 		CFaction* current_faction = current_campaign->GetFaction();
 		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->Faction != current_faction->ID) {
-			CPlayer::GetThisPlayer()->SetCivilization(current_faction->Civilization->ID);
+			CPlayer::GetThisPlayer()->set_civilization(current_faction->civilization->ID);
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);
 			CPlayer::GetThisPlayer()->Resources[CopperCost] = 2500; // give the player enough resources to start up
 			CPlayer::GetThisPlayer()->Resources[WoodCost] = 2500;
@@ -1113,7 +1113,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				}
 				if (first_building) {
 					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
-						unit->Name = site->GetCulturalName(site_owner->Civilization);
+						unit->Name = site->GetCulturalName(site_owner->civilization);
 					}
 					first_building = false;
 				}

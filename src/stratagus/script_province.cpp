@@ -195,7 +195,7 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -294,7 +294,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string historical_civilization_name = LuaToString(l, -1, j + 1);
 				if (!historical_civilization_name.empty()) {
-					CCivilization *historical_civilization = CCivilization::get(historical_civilization_name);
+					stratagus::civilization *historical_civilization = stratagus::civilization::get(historical_civilization_name);
 					province->HistoricalCultures[year] = historical_civilization->ID;
 				}
 			}
@@ -410,7 +410,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
 
-				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -457,7 +457,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
 
-				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -497,7 +497,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 
-				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);

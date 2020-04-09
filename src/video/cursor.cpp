@@ -161,11 +161,11 @@ CCursor *CursorByIdent(const std::string &ident)
 			continue;
 		}
 
-		if (!CPlayer::GetThisPlayer() && cursor.Race != CCivilization::get_all()[CPlayer::Players[0]->Race]->get_identifier() && !cursor.Race.empty()) {
+		if (!CPlayer::GetThisPlayer() && cursor.Race != stratagus::civilization::get_all()[CPlayer::Players[0]->Race]->get_identifier() && !cursor.Race.empty()) {
 			continue;
 		}
 		
-		if (cursor.Race.empty() || !CPlayer::GetThisPlayer() || cursor.Race == CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier()) {
+		if (cursor.Race.empty() || !CPlayer::GetThisPlayer() || cursor.Race == stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier()) {
 			found_cursor = &cursor;
 			if (!cursor.Race.empty()) { //if this is a generic cursor, keep searching for a civilization-specific one; stop searching otherwise
 				break;

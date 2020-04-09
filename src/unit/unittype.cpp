@@ -558,7 +558,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
-	Class(-1), Civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
+	Class(-1), civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
 	//Wyrmgus end
 	Animations(nullptr), StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
@@ -712,8 +712,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->SetParent(parent_type);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCivilization *civilization = CCivilization::get(value);
-			this->Civilization = civilization->ID;
+			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			this->civilization = civilization->ID;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
@@ -1122,9 +1122,9 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.civilization_class_unit_types[i].rbegin(); iterator != PlayerRaces.civilization_class_unit_types[i].rend(); ++iterator) {
 				if (iterator->second == this->Slot) {
-					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
+					PlayerRaces.civilization_class_unit_types[i].erase(iterator->first);
 					break;
 				}
 			}
@@ -1138,8 +1138,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		}
 		
-		if (this->Civilization != -1) {
-			int civilization_id = this->Civilization;
+		if (this->civilization != -1) {
+			int civilization_id = this->civilization;
 			
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
@@ -1148,7 +1148,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = this->Slot;
+					PlayerRaces.civilization_class_unit_types[civilization_id][class_id] = this->Slot;
 				}
 			}
 		}
@@ -1854,14 +1854,14 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 		}
 	}
 	
-	if (potential_names.size() == 0 && this->Civilization != -1) {
-		int civilization_id = this->Civilization;
+	if (potential_names.size() == 0 && this->civilization != -1) {
+		int civilization_id = this->civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
-				civilization_id = faction->Civilization->ID;
+			if (faction && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
+				civilization_id = faction->civilization->ID;
 			}
-			CCivilization *civilization = CCivilization::get_all()[civilization_id];
-			if (faction && faction->Civilization != civilization) {
+			stratagus::civilization *civilization = stratagus::civilization::get_all()[civilization_id];
+			if (faction && faction->civilization != civilization) {
 				faction = nullptr;
 			}
 			if (this->Faction != -1 && !faction) {

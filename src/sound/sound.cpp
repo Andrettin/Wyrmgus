@@ -172,12 +172,12 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 //			return unit.Type->MapSound.Acknowledgement.Sound;
 			if (unit.Type->MapSound.Acknowledgement.Sound) {
 				return unit.Type->MapSound.Acknowledgement.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				return CCivilization::get_all()[civilization]->UnitSounds.Acknowledgement.Sound;
+				return stratagus::civilization::get_all()[civilization]->UnitSounds.Acknowledgement.Sound;
 			} else {
 				return nullptr;
 			}
@@ -186,13 +186,13 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			//Wyrmgus start
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				if (CCivilization::get_all()[civilization]->UnitSounds.Attack.Sound) {
-					return CCivilization::get_all()[civilization]->UnitSounds.Attack.Sound;
+				if (stratagus::civilization::get_all()[civilization]->UnitSounds.Attack.Sound) {
+					return stratagus::civilization::get_all()[civilization]->UnitSounds.Attack.Sound;
 				} else {
 					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				}
@@ -239,13 +239,13 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			if (unit.Type->MapSound.Build.Sound) {
 				return unit.Type->MapSound.Build.Sound;
 			//Wyrmgus start
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				if (CCivilization::get_all()[civilization]->UnitSounds.Build.Sound) {
-					return CCivilization::get_all()[civilization]->UnitSounds.Build.Sound;
+				if (stratagus::civilization::get_all()[civilization]->UnitSounds.Build.Sound) {
+					return stratagus::civilization::get_all()[civilization]->UnitSounds.Build.Sound;
 				} else {
 					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				}
@@ -259,12 +259,12 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 //			return unit.Type->MapSound.Ready.Sound;
 			if (unit.Type->MapSound.Ready.Sound) {
 				return unit.Type->MapSound.Ready.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				return CCivilization::get_all()[civilization]->UnitSounds.Ready.Sound;
+				return stratagus::civilization::get_all()[civilization]->UnitSounds.Ready.Sound;
 			} else {
 				return nullptr;
 			}
@@ -274,12 +274,12 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 //			return unit.Type->MapSound.Selected.Sound;
 			if (unit.Type->MapSound.Selected.Sound) {
 				return unit.Type->MapSound.Selected.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				return CCivilization::get_all()[civilization]->UnitSounds.Selected.Sound;
+				return stratagus::civilization::get_all()[civilization]->UnitSounds.Selected.Sound;
 			} else {
 				return nullptr;
 			}
@@ -289,15 +289,15 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 //			return unit.Type->MapSound.Help.Sound;
 			if (unit.Type->MapSound.Help.Sound) {
 				return unit.Type->MapSound.Help.Sound;
-			} else if (unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				if (unit.Type->BoolFlag[BUILDING_INDEX].value && CCivilization::get_all()[civilization]->UnitSounds.HelpTown.Sound) {
-					return CCivilization::get_all()[civilization]->UnitSounds.HelpTown.Sound;
+				if (unit.Type->BoolFlag[BUILDING_INDEX].value && stratagus::civilization::get_all()[civilization]->UnitSounds.HelpTown.Sound) {
+					return stratagus::civilization::get_all()[civilization]->UnitSounds.HelpTown.Sound;
 				} else {
-					return CCivilization::get_all()[civilization]->UnitSounds.Help.Sound;
+					return stratagus::civilization::get_all()[civilization]->UnitSounds.Help.Sound;
 				}
 			} else {
 				return nullptr;
@@ -319,13 +319,13 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			//Wyrmgus start
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+				int civilization = unit.Type->civilization;
 				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 					civilization = unit.Player->Race;
 				}
-				if (CCivilization::get_all()[civilization]->UnitSounds.Repair.Sound) {
-					return CCivilization::get_all()[civilization]->UnitSounds.Repair.Sound;
+				if (stratagus::civilization::get_all()[civilization]->UnitSounds.Repair.Sound) {
+					return stratagus::civilization::get_all()[civilization]->UnitSounds.Repair.Sound;
 				} else {
 					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 				}
@@ -343,13 +343,13 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
 					//Wyrmgus start
-					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-						int civilization = unit.Type->Civilization;
+					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
+						int civilization = unit.Type->civilization;
 						if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
 							civilization = unit.Player->Race;
 						}
-						if (CCivilization::get_all()[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
-							return CCivilization::get_all()[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
+						if (stratagus::civilization::get_all()[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
+							return stratagus::civilization::get_all()[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
 						} else {
 							return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
 						}
@@ -674,13 +674,13 @@ void InitSoundClient()
 	}
 	// let's map game sounds, look if already setup in ccl.
 
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.PlacementError[i].Sound) {
 			GameSounds.PlacementError[i].MapSound();
 		}
 	}
 
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.PlacementSuccess[i].Sound) {
 			GameSounds.PlacementSuccess[i].MapSound();
 		}
@@ -693,34 +693,34 @@ void InitSoundClient()
 		GameSounds.Docking.MapSound();
 	}
 
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.BuildingConstruction[i].Sound) {
 			GameSounds.BuildingConstruction[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.WorkComplete[i].Sound) {
 			GameSounds.WorkComplete[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.ResearchComplete[i].Sound) {
 			GameSounds.ResearchComplete[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		for (unsigned int j = 0; j < MaxCosts; ++j) {
 			if (!GameSounds.NotEnoughRes[i][j].Sound) {
 				GameSounds.NotEnoughRes[i][j].MapSound();
 			}
 		}
 	}
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.NotEnoughFood[i].Sound) {
 			GameSounds.NotEnoughFood[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < CCivilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.Rescue[i].Sound) {
 			GameSounds.Rescue[i].MapSound();
 		}

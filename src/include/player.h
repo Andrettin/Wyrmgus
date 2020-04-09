@@ -67,7 +67,6 @@ static constexpr int DefaultTradeCost = 30;
 
 class CCalendar;
 class CCharacter;
-class CCivilization;
 class CCurrency;
 class CDeity;
 class CDeityDomain;
@@ -92,6 +91,7 @@ struct lua_State;
 
 namespace stratagus {
 	class age;
+	class civilization;
 }
 
 /*----------------------------------------------------------------------------
@@ -236,8 +236,8 @@ public:
 	void SetName(const std::string &name);
 	
 	//Wyrmgus start
-	const CCivilization *GetCivilization() const;
-	void SetCivilization(int civilization);
+	const stratagus::civilization *get_civilization() const;
+	void set_civilization(int civilization);
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
@@ -638,7 +638,7 @@ public:
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
-	CCivilization *Civilization = nullptr;								/// faction civilization
+	stratagus::civilization *civilization = nullptr;								/// faction civilization
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
@@ -682,7 +682,7 @@ class CDynasty
 {
 public:
 	CDynasty() : 
-		ID(-1), Civilization(-1),
+		ID(-1), civilization(-1),
 		DynastyUpgrade(nullptr), Conditions(nullptr)
 	{
 	}
@@ -696,7 +696,7 @@ public:
 	std::string Background;												/// dynasty background
 	CUpgrade *DynastyUpgrade;											/// dynasty upgrade applied when the dynasty is set
 	int ID;																/// dynasty ID
-	int Civilization;													/// dynasty civilization
+	int civilization;													/// dynasty civilization
 	IconConfig Icon;													/// Dynasty's icon
 	LuaCallback *Conditions;
 	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
@@ -760,7 +760,7 @@ class CLanguage
 {
 public:
 	CLanguage() :
-		UsedByCivilizationOrFaction(false),
+		used_by_civilization_or_faction(false),
 		DialectOf(nullptr)
 	{
 	}
@@ -776,7 +776,7 @@ public:
 	std::string Family;											/// Family of the language
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
-	bool UsedByCivilizationOrFaction;
+	bool used_by_civilization_or_faction;
 	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
@@ -802,12 +802,12 @@ public:
 	CFaction *GetFaction(const std::string &faction_ident) const;
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
-	int GetCivilizationClassUnitType(int civilization, int class_id);
-	int GetCivilizationClassUpgrade(int civilization, int class_id);
+	int get_civilization_class_unit_type(int civilization, int class_id);
+	int get_civilization_class_upgrade(int civilization, int class_id);
 	int GetFactionClassUnitType(int faction, int class_id);
 	int GetFactionClassUpgrade(int faction, int class_id);
-	CLanguage *GetCivilizationLanguage(int civilization);
-	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
+	CLanguage *get_civilization_language(int civilization);
+	std::vector<CFiller> get_civilization_ui_fillers(int civilization);
 	std::vector<CFiller> GetFactionUIFillers(int faction);
 	std::string TranslateName(const std::string &name, CLanguage *language);
 	//Wyrmgus end
@@ -818,14 +818,14 @@ public:
 	//Wyrmgus start
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
-	std::string CivilizationUpgrades[MAX_RACES];
-	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
-	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
+	std::string civilization_upgrades[MAX_RACES];
+	std::map<int, int> civilization_class_unit_types[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
+	std::map<int, int> civilization_class_upgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions;    								/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
-	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
+	std::vector<CFiller> civilization_ui_fillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties
 	//Wyrmgus end

@@ -691,7 +691,7 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 static int CclAiGetRace(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, CCivilization::get_all()[AiPlayer->Player->Race]->get_identifier().c_str());
+	lua_pushstring(l, stratagus::civilization::get_all()[AiPlayer->Player->Race]->get_identifier().c_str());
 	return 1;
 }
 

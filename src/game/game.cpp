@@ -581,7 +581,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				
 			f->printf("DefineFaction(\"%s\", {\n", faction->Ident.c_str());
 			f->printf("\tName = \"%s\",\n", faction->Name.c_str());
-			f->printf("\tCivilization = \"%s\",\n", faction->Civilization->get_identifier().c_str());
+			f->printf("\tCivilization = \"%s\",\n", faction->civilization->get_identifier().c_str());
 			if (faction->Type != FactionTypeNoFactionType) {
 				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
@@ -616,8 +616,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!type.Name.empty() && (!type.Parent || type.Name != type.Parent->Name)) {
 				f->printf("\tName = \"%s\",\n", type.Name.c_str());
 			}
-			if (type.Civilization != -1) {
-				f->printf("\tCivilization = \"%s\",\n", CCivilization::get_all()[type.Civilization]->get_identifier().c_str());
+			if (type.civilization != -1) {
+				f->printf("\tCivilization = \"%s\",\n", stratagus::civilization::get_all()[type.civilization]->get_identifier().c_str());
 			}
 			if (type.Faction != -1) {
 				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Faction]->Ident.c_str());
@@ -853,7 +853,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, DefaultResourceNames[StoneCost].c_str(),
 						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, CCivilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
+						  i, stratagus::civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
 							  i, PlayerRaces.Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
@@ -1525,7 +1525,7 @@ void CalculateItemsToLoad()
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad += GetIconsCount();
 		if (CPlayer::GetThisPlayer()) {
-			itemsToLoad+= GetCursorsCount(CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier());
+			itemsToLoad+= GetCursorsCount(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier());
 		}
 		itemsToLoad+= GetUnitTypesCount();
 		itemsToLoad+= GetDecorationsCount();

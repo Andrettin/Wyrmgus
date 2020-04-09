@@ -201,7 +201,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Civilization = CCivilization::get(value);
+			this->civilization = stratagus::civilization::get(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
@@ -429,12 +429,12 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		if (name_changed) {
 			this->Type->PersonalNames[this->Gender].push_back(this->Name);
 		}
-	} else if (this->Civilization) {
+	} else if (this->civilization) {
 		if (name_changed) {
-			this->Civilization->PersonalNames[this->Gender].push_back(this->Name);
+			this->civilization->PersonalNames[this->Gender].push_back(this->Name);
 		}
 		if (family_name_changed) {
-			this->Civilization->FamilyNames.push_back(this->FamilyName);
+			this->civilization->FamilyNames.push_back(this->FamilyName);
 		}
 	}
 	
@@ -488,7 +488,7 @@ void CCharacter::GenerateHistory()
 					continue; //try to get a major deity if the character has none, or a minor deity otherwise
 				}
 				
-				if (std::find(deity->Civilizations.begin(), deity->Civilizations.end(), this->Civilization) == deity->Civilizations.end()) {
+				if (std::find(deity->civilizations.begin(), deity->civilizations.end(), this->civilization) == deity->civilizations.end()) {
 					continue;
 				}
 				
@@ -667,13 +667,13 @@ CReligion *CCharacter::GetReligion() const
 
 CLanguage *CCharacter::GetLanguage() const
 {
-	return PlayerRaces.GetCivilizationLanguage(this->Civilization->ID);
+	return PlayerRaces.get_civilization_language(this->civilization->ID);
 }
 
 CCalendar *CCharacter::GetCalendar() const
 {
-	if (this->Civilization) {
-		return this->Civilization->GetCalendar();
+	if (this->civilization) {
+		return this->civilization->GetCalendar();
 	}
 	
 	return CCalendar::BaseCalendar;
@@ -949,8 +949,8 @@ void SaveHero(CCharacter *hero)
 		if (hero->Gender != NoGender) {
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
 		}
-		if (hero->Civilization) {
-			fprintf(fd, "\tCivilization = \"%s\",\n", hero->Civilization->get_identifier().c_str());
+		if (hero->civilization) {
+			fprintf(fd, "\tCivilization = \"%s\",\n", hero->civilization->get_identifier().c_str());
 		}
 	}
 	if (hero->Type != nullptr) {
@@ -1184,7 +1184,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 
-		CCivilization *civilization = CCivilization::get(civilization_name);
+		stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
 		//delete old hero save file
 		std::string path = Parameters::Instance.GetUserDirectory();
 		if (!GameName.empty()) {
@@ -1203,8 +1203,8 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 		}
 
 		//now, update the hero
-		hero->Civilization = civilization;
-		int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization->ID, hero->Type->Class);
+		hero->civilization = civilization;
+		int new_unit_type_id = PlayerRaces.get_civilization_class_unit_type(hero->civilization->ID, hero->Type->Class);
 		if (new_unit_type_id != -1) {
 			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
 			hero->Name = new_hero_name;

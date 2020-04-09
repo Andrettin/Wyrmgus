@@ -52,7 +52,11 @@ class CQuest;
 class CUpgrade;
 struct lua_State;
 
-class CCivilization final : public stratagus::data_entry, public stratagus::data_type<CCivilization>
+int CclDefineCivilization(lua_State *l);
+
+namespace stratagus {
+
+class civilization final : public data_entry, public data_type<civilization>
 {
 	Q_OBJECT
 
@@ -60,18 +64,18 @@ public:
 	static constexpr const char *class_identifier = "civilization";
 	static constexpr const char *database_folder = "civilizations";
 
-	static CCivilization *add(const std::string &identifier, const stratagus::module *module)
+	static civilization *add(const std::string &identifier, const stratagus::module *module)
 	{
-		CCivilization *civilization = data_type::add(identifier, module);
-		civilization->ID = CCivilization::get_all().size() - 1;
+		civilization *civilization = data_type::add(identifier, module);
+		civilization->ID = civilization::get_all().size() - 1;
 		return civilization;
 	}
 
-	CCivilization(const std::string &identifier) : data_entry(identifier)
+	civilization(const std::string &identifier) : data_entry(identifier)
 	{
 	}
 
-	~CCivilization();
+	~civilization();
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
@@ -96,7 +100,7 @@ public:
 	std::vector<std::string> &GetShipNames();
 	
 	int ID = -1;
-	CCivilization *ParentCivilization = nullptr;
+	civilization *parent_civilization = nullptr;
 	std::string Description;		/// civilization description
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
@@ -126,5 +130,7 @@ public:
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
-	friend int CclDefineCivilization(lua_State *l);
+	friend int ::CclDefineCivilization(lua_State *l);
 };
+
+}

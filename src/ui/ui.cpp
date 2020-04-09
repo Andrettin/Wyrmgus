@@ -260,7 +260,7 @@ void CUserInterface::Load()
 		if (CPlayer::GetThisPlayer()->Faction != -1) {
 			new_ui_fillers = PlayerRaces.GetFactionUIFillers(CPlayer::GetThisPlayer()->Faction);
 		} else {
-			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race);
+			new_ui_fillers = PlayerRaces.get_civilization_ui_fillers(CPlayer::GetThisPlayer()->Race);
 		}
 	}
 	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {

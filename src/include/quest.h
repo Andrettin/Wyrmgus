@@ -116,7 +116,7 @@ public:
 	std::string Rewards;			/// Description of the quest's rewards
 	std::string Hint;				/// Quest hint
 	int ID = -1;
-	int Civilization = -1;				/// Which civilization the quest belongs to
+	int civilization = -1;				/// Which civilization the quest belongs to
 	int PlayerColor = 0;				/// Player color used for the quest's icon
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden

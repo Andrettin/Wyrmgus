@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SITE_H__
-#define __SITE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -42,13 +41,16 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCivilization;
 class CFaction;
 class CMapTemplate;
 class CRegion;
 class CUnit;
 class CUnitType;
 class CUniqueItem;
+
+namespace stratagus {
+	class civilization;
+}
 
 class CSite : public CDataType
 {
@@ -61,7 +63,7 @@ public:
 	static std::map<std::string, CSite *> SitesByIdent;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	std::string GetCulturalName(const CCivilization *civilization) const;
+	std::string GetCulturalName(const stratagus::civilization *civilization) const;
 
 	std::string Name;
 	bool Major = false;											/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
@@ -70,12 +72,10 @@ public:
 	CUnit *SiteUnit = nullptr;									/// Unit which represents this site
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
 	std::vector<CFaction *> Cores;						/// Factions which have this site as a core
-	std::map<const CCivilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
+	std::map<const stratagus::civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
 	std::map<CDate, const CFaction *> HistoricalOwners;				/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 };
-
-#endif

@@ -1793,7 +1793,7 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -1814,8 +1814,8 @@ static int CclDefineSite(lua_State *l)
 				site->Cores.push_back(faction);
 				faction->Cores.push_back(site);
 				faction->Sites.push_back(site);
-				if (faction->Civilization) {
-					faction->Civilization->Sites.push_back(site);
+				if (faction->civilization) {
+					faction->civilization->Sites.push_back(site);
 				}
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
@@ -2085,7 +2085,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::get(LuaToString(l, -1, j + 1));
+				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);

@@ -239,7 +239,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			this->upgrade_class = class_id;
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::get(value);
+			const stratagus::civilization *civilization = stratagus::civilization::get(value);
 			this->civilization = civilization->ID;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -340,7 +340,7 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 
 		this->upgrade_class = class_id;
 	} else if (key == "civilization") {
-		const CCivilization *civilization = CCivilization::get(value);
+		const stratagus::civilization *civilization = stratagus::civilization::get(value);
 		this->civilization = civilization->ID;
 	} else if (key == "faction") {
 		const CFaction *faction = PlayerRaces.GetFaction(value);
@@ -388,7 +388,7 @@ void CUpgrade::initialize()
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = this->ID;
+					PlayerRaces.civilization_class_upgrades[civilization_id][class_id] = this->ID;
 				}
 			}
 		}
@@ -538,7 +538,7 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->upgrade_class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			CCivilization *civilization = CCivilization::get(civilization_name);
+			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
 			upgrade->civilization = civilization->ID;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
@@ -645,7 +645,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string civilization_ident = LuaToString(l, -1, j + 1);
-				CCivilization *priority_civilization = CCivilization::get(civilization_ident);
+				stratagus::civilization *priority_civilization = stratagus::civilization::get(civilization_ident);
 				++j;
 
 				int priority = LuaToNumber(l, -1, j + 1);
@@ -762,7 +762,7 @@ static int CclDefineUpgrade(lua_State *l)
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = upgrade->ID;
+					PlayerRaces.civilization_class_upgrades[civilization_id][class_id] = upgrade->ID;
 				}
 			}
 		}
@@ -879,8 +879,8 @@ static int CclDefineModifier(lua_State *l)
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			CCivilization *civilization = CCivilization::get(civilization_ident);
-			um->ChangeCivilizationTo = civilization->ID;
+			stratagus::civilization *civilization = stratagus::civilization::get(civilization_ident);
+			um->change_civilization_to = civilization->ID;
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
 			um->ChangeFactionTo = PlayerRaces.GetFaction(faction_ident);
@@ -1153,7 +1153,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (upgrade->get_civilization() != -1) {
-			lua_pushstring(l, CCivilization::get_all()[upgrade->get_civilization()]->get_identifier().c_str());
+			lua_pushstring(l, stratagus::civilization::get_all()[upgrade->get_civilization()]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1454,12 +1454,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch += um->SpeedResearch;
 	}
-	if (um->ChangeCivilizationTo != -1 && GameRunning && um->ChangeCivilizationTo != player.Race) {
-		player.SetCivilization(um->ChangeCivilizationTo);
+	if (um->change_civilization_to != -1 && GameRunning && um->change_civilization_to != player.Race) {
+		player.set_civilization(um->change_civilization_to);
 	}
-	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->Civilization->ID != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
-		if (um->ChangeFactionTo->Civilization->ID != player.Race) {
-			player.SetCivilization(um->ChangeFactionTo->Civilization->ID);
+	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->civilization->ID != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
+		if (um->ChangeFactionTo->civilization->ID != player.Race) {
+			player.set_civilization(um->ChangeFactionTo->civilization->ID);
 		}
 		player.SetFaction(um->ChangeFactionTo);
 	}

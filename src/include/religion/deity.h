@@ -40,13 +40,16 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCivilization;
 class CDeityDomain;
 class CFaction;
 class CPantheon;
 class CPlane;
 class CReligion;
 class CUpgrade;
+
+namespace stratagus {
+	class civilization;
+}
 
 static constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; //major deities can only have up to three domains
 static constexpr int MINOR_DEITY_DOMAIN_MAX = 1; //minor deities can only have one domain
@@ -65,7 +68,7 @@ public:
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string GetCulturalName(const CCivilization *civilization) const;
+	std::string GetCulturalName(const stratagus::civilization *civilization) const;
 	
 	int Gender = 0;								//deity's gender
 	bool Major = false;							//whether the deity is a major one or not
@@ -78,11 +81,11 @@ public:
 	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;							//deity's icon
-	std::vector<CCivilization *> Civilizations;	//civilizations which may worship the deity
+	std::vector<stratagus::civilization *> civilizations;	//civilizations which may worship the deity
 	std::vector<CReligion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
 	std::vector<CFaction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
-	std::map<const CCivilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+	std::map<const stratagus::civilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };

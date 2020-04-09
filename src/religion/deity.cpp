@@ -154,8 +154,8 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Major = string::to_bool(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCivilization *civilization = CCivilization::get(value);
-			this->Civilizations.push_back(civilization);
+			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			this->civilizations.push_back(civilization);
 			civilization->Deities.push_back(this);
 		} else if (key == "religion") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -218,7 +218,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const CCivilization *civilization = CCivilization::get(key);
+				const stratagus::civilization *civilization = stratagus::civilization::get(key);
 				this->CulturalNames[civilization] = value;
 			}
 		} else {
@@ -248,9 +248,9 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The name if present, or an empty string otherwise
 */
-std::string CDeity::GetCulturalName(const CCivilization *civilization) const
+std::string CDeity::GetCulturalName(const stratagus::civilization *civilization) const
 {
-	std::map<const CCivilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+	std::map<const stratagus::civilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
 	
 	if (find_iterator != this->CulturalNames.end()) {
 		return find_iterator->second;

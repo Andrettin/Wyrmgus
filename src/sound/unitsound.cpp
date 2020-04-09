@@ -167,7 +167,7 @@ void MapUnitSounds()
 		return;
 	}
 
-	for (CCivilization *civilization : CCivilization::get_all()) {
+	for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
 		civilization->UnitSounds.Selected.MapSound();
 		civilization->UnitSounds.Acknowledgement.MapSound();
 		civilization->UnitSounds.Attack.MapSound();

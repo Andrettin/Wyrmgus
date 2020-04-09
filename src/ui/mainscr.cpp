@@ -930,7 +930,7 @@ void DrawTime() {
 	}
 	
 	if (CPlayer::GetThisPlayer()) {
-		CCalendar *calendar = CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]->GetCalendar();
+		CCalendar *calendar = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->GetCalendar();
 		
 		if (calendar) {
 			if (UI.DatePanel.TextX != -1) {

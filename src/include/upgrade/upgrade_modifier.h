@@ -88,7 +88,7 @@ public:
 	CUnitType *ConvertTo = nullptr;			/// convert to this unit-type.
 
 	//Wyrmgus start
-	int ChangeCivilizationTo = -1;			/// changes the player's civilization to this one
+	int change_civilization_to = -1;		/// changes the player's civilization to this one
 	CFaction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
 	CDynasty *ChangeDynastyTo = nullptr;	/// changes the player's dynasty to this one
 	

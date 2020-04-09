@@ -216,7 +216,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "incorrect argument");
 	}
 	const char *civilization_ident = LuaToString(l, j + 1, 1);
-	const CCivilization *civilization = CCivilization::get(civilization_ident);
+	const stratagus::civilization *civilization = stratagus::civilization::get(civilization_ident);
 	lua_rawgeti(l, j + 1, 2);
 	LuaUserData *data = nullptr;
 	if (!lua_isuserdata(l, -1)
@@ -272,7 +272,7 @@ static int CclDefineGameSounds(lua_State *l)
 			const char *resName = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, resName);
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			const CCivilization *civilization = CCivilization::get(civilization_ident);
+			const stratagus::civilization *civilization = stratagus::civilization::get(civilization_ident);
 			lua_rawgeti(l, j + 1, 3);
 			if (!lua_isuserdata(l, -1)
 				|| (data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {

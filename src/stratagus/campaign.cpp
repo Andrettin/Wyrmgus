@@ -233,8 +233,8 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 
 std::string CCampaign::GetSpecies() const
 {
-	if (this->Faction && this->Faction->Civilization) {
-		return PlayerRaces.Species[this->Faction->Civilization->ID];
+	if (this->Faction && this->Faction->civilization) {
+		return PlayerRaces.Species[this->Faction->civilization->ID];
 	}
 
 	return std::string();

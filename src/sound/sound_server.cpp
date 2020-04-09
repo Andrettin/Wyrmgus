@@ -837,7 +837,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 	SDL_LockMutex(Audio.Lock);
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
-		CCivilization *civilization = CCivilization::try_get(civilization_name);
+		stratagus::civilization *civilization = stratagus::civilization::try_get(civilization_name);
 		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		int parent_faction = -1;
 		bool found_music = false;
@@ -856,10 +856,10 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 			}
 		}
 		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-			CCivilization *parent_civilization = nullptr;
+			stratagus::civilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {
-					parent_civilization = civilization->ParentCivilization;
+					parent_civilization = civilization->parent_civilization;
 					if (!parent_civilization) {
 						break;
 					}

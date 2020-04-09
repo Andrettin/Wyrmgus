@@ -947,13 +947,13 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->IndividualUpgrades.clear(); //reset the individual upgrades and then apply the character's
 	this->Trait = nullptr;
 	
-	if (this->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Type->Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[this->Type->Civilization]);
+	if (this->Type->civilization != -1 && !PlayerRaces.civilization_upgrades[this->Type->civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[this->Type->civilization]);
 		if (civilization_upgrade) {
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->Civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
+	if (this->Type->civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
@@ -1420,8 +1420,8 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		return;
 	}
 	
-	if (this->Type->Civilization != -1) {
-		int civilization = this->Type->Civilization;
+	if (this->Type->civilization != -1) {
+		int civilization = this->Type->civilization;
 		int faction = this->Type->Faction;
 		
 		if (faction == -1 && this->Player->Race == civilization) {
@@ -2353,7 +2353,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CUnitType *> potential_items;
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
-		int civilization_id = this->Type->Civilization;
+		int civilization_id = this->Type->civilization;
 		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
 			civilization_id = this->Player->Race;
 		}
@@ -2368,7 +2368,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization && iterator->second->Civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
+					(iterator->second->civilization && iterator->second->civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.get_civilization_class_unit_type(civilization_id, iterator->second->Type->Class))
 					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
@@ -2841,13 +2841,13 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//Wyrmgus start
 	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
-	if (unit->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[unit->Type->Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.CivilizationUpgrades[unit->Type->Civilization]);
+	if (unit->Type->civilization != -1 && !PlayerRaces.civilization_upgrades[unit->Type->civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[unit->Type->civilization]);
 		if (civilization_upgrade) {
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->Civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
+	if (unit->Type->civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
@@ -3276,18 +3276,18 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	int civilization_id = this->Type->Civilization;
+	int civilization_id = this->Type->civilization;
 	
 	CFaction *faction = nullptr;
 	if (this->Player->Faction != -1) {
 		faction = PlayerRaces.Factions[this->Player->Faction];
 		
-		if (civilization_id != -1 && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
-			civilization_id = faction->Civilization->ID;
+		if (civilization_id != -1 && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
+			civilization_id = faction->civilization->ID;
 		}
 	}
 	
-	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
+	CLanguage *language = PlayerRaces.get_civilization_language(civilization_id);
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
@@ -3339,13 +3339,13 @@ void CUnit::UpdateSettlement()
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
-			int civilization_id = this->Type->Civilization;
+			int civilization_id = this->Type->civilization;
 			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
 				civilization_id = this->Player->Race;
 			}
-			const CCivilization *civilization = nullptr;
+			const stratagus::civilization *civilization = nullptr;
 			if (civilization_id != -1) {
-				civilization = CCivilization::get_all()[civilization_id];
+				civilization = stratagus::civilization::get_all()[civilization_id];
 			}
 			
 			int faction_id = this->Type->Faction;
@@ -4582,7 +4582,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->is_shield() || EquippedItems[ShieldItemSlot].size() == 0)
 				&& (!modifier_upgrade->is_boots() || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!modifier_upgrade->is_arrows() || EquippedItems[ArrowsItemSlot].size() == 0)
-				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.CivilizationUpgrades[newplayer.Race])
+				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.civilization_upgrades[newplayer.Race])
 				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == PlayerRaces.Factions[newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
@@ -6147,7 +6147,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
 {
 	if (civilization_id == -1) {
-		civilization_id = type->Civilization;
+		civilization_id = type->civilization;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && CheckDependencies(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
@@ -6365,7 +6365,7 @@ std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]);
+			std::string cultural_name = this->Character->Deity->GetCulturalName(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;

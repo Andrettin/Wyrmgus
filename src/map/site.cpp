@@ -137,8 +137,8 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 				this->Cores.push_back(faction);
 				faction->Cores.push_back(this);
 				faction->Sites.push_back(this);
-				if (faction->Civilization) {
-					faction->Civilization->Sites.push_back(this);
+				if (faction->civilization) {
+					faction->civilization->Sites.push_back(this);
 				}
 			} else {
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
@@ -166,7 +166,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const CCivilization *civilization = CCivilization::get(key);
+				const stratagus::civilization *civilization = stratagus::civilization::get(key);
 				this->CulturalNames[civilization] = value;
 			}
 		} else if (child_config_data->Tag == "historical_owner") {
@@ -273,10 +273,10 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 /**
 **  
 */
-std::string CSite::GetCulturalName(const CCivilization *civilization) const
+std::string CSite::GetCulturalName(const stratagus::civilization *civilization) const
 {
 	if (civilization != nullptr) {
-		std::map<const CCivilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+		std::map<const stratagus::civilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
 		if (find_iterator != this->CulturalNames.end()) {
 			return find_iterator->second;
 		}

@@ -1671,7 +1671,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 	char individual_unit_ident[200][128]; // the 200 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
 	//Wyrmgus end
 
-	sprintf(unit_ident, ",%s-group,", CCivilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
+	sprintf(unit_ident, ",%s-group,", stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {

@@ -44,7 +44,6 @@
 ----------------------------------------------------------------------------*/
 
 class CCalendar;
-class CCivilization;
 class CDeity;
 class CDeityDomain;
 class CDependency;
@@ -62,6 +61,10 @@ class CUnitType;
 class CUnit;
 class CUpgrade;
 class LuaCallback;
+
+namespace stratagus {
+	class civilization;
+}
 
 /**
 **  Indexes into gender array.
@@ -150,7 +153,7 @@ public:
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
-	CCivilization *Civilization = nullptr;	/// Culture to which the character belongs
+	stratagus::civilization *civilization = nullptr;	/// Culture to which the character belongs
 	CFaction *Faction = nullptr;	/// Faction to which the character belongs
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level

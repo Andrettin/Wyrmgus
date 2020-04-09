@@ -192,7 +192,7 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 	if (!strcmp(prop, "RaceName")) {
 		//Wyrmgus start
 //		CPlayer::Players[player]->Race = value;
-		CPlayer::Players[player]->SetCivilization(value);
+		CPlayer::Players[player]->set_civilization(value);
 		//Wyrmgus end
 	} else if (!strcmp(prop, "Resources")) {
 		const int resId = GetResourceIdByName(arg);

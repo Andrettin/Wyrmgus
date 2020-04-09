@@ -1771,8 +1771,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			CCivilization *civilization = CCivilization::get(civilization_name);
-			type->Civilization = civilization->ID;
+			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
+			type->civilization = civilization->ID;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			CFaction *faction = PlayerRaces.GetFaction(faction_name);
@@ -1954,9 +1954,9 @@ static int CclDefineUnitType(lua_State *l)
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.civilization_class_unit_types[i].rbegin(); iterator != PlayerRaces.civilization_class_unit_types[i].rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
-					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
+					PlayerRaces.civilization_class_unit_types[i].erase(iterator->first);
 					break;
 				}
 			}
@@ -1970,8 +1970,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 		
-		if (type->Civilization != -1) {
-			int civilization_id = type->Civilization;
+		if (type->civilization != -1) {
+			int civilization_id = type->civilization;
 			
 			if (type->Faction != -1) {
 				int faction_id = type->Faction;
@@ -1980,7 +1980,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+					PlayerRaces.civilization_class_unit_types[civilization_id][class_id] = type->Slot;
 				}
 			}
 		}
@@ -2411,8 +2411,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (type->Civilization != -1) {
-			lua_pushstring(l, CCivilization::get_all()[type->Civilization]->get_identifier().c_str());
+		if (type->civilization != -1) {
+			lua_pushstring(l, stratagus::civilization::get_all()[type->civilization]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

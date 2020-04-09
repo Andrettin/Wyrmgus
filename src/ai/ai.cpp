@@ -646,7 +646,7 @@ void AiInit(CPlayer &player)
 
 	for (i = 0; i < AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (!ait->Race.empty() && ait->Race != CCivilization::get_all()[player.Race]->get_identifier()) {
+		if (!ait->Race.empty() && ait->Race != stratagus::civilization::get_all()[player.Race]->get_identifier()) {
 			continue;
 		}
 		if (!player.AiName.empty() && ait->Name != player.AiName) {
@@ -663,7 +663,7 @@ void AiInit(CPlayer &player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ CCivilization::get_all()[player.Race]->get_identifier().c_str() _C_
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ stratagus::civilization::get_all()[player.Race]->get_identifier().c_str() _C_
 			   !ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player.AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;

@@ -91,7 +91,7 @@ class CGrandStrategyProvince : public CProvince
 {
 public:
 	CGrandStrategyProvince() : CProvince(),
-		Civilization(-1),
+		civilization(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Movement(false),
@@ -132,7 +132,7 @@ public:
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();
 	
-	int Civilization;													/// Civilization of the province (-1 = no one).
+	int civilization;													/// Civilization of the province (-1 = no one).
 	int TotalUnits;														/// Total quantity of units in the province
 	int TotalWorkers;													/// Total quantity of workers in the province
 	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
@@ -162,7 +162,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
+		Faction(-1), civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -189,7 +189,7 @@ public:
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
 	int Faction;														/// The faction's ID (-1 = none).
-	int Civilization;													/// Civilization of the faction (-1 = none).
+	int civilization;													/// Civilization of the faction (-1 = none).
 	int GovernmentType;													/// Government type of the faction (-1 = none).
 	int FactionTier;													/// What is the tier of this faction (barony, etc.).
 	CGrandStrategyProvince *Capital;									/// Capital province of this faction

@@ -70,8 +70,8 @@
 		//Wyrmgus start
 		} else if (!strcmp(value, "civilization")) {
 			value = LuaToString(l, -1, j + 1);
-			CCivilization *civilization = CCivilization::get(value);
-			this->Civilization = civilization->ID;
+			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			this->civilization = civilization->ID;
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
 			this->Faction = PlayerRaces.GetFactionIndexByName(value);
@@ -89,7 +89,7 @@
 	// Now, checking value.
 	//Wyrmgus start
 //	if (this->NewForm == nullptr) {
-	if (this->NewForm == nullptr && this->Civilization == -1 && this->Faction == -1 && !this->Detachment) {
+	if (this->NewForm == nullptr && this->civilization == -1 && this->Faction == -1 && !this->Detachment) {
 	//Wyrmgus end
 		LuaError(l, "Use a unittype for polymorph (with new-form)");
 	}
@@ -114,20 +114,20 @@
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
 		int new_unit_type = -1;
-		if (this->Civilization != -1 && this->Faction != -1 && this->Civilization == target->Type->Civilization) { //get faction equivalent, if is of the same civilization
+		if (this->civilization != -1 && this->Faction != -1 && this->civilization == target->Type->civilization) { //get faction equivalent, if is of the same civilization
 			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Faction, target->Type->Class);
-		} else if (this->Civilization != -1 && this->Civilization != target->Type->Civilization) {
-			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
+		} else if (this->civilization != -1 && this->civilization != target->Type->civilization) {
+			new_unit_type = PlayerRaces.get_civilization_class_unit_type(this->civilization, target->Type->Class);
 		}
-		if (this->Detachment && target->Type->Civilization != -1 && target->Type->Faction != -1) {
-			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->Civilization, target->Type->Class);
+		if (this->Detachment && target->Type->civilization != -1 && target->Type->Faction != -1) {
+			new_unit_type = PlayerRaces.get_civilization_class_unit_type(target->Type->civilization, target->Type->Class);
 		}
 		if (new_unit_type != -1) {
 			type = UnitTypes[new_unit_type];
 		}
 	}
-	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != -1 && this->Civilization != target->Character->Civilization->ID) {
-		target->Character->Civilization = CCivilization::get_all()[this->Civilization];
+	if (target->Character && target->Character->Custom && target->Character->civilization && this->civilization != -1 && this->civilization != target->Character->civilization->ID) {
+		target->Character->civilization = stratagus::civilization::get_all()[this->civilization];
 		SaveHero(target->Character);
 	}
 	if (type == nullptr) {

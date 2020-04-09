@@ -245,13 +245,13 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 			return false;
 		}
 	}
-	if (condition->CivilizationEquivalent != -1) {
-		if (caster.Type->Civilization == -1 || (caster.Type->Civilization == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->ID == condition->CivilizationEquivalent))) || PlayerRaces.Species[caster.Type->Civilization] != PlayerRaces.Species[condition->CivilizationEquivalent] || PlayerRaces.GetCivilizationClassUnitType(condition->CivilizationEquivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+	if (condition->civilization_equivalent != -1) {
+		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent && (!caster.Character || (caster.Character->civilization && caster.Character->civilization->ID == condition->civilization_equivalent))) || PlayerRaces.Species[caster.Type->civilization] != PlayerRaces.Species[condition->civilization_equivalent] || PlayerRaces.get_civilization_class_unit_type(condition->civilization_equivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->Civilization == -1 || caster.Type->Civilization != condition->FactionEquivalent->Civilization->ID || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->ID, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->civilization == -1 || caster.Type->civilization != condition->FactionEquivalent->civilization->ID || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->ID, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
@@ -990,8 +990,8 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			this->FactionUnit = StringToCondition(value);
 		} else if (key == "civilization_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::get(value);
-			this->CivilizationEquivalent = civilization->ID;
+			const stratagus::civilization *civilization = stratagus::civilization::get(value);
+			this->civilization_equivalent = civilization->ID;
 		} else if (key == "faction_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);

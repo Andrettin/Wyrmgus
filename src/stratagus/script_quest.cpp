@@ -117,8 +117,8 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Hint")) {
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			CCivilization *civilization = CCivilization::get(LuaToString(l, -1));
-			quest->Civilization = civilization->ID;
+			stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1));
+			quest->civilization = civilization->ID;
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
 			int color = GetPlayerColorIndexByName(color_name);
@@ -272,8 +272,8 @@ static int CclDefineQuest(lua_State *l)
 		}
 	}
 	
-	if (!quest->Hidden && quest->Civilization != -1 && std::find(CCivilization::get_all()[quest->Civilization]->Quests.begin(), CCivilization::get_all()[quest->Civilization]->Quests.end(), quest) == CCivilization::get_all()[quest->Civilization]->Quests.end()) {
-		CCivilization::get_all()[quest->Civilization]->Quests.push_back(quest);
+	if (!quest->Hidden && quest->civilization != -1 && std::find(stratagus::civilization::get_all()[quest->civilization]->Quests.begin(), stratagus::civilization::get_all()[quest->civilization]->Quests.end(), quest) == stratagus::civilization::get_all()[quest->civilization]->Quests.end()) {
+		stratagus::civilization::get_all()[quest->civilization]->Quests.push_back(quest);
 	}
 	
 	return 0;
@@ -358,8 +358,8 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushstring(l, quest->CompletionSpeech.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (quest->Civilization != -1) {
-			lua_pushstring(l, CCivilization::get_all()[quest->Civilization]->get_identifier().c_str());
+		if (quest->civilization != -1) {
+			lua_pushstring(l, stratagus::civilization::get_all()[quest->civilization]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

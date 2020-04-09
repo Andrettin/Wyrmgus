@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "civilization.h"
@@ -38,11 +34,9 @@
 #include "player.h"
 #include "time/calendar.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-CCivilization::~CCivilization()
+civilization::~civilization()
 {
 	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
 		for (size_t i = 0; i < iterator->second.size(); ++i) {
@@ -55,10 +49,10 @@ CCivilization::~CCivilization()
 	}
 }
 
-int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
+int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {
-		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is null.\n");
+		fprintf(stderr, "Error in civilization::GetUpgradePriority: the upgrade is null.\n");
 	}
 	
 	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
@@ -68,114 +62,116 @@ int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 	return 100;
 }
 
-int CCivilization::GetForceTypeWeight(int force_type) const
+int civilization::GetForceTypeWeight(int force_type) const
 {
 	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTypeWeight: the force_type is -1.\n");
+		fprintf(stderr, "Error in civilization::GetForceTypeWeight: the force_type is -1.\n");
 	}
 	
 	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
 		return this->ForceTypeWeights.find(force_type)->second;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetForceTypeWeight(force_type);
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetForceTypeWeight(force_type);
 	}
 	
 	return 1;
 }
 
-CCalendar *CCivilization::GetCalendar() const
+CCalendar *civilization::GetCalendar() const
 {
 	if (this->Calendar) {
 		return this->Calendar;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetCalendar();
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetCalendar();
 	}
 	
 	return CCalendar::BaseCalendar;
 }
 
-CCurrency *CCivilization::GetCurrency() const
+CCurrency *civilization::GetCurrency() const
 {
 	if (this->Currency) {
 		return this->Currency;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetCurrency();
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetCurrency();
 	}
 	
 	return nullptr;
 }
 
-std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) const
+std::vector<CForceTemplate *> civilization::GetForceTemplates(int force_type) const
 {
 	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTemplates: the force_type is -1.\n");
+		fprintf(stderr, "Error in civilization::GetForceTemplates: the force_type is -1.\n");
 	}
 	
 	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
 		return this->ForceTemplates.find(force_type)->second;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetForceTemplates(force_type);
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetForceTemplates(force_type);
 	}
 	
 	return std::vector<CForceTemplate *>();
 }
 
-std::vector<CAiBuildingTemplate *> CCivilization::GetAiBuildingTemplates() const
+std::vector<CAiBuildingTemplate *> civilization::GetAiBuildingTemplates() const
 {
 	if (this->AiBuildingTemplates.size() > 0) {
 		return this->AiBuildingTemplates;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetAiBuildingTemplates();
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetAiBuildingTemplates();
 	}
 	
 	return std::vector<CAiBuildingTemplate *>();
 }
 
-std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
+std::map<int, std::vector<std::string>> &civilization::GetPersonalNames()
 {
 	if (this->PersonalNames.size() > 0) {
 		return this->PersonalNames;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetPersonalNames();
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetPersonalNames();
 	}
 	
 	return this->PersonalNames;
 }
 
-std::vector<std::string> &CCivilization::GetUnitClassNames(int class_id)
+std::vector<std::string> &civilization::GetUnitClassNames(int class_id)
 {
 	if (this->UnitClassNames[class_id].size() > 0) {
 		return this->UnitClassNames[class_id];
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetUnitClassNames(class_id);
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetUnitClassNames(class_id);
 	}
 	
 	return this->UnitClassNames[class_id];
 }
 
-std::vector<std::string> &CCivilization::GetShipNames()
+std::vector<std::string> &civilization::GetShipNames()
 {
 	if (this->ShipNames.size() > 0) {
 		return this->ShipNames;
 	}
 	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetShipNames();
+	if (this->parent_civilization) {
+		return this->parent_civilization->GetShipNames();
 	}
 	
 	return this->ShipNames;
+}
+
 }

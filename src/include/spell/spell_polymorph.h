@@ -49,7 +49,7 @@ private:
 	CUnitType *NewForm = nullptr;	/// The new form
 	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
 	//Wyrmgus start
-	int Civilization = -1;			/// For using with the Faction value.
+	int civilization = -1;			/// For using with the Faction value.
 	int Faction = -1;				/// If the unit should be transformed in its faction equivalent.
 	bool Detachment = false;		/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
 	//Wyrmgus end

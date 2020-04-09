@@ -776,7 +776,7 @@ static void DrawPlayers()
 		//Wyrmgus start
 //		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
 //				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
-		std::string civ_str = CCivilization::get_all()[CPlayer::Players[Editor.SelectedPlayer]->Race]->get_identifier().c_str();
+		std::string civ_str = stratagus::civilization::get_all()[CPlayer::Players[Editor.SelectedPlayer]->Race]->get_identifier().c_str();
 		civ_str[0] = toupper(civ_str[0]);
 		snprintf(buf, sizeof(buf), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end
@@ -2467,7 +2467,7 @@ void CEditor::Init()
 				CMap::Map.Info.PlayerType[i] = PlayerNeutral;
 				//Wyrmgus start
 //				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race = 0;
-				CPlayer::Players[i]->SetCivilization(0);
+				CPlayer::Players[i]->set_civilization(0);
 				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race;
 				//Wyrmgus end
 			} else {
