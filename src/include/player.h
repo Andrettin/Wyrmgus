@@ -815,7 +815,6 @@ public:
 
 public:
 	bool Visible[MAX_RACES];        /// race should be visible in pulldown
-	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)

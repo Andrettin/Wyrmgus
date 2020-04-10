@@ -1580,7 +1580,7 @@ std::string EvalString(const StringDesc *s)
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				if ((**upgrade).get_civilization() != nullptr) {
-					return PlayerRaces.Display[(**upgrade).get_civilization()->ID];
+					return (**upgrade).get_civilization()->get_name();
 				} else {
 					return std::string("");
 				}
@@ -1612,7 +1612,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return PlayerRaces.Display[(**faction).civilization->ID];
+				return (**faction).civilization->get_name();
 			} else {
 				return std::string("");
 			}

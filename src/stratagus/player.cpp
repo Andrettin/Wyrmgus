@@ -411,7 +411,6 @@ void PlayerRace::Clean()
 	}
 	//Wyrmgus end
 	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
-		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
 		this->civilization_upgrades[i].clear();

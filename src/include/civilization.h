@@ -33,8 +33,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database/data_entry.h"
 #include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "player.h" //for certain enums
 #include "time/date.h"
 
@@ -56,7 +56,7 @@ int CclDefineCivilization(lua_State *l);
 
 namespace stratagus {
 
-class civilization final : public data_entry, public data_type<civilization>
+class civilization final : public detailed_data_entry, public data_type<civilization>
 {
 	Q_OBJECT
 
@@ -71,7 +71,7 @@ public:
 		return civilization;
 	}
 
-	civilization(const std::string &identifier) : data_entry(identifier)
+	civilization(const std::string &identifier) : detailed_data_entry(identifier)
 	{
 	}
 
@@ -101,9 +101,6 @@ public:
 	
 	int ID = -1;
 	civilization *parent_civilization = nullptr;
-	std::string Description;		/// civilization description
-	std::string Quote;				/// civilization quote
-	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
 	std::string interface;			/// the string identifier for the civilization's interface

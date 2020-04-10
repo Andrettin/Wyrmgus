@@ -789,13 +789,13 @@ static int CclDefineCivilization(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Display")) {
-			PlayerRaces.Display[civilization_id] = LuaToString(l, -1);
+			civilization->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
-			civilization->Description = LuaToString(l, -1);
+			civilization->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			civilization->Quote = LuaToString(l, -1);
+			civilization->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
-			civilization->Background = LuaToString(l, -1);
+			civilization->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Adjective")) {
 			civilization->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Interface")) {
@@ -1571,22 +1571,22 @@ static int CclGetCivilizationData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Display")) {
-		lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
+		lua_pushstring(l, civilization->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, civilization->Description.c_str());
+		lua_pushstring(l, civilization->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, civilization->Quote.c_str());
+		lua_pushstring(l, civilization->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, civilization->Background.c_str());
+		lua_pushstring(l, civilization->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
 		if (!civilization->Adjective.empty()) {
 			lua_pushstring(l, civilization->Adjective.c_str());
 		} else {
-			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
+			lua_pushstring(l, civilization->get_name().c_str());
 		}
 		return 1;
 	} else if (!strcmp(data, "Interface")) {
