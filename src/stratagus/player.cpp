@@ -779,17 +779,17 @@ std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
 	return this->civilization->GetAiBuildingTemplates();
 }
 
-std::vector<std::string> &CFaction::GetShipNames()
+const std::vector<std::string> &CFaction::get_ship_names() const
 {
-	if (this->ShipNames.size() > 0) {
-		return this->ShipNames;
+	if (this->ship_names.size() > 0) {
+		return this->ship_names;
 	}
 	
 	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetShipNames();
+		return PlayerRaces.Factions[this->ParentFaction]->get_ship_names();
 	}
 	
-	return this->civilization->GetShipNames();
+	return this->civilization->get_ship_names();
 }
 
 CDynasty::~CDynasty()
@@ -1556,7 +1556,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
-		ship_names_changed = PlayerRaces.Factions[this->Faction]->GetShipNames() != PlayerRaces.Factions[faction_id]->GetShipNames();
+		ship_names_changed = PlayerRaces.Factions[this->Faction]->get_ship_names() != PlayerRaces.Factions[faction_id]->get_ship_names();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	

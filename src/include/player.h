@@ -628,7 +628,7 @@ public:
 	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
-	std::vector<std::string> &GetShipNames();
+	const std::vector<std::string> &get_ship_names() const;
 
 	std::string Ident;													/// faction name
 	std::string Name;
@@ -661,7 +661,9 @@ public:
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
-	std::vector<std::string> ShipNames;									/// Ship names for the faction
+private:
+	std::vector<std::string> ship_names;									/// Ship names for the faction
+public:
 	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)
 	std::vector<CSite *> Sites;											/// Sites used for this faction if it needs a randomly-generated settlement
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
@@ -677,6 +679,8 @@ public:
 	std::vector<CFiller> UIFillers;
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
+
+	friend int CclDefineFaction(lua_State *l);
 };
 
 class CDynasty

@@ -64,6 +64,7 @@ class civilization final : public detailed_data_entry, public data_type<civiliza
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring WRITE set_interface_qstring)
 	Q_PROPERTY(QString default_color READ get_default_color_qstring WRITE set_default_color_qstring)
+	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 
 public:
 	static constexpr const char *class_identifier = "civilization";
@@ -133,10 +134,20 @@ public:
 
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
-	std::map<int, std::vector<std::string>> &GetPersonalNames();
-	std::vector<std::string> &GetUnitClassNames(int class_id);
-	std::vector<std::string> &GetShipNames();
-	
+	const std::map<int, std::vector<std::string>> &GetPersonalNames() const;
+	const std::vector<std::string> &get_unit_class_names(const int class_id);
+
+	const std::vector<std::string> &get_ship_names() const;
+
+	QStringList get_ship_names_qstring_list() const;
+
+	Q_INVOKABLE void add_ship_name(const std::string &ship_name)
+	{
+		this->ship_names.push_back(ship_name);
+	}
+
+	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
+
 	int ID = -1;
 	civilization *parent_civilization = nullptr;
 	std::string Adjective;			/// adjective pertaining to the civilization
@@ -158,10 +169,14 @@ public:
 	std::map<int, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
-	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
+private:
+	std::map<int, std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
+public:
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
-	std::vector<std::string> ShipNames;			/// Ship names for the civilization
+private:
+	std::vector<std::string> ship_names;			/// Ship names for the civilization
+public:
 	std::vector<CDeity *> Deities;
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type

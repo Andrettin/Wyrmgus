@@ -295,8 +295,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
-					|| (stratagus::civilization::get_all()[oldtype.civilization]->GetUnitClassNames(oldtype.Class) != stratagus::civilization::get_all()[newtype.civilization]->GetUnitClassNames(newtype.Class))
-					|| (stratagus::civilization::get_all()[oldtype.civilization]->GetUnitClassNames(oldtype.Class) != stratagus::civilization::get_all()[player.Race]->GetUnitClassNames(newtype.Class))
+					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.Class) != stratagus::civilization::get_all()[newtype.civilization]->get_unit_class_names(newtype.Class))
+					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.Class) != stratagus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.Class))
 				)
 			)
 		)

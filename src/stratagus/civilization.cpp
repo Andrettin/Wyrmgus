@@ -35,6 +35,9 @@
 #include "time/calendar.h"
 #include "ui/button_action.h"
 #include "unit/unittype.h"
+#include "util/container_util.h"
+#include "util/string_util.h"
+#include "util/vector_util.h"
 #include "video.h"
 
 namespace stratagus {
@@ -74,8 +77,6 @@ void civilization::process_sml_scope(const sml_data &scope)
 		PlayerRaces.civilization_ui_fillers[this->ID].clear();
 
 		scope.for_each_child([&](const sml_data &child_scope) {
-			const std::string &tag = child_scope.get_tag();
-
 			CFiller filler = CFiller();
 			const std::string filler_file = child_scope.get_property_value("file");
 			if (filler_file.empty()) {
@@ -136,6 +137,40 @@ void civilization::process_sml_scope(const sml_data &scope)
 				return a->Priority > b->Priority;
 			});
 		}
+	} else if (tag == "ai_building_templates") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			CAiBuildingTemplate *building_template = new CAiBuildingTemplate;
+
+			child_scope.for_each_property([&](const sml_property &property) {
+				const std::string &key = property.get_key();
+				const std::string &value = property.get_value();
+
+				if (key == "unit_class") {
+					const int unit_class = GetOrAddUnitTypeClassIndexByName(value);
+					building_template->UnitClass = unit_class;
+					this->AiBuildingTemplates.push_back(building_template);
+				} else if (key == "priority") {
+					building_template->Priority = std::stoi(value);
+				} else if (key == "per_settlement") {
+					building_template->PerSettlement = string::to_bool(value);
+				} else {
+					throw std::runtime_error("Invalid AI building template property: " + child_scope.get_tag() + ".");
+				}
+			});
+		});
+
+		std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
+			return a->Priority > b->Priority;
+		});
+	} else if (tag == "unit_class_names") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+
+			const int class_id = GetOrAddUnitTypeClassIndexByName(tag);
+			vector::merge(this->unit_class_names[class_id], child_scope.get_values());
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
@@ -385,7 +420,7 @@ std::vector<CAiBuildingTemplate *> civilization::GetAiBuildingTemplates() const
 	return std::vector<CAiBuildingTemplate *>();
 }
 
-std::map<int, std::vector<std::string>> &civilization::GetPersonalNames()
+const std::map<int, std::vector<std::string>> &civilization::GetPersonalNames() const
 {
 	if (this->PersonalNames.size() > 0) {
 		return this->PersonalNames;
@@ -398,30 +433,40 @@ std::map<int, std::vector<std::string>> &civilization::GetPersonalNames()
 	return this->PersonalNames;
 }
 
-std::vector<std::string> &civilization::GetUnitClassNames(int class_id)
+const std::vector<std::string> &civilization::get_unit_class_names(const int class_id)
 {
-	if (this->UnitClassNames[class_id].size() > 0) {
-		return this->UnitClassNames[class_id];
+	if (!this->unit_class_names[class_id].empty()) {
+		return this->unit_class_names[class_id];
 	}
 	
 	if (this->parent_civilization) {
-		return this->parent_civilization->GetUnitClassNames(class_id);
+		return this->parent_civilization->get_unit_class_names(class_id);
 	}
 	
-	return this->UnitClassNames[class_id];
+	return this->unit_class_names[class_id];
 }
 
-std::vector<std::string> &civilization::GetShipNames()
+const std::vector<std::string> &civilization::get_ship_names() const
 {
-	if (this->ShipNames.size() > 0) {
-		return this->ShipNames;
+	if (!this->ship_names.empty()) {
+		return this->ship_names;
 	}
 	
 	if (this->parent_civilization) {
-		return this->parent_civilization->GetShipNames();
+		return this->parent_civilization->get_ship_names();
 	}
 	
-	return this->ShipNames;
+	return this->ship_names;
+}
+
+QStringList civilization::get_ship_names_qstring_list() const
+{
+	return container::to_qstring_list(this->get_ship_names());
+}
+
+void civilization::remove_ship_name(const std::string &ship_name)
+{
+	vector::remove_one(this->ship_names, ship_name);
 }
 
 }

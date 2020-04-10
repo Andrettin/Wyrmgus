@@ -1880,17 +1880,17 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 					}
 				}
 			} else {
-				if (this->Class != -1 && civilization->GetUnitClassNames(this->Class).size() > 0) {
-					return civilization->GetUnitClassNames(this->Class);
+				if (this->Class != -1 && civilization->get_unit_class_names(this->Class).size() > 0) {
+					return civilization->get_unit_class_names(this->Class);
 				}
 				
 				if (this->UnitType == UnitTypeType::Naval) { // if is a ship
-					if (faction && faction->GetShipNames().size() > 0) {
-						return faction->GetShipNames();
+					if (faction && !faction->get_ship_names().empty()) {
+						return faction->get_ship_names();
 					}
 					
-					if (civilization->GetShipNames().size() > 0) {
-						return civilization->GetShipNames();
+					if (!civilization->get_ship_names().empty()) {
+						return civilization->get_ship_names();
 					}
 				}
 			}

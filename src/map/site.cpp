@@ -210,7 +210,6 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					end_date = CDate::FromString(value);
 				} else if (key == "building_class") {
-					value = FindAndReplaceString(value, "_", "-");
 					building_class_id = GetUnitTypeClassIndexByName(value);
 					if (building_class_id == -1) {
 						fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());

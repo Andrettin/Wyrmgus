@@ -1016,7 +1016,7 @@ static int CclDefineCivilization(lua_State *l)
 				int class_id = GetOrAddUnitTypeClassIndexByName(class_name);
 				++j;
 				
-				civilization->UnitClassNames[class_id].push_back(LuaToString(l, -1, j + 1));
+				civilization->unit_class_names[class_id].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "FamilyNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -1031,7 +1031,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "ShipNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				civilization->ShipNames.push_back(LuaToString(l, -1, j + 1));
+				civilization->ship_names.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "MinisterTitles")) {
 			if (!lua_istable(l, -1)) {
@@ -1525,14 +1525,6 @@ static int CclGetCivilizationData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "ShipNames")) {
-		lua_createtable(l, civilization->ShipNames.size(), 0);
-		for (size_t i = 1; i <= civilization->ShipNames.size(); ++i)
-		{
-			lua_pushstring(l, civilization->ShipNames[i-1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -1915,10 +1907,10 @@ static int CclDefineFaction(lua_State *l)
 				faction->ProvinceNames.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "ShipNames")) {
-			faction->ShipNames.clear();
+			faction->ship_names.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				faction->ShipNames.push_back(LuaToString(l, -1, j + 1));
+				faction->ship_names.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
