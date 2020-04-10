@@ -411,13 +411,11 @@ void PlayerRace::Clean()
 	}
 	//Wyrmgus end
 	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
-		this->Visible[i] = false;
 		//Wyrmgus start
 		this->civilization_upgrades[i].clear();
 		this->civilization_class_unit_types[i].clear();
 		this->civilization_class_upgrades[i].clear();
 		this->Species[i].clear();
-		this->DefaultColor[i].clear();
 		this->DevelopsFrom[i].clear();
 		this->DevelopsTo[i].clear();
 		this->civilization_ui_fillers[i].clear();
@@ -4715,15 +4713,15 @@ std::string GetForceTypeNameById(int force_type)
 
 int GetForceTypeIdByName(const std::string &force_type)
 {
-	if (force_type == "land-force") {
+	if (force_type == "land-force" || force_type == "land_force") {
 		return LandForceType;
-	} else if (force_type == "naval-force") {
+	} else if (force_type == "naval-force" || force_type == "naval_force") {
 		return NavalForceType;
-	} else if (force_type == "air-force") {
+	} else if (force_type == "air-force" || force_type == "air_force") {
 		return AirForceType;
 	}
 
-	return -1;
+	throw std::runtime_error("Invalid force type: " + force_type + ".");
 }
 
 std::string GetWordTypeNameById(int word_type)

@@ -60,6 +60,11 @@ class civilization final : public detailed_data_entry, public data_type<civiliza
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
+	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
+	Q_PROPERTY(QString interface READ get_interface_qstring WRITE set_interface_qstring)
+	Q_PROPERTY(QString default_color READ get_default_color_qstring WRITE set_default_color_qstring)
+
 public:
 	static constexpr const char *class_identifier = "civilization";
 	static constexpr const char *database_folder = "civilizations";
@@ -76,6 +81,9 @@ public:
 	}
 
 	~civilization();
+
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
@@ -85,8 +93,38 @@ public:
 		return this->interface;
 	}
 
+	QString get_interface_qstring() const
+	{
+		return QString::fromStdString(this->interface);
+	}
+
+	void set_interface_qstring(const QString &interface)
+	{
+		this->interface = interface.toStdString();
+	}
+
+	const std::string &get_default_color() const
+	{
+		return this->default_color;
+	}
+
+	QString get_default_color_qstring() const
+	{
+		return QString::fromStdString(this->default_color);
+	}
+
+	void set_default_color_qstring(const QString &default_color)
+	{
+		this->default_color = default_color.toStdString();
+	}
+
 	CCalendar *GetCalendar() const;
 	CCurrency *GetCurrency() const;
+
+	bool is_visible() const
+	{
+		return this->visible;
+	}
 
 	bool is_playable() const
 	{
@@ -103,13 +141,15 @@ public:
 	civilization *parent_civilization = nullptr;
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
-	std::string interface;			/// the string identifier for the civilization's interface
+	std::string interface; //the string identifier for the civilization's interface
+	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 public:
 	CUnitSound UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
 private:
+	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
 public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization

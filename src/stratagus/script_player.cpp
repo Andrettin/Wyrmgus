@@ -801,7 +801,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Interface")) {
 			civilization->interface = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
-			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
+			civilization->visible = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
 			civilization->playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
@@ -823,7 +823,7 @@ static int CclDefineCivilization(lua_State *l)
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			civilization->Currency = currency;
 		} else if (!strcmp(value, "DefaultColor")) {
-			PlayerRaces.DefaultColor[civilization_id] = LuaToString(l, -1);
+			civilization->default_color = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
 			PlayerRaces.civilization_upgrades[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "DevelopsFrom")) {
@@ -1072,157 +1072,8 @@ static int CclDefineCivilization(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-	
-	if (civilization->parent_civilization) {
-		const stratagus::civilization *parent_civilization = civilization->parent_civilization;
-		int parent_civilization_id = parent_civilization->ID;
 
-		if (civilization->get_interface().empty()) {
-			civilization->interface = parent_civilization->interface;
-		}
-
-		if (PlayerRaces.civilization_upgrades[civilization_id].empty() && !PlayerRaces.civilization_upgrades[parent_civilization_id].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
-			PlayerRaces.civilization_upgrades[civilization_id] = PlayerRaces.civilization_upgrades[parent_civilization_id];
-		}
-		
-		//inherit button icons from the parent civilization, for button actions which none are specified
-		for (std::map<ButtonCmd, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization_id].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization_id].end(); ++iterator) {
-			if (PlayerRaces.ButtonIcons[civilization_id].find(iterator->first) == PlayerRaces.ButtonIcons[civilization_id].end()) {
-				PlayerRaces.ButtonIcons[civilization_id][iterator->first] = iterator->second;
-			}
-		}
-		
-		//inherit historical upgrades from the parent civilization, if no historical data is given for that upgrade for this civilization
-		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = parent_civilization->HistoricalUpgrades.begin(); iterator != parent_civilization->HistoricalUpgrades.end(); ++iterator) {
-			if (civilization->HistoricalUpgrades.find(iterator->first) == civilization->HistoricalUpgrades.end()) {
-				civilization->HistoricalUpgrades[iterator->first] = iterator->second;
-			}
-		}
-		
-		//unit sounds
-		if (civilization->UnitSounds.Selected.Name.empty()) {
-			civilization->UnitSounds.Selected = parent_civilization->UnitSounds.Selected;
-		}
-		if (civilization->UnitSounds.Acknowledgement.Name.empty()) {
-			civilization->UnitSounds.Acknowledgement = parent_civilization->UnitSounds.Acknowledgement;
-		}
-		if (civilization->UnitSounds.Attack.Name.empty()) {
-			civilization->UnitSounds.Attack = parent_civilization->UnitSounds.Attack;
-		}
-		if (civilization->UnitSounds.Idle.Name.empty()) {
-			civilization->UnitSounds.Idle = parent_civilization->UnitSounds.Idle;
-		}
-		if (civilization->UnitSounds.Hit.Name.empty()) {
-			civilization->UnitSounds.Hit = parent_civilization->UnitSounds.Hit;
-		}
-		if (civilization->UnitSounds.Miss.Name.empty()) {
-			civilization->UnitSounds.Miss = parent_civilization->UnitSounds.Miss;
-		}
-		if (civilization->UnitSounds.FireMissile.Name.empty()) {
-			civilization->UnitSounds.FireMissile = parent_civilization->UnitSounds.FireMissile;
-		}
-		if (civilization->UnitSounds.Step.Name.empty()) {
-			civilization->UnitSounds.Step = parent_civilization->UnitSounds.Step;
-		}
-		if (civilization->UnitSounds.StepDirt.Name.empty()) {
-			civilization->UnitSounds.StepDirt = parent_civilization->UnitSounds.StepDirt;
-		}
-		if (civilization->UnitSounds.StepGrass.Name.empty()) {
-			civilization->UnitSounds.StepGrass = parent_civilization->UnitSounds.StepGrass;
-		}
-		if (civilization->UnitSounds.StepGravel.Name.empty()) {
-			civilization->UnitSounds.StepGravel = parent_civilization->UnitSounds.StepGravel;
-		}
-		if (civilization->UnitSounds.StepMud.Name.empty()) {
-			civilization->UnitSounds.StepMud = parent_civilization->UnitSounds.StepMud;
-		}
-		if (civilization->UnitSounds.StepStone.Name.empty()) {
-			civilization->UnitSounds.StepStone = parent_civilization->UnitSounds.StepStone;
-		}
-		if (civilization->UnitSounds.Used.Name.empty()) {
-			civilization->UnitSounds.Used = parent_civilization->UnitSounds.Used;
-		}
-		if (civilization->UnitSounds.Build.Name.empty()) {
-			civilization->UnitSounds.Build = parent_civilization->UnitSounds.Build;
-		}
-		if (civilization->UnitSounds.Ready.Name.empty()) {
-			civilization->UnitSounds.Ready = parent_civilization->UnitSounds.Ready;
-		}
-		if (civilization->UnitSounds.Repair.Name.empty()) {
-			civilization->UnitSounds.Repair = parent_civilization->UnitSounds.Repair;
-		}
-		for (unsigned int j = 0; j < MaxCosts; ++j) {
-			if (civilization->UnitSounds.Harvest[j].Name.empty()) {
-				civilization->UnitSounds.Harvest[j] = parent_civilization->UnitSounds.Harvest[j];
-			}
-		}
-		if (civilization->UnitSounds.Help.Name.empty()) {
-			civilization->UnitSounds.Help = parent_civilization->UnitSounds.Help;
-		}
-		if (civilization->UnitSounds.HelpTown.Name.empty()) {
-			civilization->UnitSounds.HelpTown = parent_civilization->UnitSounds.HelpTown;
-		}
-	}
-	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonCmd::Move) != PlayerRaces.ButtonIcons[civilization_id].end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 1,\n";
-		button_definition += "\tAction = \"move\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"m\",\n";
-		button_definition += "\tHint = _(\"~!Move\"),\n";
-		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonCmd::Stop) != PlayerRaces.ButtonIcons[civilization_id].end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 2,\n";
-		button_definition += "\tAction = \"stop\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"s\",\n";
-		button_definition += "\tHint = _(\"~!Stop\"),\n";
-		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonCmd::Attack) != PlayerRaces.ButtonIcons[civilization_id].end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 3,\n";
-		button_definition += "\tAction = \"attack\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"a\",\n";
-		button_definition += "\tHint = _(\"~!Attack\"),\n";
-		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonCmd::Patrol) != PlayerRaces.ButtonIcons[civilization_id].end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 4,\n";
-		button_definition += "\tAction = \"patrol\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"p\",\n";
-		button_definition += "\tHint = _(\"~!Patrol\"),\n";
-		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonCmd::StandGround) != PlayerRaces.ButtonIcons[civilization_id].end()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 5,\n";
-		button_definition += "\tAction = \"stand-ground\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"t\",\n";
-		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
-		button_definition += "\tForUnit = {\"" + civilization->get_identifier() + "-group\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
+	civilization->initialize();	
 	
 	return 0;
 }
@@ -1614,7 +1465,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "DefaultColor")) {
-		lua_pushstring(l, PlayerRaces.DefaultColor[civilization_id].c_str());
+		lua_pushstring(l, civilization->get_default_color().c_str());
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
 		lua_pushstring(l, PlayerRaces.civilization_upgrades[civilization_id].c_str());
@@ -2633,7 +2484,7 @@ static int CclGetCivilizations(lua_State *l)
 
 	std::vector<std::string> civilization_idents;
 	for (const stratagus::civilization *civilization : stratagus::civilization::get_all()) {
-		if (!only_visible || PlayerRaces.Visible[civilization->ID]) {
+		if (!only_visible || civilization->is_visible()) {
 			civilization_idents.push_back(civilization->get_identifier());
 		}
 	}

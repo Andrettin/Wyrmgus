@@ -371,11 +371,11 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::Train;
 	} else if (button_action == "patrol") {
 		return ButtonCmd::Patrol;
-	} else if (button_action == "stand-ground") {
+	} else if (button_action == "stand-ground" || button_action == "stand_ground") {
 		return ButtonCmd::StandGround;
 	} else if (button_action == "attack-ground") {
 		return ButtonCmd::AttackGround;
-	} else if (button_action == "return-goods") {
+	} else if (button_action == "return-goods" || button_action == "return_goods") {
 		return ButtonCmd::Return;
 	} else if (button_action == "cast-spell") {
 		return ButtonCmd::SpellCast;

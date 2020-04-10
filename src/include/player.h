@@ -792,11 +792,6 @@ public:
 class PlayerRace
 {
 public:
-	PlayerRace()
-	{
-		memset(Visible, 0, sizeof(Visible));
-	}
-
 	void Clean();
 	//Wyrmgus start
 	int GetFactionIndexByName(const std::string &faction_ident) const;
@@ -814,10 +809,8 @@ public:
 	//Wyrmgus end
 
 public:
-	bool Visible[MAX_RACES];        /// race should be visible in pulldown
 	//Wyrmgus start
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
-	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::string civilization_upgrades[MAX_RACES];
 	std::map<int, int> civilization_class_unit_types[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> civilization_class_upgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
