@@ -68,7 +68,7 @@ void database::process_sml_property_for_object(QObject *object, const sml_proper
 
 		const QVariant::Type property_type = meta_property.type();
 
-		if (property_type == QVariant::Type::List) {
+		if (property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) {
 			database::modify_list_property_for_object(object, property_name, property.get_operator(), property.get_value());
 			return;
 		} else {
@@ -170,7 +170,7 @@ void database::process_sml_scope_for_object(QObject *object, const sml_data &sco
 
 		const QVariant::Type property_type = meta_property.type();
 
-		if (property_type == QVariant::Type::List && !scope.get_values().empty()) {
+		if ((property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) && !scope.get_values().empty()) {
 			for (const std::string &value : scope.get_values()) {
 				database::modify_list_property_for_object(object, property_name, sml_operator::addition, value);
 			}
@@ -231,6 +231,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 {
 	const QMetaObject *meta_object = object->metaObject();
 	const std::string class_name = meta_object->className();
+	const int property_index = meta_object->indexOfProperty(property_name.c_str());
+	QMetaProperty meta_property = meta_object->property(property_index);
+	const QVariant::Type property_type = meta_property.type();
 
 	if (sml_operator == sml_operator::assignment) {
 		throw std::runtime_error("The assignment operator is not available for list properties.");
@@ -253,6 +256,8 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "files") {
 		const std::filesystem::path filepath(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::filesystem::path &, filepath));
+	} else if (property_type == QVariant::Type::StringList) {
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {
 		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
 	}
