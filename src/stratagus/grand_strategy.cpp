@@ -691,21 +691,6 @@ void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 	this->Capital = province;
 }
 
-void CGrandStrategyFaction::SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id)
-{
-	int second_diplomacy_state_id; // usually the second diplomacy state is the same as the first, but there are asymmetrical diplomacy states (such as vassal/sovereign relationships)
-	if (diplomacy_state_id == DiplomacyStateVassal) {
-		second_diplomacy_state_id = DiplomacyStateOverlord;
-	} else if (diplomacy_state_id == DiplomacyStateOverlord) {
-		second_diplomacy_state_id = DiplomacyStateVassal;
-	} else {
-		second_diplomacy_state_id = diplomacy_state_id;
-	}
-	
-	this->DiplomacyStates[faction] = diplomacy_state_id;
-	faction->DiplomacyStates[this] = second_diplomacy_state_id;
-}
-
 void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 {
 	if (this->Ministers[title] != nullptr && std::find(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::pair<int, CGrandStrategyFaction *>(title, this)) != this->Ministers[title]->Titles.end()) { // remove from the old minister's array
@@ -883,24 +868,6 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 	}
 	
 	return modifier;
-}
-
-int CGrandStrategyFaction::GetDiplomacyState(CGrandStrategyFaction *faction)
-{
-	if (this->DiplomacyStates.find(faction) != this->DiplomacyStates.end()) {
-		return this->DiplomacyStates[faction];
-	} else {
-		return DiplomacyStatePeace;
-	}
-}
-
-int CGrandStrategyFaction::GetDiplomacyStateProposal(CGrandStrategyFaction *faction)
-{
-	if (this->DiplomacyStateProposals.find(faction) != this->DiplomacyStateProposals.end()) {
-		return this->DiplomacyStateProposals[faction];
-	} else {
-		return -1;
-	}
 }
 
 std::string CGrandStrategyFaction::GetFullName()
@@ -1476,33 +1443,10 @@ void SetFactionGovernmentType(std::string civilization_name, std::string faction
 
 void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name)
 {
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-	stratagus::civilization *second_civilization = stratagus::civilization::get(second_civilization_name);
-	
-	int diplomacy_state_id = GetDiplomacyStateIdByName(diplomacy_state_name);
-	
-	if (civilization && second_civilization) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		int second_faction = PlayerRaces.GetFactionIndexByName(second_faction_name);
-		if (faction != -1 && second_faction != -1) {
-			GrandStrategyGame.Factions[civilization->ID][faction]->DiplomacyStateProposals[GrandStrategyGame.Factions[second_civilization->ID][second_faction]] = diplomacy_state_id;
-		}
-	}
 }
 
 std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name)
 {
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-	stratagus::civilization *second_civilization = stratagus::civilization::get(second_civilization_name);
-
-	if (civilization && second_civilization) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		int second_faction = PlayerRaces.GetFactionIndexByName(second_faction_name);
-		if (faction != -1 && second_faction != -1) {
-			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization->ID][faction]->GetDiplomacyStateProposal(GrandStrategyGame.Factions[second_civilization->ID][second_faction]));
-		}
-	}
-	
 	return "";
 }
 
@@ -1666,40 +1610,21 @@ CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name)
 	return nullptr;
 }
 
-std::string GetDiplomacyStateNameById(int diplomacy_state)
-{
-	if (diplomacy_state == DiplomacyStatePeace) {
-		return "peace";
-	} else if (diplomacy_state == DiplomacyStateWar) {
-		return "war";
-	} else if (diplomacy_state == DiplomacyStateAlliance) {
-		return "alliance";
-	} else if (diplomacy_state == DiplomacyStateVassal) {
-		return "vassal";
-	} else if (diplomacy_state == DiplomacyStateOverlord) {
-		return "overlord";
-	} else if (diplomacy_state == -1) {
-		return "";
-	}
-
-	return "";
-}
-
-int GetDiplomacyStateIdByName(std::string diplomacy_state)
+Diplomacy GetDiplomacyStateIdByName(std::string diplomacy_state)
 {
 	if (diplomacy_state == "peace") {
-		return DiplomacyStatePeace;
+		return Diplomacy::Neutral;
 	} else if (diplomacy_state == "war") {
-		return DiplomacyStateWar;
+		return Diplomacy::Enemy;
 	} else if (diplomacy_state == "alliance") {
-		return DiplomacyStateAlliance;
+		return Diplomacy::Allied;
 	} else if (diplomacy_state == "vassal") {
-		return DiplomacyStateVassal;
+		return Diplomacy::Vassal;
 	} else if (diplomacy_state == "overlord") {
-		return DiplomacyStateOverlord;
+		return Diplomacy::Overlord;
+	} else {
+		throw std::runtime_error("Invalid diplomacy state: " + diplomacy_state);
 	}
-
-	return -1;
 }
 
 std::string GetFactionTierNameById(int faction_tier)

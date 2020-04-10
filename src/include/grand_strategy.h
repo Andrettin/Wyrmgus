@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __GRAND_STRATEGY_H__
-#define __GRAND_STRATEGY_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -46,26 +45,14 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
-#define FoodConsumptionPerWorker 100
+static constexpr int BasePopulationGrowthPermyriad = 12; /// Base population growth per 10,000
+static constexpr int FoodConsumptionPerWorker = 100;
 
 class CGrandStrategyProvince;
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
 class LuaCallback;
-
-/**
-**  Indexes into diplomacy state array.
-*/
-enum DiplomacyStates {
-	DiplomacyStateAlliance,
-	DiplomacyStatePeace,
-	DiplomacyStateWar,
-	DiplomacyStateOverlord,
-	DiplomacyStateVassal,
-	
-	MaxDiplomacyStates
-};
+enum class Diplomacy;
 
 class GrandStrategyWorldMapTile : public WorldMapTile
 {
@@ -175,7 +162,6 @@ public:
 	
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void SetCapital(CGrandStrategyProvince *province);
-	void SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id);
 	void SetMinister(int title, std::string hero_full_name);
 	void MinisterSuccession(int title);
 	bool IsAlive();
@@ -183,8 +169,6 @@ public:
 	bool CanHaveSuccession(int title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
 	int GetTroopCostModifier();
-	int GetDiplomacyState(CGrandStrategyFaction *faction);
-	int GetDiplomacyStateProposal(CGrandStrategyFaction *faction);
 	std::string GetFullName();
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
@@ -200,8 +184,6 @@ public:
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Trade[MaxCosts];												/// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 	int MilitaryScoreBonus[UnitTypeMax];
-	std::map<CGrandStrategyFaction *, int> DiplomacyStates;				/// Diplomacy states between this faction and other factions
-	std::map<CGrandStrategyFaction *, int> DiplomacyStateProposals;		/// Diplomacy state being offered by this faction to other factions
 	CGrandStrategyHero *Ministers[MaxCharacterTitles];					/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
 	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
@@ -324,7 +306,7 @@ extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPo
 ----------------------------------------------------------------------------*/
 
 extern std::string GetDiplomacyStateNameById(int diplomacy_state);
-extern int GetDiplomacyStateIdByName(std::string diplomacy_state);
+extern Diplomacy GetDiplomacyStateIdByName(std::string diplomacy_state);
 extern std::string GetFactionTierNameById(int faction_tier);
 extern int GetFactionTierIdByName(std::string faction_tier);
 extern int GetProvinceId(std::string province_name);
@@ -368,5 +350,3 @@ extern bool GetGrandStrategyEventTriggered(std::string event_name);
 extern void CleanGrandStrategyEvents();
 extern CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name);
 extern void GrandStrategyCclRegister();
-
-#endif

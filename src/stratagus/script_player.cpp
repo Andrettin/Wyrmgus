@@ -707,18 +707,18 @@ static int CclSetDiplomacy(lua_State *l)
 	const char *state = LuaToString(l, 2);
 
 	if (!strcmp(state, "allied")) {
-		SendCommandDiplomacy(base, DiplomacyAllied, plynr);
+		SendCommandDiplomacy(base, Diplomacy::Allied, plynr);
 	} else if (!strcmp(state, "neutral")) {
-		SendCommandDiplomacy(base, DiplomacyNeutral, plynr);
+		SendCommandDiplomacy(base, Diplomacy::Neutral, plynr);
 	} else if (!strcmp(state, "crazy")) {
-		SendCommandDiplomacy(base, DiplomacyCrazy, plynr);
+		SendCommandDiplomacy(base, Diplomacy::Crazy, plynr);
 	} else if (!strcmp(state, "enemy")) {
-		SendCommandDiplomacy(base, DiplomacyEnemy, plynr);
+		SendCommandDiplomacy(base, Diplomacy::Enemy, plynr);
 	//Wyrmgus start
 	} else if (!strcmp(state, "overlord")) {
-		SendCommandDiplomacy(base, DiplomacyOverlord, plynr);
+		SendCommandDiplomacy(base, Diplomacy::Overlord, plynr);
 	} else if (!strcmp(state, "vassal")) {
-		SendCommandDiplomacy(base, DiplomacyVassal, plynr);
+		SendCommandDiplomacy(base, Diplomacy::Vassal, plynr);
 	//Wyrmgus end
 	}
 	return 0;
@@ -2138,10 +2138,7 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 
 				std::string diplomacy_state_name = LuaToString(l, -1, j + 1);
-				int diplomacy_state = GetDiplomacyStateIdByName(diplomacy_state_name);
-				if (diplomacy_state == -1) {
-					LuaError(l, "Diplomacy state \"%s\" doesn't exist." _C_ diplomacy_state_name.c_str());
-				}
+				const Diplomacy diplomacy_state = GetDiplomacyStateIdByName(diplomacy_state_name);
 				faction->HistoricalDiplomacyStates[std::pair<CDate, CFaction *>(date, diplomacy_state_faction)] = diplomacy_state;
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {

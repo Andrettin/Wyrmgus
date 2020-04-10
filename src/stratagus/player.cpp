@@ -4377,8 +4377,8 @@ void CPlayer::SetOverlord(CPlayer *player)
 		if (!SaveGameLoading) {
 			this->SetDiplomacyAlliedWith(*this->Overlord);
 			this->Overlord->SetDiplomacyAlliedWith(*this);
-			CommandDiplomacy(this->Index, DiplomacyAllied, this->Overlord->Index);
-			CommandDiplomacy(this->Overlord->Index, DiplomacyAllied, this->Index);
+			CommandDiplomacy(this->Index, Diplomacy::Allied, this->Overlord->Index);
+			CommandDiplomacy(this->Overlord->Index, Diplomacy::Allied, this->Index);
 			CommandSharedVision(this->Index, true, this->Overlord->Index);
 			CommandSharedVision(this->Overlord->Index, true, this->Index);
 		}

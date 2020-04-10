@@ -738,33 +738,33 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 ** @param state      New diplomacy state.
 ** @param opponent   Opponent.
 */
-void SendCommandDiplomacy(int player, int state, int opponent)
+void SendCommandDiplomacy(const int player, const Diplomacy state, const int opponent)
 {
 	if (!IsNetworkGame()) {
 		switch (state) {
-			case DiplomacyNeutral:
+			case Diplomacy::Neutral:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "neutral", -1);
 				break;
-			case DiplomacyAllied:
+			case Diplomacy::Allied:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "allied", -1);
 				break;
-			case DiplomacyEnemy:
+			case Diplomacy::Enemy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "enemy", -1);
 				break;
 			//Wyrmgus start
-			case DiplomacyOverlord:
+			case Diplomacy::Overlord:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "overlord", -1);
 				break;
-			case DiplomacyVassal:
+			case Diplomacy::Vassal:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "vassal", -1);
 				break;
 			//Wyrmgus end
-			case DiplomacyCrazy:
+			case Diplomacy::Crazy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "crazy", -1);
 				break;
@@ -772,7 +772,7 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 		CommandDiplomacy(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
-								   -1, player, state, opponent, 0);
+								   -1, player, static_cast<int>(state), opponent, 0);
 	}
 }
 
@@ -1139,12 +1139,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 	}
 }
 
-static const char *GetDiplomacyName(enum _diplomacy_ e)
+static const char *GetDiplomacyName(enum class Diplomacy e)
 {
-	Assert(int(e) < 4);
+	Assert(static_cast<int>(e) < 4);
 	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
 
-	return diplomacyNames[int(e)];
+	return diplomacyNames[static_cast<int>(e)];
 }
 
 /**
@@ -1165,9 +1165,10 @@ void ExecExtendedCommand(unsigned char type, int status,
 
 	switch (type) {
 		case ExtendedMessageDiplomacy: {
-			const char *diplomacyName = GetDiplomacyName(_diplomacy_(arg3));
+			const Diplomacy diplomacy_state = static_cast<Diplomacy>(arg3);
+			const char *diplomacyName = GetDiplomacyName(diplomacy_state);
 			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, diplomacyName, -1);
-			CommandDiplomacy(arg2, arg3, arg4);
+			CommandDiplomacy(arg2, diplomacy_state, arg4);
 			break;
 		}
 		case ExtendedMessageSharedVision:

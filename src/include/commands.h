@@ -42,6 +42,7 @@ class CSite;
 class CSpell;
 class CUnitType;
 class CUpgrade;
+enum class Diplomacy;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -166,7 +167,7 @@ extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const C
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
-extern void CommandDiplomacy(int player, int state, int opponent);
+extern void CommandDiplomacy(const int player, const Diplomacy state, const int opponent);
 /// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 
@@ -295,7 +296,7 @@ extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int
 /// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Send diplomacy command
-extern void SendCommandDiplomacy(int player, int state, int opponent);
+extern void SendCommandDiplomacy(const int player, const Diplomacy state, const int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
 //Wyrmgus start

@@ -87,6 +87,7 @@ class PlayerAi;
 class CFiller;
 class LuaCallback;
 //Wyrmgus end
+enum class Diplomacy;
 struct lua_State;
 
 namespace stratagus {
@@ -98,15 +99,15 @@ namespace stratagus {
 --  Player type
 ----------------------------------------------------------------------------*/
 
-enum _diplomacy_ {
-	DiplomacyAllied,   /// Ally with opponent
-	DiplomacyNeutral,  /// Don't attack be neutral
-	DiplomacyEnemy,    /// Attack opponent
+enum class Diplomacy {
+	Allied,   /// Ally with opponent
+	Neutral,  /// Don't attack be neutral
+	Enemy,    /// Attack opponent
 	//Wyrmgus start
-	DiplomacyOverlord,	/// Become overlord to other player
-	DiplomacyVassal,	/// Become vassal to other player
+	Overlord,	/// Become overlord to other player
+	Vassal,	/// Become vassal to other player
 	//Wyrmgus end
-	DiplomacyCrazy     /// Ally and attack opponent
+	Crazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
 
 ///  Player structure
@@ -670,7 +671,7 @@ public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
-	std::map<std::pair<CDate, CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
+	std::map<std::pair<CDate, CFaction *>, Diplomacy> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
 	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
 	std::vector<CFiller> UIFillers;
