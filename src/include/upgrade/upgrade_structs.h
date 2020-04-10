@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database/data_entry.h"
 #include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
 //Wyrmgus start
 #include "item.h"
@@ -95,16 +95,12 @@ public:
 	std::map<CUnitType *, int> UnitStock;	/// Units in stock
 };
 
-class CUpgrade final : public stratagus::data_entry, public stratagus::data_type<CUpgrade>, public CDataType
+class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::data_type<CUpgrade>, public CDataType
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
 	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(QString description READ get_description_qstring WRITE set_description_qstring)
-	Q_PROPERTY(QString quote READ get_quote_qstring WRITE set_quote_qstring)
-	Q_PROPERTY(QString background READ get_background_qstring WRITE set_background_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
 	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
@@ -130,21 +126,6 @@ public:
 	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
 	virtual void initialize() override;
 
-	const std::string &get_name() const
-	{
-		return this->name;
-	}
-
-	QString get_name_qstring() const
-	{
-		return QString::fromStdString(this->get_name());
-	}
-
-	void set_name_qstring(const QString &name)
-	{
-		this->name = name.toStdString();
-	}
-
 	CIcon *get_icon() const
 	{
 		return this->icon;
@@ -163,51 +144,6 @@ public:
 	int get_faction() const
 	{
 		return this->faction;
-	}
-
-	const std::string &get_description() const
-	{
-		return this->description;
-	}
-
-	QString get_description_qstring() const
-	{
-		return QString::fromStdString(this->get_description());
-	}
-
-	void set_description_qstring(const QString &description)
-	{
-		this->description = description.toStdString();
-	}
-
-	const std::string &get_quote() const
-	{
-		return this->quote;
-	}
-
-	QString get_quote_qstring() const
-	{
-		return QString::fromStdString(this->get_quote());
-	}
-
-	void set_quote_qstring(const QString &quote)
-	{
-		this->quote = quote.toStdString();
-	}
-
-	const std::string &get_background() const
-	{
-		return this->background;
-	}
-
-	QString get_background_qstring() const
-	{
-		return QString::fromStdString(this->get_background());
-	}
-
-	void set_background_qstring(const QString &background)
-	{
-		this->background = background.toStdString();
 	}
 
 	bool is_ability() const
@@ -236,13 +172,9 @@ public:
 	}
 
 private:
-	std::string name;
 	int upgrade_class = -1;			/// upgrade class (e.g. siege weapon projectile I)
 	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
 	int faction = -1;				/// which faction this upgrade belongs to, if any
-	std::string description;		/// description of the upgrade
-	std::string quote;				/// quote of the upgrade
-	std::string background;			/// encyclopedia entry for the upgrade
 public:
 	std::string EffectsString;		/// effects string of the upgrade
 	std::string RequirementsString;	/// requirements string of the upgrade

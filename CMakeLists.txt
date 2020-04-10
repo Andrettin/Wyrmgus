@@ -600,7 +600,9 @@ set(stratagus_database_HDRS
 	src/database/data_type_metadata.h
 	src/database/database.h
 	src/database/defines.h
+	src/database/detailed_data_entry.h
 	src/database/module.h
+	src/database/named_data_entry.h
 	src/database/sml_data.h
 	src/database/sml_data_visitor.h
 	src/database/sml_element_visitor.h

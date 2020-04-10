@@ -197,7 +197,7 @@ void CUnitStats::ChangeUnitStock(CUnitType *unit_type, int quantity)
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), data_entry(identifier)
+CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), detailed_data_entry(identifier)
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
@@ -220,7 +220,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->name = value;
+			this->set_name(value);
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			CIcon *icon = CIcon::get(value);
@@ -268,11 +268,11 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "description") {
-			this->description = value;
+			this->set_description(value);
 		} else if (key == "quote") {
-			this->quote = value;
+			this->set_quote(value);
 		} else if (key == "background") {
-			this->background = value;
+			this->set_background(value);
 		} else if (key == "effects_string") {
 			this->EffectsString = value;
 		} else if (key == "requirements_string") {
@@ -484,12 +484,12 @@ static int CclDefineUpgrade(lua_State *l)
 		if (!strcmp(value, "Parent")) {
 			CUpgrade *parent_upgrade = CUpgrade::get(LuaToString(l, -1));
 
-			upgrade->name = parent_upgrade->get_name();
+			upgrade->set_name(parent_upgrade->get_name());
 			upgrade->icon = parent_upgrade->get_icon();
 			upgrade->upgrade_class = parent_upgrade->get_class();
-			upgrade->description = parent_upgrade->get_description();
-			upgrade->quote = parent_upgrade->get_quote();
-			upgrade->background = parent_upgrade->get_background();
+			upgrade->set_description(parent_upgrade->get_description());
+			upgrade->set_quote(parent_upgrade->get_quote());
+			upgrade->set_background(parent_upgrade->get_background());
 			upgrade->EffectsString = parent_upgrade->EffectsString;
 			upgrade->RequirementsString = parent_upgrade->RequirementsString;
 			for (int i = 0; i < MaxCosts; ++i) {
@@ -518,7 +518,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
 			}
 		} else if (!strcmp(value, "Name")) {
-			upgrade->name = LuaToString(l, -1);
+			upgrade->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			CIcon *icon = CIcon::get(LuaToString(l, -1));
 			upgrade->icon = icon;
@@ -546,11 +546,11 @@ static int CclDefineUpgrade(lua_State *l)
 				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 			}
 		} else if (!strcmp(value, "Description")) {
-			upgrade->description = LuaToString(l, -1);
+			upgrade->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			upgrade->quote = LuaToString(l, -1);
+			upgrade->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
-			upgrade->background = LuaToString(l, -1);
+			upgrade->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "EffectsString")) {
 			upgrade->EffectsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {

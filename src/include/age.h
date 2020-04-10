@@ -27,8 +27,8 @@
 
 #pragma once
 
-#include "database/data_entry.h"
 #include "database/data_type.h"
+#include "database/named_data_entry.h"
 
 class CDependency;
 class CGraphic;
@@ -36,11 +36,10 @@ class CUpgrade;
 
 namespace stratagus {
 
-class age final : public data_entry, public data_type<age>
+class age final : public named_data_entry, public data_type<age>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
 	Q_PROPERTY(int priority MEMBER priority)
 	Q_PROPERTY(int year_boost MEMBER year_boost)
 
@@ -55,7 +54,7 @@ public:
 
 	static age *current_age;
 
-	age(const std::string &identifier) : data_entry(identifier)
+	age(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
@@ -69,21 +68,6 @@ public:
 		if (this->get_graphics() == nullptr) {
 			throw std::runtime_error("Age \"" + this->get_identifier() + "\" has no icon.");
 		}
-	}
-
-	const std::string &get_name() const
-	{
-		return this->name;
-	}
-
-	QString get_name_qstring() const
-	{
-		return QString::fromStdString(this->get_name());
-	}
-
-	void set_name_qstring(const QString &name)
-	{
-		this->name = name.toStdString();
 	}
 
 	CGraphic *get_graphics() const
@@ -102,7 +86,6 @@ public:
 	}
 
 private:
-	std::string name;
 	CGraphic *graphics = nullptr;
 	int priority = 0;
 	int year_boost = 0;
