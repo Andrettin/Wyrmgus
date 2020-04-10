@@ -51,4 +51,16 @@ inline QVariantList to_qvariant_list(const T &container)
 	return list;
 }
 
+template <typename T>
+QStringList to_qstring_list(const T &string_container)
+{
+	static_assert(std::is_same_v<T::value_type, std::string>);
+
+	QStringList qstring_list;
+	for (const std::string &str : string_container) {
+		qstring_list.push_back(QString::fromStdString(str));
+	}
+	return qstring_list;
+}
+
 }
