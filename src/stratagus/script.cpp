@@ -1590,14 +1590,14 @@ std::string EvalString(const StringDesc *s)
 		case EString_UpgradeEffectsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				return (**upgrade).EffectsString;
+				return (**upgrade).get_effects_string();
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_UpgradeRequirementsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				return (**upgrade).RequirementsString;
+				return (**upgrade).get_requirements_string();
 			} else { // ERROR.
 				return std::string("");
 			}

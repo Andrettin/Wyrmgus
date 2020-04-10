@@ -274,9 +274,9 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "background") {
 			this->set_background(value);
 		} else if (key == "effects_string") {
-			this->EffectsString = value;
+			this->effects_string = value;
 		} else if (key == "requirements_string") {
-			this->RequirementsString = value;
+			this->requirements_string = value;
 		} else {
 			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", key.c_str());
 		}
@@ -490,8 +490,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->set_description(parent_upgrade->get_description());
 			upgrade->set_quote(parent_upgrade->get_quote());
 			upgrade->set_background(parent_upgrade->get_background());
-			upgrade->EffectsString = parent_upgrade->EffectsString;
-			upgrade->RequirementsString = parent_upgrade->RequirementsString;
+			upgrade->effects_string = parent_upgrade->get_effects_string();
+			upgrade->requirements_string = parent_upgrade->get_requirements_string();
 			for (int i = 0; i < MaxCosts; ++i) {
 				upgrade->Costs[i] = parent_upgrade->Costs[i];
 				upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
@@ -552,9 +552,9 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			upgrade->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "EffectsString")) {
-			upgrade->EffectsString = LuaToString(l, -1);
+			upgrade->effects_string = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
-			upgrade->RequirementsString = LuaToString(l, -1);
+			upgrade->requirements_string = LuaToString(l, -1);
 		} else if (!strcmp(value, "MaxLimit")) {
 			upgrade->MaxLimit = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MagicLevel")) {
@@ -1179,10 +1179,10 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "EffectsString")) {
-		lua_pushstring(l, upgrade->EffectsString.c_str());
+		lua_pushstring(l, upgrade->get_effects_string().c_str());
 		return 1;
 	} else if (!strcmp(data, "RequirementsString")) {
-		lua_pushstring(l, upgrade->RequirementsString.c_str());
+		lua_pushstring(l, upgrade->get_requirements_string().c_str());
 		return 1;
 	} else if (!strcmp(data, "Ability")) {
 		lua_pushboolean(l, upgrade->is_ability());

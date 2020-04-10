@@ -101,6 +101,7 @@ class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::
 
 	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring WRITE set_requirements_string_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
 	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
@@ -146,6 +147,26 @@ public:
 		return this->faction;
 	}
 
+	const std::string &get_effects_string() const
+	{
+		return this->effects_string;
+	}
+
+	const std::string &get_requirements_string() const
+	{
+		return this->requirements_string;
+	}
+
+	QString get_requirements_string_qstring() const
+	{
+		return QString::fromStdString(this->get_requirements_string());
+	}
+
+	void set_requirements_string_qstring(const QString &requirements_string)
+	{
+		this->requirements_string = requirements_string.toStdString();
+	}
+
 	bool is_ability() const
 	{
 		return this->ability;
@@ -175,9 +196,8 @@ private:
 	int upgrade_class = -1;			/// upgrade class (e.g. siege weapon projectile I)
 	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
 	int faction = -1;				/// which faction this upgrade belongs to, if any
-public:
-	std::string EffectsString;		/// effects string of the upgrade
-	std::string RequirementsString;	/// requirements string of the upgrade
+	std::string effects_string; //effects string of the upgrade
+	std::string requirements_string; //requirements string of the upgrade
 private:
 	CIcon *icon = nullptr;			/// icon to display to the user
 	bool ability = false;
