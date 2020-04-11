@@ -100,6 +100,45 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
+void CUpgradeModifier::process_sml_property(const stratagus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	const std::string variable_name = string::snake_case_to_pascal_case(key);
+
+	const int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
+	if (index != -1) { // valid index
+		if (string::is_number(value)) {
+			this->Modifier.Variables[index].Enable = 1;
+			this->Modifier.Variables[index].Value = std::stoi(value);
+			this->Modifier.Variables[index].Max = std::stoi(value);
+		} else { // error
+			throw std::runtime_error("Invalid value (\"" + value +"\") for variable \"" + key + "\" when defining modifier for upgrade \"" + CUpgrade::get_all()[this->UpgradeId]->get_identifier() + "\".");
+		}
+	} else {
+		throw std::runtime_error("Invalid upgrade modifier property: \"" + key + "\".");
+	}
+}
+
+void CUpgradeModifier::process_sml_scope(const stratagus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "units") {
+		for (const std::string &value : scope.get_values()) {
+			const int unit_type_id = UnitTypeIdByIdent(value.c_str());
+			if (unit_type_id != -1) {
+				this->ApplyTo[unit_type_id] = 'X';
+			} else {
+				throw std::runtime_error("Invalid unit type: \"" + value + "\".");
+			}
+		}
+	} else {
+		throw std::runtime_error("Invalid upgrade modifier property: \"" + tag + "\".");
+	}
+}
+
 int CUpgradeModifier::GetUnitStock(CUnitType *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {

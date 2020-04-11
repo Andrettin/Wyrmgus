@@ -46,6 +46,11 @@ class CFaction;
 class CUnitType;
 class CUpgrade;
 
+namespace stratagus {
+	class sml_data;
+	class sml_property;
+}
+
 /**
 **  This is the modifier of an upgrade.
 **  This does the real action of an upgrade, and an upgrade can have multiple
@@ -65,6 +70,8 @@ public:
 	static std::vector<CUpgradeModifier *> UpgradeModifiers;
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	void process_sml_property(const stratagus::sml_property &property);
+	void process_sml_scope(const stratagus::sml_data &scope);
 	
 	int GetUnitStock(CUnitType *unit_type) const;
 	void SetUnitStock(CUnitType *unit_type, int quantity);

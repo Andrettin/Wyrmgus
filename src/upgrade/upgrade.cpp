@@ -367,6 +367,14 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
 			}
 		});
+	} else if (tag == "modifier") {
+		CUpgradeModifier *modifier = new CUpgradeModifier;
+		modifier->UpgradeId = this->ID;
+		this->UpgradeModifiers.push_back(modifier);
+
+		stratagus::database::process_sml_data(modifier, scope);
+
+		CUpgradeModifier::UpgradeModifiers.push_back(modifier);
 	}
 }
 
