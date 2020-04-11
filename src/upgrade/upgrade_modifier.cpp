@@ -107,7 +107,7 @@ void CUpgradeModifier::process_sml_property(const stratagus::sml_property &prope
 
 	const std::string variable_name = string::snake_case_to_pascal_case(key);
 
-	const int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
+	const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
 	if (index != -1) { // valid index
 		if (string::is_number(value)) {
 			this->Modifier.Variables[index].Enable = 1;
