@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,6 +39,7 @@
 #include "config.h"
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -53,9 +52,6 @@ std::vector<CUpgradeModifier *> CUpgradeModifier::UpgradeModifiers;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Constructor
-*/
 CUpgradeModifier::CUpgradeModifier()
 {
 	memset(this->ChangeUnits, 0, sizeof(this->ChangeUnits));
@@ -67,11 +63,6 @@ CUpgradeModifier::CUpgradeModifier()
 	memset(this->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -95,7 +86,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 			
 			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
 			if (index != -1) { // valid index
-				if (IsStringNumber(value)) {
+				if (string::is_number(value)) {
 					this->Modifier.Variables[index].Enable = 1;
 					this->Modifier.Variables[index].Value = std::stoi(value);
 					this->Modifier.Variables[index].Max = std::stoi(value);

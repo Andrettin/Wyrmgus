@@ -57,7 +57,7 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 		
 		int index = UnitTypeVar.VariableNameLookup[key.c_str()];
 		if (index != -1) {
-			if (IsStringNumber(value)) {
+			if (string::is_number(value)) {
 				const int number_value = std::stoi(value);
 				this->Var[index].Enable = number_value != 0;
 				this->Var[index].ModifEnable = 1;

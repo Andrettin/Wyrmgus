@@ -291,17 +291,6 @@ std::vector<std::string> SplitString(const std::string &str, const char *separat
 	return output;
 }
 
-bool IsStringNumber(const std::string &str)
-{
-	for (size_t i = 0; i < str.length(); ++i) {
-		if (!std::isdigit(str[i]) && (i != 0 || str[i] != '-')) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
 bool IsStringBool(const std::string &str)
 {
 	return str == "true" || str == "false";

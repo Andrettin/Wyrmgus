@@ -40,6 +40,7 @@
 #include "civilization.h"
 #include "player.h"
 #include "quest.h"
+#include "util/string_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -60,7 +61,7 @@ CDate CDate::FromString(const std::string &date_str)
 	CCalendar *calendar = nullptr;
 	size_t offset = 0;
 	
-	if (date_vector.size() >= 1 && !IsStringNumber(date_vector[0])) {
+	if (date_vector.size() >= 1 && !string::is_number(date_vector[0])) {
 		calendar = CCalendar::GetCalendar(date_vector[0]);
 		if (calendar) {
 			offset += 1;
@@ -69,7 +70,7 @@ CDate CDate::FromString(const std::string &date_str)
 		}
 	}
 	
-	if (date_vector.size() >= (1 + offset) && !IsStringNumber(date_vector[0 + offset])) {
+	if (date_vector.size() >= (1 + offset) && !string::is_number(date_vector[0 + offset])) {
 		CTimeline *timeline = CTimeline::GetTimeline(date_vector[0 + offset]);
 		if (timeline) {
 			date.Timeline = timeline;

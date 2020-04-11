@@ -73,6 +73,28 @@ inline bool to_bool(const std::string &str)
 	throw std::runtime_error("Invalid string used for conversion to boolean: \"" + str + "\".");
 }
 
+inline bool is_number(const std::string &str)
+{
+	bool digit_found = false;
+
+	for (size_t i = 0; i < str.size(); ++i) {
+		const char c = str[i];
+
+		if (c == '-' && i == 0) {
+			continue;
+		}
+
+		if (std::isdigit(c)) {
+			digit_found = true;
+			continue;
+		}
+
+		return false;
+	}
+
+	return digit_found;
+}
+
 inline QDateTime to_date(const std::string &date_str)
 {
 	const std::vector<std::string> date_string_list = string::split(date_str, '.');

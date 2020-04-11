@@ -901,7 +901,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			
 			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
 			if (index != -1) { // valid index
-				if (IsStringNumber(value)) {
+				if (string::is_number(value)) {
 					this->DefaultStat.Variables[index].Enable = 1;
 					this->DefaultStat.Variables[index].Value = std::stoi(value);
 					this->DefaultStat.Variables[index].Max = std::stoi(value);
@@ -917,7 +917,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 
 				index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
 				if (index != -1) {
-					if (IsStringNumber(value)) {
+					if (string::is_number(value)) {
 						this->BoolFlag[index].value = (std::stoi(value) != 0);
 					} else {
 						this->BoolFlag[index].value = string::to_bool(value);
