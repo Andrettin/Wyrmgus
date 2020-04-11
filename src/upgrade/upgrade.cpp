@@ -375,6 +375,12 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 		stratagus::database::process_sml_data(modifier, scope);
 
 		CUpgradeModifier::UpgradeModifiers.push_back(modifier);
+	} else if (tag == "predependencies") {
+		this->Predependency = new CAndDependency;
+		stratagus::database::process_sml_data(this->Predependency, scope);
+	} else if (tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		stratagus::database::process_sml_data(this->Dependency, scope);
 	}
 }
 

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DEPEND_H__
-#define __DEPEND_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -374,5 +373,3 @@ extern bool CheckDependencies(const T *target, const CUnit *unit, bool ignore_un
 		return !target->Dependency || target->Dependency->Check(unit, ignore_units);
 	}
 }
-
-#endif
