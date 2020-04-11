@@ -897,7 +897,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else {
-			key = SnakeCaseToPascalCase(key);
+			key = string::snake_case_to_pascal_case(key);
 			
 			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
 			if (index != -1) { // valid index
@@ -1090,7 +1090,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			
 			this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
 		} else {
-			std::string tag = SnakeCaseToPascalCase(child_config_data->Tag);
+			std::string tag = string::snake_case_to_pascal_case(child_config_data->Tag);
 			
 			const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
 			

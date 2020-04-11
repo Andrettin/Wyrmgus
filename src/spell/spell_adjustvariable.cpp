@@ -53,7 +53,7 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		key = SnakeCaseToPascalCase(key);
+		key = string::snake_case_to_pascal_case(key);
 		
 		int index = UnitTypeVar.VariableNameLookup[key.c_str()];
 		if (index != -1) {
@@ -75,7 +75,7 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		std::string tag = child_config_data->Tag;
-		tag = SnakeCaseToPascalCase(tag);
+		tag = string::snake_case_to_pascal_case(tag);
 		
 		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
 		if (index != -1) {

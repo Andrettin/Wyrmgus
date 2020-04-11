@@ -146,4 +146,29 @@ inline std::string get_singular_form(const std::string &str)
 	return str;
 }
 
+inline std::string snake_case_to_pascal_case(const std::string &str)
+{
+	if (str.empty()) {
+		return str;
+	}
+
+	if (str.empty()) {
+		return str;
+	}
+
+	std::string result;
+	result += static_cast<char>(toupper(str[0]));
+
+	for (size_t pos = 1; pos < str.length(); ++pos) {
+		if (str[pos] == '_') {
+			++pos;
+			result += static_cast<char>(toupper(str[pos]));
+		} else {
+			result += str[pos];
+		}
+	}
+
+	return result;
+}
+
 }

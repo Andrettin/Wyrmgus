@@ -343,27 +343,6 @@ std::string FormatNumber(const int number)
 	return str;
 }
 
-std::string SnakeCaseToPascalCase(const std::string &str)
-{
-	if (str.empty()) {
-		return str;
-	}
-	
-	std::string result(str);
-	
-	result[0] = toupper(result[0]);
-	
-	size_t pos = 0;
-	while ((pos = result.find('_', pos)) != std::string::npos) {
-		result.replace(pos, 1, "");
-		if (pos < result.length()) {
-			result[pos] = toupper(result[pos]);
-		}
-	}
-	
-	return result;
-}
-
 /*----------------------------------------------------------------------------
 --  Getopt
 ----------------------------------------------------------------------------*/

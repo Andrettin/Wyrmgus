@@ -111,7 +111,6 @@ extern std::vector<std::string> SplitString(const std::string &str, const char *
 extern bool IsStringBool(const std::string &str);
 extern std::string NumberToRomanNumeral(unsigned number);
 extern std::string FormatNumber(const int number);
-extern std::string SnakeCaseToPascalCase(const std::string &str);
 
 /*----------------------------------------------------------------------------
 --  Getopt

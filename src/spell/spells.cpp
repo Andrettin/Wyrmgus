@@ -1001,7 +1001,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else {
-			key = SnakeCaseToPascalCase(key);
+			key = string::snake_case_to_pascal_case(key);
 			
 			int index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
 			if (index != -1) {
@@ -1014,7 +1014,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		std::string tag = child_config_data->Tag;
-		tag = SnakeCaseToPascalCase(tag);
+		tag = string::snake_case_to_pascal_case(tag);
 		
 		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
 		if (index != -1) {
@@ -1089,7 +1089,7 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 					if (value == "distance") {
 						index = ACP_DISTANCE;
 					} else {
-						value = SnakeCaseToPascalCase(value);
+						value = string::snake_case_to_pascal_case(value);
 						index = UnitTypeVar.VariableNameLookup[value.c_str()];
 					}
 					

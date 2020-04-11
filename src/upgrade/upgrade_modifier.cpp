@@ -82,7 +82,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 			CUpgrade *removed_upgrade = CUpgrade::get(value);
 			this->RemoveUpgrades.push_back(removed_upgrade);
 		} else {
-			key = SnakeCaseToPascalCase(key);
+			key = string::snake_case_to_pascal_case(key);
 			
 			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
 			if (index != -1) { // valid index
