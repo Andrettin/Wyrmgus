@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __TITLE_H__
-#define __TITLE_H__
+#pragma once
 
 class CFont;
 
@@ -78,5 +77,3 @@ public:
 extern TitleScreen **TitleScreens;          /// File for title screen
 
 extern void ShowTitleScreens();
-
-#endif // !__TITLE_H__

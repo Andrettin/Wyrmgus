@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SCHOOL_OF_MAGIC_H__
-#define __SCHOOL_OF_MAGIC_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -63,5 +62,3 @@ public:
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the school of magic
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this school of magic
 };
-
-#endif

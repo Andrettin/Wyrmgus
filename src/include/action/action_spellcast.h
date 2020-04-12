@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_SPELLCAST_H__
-#define __ACTION_SPELLCAST_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_SpellCast : public COrder
 {
@@ -76,7 +73,3 @@ private:
 	//Wyrmgus end
 	bool isAutocast;
 };
-
-//@}
-
-#endif // !__ACTION_SPELLCAST_H__

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTIONS_H__
-#define __ACTIONS_H__
+#pragma once
 
 #include "unit/unitptr.h"
 #include "vec2i.h"
@@ -230,5 +229,3 @@ extern void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *order);
 
 /// Handle the actions of all units each game cycle
 extern void UnitActions();
-
-#endif

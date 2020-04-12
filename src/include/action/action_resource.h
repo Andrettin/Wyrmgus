@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_RESOURCE_H__
-#define __ACTION_RESOURCE_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Resource : public COrder
 {
@@ -118,7 +115,3 @@ private:
 	//Wyrmgus end
 #endif
 };
-
-//@}
-
-#endif // !__ACTION_RESOURCE_H__

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name time_period_schedule.h - The time period schedule header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +25,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIME_PERIOD_SCHEDULE_H__
-#define __TIME_PERIOD_SCHEDULE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -50,5 +47,3 @@ public:
 	unsigned long TotalHours = 0;						/// The total amount of hours this time period schedule contains
 	int HourMultiplier = 1;								/// The amount of hours that pass for this schedule for each in-game hour
 };
-
-#endif

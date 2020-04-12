@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __AI_LOCAL_H__
-#define __AI_LOCAL_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -604,7 +601,3 @@ extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
 //
 /// Check for magic
 extern void AiCheckMagic();
-
-//@}
-
-#endif // !__AI_LOCAL_H__

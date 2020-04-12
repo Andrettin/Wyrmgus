@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __HISTORICAL_UNIT_H__
-#define __HISTORICAL_UNIT_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -68,5 +67,3 @@ public:
 	CDate EndDate; //when the unit ends being active (e.g. when it is disbanded)
 	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
 };
-
-#endif

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name time_of_day_schedule.h - The time of day schedule header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +25,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIME_OF_DAY_SCHEDULE_H__
-#define __TIME_OF_DAY_SCHEDULE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -81,5 +78,3 @@ public:
 	std::string Name;										/// Name of the time of day schedules
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 };
-
-#endif

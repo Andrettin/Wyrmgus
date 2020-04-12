@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DIALOGUE_H__
-#define __DIALOGUE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -77,15 +76,9 @@ public:
 };
 
 /*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
 extern void CallDialogue(const std::string &dialogue_ident, int player);
 extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
 extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);
-
-#endif

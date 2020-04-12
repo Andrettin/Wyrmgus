@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PATH_FINDER_H__
-#define __PATH_FINDER_H__
-
-//@{
+#pragma once
 
 #if defined(DEBUG_ASTAR)
 #define AstarDebugPrint(x) DebugPrint(x)
@@ -268,7 +265,3 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 //Wyrmgus end
 
 extern void PathfinderCclRegister();
-
-//@}
-
-#endif // !__PATH_FINDER_H__

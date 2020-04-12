@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_REPAIR_H__
-#define __ACTION_REPAIR_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Repair : public COrder
 {
@@ -74,8 +71,3 @@ private:
 	int MapLayer;
 	//Wyrmgus end
 };
-
-
-//@}
-
-#endif // !__ACTION_REPAIR_H__

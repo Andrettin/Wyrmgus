@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DEITY_DOMAIN_H__
-#define __DEITY_DOMAIN_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -63,5 +62,3 @@ public:
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
 };
-
-#endif

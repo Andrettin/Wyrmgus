@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __PARTICLE_H__
-#define __PARTICLE_H__
+#pragma once
 
 class CGraphic;
 class CViewport;
@@ -251,5 +250,3 @@ private:
 };
 
 extern CParticleManager ParticleManager;
-
-#endif // !__PARTICLE_H__

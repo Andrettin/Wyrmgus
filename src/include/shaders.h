@@ -1,5 +1,5 @@
-#ifndef __SHADERS_H__
-#define __SHADERS_H__
+#pragma once
+
 #ifdef USE_OPENGL
 #define MAX_SHADERS 5
 #ifndef __APPLE__
@@ -13,5 +13,4 @@ extern bool LoadShaders();
 extern bool LoadShaderExtensions();
 extern void SetupFramebuffer();
 extern void RenderFramebufferToScreen();
-#endif
 #endif

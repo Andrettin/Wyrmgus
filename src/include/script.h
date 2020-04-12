@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SCRIPT_H__
-#define __SCRIPT_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -425,7 +422,3 @@ std::string EvalString(const StringDesc *s);         /// Evaluate the string.
 void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (no pointer itself).
 void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
 void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).
-
-//@}
-
-#endif // !__SCRIPT_H__

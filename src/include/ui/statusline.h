@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __STATUS_LINE_H__
-#define __STATUS_LINE_H__
+#pragma once
 
 #include "upgrade/upgrade_structs.h"
 
@@ -59,5 +58,3 @@ public:
 private:
 	std::string StatusLine;
 };
-
-#endif // __STATUS_LINE_H__

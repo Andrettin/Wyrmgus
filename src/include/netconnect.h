@@ -26,10 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __NETCONNECT_H__
-#define __NETCONNECT_H__
-
-//@{
+#pragma once
 
 #include "net_message.h"
 
@@ -118,7 +115,3 @@ extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client reque
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
-
-//@}
-
-#endif // !__NETCONNECT_H__

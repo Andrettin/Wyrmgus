@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CALENDAR_H__
-#define __CALENDAR_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -99,5 +98,3 @@ private:
 	std::map<std::string, CDayOfTheWeek *> DaysOfTheWeekByIdent;
 	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
 };
-
-#endif

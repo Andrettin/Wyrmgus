@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UITIMER_H__
-#define __UITIMER_H__
-
-//@{
+#pragma once
 
 class CFont;
 
@@ -46,7 +43,3 @@ public:
 	int Y;
 	CFont *Font;
 };
-
-//@}
-
-#endif // __UITIMER_H__

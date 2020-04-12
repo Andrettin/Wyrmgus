@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger_effect.h - The trigger effect header file. */
-//
-//      (c) Copyright 2019 by Andrettin
+//      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,12 +25,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TRIGGER_EFFECT_H__
-#define __TRIGGER_EFFECT_H__
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -71,5 +64,3 @@ public:
 	int Quantity = 1;				/// Quantity of units created
 	CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
-
-#endif

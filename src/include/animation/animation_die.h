@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ANIMATION_DIE_H__
-#define __ANIMATION_DIE_H__
+#pragma once
 
 #include "animation.h"
 
@@ -50,5 +49,3 @@ class AnimationDie_Exception
 };
 
 extern void AnimationDie_OnCatch(CUnit &unit);
-
-#endif // !__ANIMATION_DIE_H__

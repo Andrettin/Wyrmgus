@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __WIDGETS_H__
-#define __WIDGETS_H__
+#pragma once
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
@@ -554,5 +553,3 @@ private:
 
 extern void WidgetGraphicTransparency(int alpha, const CGraphic &sprite);
 //Wyrmgus end
-
-#endif

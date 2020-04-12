@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __RELIGION_H__
-#define __RELIGION_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -55,5 +54,3 @@ public:
 	bool CulturalDeities = false;				/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
 	std::vector<CDeityDomain *> Domains;
 };
-
-#endif

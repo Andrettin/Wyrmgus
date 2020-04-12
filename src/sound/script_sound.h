@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SCRIPT_SOUND_H__
-#define __SCRIPT_SOUND_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -39,7 +36,3 @@
 extern void SoundCclRegister();  /// register ccl features
 
 //-----------------------------------------------------------------------------
-
-//@}
-
-#endif // !__CCL_SOUND_H__

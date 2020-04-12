@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TRANSLATE_H__
-#define __TRANSLATE_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -47,8 +44,3 @@ extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile
 
 #define _(str) Translate(str)
 #define N_(str) str
-
-//@}
-
-#endif // !__TRANSLATE_H__
-

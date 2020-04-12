@@ -26,10 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __NETWORK_H__
-#define __NETWORK_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -93,7 +90,3 @@ extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 extern void NetworkSendSelection(CUnit **units, int count);
 
 extern void NetworkCclRegister();
-
-//@}
-
-#endif // !__NETWORK_H__

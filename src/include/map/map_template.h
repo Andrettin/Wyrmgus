@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MAP_TEMPLATE_H__
-#define __MAP_TEMPLATE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -144,5 +143,3 @@ public:
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 };
-
-#endif

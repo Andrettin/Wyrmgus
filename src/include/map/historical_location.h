@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __HISTORICAL_LOCATION_H__
-#define __HISTORICAL_LOCATION_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,5 +54,3 @@ public:
 	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
 	CSite *Site = nullptr; //the historical location's site (if any)
 };
-
-#endif

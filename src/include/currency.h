@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CURRENCY_H__
-#define __CURRENCY_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,5 +54,3 @@ public:
 public:
 	std::string Name;
 };
-
-#endif

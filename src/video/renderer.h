@@ -1,5 +1,4 @@
-#ifndef __RENDERER_H__
-#define __RENDERER_H__
+#pragma once
 
 struct CPrimitives {
 	virtual void DrawPixel(Uint32 color, int x, int y) = 0;
@@ -875,6 +874,3 @@ class CRenderer : public CPrimitives
 typedef CRenderer<2, 0xfbde> Primitive16_555_t;
 typedef CRenderer<2, 0xf7de> Primitive16_565_t;
 typedef CRenderer<4, 0> Primitive32_t;
-
-#endif
-

@@ -28,8 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __RESOURCE_H__
-#define __RESOURCE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -139,5 +138,3 @@ extern std::vector<int> LuxuryResources;
 extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 extern std::string GetResourceNameById(int resource_id);
-
-#endif

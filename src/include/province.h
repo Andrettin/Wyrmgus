@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PROVINCE_H__
-#define __PROVINCE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -183,5 +182,3 @@ extern int GetWorldMapTerrainTypeId(const std::string &terrain_type_name);
 extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(const std::string &era);
 extern void ProvinceCclRegister();
-
-#endif // !__PROVINCE_H__

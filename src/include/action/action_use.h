@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_USE_H__
-#define __ACTION_USE_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Use : public COrder
 {
@@ -60,7 +57,3 @@ private:
 	Vec2i goalPos;
 	int MapLayer;
 };
-
-//@}
-
-#endif // !__ACTION_USE_H__

@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_DIE_H__
-#define __ACTION_DIE_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Die : public COrder
 {
@@ -50,7 +47,3 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 };
-
-//@}
-
-#endif // !__ACTION_DIE_H__

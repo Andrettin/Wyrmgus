@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MOD_H__
-#define __MOD_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -36,11 +35,6 @@
 
 class CMod
 {
-public:
-	CMod() :
-		Ident("")
-	{
-	}
 public:
 	static void SetCurrentModPath(const std::string &path);
 	static std::string GetCurrentModPath();
@@ -53,5 +47,3 @@ public:
 	std::string Name;									/// Name of the mod
 	std::string Path;
 };
-
-#endif

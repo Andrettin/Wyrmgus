@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PANTHEON_H__
-#define __PANTHEON_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -57,5 +56,3 @@ public:
 	std::string Background;
 	std::string Quote;
 };
-
-#endif

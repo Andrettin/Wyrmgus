@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile.h - The missile headerfile. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +25,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MISSILE_H__
-#define __MISSILE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -665,5 +662,3 @@ extern void InitMissiles();
 extern void CleanMissiles();
 
 extern void FreeBurningBuildingFrames();
-
-#endif

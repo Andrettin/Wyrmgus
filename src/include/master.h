@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MASTER_H__
-#define __MASTER_H__
+#pragma once
 
 #include "network/netsockets.h"
 
@@ -42,7 +41,6 @@ struct lua_State;
 struct CClientLog {
 	std::string entry;     // command itself
 };
-
 
 // Class representing meta server client structure
 class CMetaClient
@@ -72,7 +70,6 @@ private:
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
 // Metaserver itself
 extern CMetaClient MetaClient;
-
-#endif // !__MASTER_H__

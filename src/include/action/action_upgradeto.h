@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_UPGRADETO_H__
-#define __ACTION_UPGRADETO_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_TransformInto : public COrder
 {
@@ -94,5 +91,3 @@ private:
 //Wyrmgus start
 extern int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype);
 //Wyrmgus end
-
-#endif // !__ACTIONS_H__

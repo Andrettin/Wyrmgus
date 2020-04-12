@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNIT_H__
-#define __UNIT_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -948,5 +947,3 @@ extern void SelectionCclRegister();
 
 /// register CCL units features
 extern void UnitCclRegister();
-
-#endif // !__UNIT_H__

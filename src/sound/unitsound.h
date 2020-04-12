@@ -28,10 +28,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNITSOUND_H__
-#define __UNITSOUND_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -120,7 +117,3 @@ extern void LoadUnitSounds();
 **  Set ranges for some sounds (infinite range for acknowledge and help sounds).
 */
 extern void MapUnitSounds();
-
-//@}
-
-#endif // !__UNITSOUND_H__

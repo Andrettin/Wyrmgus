@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_TRADE_H__
-#define __ACTION_TRADE_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Trade : public COrder
 {
@@ -64,7 +61,3 @@ private:
 	CUnit *HomeMarket;
 	Vec2i HomeMarketPos;
 };
-
-//@}
-
-#endif // !__ACTION_TRADE_H__

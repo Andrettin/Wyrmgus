@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SEASON_H__
-#define __SEASON_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -57,5 +56,3 @@ public:
 	std::string Name;							/// Name of the season
 	CGraphic *G = nullptr;
 };
-
-#endif

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name terrain_type.h - The terrain type headerfile. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,8 +25,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TERRAIN_TYPE_H__
-#define __TERRAIN_TYPE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -102,5 +99,3 @@ public:
 	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 };
-
-#endif

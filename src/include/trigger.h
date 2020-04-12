@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TRIGGER_H__
-#define __TRIGGER_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -149,5 +148,3 @@ extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features
 extern void SaveTriggers(CFile &file); /// Save the trigger module
-
-#endif

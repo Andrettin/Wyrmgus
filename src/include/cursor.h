@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CURSOR_H__
-#define __CURSOR_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -209,7 +206,3 @@ extern void InitVideoCursors();
 extern void CleanCursors();
 
 extern void CursorCclRegister();
-
-//@}
-
-#endif // !__CURSOR_H__

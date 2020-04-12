@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ENDIAN_H__
-#define __ENDIAN_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -235,7 +232,3 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 **  and return it in native format.
 */
 #define FetchByte(p) (*((unsigned char *)(p))++)
-
-//@}
-
-#endif // !__ENDIAN_H__

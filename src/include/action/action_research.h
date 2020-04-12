@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_RESEARCH_H__
-#define __ACTION_RESEARCH_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Research : public COrder
 {
@@ -65,7 +62,3 @@ private:
 	int Player;      /// Player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
 	//Wyrmgus end
 };
-
-//@}
-
-#endif // !__ACTION_RESEARCH_H__

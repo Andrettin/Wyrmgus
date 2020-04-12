@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __WORLD_H__
-#define __WORLD_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -71,5 +70,3 @@ public:
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world
 };
-
-#endif

@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __INTERN_VIDEO_H__
-#define __INTERN_VIDEO_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 -- Documentation
@@ -51,20 +48,10 @@
 */
 
 /*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
-
-/*----------------------------------------------------------------------------
--- Declarations
-----------------------------------------------------------------------------*/
-
-
-/*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
-// Direct acces to clipping rectangle for macro CLIP_RECTANGLE
+// Direct access to clipping rectangle for macro CLIP_RECTANGLE
 extern int ClipX1; /// current clipping top left
 extern int ClipY1; /// current clipping top left
 extern int ClipX2; /// current clipping bottom right
@@ -183,13 +170,3 @@ extern int ClipY2; /// current clipping bottom right
 			endx = 0; \
 		} \
 	} while(0)
-
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
-
-//@}
-
-#endif // !__INTERN_VIDEO_H__

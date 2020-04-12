@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __RESULTS_H__
-#define __RESULTS_H__
-
-//@{
+#pragma once
 
 /**
 **  Possible outcomes of the game.
@@ -49,7 +46,3 @@ enum GameResults {
 extern GameResults GameResult;   /// Outcome of the game
 
 extern void StopGame(GameResults result);
-
-//@}
-
-#endif

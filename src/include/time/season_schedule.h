@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SEASON_SCHEDULE_H__
-#define __SEASON_SCHEDULE_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -75,5 +72,3 @@ public:
 	unsigned HoursPerDay = DEFAULT_HOURS_PER_DAY;		/// The hours per each day for this season schedule
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
 };
-
-#endif

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MAP_LAYER_H__
-#define __MAP_LAYER_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -151,5 +150,3 @@ public:
 	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };
-
-#endif

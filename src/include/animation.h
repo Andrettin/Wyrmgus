@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ANIMATIONS_H__
-#define __ANIMATIONS_H__
+#pragma once
 
 #include "data_type.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
@@ -179,5 +178,3 @@ extern void FreeAnimations();
 //Wyrmgus start
 extern std::map<std::string, CAnimations *> AnimationMap;
 //Wyrmgus end
-
-#endif

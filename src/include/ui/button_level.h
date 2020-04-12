@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __BUTTON_LEVEL_H__
-#define __BUTTON_LEVEL_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -56,5 +55,3 @@ public:
 	
 	int ID = -1;									/// ID of the button level (starting at 1)
 };
-
-#endif

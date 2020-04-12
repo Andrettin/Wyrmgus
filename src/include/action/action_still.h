@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_STILL_H__
-#define __ACTION_STILL_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Still : public COrder
 {
@@ -56,7 +53,3 @@ private:
 private:
 	int State;
 };
-
-//@}
-
-#endif // !__ACTION_STILL_H__

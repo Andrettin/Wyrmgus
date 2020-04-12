@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __REPLAY_H__
-#define __REPLAY_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -70,5 +69,3 @@ extern void CleanReplayLog();
 extern void SaveReplayList(CFile &file);
 /// Register ccl functions related to network
 extern void ReplayCclRegister();
-
-#endif // !__REPLAY_H__

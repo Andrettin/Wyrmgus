@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_UNLOAD_H__
-#define __ACTION_UNLOAD_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Unload : public COrder
 {
@@ -72,7 +69,3 @@ private:
 	int Landmass;
 	//Wyrmgus end
 };
-
-//@}
-
-#endif // !__ACTION_UNLOAD_H__

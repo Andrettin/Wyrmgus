@@ -27,17 +27,14 @@
 //      02111-1307, USA.
 //
 
-#ifndef __MENUS_H__
-#define __MENUS_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
 ----------------------------------------------------------------------------*/
 
-#define MI_FLAGS_ACTIVE     1  /// cursor on item
-#define MI_FLAGS_CLICKED    2  /// mouse button pressed down on item
+static constexpr int MI_FLAGS_ACTIVE = 1;  /// cursor on item
+static constexpr int MI_FLAGS_CLICKED = 2; /// mouse button pressed down on item
 
 class ButtonStyle;
 
@@ -54,7 +51,3 @@ extern void DrawUIButton(ButtonStyle *style, unsigned flags,
 
 /// Pre menu setup
 extern void PreMenuSetup();
-
-//@}
-
-#endif // !__MENUS_H__

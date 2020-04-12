@@ -27,14 +27,11 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_BUILD_H__
-#define __ACTION_BUILD_H__
+#pragma once
 
 #include "actions.h"
 
 class CSite;
-
-//@{
 
 class COrder_Build : public COrder
 {
@@ -92,7 +89,3 @@ private:
 	CSite *Settlement;
 	//Wyrmgus end
 };
-
-//@}
-
-#endif // !__ACTION_BUILD_H__

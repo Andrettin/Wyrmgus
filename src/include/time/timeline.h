@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIMELINE_H__
-#define __TIMELINE_H__
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -59,5 +56,3 @@ public:
 	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
 };
-
-#endif

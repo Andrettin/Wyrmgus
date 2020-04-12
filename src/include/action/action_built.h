@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_BUILT_H__
-#define __ACTION_BUILT_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Built : public COrder
 {
@@ -73,7 +70,3 @@ private:
 	bool IsCancelled;                  /// Cancel construction
 	const CConstructionFrame *Frame;  /// Construction frame
 };
-
-//@}
-
-#endif // !__ACTION_BUILT_H__

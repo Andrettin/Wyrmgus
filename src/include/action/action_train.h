@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_TRAIN_H__
-#define __ACTION_TRAIN_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Train : public COrder
 {
@@ -69,7 +66,3 @@ private:
 	//Wyrmgus end
 	int Ticks;       /// Ticks to complete
 };
-
-//@}
-
-#endif // !__ACTION_TRAIN_H__

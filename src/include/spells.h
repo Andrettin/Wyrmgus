@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spells.h - The spells header file. */
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
 //                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
@@ -28,8 +26,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SPELLS_H__
-#define __SPELLS_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -314,5 +311,3 @@ extern int AutoCastSpell(CUnit &caster, const CSpell &spell);
 
 /// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State *l, const char *value);
-
-#endif

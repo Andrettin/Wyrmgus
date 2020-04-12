@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_PATROL_H__
-#define __ACTION_PATROL_H__
+#pragma once
 
 #include "actions.h"
-
-//@{
 
 class COrder_Patrol : public COrder
 {
@@ -72,7 +69,3 @@ private:
 	int WayPointMapLayer;
 	//Wyrmgus end
 };
-
-//@}
-
-#endif // !__ACTION_PATROL_H__
