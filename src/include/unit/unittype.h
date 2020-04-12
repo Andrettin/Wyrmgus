@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.h - The unit type header file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -72,8 +70,8 @@ class Mng;
 class LuaCallback;
 enum class UnitTypeType;
 
-#define UnitSides 8
-#define MaxAttackPos 5
+static constexpr int UnitSides = 8;
+static constexpr int MaxAttackPos = 5;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
@@ -129,8 +127,6 @@ public:
 class CVariable
 {
 public:
-	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
-
 	bool operator ==(const CVariable &rhs) const
 	{
 		return this->Max == rhs.Max
@@ -141,10 +137,10 @@ public:
 	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
 
 public:
-	int Max;        /// Maximum for the variable. (Assume min is 0.)
-	int Value;      /// Current (or initial) value of the variable (or initial value).
-	char Increase;  /// Number to increase(decrease) Value by second.
-	char Enable;    /// True if the unit doesn't have this variable. (f.e shield)
+	int Max = 0;        /// Maximum for the variable. (Assume min is 0.)
+	int Value = 0;      /// Current (or initial) value of the variable (or initial value).
+	char Increase = 0;  /// Number to increase(decrease) Value by second.
+	char Enable = 0;    /// True if the unit doesn't have this variable. (f.e shield)
 };
 
 // Index for boolflag already defined

@@ -9,7 +9,6 @@ class CUnit
 {
 	tolua_readonly Vec2i tilePos;
 
-	tolua_readonly CUnitType *Type;
 	tolua_readonly CPlayer *Player;
 	CUnit *Goal;
 	bool Active;
