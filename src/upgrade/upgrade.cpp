@@ -386,7 +386,6 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 
 void CUpgrade::initialize()
 {
-
 	if (this->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = this->get_class();
 		if (this->get_civilization() != nullptr) {
@@ -411,6 +410,8 @@ void CUpgrade::initialize()
 	}
 
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+
+	data_entry::initialize();
 }
 
 /**

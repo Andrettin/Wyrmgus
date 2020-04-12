@@ -63,6 +63,8 @@ void CIcon::initialize()
 		const QSize &icon_size = stratagus::defines::get()->get_icon_size();
 		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size.width(), icon_size.height());
 	}
+
+	data_entry::initialize();
 }
 
 void CIcon::ProcessConfigData(const CConfigData *config_data)

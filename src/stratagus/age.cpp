@@ -150,6 +150,8 @@ void age::initialize()
 		this->graphics->Load();
 		this->graphics->UseDisplayFormat();
 	}
+
+	data_entry::initialize();
 }
 
 }
