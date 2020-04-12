@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player.h - The player header file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -124,25 +122,25 @@ private:
 	static CPlayer *ThisPlayer; //player on local computer
 
 public:
-	int Index;          /// player as number
+	int Index = 0;          /// player as number
 	std::string Name;   /// name of non computer
 
-	int   Type; //type of player (human,computer,...)
-	int   Race; //race of player (orc,human,...)
-	int Faction; //faction of the player
-	CReligion *Religion; //religion of the player
-	CDynasty *Dynasty; //ruling dynasty of the player
-	stratagus::age *age; //the current age the player/faction is in
+	int Type = 0; //type of the player (human, computer, ...)
+	int Race = 0; //race of the player (orc, human, ...)
+	int Faction = -1; //faction of the player
+	CReligion *Religion = nullptr; //religion of the player
+	CDynasty *Dynasty = nullptr; //ruling dynasty of the player
+	stratagus::age *age = nullptr; //the current age the player/faction is in
 	std::string AiName; //AI for computer
 
 	// friend enemy detection
-	int      Team;          /// team of player
+	int Team = 0;          /// team of player
 
-	Vec2i StartPos;  /// map tile start position
+	Vec2i StartPos = Vec2i(0, 0);  /// map tile start position
 	//Wyrmgus start
-	int StartMapLayer;  /// map tile start map layer
+	int StartMapLayer = 0;  /// map tile start map layer
 	
-	CPlayer *Overlord;	/// overlord of this player
+	CPlayer *Overlord = nullptr;	/// overlord of this player
 	std::vector<CPlayer *> Vassals;	/// vassals of this player
 	//Wyrmgus end
 
@@ -187,40 +185,40 @@ public:
 	std::vector<int> AutosellResources;
 	//Wyrmgus end
 
-	bool AiEnabled;        /// handle AI on local computer
+	bool AiEnabled = false; //handle AI on local computer
 	//Wyrmgus start
-	bool Revealed;			/// Whether the player has been revealed (i.e. after losing the last town hall)
+	bool Revealed = false; //whether the player has been revealed (i.e. after losing the last town hall)
 	//Wyrmgus end
-	PlayerAi *Ai;          /// Ai structure pointer
+	PlayerAi *Ai = nullptr;          /// Ai structure pointer
 
-	int    NumBuildings;   /// # buildings
+	int NumBuildings = 0;   /// # buildings
 	//Wyrmgus start
-	int    NumBuildingsUnderConstruction; /// # buildings under construction
-	int    NumTownHalls;
+	int NumBuildingsUnderConstruction = 0; /// # buildings under construction
+	int NumTownHalls = 0;
 	//Wyrmgus end
-	int    Supply;         /// supply available/produced
-	int    Demand;         /// demand of player
+	int Supply = 0;         /// supply available/produced
+	int Demand = 0;         /// demand of player
 
-	int    UnitLimit;       /// # food units allowed
-	int    BuildingLimit;   /// # buildings allowed
-	int    TotalUnitLimit;  /// # total unit number allowed
+	int UnitLimit;       /// # food units allowed
+	int BuildingLimit;   /// # buildings allowed
+	int TotalUnitLimit;  /// # total unit number allowed
 
-	int    Score;           /// Points for killing ...
-	int    TotalUnits;
-	int    TotalBuildings;
-	int    TotalResources[MaxCosts];
-	int    TotalRazings;
-	int    TotalKills;      /// How many units killed
+	int Score = 0;           /// Player score points
+	int TotalUnits = 0;
+	int TotalBuildings = 0;
+	int TotalResources[MaxCosts];
+	int TotalRazings = 0;
+	int TotalKills = 0;      /// How many units killed
 	//Wyrmgus start
-	int UnitTypeKills[UnitTypeMax];  /// total killed units of unit-type
+	int UnitTypeKills[UnitTypeMax];  /// total killed units of each unit type
 	//Wyrmgus end
 
 	//Wyrmgus start
-	int LostTownHallTimer;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)
-	int HeroCooldownTimer;	/// The cooldown timer for recruiting heroes
+	int LostTownHallTimer = 0;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)
+	int HeroCooldownTimer = 0;	/// The cooldown timer for recruiting heroes
 	//Wyrmgus end
 	
-	IntColor Color;           /// color of units on minimap
+	IntColor Color = 0;           /// color of units on minimap
 
 	CUnitColors UnitColors; /// Unit colors for new units
 
@@ -444,9 +442,9 @@ public:
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
-	unsigned int Enemy;         /// enemy bit field for this player
-	unsigned int Allied;        /// allied bit field for this player
-	unsigned int SharedVision;  /// shared vision bit field
+	unsigned int Enemy = 0;     /// enemy bit field for this player
+	unsigned int Allied = 0;    /// allied bit field for this player
+	unsigned int SharedVision = 0; /// shared vision bit field
 };
 
 //Wyrmgus start

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player.cpp - The player source file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
 //
@@ -2396,35 +2394,35 @@ std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
 */
 void CPlayer::Clear()
 {
-	Index = 0;
-	Name.clear();
-	Type = 0;
-	Race = 0;
-	Faction = -1;
-	Religion = nullptr;
-	Dynasty = nullptr;
+	this->Index = 0;
+	this->Name.clear();
+	this->Type = 0;
+	this->Race = 0;
+	this->Faction = -1;
+	this->Religion = nullptr;
+	this->Dynasty = nullptr;
 	this->age = nullptr;
-	Overlord = nullptr;
-	Vassals.clear();
-	AiName.clear();
-	Team = 0;
-	Enemy = 0;
-	Allied = 0;
-	SharedVision = 0;
-	StartPos.x = 0;
-	StartPos.y = 0;
+	this->Overlord = nullptr;
+	this->Vassals.clear();
+	this->AiName.clear();
+	this->Team = 0;
+	this->Enemy = 0;
+	this->Allied = 0;
+	this->SharedVision = 0;
+	this->StartPos.x = 0;
+	this->StartPos.y = 0;
 	//Wyrmgus start
-	StartMapLayer = 0;
+	this->StartMapLayer = 0;
 	//Wyrmgus end
-	memset(Resources, 0, sizeof(Resources));
-	memset(StoredResources, 0, sizeof(StoredResources));
-	memset(MaxResources, 0, sizeof(MaxResources));
-	memset(LastResources, 0, sizeof(LastResources));
-	memset(Incomes, 0, sizeof(Incomes));
-	memset(Revenue, 0, sizeof(Revenue));
+	memset(this->Resources, 0, sizeof(this->Resources));
+	memset(this->StoredResources, 0, sizeof(this->StoredResources));
+	memset(this->MaxResources, 0, sizeof(this->MaxResources));
+	memset(this->LastResources, 0, sizeof(this->LastResources));
+	memset(this->Incomes, 0, sizeof(this->Incomes));
+	memset(this->Revenue, 0, sizeof(this->Revenue));
 	//Wyrmgus start
-	memset(ResourceDemand, 0, sizeof(ResourceDemand));
-	memset(StoredResourceDemand, 0, sizeof(StoredResourceDemand));
+	memset(this->ResourceDemand, 0, sizeof(this->ResourceDemand));
+	memset(this->StoredResourceDemand, 0, sizeof(this->StoredResourceDemand));
 	//Wyrmgus end
 	this->UnitTypesCount.clear();
 	this->UnitTypesUnderConstructionCount.clear();
@@ -2438,58 +2436,58 @@ void CPlayer::Clear()
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
 	this->AutosellResources.clear();
-	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
-		delete this->QuestObjectives[i];
+	for (CPlayerQuestObjective *quest_objective : this->QuestObjectives) {
+		delete quest_objective;
 	}
 	this->QuestObjectives.clear();
 	this->Modifiers.clear();
 	//Wyrmgus end
-	AiEnabled = false;
+	this->AiEnabled = false;
 	//Wyrmgus start
-	Revealed = false;
+	this->Revealed = false;
 	//Wyrmgus end
-	Ai = 0;
+	this->Ai = 0;
 	this->Units.resize(0);
 	this->FreeWorkers.resize(0);
 	//Wyrmgus start
 	this->LevelUpUnits.resize(0);
 	//Wyrmgus end
-	NumBuildings = 0;
+	this->NumBuildings = 0;
 	//Wyrmgus start
-	NumBuildingsUnderConstruction = 0;
-	NumTownHalls = 0;
+	this->NumBuildingsUnderConstruction = 0;
+	this->NumTownHalls = 0;
 	//Wyrmgus end
-	Supply = 0;
-	Demand = 0;
-	TradeCost = 0;
+	this->Supply = 0;
+	this->Demand = 0;
+	this->TradeCost = 0;
 	// FIXME: can't clear limits since it's initialized already
 	//	UnitLimit = 0;
 	//	BuildingLimit = 0;
 	//	TotalUnitLimit = 0;
-	Score = 0;
-	TotalUnits = 0;
-	TotalBuildings = 0;
-	memset(TotalResources, 0, sizeof(TotalResources));
-	TotalRazings = 0;
-	TotalKills = 0;
+	this->Score = 0;
+	this->TotalUnits = 0;
+	this->TotalBuildings = 0;
+	memset(this->TotalResources, 0, sizeof(this->TotalResources));
+	this->TotalRazings = 0;
+	this->TotalKills = 0;
 	//Wyrmgus start
-	memset(UnitTypeKills, 0, sizeof(UnitTypeKills));
-	LostTownHallTimer = 0;
-	HeroCooldownTimer = 0;
+	memset(this->UnitTypeKills, 0, sizeof(this->UnitTypeKills));
+	this->LostTownHallTimer = 0;
+	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
-	Color = 0;
-	UpgradeTimers.Clear();
+	this->Color = 0;
+	this->UpgradeTimers.Clear();
 	for (int i = 0; i < MaxCosts; ++i) {
-		SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
-		SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
+		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
+		this->SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
 		//Wyrmgus start
-		Prices[i] = CResource::Resources[i]->BasePrice;
+		this->Prices[i] = CResource::Resources[i]->BasePrice;
 		//Wyrmgus end
 	}
-	SpeedBuild = SPEEDUP_FACTOR;
-	SpeedTrain = SPEEDUP_FACTOR;
-	SpeedUpgrade = SPEEDUP_FACTOR;
-	SpeedResearch = SPEEDUP_FACTOR;
+	this->SpeedBuild = SPEEDUP_FACTOR;
+	this->SpeedTrain = SPEEDUP_FACTOR;
+	this->SpeedUpgrade = SPEEDUP_FACTOR;
+	this->SpeedResearch = SPEEDUP_FACTOR;
 }
 
 
