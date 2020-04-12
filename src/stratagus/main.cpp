@@ -43,6 +43,7 @@ int main(int argc, char **argv)
 				stratagusMain(argc, argv);
 			} catch (const std::exception &exception) {
 				exception::report(exception);
+				QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
 			}
 		});
 
