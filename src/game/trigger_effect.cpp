@@ -90,13 +90,8 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 		if (key == "quantity") {
 			this->Quantity = std::stoi(value);
 		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				this->UnitType = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
+			CUnitType *unit_type = CUnitType::get(value);
+			this->UnitType = unit_type;
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
 		}

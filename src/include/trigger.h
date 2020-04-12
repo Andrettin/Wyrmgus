@@ -122,7 +122,7 @@ struct TriggerDataType {
 	//Wyrmgus start
 	CUnit *Unit;	  /// Unit used in trigger
 	//Wyrmgus end
-	CUnitType *Type;  /// Type used in trigger;
+	const CUnitType *Type;  /// Type used in trigger;
 	//Wyrmgus start
 	CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger

@@ -314,9 +314,9 @@ static int CclUnit(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "type")) {
-			type = UnitTypeByIdent(LuaToString(l, 2, j + 1));
+			type = CUnitType::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "seen-type")) {
-			seentype = UnitTypeByIdent(LuaToString(l, 2, j + 1));
+			seentype = CUnitType::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "player")) {
 			player = CPlayer::Players[LuaToNumber(l, 2, j + 1)];
 
@@ -705,11 +705,11 @@ static int CclUnit(lua_State *l)
 				LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 			}
 		} else if (!strcmp(value, "unit-stock")) {
-			CUnitType *stocked_unit_type = UnitTypeByIdent(LuaToString(l, 2, j + 1));
+			CUnitType *stocked_unit_type = CUnitType::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->SetUnitStock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "unit-stock-replenishment-timer")) {
-			CUnitType *stocked_unit_type = UnitTypeByIdent(LuaToString(l, 2, j + 1));
+			CUnitType *stocked_unit_type = CUnitType::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->SetUnitStockReplenishmentTimer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "character")) {

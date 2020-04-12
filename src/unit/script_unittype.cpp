@@ -694,10 +694,9 @@ static int CclDefineUnitType(lua_State *l)
 
 	// Slot identifier
 	const char *str = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(str);
-	int redefine;
-	if (type) {
-		redefine = 1;
+	CUnitType *type = CUnitType::try_get(str);
+	const bool redefine = type != nullptr;
+	if (redefine) {
 		//Wyrmgus start
 		type->RemoveButtons(ButtonCmd::Move);
 		type->RemoveButtons(ButtonCmd::Stop);
@@ -707,8 +706,7 @@ static int CclDefineUnitType(lua_State *l)
 		type->RemoveButtons(ButtonCmd::Return);
 		//Wyrmgus end
 	} else {
-		type = NewUnitTypeSlot(str);
-		redefine = 0;
+		type = CUnitType::add(str, nullptr);
 	}
 
 	//  Parse the list: (still everything could be changed!)
@@ -719,10 +717,7 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Parent")) {
 			std::string parent_ident = LuaToString(l, -1);
-			CUnitType *parent_type = UnitTypeByIdent(parent_ident);
-			if (!parent_type) {
-				LuaError(l, "Unit type %s not defined" _C_ parent_ident.c_str());
-			}
+			CUnitType *parent_type = CUnitType::get(parent_ident);
 			type->SetParent(parent_type);
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
@@ -840,20 +835,12 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "item-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
-						const CUnitType *type = UnitTypeByIdent(type_ident);
-						if (type) {
-							variation->ItemsEquipped.push_back(type);
-						} else {
-							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
-						}
+						const CUnitType *type = CUnitType::get(type_ident);
+						variation->ItemsEquipped.push_back(type);
 					} else if (!strcmp(value, "item-not-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
-						const CUnitType *type = UnitTypeByIdent(type_ident);
-						if (type) {
-							variation->ItemsNotEquipped.push_back(type);
-						} else {
-							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
-						}
+						const CUnitType *type = CUnitType::get(type_ident);
+						variation->ItemsNotEquipped.push_back(type);
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
 						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
@@ -1026,12 +1013,8 @@ static int CclDefineUnitType(lua_State *l)
 				for (int k = 0; k < subargs; ++k) {
 					int item_slot = GetItemSlotIdByName(LuaToString(l, -1, k + 1));
 					++k;
-					CUnitType *default_equipment = UnitTypeByIdent(LuaToString(l, -1, k + 1));
-					if (default_equipment != nullptr) {
-						type->DefaultEquipment[item_slot] = default_equipment;
-					} else { // Error
-						LuaError(l, "incorrect default equipment unit-type");
-					}
+					CUnitType *default_equipment = CUnitType::get(LuaToString(l, -1, k + 1));
+					type->DefaultEquipment[item_slot] = default_equipment;
 				}
 				lua_pop(l, 1);
 			}
@@ -1120,10 +1103,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type \"%s\" does not exist." _C_ value);
-				}
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
 				++k;
 				type->DefaultStat.SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
 			}
@@ -1166,13 +1146,9 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				value = LuaToString(l, -1, j + 1);
-				CUnitType *trained_unit = UnitTypeByIdent(value);
-				if (trained_unit != nullptr) {
-					type->Trains.push_back(trained_unit);
-					trained_unit->TrainedBy.push_back(type);
-				} else {
-					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
-				}
+				CUnitType *trained_unit = CUnitType::get(value);
+				type->Trains.push_back(trained_unit);
+				trained_unit->TrainedBy.push_back(type);
 			}
 		//Wyrmgus end
 		//Wyrmgus start
@@ -1803,42 +1779,26 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int sold_unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
-				if (sold_unit_type_id != -1) {
-					type->SoldUnits.push_back(UnitTypes[sold_unit_type_id]);
-				} else { // Error
-					LuaError(l, "incorrect sold unit unit-type");
-				}
+				CUnitType *sold_unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				type->SoldUnits.push_back(sold_unit_type);
 			}
 		} else if (!strcmp(value, "SpawnUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int sold_unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
-				if (sold_unit_type_id != -1) {
-					type->SpawnUnits.push_back(UnitTypes[sold_unit_type_id]);
-				} else { // Error
-					LuaError(l, "incorrect spawn unit unit-type");
-				}
+				CUnitType *spawned_unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				type->SpawnUnits.push_back(spawned_unit_type);
 			}
 		} else if (!strcmp(value, "Drops")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
-				if (drop_type_id != -1) {
-					type->Drops.push_back(UnitTypes[drop_type_id]);
-				} else { // Error
-					LuaError(l, "incorrect drop unit-type");
-				}
+				CUnitType *drop_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				type->Drops.push_back(drop_type);
 			}
 		} else if (!strcmp(value, "AiDrops")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
-				if (drop_type_id != -1) {
-					type->AiDrops.push_back(UnitTypes[drop_type_id]);
-				} else { // Error
-					LuaError(l, "incorrect drop unit-type");
-				}
+				CUnitType *drop_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				type->AiDrops.push_back(drop_type);
 			}
 		} else if (!strcmp(value, "DropSpells")) {
 			const int args = lua_rawlen(l, -1);
@@ -2125,10 +2085,9 @@ static int CclDefineUnitType(lua_State *l)
 */
 static int CclDefineUnitStats(lua_State *l)
 {
-	CUnitType *type = UnitTypeByIdent(LuaToString(l, 1));
+	CUnitType *type = CUnitType::get(LuaToString(l, 1));
 	const int playerId = LuaToNumber(l, 2);
 
-	Assert(type);
 	Assert(playerId < PlayerMax);
 
 	CUnitStats *stats = &type->Stats[playerId];
@@ -2212,10 +2171,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, 3, j + 1);
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
 				++k;
 				stats->SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
@@ -2261,7 +2217,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
 		const char *str = LuaToString(l, -1);
-		return UnitTypeByIdent(str);
+		return CUnitType::get(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
@@ -2284,7 +2240,7 @@ static int CclUnitType(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const char *str = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(str);
+	CUnitType *type = CUnitType::get(str);
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
 	data->Data = type;
@@ -2304,11 +2260,11 @@ static int CclUnitTypeArray(lua_State *l)
 
 	lua_newtable(l);
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (CUnitType *unit_type : CUnitType::get_all()) {
 		LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
-		data->Data = UnitTypes[i];
-		lua_rawseti(l, 1, i + 1);
+		data->Data = unit_type;
+		lua_rawseti(l, 1, unit_type->Slot + 1);
 	}
 	return 1;
 }
@@ -2380,12 +2336,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string ident = LuaToString(l, 1);
-	const CUnitType *type = UnitTypeByIdent(ident.c_str());
+	const CUnitType *type = CUnitType::get(ident.c_str());
 	const char *data = LuaToString(l, 2);
-
-	if (!type) {
-		LuaError(l, "Invalid unit type: \"%s\"" _C_ ident.c_str());
-	}
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, type->Name.c_str());
@@ -2486,7 +2438,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "UnitStock")) {
 		LuaCheckArgs(l, 3);
-		CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, 3));
+		CUnitType *unit_type = CUnitType::get(LuaToString(l, 3));
 		if (!GameRunning && Editor.Running != EditorEditing) {
 			lua_pushnumber(l, type->DefaultStat.GetUnitStock(unit_type));
 		} else {
@@ -2826,13 +2778,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
-		std::vector<CUnitType *> droppers;
-		for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		std::vector<const CUnitType *> droppers;
+		for (const CUnitType *other_unit_type : CUnitType::get_all()) {
 			if (
-				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type) != UnitTypes[i]->Drops.end()
-				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type) != UnitTypes[i]->AiDrops.end()
+				std::find(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), type) != other_unit_type->Drops.end()
+				|| std::find(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), type) != other_unit_type->AiDrops.end()
 			) {
-				droppers.push_back(UnitTypes[i]);
+				droppers.push_back(other_unit_type);
 			}
 		}
 		
@@ -3107,8 +3059,8 @@ static int CclDefineBoolFlags(lua_State *l)
 
 	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
 		size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-			UnitTypes[i]->BoolFlag.resize(new_size);
+		for (CUnitType *unit_type : CUnitType::get_all()) { // adjust array for unit already defined
+			unit_type->BoolFlag.resize(new_size);
 		}
 	}
 	return 0;
@@ -3340,9 +3292,9 @@ static int CclGetUnitTypes(lua_State *l)
 	}
 	
 	std::vector<std::string> unit_types;
-	for (size_t i = 0; i != UnitTypes.size(); ++i) {
-		if (mod_file.empty() || UnitTypes[i]->Mod == mod_file) {
-			unit_types.push_back(UnitTypes[i]->Ident);
+	for (const CUnitType *unit_type : CUnitType::get_all()) {
+		if (mod_file.empty() || unit_type->Mod == mod_file) {
+			unit_types.push_back(unit_type->Ident);
 		}
 	}
 		
@@ -4057,7 +4009,7 @@ static int CclGetSpeciesGenusData(lua_State *l)
 static int CclSetSettlementSiteUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	SettlementSiteUnitType = UnitTypeByIdent(LuaToString(l, 1));
+	SettlementSiteUnitType = CUnitType::get(LuaToString(l, 1));
 
 	return 0;
 }
@@ -4073,7 +4025,7 @@ static int CclSetSettlementSiteUnit(lua_State *l)
 */
 void SetModStat(const std::string &mod_file, const std::string &ident, const std::string &variable_key, const int value, const std::string &variable_type)
 {
-	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	CUnitType *type = CUnitType::get(ident);
 	
 	if (type->ModDefaultStats.find(mod_file) == type->ModDefaultStats.end()) {
 		type->ModDefaultStats[mod_file].Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
@@ -4110,7 +4062,7 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 			}
 		}
 	} else if (variable_key == "UnitStock") {
-		CUnitType *unit_type = UnitTypeByIdent(variable_type);
+		CUnitType *unit_type = CUnitType::get(variable_type);
 		if (GameRunning || Editor.Running == EditorEditing) {
 			type->MapDefaultStat.ChangeUnitStock(unit_type, - type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
@@ -4200,7 +4152,7 @@ void SetModSound(const std::string &mod_file, const std::string &ident, const st
 	if (sound.empty()) {
 		return;
 	}
-	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	CUnitType *type = CUnitType::get(ident);
 	
 	if (sound_type == "selected") {
 		type->ModSounds[mod_file].Selected.Name = sound;
@@ -4323,10 +4275,7 @@ static int CclSetModTrains(lua_State *l)
 	LuaCheckArgs(l, 3);
 	
 	std::string mod_file = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(LuaToString(l, 2));
-	if (type == nullptr) {
-		LuaError(l, "Unit type doesn't exist.");
-	}
+	CUnitType *type = CUnitType::get(LuaToString(l, 2));
 
 	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
 		if (std::find(type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].begin(), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end(), type) != type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end()) {
@@ -4342,13 +4291,9 @@ static int CclSetModTrains(lua_State *l)
 	int subargs = lua_rawlen(l, 3);
 	for (int i = 0; i < subargs; ++i) {
 		const char *value = LuaToString(l, 3, i + 1);
-		CUnitType *trained_unit = UnitTypeByIdent(value);
-		if (trained_unit != nullptr) {
-			type->ModTrains[mod_file].push_back(trained_unit);
-			trained_unit->ModTrainedBy[mod_file].push_back(type);
-		} else {
-			LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
-		}
+		CUnitType *trained_unit = CUnitType::get(value);
+		type->ModTrains[mod_file].push_back(trained_unit);
+		trained_unit->ModTrainedBy[mod_file].push_back(type);
 	}
 	
 	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
@@ -4384,10 +4329,7 @@ static int CclSetModAiDrops(lua_State *l)
 	LuaCheckArgs(l, 3);
 	
 	std::string mod_file = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(LuaToString(l, 2));
-	if (type == nullptr) {
-		LuaError(l, "Unit type doesn't exist.");
-	}
+	CUnitType *type = CUnitType::get(LuaToString(l, 2));
 
 	type->ModAiDrops[mod_file].clear();
 	
@@ -4397,12 +4339,8 @@ static int CclSetModAiDrops(lua_State *l)
 	int subargs = lua_rawlen(l, 3);
 	for (int i = 0; i < subargs; ++i) {
 		const char *value = LuaToString(l, 3, i + 1);
-		CUnitType *dropped_unit = UnitTypeByIdent(value);
-		if (dropped_unit != nullptr) {
-			type->ModAiDrops[mod_file].push_back(dropped_unit);
-		} else {
-			LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
-		}
+		CUnitType *dropped_unit = CUnitType::get(value);
+		type->ModAiDrops[mod_file].push_back(dropped_unit);
 	}
 	
 	return 0;

@@ -118,16 +118,12 @@ static int CclDefineCharacter(lua_State *l)
 			character->HairVariation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				if (character->Type == nullptr || character->Type == UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
-					character->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-					if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-						character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
-					}
+			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			if (character->Type == nullptr || character->Type == unit_type || character->Type->CanExperienceUpgradeTo(unit_type)) {
+				character->Type = unit_type;
+				if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
+					character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 				}
-			} else {
-				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
@@ -346,9 +342,9 @@ static int CclDefineCharacter(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						std::string item_ident = LuaToString(l, -1, k + 1);
-						int item_type_id = UnitTypeIdByIdent(item_ident);
-						if (item_type_id != -1) {
-							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+						CUnitType *item_type = CUnitType::try_get(item_ident);
+						if (item_type != nullptr) {
+							item->Type = item_type;
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							character->Items.erase(std::remove(character->Items.begin(), character->Items.end(), item), character->Items.end());
@@ -437,12 +433,8 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-				if (unit_type_id != -1) {
-					character->ForbiddenUpgrades.push_back(UnitTypes[unit_type_id]);
-				} else {
-					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
-				}
+				CUnitType *unit_type = CUnitType::get(unit_type_ident);
+				character->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "HistoricalFactions")) {
 			if (!lua_istable(l, -1)) {
@@ -619,14 +611,10 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->HairVariation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-				if (hero->Level < hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-					hero->Level = hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
-				}
-			} else {
-				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
+			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			hero->Type = unit_type;
+			if (hero->Level < hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
+				hero->Level = hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
@@ -702,9 +690,9 @@ static int CclDefineCustomHero(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						std::string item_ident = LuaToString(l, -1, k + 1);
-						int item_type_id = UnitTypeIdByIdent(item_ident);
-						if (item_type_id != -1) {
-							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+						CUnitType *item_type = CUnitType::try_get(item_ident);
+						if (item_type != nullptr) {
+							item->Type = item_type;
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							hero->Items.erase(std::remove(hero->Items.begin(), hero->Items.end(), item), hero->Items.end());
@@ -815,12 +803,8 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-				if (unit_type_id != -1) {
-					hero->ForbiddenUpgrades.push_back(UnitTypes[unit_type_id]);
-				} else {
-					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
-				}
+				CUnitType *unit_type = CUnitType::get(unit_type_ident);
+				hero->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "Icon")) {
 			hero->Icon.Name = LuaToString(l, -1);

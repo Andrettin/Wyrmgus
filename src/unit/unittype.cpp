@@ -92,7 +92,7 @@
 **    config files and during startup. As convention they start with
 **    "unit-" fe. "unit-farm".
 **  @note Don't use this member in game, use instead the pointer
-**  to this structure. See UnitTypeByIdent().
+**  to this structure. See CUnitType::get().
 **
 **  CUnitType::Name
 **
@@ -468,9 +468,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CUnitType *> UnitTypes;   /// unit-types definition
-std::map<std::string, CUnitType *> UnitTypeMap;
-
 /**
 **  Next unit type are used hardcoded in the source.
 **
@@ -553,7 +550,7 @@ bool CResource::IsMineResource() const
 }
 //Wyrmgus end
 
-CUnitType::CUnitType() :
+CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
@@ -602,6 +599,13 @@ CUnitType::CUnitType() :
 	//Wyrmgus start
 	memset(LayerSprites, 0, sizeof(LayerSprites));
 	//Wyrmgus end
+
+	this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+
+	this->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+		this->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
+	}
 }
 
 CUnitType::~CUnitType()
@@ -704,11 +708,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "parent") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *parent_type = UnitTypeByIdent(value);
-			if (!parent_type) {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
+			CUnitType *parent_type = CUnitType::get(value);
 			this->SetParent(parent_type);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -800,12 +800,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "ai_drop") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *drop_type = UnitTypeByIdent(value);
-			if (drop_type) {
-				this->AiDrops.push_back(drop_type);
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
+			CUnitType *drop_type = CUnitType::get(value);
+			this->AiDrops.push_back(drop_type);
 		} else if (key == "item_class") {
 			value = FindAndReplaceString(value, "_", "-");
 			const int item_class_id = GetItemClassIdByName(value);
@@ -988,11 +984,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					continue;
 				}
 				
-				CUnitType *item = UnitTypeByIdent(value);
-				if (!item) {
-					fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
-					continue;
-				}
+				CUnitType *item = CUnitType::get(value);
 				
 				this->DefaultEquipment[item_slot] = item;
 			}
@@ -2253,9 +2245,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 void UpdateStats(int reset)
 {
 	// Update players stats
-	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		CUnitType &type = *UnitTypes[j];
-		UpdateUnitStats(type, reset);
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		UpdateUnitStats(*unit_type, reset);
 	}
 }
 
@@ -2312,14 +2303,14 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
 	}
 	file.printf("},\n\"unit-stock\", {");
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (stats.GetUnitStock(UnitTypes[i]) == type.DefaultStat.GetUnitStock(UnitTypes[i])) {
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (stats.GetUnitStock(unit_type) == type.DefaultStat.GetUnitStock(unit_type)) {
 			continue;
 		}
-		if (i) {
+		if (unit_type->Slot > 0) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", UnitTypes[i]->Ident.c_str(), stats.GetUnitStock(UnitTypes[i]));
+		file.printf("\"%s\", %d,", unit_type->Ident.c_str(), stats.GetUnitStock(unit_type));
 	}
 	//Wyrmgus end
 	file.printf("}})\n");
@@ -2337,38 +2328,18 @@ void SaveUnitTypes(CFile &file)
 	file.printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		const CUnitType &type = *UnitTypes[i];
+	for (const CUnitType *unit_type : CUnitType::get_all()) {
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
 			if (CPlayer::Players[j]->Type != PlayerNobody) {
-				somethingSaved |= SaveUnitStats(type.Stats[j], type, j, file);
+				somethingSaved |= SaveUnitStats(unit_type->Stats[j], *unit_type, j, file);
 			}
 		}
 		if (somethingSaved) {
 			file.printf("\n");
 		}
 	}
-}
-
-/**
-**  Find unit-type by identifier.
-**
-**  @param ident  The unit-type identifier.
-**
-**  @return       Unit-type pointer.
-*/
-CUnitType *UnitTypeByIdent(const std::string &ident)
-{
-	std::map<std::string, CUnitType *>::iterator ret = UnitTypeMap.find(ident);
-	if (ret != UnitTypeMap.end()) {
-		return (*ret).second;
-	}
-	//Wyrmgus start
-//	fprintf(stderr, "Unit type \"%s\" does not exist.\n", ident.c_str());
-	//Wyrmgus end
-	return nullptr;
 }
 
 //Wyrmgus start
@@ -2414,35 +2385,6 @@ void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id)
 	UpgradeClassStringToIndex[class_name] = class_id;
 }
 //Wyrmgus end
-
-/**
-**  Allocate an empty unit-type slot.
-**
-**  @param ident  Identifier to identify the slot (malloced by caller!).
-**
-**  @return       New allocated (zeroed) unit-type pointer.
-*/
-CUnitType *NewUnitTypeSlot(const std::string &ident)
-{
-	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-	CUnitType *type = new CUnitType;
-
-	if (!type) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
-	type->Slot = UnitTypes.size();
-	type->Ident = ident;
-	type->BoolFlag.resize(new_bool_size);
-
-	type->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		type->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
-	}
-	UnitTypes.push_back(type);
-	UnitTypeMap[type->Ident] = type;
-	return type;
-}
 
 /**
 **  Draw unit-type on map.
@@ -2558,16 +2500,11 @@ static int GetStillFrame(const CUnitType &type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
-		Assert(type.Slot == (int)i);
-
-		if (type.Animations == nullptr) {
-			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ type.Ident.c_str());
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->Animations == nullptr) {
+			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ unit_type->Ident.c_str());
 			continue;
 		}
-		//  Add idents to hash.
-		UnitTypeMap[type.Ident] = UnitTypes[i];
 		
 		//Wyrmgus start
 		/*
@@ -2586,7 +2523,7 @@ void InitUnitTypes(int reset_player_stats)
 			(*b)->Init();
 		}
 		*/
-		InitUnitType(type);
+		InitUnitType(*unit_type);
 		//Wyrmgus end
 	}
 
@@ -2779,15 +2716,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 int GetUnitTypesCount()
 {
 	int count = 0;
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
-
-		if (type.Missile.IsEmpty() == false) count++;
-		if (type.FireMissile.IsEmpty() == false) count++;
-		if (type.Explosion.IsEmpty() == false) count++;
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->Missile.IsEmpty() == false) count++;
+		if (unit_type->FireMissile.IsEmpty() == false) count++;
+		if (unit_type->Explosion.IsEmpty() == false) count++;
 
 
-		if (!type.Sprite) {
+		if (!unit_type->Sprite) {
 			count++;
 		}
 	}
@@ -2799,11 +2734,9 @@ int GetUnitTypesCount()
 */
 void LoadUnitTypes()
 {
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
-
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (i + 1) * 100 / UnitTypes.size());
-		LoadUnitType(type);
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->Slot + 1) * 100 / CUnitType::get_all().size());
+		LoadUnitType(*unit_type);
 	}
 }
 
@@ -2834,7 +2767,7 @@ void LoadUnitType(CUnitType &type)
 	}
 	// Lookup corpse.
 	if (!type.CorpseName.empty()) {
-		type.CorpseType = UnitTypeByIdent(type.CorpseName);
+		type.CorpseType = CUnitType::get(type.CorpseName);
 	}
 #ifndef DYNAMIC_LOAD
 	// Load Sprite
@@ -2853,8 +2786,8 @@ void CUnitTypeVar::Init()
 	// Variables.
 	Variable.resize(GetNumberVariable());
 	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-	for (unsigned int i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-		UnitTypes[i]->BoolFlag.resize(new_size);
+	for (CUnitType *unit_type : CUnitType::get_all()) { // adjust array for unit already defined
+		unit_type->BoolFlag.resize(new_size);
 	}
 }
 
@@ -2872,17 +2805,12 @@ void CUnitTypeVar::Clear()
 /**
 **  Cleanup the unit-type module.
 */
-void CleanUnitTypes()
+void CleanUnitTypeVariables()
 {
 	DebugPrint("FIXME: icon, sounds not freed.\n");
 	FreeAnimations();
 
 	// Clean all unit-types
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		delete UnitTypes[i];
-	}
-	UnitTypes.clear();
-	UnitTypeMap.clear();
 	UnitTypeVar.Clear();
 
 	// Clean hardcoded unit types.
@@ -2918,7 +2846,7 @@ void CleanUnitTypes()
 //Wyrmgus start
 std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
-	const CUnitType *unit_type = UnitTypeByIdent(unit_type_ident);
+	const CUnitType *unit_type = CUnitType::get(unit_type_ident);
 
 	if (unit_type) {
 		std::string unit_type_stats_string;

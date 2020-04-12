@@ -50,11 +50,7 @@
 		++j;
 		if (!strcmp(value, "unit-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = UnitTypeByIdent(value);
-			if (!this->UnitType) {
-				this->UnitType = 0;
-				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
-			}
+			this->UnitType = CUnitType::get(value);
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {

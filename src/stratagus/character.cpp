@@ -179,19 +179,16 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->FamilyName = value;
 			family_name_changed = true;
 		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				if (this->Type == nullptr || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
-					this->Type = unit_type;
-					if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-						this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
-					}
+			CUnitType *unit_type = CUnitType::get(value);
+			if (this->Type == nullptr || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
+				this->Type = unit_type;
+				if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
+					this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+				}
 					
-					if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
-						if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-							this->Gender = this->Type->DefaultStat.Variables[GENDER_INDEX].Value;
-						}
+				if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+					if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+						this->Gender = this->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 					}
 				}
 			} else {
@@ -312,12 +309,8 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->HeroicIcon.Load();
 		} else if (key == "forbidden_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				this->ForbiddenUpgrades.push_back(unit_type);
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
+			CUnitType *unit_type = CUnitType::get(value);
+			this->ForbiddenUpgrades.push_back(unit_type);
 		} else if (key == "ability") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *ability_upgrade = CUpgrade::try_get(value);
@@ -1204,7 +1197,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 		hero->civilization = civilization;
 		int new_unit_type_id = PlayerRaces.get_civilization_class_unit_type(hero->civilization->ID, hero->Type->Class);
 		if (new_unit_type_id != -1) {
-			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
+			hero->Type = CUnitType::get_all()[new_unit_type_id];
 			hero->Name = new_hero_name;
 			hero->FamilyName = new_hero_family_name;
 			SaveHero(hero);

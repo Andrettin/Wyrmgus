@@ -531,7 +531,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		*/
 		int value;
 		if (button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy) {
-			value = UnitTypes[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
+			value = CUnitType::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
 			}

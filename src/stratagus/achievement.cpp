@@ -148,13 +148,8 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 				this->Character = character;
 			}
 		} else if (key == "character_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				this->CharacterType = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
+			const CUnitType *unit_type = CUnitType::get(value);
+			this->CharacterType = unit_type;
 		} else if (key == "required_quest") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CQuest *required_quest = GetQuest(value);

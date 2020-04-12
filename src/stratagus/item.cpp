@@ -381,12 +381,8 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "type") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				this->Type = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
-			}
+			CUnitType *unit_type = CUnitType::get(value);
+			this->Type = unit_type;
 		} else if (key == "prefix") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
@@ -464,44 +460,87 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 
 std::string GetItemEffectsString(const std::string &item_ident)
 {
-	const CUnitType *item = UnitTypeByIdent(item_ident);
+	const CUnitType *item = CUnitType::get(item_ident);
 
-	if (item) {
-		std::string item_effects_string;
-		
-		bool first_var = true;
-		for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
-			if (
-				!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
-				|| var == FIREDAMAGE_INDEX || var == COLDDAMAGE_INDEX || var == ARCANEDAMAGE_INDEX || var == LIGHTNINGDAMAGE_INDEX
-				|| var == AIRDAMAGE_INDEX || var == EARTHDAMAGE_INDEX || var == WATERDAMAGE_INDEX || var == ACIDDAMAGE_INDEX
-				|| var == ARMOR_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX
-				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX
-				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
-				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX || var == HP_INDEX || var == MANA_INDEX
-				|| var == ATTACKRANGE_INDEX)
-			) {
-				continue;
+	std::string item_effects_string;
+	
+	bool first_var = true;
+	for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+		if (
+			!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
+			|| var == FIREDAMAGE_INDEX || var == COLDDAMAGE_INDEX || var == ARCANEDAMAGE_INDEX || var == LIGHTNINGDAMAGE_INDEX
+			|| var == AIRDAMAGE_INDEX || var == EARTHDAMAGE_INDEX || var == WATERDAMAGE_INDEX || var == ACIDDAMAGE_INDEX
+			|| var == ARMOR_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX
+			|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX
+			|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
+			|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
+			|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX || var == HP_INDEX || var == MANA_INDEX
+			|| var == ATTACKRANGE_INDEX)
+		) {
+			continue;
+		}
+					
+		if (var != HP_INDEX) { //only for elixirs, equippable items use the hit point bonus variable instead
+			if (item->DefaultStat.Variables[var].Enable) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+										
+				if (IsBooleanVariable(var) && item->DefaultStat.Variables[var].Value < 0) {
+					item_effects_string += "Lose ";
+				}
+				
+				if (!IsBooleanVariable(var)) {
+					if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+						item_effects_string += "+";
+					}
+					item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
+					if (IsPercentageVariable(var)) {
+						item_effects_string += "%";
+					}
+					item_effects_string += " ";
+				}
+											
+				item_effects_string += GetVariableDisplayName(var);
 			}
-						
-			if (var != HP_INDEX) { //only for elixirs, equippable items use the hit point bonus variable instead
-				if (item->DefaultStat.Variables[var].Enable) {
+			
+			if (item->DefaultStat.Variables[var].Increase != 0) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+											
+				if (item->DefaultStat.Variables[var].Increase > 0) {
+					item_effects_string += "+";
+				}
+				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Increase);
+				item_effects_string += " ";
+											
+				item_effects_string += GetVariableDisplayName(var, true);
+			}
+		}
+		
+		if (item->Elixir) {
+			for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
+				if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
 					if (!first_var) {
 						item_effects_string += ", ";
 					} else {
 						first_var = false;
 					}
 											
-					if (IsBooleanVariable(var) && item->DefaultStat.Variables[var].Value < 0) {
+					if (IsBooleanVariable(var) && item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
 						item_effects_string += "Lose ";
 					}
 					
 					if (!IsBooleanVariable(var)) {
-						if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+						if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
 							item_effects_string += "+";
 						}
-						item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
+						item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value);
 						if (IsPercentageVariable(var)) {
 							item_effects_string += "%";
 						}
@@ -511,73 +550,26 @@ std::string GetItemEffectsString(const std::string &item_ident)
 					item_effects_string += GetVariableDisplayName(var);
 				}
 				
-				if (item->DefaultStat.Variables[var].Increase != 0) {
+				if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
 					if (!first_var) {
 						item_effects_string += ", ";
 					} else {
 						first_var = false;
 					}
 												
-					if (item->DefaultStat.Variables[var].Increase > 0) {
+					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
 						item_effects_string += "+";
 					}
-					item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Increase);
+					item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
 					item_effects_string += " ";
 												
 					item_effects_string += GetVariableDisplayName(var, true);
 				}
 			}
-			
-			if (item->Elixir) {
-				for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
-					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
-						if (!first_var) {
-							item_effects_string += ", ";
-						} else {
-							first_var = false;
-						}
-												
-						if (IsBooleanVariable(var) && item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
-							item_effects_string += "Lose ";
-						}
-						
-						if (!IsBooleanVariable(var)) {
-							if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
-								item_effects_string += "+";
-							}
-							item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value);
-							if (IsPercentageVariable(var)) {
-								item_effects_string += "%";
-							}
-							item_effects_string += " ";
-						}
-													
-						item_effects_string += GetVariableDisplayName(var);
-					}
-					
-					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
-						if (!first_var) {
-							item_effects_string += ", ";
-						} else {
-							first_var = false;
-						}
-													
-						if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
-							item_effects_string += "+";
-						}
-						item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
-						item_effects_string += " ";
-													
-						item_effects_string += GetVariableDisplayName(var, true);
-					}
-				}
-			}
 		}
-			
-		return item_effects_string;
 	}
-	
-	return "";
+			
+	return item_effects_string;
 }
 
 std::string GetUniqueItemEffectsString(const std::string &item_ident)

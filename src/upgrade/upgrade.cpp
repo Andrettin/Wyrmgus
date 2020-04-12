@@ -260,13 +260,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "arrows") {
 			this->arrows = string::to_bool(value);
 		} else if (key == "item") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *item = UnitTypeByIdent(value);
-			if (item != nullptr) {
-				this->Item = item;
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
+			CUnitType *item = CUnitType::get(value);
+			this->Item = item;
 		} else if (key == "description") {
 			this->set_description(value);
 		} else if (key == "quote") {
@@ -443,13 +438,13 @@ void SaveUpgrades(CFile &file)
 	//
 	//  Save the allow
 	//
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		file.printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident.c_str());
+	for (const CUnitType *unit_type : CUnitType::get_all()) {
+		file.printf("DefineUnitAllow(\"%s\", ", unit_type->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {
 				file.printf(", ");
 			}
-			file.printf("%d", CPlayer::Players[p]->Allow.Units[i]);
+			file.printf("%d", CPlayer::Players[p]->Allow.Units[unit_type->Slot]);
 		}
 		file.printf(")\n");
 	}
@@ -597,12 +592,8 @@ static int CclDefineUpgrade(lua_State *l)
 				LuaError(l, "Work item class doesn't exist.");
 			}
 		} else if (!strcmp(value, "Item")) {
-			CUnitType *item = UnitTypeByIdent(LuaToString(l, -1));
-			if (item != nullptr) {
-				upgrade->Item = item;
-			} else {
-				LuaError(l, "Item type doesn't exist.");
-			}
+			CUnitType *item = CUnitType::get(LuaToString(l, -1));
+			upgrade->Item = item;
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -721,11 +712,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUnitType *scaled_cost_unit = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (scaled_cost_unit == nullptr) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
-
+				CUnitType *scaled_cost_unit = CUnitType::get(LuaToString(l, -1, j + 1));
 				upgrade->ScaledCostUnits.push_back(scaled_cost_unit);
 			}
 		} else if (!strcmp(value, "WeaponClasses")) {
@@ -847,7 +834,7 @@ static int CclDefineModifier(lua_State *l)
 			um->Modifier.ResourceDemand[resId] = LuaToNumber(l, j + 1, 3);
 		} else if (!strcmp(key, "unit-stock")) {
 			std::string value = LuaToString(l, j + 1, 2);
-			CUnitType *unit_type = UnitTypeByIdent(value);
+			CUnitType *unit_type = CUnitType::get(value);
 			um->Modifier.SetUnitStock(unit_type, LuaToNumber(l, j + 1, 3));
 		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
@@ -875,7 +862,7 @@ static int CclDefineModifier(lua_State *l)
 			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ConvertTo = UnitTypeByIdent(value);
+			um->ConvertTo = CUnitType::get(value);
 		//Wyrmgus start
 		} else if (!strcmp(key, "research-speed")) {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
@@ -1239,13 +1226,13 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-			for (size_t i = 0; i < UnitTypes.size(); ++i) {
-				if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
+			for (const CUnitType *unit_type : CUnitType::get_all()) {
+				if (unit_type->get_identifier().find("template") != std::string::npos) { //if is a template, continue
 					continue;
 				}
 				
-				if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X' || std::find(UnitTypes[i]->Affixes.begin(), UnitTypes[i]->Affixes.end(), upgrade) != UnitTypes[i]->Affixes.end()) {
-					applies_to.push_back(UnitTypes[i]->Ident);
+				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X' || std::find(unit_type->Affixes.begin(), unit_type->Affixes.end(), upgrade) != unit_type->Affixes.end()) {
+					applies_to.push_back(unit_type->get_identifier());
 				}
 			}
 		}
@@ -1303,7 +1290,7 @@ void UpgradesCclRegister()
 */
 int UnitTypeIdByIdent(const std::string &ident)
 {
-	const CUnitType *type = UnitTypeByIdent(ident);
+	const CUnitType *type = CUnitType::try_get(ident);
 
 	if (type) {
 		return type->Slot;
@@ -1497,8 +1484,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 	//Wyrmgus end
 
-	for (size_t z = 0; z < UnitTypes.size(); ++z) {
-		CUnitStats &stat = UnitTypes[z]->Stats[pn];
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
 		//Wyrmgus start
@@ -1509,18 +1496,18 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 		// FIXME: check if modify is allowed
 
-		player.Allow.Units[z] += um->ChangeUnits[z];
+		player.Allow.Units[unit_type->Slot] += um->ChangeUnits[unit_type->Slot];
 
-		Assert(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X');
+		Assert(um->ApplyTo[unit_type->Slot] == '?' || um->ApplyTo[unit_type->Slot] == 'X');
 
 		// this modifier should be applied to unittype id == z
-		if (um->ApplyTo[z] == 'X') {
+		if (um->ApplyTo[unit_type->Slot] == 'X') {
 
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && unit.IsAlive()) {
@@ -1533,7 +1520,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && unit.IsAlive()) {
@@ -1554,7 +1541,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 					//update player's income
 					std::vector<CUnit *> unitupgrade;
-					FindUnitsByType(*UnitTypes[z], unitupgrade);
+					FindUnitsByType(*unit_type, unitupgrade);
 					if (unitupgrade.size() > 0) {
 						player.Incomes[j] = std::max(player.Incomes[j], stat.ImproveIncomes[j]);
 					}
@@ -1605,7 +1592,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[TRADECOST_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				FindUnitsByType(*unit_type, unitupgrade);
 				if (unitupgrade.size() > 0) {
 					player.TradeCost = std::min(player.TradeCost, stat.Variables[TRADECOST_INDEX].Value);
 				}
@@ -1615,7 +1602,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			//Wyrmgus start
 			std::vector<CUnit *> unitupgrade;
 
-			FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+			FindUnitsByType(*unit_type, unitupgrade, true);
 			//Wyrmgus end
 			
 			if (varModified) {
@@ -1747,7 +1734,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			//Wyrmgus end
 			
 			if (um->ConvertTo) {
-				ConvertUnitTypeTo(player, *UnitTypes[z], *um->ConvertTo);
+				ConvertUnitTypeTo(player, *unit_type, *um->ConvertTo);
 			}
 		}
 	}
@@ -1791,8 +1778,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 	}
 
-	for (size_t z = 0; z < UnitTypes.size(); ++z) {
-		CUnitStats &stat = UnitTypes[z]->Stats[pn];
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
 		//Wyrmgus start
@@ -1803,17 +1790,17 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		
 		// FIXME: check if modify is allowed
 
-		player.Allow.Units[z] -= um->ChangeUnits[z];
+		player.Allow.Units[unit_type->Slot] -= um->ChangeUnits[unit_type->Slot];
 
-		Assert(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X');
+		Assert(um->ApplyTo[unit_type->Slot] == '?' || um->ApplyTo[unit_type->Slot] == 'X');
 
 		// this modifier should be applied to unittype id == z
-		if (um->ApplyTo[z] == 'X') {
+		if (um->ApplyTo[unit_type->Slot] == 'X') {
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && unit.IsAlive()) {
@@ -1826,7 +1813,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && unit.IsAlive()) {
@@ -1911,7 +1898,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			//Wyrmgus start
 			std::vector<CUnit *> unitupgrade;
 
-			FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+			FindUnitsByType(*unit_type, unitupgrade, true);
 			//Wyrmgus end
 			
 			// And now modify ingame units
@@ -2042,7 +2029,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			//Wyrmgus end
 			
 			if (um->ConvertTo) {
-				ConvertUnitTypeTo(player, *um->ConvertTo, *UnitTypes[z]);
+				ConvertUnitTypeTo(player, *um->ConvertTo, *unit_type);
 			}
 		}
 	}
@@ -2481,10 +2468,10 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
-			for (size_t i = 0; i < UnitTypes.size(); ++i) {
-				if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+			for (const CUnitType *unit_type : CUnitType::get_all()) {
+				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 					applies_to_any_unit_types = true;
-					if (i == unit.Type->Slot) {
+					if (unit_type == unit.Type) {
 						applies_to_this = true;
 						break;
 					}
@@ -2535,10 +2522,10 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
-			for (size_t i = 0; i < UnitTypes.size(); ++i) {
-				if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+			for (const CUnitType *unit_type : CUnitType::get_all()) {
+				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 					applies_to_any_unit_types = true;
-					if (i == unit.Type->Slot) {
+					if (unit_type == unit.Type) {
 						applies_to_this = true;
 						break;
 					}
@@ -2715,8 +2702,8 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					upgrade_effects_string += GetVariableDisplayName(var);
 						
 					bool first_unit_type = true;
-					for (size_t i = 0; i < UnitTypes.size(); ++i) {
-						if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+					for (const CUnitType *unit_type : CUnitType::get_all()) {
+						if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
 							} else {
@@ -2724,7 +2711,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 								first_unit_type = false;
 							}
 									
-							upgrade_effects_string += UnitTypes[i]->GetNamePlural();
+							upgrade_effects_string += unit_type->GetNamePlural();
 						}
 					}
 				}
@@ -2766,8 +2753,8 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 						upgrade_effects_string += " Processing";
 							
 						bool first_unit_type = true;
-						for (size_t i = 0; i < UnitTypes.size(); ++i) {
-							if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+						for (const CUnitType *unit_type : CUnitType::get_all()) {
+							if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 								if (!first_unit_type) {
 									upgrade_effects_string += ", ";
 								} else {
@@ -2775,7 +2762,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 									first_unit_type = false;
 								}
 										
-								upgrade_effects_string += UnitTypes[i]->GetNamePlural();
+								upgrade_effects_string += unit_type->GetNamePlural();
 							}
 						}
 					}

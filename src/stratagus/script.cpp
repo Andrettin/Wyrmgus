@@ -506,9 +506,9 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CUnitType **Str2TypeRef(lua_State *l, const char *s)
+static const CUnitType **Str2TypeRef(lua_State *l, const char *s)
 {
-	CUnitType **res = nullptr; // Result.
+	const CUnitType **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Type")) {
@@ -623,9 +623,9 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 **
 **  @return   unit type referernce definition.
 */
-CUnitType **CclParseTypeDesc(lua_State *l)
+const CUnitType **CclParseTypeDesc(lua_State *l)
 {
-	CUnitType **res = nullptr;
+	const CUnitType **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -1200,7 +1200,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
-	CUnitType **type;
+	const CUnitType **type;
 	std::string s;
 	int a;
 	int b;
@@ -1338,7 +1338,7 @@ std::string EvalString(const StringDesc *s)
 	std::string tmp1;   // Temporary string.
 	const CUnit *unit;  // Temporary unit
 	//Wyrmgus start
-	CUnitType **type;	// Temporary unit type
+	const CUnitType **type;	// Temporary unit type
 	CUpgrade **upgrade;	// Temporary upgrade
 	int **resource;		// Temporary resource
 	CFaction **faction;	// Temporary faction
@@ -3545,7 +3545,7 @@ void DeleteModFaction(const std::string &faction_name)
 
 void DeleteModUnitType(const std::string &unit_type_ident)
 {
-	CUnitType *unit_type = UnitTypeByIdent(unit_type_ident.c_str());
+	CUnitType *unit_type = CUnitType::get(unit_type_ident.c_str());
 	
 	if (Editor.Running == EditorEditing) {
 		std::vector<CUnit *> units_to_remove;
@@ -3578,18 +3578,18 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			}
 		}
 	}
-	for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
-		if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), unit_type) != UnitTypes[j]->Trains.end()) {
-			UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), unit_type), UnitTypes[j]->Trains.end());
+	for (CUnitType *other_unit_type : CUnitType::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
+		if (std::find(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type) != other_unit_type->Trains.end()) {
+			other_unit_type->Trains.erase(std::remove(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type), other_unit_type->Trains.end());
 		}
-		if (std::find(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), unit_type) != UnitTypes[j]->TrainedBy.end()) {
-			UnitTypes[j]->TrainedBy.erase(std::remove(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), unit_type), UnitTypes[j]->TrainedBy.end());
+		if (std::find(other_unit_type->TrainedBy.begin(), other_unit_type->TrainedBy.end(), unit_type) != other_unit_type->TrainedBy.end()) {
+			other_unit_type->TrainedBy.erase(std::remove(other_unit_type->TrainedBy.begin(), other_unit_type->TrainedBy.end(), unit_type), other_unit_type->TrainedBy.end());
 		}
-		if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), unit_type) != UnitTypes[j]->Drops.end()) {
-			UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), unit_type), UnitTypes[j]->Drops.end());
+		if (std::find(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), unit_type) != other_unit_type->Drops.end()) {
+			other_unit_type->Drops.erase(std::remove(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), unit_type), other_unit_type->Drops.end());
 		}
-		if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), unit_type) != UnitTypes[j]->AiDrops.end()) {
-			UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), unit_type), UnitTypes[j]->AiDrops.end());
+		if (std::find(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), unit_type) != other_unit_type->AiDrops.end()) {
+			other_unit_type->AiDrops.erase(std::remove(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), unit_type), other_unit_type->AiDrops.end());
 		}
 	}
 	int buttons_size = UnitButtonTable.size();
@@ -3602,39 +3602,37 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
 		}
 	}
-	UnitTypeMap.erase(unit_type->Ident);
-	delete unit_type;
-	UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), unit_type), UnitTypes.end());
+	CUnitType::remove(unit_type);
 }
 
 void DisableMod(const std::string &mod_file)
 {
-	int unit_types_size = UnitTypes.size();
+	const int unit_types_size = CUnitType::get_all().size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {
 		
-		if (UnitTypes[i]->Mod == mod_file) {
-			DeleteModUnitType(UnitTypes[i]->Ident);
+		if (CUnitType::get_all()[i]->Mod == mod_file) {
+			DeleteModUnitType(CUnitType::get_all()[i]->Ident);
 		}
 	}
 		
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (UnitTypes[i]->ModTrains.find(mod_file) != UnitTypes[i]->ModTrains.end()) {
-			UnitTypes[i]->ModTrains.erase(mod_file);
-			UnitTypes[i]->RemoveButtons(ButtonCmd::None, mod_file);
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->ModTrains.find(mod_file) != unit_type->ModTrains.end()) {
+			unit_type->ModTrains.erase(mod_file);
+			unit_type->RemoveButtons(ButtonCmd::None, mod_file);
 		}
-		if (UnitTypes[i]->ModTrainedBy.find(mod_file) != UnitTypes[i]->ModTrainedBy.end()) {
-			UnitTypes[i]->ModTrainedBy.erase(mod_file);
-			UnitTypes[i]->RemoveButtons(ButtonCmd::None, mod_file);
+		if (unit_type->ModTrainedBy.find(mod_file) != unit_type->ModTrainedBy.end()) {
+			unit_type->ModTrainedBy.erase(mod_file);
+			unit_type->RemoveButtons(ButtonCmd::None, mod_file);
 		}
-		if (UnitTypes[i]->ModAiDrops.find(mod_file) != UnitTypes[i]->ModAiDrops.end()) {
-			UnitTypes[i]->ModAiDrops.erase(mod_file);
+		if (unit_type->ModAiDrops.find(mod_file) != unit_type->ModAiDrops.end()) {
+			unit_type->ModAiDrops.erase(mod_file);
 		}
-		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
-			UnitTypes[i]->ModDefaultStats.erase(mod_file);
+		if (unit_type->ModDefaultStats.find(mod_file) != unit_type->ModDefaultStats.end()) {
+			unit_type->ModDefaultStats.erase(mod_file);
 		}
 	}
 	
-	int factions_size = PlayerRaces.Factions.size();
+	const int factions_size = PlayerRaces.Factions.size();
 	for (int i = (factions_size - 1); i >= 0; --i) {
 		if (PlayerRaces.Factions[i]->Mod == mod_file) {
 			FactionStringToIndex.erase(PlayerRaces.Factions[i]->Ident);

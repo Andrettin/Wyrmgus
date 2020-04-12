@@ -145,7 +145,7 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, con
 */
 void CBuildRestrictionDistance::Init()
 {
-	this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);
+	this->RestrictType = CUnitType::try_get(this->RestrictTypeName);
 	this->RestrictClass = GetOrAddUnitTypeClassIndexByName(this->RestrictClassName);
 }
 
@@ -228,6 +228,11 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			this->DistanceType == DistanceTypeType::NotEqual);
 }
 
+void CBuildRestrictionHasUnit::Init()
+{
+	this->RestrictType = CUnitType::get(this->RestrictTypeName);
+}
+
 /**
 **  Check HasUnit Restriction
 */
@@ -270,6 +275,11 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 	case DistanceTypeType::GreaterThan: return count > this->Count;
 	default: return false;
 	}
+}
+
+void CBuildRestrictionSurroundedBy::Init()
+{
+	this->RestrictType = CUnitType::get(this->RestrictTypeName);
 }
 
 /**
@@ -362,6 +372,11 @@ inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit)
 	return (unit->Type == Parent && unit->tilePos == this->pos);
 }
 
+void CBuildRestrictionAddOn::Init()
+{
+	this->Parent = CUnitType::get(this->ParentName);
+}
+
 /**
 **  Check AddOn Restriction
 */
@@ -411,6 +426,11 @@ public:
 private:
 	const CUnitType *type;
 };
+
+void CBuildRestrictionOnTop::Init()
+{
+	this->Parent = CUnitType::get(this->ParentName);
+}
 
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {

@@ -124,7 +124,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 	std::vector<CUnitType *> res;
 
 	if (list == "*") {
-		return UnitTypes;
+		return CUnitType::get_all();
 	}
 	size_t begin = 1;
 	size_t end = list.find(",", begin);
@@ -134,7 +134,10 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 		end = list.find(",", begin);
 		if (!unitName.empty()) {
 			Assert(unitName[0] != ',');
-			res.push_back(UnitTypeByIdent(unitName.c_str()));
+			CUnitType *unit_type = CUnitType::try_get(unitName);
+			if (unit_type != nullptr) {
+				res.push_back(unit_type);
+			}
 		}
 	}
 	return res;
@@ -147,11 +150,9 @@ static std::vector<CUnitType *> getReparableUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-
-		if (type.RepairHP > 0) {
-			res.push_back(&type);
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->RepairHP > 0) {
+			res.push_back(unit_type);
 		}
 	}
 	return res;
@@ -167,15 +168,13 @@ static std::vector<CUnitType *> getSupplyUnits()
 	std::vector<CUnitType *> res;
 	std::vector<CUnitType *> sorted_res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-		
-		if (type.BoolFlag[TOWNHALL_INDEX].value) {
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 			continue;
 		}
 
-		if (type.DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
-			res.push_back(&type);
+		if (unit_type->DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
+			res.push_back(unit_type);
 		}
 	}
 	// Now, sort them, best first.
@@ -216,11 +215,9 @@ static std::vector<CUnitType *> getMineUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-
-		if (type.GivesResource > 0 && type.BoolFlag[CANHARVEST_INDEX].value) {
-			res.push_back(&type);
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->GivesResource > 0 && unit_type->BoolFlag[CANHARVEST_INDEX].value) {
+			res.push_back(unit_type);
 		}
 	}
 #if 0
@@ -268,11 +265,10 @@ static std::vector<CUnitType *> GetMarketUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
+	for (CUnitType *unit_type : CUnitType::get_all()) {
 
-		if (type.BoolFlag[MARKET_INDEX].value) {
-			res.push_back(&type);
+		if (unit_type->BoolFlag[MARKET_INDEX].value) {
+			res.push_back(unit_type);
 		}
 	}
 	return res;
@@ -285,11 +281,9 @@ static std::vector<CUnitType *> GetNavalTransporterUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-
-		if (type.CanTransport() && (type.UnitType == UnitTypeType::Naval || type.UnitType == UnitTypeType::Fly || type.UnitType == UnitTypeType::FlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
-			res.push_back(&type);
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		if (unit_type->CanTransport() && (unit_type->UnitType == UnitTypeType::Naval || unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::FlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
+			res.push_back(unit_type);
 		}
 	}
 	return res;
@@ -353,11 +347,9 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Mines, i, **j);
 			}
 		}
-		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
-			CUnitType &type = **d;
-
-			if (type.CanStore[i] > 0) {
-				AiHelperInsert(aiHelper.Depots, i, type);
+		for (CUnitType *unit_type : CUnitType::get_all()) {
+			if (unit_type->CanStore[i] > 0) {
+				AiHelperInsert(aiHelper.Depots, i, *unit_type);
 			}
 		}
 	}
@@ -375,7 +367,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			case ButtonCmd::Build: {
-				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
+				CUnitType *buildingType = CUnitType::get(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Build, buildingType->Slot, (**j));
@@ -383,7 +375,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Train : {
-				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
+				CUnitType *trainingType = CUnitType::get(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Train, trainingType->Slot, (**j));
@@ -391,7 +383,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::UpgradeTo : {
-				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
+				CUnitType *upgradeToType = CUnitType::get(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, **j);
@@ -440,7 +432,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::ExperienceUpgradeTo : {
-				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
+				CUnitType *upgradeToType = CUnitType::get(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.ExperienceUpgrades, (**j).Slot, *upgradeToType);
@@ -504,18 +496,12 @@ static int CclDefineAiHelper(lua_State *l)
 		}
 		// Get the base unit type, which could handle the action.
 		const char *baseTypeName = LuaToString(l, j + 1, 2);
-		const CUnitType *base = UnitTypeByIdent(baseTypeName);
-		if (!base) {
-			LuaError(l, "unknown unittype: %s" _C_ baseTypeName);
-		}
+		const CUnitType *base = CUnitType::get(baseTypeName);
 
 		// Get the unit types, which could be produced
 		for (int k = 2; k < subargs; ++k) {
 			const char *equivTypeName = LuaToString(l, j + 1, k + 1);
-			CUnitType *type = UnitTypeByIdent(equivTypeName);
-			if (!type) {
-				LuaError(l, "unknown unittype: %s" _C_ equivTypeName);
-			}
+			CUnitType *type = CUnitType::get(equivTypeName);
 			AiHelperInsert(AiHelpers.Equiv, base->Slot, *type);
 			AiNewUnitTypeEquiv(*base, *type);
 		}
@@ -899,7 +885,7 @@ static int CclAiWait(lua_State *l)
 	*/
 	const char *ident = LuaToString(l, 1);
 	if (!strncmp(ident, "unit-", 5)) {
-		const CUnitType *type = UnitTypeByIdent(ident);
+		const CUnitType *type = CUnitType::get(ident);
 		const AiRequestType *autt = FindInUnitTypeRequests(type);
 		if (!autt) {
 			// Look if we have this unit-type.
@@ -991,7 +977,7 @@ static int CclAiForce(lua_State *l)
 		}
 
 		// Use the equivalent unittype.
-		type = UnitTypes[UnitTypeEquivs[type->Slot]];
+		type = CUnitType::get_all()[UnitTypeEquivs[type->Slot]];
 
 		if (resetForce) {
 			// Append it.
@@ -1478,7 +1464,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			const int want = LuaToNumber(l, offset, k + 1);
 
 			AiBuildQueue queue;
-			queue.Type = UnitTypeByIdent(value);
+			queue.Type = CUnitType::get(value);
 			queue.Want = want;
 			queue.Made = made;
 			queue.Pos = pos;
@@ -1588,7 +1574,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						AiUnitType queue;
 
 						queue.Want = num;
-						queue.Type = UnitTypeByIdent(ident);
+						queue.Type = CUnitType::get(ident);
 						ai->Force[forceIdx].UnitTypes.push_back(queue);
 					}
 					lua_pop(l, 1);
@@ -1724,7 +1710,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				++k;
 				const int landmass = LuaToNumber(l, j + 1, k + 1);
 				//Wyrmgus end
-				ai->UnitTypeRequests[i].Type = UnitTypeByIdent(ident);
+				ai->UnitTypeRequests[i].Type = CUnitType::get(ident);
 				ai->UnitTypeRequests[i].Count = count;
 				//Wyrmgus start
 				ai->UnitTypeRequests[i].Landmass = landmass;
@@ -1738,7 +1724,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
-				ai->UpgradeToRequests.push_back(UnitTypeByIdent(ident));
+				ai->UpgradeToRequests.push_back(CUnitType::get(ident));
 			}
 		} else if (!strcmp(value, "research")) {
 			if (!lua_istable(l, j + 1)) {

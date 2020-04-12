@@ -326,11 +326,9 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, j + 1, k + 1));
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, j + 1, k + 1));
 				++k;
-				if (unit_type) {
-					this->UnitTypeKills[unit_type->Slot] = LuaToNumber(l, j + 1, k + 1);
-				}
+				this->UnitTypeKills[unit_type->Slot] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (!strcmp(value, "lost-town-hall-timer")) {
 			this->LostTownHallTimer = LuaToNumber(l, j + 1);
@@ -476,10 +474,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->UnitClass = unit_class;
 					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, n + 1));
-						if (!unit_type) {
-							LuaError(l, "Unit type doesn't exist.");
-						}
+						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, n + 1));
 						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
 						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, n + 1));
@@ -1547,7 +1542,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	if (civilization && class_id != -1) {
 		int unit_type_id = PlayerRaces.get_civilization_class_unit_type(civilization->ID, class_id);
 		if (unit_type_id != -1) {
-			unit_type_ident = UnitTypes[unit_type_id]->Ident;
+			unit_type_ident = CUnitType::get_all()[unit_type_id]->Ident;
 		}
 	}
 		
@@ -1599,7 +1594,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	if (class_id != -1) {
 		int unit_type_id = PlayerRaces.GetFactionClassUnitType(faction_id, class_id);
 		if (unit_type_id != -1) {
-			unit_type_ident = UnitTypes[unit_type_id]->Ident;
+			unit_type_ident = CUnitType::get_all()[unit_type_id]->Ident;
 		}
 	}
 		

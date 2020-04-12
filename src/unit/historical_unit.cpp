@@ -131,8 +131,7 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quantity") {
 			this->Quantity = std::stoi(value);
 		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->UnitType = UnitTypeByIdent(value);
+			this->UnitType = CUnitType::get(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Faction = PlayerRaces.GetFaction(value);

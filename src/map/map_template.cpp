@@ -274,10 +274,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "unit_type") {
 					value = FindAndReplaceString(value, "_", "-");
-					unit_type = UnitTypeByIdent(value);
-					if (!unit_type) {
-						fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
-					}
+					unit_type = CUnitType::get(value);
 				} else if (key == "quantity") {
 					quantity = std::stoi(value);
 				} else {
@@ -751,8 +748,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
 			int worker_type_id = PlayerRaces.GetFactionClassUnitType(CPlayer::Players[i]->Faction, GetUnitTypeClassIndexByName("worker"));
-			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
-				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileSize - 1) / 2);
+			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(CUnitType::get_all()[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
+				Vec2i worker_unit_offset((CUnitType::get_all()[worker_type_id]->TileSize - 1) / 2);
 				
 				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
 
@@ -780,7 +777,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CUnit *worker_unit = CreateUnit(worker_pos, *UnitTypes[worker_type_id], CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
+					CUnit *worker_unit = CreateUnit(worker_pos, *CUnitType::get_all()[worker_type_id], CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
 				}
 			}
 		}
@@ -1056,10 +1053,10 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (unit_type_id == -1) {
 					continue;
 				}
-				const CUnitType *type = UnitTypes[unit_type_id];
+				const CUnitType *type = CUnitType::get_all()[unit_type_id];
 				if (type->TerrainType) {
 					if ((type->TerrainType->Flags & MapFieldRoad) || (type->TerrainType->Flags & MapFieldRailroad)) {
-						pathway_type = UnitTypes[unit_type_id];
+						pathway_type = CUnitType::get_all()[unit_type_id];
 					}
 				}
 			}
@@ -1081,7 +1078,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (unit_type_id == -1) {
 					continue;
 				}
-				const CUnitType *type = UnitTypes[unit_type_id];
+				const CUnitType *type = CUnitType::get_all()[unit_type_id];
 				if (type->TerrainType) {
 					continue;
 				}

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Include
 ----------------------------------------------------------------------------*/
@@ -186,42 +184,38 @@ void MapUnitSounds()
 	}
 
 	// Parse all units sounds.
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
+	for (CUnitType *unit_type : CUnitType::get_all()) {
+		MapAnimSounds(*unit_type);
 
-		MapAnimSounds(type);
-
-		type.MapSound.Selected.MapSound();
-		type.MapSound.Acknowledgement.MapSound();
-		// type.Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
-		type.MapSound.Attack.MapSound();
+		unit_type->MapSound.Selected.MapSound();
+		unit_type->MapSound.Acknowledgement.MapSound();
+		// unit_type->Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
+		unit_type->MapSound.Attack.MapSound();
 		//Wyrmgus start
-		type.MapSound.Idle.MapSound();
-		type.MapSound.Hit.MapSound();
-		type.MapSound.Miss.MapSound();
-		type.MapSound.FireMissile.MapSound();
-		type.MapSound.Step.MapSound();
-		type.MapSound.StepDirt.MapSound();
-		type.MapSound.StepGrass.MapSound();
-		type.MapSound.StepGravel.MapSound();
-		type.MapSound.StepMud.MapSound();
-		type.MapSound.StepStone.MapSound();
-		type.MapSound.Used.MapSound();
+		unit_type->MapSound.Idle.MapSound();
+		unit_type->MapSound.Hit.MapSound();
+		unit_type->MapSound.Miss.MapSound();
+		unit_type->MapSound.FireMissile.MapSound();
+		unit_type->MapSound.Step.MapSound();
+		unit_type->MapSound.StepDirt.MapSound();
+		unit_type->MapSound.StepGrass.MapSound();
+		unit_type->MapSound.StepGravel.MapSound();
+		unit_type->MapSound.StepMud.MapSound();
+		unit_type->MapSound.StepStone.MapSound();
+		unit_type->MapSound.Used.MapSound();
 		//Wyrmgus end
-		type.MapSound.Build.MapSound();
-		type.MapSound.Ready.MapSound();
-		type.MapSound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
-		type.MapSound.Repair.MapSound();
+		unit_type->MapSound.Build.MapSound();
+		unit_type->MapSound.Ready.MapSound();
+		unit_type->MapSound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
+		unit_type->MapSound.Repair.MapSound();
 		for (int i = 0; i < MaxCosts; ++i) {
-			type.MapSound.Harvest[i].MapSound();
+			unit_type->MapSound.Harvest[i].MapSound();
 		}
-		type.MapSound.Help.MapSound();
-		type.MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
+		unit_type->MapSound.Help.MapSound();
+		unit_type->MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
 
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			type.MapSound.Dead[i].MapSound();
+			unit_type->MapSound.Dead[i].MapSound();
 		}
 	}
 }
-
-//@}

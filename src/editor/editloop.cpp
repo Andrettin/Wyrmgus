@@ -688,8 +688,8 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
-		Assert(type && type->Icon.Icon);
+		const CUnitType *type = CUnitType::get(Editor.UnitTypes[i].c_str());
+		Assert(type->Icon.Icon);
 		const CIcon &icon = *type->Icon.Icon;
 
 		IconWidth = std::max(IconWidth, icon.G->Width);
@@ -708,7 +708,7 @@ void RecalculateShownUnits()
 	Editor.ShownUnitTypes.clear();
 
 	for (size_t i = 0; i != Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+		const CUnitType *type = CUnitType::get(Editor.UnitTypes[i].c_str());
 		Editor.ShownUnitTypes.push_back(type);
 	}
 
@@ -2435,14 +2435,12 @@ void CEditor::Init()
 	//Wyrmgus start
 	if (this->UnitTypes.size() == 0) {
 		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
-		for (std::vector<CUnitType *>::size_type i = 0; i < ::UnitTypes.size(); ++i) {
-			CUnitType &type = *::UnitTypes[i];
-			
-			if (type.Icon.Name.empty() || type.BoolFlag[VANISHES_INDEX].value || type.BoolFlag[HIDDENINEDITOR_INDEX].value) {
+		for (const CUnitType *unit_type : CUnitType::get_all()) {
+			if (unit_type->Icon.Name.empty() || unit_type->BoolFlag[VANISHES_INDEX].value || unit_type->BoolFlag[HIDDENINEDITOR_INDEX].value) {
 				continue;
 			}
 			
-			this->UnitTypes.push_back(type.Ident);
+			this->UnitTypes.push_back(unit_type->Ident);
 		}
 	}
 	//Wyrmgus end
@@ -2543,7 +2541,7 @@ void CEditor::Init()
 	VisibleUnitIcons = CalculateVisibleIcons();
 
 	if (!StartUnitName.empty()) {
-		StartUnit = UnitTypeByIdent(StartUnitName);
+		StartUnit = CUnitType::get(StartUnitName);
 	}
 	Select.Icon = nullptr;
 	Select.Load();

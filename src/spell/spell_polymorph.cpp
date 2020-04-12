@@ -55,11 +55,7 @@
 		++j;
 		if (!strcmp(value, "new-form")) {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = UnitTypeByIdent(value);
-			if (!this->NewForm) {
-				this->NewForm = 0;
-				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
-			}
+			this->NewForm = CUnitType::get(value);
 			// FIXME: temp polymorphs? hard to do.
 		} else if (!strcmp(value, "player-neutral")) {
 			this->PlayerNeutral = 1;
@@ -123,7 +119,7 @@
 			new_unit_type = PlayerRaces.get_civilization_class_unit_type(target->Type->civilization, target->Type->Class);
 		}
 		if (new_unit_type != -1) {
-			type = UnitTypes[new_unit_type];
+			type = CUnitType::get_all()[new_unit_type];
 		}
 	}
 	if (target->Character && target->Character->Custom && target->Character->civilization && this->civilization != -1 && this->civilization != target->Character->civilization->ID) {

@@ -42,11 +42,7 @@
 		++j;
 		if (!strcmp(value, "portal-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->PortalType = UnitTypeByIdent(value);
-			if (!this->PortalType) {
-				this->PortalType = 0;
-				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
-			}
+			this->PortalType = CUnitType::get(value);
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "current-player")) {

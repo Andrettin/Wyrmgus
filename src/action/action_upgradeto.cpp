@@ -411,7 +411,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
 	} else {
 		return false;
 	}
@@ -463,7 +463,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, CUnitType &newType
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
 	} else if (!strcmp(value, "ticks")) {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);

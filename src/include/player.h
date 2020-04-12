@@ -383,10 +383,8 @@ public:
 	void DecreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	//Wyrmgus end
 
-	/// Does the player have units of that type
-	int HaveUnitTypeByType(const CUnitType &type) const;
-	/// Does the player have units of that type
-	int HaveUnitTypeByIdent(const std::string &ident) const;
+	/// Does the player have units of a given type
+	bool has_unit_type(const CUnitType *unit_type) const;
 
 	/// Notify player about a problem
 	//Wyrmgus start

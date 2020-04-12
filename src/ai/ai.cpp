@@ -813,8 +813,8 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 	const int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (int i = 0; i < equivalentsCount; ++i) {
 		//Wyrmgus start
-//		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]])) {
-		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]], landmass, settlement)) {
+//		if (AiRemoveFromBuilt2(pai, *CUnitType::get_all()[equivalents[i]])) {
+		if (AiRemoveFromBuilt2(pai, *CUnitType::get_all()[equivalents[i]], landmass, settlement)) {
 		//Wyrmgus end
 			return;
 		}
@@ -890,8 +890,8 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, con
 
 	for (unsigned int i = 0; i < equivnb; ++i) {
 		//Wyrmgus start
-//		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]])) {
-		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]], landmass, settlement)) {
+//		if (AiReduceMadeInBuilt2(pai, *CUnitType::get_all()[equivs[i]])) {
+		if (AiReduceMadeInBuilt2(pai, *CUnitType::get_all()[equivs[i]], landmass, settlement)) {
 		//Wyrmgus end
 			return;
 		}
@@ -1435,7 +1435,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	} else { //remove the request of the unit the mercenary is substituting
 		int requested_unit_type_id = PlayerRaces.GetFactionClassUnitType(what.Player->Faction, what.Type->Class);
 		if (requested_unit_type_id != -1) {
-			AiRemoveFromBuilt(what.Player->Ai, *UnitTypes[requested_unit_type_id], CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::get_all()[requested_unit_type_id], CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}
 	}
 	//Wyrmgus end

@@ -959,7 +959,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 
 	// Iterate them
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
-		CUnitType &type = *UnitTypes[usableTypes[currentType]];
+		CUnitType &type = *CUnitType::get_all()[usableTypes[currentType]];
 		int n;
 		std::vector<std::vector<CUnitType *> > *tablep;
 		//
@@ -2067,20 +2067,18 @@ static void AiCheckPathwayConstruction()
 
 	std::vector<CUnitType *> pathway_types;
 	
-	for (size_t i = 0; i != UnitTypes.size(); ++i) { //assumes the pathways are listed in order of speed bonus
-		CUnitType *type = UnitTypes[i];
-
-		if (!type || !type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+	for (CUnitType *unit_type : CUnitType::get_all()) { //assumes the pathways are listed in order of speed bonus
+		if (!unit_type || !unit_type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 			continue;
 		}
 		
-		const int resourceNeeded = AiCheckUnitTypeCosts(*type);
-		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the pathway type if it is going to use up a resource that is currently needed
+		const int resourceNeeded = AiCheckUnitTypeCosts(*unit_type);
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) { //don't request the pathway type if it is going to use up a resource that is currently needed
 			continue;
 		}
 		
-		if ((type->TerrainType->Flags & MapFieldRoad) || (type->TerrainType->Flags & MapFieldRailroad)) {
-			pathway_types.push_back(type);
+		if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
+			pathway_types.push_back(unit_type);
 		}
 	}
 	
@@ -2155,7 +2153,7 @@ static void AiCheckPathwayConstruction()
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
 					int worker_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("worker"));
 					if (worker_type_id != -1) {
-						CUnitType *test_worker_type = UnitTypes[worker_type_id];
+						CUnitType *test_worker_type = CUnitType::get_all()[worker_type_id];
 						
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
@@ -2303,7 +2301,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 	
-	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
+	CUnitType *town_hall_type = CUnitType::get_all()[town_hall_type_id];
 	
 	if (!CheckDependencies(town_hall_type, AiPlayer->Player)) {
 		return;
@@ -2396,7 +2394,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 	
-	CUnitType *dock_type = UnitTypes[dock_type_id];
+	CUnitType *dock_type = CUnitType::get_all()[dock_type_id];
 	
 	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *dock_type)) {
 		return;
@@ -2537,7 +2535,7 @@ void AiCheckBuildings()
 		int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_templates[i]->UnitClass);
 		CUnitType *type = nullptr;
 		if (unit_type_id != -1) {
-			type = UnitTypes[unit_type_id];
+			type = CUnitType::get_all()[unit_type_id];
 		}
 		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type, false, true)) {
 			continue;
@@ -2575,7 +2573,7 @@ void AiCheckBuildings()
 	CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
 	int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_template->UnitClass);
-	CUnitType *type = UnitTypes[unit_type_id];
+	CUnitType *type = CUnitType::get_all()[unit_type_id];
 	
 	if (type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[type->Slot].empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*type, 1);
@@ -2593,7 +2591,7 @@ static void AiCheckMinecartConstruction()
 		return;
 	}
 	
-	CUnitType *minecart_type = UnitTypes[minecart_type_id];
+	CUnitType *minecart_type = CUnitType::get_all()[minecart_type_id];
 		
 	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *minecart_type, false, false)) {
 		return;
@@ -2666,7 +2664,7 @@ static void AiCheckMinecartSalvaging()
 		return;
 	}
 	
-	CUnitType *minecart_type = UnitTypes[minecart_type_id];
+	CUnitType *minecart_type = CUnitType::get_all()[minecart_type_id];
 	std::vector<CUnit *> minecart_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *minecart_type, minecart_table, true);
 	

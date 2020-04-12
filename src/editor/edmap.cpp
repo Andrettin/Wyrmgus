@@ -383,11 +383,8 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
 	const Vec2i mpos(UI.CurrentMapLayer->GetWidth(), UI.CurrentMapLayer->GetHeight());
-	CUnitType *typeptr = UnitTypeByIdent(unit_type);
+	CUnitType *typeptr = CUnitType::get(unit_type);
 
-	if (!typeptr) { // Error
-		return;
-	}
 	CUnitType &type = *typeptr;
 	const Vec2i tpos(type.TileSize);
 

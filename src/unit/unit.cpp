@@ -828,21 +828,21 @@ void CUnit::Retrain()
 	//now, revert the unit's type to the level 1 one
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
 		bool found_previous_unit_type = false;
-		for (size_t i = 0; i != UnitTypes.size(); ++i) {
-			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
+		for (CUnitType *unit_type : CUnitType::get_all()) {
+			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
-			if (((int) AiHelpers.ExperienceUpgrades.size()) > i) {
-				for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[i].size(); ++j) {
-					if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
+			if (((int) AiHelpers.ExperienceUpgrades.size()) > unit_type->Slot) {
+				for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[unit_type->Slot].size(); ++j) {
+					if (AiHelpers.ExperienceUpgrades[unit_type->Slot][j] == this->Type) {
 						this->Variable[LEVELUP_INDEX].Value += 1;
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 						this->Variable[LEVELUP_INDEX].Enable = 1;
-						TransformUnitIntoType(*this, *UnitTypes[i]);
+						TransformUnitIntoType(*this, *unit_type);
 						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
-							if (Character->Type->Slot != i) {
+							if (Character->Type != unit_type) {
 								if (Player->AiEnabled == false) {
-									Character->Type = UnitTypes[i];
+									Character->Type = unit_type;
 									SaveHero(Character);
 									CAchievement::CheckAchievements();
 								}
@@ -3683,15 +3683,15 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 	// create metal rocks near metal resources
 	CUnitType *metal_rock_type = nullptr;
 	if (type.Ident == "unit-gold-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-gold-rock");
+		metal_rock_type = CUnitType::get("unit-gold-rock");
 	} else if (type.Ident == "unit-silver-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-silver-rock");
+		metal_rock_type = CUnitType::get("unit-silver-rock");
 	} else if (type.Ident == "unit-copper-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-copper-rock");
+		metal_rock_type = CUnitType::get("unit-copper-rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-diamond-rock");
+		metal_rock_type = CUnitType::get("unit-diamond-rock");
 	} else if (type.Ident == "unit-emerald-deposit") {
-		metal_rock_type = UnitTypeByIdent("unit-emerald-rock");
+		metal_rock_type = CUnitType::get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileSize - 1) / 2);

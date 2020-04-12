@@ -1001,8 +1001,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandBuild:
-			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], status);
+			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
+			CommandBuildBuilding(unit, pos, *CUnitType::get_all()[dstnr], status);
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, arg1, -1, nullptr, nullptr, -1);
@@ -1029,18 +1029,18 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandTrain:
 			//Wyrmgus start
-//			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
+//			CommandLog("train", &unit, status, -1, -1, NoUnitP, CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
 //			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
-			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
-			CommandTrainUnit(unit, *UnitTypes[dstnr], arg1, status);
+			CommandLog("train", &unit, status, -1, -1, NoUnitP, CUnitType::get_all()[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
+			CommandTrainUnit(unit, *CUnitType::get_all()[dstnr], arg1, status);
 			//Wyrmgus end
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-						   UnitTypes[dstnr]->Ident.c_str(), (short)x);
-				CommandCancelTraining(unit, (short)x, UnitTypes[dstnr]);
+					CUnitType::get_all()[dstnr]->Ident.c_str(), (short)x);
+				CommandCancelTraining(unit, (short)x, CUnitType::get_all()[dstnr]);
 			} else {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP, nullptr, (short)x);
 				CommandCancelTraining(unit, (short)x, nullptr);
@@ -1056,12 +1056,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			*/
 			if (arg1 == 2) { //use X as a way to mark whether this is an upgrade or a transformation
 				CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
-						   UnitTypes[dstnr]->Ident.c_str(), -1);
-				CommandTransformIntoType(unit, *UnitTypes[dstnr]);
+					CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
+				CommandTransformIntoType(unit, *CUnitType::get_all()[dstnr]);
 			} else {
 				CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
-						   UnitTypes[dstnr]->Ident.c_str(), -1);
-				CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
+					CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
+				CommandUpgradeTo(unit, *CUnitType::get_all()[dstnr], status);
 			}
 			break;
 			//Wyrmgus end

@@ -253,7 +253,7 @@ struct NumberDesc {
 		int Val;       /// Direct value.
 		NumberDesc *N; /// Other number.
 		//Wyrmgus start
-		CUnitType **Type;           /// Which unit type.
+		const CUnitType **Type;     /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
 		CFaction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
@@ -266,7 +266,7 @@ struct NumberDesc {
 			int Loc;                   /// Location of Variables[].
 		} UnitStat;
 		struct {
-			CUnitType **Type;           /// Which unit type.
+			const CUnitType **Type;    /// Which unit type.
 			int Index;                 /// Which index variable.
 			EnumVariable Component;    /// Which component.
 			int Loc;                   /// Location of Variables[].
@@ -318,7 +318,7 @@ struct StringDesc {
 		StringDesc *String;  /// String.
 		UnitDesc *Unit;      /// Unit desciption.
 		//Wyrmgus start
-		CUnitType **Type;           /// Which unit type.
+		const CUnitType **Type;     /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
 		CFaction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
@@ -410,7 +410,7 @@ extern NumberDesc *Damage;  /// Damage calculation for missile.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
 extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
 extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
-extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
+extern const CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 //Wyrmgus start
 extern CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
 extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.

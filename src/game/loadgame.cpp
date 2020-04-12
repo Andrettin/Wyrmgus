@@ -147,7 +147,7 @@ void CleanModules()
 	//Wyrmgus end
 	CTimeline::ClearTimelines();
 	CleanUnits();
-	CleanUnitTypes();
+	CleanUnitTypeVariables();
 	CWorld::ClearWorlds();
 	CleanPlayers();
 	CleanSelections();

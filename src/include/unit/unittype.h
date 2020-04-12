@@ -32,6 +32,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "color.h"
+#include "database/detailed_data_entry.h"
+#include "database/data_type.h"
 #include "data_type.h"
 #include "icons.h"
 #include "missileconfig.h"
@@ -72,8 +74,6 @@ enum class UnitTypeType;
 
 static constexpr int UnitSides = 8;
 static constexpr int MaxAttackPos = 5;
-
-CUnitType *UnitTypeByIdent(const std::string &ident);
 
 enum class GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
@@ -572,7 +572,7 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 public:
 	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
 	virtual ~CBuildRestrictionAddOn() {}
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
+	virtual void Init();
 	//Wyrmgus start
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
@@ -598,7 +598,7 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 public:
 	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
+	virtual void Init();
 	//Wyrmgus start
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
@@ -637,7 +637,7 @@ class CBuildRestrictionHasUnit : public CBuildRestriction
 public:
 	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
 	virtual ~CBuildRestrictionHasUnit() {};
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	virtual void Init();
 	//Wyrmgus start
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
@@ -659,7 +659,7 @@ public:
 	}
 
 	virtual ~CBuildRestrictionSurroundedBy() {};
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	virtual void Init();
 	//Wyrmgus start
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
@@ -796,10 +796,20 @@ public:
 
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType : public CDataType
+class CUnitType final : public stratagus::detailed_data_entry, public stratagus::data_type<CUnitType>, public CDataType
 {
 public:
-	CUnitType();
+	static constexpr const char *class_identifier = "unit_type";
+	static constexpr const char *database_folder = "unit_types";
+
+	static CUnitType *add(const std::string &identifier, const stratagus::module *module)
+	{
+		CUnitType *unit_type = data_type::add(identifier, module);
+		unit_type->Slot = CUnitType::get_all().size() - 1;
+		return unit_type;
+	}
+
+	CUnitType(const std::string &identifier);
 	~CUnitType();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
@@ -1065,14 +1075,6 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
-
-/// @todo this hardcoded unit-types must be removed!!
-//Wyrmgus start
-//extern CUnitType *UnitTypeHumanWall;  /// Human wall
-//extern CUnitType *UnitTypeOrcWall;    /// Orc wall
-//Wyrmgus end
-
 /**
 **  Variable info for unit and unittype.
 */
@@ -1218,7 +1220,6 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
-extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 //Wyrmgus start
 extern int GetUnitTypeClassIndexByName(const std::string &class_name);
 extern int GetOrAddUnitTypeClassIndexByName(const std::string &class_name);
@@ -1237,7 +1238,6 @@ extern CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
-extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 						 int player, int frame, const PixelPos &screenPos);
@@ -1252,7 +1252,7 @@ extern void LoadUnitTypes();                     /// Load the unit-type data
 //Wyrmgus start
 extern void LoadUnitType(CUnitType &unittype);	/// Load a unittype
 //Wyrmgus end
-extern void CleanUnitTypes();                    /// Cleanup unit-type module
+extern void CleanUnitTypeVariables();                    /// Cleanup unit-type module
 
 // in script_unittype.c
 
@@ -1268,6 +1268,4 @@ extern void SetModSound(const std::string &mod_file, const std::string &ident, c
 //Wyrmgus start
 extern std::string GetImageLayerNameById(int image_layer);
 extern int GetImageLayerIdByName(const std::string &image_layer);
-
-extern std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end

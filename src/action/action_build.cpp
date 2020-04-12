@@ -157,7 +157,7 @@ enum {
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "type")) {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;

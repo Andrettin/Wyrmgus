@@ -217,10 +217,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->UnitClass = unit_class;
 					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
-						if (!unit_type) {
-							LuaError(l, "Unit type doesn't exist.");
-						}
+						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
 						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
 						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
@@ -632,13 +629,9 @@ static int CclDefineAchievement(lua_State *l)
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ character_name.c_str());
 			}
 		} else if (!strcmp(value, "CharacterType")) {
-			std::string unit_type_ident = LuaToString(l, -1);
-			const int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				achievement->CharacterType = UnitTypes[unit_type_id];
-			} else {
-				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
-			}
+			const std::string unit_type_ident = LuaToString(l, -1);
+			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			achievement->CharacterType = unit_type;
 		} else if (!strcmp(value, "RequiredQuests")) {
 			achievement->RequiredQuests.clear();
 			const int args = lua_rawlen(l, -1);

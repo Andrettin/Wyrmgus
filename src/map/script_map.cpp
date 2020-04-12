@@ -414,11 +414,7 @@ static int CclShowMapLocation(lua_State *l)
 
 	LuaCheckArgs(l, 4);
 	const char *unitname = LuaToString(l, 5);
-	CUnitType *unitType = UnitTypeByIdent(unitname);
-	if (!unitType) {
-		DebugPrint("Unable to find UnitType '%s'" _C_ unitname);
-		return 0;
-	}
+	CUnitType *unitType = CUnitType::get(unitname);
 	CUnit *target = MakeUnit(*unitType, CPlayer::GetThisPlayer());
 	if (target != nullptr) {
 		target->Variable[HP_INDEX].Value = 0;
@@ -1720,10 +1716,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
@@ -1736,10 +1729,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
@@ -1870,10 +1860,7 @@ static int CclDefineSite(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				int unit_quantity = LuaToNumber(l, -1, j + 1);
@@ -1955,10 +1942,7 @@ static int CclDefineSite(lua_State *l)
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
+				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				CUniqueItem *unique = nullptr;

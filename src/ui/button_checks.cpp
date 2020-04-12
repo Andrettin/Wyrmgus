@@ -276,7 +276,8 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button)
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		if (player->HaveUnitTypeByIdent(s)) {
+		const CUnitType *unit_type = CUnitType::try_get(s);
+		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
 			delete[] buf;
 			return true;
 		}
@@ -299,7 +300,8 @@ bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button)
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		if (!player->HaveUnitTypeByIdent(s)) {
+		const CUnitType *unit_type = CUnitType::try_get(s);
+		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
 			delete[] buf;
 			return false;
 		}
@@ -402,7 +404,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitAction::Still) {
 		return false;
 	}
-	return CheckDependencies(UnitTypes[button.Value], unit.Player, false, true);
+	return CheckDependencies(CUnitType::get_all()[button.Value], unit.Player, false, true);
 }
 
 /**

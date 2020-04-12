@@ -149,20 +149,12 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "item_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type != nullptr) {
-				this->ItemsEquipped.push_back(unit_type);
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
+			const CUnitType *unit_type = CUnitType::get(value);
+			this->ItemsEquipped.push_back(unit_type);
 		} else if (key == "item_not_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type != nullptr) {
-				this->ItemsNotEquipped.push_back(unit_type);
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
+			const CUnitType *unit_type = CUnitType::get(value);
+			this->ItemsNotEquipped.push_back(unit_type);
 		} else if (key == "terrain") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
