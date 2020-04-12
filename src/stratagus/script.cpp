@@ -300,7 +300,11 @@ static int CclLoadConfigFile(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const std::string filename = LibraryFileName(LuaToString(l, 1));
 	
-	CConfigData::ParseConfigData(filename, DefiningData);
+	try {
+		CConfigData::ParseConfigData(filename, DefiningData);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error parsing config file \"" + filename + "\"."));
+	}
 
 	return 0;
 }

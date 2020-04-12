@@ -218,9 +218,8 @@ void StartMap(const std::string &filename, bool clean)
 		Gui->setTop(oldTop);
 		Containers.erase(std::find(Containers.begin(), Containers.end(), container));
 		delete container;
-	} catch (const std::exception &exception) {
-		stratagus::exception::report(exception);
-		exit(-1);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error starting map."));
 	}
 }
 

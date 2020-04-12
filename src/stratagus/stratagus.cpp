@@ -933,9 +933,8 @@ void load_database(const bool initial_definition)
 {
 	try {
 		stratagus::database::get()->load(initial_definition);
-	} catch (const std::exception &exception) {
-		stratagus::exception::report(exception);
-		exit(-1);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error loading database."));
 	}
 }
 
@@ -943,8 +942,7 @@ void initialize_database()
 {
 	try {
 		stratagus::database::get()->initialize();
-	} catch (const std::exception &exception) {
-		stratagus::exception::report(exception);
-		exit(-1);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error initializing database."));
 	}
 }
