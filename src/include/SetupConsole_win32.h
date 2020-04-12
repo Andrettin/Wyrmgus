@@ -16,8 +16,7 @@
 
 */
 
-#ifndef SETUPCONSOLE_WIN32_H
-#define SETUPCONSOLE_WIN32_H
+#pragma once
 
 /* Returns true if standard output points to console */
 bool IsStdoutConsole();
@@ -28,5 +27,3 @@ bool IsStderrConsole();
 /* Attach console from parent process and setup console standard input, output and error */
 /* Must be called before any console I/O, ideally as first call in main() */
 void SetupConsole();
-
-#endif

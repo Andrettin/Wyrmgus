@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_LABEL_H
-#define ANIMATION_LABEL_H
-
-//@{
+#pragma once
 
 #include "animation.h"
 
@@ -42,7 +39,3 @@ public:
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 };
-
-//@}
-
-#endif // ANIMATION_LABEL_H

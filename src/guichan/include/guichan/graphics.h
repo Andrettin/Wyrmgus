@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_GRAPHICS_HPP
-#define GCN_GRAPHICS_HPP
+#pragma once
 
 #include "guichan/cliprectangle.h"
 #include "guichan/color.h"
@@ -275,11 +274,8 @@ namespace gcn
     };
 }
 
-#endif // end GCN_GRAPHICS_HPP
-
 /*
  * yakslem - "little cake on cake, but that's the fall"
  * finalman - "skall jag skriva det?"
  * yakslem - "ja, varfor inte?"
  */
-

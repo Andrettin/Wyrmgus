@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_POLYMORPH_H
-#define SPELL_POLYMORPH_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,5 +54,3 @@ private:
 	//Wyrmgus end
 	// TODO: temporary polymorphs would be awesome, but hard to implement
 };
-
-#endif

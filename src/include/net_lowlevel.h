@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __NET_LOWLEVEL_H
-#define __NET_LOWLEVEL_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -140,5 +139,3 @@ extern Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *client
 extern int NetSetNonBlocking(Socket sockfd);
 /// Wait for socket ready.
 extern int NetSocketReady(Socket sockfd, int timeout);
-
-#endif // !__NET_LOWLEVEL_H

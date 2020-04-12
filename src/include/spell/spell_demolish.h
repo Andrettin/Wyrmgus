@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_DEMOLISH_H
-#define SPELL_DEMOLISH_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -66,5 +65,3 @@ private:
 	bool DamageTerrain = true;	/// If true, damages terrain when casting spell
 	//Wyrmgus end
 };
-
-#endif

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_IMAGE_HPP
-#define GCN_IMAGE_HPP
+#pragma once
 
 #include "guichan/imageloader.h"
 #include "guichan/platform.h"
@@ -157,5 +156,3 @@ namespace gcn
         static ImageLoader* mImageLoader;
     };
 }
-
-#endif // end GCN_IMAGE_HPP

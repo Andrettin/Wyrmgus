@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_SPAWNPORTAL_H
-#define SPELL_SPAWNPORTAL_H
-
-//@{
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -52,8 +49,3 @@ private:
 	int TTL;                 /// Time to live for summoned portal. 0 means infinite
 	bool CurrentPlayer;      /// If true, summon portal for caster's player rather than neutral
 };
-
-
-//@}
-
-#endif // SPELL_SPAWNPORTAL_H

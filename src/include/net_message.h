@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef NET_MESSAGE_H
-#define NET_MESSAGE_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -482,5 +481,3 @@ public:
 	CNetworkPacketHeader Header;  /// Packet Header Info
 	std::vector<unsigned char> Command[MaxNetworkCommands];
 };
-
-#endif // !NET_MESSAGE_H

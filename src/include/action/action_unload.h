@@ -38,13 +38,8 @@ class COrder_Unload : public COrder
 	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
 	//WYrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Unload() : COrder(UnitAction::Unload), State(0), Range(0)
-	COrder_Unload() : COrder(UnitAction::Unload), State(0), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Unload() : COrder(UnitAction::Unload)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_Unload *Clone() const { return new COrder_Unload(*this); }
@@ -60,12 +55,13 @@ public:
 
 private:
 	bool LeaveTransporter(CUnit &transporter);
+
 private:
-	int State;
-	int Range;
-	Vec2i goalPos;
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	int Landmass;
 	//Wyrmgus end
 };

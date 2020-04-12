@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_SDLGRAPHICS_HPP
-#define GCN_SDLGRAPHICS_HPP
+#pragma once
 
 #include "SDL.h"
 
@@ -162,5 +161,3 @@ namespace gcn
         bool mAlpha;
     };
 }
-
-#endif // end GCN_SDLGRAPHICS_HPP

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_DEFAULTFONT_HPP
-#define GCN_DEFAULTFONT_HPP
+#pragma once
 
 #include "guichan/font.h"
 #include "guichan/platform.h"
@@ -104,5 +103,3 @@ namespace gcn
         virtual int getStringIndexAt(const std::string& text, int x);
     };
 }
-
-#endif // end GCN_DEFAULTFONT_HPP

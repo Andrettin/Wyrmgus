@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_GUICHAN_HPP
-#define GCN_GUICHAN_HPP
+#pragma once
 
 #include <guichan/actionlistener.h>
 #include <guichan/graphics.h>
@@ -103,5 +102,3 @@ extern "C"
      */
     GCN_CORE_DECLSPEC extern const char* gcnGuichanVersion();
 }
-
-#endif // end GCN_GUICHAN_HPP

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -147,5 +145,3 @@ static bool AnimateActionDie(CUnit &unit)
 	UnitUpdateHeading(unit);
 	AnimateActionDie(unit); // with new corpse.
 }
-
-//@}

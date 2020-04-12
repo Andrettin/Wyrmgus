@@ -137,8 +137,6 @@ int GetClipboard(std::string &str);
 int UTF8GetNext(const std::string &text, int curpos);
 int UTF8GetPrev(const std::string &text, int curpos);
 
-//@}
-
 //Wyrmgus start
 extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
 extern std::string FindAndReplaceStringEnding(const std::string &text, const std::string &find, const std::string &replace);

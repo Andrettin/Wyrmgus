@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_ACTIONLISTENER_HPP
-#define GCN_ACTIONLISTENER_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -86,5 +85,3 @@ namespace gcn
 
     };
 }
-
-#endif // end GCN_ACTIONLISTENER_HPP

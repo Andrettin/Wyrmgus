@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "missileconfig.h"
@@ -65,5 +63,3 @@ bool MissileConfig::MapMissile()
 
 	return res;
 }
-
-//@}

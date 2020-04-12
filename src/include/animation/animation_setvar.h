@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SETVAR_H
-#define ANIMATION_SETVAR_H
+#pragma once
 
 #include "animation.h"
 
@@ -46,5 +45,3 @@ private:
 	std::string valueStr;
 	std::string unitSlotStr;
 };
-
-#endif // ANIMATION_SETVAR_H

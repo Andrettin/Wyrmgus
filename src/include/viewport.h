@@ -27,12 +27,10 @@
 //      02111-1307, USA.
 //
 
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
-
-//@{
+#pragma once
 
 #include "vec2i.h"
+
 class CUnit;
 
 /**
@@ -122,7 +120,3 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 };
-
-//@}
-
-#endif // VIEWPORT_H

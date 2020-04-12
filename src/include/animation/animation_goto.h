@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_GOTO_H
-#define ANIMATION_GOTO_H
+#pragma once
 
 #include "animation.h"
 
@@ -43,5 +42,3 @@ public:
 private:
 	CAnimation *gotoLabel;
 };
-
-#endif // ANIMATION_GOTO_H

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_BUTTON_HPP
-#define GCN_BUTTON_HPP
+#pragma once
 
 #include "guichan/platform.h"
 #include "guichan/widget.h"
@@ -178,5 +177,3 @@ namespace gcn
         unsigned int mAlignment;
     };
 }
-
-#endif // end GCN_BUTTON_HPP

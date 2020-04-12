@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_AREAADJUSTVITAL_H
-#define SPELL_AREAADJUSTVITAL_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -51,5 +50,3 @@ private:
 	int Range = 1;			/// Range of spell
 	bool UseMana = false;	/// If true, use mana for spell cast
 };
-
-#endif

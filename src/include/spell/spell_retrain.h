@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_RETRAIN_H
-#define SPELL_RETRAIN_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -46,5 +45,3 @@ public:
 
 private:
 };
-
-#endif

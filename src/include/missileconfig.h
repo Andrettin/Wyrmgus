@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef MISSILE_CONFIG_H
-#define MISSILE_CONFIG_H
+#pragma once
 
 class MissileType;
 
@@ -50,5 +49,3 @@ public:
 	std::string Name;        /// Config missile name
 	MissileType *Missile;    /// Identifier to use to run time
 };
-
-#endif // MISSILE_CONFIG_H

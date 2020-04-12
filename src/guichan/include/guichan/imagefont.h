@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_IMAGEFONT_HPP
-#define GCN_IMAGEFONT_HPP
+#pragma once
 
 #include "guichan/font.h"
 #include "guichan/graphics.h"
@@ -202,5 +201,3 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
         std::string mFilename;
     };
 }
-
-#endif // end GCN_IMAGEFONT_HPP

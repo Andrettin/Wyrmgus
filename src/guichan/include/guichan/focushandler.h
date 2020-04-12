@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_FOCUSHANDLER_HPP
-#define GCN_FOCUSHANDLER_HPP
+#pragma once
 
 #include "guichan/platform.h"
 #include "guichan/widget.h"
@@ -238,5 +237,3 @@ namespace gcn
         Widget* mModalFocusedWidget;
     };
 }
-
-#endif // end GCN_FOCUSHANDLER_HPP

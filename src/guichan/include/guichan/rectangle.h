@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_RECTANGLE_HPP
-#define GCN_RECTANGLE_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -119,5 +118,3 @@ namespace gcn
         int height;
     };
 }
-
-#endif // end GCN_RECTANGEL_HPP

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SETPLAYERVAR_H
-#define ANIMATION_SETPLAYERVAR_H
+#pragma once
 
 #include "animation.h"
 
@@ -49,5 +48,3 @@ private:
 };
 
 extern int GetPlayerData(const int player, const char *prop, const char *arg);
-
-#endif // ANIMATION_SETPLAYERVAR_H

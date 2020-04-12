@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_SCROLLAREA_HPP
-#define GCN_SCROLLAREA_HPP
+#pragma once
 
 #include "guichan/basiccontainer.h"
 #include "guichan/mouselistener.h"
@@ -438,5 +437,3 @@ namespace gcn
         int mHorizontalMarkerMousePosition;
     };
 }
-
-#endif // end GCN_SCROLLAREA_HPP

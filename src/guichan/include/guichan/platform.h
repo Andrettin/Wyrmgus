@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_PLATFORM_HPP
-#define GCN_PLATFORM_HPP
+#pragma once
 
 #ifndef GCN_CORE_DECLSPEC
 #define GCN_CORE_DECLSPEC
@@ -62,6 +61,3 @@
 #ifndef GCN_EXTENSION_DECLSPEC
 #define GCN_EXTENSION_DECLSPEC
 #endif
-
-#endif // end GCN_PLATFORM_HPP
-

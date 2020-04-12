@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_LUACALLBACK_H
-#define ANIMATION_LUACALLBACK_H
+#pragma once
 
 #include "animation.h"
 
@@ -48,5 +47,3 @@ private:
 	std::string cbName;
 	std::vector<std::string> cbArgs;
 };
-
-#endif // ANIMATION_LUACALLBACK_H

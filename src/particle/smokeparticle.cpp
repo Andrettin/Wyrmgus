@@ -27,9 +27,10 @@
 //      02111-1307, USA.
 //
 
-//@{
 #include "stratagus.h"
+
 #include "particle.h"
+
 #include "video.h"
 
 //Wyrmgus start
@@ -88,5 +89,3 @@ CParticle *CSmokeParticle::clone()
 	return new CSmokeParticle(pos, MapLayer, puff, speedVector.x, speedVector.y, drawLevel);
 	//Wyrmgus end
 }
-
-//@}

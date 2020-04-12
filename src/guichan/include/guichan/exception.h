@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_EXCEPTION_HPP
-#define GCN_EXCEPTION_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -155,8 +154,6 @@ namespace gcn
         int mLine;
     };
 }
-
-#endif // end GCN_EXCEPTION_HPP
 
 /*
  * "Final Fantasy XI is the BEST!... It's even better then water!"

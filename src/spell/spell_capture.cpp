@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_capture.h"
@@ -133,5 +131,3 @@
 	}
 	return 0;
 }
-
-//@}

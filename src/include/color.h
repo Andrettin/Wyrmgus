@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef __COLOR_H
-#define __COLOR_H
+#pragma once
 
 class CConfigData;
 struct lua_State;
@@ -147,5 +146,3 @@ public:
 
 
 typedef uint32_t IntColor; // Uint32 in SDL
-
-#endif

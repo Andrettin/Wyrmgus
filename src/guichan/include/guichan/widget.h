@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_WIDGET_HPP
-#define GCN_WIDGET_HPP
+#pragma once
 
 #include "guichan/actionlistener.h"
 #include "guichan/color.h"
@@ -733,8 +732,6 @@ namespace gcn
         bool mDirty;
     };
 }
-
-#endif // end GCN_WIDGET_HPP
 
 /*
  * yakslem  - "I have a really great idea! Why not have an

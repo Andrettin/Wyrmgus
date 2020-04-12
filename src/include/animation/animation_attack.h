@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_ATTACK_H
-#define ANIMATION_ATTACK_H
+#pragma once
 
 #include "animation.h"
 
@@ -41,5 +40,3 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 };
-
-#endif // ANIMATION_ATTACK_H

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_ALLEGRO_HPP
-#define GCN_ALLEGRO_HPP
+#pragma once
 
 #include <guichan/allegro/allegrographics.h>
 #include <guichan/allegro/allegroimageloader.h>
@@ -68,5 +67,3 @@ extern "C"
      */
     extern void gcnAllegro();
 }
-
-#endif // end GCN_ALLEGRO_HPP

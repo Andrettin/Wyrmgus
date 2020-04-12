@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -183,5 +181,3 @@ void SetTranslationsFiles(const char *stratagusfile, const char *gamefile)
 	LoadPO(stratagusfile);
 	LoadPO(gamefile);
 }
-//@}
-

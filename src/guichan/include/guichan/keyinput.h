@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_KEYINPUT_HPP
-#define GCN_KEYINPUT_HPP
+#pragma once
 
 #include "guichan/key.h"
 #include "guichan/platform.h"
@@ -126,5 +125,3 @@ namespace gcn
         int mButton;
     };
 }
-
-#endif // end GCN_KEYINPUT_HPP

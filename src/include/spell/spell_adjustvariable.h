@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_ADJUSTVARIABLE_H
-#define SPELL_ADJUSTVARIABLE_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -76,5 +75,3 @@ public:
 private:
 	SpellActionTypeAdjustVariable *Var;
 };
-
-#endif

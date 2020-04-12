@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_MOUSELISTENER_HPP
-#define GCN_MOUSELISTENER_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -174,5 +173,3 @@ namespace gcn
         MouseListener() { }
     };
 }
-
-#endif // end GCN_MOUSELISTENER_HPP

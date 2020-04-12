@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_IFVAR_H
-#define ANIMATION_IFVAR_H
+#pragma once
 
 #include "animation.h"
 
@@ -49,5 +48,3 @@ private:
 	BinOpFunc *binOpFunc;
 	CAnimation *gotoLabel;
 };
-
-#endif // ANIMATION_IFVAR_H

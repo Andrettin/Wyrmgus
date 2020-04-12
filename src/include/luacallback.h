@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef LUA_CALLBACK_HEADER_FILE
-#define LUA_CALLBACK_HEADER_FILE
+#pragma once
 
 typedef int lua_Object; // from tolua++.h
 struct lua_State;
@@ -51,5 +50,3 @@ private:
 	int rescount;
 	int base;
 };
-
-#endif

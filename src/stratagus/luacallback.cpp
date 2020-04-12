@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "luacallback.h"
@@ -170,5 +168,3 @@ LuaCallback::~LuaCallback()
 	}
 	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }
-
-//@}

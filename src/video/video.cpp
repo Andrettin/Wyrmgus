@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /**
 **   @page VideoModule Module - Video
 **
@@ -498,7 +496,4 @@ void RestoreColorCyclingSurface()
 	colorCycling.cycleCount = 0;
 }
 
-
 #endif
-
-//@}

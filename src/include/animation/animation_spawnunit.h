@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SPAWNUNIT_H
-#define ANIMATION_SPAWNUNIT_H
+#pragma once
 
 #include "animation.h"
 
@@ -55,5 +54,3 @@ private:
 	std::string playerStr;
 	std::string flagsStr;
 };
-
-#endif // ANIMATION_SPAWNUNIT_H

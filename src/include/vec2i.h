@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef VEC2I_H
-#define VEC2I_H
-
-//@{
+#pragma once
 
 template <typename T>
 class Vec2T
@@ -212,7 +209,3 @@ typedef Vec2T<int> PixelPos;
 typedef Vec2T<int> PixelDiff;
 typedef Vec2T<int> PixelSize;
 typedef Vec2T<double> PixelPrecise;
-
-//@}
-
-#endif // !VEC2I_H

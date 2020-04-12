@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_SPAWNMISSILE_H
-#define SPELL_SPAWNMISSILE_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -88,5 +87,3 @@ private:
 	SpellActionMissileLocation EndPoint;	/// Start point description.
 	MissileType *Missile = nullptr;			/// Missile fired on cast
 };
-
-#endif

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_ROTATE_H
-#define ANIMATION_ROTATE_H
+#pragma once
 
 #include "animation.h"
 
@@ -45,5 +44,3 @@ private:
 };
 
 extern void UnitRotate(CUnit &unit, int rotate);
-
-#endif // ANIMATION_ROTATE_H

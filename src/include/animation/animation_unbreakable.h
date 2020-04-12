@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_UNBREAKABLE_H
-#define ANIMATION_UNBREAKABLE_H
+#pragma once
 
 #include "animation.h"
 
@@ -43,5 +42,3 @@ public:
 private:
 	int state;
 };
-
-#endif // ANIMATION_UNBREAKABLE_H

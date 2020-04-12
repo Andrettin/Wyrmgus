@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_WAIT_H
-#define ANIMATION_WAIT_H
+#pragma once
 
 #include "animation.h"
 
@@ -43,5 +42,3 @@ public:
 private:
 	std::string wait;
 };
-
-#endif // ANIMATION_WAIT_H

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_FONT_HPP
-#define GCN_FONT_HPP
+#pragma once
 
 #include "guichan/graphics.h"
 #include "guichan/platform.h"
@@ -119,5 +118,3 @@ namespace gcn
 		//Wyrmgus end
     };
 }
-
-#endif // end GCN_FONT_HPP

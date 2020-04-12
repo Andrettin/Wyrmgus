@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SPAWNMISSILE_H
-#define ANIMATION_SPAWNMISSILE_H
+#pragma once
 
 #include "animation.h"
 
@@ -61,5 +60,3 @@ private:
 	std::string flagsStr;
 	std::string offsetNumStr;
 };
-
-#endif // ANIMATION_SPAWNMISSILE_H

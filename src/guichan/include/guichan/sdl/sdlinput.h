@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_SDLINPUT_HPP
-#define GCN_SDLINPUT_HPP
+#pragma once
 
 #include "SDL.h"
 
@@ -132,5 +131,3 @@ namespace gcn
 		bool mIsRepeating;
 	};
 }
-
-#endif // end GCN_SDLINPUT_HPP

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_CLIPRECTANGLE_HPP
-#define GCN_CLIPRECTANGLE_HPP
+#pragma once
 
 #include "guichan/rectangle.h"
 #include "guichan/platform.h"
@@ -104,5 +103,3 @@ namespace gcn
         int yOffset;
     };
 }
-
-#endif // end GCN_CLIPRECTANGLE_HPP

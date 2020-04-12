@@ -27,9 +27,8 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
+
 #include "particle.h"
 
 //Wyrmgus start
@@ -80,5 +79,3 @@ CParticle *StaticParticle::clone()
 	//Wyrmgus end
 	return p;
 }
-
-//@}

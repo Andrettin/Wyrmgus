@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_SLIDER_HPP
-#define GCN_SLIDER_HPP
+#pragma once
 
 #include "guichan/platform.h"
 #include "guichan/widget.h"
@@ -259,5 +258,3 @@ namespace gcn
         unsigned int mOrientation;
     };
 }
-
-#endif // end GCN_SLIDER_HPP

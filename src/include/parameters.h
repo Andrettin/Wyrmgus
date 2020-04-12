@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef PARAMATERS_H
-#define PARAMATERS_H
+#pragma once
 
 class Parameters
 {
@@ -53,5 +52,3 @@ private:
 public:
 	static Parameters Instance;
 };
-
-#endif /* PARAMATERS_H */

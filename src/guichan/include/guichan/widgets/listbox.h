@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_LISTBOX_HPP
-#define GCN_LISTBOX_HPP
+#pragma once
 
 #include "guichan/keylistener.h"
 #include "guichan/listmodel.h"
@@ -149,5 +148,3 @@ namespace gcn
         int mSelected;
     };
 }
-
-#endif // end GCN_LISTBOX_HPP

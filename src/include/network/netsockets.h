@@ -26,8 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef NETSOCKETS_H
-#define NETSOCKETS_H
+#pragma once
 
 class CHost
 {
@@ -111,5 +110,3 @@ public:
 private:
 	CTCPSocket_Impl *m_impl;
 };
-
-#endif // !NETSOCKETS_H

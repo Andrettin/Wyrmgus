@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_CHECKBOX_HPP
-#define GCN_CHECKBOX_HPP
+#pragma once
 
 #include "guichan/keylistener.h"
 #include "guichan/mouselistener.h"
@@ -158,5 +157,3 @@ namespace gcn
         std::string mCaption;
     };
 }
-
-#endif // end GCN_CHECKBOX_HPP

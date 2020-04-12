@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMWAIT_H
-#define ANIMATION_RANDOMWAIT_H
+#pragma once
 
 #include "animation.h"
 
@@ -44,5 +43,3 @@ private:
 	std::string minWait;
 	std::string maxWait;
 };
-
-#endif // ANIMATION_RANDOMWAIT_H

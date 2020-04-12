@@ -13,8 +13,7 @@
 // * do so, delete this exception statement from your version.                *
 // ****************************************************************************
 
-#ifndef XBRZ_HEADER_3847894708239054
-#define XBRZ_HEADER_3847894708239054
+#pragma once
 
 #include <cstddef> //size_t
 #include "config.h"
@@ -81,5 +80,3 @@ void nearestNeighborScale(const uint32_t* src, int srcWidth, int srcHeight,
                          NN_SCALE_SLICE_TARGET, 0, trgHeight);
 }
 }
-
-#endif

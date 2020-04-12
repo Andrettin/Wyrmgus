@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_IMAGELOADER_HPP
-#define GCN_IMAGELOADER_HPP
+#pragma once
 
 #include "guichan/color.h"
 #include "guichan/platform.h"
@@ -158,5 +157,3 @@ namespace gcn
         virtual void putPixel(int x, int y, const Color& color) = 0;
     };
 }
-
-#endif // end GCN_IMAGELOADER_HPP

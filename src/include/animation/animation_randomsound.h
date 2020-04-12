@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMSOUND_H
-#define ANIMATION_RANDOMSOUND_H
+#pragma once
 
 #include "animation.h"
 #include "sound/unitsound.h"
@@ -45,5 +44,3 @@ public:
 private:
 	std::vector<SoundConfig> sounds;
 };
-
-#endif // ANIMATION_RANDOMSOUND_H

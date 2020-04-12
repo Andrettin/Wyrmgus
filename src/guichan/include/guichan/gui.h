@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_GUI_HPP
-#define GCN_GUI_HPP
+#pragma once
 
 #include "guichan/input.h"
 #include "guichan/platform.h"
@@ -189,8 +188,6 @@ namespace gcn
 		bool mUseDirtyDrawing;
     };
 }
-
-#endif // end GCN_GUI_HPP
 
 /* yakslem  - "Women, it's a constant struggle."
  * finalman - "Yes, but sometimes they succeed with their guesses."

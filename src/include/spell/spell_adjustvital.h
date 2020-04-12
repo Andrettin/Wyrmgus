@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_ADJUSTVITAL_H
-#define SPELL_ADJUSTVITAL_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -53,5 +52,3 @@ private:
 	/// can scale up to MaxMultiCast times. Use 0 for infinite.
 	int MaxMultiCast;
 };
-
-#endif

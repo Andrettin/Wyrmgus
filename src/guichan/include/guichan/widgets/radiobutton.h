@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_RADIOBUTTON_HPP
-#define GCN_RADIOBUTTON_HPP
+#pragma once
 
 #include "guichan/keylistener.h"
 #include "guichan/mouselistener.h"
@@ -176,5 +175,3 @@ namespace gcn
         static GroupMap mGroupMap;
     };
 }
-
-#endif // end GCN_RADIOBUTTON_HPP

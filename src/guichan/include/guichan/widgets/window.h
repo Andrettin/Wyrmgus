@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_WINDOW_HPP
-#define GCN_WINDOW_HPP
+#pragma once
 
 #include <string>
 
@@ -269,5 +268,3 @@ namespace gcn
         bool mOpaque;
     };
 }
-
-#endif // end GCN_WINDOW_HPP

@@ -26,8 +26,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_LUACALLBACK_H
-#define SPELL_LUACALLBACK_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -50,5 +49,3 @@ public:
 private:
 	LuaCallback *Func;
 };
-
-#endif

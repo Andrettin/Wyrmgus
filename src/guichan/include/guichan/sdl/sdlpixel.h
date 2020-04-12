@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_SDLPIXEL_HPP
-#define GCN_SDLPIXEL_HPP
+#pragma once
 
 #include "SDL.h"
 
@@ -257,5 +256,3 @@ namespace gcn
         SDL_UnlockSurface(surface);
     }
 }
-
-#endif // end GCN_SDLPIXEL_HPP

@@ -52,10 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_X_HPP
-#define GCN_X_HPP
+#pragma once
 
 #include <guichan/x/xgraphics.h>
 #include <guichan/x/ximage.h>
-
-#endif // end GCN_X_HPP

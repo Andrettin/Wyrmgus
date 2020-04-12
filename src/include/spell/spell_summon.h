@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_SUMMON_H
-#define SPELL_SUMMON_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -52,5 +51,3 @@ private:
 	int RequireCorpse;      /// Corpse consumed while summoning.
 	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available
 };
-
-#endif

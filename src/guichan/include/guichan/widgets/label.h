@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_LABEL_HPP
-#define GCN_LABEL_HPP
+#pragma once
 
 #include "guichan/platform.h"
 #include "guichan/widget.h"
@@ -124,5 +123,3 @@ namespace gcn
         unsigned int mAlignment;
     };
 }
-
-#endif // end GCN_LABEL_HPP

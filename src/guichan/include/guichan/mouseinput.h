@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_MOUSEINPUT_HPP
-#define GCN_MOUSEINPUT_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -150,5 +149,3 @@ namespace gcn
         int mTimeStamp;
     };
 }
-
-#endif // end GCN_MOUSEINPUT_HPP

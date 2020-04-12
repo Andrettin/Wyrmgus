@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_CONTAINER_HPP
-#define GCN_CONTAINER_HPP
+#pragma once
 
 #include "guichan/basiccontainer.h"
 #include "guichan/graphics.h"
@@ -193,5 +192,3 @@ namespace gcn
         bool mOpaque;
     };
 }
-
-#endif // end GCN_CONTAINER_HPP

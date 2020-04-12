@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMROTATE_H
-#define ANIMATION_RANDOMROTATE_H
+#pragma once
 
 #include "animation.h"
 
@@ -43,5 +42,3 @@ public:
 private:
 	std::string rotateStr;
 };
-
-#endif // ANIMATION_RANDOMROTATE_H

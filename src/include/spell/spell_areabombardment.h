@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_AREABOMBARDMENT_H
-#define SPELL_AREABOMBARDMENT_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -54,5 +53,3 @@ private:
 	int StartOffsetY;       /// The offset of the missile start point to the hit location.
 	MissileType *Missile;   /// Missile fired on cast
 };
-
-#endif

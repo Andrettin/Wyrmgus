@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_COLOR_HPP
-#define GCN_COLOR_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -159,5 +158,3 @@ namespace gcn
         int a;
     };
 }
-
-#endif // end GCN_COLOR_HPP

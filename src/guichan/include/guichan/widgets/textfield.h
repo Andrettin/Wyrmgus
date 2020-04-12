@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_TEXTFIELD_HPP
-#define GCN_TEXTFIELD_HPP
+#pragma once
 
 #include "guichan/platform.h"
 #include "guichan/widget.h"
@@ -168,5 +167,3 @@ namespace gcn
 		int mSelectEndOffset;
     };
 }
-
-#endif // end GCN_TEXTFIELD_HPP

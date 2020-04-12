@@ -26,8 +26,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_TELEPORT_H
-#define SPELL_TELEPORT_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -44,5 +43,3 @@ public:
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 };
-
-#endif

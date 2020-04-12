@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_INPUT_HPP
-#define GCN_INPUT_HPP
+#pragma once
 
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
@@ -114,5 +113,3 @@ namespace gcn
         virtual void _pollInput() = 0;
     };
 }
-
-#endif // end GCN_INPUT_HPP

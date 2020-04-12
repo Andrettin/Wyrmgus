@@ -27,13 +27,9 @@
 //      02111-1307, USA.
 //
 
-#ifndef UNIT_PTR_H
-#define UNIT_PTR_H
-
-//@{
+#pragma once
 
 class CUnit;
-
 
 /**
 **  Class to ease the ref counting of each CUnit instance.
@@ -62,7 +58,3 @@ public:
 private:
 	CUnit *unit;
 };
-
-//@}
-
-#endif // UNIT_PTR_H

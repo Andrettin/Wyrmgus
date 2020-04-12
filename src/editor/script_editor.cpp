@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -92,5 +90,3 @@ void EditorCclRegister()
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
 }
-
-//@}

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_KEY_HPP
-#define GCN_KEY_HPP
+#pragma once
 
 #include "guichan/platform.h"
 
@@ -249,5 +248,3 @@ namespace gcn
         bool mNumericPad;
     };
 }
-
-#endif // end GCN_KEY_HPP

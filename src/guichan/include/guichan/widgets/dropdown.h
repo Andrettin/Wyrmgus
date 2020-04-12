@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_DROPDOWN_HPP
-#define GCN_DROPDOWN_HPP
+#pragma once
 
 #include "guichan/basiccontainer.h"
 #include "guichan/focushandler.h"
@@ -254,5 +253,3 @@ namespace gcn
         FocusHandler mFocusHandler;
     };
 }
-
-#endif // end GCN_DROPDOWN_HPP

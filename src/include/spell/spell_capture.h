@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_CAPTURE_H
-#define SPELL_CAPTURE_H
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -52,5 +51,3 @@ private:
 	int DamagePercent;    /// percent the target must be damaged for a
 	/// capture to succeed.
 };
-
-#endif

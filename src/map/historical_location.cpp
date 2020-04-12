@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -96,5 +94,3 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 		fprintf(stderr, "Historical location has no map template.\n");
 	}
 }
-
-//@}

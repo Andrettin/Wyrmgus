@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_TEXTBOX_HPP
-#define GCN_TEXTBOX_HPP
+#pragma once
 
 #include "guichan/platform.h"
 #include "guichan/widget.h"
@@ -251,5 +250,3 @@ namespace gcn
         bool mOpaque;
     };
 }
-
-#endif // end GCN_TEXTBOX_HPP

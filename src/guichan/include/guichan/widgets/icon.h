@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_ICON_HPP
-#define GCN_ICON_HPP
+#pragma once
 
 #include "guichan/image.h"
 #include "guichan/platform.h"
@@ -87,5 +86,3 @@ namespace gcn
         Image* mImage;
     };
 }
-
-#endif // end GCN_ICON_HPP

@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_FRAME_H
-#define ANIMATION_FRAME_H
+#pragma once
 
 #include "animation.h"
 
@@ -44,5 +43,3 @@ public:
 private:
 	std::string frame;
 };
-
-#endif // ANIMATION_FRAME_H

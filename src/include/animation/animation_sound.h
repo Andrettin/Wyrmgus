@@ -27,10 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SOUND_H
-#define ANIMATION_SOUND_H
-
-//@{
+#pragma once
 
 #include "animation.h"
 #include "sound/unitsound.h"
@@ -48,7 +45,3 @@ public:
 private:
 	SoundConfig sound;
 };
-
-//@}
-
-#endif // ANIMATION_SOUND_H

@@ -52,8 +52,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCN_SDL_HPP
-#define GCN_SDL_HPP
+#pragma once
 
 #include <guichan/sdl/sdlgraphics.h>
 #ifdef USE_SDL_IMAGE
@@ -70,5 +69,3 @@ extern "C"
      */
     GCN_EXTENSION_DECLSPEC extern void gcnSDL();
 }
-
-#endif // end GCN_SDL_HPP

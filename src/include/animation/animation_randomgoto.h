@@ -27,8 +27,7 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMGOTO_H
-#define ANIMATION_RANDOMGOTO_H
+#pragma once
 
 #include "animation.h"
 
@@ -44,5 +43,3 @@ private:
 	std::string randomStr;
 	CAnimation *gotoLabel;
 };
-
-#endif // ANIMATION_RANDOMGOTO_H
