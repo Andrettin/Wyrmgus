@@ -613,15 +613,15 @@ set(stratagus_database_HDRS
 )
 
 set(stratagus_map_HDRS
-	src/include/map/historical_location.h
-	src/include/map/map.h
-	src/include/map/map_layer.h
-	src/include/map/map_template.h
-	src/include/map/minimap.h
-	src/include/map/site.h
-	src/include/map/terrain_type.h
-	src/include/map/tile.h
-	src/include/map/tileset.h
+	src/map/historical_location.h
+	src/map/map.h
+	src/map/map_layer.h
+	src/map/map_template.h
+	src/map/minimap.h
+	src/map/site.h
+	src/map/terrain_type.h
+	src/map/tile.h
+	src/map/tileset.h
 )
 
 set(stratagus_religion_HDRS
@@ -789,7 +789,7 @@ source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
-source_group(include\\map FILES ${stratagus_map_HDRS})
+source_group(map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(sound FILES ${stratagus_sound_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
