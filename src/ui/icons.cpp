@@ -64,6 +64,8 @@ void CIcon::initialize()
 		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size.width(), icon_size.height());
 	}
 
+	this->load();
+
 	data_entry::initialize();
 }
 
@@ -125,18 +127,8 @@ void CIcon::set_file(const std::filesystem::path &filepath)
 	this->file = stratagus::database::get_graphics_path(this->get_module()) / filepath;
 }
 
-void CIcon::Load()
+void CIcon::load()
 {
-	if (!this->is_initialized()) {
-		this->initialize();
-	}
-
-	//Wyrmgus start
-	if (this->Loaded) {
-		return;
-	}
-	//Wyrmgus end
-
 	if (this->G == nullptr) {
 		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
 	}
@@ -149,9 +141,6 @@ void CIcon::Load()
 		DebugPrint("Invalid icon frame: %s - %d\n" _C_ this->get_identifier().c_str() _C_ this->get_frame());
 		this->frame = 0;
 	}
-	//Wyrmgus start
-	this->Loaded = true;
-	//Wyrmgus end
 }
 
 /**
@@ -379,27 +368,4 @@ bool IconConfig::Load()
 		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
 	}
 	return res;
-}
-
-/**
-**  Get the numbers of icons.
-*/
-int GetIconsCount()
-{
-	return CIcon::get_all().size();
-}
-
-/**
-**  Load the graphics for the icons.
-*/
-void LoadIcons()
-{
-	ShowLoadProgress("%s", _("Loading Icons"));
-		
-	for (CIcon *icon : CIcon::get_all()) {
-		UpdateLoadProgress();
-		icon->Load();
-
-		IncItemsLoaded();
-	}
 }

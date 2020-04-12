@@ -217,7 +217,6 @@ void InitModules()
 void LoadModules()
 {
 	LoadFonts();
-	LoadIcons();
 	//Wyrmgus start
 //	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
 	LoadCursors();

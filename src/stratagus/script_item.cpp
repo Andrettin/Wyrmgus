@@ -89,7 +89,6 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->Icon.Name = LuaToString(l, -1);
 			item->Icon.Icon = nullptr;
 			item->Icon.Load();
-			item->Icon.Icon->Load();
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(affix_ident);

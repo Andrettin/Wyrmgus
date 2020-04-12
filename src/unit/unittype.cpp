@@ -733,7 +733,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
-			this->Icon.Icon->Load();
 		} else if (key == "tile_width") {
 			this->TileSize.x = std::stoi(value);
 		} else if (key == "tile_height") {
@@ -1564,7 +1563,6 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			variation->ButtonIcons[iterator->first].Name = iterator->second.Name;
 			variation->ButtonIcons[iterator->first].Icon = nullptr;
 			variation->ButtonIcons[iterator->first].Load();
-			variation->ButtonIcons[iterator->first].Icon->Load();
 		}
 	}
 	
@@ -1603,7 +1601,6 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		this->ButtonIcons[iterator->first].Name = iterator->second.Name;
 		this->ButtonIcons[iterator->first].Icon = nullptr;
 		this->ButtonIcons[iterator->first].Load();
-		this->ButtonIcons[iterator->first].Icon->Load();
 	}
 	for (std::map<int, CUnitType *>::iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
 		this->DefaultEquipment[iterator->first] = iterator->second;

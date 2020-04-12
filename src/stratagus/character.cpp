@@ -305,13 +305,11 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
-			this->Icon.Icon->Load();
 		} else if (key == "heroic_icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->HeroicIcon.Name = value;
 			this->HeroicIcon.Icon = nullptr;
 			this->HeroicIcon.Load();
-			this->HeroicIcon.Icon->Load();
 		} else if (key == "forbidden_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = UnitTypeByIdent(value);

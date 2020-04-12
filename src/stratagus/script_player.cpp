@@ -1718,7 +1718,6 @@ static int CclDefineFaction(lua_State *l)
 			faction->Icon.Name = LuaToString(l, -1);
 			faction->Icon.Icon = nullptr;
 			faction->Icon.Load();
-			faction->Icon.Icon->Load();
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			faction->Currency = currency;
@@ -2105,7 +2104,6 @@ static int CclDefineDynasty(lua_State *l)
 			dynasty->Icon.Name = LuaToString(l, -1);
 			dynasty->Icon.Icon = nullptr;
 			dynasty->Icon.Load();
-			dynasty->Icon.Icon->Load();
 		} else if (!strcmp(value, "Factions")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2229,7 +2227,6 @@ static int CclDefineDeity(lua_State *l)
 			deity->Icon.Name = LuaToString(l, -1);
 			deity->Icon.Icon = nullptr;
 			deity->Icon.Load();
-			deity->Icon.Icon->Load();
 		} else if (!strcmp(value, "Civilizations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");

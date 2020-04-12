@@ -111,7 +111,6 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
-			this->Icon.Icon->Load();
 		} else if (key == "animations") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Animations = AnimationsByIdent(value);
@@ -319,7 +318,6 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->ButtonIcons[button_action].Name = icon_ident;
 			this->ButtonIcons[button_action].Icon = nullptr;
 			this->ButtonIcons[button_action].Load();
-			this->ButtonIcons[button_action].Icon->Load();
 		} else {
 			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

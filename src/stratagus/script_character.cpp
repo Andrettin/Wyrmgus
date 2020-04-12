@@ -237,12 +237,10 @@ static int CclDefineCharacter(lua_State *l)
 			character->Icon.Name = LuaToString(l, -1);
 			character->Icon.Icon = nullptr;
 			character->Icon.Load();
-			character->Icon.Icon->Load();
 		} else if (!strcmp(value, "HeroicIcon")) {
 			character->HeroicIcon.Name = LuaToString(l, -1);
 			character->HeroicIcon.Icon = nullptr;
 			character->HeroicIcon.Load();
-			character->HeroicIcon.Icon->Load();
 		} else if (!strcmp(value, "Level")) {
 			character->Level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -828,12 +826,10 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->Icon.Name = LuaToString(l, -1);
 			hero->Icon.Icon = nullptr;
 			hero->Icon.Load();
-			hero->Icon.Icon->Load();
 		} else if (!strcmp(value, "HeroicIcon")) {
 			hero->HeroicIcon.Name = LuaToString(l, -1);
 			hero->HeroicIcon.Icon = nullptr;
 			hero->HeroicIcon.Load();
-			hero->HeroicIcon.Icon->Load();
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

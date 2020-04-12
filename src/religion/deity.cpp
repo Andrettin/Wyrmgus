@@ -180,7 +180,6 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
-			this->Icon.Icon->Load();
 		} else if (key == "home_plane") {
 			value = FindAndReplaceString(value, "_", "-");
 			CPlane *plane = CPlane::GetPlane(value);

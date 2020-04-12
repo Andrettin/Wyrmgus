@@ -141,7 +141,6 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
-			this->Icon.Icon->Load();
 		} else if (key == "character") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CCharacter *character = CCharacter::GetCharacter(value);

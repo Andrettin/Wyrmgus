@@ -52,9 +52,8 @@
 **
 **  CIcon::G
 **
-**    Graphic image containing the loaded graphics. Loaded by
-**    LoadIcons(). All icons belonging to the same icon file shares
-**    this structure.
+**    Graphic image containing the loaded graphics. All icons
+**    belonging to the same icon file shares this structure.
 **
 **  CIcon::Frame
 **
@@ -158,8 +157,6 @@ public:
 		return this->frame;
 	}
 
-	void Load();
-
 	/// Draw icon
 	void DrawIcon(const PixelPos &pos, const int player = -1) const;
 	/// Draw grayscale icon
@@ -173,16 +170,15 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
+private:
+	void load();
+
 public:
 	CPlayerColorGraphic *G = nullptr; //graphic data
 	CPlayerColorGraphic *GScale = nullptr; //icon when drawn grayscaled
 private:
 	std::filesystem::path file;
 	int frame = 0; //frame number in the icon's image
-public:
-	//Wyrmgus start
-	bool Loaded = false;
-	//Wyrmgus end
 
 	friend int CclDefineIcon(lua_State *l);
 };
@@ -199,10 +195,3 @@ public:
 	std::string Name;    /// config icon name
 	CIcon *Icon;         /// icon pointer to use to run time
 };
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern void LoadIcons();   /// Load icons
-extern int  GetIconsCount();

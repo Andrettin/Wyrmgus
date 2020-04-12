@@ -404,11 +404,6 @@ void CUpgrade::initialize()
 		}
 	}
 
-	//load icon here
-	if (this->get_icon() != nullptr && !this->get_icon()->Loaded) {
-		this->get_icon()->Load();
-	}
-
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 
 	data_entry::initialize();
@@ -784,11 +779,6 @@ static int CclDefineUpgrade(lua_State *l)
 		if (upgrade->IncompatibleAffixes[other_upgrade->ID]) {
 			other_upgrade->IncompatibleAffixes[upgrade->ID] = true;
 		}
-	}
-	
-	//load icon here
-	if (upgrade->get_icon() != nullptr && !upgrade->get_icon()->Loaded) {
-		upgrade->get_icon()->Load();
 	}
 	
 	return 0;

@@ -141,7 +141,6 @@ static int CclDefineQuest(lua_State *l)
 			quest->Icon.Name = LuaToString(l, -1);
 			quest->Icon.Icon = nullptr;
 			quest->Icon.Load();
-			quest->Icon.Icon->Load();
 		} else if (!strcmp(value, "QuestGiver")) {
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
 			CCharacter *quest_giver = CCharacter::GetCharacter(quest_giver_name);
@@ -624,7 +623,6 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Name = LuaToString(l, -1);
 			achievement->Icon.Icon = nullptr;
 			achievement->Icon.Load();
-			achievement->Icon.Icon->Load();
 		} else if (!strcmp(value, "Character")) {
 			std::string character_name = LuaToString(l, -1);
 			CCharacter *character = CCharacter::GetCharacter(character_name);

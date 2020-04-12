@@ -1523,7 +1523,6 @@ void CalculateItemsToLoad()
 	}
 	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
-		itemsToLoad += GetIconsCount();
 		if (CPlayer::GetThisPlayer()) {
 			itemsToLoad+= GetCursorsCount(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier());
 		}
@@ -1785,7 +1784,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	// Graphic part
 	//
 	SetPlayersPalette();
-	LoadIcons();
 
 	//Wyrmgus start
 //	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);

@@ -793,14 +793,12 @@ static int CclDefineUnitType(lua_State *l)
 						variation->Icon.Name = LuaToString(l, -1, k + 1);
 						variation->Icon.Icon = nullptr;
 						variation->Icon.Load();
-						variation->Icon.Icon->Load();
 					} else if (!strcmp(value, "button-icon")) {
 						const ButtonCmd button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 						++k;
 						variation->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
 						variation->ButtonIcons[button_action].Icon = nullptr;
 						variation->ButtonIcons[button_action].Load();
-						variation->ButtonIcons[button_action].Icon->Load();
 					} else if (!strcmp(value, "animations")) {
 						variation->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
 						if (!variation->Animations) {
@@ -1013,7 +1011,6 @@ static int CclDefineUnitType(lua_State *l)
 					type->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
 					type->ButtonIcons[button_action].Icon = nullptr;
 					type->ButtonIcons[button_action].Load();
-					type->ButtonIcons[button_action].Icon->Load();
 				}
 				lua_pop(l, 1);
 			}
@@ -1053,7 +1050,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->Icon.Icon = nullptr;
 			//Wyrmgus start
 			type->Icon.Load();
-			type->Icon.Icon->Load();
 			//Wyrmgus end
 #ifdef USE_MNG
 		} else if (!strcmp(value, "Portrait")) {
