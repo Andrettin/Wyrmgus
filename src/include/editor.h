@@ -27,14 +27,13 @@
 //      02111-1307, USA.
 //
 
-#ifndef __EDITOR_H__
-#define __EDITOR_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icons.h"
+#include "ui/icon.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -154,9 +153,6 @@ extern void EditorTileChanged(const Vec2i &pos, int tile);
 extern void EditorChangeTile(const Vec2i &pos, int tileIndex);
 //Wyrmgus end
 
-
 //Wyrmgus start
 extern void RecalculateShownUnits();
 //Wyrmgus end
-
-#endif // !__EDITOR_H__

@@ -31,7 +31,7 @@
 
 #include "stratagus.h"
 
-#include "icons.h"
+#include "ui/icon.h"
 
 #include "config.h"
 #include "database/defines.h"

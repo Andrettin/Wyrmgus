@@ -27,14 +27,13 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNIT_TYPE_VARIATION_H__
-#define __UNIT_TYPE_VARIATION_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icons.h"
+#include "ui/icon.h"
 #include "unit/unittype.h" //for the image layers enum
 #include "upgrade/upgrade_structs.h" //for the costs enum
 
@@ -103,5 +102,3 @@ public:
 	
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
 };
-
-#endif

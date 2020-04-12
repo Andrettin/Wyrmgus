@@ -27,15 +27,14 @@
 //      02111-1307, USA.
 //
 
-#ifndef __INTERFACE_H__
-#define __INTERFACE_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icons.h"
 #include "sound/unitsound.h"
+#include "ui/icon.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -427,5 +426,3 @@ extern bool GetGamePaused();
 extern void SetGameSpeed(int speed);
 /// Get the game speed
 extern int GetGameSpeed();
-
-#endif // !__INTERFACE_H__

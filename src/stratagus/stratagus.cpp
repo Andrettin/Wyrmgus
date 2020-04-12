@@ -137,7 +137,7 @@
 **
 ** @subsection Icon Icon
 **
-** @see icons.h @see icons.cpp
+** @see icon.h @see icon.cpp
 **
 ** @subsection Editor Editor
 **

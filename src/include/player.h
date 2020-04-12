@@ -37,12 +37,12 @@
 #include "character.h" // because of "MaxCharacterTitles"
 #include "color.h"
 //Wyrmgus end
-#include "icons.h"
 //Wyrmgus start
 #include "item.h"
 #include "time/date.h"
 //Wyrmgus end
 #include "ui/button_cmd.h"
+#include "ui/icon.h"
 //Wyrmgus start
 #include "ui/ui.h" // for the UI fillers
 //Wyrmgus end

@@ -36,9 +36,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class CIcon icons.h
+**  @class CIcon icon.h
 **
-**  \#include "icons.h"
+**  \#include "icon.h"
 **
 **  This structure contains all information about an icon.
 **
@@ -61,9 +61,9 @@
 */
 
 /**
-**  @class IconConfig icons.h
+**  @class IconConfig icon.h
 **
-**  \#include "icons.h"
+**  \#include "icon.h"
 **
 **  This structure contains all configuration information about an icon.
 **
@@ -192,6 +192,6 @@ public:
 	bool LoadNoLog();
 	bool Load();
 public:
-	std::string Name;    /// config icon name
-	CIcon *Icon;         /// icon pointer to use to run time
+	std::string Name; //config icon name
+	CIcon *Icon = nullptr; //icon pointer to use to run time
 };

@@ -28,7 +28,7 @@
 #pragma once
 
 #include "data_type.h"
-#include "icons.h"
+#include "ui/icon.h"
 
 class CCharacter;
 class CQuest;

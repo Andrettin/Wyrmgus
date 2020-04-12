@@ -40,8 +40,8 @@
 #include "database/sml_operator.h"
 #include "database/sml_parser.h"
 #include "database/sml_property.h"
-#include "icons.h"
 #include "sound/sound.h"
+#include "ui/icon.h"
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
 

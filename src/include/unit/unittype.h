@@ -35,10 +35,10 @@
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"
 #include "data_type.h"
-#include "icons.h"
 #include "missileconfig.h"
 #include "sound/unitsound.h"
 #include "ui/button_cmd.h"
+#include "ui/icon.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 

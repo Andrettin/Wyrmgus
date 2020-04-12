@@ -27,16 +27,15 @@
 //      02111-1307, USA.
 //
 
-#ifndef __BUTTON_ACTION_H__
-#define __BUTTON_ACTION_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icons.h"
 #include "sound/unitsound.h"
 #include "ui/button_cmd.h"
+#include "ui/icon.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -129,5 +128,3 @@ extern int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &butto
 extern std::string GetButtonActionNameById(const ButtonCmd button_action);
 extern ButtonCmd GetButtonActionIdByName(const std::string &button_action);
 extern bool IsNeutralUsableButtonAction(const ButtonCmd button_action);
-
-#endif // !__BUTTON_ACTION_H__

@@ -27,14 +27,13 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ITEM_H__
-#define __ITEM_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icons.h"
+#include "ui/icon.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -170,5 +169,3 @@ extern CUniqueItem *GetUniqueItem(const std::string &item_ident);
 extern std::string GetItemEffectsString(const std::string &item_ident);
 extern std::string GetUniqueItemEffectsString(const std::string &item_ident);
 extern void ItemCclRegister();
-
-#endif // !__ITEM_H__

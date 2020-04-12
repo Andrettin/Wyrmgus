@@ -27,17 +27,16 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CHARACTER_H__
-#define __CHARACTER_H__
+#pragma once
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "icons.h"
 #include "item.h"
 #include "time/date.h"
+#include "ui/icon.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -231,5 +230,3 @@ extern std::string GetCharacterTitleNameById(int title);
 extern int GetCharacterTitleIdByName(const std::string &title);
 extern bool IsMinisterialTitle(int title);
 extern void CharacterCclRegister();
-
-#endif
