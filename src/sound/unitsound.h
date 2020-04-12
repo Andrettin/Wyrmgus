@@ -34,13 +34,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "animation.h" //for the ANIMATIONS_DEATHTYPES constant
 #include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-
-#define ANIMATIONS_DEATHTYPES 40
 
 namespace stratagus {
 	class sound;

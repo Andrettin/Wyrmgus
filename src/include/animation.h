@@ -32,7 +32,7 @@
 #include "data_type.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 
-#define ANIMATIONS_DEATHTYPES 40
+static constexpr int ANIMATIONS_DEATHTYPES = 40;
 
 class CFile;
 class CUnit;
