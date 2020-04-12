@@ -131,7 +131,8 @@ public:
 	database();
 	~database();
 
-	void load();
+	void parse();
+	void load(const bool initial_definition);
 	void initialize();
 	void clear();
 	void register_metadata(std::unique_ptr<data_type_metadata> &&metadata);

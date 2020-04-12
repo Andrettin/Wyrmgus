@@ -298,19 +298,8 @@ database::~database()
 {
 }
 
-void database::load()
+void database::parse()
 {
-	//sort the metadata instances so they are placed after their class' dependencies' metadata
-	std::sort(this->metadata.begin(), this->metadata.end(), [](const std::unique_ptr<data_type_metadata> &a, const std::unique_ptr<data_type_metadata> &b) {
-		if (a->has_database_dependency_on(b)) {
-			return false;
-		} else if (b->has_database_dependency_on(a)) {
-			return true;
-		}
-
-		return a->get_database_dependency_count() < b->get_database_dependency_count();
-	});
-
 	for (const auto &kv_pair : database::get()->get_data_paths_with_module()) {
 		const std::filesystem::path &path = kv_pair.first;
 		const module *module = kv_pair.second;
@@ -319,18 +308,38 @@ void database::load()
 		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
 			metadata->get_parsing_function()(path, module);
 		}
+	}
+}
 
-		try {
-			//create data entries for each data type
-			for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-				metadata->get_processing_function()(true);
+void database::load(const bool initial_definition)
+{
+	if (initial_definition) {
+		//sort the metadata instances so they are placed after their class' dependencies' metadata
+		std::sort(this->metadata.begin(), this->metadata.end(), [](const std::unique_ptr<data_type_metadata> &a, const std::unique_ptr<data_type_metadata> &b) {
+			if (a->has_database_dependency_on(b)) {
+				return false;
+			} else if (b->has_database_dependency_on(a)) {
+				return true;
 			}
 
-			defines::get()->load(path); //load the defines here so that they can refer to data entries
+			return a->get_database_dependency_count() < b->get_database_dependency_count();
+		});
 
-			//actually define the data entries for each data type
+		this->parse();
+	}
+
+	for (const auto &kv_pair : database::get()->get_data_paths_with_module()) {
+		const std::filesystem::path &path = kv_pair.first;
+		const module *module = kv_pair.second;
+
+		try {
+			if (!initial_definition) {
+				defines::get()->load(path); //load the defines after initial definition so that they can refer to data entries
+			}
+
+			//create or process data entries for each data type
 			for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-				metadata->get_processing_function()(false);
+				metadata->get_processing_function()(initial_definition);
 			}
 		} catch (...) {
 			if (module != nullptr) {

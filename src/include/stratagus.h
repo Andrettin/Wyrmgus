@@ -246,5 +246,5 @@ extern int GetDirectionFromOffset(int x, int y);
 extern Vec2i GetDirectionOffset(int direction);
 //Wyrmgus end
 
-extern void load_database();
+extern void load_database(const bool initial_definition);
 extern void initialize_database();

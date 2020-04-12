@@ -929,10 +929,10 @@ Vec2i GetDirectionOffset(int direction)
 }
 //Wyrmgus end
 
-void load_database()
+void load_database(const bool initial_definition)
 {
 	try {
-		stratagus::database::get()->load();
+		stratagus::database::get()->load(initial_definition);
 	} catch (const std::exception &exception) {
 		stratagus::exception::report(exception);
 		exit(-1);
