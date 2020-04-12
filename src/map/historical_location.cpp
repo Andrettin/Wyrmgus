@@ -63,8 +63,7 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->Date = CDate::FromString(value);
 		} else if (key == "map_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->MapTemplate = CMapTemplate::GetMapTemplate(value);
+			this->MapTemplate = CMapTemplate::get(value);
 			if (!this->MapTemplate) {
 				fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
 			}

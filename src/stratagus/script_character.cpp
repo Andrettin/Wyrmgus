@@ -463,7 +463,7 @@ static int CclDefineCharacter(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				historical_location->MapTemplate = CMapTemplate::GetMapTemplate(LuaToString(l, -1, j + 1));
+				historical_location->MapTemplate = CMapTemplate::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);

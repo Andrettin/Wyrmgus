@@ -509,8 +509,6 @@ extern void PreprocessMap();
 
 //Wyrmgus start
 extern int GetMapLayer(const std::string &plane_ident = "", const std::string &world_ident = "", const int surface_layer = 0);
-extern int GetSubtemplateStartX(const std::string &subtemplate_ident);
-extern int GetSubtemplateStartY(const std::string &subtemplate_ident);
 extern void ChangeToPreviousMapLayer();
 extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(const std::string &time_of_day_ident, int z = 0);

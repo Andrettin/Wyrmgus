@@ -1116,46 +1116,6 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, 
 	return -1;
 }
 
-int GetSubtemplateStartX(const std::string &subtemplate_ident)
-{
-	CMapTemplate *subtemplate = CMapTemplate::GetMapTemplate(subtemplate_ident);
-	
-	if (!subtemplate) {
-		return -1;
-	}
-
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
-			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
-				return min_pos.x;
-			}
-		}
-	}
-
-	return -1;
-}
-
-int GetSubtemplateStartY(const std::string &subtemplate_ident)
-{
-	CMapTemplate *subtemplate = CMapTemplate::GetMapTemplate(subtemplate_ident);
-	
-	if (!subtemplate) {
-		return -1;
-	}
-
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
-			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
-				return min_pos.y;
-			}
-		}
-	}
-
-	return -1;
-}
-
 /**
 **	@brief	Change the map layer currently being displayed to the previous one
 */

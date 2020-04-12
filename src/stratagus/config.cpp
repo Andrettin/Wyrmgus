@@ -310,7 +310,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				icon->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "map_template") {
-			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(ident);
+			CMapTemplate *map_template = CMapTemplate::get_or_add(ident, nullptr);
 			if (!define_only) {
 				map_template->ProcessConfigData(config_data);
 			}

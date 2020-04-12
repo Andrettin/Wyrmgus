@@ -67,9 +67,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CMapTemplate *> CMapTemplate::MapTemplates;
-std::map<std::string, CMapTemplate *> CMapTemplate::MapTemplatesByIdent;
-const int MaxAdjacentTemplateDistance = 16;
+static constexpr int MaxAdjacentTemplateDistance = 16;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -83,61 +81,6 @@ CMapTemplate::~CMapTemplate()
 	for (CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 		delete generated_terrain;
 	}
-}
-
-/**
-**	@brief	Get a map template
-**
-**	@param	ident			The map template's string identifier
-**	@param	should_find		Whether it is an error if the map template could not be found; this is true by default
-**
-**	@return	The map template if found, or null otherwise
-*/
-CMapTemplate *CMapTemplate::GetMapTemplate(const std::string &ident)
-{
-	if (ident.empty()) {
-		return nullptr;
-	}
-	
-	std::map<std::string, CMapTemplate *>::const_iterator find_iterator = MapTemplatesByIdent.find(ident);
-	
-	if (find_iterator != MapTemplatesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a map template
-**
-**	@param	ident	The map template's string identifier
-**
-**	@return	The map template if found, or a newly-created one otherwise
-*/
-CMapTemplate *CMapTemplate::GetOrAddMapTemplate(const std::string &ident)
-{
-	CMapTemplate *map_template = GetMapTemplate(ident);
-	
-	if (!map_template) {
-		map_template = new CMapTemplate;
-		map_template->Ident = ident;
-		MapTemplates.push_back(map_template);
-		MapTemplatesByIdent[ident] = map_template;
-	}
-	
-	return map_template;
-}
-
-/**
-**	@brief	Remove the existing map templates
-*/
-void CMapTemplate::ClearMapTemplates()
-{
-	for (size_t i = 0; i < MapTemplates.size(); ++i) {
-		delete MapTemplates[i];
-	}
-	MapTemplates.clear();
 }
 
 /**
@@ -204,8 +147,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "max_y") {
 			this->MaxPos.y = std::stoi(value);
 		} else if (key == "main_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *main_template = CMapTemplate::GetMapTemplate(value);
+			CMapTemplate *main_template = CMapTemplate::get(value);
 			this->MainTemplate = main_template;
 			main_template->Subtemplates.push_back(this);
 			if (main_template->Plane) {
@@ -216,22 +158,19 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			}
 			this->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (key == "upper_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *upper_template = CMapTemplate::GetMapTemplate(value);
+			CMapTemplate *upper_template = CMapTemplate::get(value);
 			if (upper_template) {
 				this->UpperTemplate = upper_template;
 				upper_template->LowerTemplate = this;
 			}
 		} else if (key == "lower_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *lower_template = CMapTemplate::GetMapTemplate(value);
+			CMapTemplate *lower_template = CMapTemplate::get(value);
 			if (lower_template) {
 				this->LowerTemplate = lower_template;
 				lower_template->UpperTemplate = this;
 			}
 		} else if (key == "adjacent_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *adjacent_template = CMapTemplate::GetMapTemplate(value);
+			CMapTemplate *adjacent_template = CMapTemplate::get(value);
 			if (adjacent_template) {
 				this->AdjacentTemplates.push_back(adjacent_template);
 				if (std::find(adjacent_template->AdjacentTemplates.begin(), adjacent_template->AdjacentTemplates.end(), this) == adjacent_template->AdjacentTemplates.end()) {
