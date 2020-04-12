@@ -35,6 +35,7 @@
 
 #include "character.h"
 
+#include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "grand_strategy.h"
 #include "map/historical_location.h"
@@ -49,12 +50,6 @@
 #include "time/timeline.h"
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
-
-#include "../ai/ai_local.h" //for using AiHelpers
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

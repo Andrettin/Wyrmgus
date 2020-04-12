@@ -38,6 +38,9 @@
 
 #include "action/action_built.h"
 #include "ai.h"
+//Wyrmgus start
+#include "ai/ai_local.h"
+//Wyrmgus end
 #include "animation.h"
 //Wyrmgus start
 #include "character.h"
@@ -60,10 +63,6 @@
 #include "unit/unittype.h"
 #include "unit/unit_type_type.h"
 #include "video.h"
-
-//Wyrmgus start
-#include "../ai/ai_local.h"
-//Wyrmgus end
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);

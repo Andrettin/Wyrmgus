@@ -35,8 +35,7 @@
 
 #include "animation/animation_spawnunit.h"
 
-#include "../ai/ai_local.h"
-
+#include "ai/ai_local.h"
 #include "commands.h"
 #include "map/map.h"
 #include "map/map_layer.h"

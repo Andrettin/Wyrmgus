@@ -36,6 +36,7 @@
 #include "action/action_resource.h"
 
 #include "ai.h"
+#include "ai/ai_local.h"
 #include "animation.h"
 //Wyrmgus start
 #include "commands.h"
@@ -62,21 +63,19 @@
 #include "unit/unit_type_type.h"
 #include "video.h"
 
-#include "../ai/ai_local.h"
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define SUB_START_RESOURCE 0
-#define SUB_MOVE_TO_RESOURCE 5
-#define SUB_UNREACHABLE_RESOURCE 31
-#define SUB_START_GATHERING 55
-#define SUB_GATHER_RESOURCE 60
-#define SUB_STOP_GATHERING 65
-#define SUB_MOVE_TO_DEPOT 70
-#define SUB_UNREACHABLE_DEPOT 100
-#define SUB_RETURN_RESOURCE 120
+static constexpr int SUB_START_RESOURCE = 0;
+static constexpr int SUB_MOVE_TO_RESOURCE = 5;
+static constexpr int SUB_UNREACHABLE_RESOURCE = 31;
+static constexpr int SUB_START_GATHERING = 55;
+static constexpr int SUB_GATHER_RESOURCE = 60;
+static constexpr int SUB_STOP_GATHERING = 65;
+static constexpr int SUB_MOVE_TO_DEPOT = 70;
+static constexpr int SUB_UNREACHABLE_DEPOT = 100;
+static constexpr int SUB_RETURN_RESOURCE = 120;
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -36,6 +36,9 @@
 #include "unit/unit.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "ai/ai_local.h"
+//Wyrmgus end
 #include "animation.h"
 #include "commands.h"
 #include "construct.h"
@@ -62,14 +65,6 @@
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
-
-//Wyrmgus start
-#include "../ai/ai_local.h"
-//Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

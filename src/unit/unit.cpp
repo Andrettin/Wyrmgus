@@ -42,7 +42,7 @@
 #include "actions.h"
 #include "ai.h"
 //Wyrmgus start
-#include "../ai/ai_local.h" //for using AiHelpers
+#include "ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end
 #include "animation.h"
 #include "character.h"
