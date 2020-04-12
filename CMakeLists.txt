@@ -370,7 +370,7 @@ set(ui_SRCS
 	src/ui/button_checks.cpp
 	src/ui/button_level.cpp
 	src/ui/contenttype.cpp
-	src/ui/icons.cpp
+	src/ui/icon.cpp
 	src/ui/interface.cpp
 	src/ui/mainscr.cpp
 	src/ui/uibuttons_proc.cpp
@@ -670,6 +670,7 @@ set(stratagus_ui_HDRS
 	src/ui/button_cmd.h
 	src/include/ui/button_level.h
 	src/include/ui/contenttype.h
+	src/ui/icon.h
 	src/include/ui/interface.h
 	src/include/ui/popup.h
 	src/include/ui/statusline.h
@@ -735,7 +736,6 @@ set(stratagus_generic_HDRS
 	src/include/font.h
 	src/include/game.h
 	src/include/grand_strategy.h
-	src/include/icons.h
 	src/include/iocompat.h
 	src/include/iolib.h
 	src/include/item.h
