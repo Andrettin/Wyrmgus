@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name campaign.h - The campaign header file. */
-//
 //      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -36,8 +34,6 @@
 #include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
-
-#include <shared_mutex>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -66,7 +62,6 @@ private:
 	static std::vector<CCampaign *> Campaigns;
 	static std::map<std::string, CCampaign *> CampaignsByIdent;
 	static CCampaign *CurrentCampaign;
-	static std::shared_mutex CampaignMutex;	/// Mutex for campaigns as a whole
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;

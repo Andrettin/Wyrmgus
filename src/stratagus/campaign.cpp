@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name campaign.cpp - The campaign source file. */
-//
 //      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -49,7 +47,6 @@
 std::vector<CCampaign *> CCampaign::Campaigns;
 std::map<std::string, CCampaign *> CCampaign::CampaignsByIdent;
 CCampaign *CCampaign::CurrentCampaign = nullptr;
-std::shared_mutex CCampaign::CampaignMutex;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -113,8 +110,6 @@ void CCampaign::ClearCampaigns()
 */
 void CCampaign::SetCurrentCampaign(CCampaign *campaign)
 {
-	std::unique_lock<std::shared_mutex> lock(CampaignMutex);
-	
 	if (campaign == CCampaign::CurrentCampaign) {
 		return;
 	}
@@ -122,13 +117,8 @@ void CCampaign::SetCurrentCampaign(CCampaign *campaign)
 	CCampaign::CurrentCampaign = campaign;
 }
 
-/**
-**	@brief	Get the current campaign
-*/
 CCampaign *CCampaign::GetCurrentCampaign()
 {
-	std::shared_lock<std::shared_mutex> lock(CampaignMutex);
-	
 	return CCampaign::CurrentCampaign;
 }
 
