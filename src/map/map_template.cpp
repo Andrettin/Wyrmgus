@@ -238,9 +238,12 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
-	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority
-		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](map_template *a, map_template *b) {
+}
+
+void map_template::initialize()
+{
+	if (!this->Subtemplates.empty()) { //if this template has subtemplates, sort them according to priority
+		std::sort(this->Subtemplates.begin(), this->Subtemplates.end(), [](map_template *a, map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
 			} else {
@@ -248,6 +251,8 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			}
 		});
 	}
+
+	data_entry::initialize();
 }
 
 void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
