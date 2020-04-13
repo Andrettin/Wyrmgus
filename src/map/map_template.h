@@ -128,6 +128,66 @@ public:
 		return this->get_width() * this->get_height();
 	}
 
+	int GetDependentTemplatesNorthOffset() const
+	{
+		int offset = 0;
+
+		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->NorthOfTemplates.begin(), map_template->NorthOfTemplates.end(), this) == map_template->NorthOfTemplates.end()) {
+				continue;
+			}
+
+			offset += map_template::MinAdjacentTemplateDistance + map_template->get_height() + map_template->GetDependentTemplatesNorthOffset();
+		}
+
+		return offset;
+	}
+
+	int GetDependentTemplatesSouthOffset() const
+	{
+		int offset = 0;
+
+		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->SouthOfTemplates.begin(), map_template->SouthOfTemplates.end(), this) == map_template->SouthOfTemplates.end()) {
+				continue;
+			}
+
+			offset += map_template::MinAdjacentTemplateDistance + map_template->get_height() + map_template->GetDependentTemplatesSouthOffset();
+		}
+
+		return offset;
+	}
+
+	int GetDependentTemplatesWestOffset() const
+	{
+		int offset = 0;
+
+		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->WestOfTemplates.begin(), map_template->WestOfTemplates.end(), this) == map_template->WestOfTemplates.end()) {
+				continue;
+			}
+
+			offset += map_template::MinAdjacentTemplateDistance + map_template->get_width() + map_template->GetDependentTemplatesWestOffset();
+		}
+
+		return offset;
+	}
+
+	int GetDependentTemplatesEastOffset() const
+	{
+		int offset = 0;
+
+		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+			if (std::find(map_template->EastOfTemplates.begin(), map_template->EastOfTemplates.end(), this) == map_template->EastOfTemplates.end()) {
+				continue;
+			}
+
+			offset += map_template::MinAdjacentTemplateDistance + map_template->get_width() + map_template->GetDependentTemplatesEastOffset();
+		}
+
+		return offset;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
 	std::string TerrainFile;
