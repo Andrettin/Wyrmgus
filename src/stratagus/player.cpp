@@ -2651,6 +2651,10 @@ void CPlayer::UpdateQuestPool()
 	if (CCampaign::GetCurrentCampaign() == nullptr) { // in-game quests only while playing the campaign mode
 		return;
 	}
+
+	if (this->Faction == -1) {
+		return;
+	}
 	
 	bool exausted_available_quests = (this->AvailableQuests.size() == 0);
 	

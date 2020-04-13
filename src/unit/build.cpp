@@ -147,7 +147,7 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, con
 void CBuildRestrictionDistance::Init()
 {
 	this->RestrictType = CUnitType::try_get(this->RestrictTypeName);
-	this->restrict_class = stratagus::unit_class::get(this->restrict_class_name);
+	this->restrict_class = stratagus::unit_class::try_get(this->restrict_class_name);
 }
 
 /**
