@@ -86,6 +86,8 @@ class map_template : public named_data_entry, public data_type<map_template>, pu
 public:
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char *database_folder = "map_templates";
+	static constexpr int MinAdjacentTemplateDistance = 4;
+	static constexpr int MaxAdjacentTemplateDistance = 16;
 
 	map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{

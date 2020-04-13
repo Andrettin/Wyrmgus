@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/map_template.h"
@@ -64,8 +60,6 @@
 #include "util/vector_util.h"
 #include "video.h"
 #include "world.h"
-
-static constexpr int MaxAdjacentTemplateDistance = 16;
 
 namespace stratagus {
 
@@ -844,8 +838,8 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						continue;
 					}
 					
-					Vec2i min_adjacency_pos = adjacent_template_pos - MaxAdjacentTemplateDistance - Vec2i(subtemplate->get_width(), subtemplate->get_height());
-					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->get_width(), adjacent_template->get_height()) + MaxAdjacentTemplateDistance;
+					Vec2i min_adjacency_pos = adjacent_template_pos - map_template::MaxAdjacentTemplateDistance - Vec2i(subtemplate->get_width(), subtemplate->get_height());
+					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->get_width(), adjacent_template->get_height()) + map_template::MaxAdjacentTemplateDistance;
 					min_pos.x = std::max(min_pos.x, min_adjacency_pos.x);
 					min_pos.y = std::max(min_pos.y, min_adjacency_pos.y);
 					max_pos.x = std::min(max_pos.x, max_adjacency_pos.x);
@@ -900,8 +894,8 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					bool on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos, z) && CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->get_width() - 1, subtemplate_pos.y + subtemplate->get_height() - 1), z);
 
 					bool on_subtemplate_area = false;
-					for (int x = 0; x < subtemplate->get_width(); ++x) {
-						for (int y = 0; y < subtemplate->get_height(); ++y) {
+					for (int x = map_template::MinAdjacentTemplateDistance * -1; x < (subtemplate->get_width() + map_template::MinAdjacentTemplateDistance); ++x) {
+						for (int y = map_template::MinAdjacentTemplateDistance * -1; y < (subtemplate->get_height() + map_template::MinAdjacentTemplateDistance); ++y) {
 							if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
 								on_subtemplate_area = true;
 								break;
