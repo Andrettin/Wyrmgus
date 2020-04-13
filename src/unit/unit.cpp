@@ -2208,46 +2208,76 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_prefixes;
-	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicPrefix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemPrefix[Type->ItemClass])) {
-			potential_prefixes.push_back(this->Type->Affixes[i]);
+
+	for (CUpgrade *affix : this->Type->Affixes) {
+		if ((this->Type->ItemClass == -1 && affix->MagicPrefix) || (this->Type->ItemClass != -1 && affix->ItemPrefix[Type->ItemClass])) {
+			potential_prefixes.push_back(affix);
 		}
 	}
+
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->ItemClass != -1 && upgrade->ItemPrefix[Type->ItemClass] && CheckDependencies(upgrade, dropper)) {
-				potential_prefixes.push_back(upgrade);
+			if (this->Type->ItemClass == -1 || !upgrade->ItemPrefix[Type->ItemClass]) {
+				continue;
 			}
+
+			if (dropper != nullptr) {
+				if (!CheckDependencies(upgrade, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(upgrade, dropper_player)) {
+					continue;
+				}
+			}
+
+			potential_prefixes.push_back(upgrade);
 		}
 	}
 	
 	if (potential_prefixes.size() > 0) {
-		SetPrefix(potential_prefixes[SyncRand(potential_prefixes.size())]);
+		this->SetPrefix(potential_prefixes[SyncRand(potential_prefixes.size())]);
 	}
 }
 
 void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_suffixes;
-	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicSuffix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemSuffix[Type->ItemClass])) {
-			if (Prefix == nullptr || !this->Type->Affixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-				potential_suffixes.push_back(this->Type->Affixes[i]);
+
+	for (CUpgrade *affix : this->Type->Affixes) {
+		if ((this->Type->ItemClass == -1 && affix->MagicSuffix) || (this->Type->ItemClass != -1 && affix->ItemSuffix[Type->ItemClass])) {
+			if (Prefix == nullptr || !affix->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				potential_suffixes.push_back(affix);
 			}
 		}
 	}
+
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->ItemClass != -1 && upgrade->ItemSuffix[Type->ItemClass] && CheckDependencies(upgrade, dropper)) {
-				if (Prefix == nullptr || !upgrade->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-					potential_suffixes.push_back(upgrade);
+			if (this->Type->ItemClass == -1 || !upgrade->ItemSuffix[Type->ItemClass]) {
+				continue;
+			}
+
+			if (dropper != nullptr) {
+				if (!CheckDependencies(upgrade, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(upgrade, dropper_player)) {
+					continue;
 				}
 			}
+
+			if (this->Prefix != nullptr && upgrade->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				continue;
+			}
+
+			potential_suffixes.push_back(upgrade);
 		}
 	}
 	
 	if (potential_suffixes.size() > 0) {
-		SetSuffix(potential_suffixes[SyncRand(potential_suffixes.size())]);
+		this->SetSuffix(potential_suffixes[SyncRand(potential_suffixes.size())]);
 	}
 }
 
@@ -2255,9 +2285,9 @@ void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CSpell *> potential_spells;
 	if (dropper != nullptr) {
-		for (size_t i = 0; i < dropper->Type->DropSpells.size(); ++i) {
-			if (this->Type->ItemClass != -1 && dropper->Type->DropSpells[i]->ItemSpell[Type->ItemClass]) {
-				potential_spells.push_back(dropper->Type->DropSpells[i]);
+		for (CSpell *spell : dropper->Type->DropSpells) {
+			if (this->Type->ItemClass != -1 && spell->ItemSpell[Type->ItemClass]) {
+				potential_spells.push_back(spell);
 			}
 		}
 	}
@@ -2270,67 +2300,161 @@ void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_works;
-	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if (this->Type->ItemClass != -1 && this->Type->Affixes[i]->Work == this->Type->ItemClass && !this->Type->Affixes[i]->UniqueOnly) {
-			potential_works.push_back(this->Type->Affixes[i]);
+
+	for (CUpgrade *affix : this->Type->Affixes) {
+		if (this->Type->ItemClass != -1 && affix->Work == this->Type->ItemClass && !affix->UniqueOnly) {
+			potential_works.push_back(affix);
 		}
 	}
+
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->ItemClass != -1 && upgrade->Work == this->Type->ItemClass && CheckDependencies(upgrade, dropper) && !upgrade->UniqueOnly) {
-				potential_works.push_back(upgrade);
+			if (this->Type->ItemClass == -1 || upgrade->Work != this->Type->ItemClass || upgrade->UniqueOnly) {
+				continue;
 			}
+
+			if (dropper != nullptr) {
+				if (!CheckDependencies(upgrade, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(upgrade, dropper_player)) {
+					continue;
+				}
+			}
+
+			potential_works.push_back(upgrade);
 		}
 	}
 	
 	if (potential_works.size() > 0) {
-		SetWork(potential_works[SyncRand(potential_works.size())]);
+		this->SetWork(potential_works[SyncRand(potential_works.size())]);
 	}
 }
 
 void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUniqueItem *> potential_uniques;
-	for (size_t i = 0; i < UniqueItems.size(); ++i) {
-		if (
-			Type == UniqueItems[i]->Type
-			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Prefix == nullptr
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Prefix, dropper))
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Suffix == nullptr
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Suffix, dropper))
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
-				UniqueItems[i]->Set == nullptr
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Set, dropper))
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
-				UniqueItems[i]->Spell == nullptr
-				|| (dropper != nullptr && std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), UniqueItems[i]->Spell) != dropper->Type->DropSpells.end())
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Work == nullptr
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Work, dropper))
-			)
-			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Elixir == nullptr
-				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Elixir, dropper))
-			)
-			&& UniqueItems[i]->CanDrop()
-		) {
-			potential_uniques.push_back(UniqueItems[i]);
+
+	for (CUniqueItem *unique : UniqueItems) {
+		if (this->Type != unique->Type) {
+			continue;
 		}
+
+		if (unique->Prefix != nullptr) {
+			//the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Prefix) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Prefix, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Prefix, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+
+		if (unique->Suffix != nullptr) {
+			//the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Suffix) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Suffix, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Suffix, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+
+		if (unique->Set != nullptr) {
+			//the dropper unit must be capable of generating this unique item's set to drop the item
+			if (dropper_player == nullptr) {
+				continue;
+			}
+
+			if (dropper != nullptr) {
+				if (!CheckDependencies(unique->Set, dropper)) {
+					continue;
+				}
+			} else {
+				if (!CheckDependencies(unique->Set, dropper_player)) {
+					continue;
+				}
+			}
+		}
+
+		if (unique->Spell != nullptr) {
+			//the dropper unit must be capable of generating this unique item's spell to drop the item
+			if (dropper == nullptr) {
+				continue;
+			}
+
+			if (std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), unique->Spell) == dropper->Type->DropSpells.end()) {
+				continue;
+			}
+		}
+
+		if (unique->Work != nullptr) {
+			//the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Work) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Work, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Work, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+
+		if (unique->Elixir != nullptr) {
+			//the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit type must be capable of generating it on its own
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Elixir) == this->Type->Affixes.end()) {
+				if (dropper_player == nullptr) {
+					continue;
+				}
+
+				if (dropper != nullptr) {
+					if (!CheckDependencies(unique->Elixir, dropper)) {
+						continue;
+					}
+				} else {
+					if (!CheckDependencies(unique->Elixir, dropper_player)) {
+						continue;
+					}
+				}
+			}
+		}
+
+		if (!unique->CanDrop()) {
+			continue;
+		}
+
+		potential_uniques.push_back(unique);
 	}
 	
 	if (potential_uniques.size() > 0) {
 		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
-		SetUnique(chosen_unique);
+		this->SetUnique(chosen_unique);
 	}
 }
 
