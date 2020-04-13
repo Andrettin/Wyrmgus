@@ -283,7 +283,9 @@ public:
 	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const;
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
 	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate = nullptr) const;
+	std::pair<Vec2i, Vec2i> get_subtemplate_rect(const stratagus::map_template *subtemplate) const;
 	Vec2i get_subtemplate_pos(const stratagus::map_template *subtemplate) const;
+	Vec2i get_subtemplate_center_pos(const stratagus::map_template *subtemplate) const;
 	Vec2i get_subtemplate_end_pos(const stratagus::map_template *subtemplate) const;
 	CMapLayer *get_subtemplate_map_layer(const stratagus::map_template *subtemplate) const;
 	std::vector<CUnit *> get_map_template_layer_connectors(const stratagus::map_template *map_template) const;

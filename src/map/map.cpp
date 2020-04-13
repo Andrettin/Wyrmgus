@@ -72,6 +72,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 #include "version.h"
 #include "video.h"
 #include "world.h"
@@ -762,6 +763,25 @@ bool CMap::is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const s
 	return false;
 }
 
+std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const stratagus::map_template *subtemplate) const
+{
+	if (!subtemplate) {
+		return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
+	}
+
+	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
+	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+		if (z != -1) {
+			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
+				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
+					return std::make_pair(std::get<0>(CMap::Map.MapLayers[z]->subtemplate_areas[i]), std::get<1>(CMap::Map.MapLayers[z]->subtemplate_areas[i]));
+				}
+			}
+		}
+	}
+}
+
 /**
 **	@brief	Get the applied map position of a given subtemplate
 **
@@ -771,23 +791,18 @@ bool CMap::is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const s
 */
 Vec2i CMap::get_subtemplate_pos(const stratagus::map_template *subtemplate) const
 {
-	if (!subtemplate) {
-		return Vec2i(-1, -1);
-	}
-	
-	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
-		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-					return std::get<0>(Map.MapLayers[z]->subtemplate_areas[i]);
-				}
-			}
-		}
-	}
-	
-	return Vec2i(-1, -1);
+	std::pair<Vec2i, Vec2i> subtemplate_rect = this->get_subtemplate_rect(subtemplate);
+	return subtemplate_rect.first;
+}
+
+Vec2i CMap::get_subtemplate_center_pos(const stratagus::map_template *subtemplate) const
+{
+	std::pair<Vec2i, Vec2i> subtemplate_rect = this->get_subtemplate_rect(subtemplate);
+
+	const Vec2i &start_pos = subtemplate_rect.first;
+	const Vec2i &end_pos = subtemplate_rect.second;
+
+	return start_pos + ((end_pos - start_pos) / 2);
 }
 
 /**
@@ -799,23 +814,8 @@ Vec2i CMap::get_subtemplate_pos(const stratagus::map_template *subtemplate) cons
 */
 Vec2i CMap::get_subtemplate_end_pos(const stratagus::map_template *subtemplate) const
 {
-	if (!subtemplate) {
-		return Vec2i(-1, -1);
-	}
-	
-	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
-		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-					return std::get<1>(Map.MapLayers[z]->subtemplate_areas[i]);
-				}
-			}
-		}
-	}
-	
-	return Vec2i(-1, -1);
+	std::pair<Vec2i, Vec2i> subtemplate_rect = this->get_subtemplate_rect(subtemplate);
+	return subtemplate_rect.second;
 }
 
 /**
