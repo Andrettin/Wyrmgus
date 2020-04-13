@@ -388,7 +388,7 @@ set(unit_SRCS
 	src/unit/build.cpp
 	src/unit/historical_unit.cpp
 	src/unit/script_unit.cpp
-	src/unit/script_unittype.cpp
+	src/unit/script_unit_type.cpp
 	src/unit/unit_cache.cpp
 	src/unit/unit.cpp
 	src/unit/unit_draw.cpp
@@ -397,7 +397,7 @@ set(unit_SRCS
 	src/unit/unit_save.cpp
 	src/unit/unit_type_variation.cpp
 	src/unit/unitptr.cpp
-	src/unit/unittype.cpp
+	src/unit/unit_type.cpp
 )
 source_group(unit FILES ${unit_SRCS})
 
@@ -463,7 +463,7 @@ set(tolua_FILES
 	src/tolua/trigger.pkg
 	src/tolua/ui.pkg
 	src/tolua/unit.pkg
-	src/tolua/unittype.pkg
+	src/tolua/unit_type.pkg
 	src/tolua/upgrade.pkg
 	src/tolua/video.pkg
 	src/tolua/stratagus.lua
@@ -679,14 +679,14 @@ set(stratagus_ui_HDRS
 )
 
 set(stratagus_unit_HDRS
-	src/include/unit/historical_unit.h
-	src/include/unit/unit.h
-	src/include/unit/unit_cache.h
-	src/include/unit/unit_find.h
-	src/include/unit/unit_manager.h
-	src/include/unit/unit_type_variation.h
-	src/include/unit/unitptr.h
-	src/include/unit/unittype.h
+	src/unit/historical_unit.h
+	src/unit/unit.h
+	src/unit/unit_cache.h
+	src/unit/unit_find.h
+	src/unit/unit_manager.h
+	src/unit/unit_type_variation.h
+	src/unit/unitptr.h
+	src/unit/unit_type.h
 	src/unit/unit_type_type.h
 )
 
@@ -795,7 +795,7 @@ source_group(sound FILES ${stratagus_sound_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
-source_group(include\\unit FILES ${stratagus_unit_HDRS})
+source_group(unit FILES ${stratagus_unit_HDRS})
 source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
 source_group(util FILES ${stratagus_util_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})

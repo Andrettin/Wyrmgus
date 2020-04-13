@@ -1465,7 +1465,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		CFaction *hero_faction = character->Faction;
+		const CFaction *hero_faction = character->Faction;
 		for (int i = ((int) character->HistoricalFactions.size() - 1); i >= 0; --i) {
 			if (start_date.ContainsDate(character->HistoricalFactions[i].first)) {
 				hero_faction = character->HistoricalFactions[i].second;
