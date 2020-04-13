@@ -61,6 +61,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 #include "video.h"
 #include "world.h"
 
@@ -151,24 +152,31 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (key == "upper_template") {
 			map_template *upper_template = map_template::get(value);
-			if (upper_template) {
+			if (upper_template != nullptr) {
 				this->UpperTemplate = upper_template;
 				upper_template->LowerTemplate = this;
 			}
 		} else if (key == "lower_template") {
 			map_template *lower_template = map_template::get(value);
-			if (lower_template) {
+			if (lower_template != nullptr) {
 				this->LowerTemplate = lower_template;
 				lower_template->UpperTemplate = this;
 			}
 		} else if (key == "adjacent_template") {
 			map_template *adjacent_template = map_template::get(value);
-			if (adjacent_template) {
-				this->AdjacentTemplates.push_back(adjacent_template);
-				if (std::find(adjacent_template->AdjacentTemplates.begin(), adjacent_template->AdjacentTemplates.end(), this) == adjacent_template->AdjacentTemplates.end()) {
-					adjacent_template->AdjacentTemplates.push_back(this);
-				}
-			}
+			this->AdjacentTemplates.push_back(adjacent_template);
+		} else if (key == "north_of") {
+			const map_template *north_of_template = map_template::get(value);
+			this->NorthOfTemplates.push_back(north_of_template);
+		} else if (key == "south_of") {
+			const map_template *south_of_template = map_template::get(value);
+			this->SouthOfTemplates.push_back(south_of_template);
+		} else if (key == "west_of") {
+			const map_template *west_of_template = map_template::get(value);
+			this->WestOfTemplates.push_back(west_of_template);
+		} else if (key == "east_of") {
+			const map_template *east_of_template = map_template::get(value);
+			this->EastOfTemplates.push_back(east_of_template);
 		} else if (key == "overland") {
 			this->Overland = string::to_bool(value);
 		} else if (key == "base_terrain_type") {
@@ -243,13 +251,48 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 void map_template::initialize()
 {
 	if (!this->Subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
-		std::sort(this->Subtemplates.begin(), this->Subtemplates.end(), [](map_template *a, map_template *b) {
+		std::sort(this->Subtemplates.begin(), this->Subtemplates.end(), [](const map_template *a, const map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
+				//give priority to the template if the other template's position depends on its own
+			} else if (
+				(
+					vector::contains(a->AdjacentTemplates, b)
+					|| vector::contains(a->NorthOfTemplates, b)
+					|| vector::contains(a->SouthOfTemplates, b)
+					|| vector::contains(a->WestOfTemplates, b)
+					|| vector::contains(a->EastOfTemplates, b)
+				)
+				&& (
+					!vector::contains(b->AdjacentTemplates, a)
+					&& !vector::contains(b->NorthOfTemplates, a)
+					&& !vector::contains(b->SouthOfTemplates, a)
+					&& !vector::contains(b->WestOfTemplates, a)
+					&& !vector::contains(b->EastOfTemplates, a)
+				)
+			) {
+				return false;
+			} else if (
+				(
+					vector::contains(b->AdjacentTemplates, a)
+					|| vector::contains(b->NorthOfTemplates, a)
+					|| vector::contains(b->SouthOfTemplates, a)
+					|| vector::contains(b->WestOfTemplates, a)
+					|| vector::contains(b->EastOfTemplates, a)
+				)
+				&& (
+					!vector::contains(a->AdjacentTemplates, b)
+					&& !vector::contains(a->NorthOfTemplates, b)
+					&& !vector::contains(a->SouthOfTemplates, b)
+					&& !vector::contains(a->WestOfTemplates, b)
+					&& !vector::contains(a->EastOfTemplates, b)
+				)
+			) {
+				return true;
 			} else if (a->get_area() != b->get_area()) {
 				return a->get_area() > b->get_area();
 			} else {
-				return a->Ident < b->Ident;
+				return a->get_identifier() < b->get_identifier();
 			}
 		});
 	}
@@ -795,6 +838,7 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					Vec2i adjacent_template_pos = CMap::Map.get_subtemplate_pos(adjacent_template);
 					
 					if (!CMap::Map.Info.IsPointOnMap(adjacent_template_pos, z)) {
+						fprintf(stderr, "Could not apply adjacency restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), adjacent_template->Ident.c_str());
 						continue;
 					}
 					
@@ -804,6 +848,40 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					min_pos.y = std::max(min_pos.y, min_adjacency_pos.y);
 					max_pos.x = std::min(max_pos.x, max_adjacency_pos.x);
 					max_pos.y = std::min(max_pos.y, max_adjacency_pos.y);
+				}
+
+				//bound the minimum and maximum positions depending on whether this template should be to the north, south, west or east of other ones
+				for (const map_template *other_template : subtemplate->NorthOfTemplates) {
+					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+						fprintf(stderr, "Could not apply \"north of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+						continue;
+					}
+					max_pos.y = std::min<short>(max_pos.y, other_template_pos.y - (subtemplate->get_height() / 2));
+				}
+				for (const map_template *other_template : subtemplate->SouthOfTemplates) {
+					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+						fprintf(stderr, "Could not apply \"south of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+						continue;
+					}
+					min_pos.y = std::max<short>(min_pos.y, other_template_pos.y + other_template->get_height() - (subtemplate->get_height() / 2));
+				}
+				for (const map_template *other_template : subtemplate->WestOfTemplates) {
+					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+						fprintf(stderr, "Could not apply \"west of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+						continue;
+					}
+					max_pos.x = std::min<short>(max_pos.x, other_template_pos.x - (subtemplate->get_width() / 2));
+				}
+				for (const map_template *other_template : subtemplate->EastOfTemplates) {
+					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+						fprintf(stderr, "Could not apply \"east of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+						continue;
+					}
+					min_pos.x = std::max<short>(min_pos.x, other_template_pos.x + other_template->get_width() - (subtemplate->get_width() / 2));
 				}
 				
 				std::vector<Vec2i> potential_positions;
@@ -1398,7 +1476,7 @@ void map_template::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 	}
 	
-	for (historical_unit *historical_unit : historical_unit::get_all()) {
+	for (const historical_unit *historical_unit : historical_unit::get_all()) {
 		if (
 			(historical_unit->StartDate.Year != 0 && !start_date.ContainsDate(historical_unit->StartDate))
 			|| (historical_unit->EndDate.Year != 0 && start_date.ContainsDate(historical_unit->EndDate))

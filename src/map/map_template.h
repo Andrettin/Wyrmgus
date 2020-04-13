@@ -145,10 +145,14 @@ public:
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
 	Vec2i CurrentStartPos = Vec2i(0, 0);
 	PixelSize PixelTileSize = PixelSize(32, 32);
-	map_template *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
-	map_template *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
-	map_template *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer
-	std::vector<const map_template *> AdjacentTemplates;		/// Map templates adjacent to this one
+	map_template *MainTemplate = nullptr; //main template in which this one is located, if this is a subtemplate
+	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
+	map_template *LowerTemplate = nullptr; //map template corresponding to this one in the lower layer
+	std::vector<const map_template *> AdjacentTemplates; //map templates adjacent to this one
+	std::vector<const map_template *> NorthOfTemplates; //map templates to which this one is to the north of
+	std::vector<const map_template *> SouthOfTemplates; //map templates to which this one is to the north of
+	std::vector<const map_template *> WestOfTemplates; //map templates to which this one is to the west of
+	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
 	CPlane *Plane = nullptr;
 	CWorld *World = nullptr;
 	CTerrainType *BaseTerrainType = nullptr;
