@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name historical_unit.cpp - The historical unit source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/historical_unit.h"
@@ -40,96 +34,25 @@
 #include "player.h"
 #include "unit/unit_type.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CHistoricalUnit *> CHistoricalUnit::HistoricalUnits;
-std::map<std::string, CHistoricalUnit *> CHistoricalUnit::HistoricalUnitsByIdent;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a historical unit
-**
-**	@param	ident	The historical unit's string identifier
-**
-**	@return	The historical unit if found, or null otherwise
-*/
-CHistoricalUnit *CHistoricalUnit::GetHistoricalUnit(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CHistoricalUnit *>::const_iterator find_iterator = HistoricalUnitsByIdent.find(ident);
-	
-	if (find_iterator != HistoricalUnitsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid historical unit: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a historical unit
-**
-**	@param	ident	The historical unit's string identifier
-**
-**	@return	The historical unit if found, otherwise a new historical unit is created and returned
-*/
-CHistoricalUnit *CHistoricalUnit::GetOrAddHistoricalUnit(const std::string &ident)
-{
-	CHistoricalUnit *historical_unit = GetHistoricalUnit(ident, false);
-	
-	if (!historical_unit) {
-		historical_unit = new CHistoricalUnit;
-		historical_unit->Ident = ident;
-		HistoricalUnits.push_back(historical_unit);
-		HistoricalUnitsByIdent[ident] = historical_unit;
-	}
-	
-	return historical_unit;
-}
-
-/**
-**	@brief	Remove the existing historical units
-*/
-void CHistoricalUnit::ClearHistoricalUnits()
-{
-	for (size_t i = 0; i < HistoricalUnits.size(); ++i) {
-		delete HistoricalUnits[i];
-	}
-	HistoricalUnits.clear();
-}
-
-/**
-**	@brief	Destructor
-*/
-CHistoricalUnit::~CHistoricalUnit()
+historical_unit::~historical_unit()
 {
 	for (size_t i = 0; i < this->HistoricalLocations.size(); ++i) {
 		delete this->HistoricalLocations[i];
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
+void historical_unit::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "quantity") {
-			this->Quantity = std::stoi(value);
+			this->quantity = std::stoi(value);
 		} else if (key == "unit_type") {
 			this->UnitType = CUnitType::get(value);
 		} else if (key == "faction") {
@@ -161,4 +84,21 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid historical unit property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+}
+
+void historical_unit::check() const
+{
+	if (this->UnitType == nullptr) {
+		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have a unit type.");
+	}
+
+	if (this->Faction == nullptr) {
+		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have a faction.");
+	}
+
+	if (this->HistoricalLocations.empty()) {
+		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have any historical locations.");
+	}
+}
+
 }

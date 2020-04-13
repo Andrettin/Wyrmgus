@@ -300,7 +300,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				deity_domain->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "historical_unit") {
-			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAddHistoricalUnit(ident);
+			stratagus::historical_unit *historical_unit = stratagus::historical_unit::get_or_add(ident, nullptr);
 			if (!define_only) {
 				historical_unit->ProcessConfigData(config_data);
 			}

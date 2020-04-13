@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name historical_unit.h - The historical unit header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,41 +27,59 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
 #include "time/date.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CFaction;
 class CHistoricalLocation;
 class CUnitType;
 
-class CHistoricalUnit : public CDataType
+namespace stratagus {
+
+class historical_unit : public named_data_entry, public data_type<historical_unit>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
+	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
+
 public:
-	~CHistoricalUnit();
-	
-	static CHistoricalUnit *GetHistoricalUnit(const std::string &ident, const bool should_find = true);
-	static CHistoricalUnit *GetOrAddHistoricalUnit(const std::string &ident);
-	static void ClearHistoricalUnits();
-	
-	static std::vector<CHistoricalUnit *> HistoricalUnits;
-	static std::map<std::string, CHistoricalUnit *> HistoricalUnitsByIdent;
+	static constexpr const char *class_identifier = "historical_unit";
+	static constexpr const char *database_folder = "historical_units";
+
+	historical_unit(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	{
+	}
+
+	~historical_unit();
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void check() const override;
+
+	int get_quantity() const
+	{
+		return this->quantity;
+	}
+
+	int get_resources_held() const
+	{
+		return this->resources_held;
+	}
 	
 public:
-	std::string Name; //the unit's name
 	CUnitType *UnitType = nullptr; //the unit's unit type
 	CFaction *Faction = nullptr; //the unit's faction
-	int Quantity = 1; //how many in-game units does this historical unit result in when applied
+private:
+	int quantity = 1; //how many in-game units does this historical unit result in when applied
+public:
 	CDate StartDate; //when the unit starts being active
 	CDate EndDate; //when the unit ends being active (e.g. when it is disbanded)
+private:
+	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
+public:
 	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
 };
+
+}
