@@ -226,6 +226,8 @@ public:
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
+	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type) const;
+	void GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
@@ -270,13 +272,15 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain, const int z);
+	bool TileBordersTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const;
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
-	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z);
+	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const;
 	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *overlay_terrain, const int z);
+	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const;
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
 	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate = nullptr) const;
 	Vec2i get_subtemplate_pos(const stratagus::map_template *subtemplate) const;
