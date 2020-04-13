@@ -1433,9 +1433,9 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		int requested_unit_type_id = PlayerRaces.GetFactionClassUnitType(what.Player->Faction, what.Type->Class);
-		if (requested_unit_type_id != -1) {
-			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::get_all()[requested_unit_type_id], CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
+		CUnitType *requested_unit_type = PlayerRaces.Factions[what.Player->Faction]->get_class_unit_type(what.Type->Class);
+		if (requested_unit_type != nullptr) {
+			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}
 	}
 	//Wyrmgus end

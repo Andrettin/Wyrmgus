@@ -1540,9 +1540,9 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization && class_id != -1) {
-		int unit_type_id = PlayerRaces.get_civilization_class_unit_type(civilization->ID, class_id);
-		if (unit_type_id != -1) {
-			unit_type_ident = CUnitType::get_all()[unit_type_id]->Ident;
+		const CUnitType *unit_type = civilization->get_class_unit_type(class_id);
+		if (unit_type != nullptr) {
+			unit_type_ident = unit_type->get_identifier();
 		}
 	}
 		
@@ -1591,10 +1591,10 @@ static int CclGetFactionClassUnitType(lua_State *l)
 		}
 	}
 	std::string unit_type_ident;
-	if (class_id != -1) {
-		int unit_type_id = PlayerRaces.GetFactionClassUnitType(faction_id, class_id);
-		if (unit_type_id != -1) {
-			unit_type_ident = CUnitType::get_all()[unit_type_id]->Ident;
+	if (faction != nullptr && class_id != -1) {
+		const CUnitType *unit_type = faction->get_class_unit_type(class_id);
+		if (unit_type != nullptr) {
+			unit_type_ident = unit_type->get_identifier();
 		}
 	}
 		

@@ -308,10 +308,10 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->OffensiveMilitaryScore += this->Units[unit_type->Slot] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
 		} else if (unit_type->Class != -1 && UnitTypeClasses[unit_type->Class] == "worker") {
-			int militia_unit_type = PlayerRaces.get_civilization_class_unit_type(unit_type->civilization, GetUnitTypeClassIndexByName("militia"));
-			if (militia_unit_type != -1) {
-				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0);
-				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type] : 0);
+			const CUnitType *militia_unit_type = stratagus::civilization::get_all()[unit_type->civilization]->get_class_unit_type(GetUnitTypeClassIndexByName("militia"));
+			if (militia_unit_type != nullptr) {
+				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
+				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
 				if (old_owner_military_score_bonus != new_owner_military_score_bonus) {
 					this->MilitaryScore += this->Units[unit_type->Slot] * ((new_owner_military_score_bonus - old_owner_military_score_bonus) / 2);
 				}
@@ -403,9 +403,9 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		int militia_unit_type = PlayerRaces.get_civilization_class_unit_type(CUnitType::get_all()[unit_type_id]->civilization, GetUnitTypeClassIndexByName("militia"));
-		if (militia_unit_type != -1) {
-			this->MilitaryScore += change * ((CUnitType::get_all()[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
+		const CUnitType *militia_unit_type = stratagus::civilization::get_all()[CUnitType::get_all()[unit_type_id]->civilization]->get_class_unit_type(GetUnitTypeClassIndexByName("militia"));
+		if (militia_unit_type != nullptr) {
+			this->MilitaryScore += change * ((militia_unit_type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0)) / 2);
 		}
 	}
 	
@@ -576,7 +576,13 @@ int CGrandStrategyProvince::GetPopulation()
 
 int CGrandStrategyProvince::GetClassUnitType(int class_id)
 {
-	return PlayerRaces.get_civilization_class_unit_type(this->civilization, class_id);
+	const CUnitType *unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(class_id);
+
+	if (unit_type != nullptr) {
+		return unit_type->Slot;
+	}
+
+	return -1;
 }
 
 int CGrandStrategyProvince::GetDesirabilityRating()

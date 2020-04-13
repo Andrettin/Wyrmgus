@@ -109,17 +109,17 @@
 	CUnitType *type = this->NewForm;
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
-		int new_unit_type = -1;
+		CUnitType *new_unit_type = nullptr;
 		if (this->civilization != -1 && this->Faction != -1 && this->civilization == target->Type->civilization) { //get faction equivalent, if is of the same civilization
-			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Faction, target->Type->Class);
+			new_unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(target->Type->Class);
 		} else if (this->civilization != -1 && this->civilization != target->Type->civilization) {
-			new_unit_type = PlayerRaces.get_civilization_class_unit_type(this->civilization, target->Type->Class);
+			new_unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(target->Type->Class);
 		}
 		if (this->Detachment && target->Type->civilization != -1 && target->Type->Faction != -1) {
-			new_unit_type = PlayerRaces.get_civilization_class_unit_type(target->Type->civilization, target->Type->Class);
+			new_unit_type = stratagus::civilization::get_all()[target->Type->civilization]->get_class_unit_type(target->Type->Class);
 		}
-		if (new_unit_type != -1) {
-			type = CUnitType::get_all()[new_unit_type];
+		if (new_unit_type != nullptr) {
+			type = new_unit_type;
 		}
 	}
 	if (target->Character && target->Character->Custom && target->Character->civilization && this->civilization != -1 && this->civilization != target->Character->civilization->ID) {

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name civilization.h - The civilization header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -148,6 +146,27 @@ public:
 
 	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
 
+	CUnitType *get_class_unit_type(const int class_id) const;
+
+	void set_class_unit_type(const int class_id, CUnitType *unit_type)
+	{
+		if (unit_type == nullptr) {
+			this->class_unit_types.erase(class_id);
+			return;
+		}
+
+		this->class_unit_types[class_id] = unit_type;
+	}
+
+	void remove_class_unit_type(CUnitType *unit_type)
+	{
+		for (std::map<int, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+			if (iterator->second == unit_type) {
+				this->class_unit_types.erase(iterator->first);
+			}
+		}
+	}
+
 	int ID = -1;
 	civilization *parent_civilization = nullptr;
 	std::string Adjective;			/// adjective pertaining to the civilization
@@ -176,6 +195,7 @@ public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
+	std::map<int, CUnitType *> class_unit_types; //the unit type slot of a particular class for the civilization
 public:
 	std::vector<CDeity *> Deities;
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required

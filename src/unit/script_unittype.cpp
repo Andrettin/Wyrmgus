@@ -1906,37 +1906,27 @@ static int CclDefineUnitType(lua_State *l)
 	
 	//Wyrmgus start
 	if (type->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		int class_id = type->Class;
-
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.civilization_class_unit_types[i].rbegin(); iterator != PlayerRaces.civilization_class_unit_types[i].rend(); ++iterator) {
-				if (iterator->second == type->Slot) {
-					PlayerRaces.civilization_class_unit_types[i].erase(iterator->first);
-					break;
-				}
-			}
+		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+			civilization->remove_class_unit_type(type);
 		}
-		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i]->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == type->Slot) {
-					PlayerRaces.Factions[i]->ClassUnitTypes.erase(iterator->first);
-					break;
-				}
-			}
+
+		for (CFaction *faction : PlayerRaces.Factions) {
+			faction->remove_class_unit_type(type);
 		}
 		
+		const int class_id = type->Class;
 		if (type->civilization != -1) {
 			int civilization_id = type->civilization;
 			
 			if (type->Faction != -1) {
 				int faction_id = type->Faction;
 				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = type->Slot;
+					PlayerRaces.Factions[faction_id]->set_class_unit_type(class_id, type);
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.civilization_class_unit_types[civilization_id][class_id] = type->Slot;
+					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(class_id, type);
 				}
 			}
 		}

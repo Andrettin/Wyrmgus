@@ -1112,21 +1112,12 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		int class_id = this->Class;
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.civilization_class_unit_types[i].rbegin(); iterator != PlayerRaces.civilization_class_unit_types[i].rend(); ++iterator) {
-				if (iterator->second == this->Slot) {
-					PlayerRaces.civilization_class_unit_types[i].erase(iterator->first);
-					break;
-				}
-			}
+		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+			civilization->remove_class_unit_type(this);
 		}
-		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i]->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == this->Slot) {
-					PlayerRaces.Factions[i]->ClassUnitTypes.erase(iterator->first);
-					break;
-				}
-			}
+
+		for (CFaction *faction : PlayerRaces.Factions) {
+			faction->remove_class_unit_type(this);
 		}
 		
 		if (this->civilization != -1) {
@@ -1135,11 +1126,11 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
 				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = this->Slot;
+					PlayerRaces.Factions[faction_id]->set_class_unit_type(class_id, this);
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.civilization_class_unit_types[civilization_id][class_id] = this->Slot;
+					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(class_id, this);
 				}
 			}
 		}
@@ -1846,7 +1837,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 	if (potential_names.size() == 0 && this->civilization != -1) {
 		int civilization_id = this->civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
+			if (faction && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this == faction->get_class_unit_type(this->Class)) {
 				civilization_id = faction->civilization->ID;
 			}
 			stratagus::civilization *civilization = stratagus::civilization::get_all()[civilization_id];

@@ -469,4 +469,23 @@ void civilization::remove_ship_name(const std::string &ship_name)
 	vector::remove_one(this->ship_names, ship_name);
 }
 
+
+CUnitType *civilization::get_class_unit_type(const int class_id) const
+{
+	if (class_id == -1) {
+		return nullptr;
+	}
+
+	auto find_iterator = this->class_unit_types.find(class_id);
+	if (find_iterator != this->class_unit_types.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_class_unit_type(class_id);
+	}
+
+	return nullptr;
+}
+
 }

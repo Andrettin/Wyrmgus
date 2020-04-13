@@ -626,6 +626,27 @@ public:
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &get_ship_names() const;
 
+	CUnitType *get_class_unit_type(const int class_id) const;
+
+	void set_class_unit_type(const int class_id, CUnitType *unit_type)
+	{
+		if (unit_type == nullptr) {
+			this->class_unit_types.erase(class_id);
+			return;
+		}
+
+		this->class_unit_types[class_id] = unit_type;
+	}
+
+	void remove_class_unit_type(CUnitType *unit_type)
+	{
+		for (std::map<int, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+			if (iterator->second == unit_type) {
+				this->class_unit_types.erase(iterator->first);
+			}
+		}
+	}
+
 	std::string Ident;													/// faction name
 	std::string Name;
 	std::string Description;											/// faction description
@@ -654,7 +675,7 @@ public:
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
-	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
+	std::map<int, CUnitType *> class_unit_types;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:
@@ -798,9 +819,7 @@ public:
 	CFaction *GetFaction(const std::string &faction_ident) const;
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
-	int get_civilization_class_unit_type(int civilization, int class_id);
 	int get_civilization_class_upgrade(int civilization, int class_id);
-	int GetFactionClassUnitType(int faction, int class_id);
 	int GetFactionClassUpgrade(int faction, int class_id);
 	CLanguage *get_civilization_language(int civilization);
 	std::vector<CFiller> get_civilization_ui_fillers(int civilization);
@@ -812,7 +831,6 @@ public:
 	//Wyrmgus start
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string civilization_upgrades[MAX_RACES];
-	std::map<int, int> civilization_class_unit_types[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> civilization_class_upgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions;    								/// factions

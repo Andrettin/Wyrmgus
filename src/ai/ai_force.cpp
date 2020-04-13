@@ -1912,17 +1912,13 @@ void AiForceManager::CheckForceRecruitment()
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
 					int class_id = faction_force_templates[i]->Units[j].first;
-					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
-					CUnitType *type = nullptr;
-					if (unit_type_id != -1) {
-						type = CUnitType::get_all()[unit_type_id];
-					}
-					if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(class_id);
+					if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
 						break;
 					}
 					
-					if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the force if it is going to use up a resource that is currently needed
+					if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) { //don't request the force if it is going to use up a resource that is currently needed
 						valid = false;
 						break;
 					}
@@ -1948,16 +1944,12 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Role = AiForceRole::Default;
 				for (size_t i = 0; i < force_template->Units.size(); ++i) {
 					int class_id = force_template->Units[i].first;
-					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
-					CUnitType *type = nullptr;
-					if (unit_type_id != -1) {
-						type = CUnitType::get_all()[unit_type_id];
-					}
-					int count = force_template->Units[i].second;
+					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(class_id);
+					const int count = force_template->Units[i].second;
 					
 					AiUnitType newaiut;
 					newaiut.Want = count;
-					newaiut.Type = type;
+					newaiut.Type = unit_type;
 					new_force.UnitTypes.push_back(newaiut);
 				}
 				AiAssignFreeUnitsToForce(new_force_id);

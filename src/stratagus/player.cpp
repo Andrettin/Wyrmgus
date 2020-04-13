@@ -407,7 +407,6 @@ void PlayerRace::Clean()
 	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
 		//Wyrmgus start
 		this->civilization_upgrades[i].clear();
-		this->civilization_class_unit_types[i].clear();
 		this->civilization_class_upgrades[i].clear();
 		this->Species[i].clear();
 		this->DevelopsFrom[i].clear();
@@ -475,23 +474,6 @@ CLanguage *PlayerRace::GetLanguage(const std::string &language_ident) const
 	return nullptr;
 }
 
-int PlayerRace::get_civilization_class_unit_type(int civilization, int class_id)
-{
-	if (civilization == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (this->civilization_class_unit_types[civilization].find(class_id) != this->civilization_class_unit_types[civilization].end()) {
-		return this->civilization_class_unit_types[civilization][class_id];
-	}
-	
-	if (stratagus::civilization::get_all()[civilization]->parent_civilization) {
-		return get_civilization_class_unit_type(stratagus::civilization::get_all()[civilization]->parent_civilization->ID, class_id);
-	}
-	
-	return -1;
-}
-
 int PlayerRace::get_civilization_class_upgrade(int civilization, int class_id)
 {
 	if (civilization == -1 || class_id == -1) {
@@ -507,23 +489,6 @@ int PlayerRace::get_civilization_class_upgrade(int civilization, int class_id)
 	}
 	
 	return -1;
-}
-
-int PlayerRace::GetFactionClassUnitType(int faction, int class_id)
-{
-	if (faction == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (PlayerRaces.Factions[faction]->ClassUnitTypes.find(class_id) != PlayerRaces.Factions[faction]->ClassUnitTypes.end()) {
-		return PlayerRaces.Factions[faction]->ClassUnitTypes[class_id];
-	}
-	
-	if (PlayerRaces.Factions[faction]->ParentFaction != -1) {
-		return GetFactionClassUnitType(PlayerRaces.Factions[faction]->ParentFaction, class_id);
-	}
-	
-	return get_civilization_class_unit_type(PlayerRaces.Factions[faction]->civilization->ID, class_id);
 }
 
 int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
@@ -784,6 +749,24 @@ const std::vector<std::string> &CFaction::get_ship_names() const
 	}
 	
 	return this->civilization->get_ship_names();
+}
+
+CUnitType *CFaction::get_class_unit_type(const int class_id) const
+{
+	if (class_id == -1) {
+		return nullptr;
+	}
+
+	auto find_iterator = this->class_unit_types.find(class_id);
+	if (find_iterator != this->class_unit_types.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->ParentFaction != -1) {
+		return PlayerRaces.Factions[this->ParentFaction]->get_class_unit_type(class_id);
+	}
+
+	return this->civilization->get_class_unit_type(class_id);
 }
 
 CDynasty::~CDynasty()
@@ -1621,7 +1604,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->civilization->ID] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->civilization->ID] && unit.Type == faction->get_class_unit_type(unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1889,17 +1872,12 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("town-hall"));			
-	if (town_hall_type_id == -1) {
+	const CUnitType *town_hall_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(GetUnitTypeClassIndexByName("town-hall"));
+	if (town_hall_type == nullptr) {
 		return false;
 	}
-	CUnitType *town_hall_type = CUnitType::get_all()[town_hall_type_id];
 	
-	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
-	CUnitType *stronghold_type = nullptr;
-	if (stronghold_type_id != -1) {
-		stronghold_type = CUnitType::get_all()[stronghold_type_id];
-	}
+	const CUnitType *stronghold_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(GetUnitTypeClassIndexByName("stronghold"));
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
 	
@@ -2890,12 +2868,12 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		if (objective->ObjectiveType == ObjectiveType::BuildUnits || objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 			if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-				int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
-				if (unit_type_id == -1) {
+				const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(objective->UnitClass);
+				if (unit_type == nullptr) {
 					return false;
 				}
 				unit_types.clear();
-				unit_types.push_back(CUnitType::get_all()[unit_type_id]);
+				unit_types.push_back(unit_type);
 			}
 
 			bool validated = false;
@@ -2928,12 +2906,12 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 						if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-							int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
-							if (unit_type_id == -1) {
+							const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(second_objective->UnitClass);
+							if (unit_type == nullptr) {
 								continue;
 							}
 							unit_types.clear();
-							unit_types.push_back(CUnitType::get_all()[unit_type_id]);
+							unit_types.push_back(unit_type);
 						}
 
 						for (const CUnitType *unit_type : unit_types) {
@@ -3050,12 +3028,12 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			if (objective->Counter < objective->Quantity) {
 				std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 				if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-					int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
-					if (unit_type_id == -1) {
+					const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(objective->UnitClass);
+					if (unit_type == nullptr) {
 						return "You can no longer produce the required unit.";
 					}
 					unit_types.clear();
-					unit_types.push_back(CUnitType::get_all()[unit_type_id]);
+					unit_types.push_back(unit_type);
 				}
 				
 				bool validated = false;
@@ -3093,12 +3071,12 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 						if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 							std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 							if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-								int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
-								if (unit_type_id == -1) {
+								const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(second_objective->UnitClass);
+								if (unit_type == nullptr) {
 									continue;
 								}
 								unit_types.clear();
-								unit_types.push_back(CUnitType::get_all()[unit_type_id]);
+								unit_types.push_back(unit_type);
 							}
 
 							for (const CUnitType *unit_type : unit_types) {

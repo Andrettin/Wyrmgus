@@ -1431,7 +1431,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				int civilization = unit->Settlement->SiteUnit->Type->civilization;
-				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
+				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type == PlayerRaces.Factions[unit->Settlement->SiteUnit->Player->Faction]->get_class_unit_type(unit->Settlement->SiteUnit->Type->Class))) {
 					civilization = unit->Settlement->SiteUnit->Player->Race;
 				}
 				return unit->Settlement->GetCulturalName(civilization != -1 ? stratagus::civilization::get_all()[civilization] : nullptr);
@@ -3568,19 +3568,11 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
 		RecalculateShownUnits();
 	}
-	for (int j = 0; j < MAX_RACES; ++j) {
-		for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.civilization_class_unit_types[j].rbegin(); iterator != PlayerRaces.civilization_class_unit_types[j].rend(); ++iterator) {
-			if (iterator->second == unit_type->Slot) {
-				PlayerRaces.civilization_class_unit_types[j].erase(iterator->first);
-			}
-		}
+	for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+		civilization->remove_class_unit_type(unit_type);
 	}
-	for (size_t j = 0; j < PlayerRaces.Factions.size(); ++j) {
-		for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j]->ClassUnitTypes.rend(); ++iterator) {
-			if (iterator->second == unit_type->Slot) {
-				PlayerRaces.Factions[j]->ClassUnitTypes.erase(iterator->first);
-			}
-		}
+	for (CFaction *faction : PlayerRaces.Factions) {
+		faction->remove_class_unit_type(unit_type);
 	}
 	for (CUnitType *other_unit_type : CUnitType::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
 		if (std::find(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type) != other_unit_type->Trains.end()) {
