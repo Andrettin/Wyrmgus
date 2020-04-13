@@ -95,7 +95,6 @@
 
 CUnitStats::~CUnitStats()
 {
-	delete [] this->Variables;
 }
 
 const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
@@ -109,11 +108,8 @@ const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 		//Wyrmgus end
 	}
 	this->UnitStock = rhs.UnitStock;
-	delete [] this->Variables;
-	const unsigned int size = UnitTypeVar.GetNumberVariable();
-	this->Variables = new CVariable[size];
+	this->Variables = rhs.Variables;
 
-	std::copy(rhs.Variables, rhs.Variables + size, this->Variables);
 	return *this;
 }
 
@@ -900,7 +896,7 @@ static int CclDefineModifier(lua_State *l)
 				} else {
 					lua_rawgeti(l, j + 1, 2);
 					if (lua_istable(l, -1)) {
-						DefineVariableField(l, um->Modifier.Variables + index, -1);
+						DefineVariableField(l, um->Modifier.Variables[index], -1);
 					} else if (lua_isnumber(l, -1)) {
 						um->Modifier.Variables[index].Enable = 1;
 						um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
@@ -1489,7 +1485,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		// add/remove allowed units
 
 		//Wyrmgus start
-		if (stat.Variables == nullptr) { // unit type's stats not initialized
+		if (stat.Variables.empty()) { // unit type's stats not initialized
 			break;
 		}
 		//Wyrmgus end
@@ -1783,7 +1779,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		// add/remove allowed units
 
 		//Wyrmgus start
-		if (stat.Variables == nullptr) { // unit types stats not initialized
+		if (stat.Variables.empty()) { // unit types stats not initialized
 			break;
 		}
 		//Wyrmgus end

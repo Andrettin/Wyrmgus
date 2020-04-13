@@ -1172,7 +1172,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->PoisonDrain = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShieldPoints")) {
 			if (lua_istable(l, -1)) {
-				DefineVariableField(l, type->DefaultStat.Variables + SHIELD_INDEX, -1);
+				DefineVariableField(l, type->DefaultStat.Variables[SHIELD_INDEX], -1);
 			} else if (lua_isnumber(l, -1)) {
 				type->DefaultStat.Variables[SHIELD_INDEX].Max = LuaToNumber(l, -1);
 				type->DefaultStat.Variables[SHIELD_INDEX].Value = 0;
@@ -1876,7 +1876,7 @@ static int CclDefineUnitType(lua_State *l)
 				if (lua_isboolean(l, -1)) {
 					type->DefaultStat.Variables[index].Enable = LuaToBoolean(l, -1);
 				} else if (lua_istable(l, -1)) {
-					DefineVariableField(l, type->DefaultStat.Variables + index, -1);
+					DefineVariableField(l, type->DefaultStat.Variables[index], -1);
 				} else if (lua_isnumber(l, -1)) {
 					type->DefaultStat.Variables[index].Enable = 1;
 					type->DefaultStat.Variables[index].Value = LuaToNumber(l, -1);
@@ -2082,8 +2082,8 @@ static int CclDefineUnitStats(lua_State *l)
 	Assert(playerId < PlayerMax);
 
 	CUnitStats *stats = &type->Stats[playerId];
-	if (!stats->Variables) {
-		stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	if (stats->Variables.empty()) {
+		stats->Variables.resize(UnitTypeVar.GetNumberVariable());
 	}
 
 	// Parse the list: (still everything could be changed!)
@@ -2173,7 +2173,7 @@ static int CclDefineUnitStats(lua_State *l)
 			if (i != -1) { // valid index
 				lua_rawgeti(l, 3, j + 1);
 				if (lua_istable(l, -1)) {
-					DefineVariableField(l, stats->Variables + i, -1);
+					DefineVariableField(l, stats->Variables[i], -1);
 				} else if (lua_isnumber(l, -1)) {
 					stats->Variables[i].Enable = 1;
 					stats->Variables[i].Value = LuaToNumber(l, -1);
@@ -2979,7 +2979,7 @@ static int CclGetUnitTypeData(lua_State *l)
 **
 **  @internal Use to not duplicate code.
 */
-void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
+void DefineVariableField(lua_State *l, stratagus::unit_variable &var, int lua_index)
 {
 	if (lua_index < 0) { // relative index
 		--lua_index;
@@ -2989,13 +2989,13 @@ void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 		const char *key = LuaToString(l, -2);
 
 		if (!strcmp(key, "Value")) {
-			var->Value = LuaToNumber(l, -1);
+			var.Value = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Max")) {
-			var->Max = LuaToNumber(l, -1);
+			var.Max = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Increase")) {
-			var->Increase = LuaToNumber(l, -1);
+			var.Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Enable")) {
-			var->Enable = LuaToBoolean(l, -1);
+			var.Enable = LuaToBoolean(l, -1);
 		} else { // Error.
 			LuaError(l, "incorrect field '%s' for variable\n" _C_ key);
 		}
@@ -3027,7 +3027,7 @@ static int CclDefineVariables(lua_State *l)
 			continue;
 		}
 		++j;
-		DefineVariableField(l, &(UnitTypeVar.Variable[index]), j + 1);
+		DefineVariableField(l, UnitTypeVar.Variable[index], j + 1);
 	}
 	return 0;
 }
@@ -4019,7 +4019,7 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 	CUnitType *type = CUnitType::get(ident);
 	
 	if (type->ModDefaultStats.find(mod_file) == type->ModDefaultStats.end()) {
-		type->ModDefaultStats[mod_file].Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+		type->ModDefaultStats[mod_file].Variables.resize(UnitTypeVar.GetNumberVariable());
 	}
 	
 	if (variable_key == "Costs") {

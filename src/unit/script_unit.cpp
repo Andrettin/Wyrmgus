@@ -729,7 +729,7 @@ static int CclUnit(lua_State *l)
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index
 				lua_rawgeti(l, 2, j + 1);
-				DefineVariableField(l, unit->Variable + index, -1);
+				DefineVariableField(l, unit->Variable[index], -1);
 				lua_pop(l, 1);
 				continue;
 			}
@@ -2039,24 +2039,7 @@ static int CclSetUnitVariable(lua_State *l)
 			LuaError(l, "Bad variable name '%s'\n" _C_ name);
 		}
 		value = LuaToNumber(l, 3);
-		bool stats = false;
-		if (nargs == 5) {
-			stats = LuaToBoolean(l, 5);
-		}
-		if (stats) { // stat variables
-			const char *const type = LuaToString(l, 4);
-			if (!strcmp(type, "Value")) {
-				unit->Stats->Variables[index].Value = std::min(unit->Stats->Variables[index].Max, value);
-			} else if (!strcmp(type, "Max")) {
-				unit->Stats->Variables[index].Max = value;
-			} else if (!strcmp(type, "Increase")) {
-				unit->Stats->Variables[index].Increase = value;
-			} else if (!strcmp(type, "Enable")) {
-				unit->Stats->Variables[index].Enable = value;
-			} else {
-				LuaError(l, "Bad variable type '%s'\n" _C_ type);
-			}
-		} else if (nargs == 3) {
+		if (nargs == 3) {
 			//Wyrmgus start
 //			unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
 			unit->Variable[index].Value = std::min(unit->GetModifiedVariable(index, VariableMax), value);

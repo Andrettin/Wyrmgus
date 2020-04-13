@@ -122,31 +122,6 @@ public:
 	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;  /// The graphic corresponding to FileWhenEmpty
 };
 
-/**
-**  User defined variable type.
-**
-**  It is used to define variables and use it after
-**  to manage magic, energy, shield or other stuff.
-*/
-class CVariable
-{
-public:
-	bool operator ==(const CVariable &rhs) const
-	{
-		return this->Max == rhs.Max
-			   && this->Value == rhs.Value
-			   && this->Increase == rhs.Increase
-			   && this->Enable == rhs.Enable;
-	}
-	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
-
-public:
-	int Max = 0;        /// Maximum for the variable. (Assume min is 0.)
-	int Value = 0;      /// Current (or initial) value of the variable (or initial value).
-	char Increase = 0;  /// Number to increase(decrease) Value by second.
-	char Enable = 0;    /// True if the unit doesn't have this variable. (f.e shield)
-};
-
 // Index for boolflag already defined
 enum {
 	COWARD_INDEX = 0,				/// Unit will only attack if instructed.
@@ -399,7 +374,7 @@ public:
 	};
 
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const = 0;
+	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const = 0;
 
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
@@ -436,7 +411,7 @@ class CDecoVarBar : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
 	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
@@ -454,7 +429,7 @@ class CDecoVarText : public CDecoVar
 public:
 	CDecoVarText() : Font(nullptr) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const;
 
 	CFont *Font;  /// Font to use to display value.
 	// FIXME : Add Color, format
@@ -467,7 +442,7 @@ public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y,
-					  const CUnitType &type, const CVariable &var) const;
+					  const CUnitType &type, const stratagus::unit_variable &var) const;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
@@ -479,7 +454,7 @@ class CDecoVarStaticSprite : public CDecoVar
 public:
 	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
 	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
@@ -1193,7 +1168,7 @@ public:
 	CVariableKeys VariableNameLookup;  /// Container of names of user defined variables.
 
 	//EventType *Event;                  /// Array of functions sets to call when en event occurs.
-	std::vector<CVariable> Variable;   /// Array of user defined variables (default value for unittype).
+	std::vector<stratagus::unit_variable> Variable;   /// Array of user defined variables (default value for unittype).
 	std::vector<CDecoVar *> DecoVar;   /// Array to describe how showing variable.
 
 	unsigned int GetNumberBoolFlag() const
@@ -1264,7 +1239,7 @@ extern void CleanUnitTypeVariables();                    /// Cleanup unit-type m
 // in script_unittype.c
 
 /// Parse User Variables field.
-extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
+extern void DefineVariableField(lua_State *l, stratagus::unit_variable &var, int lua_index);
 
 /// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);

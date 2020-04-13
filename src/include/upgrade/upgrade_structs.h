@@ -42,6 +42,7 @@
 //Wyrmgus end
 #include "resource.h"
 #include "stratagus.h"
+#include "unit/unit_variable.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -55,7 +56,6 @@ class CSchoolOfMagic;
 class CUniqueItem;
 class CUnitType;
 class CUpgradeModifier;
-class CVariable;
 struct lua_State;
 
 namespace stratagus {
@@ -68,7 +68,7 @@ namespace stratagus {
 class CUnitStats
 {
 public:
-	CUnitStats() : Variables(nullptr)
+	CUnitStats()
 	{
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
@@ -87,7 +87,7 @@ public:
 	void SetUnitStock(CUnitType *unit_type, int quantity);
 	void ChangeUnitStock(CUnitType *unit_type, int quantity);
 public:
-	CVariable *Variables;           /// user defined variable.
+	std::vector<stratagus::unit_variable> Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income

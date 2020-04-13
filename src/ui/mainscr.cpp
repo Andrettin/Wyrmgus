@@ -350,7 +350,7 @@ struct UStrInt {
 UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;
-	CVariable *var;
+	const stratagus::unit_variable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 	
@@ -440,7 +440,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 {
 	UStrInt val;
-	CVariable *var;
+	const stratagus::unit_variable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 

@@ -70,7 +70,7 @@
 
 	char *next = strchr(arg1, '.');
 	if (next == nullptr) {
-		// Special case for non-CVariable variables
+		// Special case for non-unit_variable variables
 		if (!strcmp(arg1, "DamageType")) {
 			int death = ExtraDeathIndex(this->valueStr.c_str());
 			if (death == ANIMATIONS_DEATHTYPES) {

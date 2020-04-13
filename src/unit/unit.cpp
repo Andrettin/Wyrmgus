@@ -503,7 +503,7 @@ void CUnit::Init()
 	RescuedFrom = nullptr;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
-	Variable = nullptr;
+	this->Variable.clear();
 	TTL = 0;
 	Threshold = 0;
 	GroupId = 0;
@@ -615,7 +615,7 @@ void CUnit::Release(bool final)
 	delete pathFinderData;
 	delete[] AutoCastSpell;
 	delete[] SpellCoolDownTimers;
-	delete[] Variable;
+	this->Variable.clear();
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		delete *order;
 	}
@@ -938,7 +938,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			TransformUnitIntoType(*this, *this->Character->Type);
 		}
 		
-		memcpy(Variable, this->Character->Type->Stats[this->Player->Index].Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+		this->Variable = this->Character->Type->Stats[this->Player->Index].Variables;
 	} else {
 		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_ident.c_str());
 		return;
@@ -2605,12 +2605,10 @@ void CUnit::Init(const CUnitType &type)
 	Frame = type.StillFrame;
 
 	if (UnitTypeVar.GetNumberVariable()) {
-		Assert(!Variable);
-		const unsigned int size = UnitTypeVar.GetNumberVariable();
-		Variable = new CVariable[size];
-		std::copy(type.MapDefaultStat.Variables, type.MapDefaultStat.Variables + size, Variable);
+		Assert(Variable.empty());
+		this->Variable = type.MapDefaultStat.Variables;
 	} else {
-		Variable = nullptr;
+		this->Variable.clear();
 	}
 
 	IndividualUpgrades.clear();
@@ -2785,9 +2783,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
-			Assert(Variable);
-			Assert(Stats->Variables);
-			memcpy(Variable, Stats->Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+			Assert(!Stats->Variables.empty());
+			this->Variable = Stats->Variables;
 		}
 	}
 	

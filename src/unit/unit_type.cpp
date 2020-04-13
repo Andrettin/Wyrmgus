@@ -600,7 +600,7 @@ CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identi
 
 	this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 
-	this->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	this->DefaultStat.Variables.resize(UnitTypeVar.GetNumberVariable());
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		this->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
 	}

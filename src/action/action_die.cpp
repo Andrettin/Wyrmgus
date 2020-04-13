@@ -133,7 +133,7 @@ static bool AnimateActionDie(CUnit &unit)
 	unit.Stats = &corpseType.Stats[unit.Player->Index];
 	//Wyrmgus start
 	const unsigned int var_size = UnitTypeVar.GetNumberVariable();
-	std::copy(corpseType.Stats[unit.Player->Index].Variables, corpseType.Stats[unit.Player->Index].Variables + var_size, unit.Variable);
+	unit.Variable = corpseType.Stats[unit.Player->Index].Variables;
 	//Wyrmgus end
 	UpdateUnitSightRange(unit);
 	//Wyrmgus start

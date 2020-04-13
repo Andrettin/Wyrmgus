@@ -35,6 +35,7 @@
 
 #include "player.h"
 #include "unit/unit_type.h"
+#include "unit/unit_variable.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -63,7 +64,6 @@ class CUnitStats;
 class CUnitType;
 class CUnitTypeVariation;
 class CUpgrade;
-class CVariable;
 class CViewport;
 class PathFinderData;
 enum class UnitAction : char;
@@ -558,7 +558,7 @@ unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
 unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	} Seen;
 
-	CVariable *Variable; /// array of User Defined variables.
+	std::vector<stratagus::unit_variable> Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live
 

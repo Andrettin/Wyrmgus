@@ -44,7 +44,6 @@ class CConfigData;
 class CUnitType;
 class CUpgrade;
 class CSpell;
-class CVariable;
 
 /**
 **  Indexes into item class array.

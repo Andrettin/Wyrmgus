@@ -458,7 +458,7 @@ void CleanDecorations()
 **  @todo fix color configuration.
 */
 void CDecoVarBar::Draw(int x, int y,
-					   const CUnitType &type, const CVariable &var) const
+					   const CUnitType &type, const stratagus::unit_variable &var) const
 {
 	Assert(var.Max);
 
@@ -519,7 +519,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix font/color configuration.
 */
-void CDecoVarText::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
+void CDecoVarText::Draw(int x, int y, const CUnitType &/*type*/, const stratagus::unit_variable &var) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
@@ -538,7 +538,7 @@ void CDecoVarText::Draw(int x, int y, const CUnitType &/*type*/, const CVariable
 **  @param unit    Unit pointer
 **  @todo fix sprite configuration.
 */
-void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
+void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const stratagus::unit_variable &var) const
 {
 	Assert(var.Max);
 	Assert(this->NSprite != -1);
@@ -575,7 +575,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVar
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
+void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const stratagus::unit_variable &var) const
 {
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;

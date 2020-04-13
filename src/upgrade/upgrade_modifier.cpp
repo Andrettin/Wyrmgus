@@ -58,7 +58,7 @@ CUpgradeModifier::CUpgradeModifier()
 	
 	memset(this->ChangeUpgrades, '?', sizeof(this->ChangeUpgrades));
 	memset(this->ApplyTo, '?', sizeof(this->ApplyTo));
-	this->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	this->Modifier.Variables.resize(UnitTypeVar.GetNumberVariable());
 	this->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
 	memset(this->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 }

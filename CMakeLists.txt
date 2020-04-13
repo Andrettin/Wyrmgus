@@ -690,6 +690,7 @@ set(stratagus_unit_HDRS
 	src/unit/unitptr.h
 	src/unit/unit_type.h
 	src/unit/unit_type_type.h
+	src/unit/unit_variable.h
 )
 
 set(stratagus_upgrade_HDRS
