@@ -1880,12 +1880,19 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	}
 	
 	const CUnitType *stronghold_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(stratagus::unit_class::get("stronghold"));
+
+	const CUnitType *fortress_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(stratagus::unit_class::get("fortress"));
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
 	
-	if (stronghold_type) {
+	if (stronghold_type != nullptr) {
 		FindPlayerUnitsByType(*this, *stronghold_type, settlement_unit_table, true); //adds strongholds to the table
 	}
+
+	if (fortress_type != nullptr) {
+		FindPlayerUnitsByType(*this, *fortress_type, settlement_unit_table, true); //adds fortresses to the table
+	}
+
 	for (size_t i = 0; i < settlement_unit_table.size(); ++i) {
 		CUnit *settlement_unit = settlement_unit_table[i];
 		if (!settlement_unit->IsAliveOnMap()) {

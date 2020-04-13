@@ -1068,7 +1068,7 @@ void map_template::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				if (unit_type == nullptr) {
 					continue;
 				}
-				if (unit_type->TerrainType) {
+				if (unit_type->TerrainType != nullptr) {
 					if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
 						pathway_type = unit_type;
 					}
