@@ -253,7 +253,7 @@ public:
 			try {
 				instance->check();
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("The " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\" is in an invalid state."));
+				std::throw_with_nested(std::runtime_error("The validity check for the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\" failed."));
 			}
 		}
 	}
