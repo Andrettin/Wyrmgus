@@ -3487,10 +3487,7 @@ void UpdateUnitVariables(CUnit &unit)
 //					   _C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
 					   _C_ unit.Variable[i].Value _C_ unit.GetModifiedVariable(i, VariableMax));
 					   //Wyrmgus end
-		   //Wyrmgus start
-//			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
-			clamp(&unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableMax));
-		   //Wyrmgus end
+			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}
 	}
 }

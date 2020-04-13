@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.h - The unit header file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -374,7 +372,39 @@ public:
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
+
+	int get_variable_value(const int var_index) const
+	{
+		return this->Variable[var_index].Value;
+	}
+
+	void set_variable_value(const int var_index, const int value)
+	{
+		this->Variable[var_index].Value = value;
+	}
+
+	void change_variable_value(const int var_index, const int change)
+	{
+		this->set_variable_value(var_index, this->get_variable_value(var_index) + change);
+	}
+
+	int get_variable_max(const int var_index) const
+	{
+		return this->Variable[var_index].Max;
+	}
+
+	void set_variable_max(const int var_index, const int max)
+	{
+		this->Variable[var_index].Max = max;
+	}
+
+	char get_variable_increase(const int var_index) const
+	{
+		return this->Variable[var_index].Increase;
+	}
+
 	int GetModifiedVariable(int index, int variable_type = 0) const;
+
 	int GetReactionRange() const;
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
@@ -413,7 +443,6 @@ public:
 	bool LevelCheck(const int level) const;
 	bool IsAbilityEmpowered(const CUpgrade *ability) const;
 	bool IsSpellEmpowered(const CSpell *spell) const;
-	bool IsNameValid() const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
@@ -439,6 +468,7 @@ public:
 		int slot;           /// index in UnitManager::unitSlots
 		int unitSlot;       /// index in UnitManager::units
 	};
+
 public:
 	// @note int is faster than shorts
 	unsigned int     Refs;         /// Reference counter

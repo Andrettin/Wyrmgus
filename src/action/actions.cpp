@@ -282,11 +282,8 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 
 static inline void IncreaseVariable(CUnit &unit, int index)
 {
-	unit.Variable[index].Value += unit.Variable[index].Increase;
-	//Wyrmgus start
-//	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
-	clamp(&unit.Variable[index].Value, 0, unit.GetModifiedVariable(index, VariableMax));
-	//Wyrmgus end
+	unit.change_variable_value(index, unit.get_variable_increase(index));
+	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
 	
 	//Wyrmgus start
 	if (index == HP_INDEX && unit.Variable[index].Increase < 0 && unit.HasInventory()) {
