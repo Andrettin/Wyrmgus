@@ -33,6 +33,8 @@
 
 namespace stratagus::vector {
 
+static inline const std::vector<std::string> empty_string_vector;
+
 template <typename T, typename U>
 bool contains(const std::vector<T> &vector, const U &value)
 {

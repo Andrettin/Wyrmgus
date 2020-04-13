@@ -1079,7 +1079,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					if (Preference.MineNotifications
 						&& unit.Player->Index == CPlayer::GetThisPlayer()->Index
 						&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::Resources[this->CurrentResource]->DefaultIncome * 10)) {
-							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->Name.c_str());
+							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->get_name().c_str());
 					}
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
@@ -1169,7 +1169,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::Resources[this->CurrentResource]->DefaultIncome * 10)) {
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
-				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
+				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->get_name().c_str());
 				//Wyrmgus end
 				source->MineLow = 1;
 		}

@@ -430,12 +430,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (condition->Class && type && type->Class == -1 && !(type->BoolFlag[ITEM_INDEX].value && type->ItemClass != -1)) {
+	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->ItemClass != -1)) {
 		return false;
 	}
 	
-	if (condition->UnitTypeClass != -1) {
-		if (!type || condition->UnitTypeClass != type->Class) {
+	if (condition->unit_class != nullptr) {
+		if (!type || condition->unit_class != type->get_unit_class()) {
 			return false;
 		}
 	}

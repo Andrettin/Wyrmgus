@@ -76,6 +76,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 //Wyrmgus end
@@ -751,22 +752,22 @@ const std::vector<std::string> &CFaction::get_ship_names() const
 	return this->civilization->get_ship_names();
 }
 
-CUnitType *CFaction::get_class_unit_type(const int class_id) const
+CUnitType *CFaction::get_class_unit_type(const stratagus::unit_class *unit_class) const
 {
-	if (class_id == -1) {
+	if (unit_class == nullptr) {
 		return nullptr;
 	}
 
-	auto find_iterator = this->class_unit_types.find(class_id);
+	auto find_iterator = this->class_unit_types.find(unit_class);
 	if (find_iterator != this->class_unit_types.end()) {
 		return find_iterator->second;
 	}
 
 	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->get_class_unit_type(class_id);
+		return PlayerRaces.Factions[this->ParentFaction]->get_class_unit_type(unit_class);
 	}
 
-	return this->civilization->get_class_unit_type(class_id);
+	return this->civilization->get_class_unit_type(unit_class);
 }
 
 CDynasty::~CDynasty()
@@ -1116,38 +1117,39 @@ void CPlayer::Save(CFile &file) const
 	
 	file.printf("\n  \"quest-objectives\", {");
 	for (size_t j = 0; j < p.QuestObjectives.size(); ++j) {
+		const CPlayerQuestObjective *objective = p.QuestObjectives[j];
 		if (j) {
 			file.printf(" ");
 		}
 		file.printf("{");
-		file.printf("\"quest\", \"%s\",", p.QuestObjectives[j]->Quest->Ident.c_str());
-		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(p.QuestObjectives[j]->ObjectiveType).c_str());
-		file.printf("\"objective-string\", \"%s\",", p.QuestObjectives[j]->ObjectiveString.c_str());
-		file.printf("\"quantity\", %d,", p.QuestObjectives[j]->Quantity);
-		file.printf("\"counter\", %d,", p.QuestObjectives[j]->Counter);
-		if (p.QuestObjectives[j]->Resource != -1) {
-			file.printf("\"resource\", \"%s\",", DefaultResourceNames[p.QuestObjectives[j]->Resource].c_str());
+		file.printf("\"quest\", \"%s\",", objective->Quest->Ident.c_str());
+		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(objective->ObjectiveType).c_str());
+		file.printf("\"objective-string\", \"%s\",", objective->ObjectiveString.c_str());
+		file.printf("\"quantity\", %d,", objective->Quantity);
+		file.printf("\"counter\", %d,", objective->Counter);
+		if (objective->Resource != -1) {
+			file.printf("\"resource\", \"%s\",", DefaultResourceNames[objective->Resource].c_str());
 		}
-		if (p.QuestObjectives[j]->UnitClass != -1) {
-			file.printf("\"unit-class\", \"%s\",", UnitTypeClasses[p.QuestObjectives[j]->UnitClass].c_str());
+		if (objective->get_unit_class() != nullptr) {
+			file.printf("\"unit-class\", \"%s\",", objective->get_unit_class()->get_identifier().c_str());
 		}
-		for (const CUnitType *unit_type : p.QuestObjectives[j]->UnitTypes) {
+		for (const CUnitType *unit_type : objective->UnitTypes) {
 			file.printf("\"unit-type\", \"%s\",", unit_type->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Upgrade) {
-			file.printf("\"upgrade\", \"%s\",", p.QuestObjectives[j]->Upgrade->Ident.c_str());
+		if (objective->Upgrade) {
+			file.printf("\"upgrade\", \"%s\",", objective->Upgrade->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Character) {
-			file.printf("\"character\", \"%s\",", p.QuestObjectives[j]->Character->Ident.c_str());
+		if (objective->Character) {
+			file.printf("\"character\", \"%s\",", objective->Character->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Unique) {
-			file.printf("\"unique\", \"%s\",", p.QuestObjectives[j]->Unique->Ident.c_str());
+		if (objective->Unique) {
+			file.printf("\"unique\", \"%s\",", objective->Unique->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Settlement) {
-			file.printf("\"settlement\", \"%s\",", p.QuestObjectives[j]->Settlement->Ident.c_str());
+		if (objective->Settlement) {
+			file.printf("\"settlement\", \"%s\",", objective->Settlement->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Faction) {
-			file.printf("\"faction\", \"%s\",", p.QuestObjectives[j]->Faction->Ident.c_str());
+		if (objective->Faction) {
+			file.printf("\"faction\", \"%s\",", objective->Faction->Ident.c_str());
 		}
 		file.printf("},");
 	}
@@ -1604,7 +1606,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->civilization->ID] && unit.Type == faction->get_class_unit_type(unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->civilization->ID] && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1872,12 +1874,12 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	const CUnitType *town_hall_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(GetUnitTypeClassIndexByName("town-hall"));
+	const CUnitType *town_hall_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
 	if (town_hall_type == nullptr) {
 		return false;
 	}
 	
-	const CUnitType *stronghold_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(GetUnitTypeClassIndexByName("stronghold"));
+	const CUnitType *stronghold_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(stratagus::unit_class::get("stronghold"));
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
 	
@@ -2772,7 +2774,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		objective->ObjectiveString = quest->Objectives[i]->ObjectiveString;
 		objective->Quantity = quest->Objectives[i]->Quantity;
 		objective->Resource = quest->Objectives[i]->Resource;
-		objective->UnitClass = quest->Objectives[i]->UnitClass;
+		objective->set_unit_class(quest->Objectives[i]->get_unit_class());
 		objective->UnitTypes = quest->Objectives[i]->UnitTypes;
 		objective->Upgrade = quest->Objectives[i]->Upgrade;
 		objective->Character = quest->Objectives[i]->Character;
@@ -2868,7 +2870,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		if (objective->ObjectiveType == ObjectiveType::BuildUnits || objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 			if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-				const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(objective->UnitClass);
+				const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(objective->get_unit_class());
 				if (unit_type == nullptr) {
 					return false;
 				}
@@ -2906,7 +2908,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 						if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-							const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(second_objective->UnitClass);
+							const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(second_objective->get_unit_class());
 							if (unit_type == nullptr) {
 								continue;
 							}
@@ -3028,7 +3030,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			if (objective->Counter < objective->Quantity) {
 				std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 				if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-					const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(objective->UnitClass);
+					const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(objective->get_unit_class());
 					if (unit_type == nullptr) {
 						return "You can no longer produce the required unit.";
 					}
@@ -3071,7 +3073,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 						if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 							std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 							if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-								const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(second_objective->UnitClass);
+								const CUnitType *unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(second_objective->get_unit_class());
 								if (unit_type == nullptr) {
 									continue;
 								}

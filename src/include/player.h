@@ -91,6 +91,7 @@ struct lua_State;
 namespace stratagus {
 	class age;
 	class civilization;
+	class unit_class;
 }
 
 /*----------------------------------------------------------------------------
@@ -589,29 +590,61 @@ enum WordJunctionTypes {
 class CForceTemplate
 {
 public:
-	CForceTemplate() :
-		ForceType(-1), Priority(100), Weight(1)
+	const std::vector<std::pair<const stratagus::unit_class *, int>> &get_units() const
 	{
+		return this->units;
 	}
-	
-	int ForceType;
-	int Priority;
-	int Weight;
-	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
+
+	void add_unit(const stratagus::unit_class *unit_class, const int quantity)
+	{
+		this->units.push_back(std::pair<const stratagus::unit_class *, int>(unit_class, quantity));
+	}
+
+	int ForceType = -1;
+	int Priority = 100;
+	int Weight = 1;
+
+private:
+	std::vector<std::pair<const stratagus::unit_class *, int>> units;	/// vector containing each unit class belonging to the force template, and the respective quantity
 };
 
 class CAiBuildingTemplate
 {
 public:
-	CAiBuildingTemplate() :
-		UnitClass(-1), Priority(100),
-		PerSettlement(false)
+	const stratagus::unit_class *get_unit_class() const
 	{
+		return this->unit_class;
 	}
-	
-	int UnitClass;		/// Building's unit class
-	int Priority;
-	bool PerSettlement;	/// Whether the building should be constructed for each settlement
+
+	void set_unit_class(const stratagus::unit_class *unit_class)
+	{
+		this->unit_class = unit_class;
+	}
+
+	int get_priority() const
+	{
+		return this->priority;
+	}
+
+	void set_priority(const int priority)
+	{
+		this->priority = priority;
+	}
+
+	bool is_per_settlement() const
+	{
+		return this->per_settlement;
+	}
+
+	void set_per_settlement(const bool per_settlement)
+	{
+		this->per_settlement = per_settlement;
+	}
+
+private:
+	const stratagus::unit_class *unit_class = nullptr; /// Building's unit class
+	int priority = 100;
+	bool per_settlement = false;	/// Whether the building should be constructed for each settlement
 };
 
 class CFaction
@@ -626,21 +659,21 @@ public:
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &get_ship_names() const;
 
-	CUnitType *get_class_unit_type(const int class_id) const;
+	CUnitType *get_class_unit_type(const stratagus::unit_class *unit_class) const;
 
-	void set_class_unit_type(const int class_id, CUnitType *unit_type)
+	void set_class_unit_type(const stratagus::unit_class *unit_class, CUnitType *unit_type)
 	{
 		if (unit_type == nullptr) {
-			this->class_unit_types.erase(class_id);
+			this->class_unit_types.erase(unit_class);
 			return;
 		}
 
-		this->class_unit_types[class_id] = unit_type;
+		this->class_unit_types[unit_class] = unit_type;
 	}
 
 	void remove_class_unit_type(CUnitType *unit_type)
 	{
-		for (std::map<int, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (std::map<const stratagus::unit_class *, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -675,7 +708,7 @@ public:
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
-	std::map<int, CUnitType *> class_unit_types;									/// the unit type slot of a particular class for a particular faction
+	std::map<const stratagus::unit_class *, CUnitType *> class_unit_types;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:

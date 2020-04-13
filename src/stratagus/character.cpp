@@ -51,6 +51,7 @@
 #include "spells.h"
 #include "time/calendar.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -620,7 +621,7 @@ void CCharacter::GenerateMissingDates()
 
 int CCharacter::GetMartialAttribute() const
 {
-	if ((this->Type->Class != -1 && UnitTypeClasses[this->Type->Class] == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+	if ((this->Type->get_unit_class() != nullptr && this->Type->get_unit_class()->get_identifier() == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
 	} else {
 		return StrengthAttribute;
@@ -1189,7 +1190,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 
 		//now, update the hero
 		hero->civilization = civilization;
-		CUnitType *new_unit_type = hero->civilization->get_class_unit_type(hero->Type->Class);
+		CUnitType *new_unit_type = hero->civilization->get_class_unit_type(hero->Type->get_unit_class());
 		if (new_unit_type != nullptr) {
 			hero->Type = new_unit_type;
 			hero->Name = new_hero_name;

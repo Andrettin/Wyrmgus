@@ -61,6 +61,7 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
@@ -496,9 +497,6 @@ std::vector<int> LuxuryResources;
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-std::vector<std::string> UnitTypeClasses;
-std::map<std::string, int> UnitTypeClassStringToIndex;
-std::vector<std::vector<CUnitType *>> ClassUnitTypes;
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
 CUnitType *SettlementSiteUnitType;
@@ -555,7 +553,7 @@ CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identi
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
-	Class(-1), civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
+	civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
 	//Wyrmgus end
 	Animations(nullptr), StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
@@ -706,7 +704,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "parent") {
 			CUnitType *parent_type = CUnitType::get(value);
 			this->SetParent(parent_type);
@@ -1108,8 +1106,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	if (this->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		int class_id = this->Class;
+	if (this->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+		const stratagus::unit_class *unit_class = this->get_unit_class();
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
@@ -1125,12 +1123,12 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
-				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->set_class_unit_type(class_id, this);
+				if (faction_id != -1) {
+					PlayerRaces.Factions[faction_id]->set_class_unit_type(unit_class, this);
 				}
 			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(class_id, this);
+				if (civilization_id != -1) {
+					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(unit_class, this);
 				}
 			}
 		}
@@ -1155,7 +1153,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
-		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->Name.c_str());
+		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->get_name().c_str());
 	}
 	this->UpdateDefaultBoolFlags();
 	//Wyrmgus start
@@ -1329,12 +1327,12 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	
 	this->Parent = parent_type;
 	
-	if (this->Name.empty()) {
-		this->Name = parent_type->Name;
+	if (this->get_name().empty()) {
+		this->set_name(parent_type->get_name());
 	}
-	this->Class = parent_type->Class;
-	if (this->Class != -1 && std::find(ClassUnitTypes[this->Class].begin(), ClassUnitTypes[this->Class].end(), this) == ClassUnitTypes[this->Class].end()) {
-		ClassUnitTypes[this->Class].push_back(this);
+	this->unit_class = parent_type->get_unit_class();
+	if (this->get_unit_class() != nullptr && !this->get_unit_class()->has_unit_type(this)) {
+		this->get_unit_class()->add_unit_type(this);
 	}
 	this->DrawLevel = parent_type->DrawLevel;
 	this->File = parent_type->File;
@@ -1753,7 +1751,7 @@ const std::string &CUnitType::GetDefaultName(const CPlayer *player) const
 	if (variation && !variation->TypeName.empty()) {
 		return variation->TypeName;
 	} else {
-		return this->Name;
+		return this->get_name();
 	}
 }
 
@@ -1786,7 +1784,7 @@ bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
 
 std::string CUnitType::GetNamePlural() const
 {
-	return GetPluralForm(this->Name);
+	return GetPluralForm(this->get_name());
 }
 
 std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
@@ -1837,7 +1835,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 	if (potential_names.size() == 0 && this->civilization != -1) {
 		int civilization_id = this->civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this == faction->get_class_unit_type(this->Class)) {
+			if (faction && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this == faction->get_class_unit_type(this->get_unit_class())) {
 				civilization_id = faction->civilization->ID;
 			}
 			stratagus::civilization *civilization = stratagus::civilization::get_all()[civilization_id];
@@ -1860,8 +1858,8 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 					}
 				}
 			} else {
-				if (this->Class != -1 && civilization->get_unit_class_names(this->Class).size() > 0) {
-					return civilization->get_unit_class_names(this->Class);
+				if (this->get_unit_class() != nullptr && civilization->get_unit_class_names(this->get_unit_class()).size() > 0) {
+					return civilization->get_unit_class_names(this->get_unit_class());
 				}
 				
 				if (this->UnitType == UnitTypeType::Naval) { // if is a ship
@@ -2334,35 +2332,6 @@ void SaveUnitTypes(CFile &file)
 }
 
 //Wyrmgus start
-int GetUnitTypeClassIndexByName(const std::string &class_name)
-{
-	if (class_name.empty()) {
-		return -1;
-	}
-	
-	if (UnitTypeClassStringToIndex.find(class_name) != UnitTypeClassStringToIndex.end()) {
-		return UnitTypeClassStringToIndex.find(class_name)->second;
-	}
-	return -1;
-}
-
-int GetOrAddUnitTypeClassIndexByName(const std::string &class_name)
-{
-	int index = GetUnitTypeClassIndexByName(class_name);
-	if (index == -1 && !class_name.empty()) {
-		SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
-		index = UnitTypeClasses.size();
-		UnitTypeClasses.push_back(class_name);
-		ClassUnitTypes.resize(UnitTypeClasses.size());
-	}
-	return index;
-}
-
-void SetUnitTypeClassStringToIndex(const std::string &class_name, int class_id)
-{
-	UnitTypeClassStringToIndex[class_name] = class_id;
-}
-
 int GetUpgradeClassIndexByName(const std::string &class_name)
 {
 	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {

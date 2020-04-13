@@ -776,7 +776,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 				CUnitType *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
-					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->Name.c_str());
+					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->get_name().c_str());
 				}
 				TransformUnitIntoType(*this, *chosen_unit_type);
 				upgrade_found = true;
@@ -2354,7 +2354,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->civilization;
-		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->Class)) {
+		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 			civilization_id = this->Player->Race;
 		}
 		
@@ -2368,7 +2368,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->civilization && iterator->second->civilization->ID == civilization_id || iterator->second->Type == stratagus::civilization::get_all()[civilization_id]->get_class_unit_type(iterator->second->Type->Class))
+					(iterator->second->civilization && iterator->second->civilization->ID == civilization_id || iterator->second->Type == stratagus::civilization::get_all()[civilization_id]->get_class_unit_type(iterator->second->Type->get_unit_class()))
 					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
@@ -2748,7 +2748,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 					if (
 						(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
-						|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->UnitClass == type.Class)
+						|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->get_unit_class() == type.get_unit_class())
 					) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 					}
@@ -3282,7 +3282,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	if (this->Player->Faction != -1) {
 		faction = PlayerRaces.Factions[this->Player->Faction];
 		
-		if (civilization_id != -1 && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Type == faction->get_class_unit_type(this->Type->Class)) {
+		if (civilization_id != -1 && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Type == faction->get_class_unit_type(this->Type->get_unit_class())) {
 			civilization_id = faction->civilization->ID;
 		}
 	}
@@ -3340,7 +3340,7 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			int civilization_id = this->Type->civilization;
-			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->Class))) {
+			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
 				civilization_id = this->Player->Race;
 			}
 			const stratagus::civilization *civilization = nullptr;
@@ -3349,7 +3349,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			int faction_id = this->Type->Faction;
-			if (this->Player->Race == civilization_id && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->Class)) {
+			if (this->Player->Race == civilization_id && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 				faction_id = this->Player->Faction;
 			}
 			const CFaction *faction = nullptr;
@@ -6404,7 +6404,7 @@ std::string CUnit::GetTypeName() const
 	if (variation && !variation->TypeName.empty()) {
 		return _(variation->TypeName.c_str());
 	} else {
-		return _(this->Type->Name.c_str());
+		return _(this->Type->get_name().c_str());
 	}
 }
 

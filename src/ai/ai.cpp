@@ -164,6 +164,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
@@ -217,7 +218,7 @@ static void AiCheckUnits()
 	for (int i = 0; i < n; ++i) {
 		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
-		const int unit_class = AiPlayer->UnitTypeRequests[i].Type->Class;
+		const stratagus::unit_class *unit_class = AiPlayer->UnitTypeRequests[i].Type->get_unit_class();
 
 		// Add equivalent units
 		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UnitTypeRequests[i].Type);
@@ -226,9 +227,8 @@ static void AiCheckUnits()
 				e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
 			}
 		}
-		if (unit_class != -1) {
-			for (size_t j = 0; j < ClassUnitTypes[unit_class].size(); ++j) {
-				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][j];
+		if (unit_class != nullptr) {
+			for (const CUnitType *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 				}
@@ -339,7 +339,7 @@ static void AiCheckUnits()
 						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
 							AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[k];
 							if (
-								mercenary_type->Class == queue.Type->Class
+								mercenary_type->get_unit_class() == queue.Type->get_unit_class()
 								&& queue.Want > queue.Made
 								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
 								&& (!queue.Settlement || queue.Settlement == mercenary_building->Settlement)
@@ -1433,7 +1433,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		CUnitType *requested_unit_type = PlayerRaces.Factions[what.Player->Faction]->get_class_unit_type(what.Type->Class);
+		CUnitType *requested_unit_type = PlayerRaces.Factions[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
 			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}

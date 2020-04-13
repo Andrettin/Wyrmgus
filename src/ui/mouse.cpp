@@ -2040,7 +2040,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 		CUnit &unit = *Selected[i];
 		if (unit.Type->Spells.size() == 0) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
-					   UnitNumber(unit) _C_ unit.Type->Name.c_str());
+					   UnitNumber(unit) _C_ unit.Type->get_name().c_str());
 			// this unit cannot cast spell
 			continue;
 		}

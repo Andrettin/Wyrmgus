@@ -44,6 +44,7 @@
 #include "map/site.h"
 #include "player.h"
 #include "script.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
@@ -207,11 +208,8 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
-						if (unit_class == -1) {
-							LuaError(l, "Unit class doesn't exist.");
-						}
-						objective->UnitClass = unit_class;
+						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						objective->set_unit_class(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
 						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
 						objective->UnitTypes.push_back(unit_type);

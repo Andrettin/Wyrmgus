@@ -45,6 +45,7 @@
 #include "player.h"
 #include "quest.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "world.h"
 
@@ -146,7 +147,7 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, con
 void CBuildRestrictionDistance::Init()
 {
 	this->RestrictType = CUnitType::try_get(this->RestrictTypeName);
-	this->RestrictClass = GetOrAddUnitTypeClassIndexByName(this->RestrictClassName);
+	this->restrict_class = stratagus::unit_class::get(this->restrict_class_name);
 }
 
 /**
@@ -187,7 +188,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (this->RestrictClass != -1 && this->RestrictClass == table[i]->Type->Class) || (!this->RestrictType && this->RestrictClass == -1 && this->RestrictTypeOwner.size() > 0)) &&
+			(this->RestrictType == table[i]->Type || (this->restrict_class != nullptr && this->restrict_class == table[i]->Type->get_unit_class()) || (!this->RestrictType && this->restrict_class == nullptr && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
 			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||

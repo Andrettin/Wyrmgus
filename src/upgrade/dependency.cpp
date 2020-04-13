@@ -327,7 +327,7 @@ bool CUnitTypeDependency::Check(const CPlayer *player, bool ignore_units) const
 
 std::string CUnitTypeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->UnitType->Name;
+	std::string str = prefix + this->UnitType->get_name();
 	
 	if (this->Count > 1) {
 		str += '(' + std::to_string(this->Count) + ')';

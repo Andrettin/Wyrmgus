@@ -54,6 +54,8 @@ int CclDefineCivilization(lua_State *l);
 
 namespace stratagus {
 
+class unit_class;
+
 class civilization final : public detailed_data_entry, public data_type<civilization>
 {
 	Q_OBJECT
@@ -133,7 +135,7 @@ public:
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::map<int, std::vector<std::string>> &GetPersonalNames() const;
-	const std::vector<std::string> &get_unit_class_names(const int class_id);
+	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
 
 	const std::vector<std::string> &get_ship_names() const;
 
@@ -146,21 +148,21 @@ public:
 
 	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
 
-	CUnitType *get_class_unit_type(const int class_id) const;
+	CUnitType *get_class_unit_type(const unit_class *unit_class) const;
 
-	void set_class_unit_type(const int class_id, CUnitType *unit_type)
+	void set_class_unit_type(const unit_class *unit_class, CUnitType *unit_type)
 	{
 		if (unit_type == nullptr) {
-			this->class_unit_types.erase(class_id);
+			this->class_unit_types.erase(unit_class);
 			return;
 		}
 
-		this->class_unit_types[class_id] = unit_type;
+		this->class_unit_types[unit_class] = unit_type;
 	}
 
 	void remove_class_unit_type(CUnitType *unit_type)
 	{
-		for (std::map<int, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (std::map<const unit_class *, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -189,13 +191,13 @@ public:
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 private:
-	std::map<int, std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
+	std::map<const unit_class *, std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 public:
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
-	std::map<int, CUnitType *> class_unit_types; //the unit type slot of a particular class for the civilization
+	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for the civilization
 public:
 	std::vector<CDeity *> Deities;
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required

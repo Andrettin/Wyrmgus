@@ -294,8 +294,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
-					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.Class) != stratagus::civilization::get_all()[newtype.civilization]->get_unit_class_names(newtype.Class))
-					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.Class) != stratagus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.Class))
+					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.get_unit_class()) != stratagus::civilization::get_all()[newtype.civilization]->get_unit_class_names(newtype.get_unit_class()))
+					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.get_unit_class()) != stratagus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.get_unit_class()))
 				)
 			)
 		)
@@ -380,7 +380,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 				if (
 					(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
-					|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->UnitClass == newtype.Class)
+					|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->get_unit_class() == newtype.get_unit_class())
 				) {
 					if (!objective->Settlement || objective->Settlement == unit.Settlement) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);

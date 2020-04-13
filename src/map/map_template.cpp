@@ -57,6 +57,7 @@
 #include "translate.h"
 #include "unit/historical_unit.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
@@ -686,7 +687,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			CUnitType *worker_type = PlayerRaces.Factions[CPlayer::Players[i]->Faction]->get_class_unit_type(GetUnitTypeClassIndexByName("worker"));
+			CUnitType *worker_type = PlayerRaces.Factions[CPlayer::Players[i]->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((worker_type->TileSize - 1) / 2);
 				

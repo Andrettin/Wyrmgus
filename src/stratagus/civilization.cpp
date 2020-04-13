@@ -34,6 +34,7 @@
 #include "player.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/string_util.h"
@@ -108,7 +109,6 @@ void civilization::process_sml_scope(const sml_data &scope)
 			child_scope.for_each_element([&](const sml_property &property) {
 				if (property.get_key() == "force_type") {
 					force->ForceType = GetForceTypeIdByName(property.get_value());
-					this->ForceTemplates[force->ForceType].push_back(force);
 				} else if (property.get_key() == "priority") {
 					force->Priority = std::stoi(property.get_value());
 				} else if (property.get_key() == "weight") {
@@ -122,14 +122,16 @@ void civilization::process_sml_scope(const sml_data &scope)
 						const std::string &key = property.get_key();
 						const std::string &value = property.get_value();
 
-						const int unit_class = GetOrAddUnitTypeClassIndexByName(key);
+						const unit_class *unit_class = unit_class::get(key);
 						const int unit_quantity = std::stoi(value);
-						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+						force->add_unit(unit_class, unit_quantity);
 					});
 				} else {
 					throw std::runtime_error("Invalid force template property: " + grandchild_scope.get_tag() + ".");
 				}
 			});
+
+			this->ForceTemplates[force->ForceType].push_back(force);
 		});
 
 		for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
@@ -146,28 +148,29 @@ void civilization::process_sml_scope(const sml_data &scope)
 				const std::string &value = property.get_value();
 
 				if (key == "unit_class") {
-					const int unit_class = GetOrAddUnitTypeClassIndexByName(value);
-					building_template->UnitClass = unit_class;
-					this->AiBuildingTemplates.push_back(building_template);
+					const unit_class *unit_class = unit_class::get(value);
+					building_template->set_unit_class(unit_class);
 				} else if (key == "priority") {
-					building_template->Priority = std::stoi(value);
+					building_template->set_priority(std::stoi(value));
 				} else if (key == "per_settlement") {
-					building_template->PerSettlement = string::to_bool(value);
+					building_template->set_per_settlement(string::to_bool(value));
 				} else {
 					throw std::runtime_error("Invalid AI building template property: " + child_scope.get_tag() + ".");
 				}
 			});
+
+			this->AiBuildingTemplates.push_back(building_template);
 		});
 
 		std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
-			return a->Priority > b->Priority;
+			return a->get_priority() > b->get_priority();
 		});
 	} else if (tag == "unit_class_names") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			const int class_id = GetOrAddUnitTypeClassIndexByName(tag);
-			vector::merge(this->unit_class_names[class_id], child_scope.get_values());
+			const unit_class *unit_class = unit_class::get(tag);
+			vector::merge(this->unit_class_names[unit_class], child_scope.get_values());
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -433,17 +436,18 @@ const std::map<int, std::vector<std::string>> &civilization::GetPersonalNames() 
 	return this->PersonalNames;
 }
 
-const std::vector<std::string> &civilization::get_unit_class_names(const int class_id)
+const std::vector<std::string> &civilization::get_unit_class_names(const unit_class *unit_class) const
 {
-	if (!this->unit_class_names[class_id].empty()) {
-		return this->unit_class_names[class_id];
+	auto find_iterator = this->unit_class_names.find(unit_class);
+	if (find_iterator != this->unit_class_names.end() && !find_iterator->second.empty()) {
+		return find_iterator->second;
 	}
 	
-	if (this->parent_civilization) {
-		return this->parent_civilization->get_unit_class_names(class_id);
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_unit_class_names(unit_class);
 	}
 	
-	return this->unit_class_names[class_id];
+	return vector::empty_string_vector;
 }
 
 const std::vector<std::string> &civilization::get_ship_names() const
@@ -470,19 +474,19 @@ void civilization::remove_ship_name(const std::string &ship_name)
 }
 
 
-CUnitType *civilization::get_class_unit_type(const int class_id) const
+CUnitType *civilization::get_class_unit_type(const unit_class *unit_class) const
 {
-	if (class_id == -1) {
+	if (unit_class == nullptr) {
 		return nullptr;
 	}
 
-	auto find_iterator = this->class_unit_types.find(class_id);
+	auto find_iterator = this->class_unit_types.find(unit_class);
 	if (find_iterator != this->class_unit_types.end()) {
 		return find_iterator->second;
 	}
 
 	if (this->parent_civilization != nullptr) {
-		return this->parent_civilization->get_class_unit_type(class_id);
+		return this->parent_civilization->get_class_unit_type(unit_class);
 	}
 
 	return nullptr;

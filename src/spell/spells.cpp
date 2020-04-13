@@ -246,12 +246,12 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->civilization_equivalent != -1) {
-		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent && (!caster.Character || (caster.Character->civilization && caster.Character->civilization->ID == condition->civilization_equivalent))) || PlayerRaces.Species[caster.Type->civilization] != PlayerRaces.Species[condition->civilization_equivalent] || stratagus::civilization::get_all()[condition->civilization_equivalent]->get_class_unit_type(caster.Type->Class) == nullptr || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent && (!caster.Character || (caster.Character->civilization && caster.Character->civilization->ID == condition->civilization_equivalent))) || PlayerRaces.Species[caster.Type->civilization] != PlayerRaces.Species[condition->civilization_equivalent] || stratagus::civilization::get_all()[condition->civilization_equivalent]->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->civilization == -1 || caster.Type->civilization != condition->FactionEquivalent->civilization->ID || condition->FactionEquivalent->get_class_unit_type(caster.Type->Class) == nullptr|| (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->civilization == -1 || caster.Type->civilization != condition->FactionEquivalent->civilization->ID || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
@@ -873,7 +873,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
-			   caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ pos.x _C_ pos.y);
+			   caster.Type->get_name().c_str() _C_ target ? target->Type->get_name().c_str() : "none" _C_ pos.x _C_ pos.y);
 	if (CanCastSpell(caster, spell, target, pos, map_layer)) {
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.

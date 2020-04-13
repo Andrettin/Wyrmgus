@@ -44,6 +44,7 @@
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
@@ -405,10 +406,9 @@ public:
 	{
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 		
-		int unit_class = unit->Type->Class;
-		if (unit_class != -1) {
-			for (size_t i = 0; i < ClassUnitTypes[unit_class].size(); ++i) {
-				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][i];
+		const stratagus::unit_class *unit_class = unit->Type->get_unit_class();
+		if (unit_class != nullptr) {
+			for (const CUnitType *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != unit->Type) {
 					data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
@@ -446,7 +446,7 @@ bool AiForce::IsBelongsTo(const CUnitType &type)
 		const int slot = aitype.Type->Slot;
 
 		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
-			if (UnitTypeEquivs[type.Slot] == slot || type.Class == aitype.Type->Class) {
+			if (UnitTypeEquivs[type.Slot] == slot || type.get_unit_class() == aitype.Type->get_unit_class()) {
 				if (counter[slot] < aitype.Want - 1) {
 					Completed = false;
 				}
@@ -1161,7 +1161,7 @@ void AiForceManager::CheckUnits(int *counter)
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
 			const AiUnitType &aiut = force.UnitTypes[j];
 			const unsigned int t = aiut.Type->Slot;
-			const int unit_class = aiut.Type->Class;
+			const stratagus::unit_class *unit_class = aiut.Type->get_unit_class();
 			const int wantedCount = aiut.Want;
 			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::get_all()[t]);
 			if (t < AiHelpers.Equiv.size()) {
@@ -1169,9 +1169,8 @@ void AiForceManager::CheckUnits(int *counter)
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
 				}
 			}
-			if (unit_class != -1) {
-				for (size_t k = 0; k < ClassUnitTypes[unit_class].size(); ++k) {
-					const CUnitType *class_unit_type = ClassUnitTypes[unit_class][k];
+			if (unit_class != nullptr) {
+				for (const CUnitType *class_unit_type : unit_class->get_unit_types()) {
 					if (class_unit_type != aiut.Type) {
 						e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 					}
@@ -1910,9 +1909,9 @@ void AiForceManager::CheckForceRecruitment()
 					break; //force templates are ordered by priority, so there is no need to go further
 				}
 				bool valid = true;
-				for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
-					int class_id = faction_force_templates[i]->Units[j].first;
-					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(class_id);
+				for (size_t j = 0; j < faction_force_templates[i]->get_units().size(); ++j) {
+					const stratagus::unit_class *unit_class = faction_force_templates[i]->get_units()[j].first;
+					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
 					if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
 						break;
@@ -1942,10 +1941,10 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Reset(true);
 				new_force.State = AiForceAttackingState::Waiting;
 				new_force.Role = AiForceRole::Default;
-				for (size_t i = 0; i < force_template->Units.size(); ++i) {
-					int class_id = force_template->Units[i].first;
-					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(class_id);
-					const int count = force_template->Units[i].second;
+				for (size_t i = 0; i < force_template->get_units().size(); ++i) {
+					const stratagus::unit_class *unit_class = force_template->get_units()[i].first;
+					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					const int count = force_template->get_units()[i].second;
 					
 					AiUnitType newaiut;
 					newaiut.Want = count;

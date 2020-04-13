@@ -72,6 +72,10 @@ class Mng;
 class LuaCallback;
 enum class UnitTypeType;
 
+namespace stratagus {
+	class unit_class;
+}
+
 static constexpr int UnitSides = 8;
 static constexpr int MaxAttackPos = 5;
 
@@ -613,7 +617,6 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), RestrictClass(-1), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init();
 	//Wyrmgus start
@@ -621,15 +624,15 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 
-	int Distance;        /// distance to build (circle)
+	int Distance = 0;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType;
-	std::string RestrictClassName;
-	int RestrictClass;
-	bool CheckBuilder;
-	bool Diagonal;
+	CUnitType *RestrictType = nullptr;
+	std::string restrict_class_name;
+	const stratagus::unit_class *restrict_class = nullptr;
+	bool CheckBuilder = false;
+	bool Diagonal = true;
 };
 
 class CBuildRestrictionHasUnit : public CBuildRestriction
@@ -814,6 +817,11 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
+	stratagus::unit_class *get_unit_class() const
+	{
+		return this->unit_class;
+	}
+
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
 	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
@@ -848,11 +856,12 @@ public:
 	//Wyrmgus end
 
 public:
-	std::string Name;               /// Pretty name shown from the engine
 	bool Initialized = false;
 	CUnitType *Parent;				/// Parent unit type
 	//Wyrmgus start
-	int Class;						/// Class identifier (i.e. infantry, archer, etc.)
+private:
+	stratagus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)
+public:
 	int civilization;				/// Which civilization this unit belongs to, if any
 	int Faction;					/// Which faction this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
@@ -1069,6 +1078,8 @@ public:
 	
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
+
+	friend int CclDefineUnitType(lua_State *l);
 };
 
 /*----------------------------------------------------------------------------
@@ -1199,7 +1210,6 @@ public:
 extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
-extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; built with CclDefineUnitType
 extern std::vector<std::vector<CUnitType *>> ClassUnitTypes; //list of unit types belonging to each class
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 extern CUnitType *SettlementSiteUnitType;
@@ -1221,9 +1231,6 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 //Wyrmgus start
-extern int GetUnitTypeClassIndexByName(const std::string &class_name);
-extern int GetOrAddUnitTypeClassIndexByName(const std::string &class_name);
-extern void SetUnitTypeClassStringToIndex(const std::string &class_name, int class_id);
 extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
 

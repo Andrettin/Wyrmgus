@@ -62,6 +62,7 @@
 #include "time/calendar.h"
 #include "ui/button_action.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "video.h"
@@ -464,11 +465,8 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetUnitTypeClassIndexByName(LuaToString(l, -1, n + 1));
-						if (unit_class == -1) {
-							LuaError(l, "Unit class doesn't exist.");
-						}
-						objective->UnitClass = unit_class;
+						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, n + 1));
+						objective->set_unit_class(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
 						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, n + 1));
 						objective->UnitTypes.push_back(unit_type);
@@ -882,10 +880,10 @@ static int CclDefineCivilization(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						force->Weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
 						++k;
 						int unit_quantity = LuaToNumber(l, -1, k + 1);
-						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+						force->add_unit(unit_class, unit_quantity);
 					} else {
 						printf("\n%s\n", civilization->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -911,13 +909,13 @@ static int CclDefineCivilization(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
-						building_template->UnitClass = unit_class;
+						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						building_template->set_unit_class(unit_class);
 						civilization->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
-						building_template->Priority = LuaToNumber(l, -1, k + 1);
+						building_template->set_priority(LuaToNumber(l, -1, k + 1));
 					} else if (!strcmp(value, "per-settlement")) {
-						building_template->PerSettlement = LuaToBoolean(l, -1, k + 1);
+						building_template->set_per_settlement(LuaToBoolean(l, -1, k + 1));
 					} else {
 						printf("\n%s\n", civilization->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -926,7 +924,7 @@ static int CclDefineCivilization(lua_State *l)
 				lua_pop(l, 1);
 			}
 			std::sort(civilization->AiBuildingTemplates.begin(), civilization->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
-				return a->Priority > b->Priority;
+				return a->get_priority() > b->get_priority();
 			});
 		} else if (!strcmp(value, "UIFillers")) {
 			if (!lua_istable(l, -1)) {
@@ -1004,10 +1002,10 @@ static int CclDefineCivilization(lua_State *l)
 				if (class_name.empty()) {
 					LuaError(l, "Class is given as a blank string.");
 				}
-				int class_id = GetOrAddUnitTypeClassIndexByName(class_name);
+				const stratagus::unit_class *unit_class = stratagus::unit_class::get(class_name);
 				++j;
 				
-				civilization->unit_class_names[class_id].push_back(LuaToString(l, -1, j + 1));
+				civilization->unit_class_names[unit_class].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "FamilyNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -1532,18 +1530,18 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string class_name = LuaToString(l, 1);
-	int class_id = GetUnitTypeClassIndexByName(class_name);
+	const stratagus::unit_class *unit_class = stratagus::unit_class::try_get(class_name);
 	stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, 2));
 	std::string unit_type_ident;
-	if (civilization && class_id != -1) {
-		const CUnitType *unit_type = civilization->get_class_unit_type(class_id);
+	if (civilization && unit_class != nullptr) {
+		const CUnitType *unit_type = civilization->get_class_unit_type(unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->get_identifier();
 		}
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		class_id = GetUpgradeClassIndexByName(class_name);
+		const int class_id = GetUpgradeClassIndexByName(class_name);
 		if (civilization && class_id != -1) {
 			int upgrade_id = PlayerRaces.get_civilization_class_upgrade(civilization->ID, class_id);
 			if (upgrade_id != -1) {
@@ -1570,7 +1568,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 static int CclGetFactionClassUnitType(lua_State *l)
 {
 	std::string class_name = LuaToString(l, 1);
-	int class_id = GetUnitTypeClassIndexByName(class_name);
+	const stratagus::unit_class *unit_class = stratagus::unit_class::try_get(class_name);
 	int faction_id = -1;
 	CFaction *faction = nullptr;
 	const int nargs = lua_gettop(l);
@@ -1587,15 +1585,15 @@ static int CclGetFactionClassUnitType(lua_State *l)
 		}
 	}
 	std::string unit_type_ident;
-	if (faction != nullptr && class_id != -1) {
-		const CUnitType *unit_type = faction->get_class_unit_type(class_id);
+	if (faction != nullptr && unit_class != nullptr) {
+		const CUnitType *unit_type = faction->get_class_unit_type(unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->get_identifier();
 		}
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		class_id = GetUpgradeClassIndexByName(class_name);
+		const int class_id = GetUpgradeClassIndexByName(class_name);
 		if (class_id != -1) {
 			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(faction_id, class_id);
 			if (upgrade_id != -1) {
@@ -1821,10 +1819,10 @@ static int CclDefineFaction(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						force->Weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
 						++k;
-						int unit_quantity = LuaToNumber(l, -1, k + 1);
-						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+						const int unit_quantity = LuaToNumber(l, -1, k + 1);
+						force->add_unit(unit_class, unit_quantity);
 					} else {
 						printf("\n%s\n", faction->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1850,13 +1848,13 @@ static int CclDefineFaction(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
-						building_template->UnitClass = unit_class;
+						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						building_template->set_unit_class(unit_class);
 						faction->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
-						building_template->Priority = LuaToNumber(l, -1, k + 1);
+						building_template->set_priority(LuaToNumber(l, -1, k + 1));
 					} else if (!strcmp(value, "per-settlement")) {
-						building_template->PerSettlement = LuaToBoolean(l, -1, k + 1);
+						building_template->set_per_settlement(LuaToBoolean(l, -1, k + 1));
 					} else {
 						printf("\n%s\n", faction->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1865,7 +1863,7 @@ static int CclDefineFaction(lua_State *l)
 				lua_pop(l, 1);
 			}
 			std::sort(faction->AiBuildingTemplates.begin(), faction->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
-				return a->Priority > b->Priority;
+				return a->get_priority() > b->get_priority();
 			});
 		} else if (!strcmp(value, "UIFillers")) {
 			if (!lua_istable(l, -1)) {

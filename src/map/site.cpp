@@ -38,6 +38,7 @@
 #include "map/map_template.h"
 #include "player.h" //for factions
 #include "province.h" //for regions
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
 
@@ -194,7 +195,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		} else if (child_config_data->Tag == "historical_building") {
 			CDate start_date;
 			CDate end_date;
-			int building_class_id = -1;
+			const stratagus::unit_class *building_class = nullptr;
 			CUniqueItem *unique = nullptr;
 			CFaction *building_owner_faction = nullptr;
 				
@@ -209,10 +210,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					end_date = CDate::FromString(value);
 				} else if (key == "building_class") {
-					building_class_id = GetUnitTypeClassIndexByName(value);
-					if (building_class_id == -1) {
-						fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());
-					}
+					building_class = stratagus::unit_class::get(value);
 				} else if (key == "unique") {
 					value = FindAndReplaceString(value, "_", "-");
 					unique = GetUniqueItem(value);
@@ -230,12 +228,12 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 			
-			if (building_class_id == -1) {
+			if (building_class == nullptr) {
 				fprintf(stderr, "Historical building has no building class.\n");
 				continue;
 			}
 			
-			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner_faction));
+			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const stratagus::unit_class *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
 		} else {
 			fprintf(stderr, "Invalid site property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

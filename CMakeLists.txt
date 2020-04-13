@@ -391,6 +391,7 @@ set(unit_SRCS
 	src/unit/script_unit_type.cpp
 	src/unit/unit_cache.cpp
 	src/unit/unit.cpp
+	src/unit/unit_class.cpp
 	src/unit/unit_draw.cpp
 	src/unit/unit_find.cpp
 	src/unit/unit_manager.cpp
@@ -682,6 +683,7 @@ set(stratagus_unit_HDRS
 	src/unit/historical_unit.h
 	src/unit/unit.h
 	src/unit/unit_cache.h
+	src/unit/unit_class.h
 	src/unit/unit_find.h
 	src/unit/unit_manager.h
 	src/unit/unit_type_variation.h

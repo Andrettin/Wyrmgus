@@ -66,6 +66,7 @@
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
@@ -475,7 +476,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (!strcmp(value, "Type")) {
 					b->RestrictTypeName = LuaToString(l, -1);
 				} else if (!strcmp(value, "Class")) {
-					b->RestrictClassName = LuaToString(l, -1);
+					b->restrict_class_name = LuaToString(l, -1);
 				} else if (!strcmp(value, "Owner")) {
 					b->RestrictTypeOwner = LuaToString(l, -1);
 				} else if (!strcmp(value, "CheckBuilder")) {
@@ -713,7 +714,7 @@ static int CclDefineUnitType(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
-			type->Name = LuaToString(l, -1);
+			type->set_name(LuaToString(l, -1));
 		//Wyrmgus start
 		} else if (!strcmp(value, "Parent")) {
 			std::string parent_ident = LuaToString(l, -1);
@@ -876,7 +877,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						variation->Weight = LuaToNumber(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", type->Name.c_str());
+						printf("\n%s\n", type->get_name().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1535,7 +1536,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "file-when-loaded")) {
 						res->FileWhenLoaded = LuaToString(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", type->Name.c_str());
+						printf("\n%s\n", type->get_name().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1732,14 +1733,14 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
-			if (type->Class != -1)  {
-				ClassUnitTypes[type->Class].erase(std::remove(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type), ClassUnitTypes[type->Class].end());
+			if (type->get_unit_class() != nullptr)  {
+				type->get_unit_class()->remove_unit_type(type);
 			}
 			
-			type->Class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1));
+			type->unit_class = stratagus::unit_class::get(LuaToString(l, -1));
 			
-			if (type->Class != -1 && std::find(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type) == ClassUnitTypes[type->Class].end()) {
-				ClassUnitTypes[type->Class].push_back(type);
+			if (type->get_unit_class() != nullptr && !type->get_unit_class()->has_unit_type(type)) {
+				type->get_unit_class()->add_unit_type(type);
 			}
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
@@ -1898,14 +1899,14 @@ static int CclDefineUnitType(lua_State *l)
 					type->BoolFlag[index].value = LuaToBoolean(l, -1);
 				}
 			} else {
-				printf("\n%s\n", type->Name.c_str());
+				printf("\n%s\n", type->get_name().c_str());
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
 	}
 	
 	//Wyrmgus start
-	if (type->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+	if (type->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
 			civilization->remove_class_unit_type(type);
@@ -1915,18 +1916,18 @@ static int CclDefineUnitType(lua_State *l)
 			faction->remove_class_unit_type(type);
 		}
 		
-		const int class_id = type->Class;
+		const stratagus::unit_class *unit_class = type->get_unit_class();
 		if (type->civilization != -1) {
 			int civilization_id = type->civilization;
 			
 			if (type->Faction != -1) {
 				int faction_id = type->Faction;
-				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->set_class_unit_type(class_id, type);
+				if (faction_id != -1) {
+					PlayerRaces.Factions[faction_id]->set_class_unit_type(unit_class, type);
 				}
 			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(class_id, type);
+				if (civilization_id != -1) {
+					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(unit_class, type);
 				}
 			}
 		}
@@ -1952,7 +1953,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
+		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->get_name().c_str());
 	}
 	type->UpdateDefaultBoolFlags();
 	//Wyrmgus start
@@ -2291,7 +2292,7 @@ static int CclGetUnitTypeName(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const CUnitType *type = CclGetUnitType(l);
-	lua_pushstring(l, type->Name.c_str());
+	lua_pushstring(l, type->get_name().c_str());
 	return 1;
 }
 
@@ -2309,7 +2310,7 @@ static int CclSetUnitTypeName(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnitType *type = CclGetUnitType(l);
 	lua_pop(l, 1);
-	type->Name = LuaToString(l, 2);
+	type->set_name(LuaToString(l, 2));
 
 	lua_pushvalue(l, 2);
 	return 1;
@@ -2330,7 +2331,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, type->Name.c_str());
+		lua_pushstring(l, type->get_name().c_str());
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "NamePlural")) {
@@ -2342,8 +2343,8 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Class")) {
 		if (type->ItemClass != -1) {
 			lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
-		} else if (type->Class != -1) {
-			lua_pushstring(l, UnitTypeClasses[type->Class].c_str());
+		} else if (type->get_unit_class() != nullptr) {
+			lua_pushstring(l, type->get_unit_class()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

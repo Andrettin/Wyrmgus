@@ -54,6 +54,10 @@ class CGrandStrategyHero;
 class LuaCallback;
 enum class Diplomacy;
 
+namespace stratagus {
+	class unit_class;
+}
+
 class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
@@ -114,7 +118,7 @@ public:
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	int GetPopulation();
-	int GetClassUnitType(int class_id);
+	int GetClassUnitType(const stratagus::unit_class *unit_class);
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();

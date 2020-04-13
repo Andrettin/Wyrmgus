@@ -111,12 +111,12 @@
 	if (this->NewForm == nullptr) {
 		CUnitType *new_unit_type = nullptr;
 		if (this->civilization != -1 && this->Faction != -1 && this->civilization == target->Type->civilization) { //get faction equivalent, if is of the same civilization
-			new_unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(target->Type->Class);
+			new_unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
 		} else if (this->civilization != -1 && this->civilization != target->Type->civilization) {
-			new_unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(target->Type->Class);
+			new_unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(target->Type->get_unit_class());
 		}
 		if (this->Detachment && target->Type->civilization != -1 && target->Type->Faction != -1) {
-			new_unit_type = stratagus::civilization::get_all()[target->Type->civilization]->get_class_unit_type(target->Type->Class);
+			new_unit_type = stratagus::civilization::get_all()[target->Type->civilization]->get_class_unit_type(target->Type->get_unit_class());
 		}
 		if (new_unit_type != nullptr) {
 			type = new_unit_type;

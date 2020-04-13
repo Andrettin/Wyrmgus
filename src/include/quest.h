@@ -48,6 +48,10 @@ class CUpgrade;
 class LuaCallback;
 class CMapTemplate;
 
+namespace stratagus {
+	class unit_class;
+}
+
 enum class ObjectiveType {
 	None = -1,
 	GatherResource,
@@ -66,10 +70,22 @@ enum class ObjectiveType {
 class CQuestObjective
 {
 public:
+	const stratagus::unit_class *get_unit_class() const
+	{
+		return this->unit_class;
+	}
+
+	void set_unit_class(const stratagus::unit_class *unit_class)
+	{
+		this->unit_class = unit_class;
+	}
+
 	ObjectiveType ObjectiveType = ObjectiveType::None;
 	int Quantity = 1;
 	int Resource = -1;
-	int UnitClass = -1;
+private:
+	const stratagus::unit_class *unit_class = nullptr;
+public:
 	std::string ObjectiveString;
 	CQuest *Quest = nullptr;
 	std::vector<const CUnitType *> UnitTypes;

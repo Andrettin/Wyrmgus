@@ -48,6 +48,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -243,7 +244,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	if (province->Owner == GrandStrategyGame.PlayerFaction || work != nullptr) { // only show foreign works that are predefined
 		std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
 		if (author != nullptr) {
-			work_creation_message += "The " + FullyDecapitalizeString(author->Type->Name) + " " + author->GetFullName() + " ";
+			work_creation_message += "The " + FullyDecapitalizeString(author->Type->get_name()) + " " + author->GetFullName() + " ";
 		} else {
 			work_creation_message += "A sage ";
 		}
@@ -307,8 +308,8 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->MilitaryScore += this->Units[unit_type->Slot] * (new_owner_military_score_bonus - old_owner_military_score_bonus);
 				this->OffensiveMilitaryScore += this->Units[unit_type->Slot] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
-		} else if (unit_type->Class != -1 && UnitTypeClasses[unit_type->Class] == "worker") {
-			const CUnitType *militia_unit_type = stratagus::civilization::get_all()[unit_type->civilization]->get_class_unit_type(GetUnitTypeClassIndexByName("militia"));
+		} else if (unit_type->get_unit_class() != nullptr && unit_type->get_unit_class()->get_identifier() == "worker") {
+			const CUnitType *militia_unit_type = stratagus::civilization::get_all()[unit_type->civilization]->get_class_unit_type(stratagus::unit_class::get("militia"));
 			if (militia_unit_type != nullptr) {
 				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
 				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
@@ -336,8 +337,8 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	
 	//if this province has an equivalent building for its civilization/faction, use that instead
 	if (CUnitType::get_all()[building_id]->civilization != -1) {
-		if (this->GetClassUnitType(CUnitType::get_all()[building_id]->Class) != building_id && this->GetClassUnitType(CUnitType::get_all()[building_id]->Class) != -1) {
-			building_id = this->GetClassUnitType(CUnitType::get_all()[building_id]->Class);
+		if (this->GetClassUnitType(CUnitType::get_all()[building_id]->get_unit_class()) != building_id && this->GetClassUnitType(CUnitType::get_all()[building_id]->get_unit_class()) != -1) {
+			building_id = this->GetClassUnitType(CUnitType::get_all()[building_id]->get_unit_class());
 		}
 	}
 				
@@ -354,7 +355,7 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 		}
 	}
 	
-	if (CUnitType::get_all()[building_id]->Class != -1 && UnitTypeClasses[CUnitType::get_all()[building_id]->Class] == "stronghold") { //increase the military score of the province, if this building is a stronghold
+	if (CUnitType::get_all()[building_id]->get_unit_class() != nullptr && CUnitType::get_all()[building_id]->get_unit_class()->get_identifier() == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
 	}
 }
@@ -399,11 +400,11 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		this->OffensiveMilitaryScore += change * (CUnitType::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
 	}
 	
-	if (CUnitType::get_all()[unit_type_id]->Class != -1 && UnitTypeClasses[CUnitType::get_all()[unit_type_id]->Class] == "worker") {
+	if (CUnitType::get_all()[unit_type_id]->get_unit_class() != nullptr && CUnitType::get_all()[unit_type_id]->get_unit_class()->get_identifier() == "worker") {
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		const CUnitType *militia_unit_type = stratagus::civilization::get_all()[CUnitType::get_all()[unit_type_id]->civilization]->get_class_unit_type(GetUnitTypeClassIndexByName("militia"));
+		const CUnitType *militia_unit_type = stratagus::civilization::get_all()[CUnitType::get_all()[unit_type_id]->civilization]->get_class_unit_type(stratagus::unit_class::get("militia"));
 		if (militia_unit_type != nullptr) {
 			this->MilitaryScore += change * ((militia_unit_type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0)) / 2);
 		}
@@ -423,7 +424,7 @@ void CGrandStrategyProvince::SetPopulation(int quantity)
 		return;
 	}
 
-	int worker_unit_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
+	int worker_unit_type = this->GetClassUnitType(stratagus::unit_class::get("worker"));
 	
 	if (quantity > 0) {
 		quantity /= 10000; // each population unit represents 10,000 people
@@ -477,7 +478,7 @@ bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 		return false;
 	}
 	
-	int building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName(building_class_name));
+	int building_type = this->GetClassUnitType(stratagus::unit_class::get(building_class_name));
 	
 	if (building_type == -1 && building_class_name == "mercenary-camp") { //special case for mercenary camps, which are a neutral building
 		building_type = UnitTypeIdByIdent("unit-mercenary-camp");
@@ -574,9 +575,9 @@ int CGrandStrategyProvince::GetPopulation()
 	return (this->TotalWorkers * 10000) * 2;
 }
 
-int CGrandStrategyProvince::GetClassUnitType(int class_id)
+int CGrandStrategyProvince::GetClassUnitType(const stratagus::unit_class *unit_class)
 {
-	const CUnitType *unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(class_id);
+	const CUnitType *unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(unit_class);
 
 	if (unit_type != nullptr) {
 		return unit_type->Slot;
@@ -637,7 +638,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 	std::vector<CGrandStrategyHero *> potential_authors;
 	
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (this->Heroes[i]->Type->Class != -1 && UnitTypeClasses[this->Heroes[i]->Type->Class] == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
+		if (this->Heroes[i]->Type->get_unit_class() != nullptr && this->Heroes[i]->Type->get_unit_class()->get_identifier() == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
 			potential_authors.push_back(this->Heroes[i]);
 		}
 	}
@@ -738,7 +739,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 				new_minister_message += " has been appointed, ";
 			}
 			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
-			new_minister_message += "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->get_name() + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
+			new_minister_message += "Type: " + this->Ministers[title]->Type->get_name() + "\\n" + "Trait: " + this->Ministers[title]->Trait->get_name() + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
 			new_minister_message += "\") end;";
 			CclCommand(new_minister_message);	
 		}
@@ -967,9 +968,9 @@ bool CGrandStrategyHero::IsGenerated()
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
 {
-	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->Type->Class != -1 && UnitTypeClasses[this->Type->Class] == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->Type->get_unit_class() != nullptr && this->Type->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->Type->Class != -1 && UnitTypeClasses[this->Type->Class] != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->Type->get_unit_class() != nullptr && this->Type->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
@@ -1060,7 +1061,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 
 std::string CGrandStrategyHero::GetBestDisplayTitle()
 {
-	std::string best_title = this->Type->Name;
+	std::string best_title = this->Type->get_name();
 	int best_title_type = MaxCharacterTitles;
 	/*
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
@@ -1490,7 +1491,7 @@ std::string GetFactionTier(std::string civilization_name, std::string faction_na
 
 bool IsGrandStrategyUnit(const CUnitType &type)
 {
-	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != -1 && UnitTypeClasses[type.Class] != "caravan") {
+	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "caravan") {
 		return true;
 	}
 	return false;
@@ -1498,7 +1499,7 @@ bool IsGrandStrategyUnit(const CUnitType &type)
 
 bool IsMilitaryUnit(const CUnitType &type)
 {
-	if (IsGrandStrategyUnit(type) && type.Class != -1 && UnitTypeClasses[type.Class] != "worker") {
+	if (IsGrandStrategyUnit(type) && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "worker") {
 		return true;
 	}
 	return false;

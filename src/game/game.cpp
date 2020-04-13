@@ -89,6 +89,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
@@ -609,8 +610,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (unit_type->Parent) {
 				f->printf("\tParent = \"%s\",\n", unit_type->Parent->Ident.c_str());
 			}
-			if (!unit_type->Name.empty() && (!unit_type->Parent || unit_type->Name != unit_type->Parent->Name)) {
-				f->printf("\tName = \"%s\",\n", unit_type->Name.c_str());
+			if (!unit_type->get_name().empty() && (!unit_type->Parent || unit_type->get_name() != unit_type->Parent->get_name())) {
+				f->printf("\tName = \"%s\",\n", unit_type->get_name().c_str());
 			}
 			if (unit_type->civilization != -1) {
 				f->printf("\tCivilization = \"%s\",\n", stratagus::civilization::get_all()[unit_type->civilization]->get_identifier().c_str());
@@ -618,8 +619,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (unit_type->Faction != -1) {
 				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[unit_type->Faction]->Ident.c_str());
 			}
-			if (unit_type->Class != -1) {
-				f->printf("\tClass = \"%s\",\n", UnitTypeClasses[unit_type->Class].c_str());
+			if (unit_type->get_unit_class() != nullptr) {
+				f->printf("\tClass = \"%s\",\n", unit_type->get_unit_class()->get_identifier().c_str());
 			}
 			if (!unit_type->File.empty() && (!unit_type->Parent || unit_type->File != unit_type->Parent->File)) {
 				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", unit_type->File.c_str(), unit_type->Width, unit_type->Height);

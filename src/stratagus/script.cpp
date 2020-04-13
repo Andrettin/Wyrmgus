@@ -69,6 +69,7 @@
 #include "ui/button_action.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 //Wyrmgus start
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
@@ -1431,7 +1432,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				int civilization = unit->Settlement->SiteUnit->Type->civilization;
-				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type == PlayerRaces.Factions[unit->Settlement->SiteUnit->Player->Faction]->get_class_unit_type(unit->Settlement->SiteUnit->Type->Class))) {
+				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type == PlayerRaces.Factions[unit->Settlement->SiteUnit->Player->Faction]->get_class_unit_type(unit->Settlement->SiteUnit->Type->get_unit_class()))) {
 					civilization = unit->Settlement->SiteUnit->Player->Race;
 				}
 				return unit->Settlement->GetCulturalName(civilization != -1 ? stratagus::civilization::get_all()[civilization] : nullptr);
@@ -1472,7 +1473,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Name;
+				return (**type).get_name();
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1489,8 +1490,8 @@ std::string EvalString(const StringDesc *s)
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
 					str = GetItemClassNameById((**type).ItemClass).c_str();
-				} else if ((**type).Class != -1) {
-					str = UnitTypeClasses[(**type).Class].c_str();
+				} else if ((**type).get_unit_class() != nullptr) {
+					str = (**type).get_unit_class()->get_identifier().c_str();
 				}
 				str[0] = toupper(str[0]);
 				size_t loc;

@@ -50,6 +50,7 @@ class CUniqueItem;
 
 namespace stratagus {
 	class civilization;
+	class unit_class;
 }
 
 class CSite : public CDataType
@@ -76,6 +77,6 @@ public:
 	std::map<CDate, const CFaction *> HistoricalOwners;				/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const stratagus::unit_class *, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 };
