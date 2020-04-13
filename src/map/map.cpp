@@ -2120,8 +2120,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 						if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
 							adjacent_terrain_directions[adjacent_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
 						} else if (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end()) { //if the two terrain types can't border, look for a third terrain type which can border both, and which treats both as outer border terrains, and then use for transitions between both tiles
-							for (size_t i = 0; i < terrain->BorderTerrains.size(); ++i) {
-								CTerrainType *border_terrain = terrain->BorderTerrains[i];
+							for (const CTerrainType *border_terrain : terrain->BorderTerrains) {
 								if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), border_terrain) != terrain->InnerBorderTerrains.end() && std::find(adjacent_terrain->InnerBorderTerrains.begin(), adjacent_terrain->InnerBorderTerrains.end(), border_terrain) != adjacent_terrain->InnerBorderTerrains.end()) {
 									adjacent_terrain_directions[border_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
 									break;
@@ -2146,37 +2145,53 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			bool found_transition = false;
 			
 			if (!overlay) {
-				if (adjacent_terrain) {
-					if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+				if (adjacent_terrain != nullptr) {
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(adjacent_terrain_id, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 						found_transition = true;
-					} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
-						found_transition = true;
-					} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
-						found_transition = true;
+					} else {
+						auto adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(terrain_id, transition_type));
+						if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+							mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+							found_transition = true;
+						} else {
+							adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+							if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+								mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+								found_transition = true;
+							}
+						}
 					}
 				} else {
-					if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 					}
 				}
 			} else {
-				if (adjacent_terrain) {
-					if (adjacent_terrain && terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+				if (adjacent_terrain != nullptr) {
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(adjacent_terrain_id, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 						found_transition = true;
-					} else if (adjacent_terrain && adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
-						found_transition = true;
-					} else if (adjacent_terrain && adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
-						found_transition = true;
+					} else {
+						auto adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(terrain_id, transition_type));
+						if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+							mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+							found_transition = true;
+						} else {
+							adjacent_transition_tiles_find_iterator = adjacent_terrain->AdjacentTransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+							if (adjacent_transition_tiles_find_iterator != adjacent_terrain->AdjacentTransitionTiles.end() && adjacent_transition_tiles_find_iterator->second.size() > 0) {
+								mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_transition_tiles_find_iterator->second[SyncRand(adjacent_transition_tiles_find_iterator->second.size())]));
+								found_transition = true;
+							}
+						}
 					}
 				} else {
-					if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+					auto transition_tiles_find_iterator = terrain->TransitionTiles.find(std::tuple<int, int>(-1, transition_type));
+					if (transition_tiles_find_iterator != terrain->TransitionTiles.end() && transition_tiles_find_iterator->second.size() > 0) {
+						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, transition_tiles_find_iterator->second[SyncRand(transition_tiles_find_iterator->second.size())]));
 					}
 				}
 				
