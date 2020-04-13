@@ -2541,7 +2541,8 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					if (overlay) {
 						mf.RemoveOverlayTerrain();
 					} else {
-						bool changed_terrain = false;
+						std::map<CTerrainType *, int> best_terrain_scores;
+
 						for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 							for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 								if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
@@ -2549,20 +2550,21 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 								}
 								CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 								if (mf.Terrain != tile_terrain) {
-									if (std::find(mf.Terrain->InnerBorderTerrains.begin(), mf.Terrain->InnerBorderTerrains.end(), tile_terrain) != mf.Terrain->InnerBorderTerrains.end()) {
-										mf.SetTerrain(tile_terrain);
-										changed_terrain = true;
-										break;
-									}
+									best_terrain_scores[tile_terrain]++;
 								}
 							}
-							if (changed_terrain) {
-								break;
+						}
+
+						CTerrainType *best_terrain = nullptr;
+						int best_score = 0;
+						for (const auto &score_pair : best_terrain_scores) {
+							if (score_pair.second > best_score) {
+								best_score = score_pair.second;
+								best_terrain = score_pair.first;
 							}
 						}
-						if (!changed_terrain && terrain->InnerBorderTerrains.size() > 0) {
-							mf.SetTerrain(terrain->InnerBorderTerrains[0]);
-						}
+
+						mf.SetTerrain(best_terrain);
 					}
 					no_irregularities_found = false;
 				}
@@ -2609,8 +2611,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					}
 					CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					if (mf.Terrain != tile_terrain && std::find(mf.Terrain->BorderTerrains.begin(), mf.Terrain->BorderTerrains.end(), tile_terrain) == mf.Terrain->BorderTerrains.end()) {
-						for (size_t i = 0; i < mf.Terrain->BorderTerrains.size(); ++i) {
-							CTerrainType *border_terrain = mf.Terrain->BorderTerrains[i];
+						for (CTerrainType *border_terrain : mf.Terrain->BorderTerrains) {
 							if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), mf.Terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), tile_terrain) != border_terrain->BorderTerrains.end()) {
 								mf.SetTerrain(border_terrain);
 								break;
