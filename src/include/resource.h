@@ -74,10 +74,10 @@ enum CostType {
 	MaxCosts                                /// how many different costs
 };
 
-#define FoodCost MaxCosts
-#define ScoreCost (MaxCosts + 1)
-#define ManaResCost (MaxCosts + 2)
-#define FreeWorkersCount (MaxCosts + 3)
+static constexpr int FoodCost = MaxCosts;
+static constexpr int ScoreCost = MaxCosts + 1;
+static constexpr int ManaResCost = MaxCosts + 2;
+static constexpr int FreeWorkersCount = MaxCosts + 3;
 
 class CResource : public CDataType
 {

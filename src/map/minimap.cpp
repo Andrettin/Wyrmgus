@@ -113,7 +113,7 @@ static std::vector<int> MinimapScaleX;                  /// Minimap scale to fit
 static std::vector<int> MinimapScaleY;                  /// Minimap scale to fit into window
 //Wyrmgus end
 
-#define MAX_MINIMAP_EVENTS 8
+static constexpr int MAX_MINIMAP_EVENTS = 8;
 
 struct MinimapEvent {
 	PixelPos pos;

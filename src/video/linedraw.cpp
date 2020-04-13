@@ -45,11 +45,11 @@
 ** Bitmask, denoting a position left/right/above/below clip rectangle
 ** (mainly used by VideoDrawLineClip)
 */
-#define ClipCodeInside 0 /// Clipping inside rectangle
-#define ClipCodeAbove  1 /// Clipping above rectangle
-#define ClipCodeBelow  2 /// Clipping below rectangle
-#define ClipCodeLeft   4 /// Clipping left rectangle
-#define ClipCodeRight  8 /// Clipping right rectangle
+static constexpr int ClipCodeInside = 0; /// Clipping inside rectangle
+static constexpr int ClipCodeAbove = 1; /// Clipping above rectangle
+static constexpr int ClipCodeBelow = 2; /// Clipping below rectangle
+static constexpr int ClipCodeLeft = 4; /// Clipping left rectangle
+static constexpr int ClipCodeRight = 8; /// Clipping right rectangle
 
 
 namespace linedraw_sdl

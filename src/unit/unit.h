@@ -82,12 +82,8 @@ typedef COrder *COrderPtr;
 #define CANATTACK_BONUS   0x00080000
 #define AIPRIORITY_BONUS  0x04000000
 
-
-
 //the range in which experience is distributed
-#define ExperienceRange 6
-
-
+static constexpr int ExperienceRange = 6;
 
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
@@ -116,7 +112,7 @@ enum _directions_ {
 	LookingNW = 7 * 32       /// Unit looking north west
 };
 
-#define NextDirection 32        /// Next direction N->NE->E...
+static constexpr int NextDirection = 32;        /// Next direction N->NE->E...
 #define UnitNotSeen 0x7fffffff  /// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure

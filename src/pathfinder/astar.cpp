@@ -108,8 +108,8 @@ static std::vector<int> Threshold;
 static std::vector<int> OpenSetMaxSize;
 static std::vector<int> AStarMatrixSize;
 //Wyrmgus end
-#define MAX_CLOSE_SET_RATIO 4
-#define MAX_OPEN_SET_RATIO 8 // 10,16 to small
+static constexpr int MAX_CLOSE_SET_RATIO = 4;
+static constexpr int MAX_OPEN_SET_RATIO = 8; // 10,16 to small
 
 /// see pathfinder.h
 int AStarFixedUnitCrossingCost;// = MaxMapWidth * MaxMapHeight;

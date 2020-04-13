@@ -43,8 +43,8 @@ class ButtonAction;
 class CFont;
 class CPopup;
 
-#define MARGIN_X 4
-#define MARGIN_Y 2
+static constexpr int MARGIN_X = 4;
+static constexpr int MARGIN_Y = 2;
 
 class PopupConditionPanel
 {

@@ -81,13 +81,13 @@ struct Settings {
 	//Wyrmgus end
 };
 
-#define SettingsPresetMapDefault  -1  /// Special: Use map supplied
+static constexpr int SettingsPresetMapDefault = -1;  /// Special: Use map supplied
 
 /**
 **  Single or multiplayer settings
 */
-#define SettingsSinglePlayerGame  1
-#define SettingsMultiPlayerGame   2
+static constexpr int SettingsSinglePlayerGame = 1;
+static constexpr int SettingsMultiPlayerGame = 2;
 
 /**
 **  GameType settings

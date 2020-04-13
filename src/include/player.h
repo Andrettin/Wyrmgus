@@ -895,7 +895,7 @@ enum PlayerTypes {
 	PlayerRescueActive = 7    /// rescued  active
 };
 
-#define PlayerNumNeutral (PlayerMax - 1)  /// this is the neutral player slot
+static constexpr int PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
 
 /**
 **  Notify types. Noties are send to the player.

@@ -55,7 +55,7 @@
 #include "unit/unit_type_type.h"
 
 /// How many resources the player gets back if canceling training
-#define CancelTrainingCostsFactor  100
+static constexpr int CancelTrainingCostsFactor = 100;
 
 /*----------------------------------------------------------------------------
 --  Functions

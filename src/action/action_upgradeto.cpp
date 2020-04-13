@@ -60,8 +60,7 @@
 //Wyrmgus end
 
 /// How many resources the player gets back if canceling upgrade
-#define CancelUpgradeCostsFactor   100
-
+static constexpr int CancelUpgradeCostsFactor = 100;
 
 /*----------------------------------------------------------------------------
 --  Functions

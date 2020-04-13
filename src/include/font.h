@@ -119,7 +119,7 @@ private:
 	CGraphic *G;          /// Graphic object used to draw
 };
 
-#define MaxFontColors 9
+static constexpr int MaxFontColors = 9;
 
 /// Font color definition
 class CFontColor

@@ -50,8 +50,7 @@
 #include "upgrade/upgrade.h"
 
 /// How many resources the player gets back if canceling research
-#define CancelResearchCostsFactor  100
-
+static constexpr int CancelResearchCostsFactor = 100;
 
 /*----------------------------------------------------------------------------
 --  Functions
