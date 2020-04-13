@@ -223,7 +223,7 @@ public:
 	void CalculateTileOwnership(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustMap();
-	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
+	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type) const;
