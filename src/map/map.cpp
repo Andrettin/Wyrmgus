@@ -2793,7 +2793,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		}
 	}
 	
-	// expand seeds
+	//expand seeds
 	for (size_t i = 0; i < seeds.size(); ++i) {
 		Vec2i seed_pos = seeds[i];
 		
@@ -3004,15 +3004,10 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 		return;
 	}
 
-	// expand seeds
-	for (size_t i = 0; i < seeds.size(); ++i) {
-		Vec2i seed_pos = seeds[i];
-
-		const int random_number = SyncRand(100);
-		if (random_number >= 50) { //50% chance for the seed to generate terrain
-			seeds.push_back(seed_pos); //try again later, as we want to ensure as much terrain is generated as possible
-			continue;
-		}
+	//expand seeds
+	while (!seeds.empty()) {
+		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
+		stratagus::vector::remove(seeds, seed_pos);
 
 		CTerrainType *terrain_type = this->Field(seed_pos, z)->Terrain;
 		CTerrainType *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
