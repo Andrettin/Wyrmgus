@@ -1494,8 +1494,8 @@ void map_template::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 		
 		CFaction *unit_faction = historical_unit->Faction;
-
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
+		CUnitType *unit_type = historical_unit->UnitType;
 		
 		bool in_another_map_template = false;
 		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
@@ -1512,8 +1512,8 @@ void map_template::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
 			
 			if (unit_pos.x == -1 || unit_pos.y == -1) {
-				unit_pos = CMap::Map.GenerateUnitLocation(historical_unit->UnitType, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
-				unit_pos += historical_unit->UnitType->GetTileCenterPosOffset();
+				unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
+				unit_pos += unit_type->GetTileCenterPosOffset();
 			}
 		} else {
 			if (random) {
@@ -1525,19 +1525,23 @@ void map_template::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		if (unit_faction) {
+		if (unit_faction != nullptr) {
 			unit_player = GetOrAddFactionPlayer(unit_faction);
 			if (!unit_player) {
 				continue;
 			}
-			if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
+			if (!unit_type->BoolFlag[ITEM_INDEX].value && unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
 				unit_player->SetStartView(unit_pos, z);
 			}
 		} else {
 			unit_player = CPlayer::Players[PlayerNumNeutral];
 		}
 		for (int i = 0; i < historical_unit->get_quantity(); ++i) {
-			CUnit *unit = CreateUnit(unit_pos - historical_unit->UnitType->GetTileCenterPosOffset(), *historical_unit->UnitType, unit_player, z);
+			//item units only use factions to generate special properties for them
+			CUnit *unit = CreateUnit(unit_pos - unit_type->GetTileCenterPosOffset(), *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+			if (unit_type->BoolFlag[ITEM_INDEX].value) {
+				unit->GenerateSpecialProperties(nullptr, unit_player, false);
+			}
 			if (historical_unit->get_resources_held() != 0) {
 				unit->SetResourcesHeld(historical_unit->get_resources_held());
 				unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->get_resources_held();
