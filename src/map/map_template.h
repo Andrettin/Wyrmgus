@@ -31,8 +31,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database/data_entry.h"
 #include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
 #include "map/tile.h"
 #include "time/date.h"
@@ -52,6 +52,7 @@ class CTerrainType;
 class CUniqueItem;
 class CUnitType;
 class CWorld;
+struct lua_State;
 
 class CGeneratedTerrain
 {
@@ -72,19 +73,24 @@ public:
 	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
-class CMapTemplate : public stratagus::data_entry, public stratagus::data_type<CMapTemplate>, public CDataType
+class CMapTemplate : public stratagus::named_data_entry, public stratagus::data_type<CMapTemplate>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(QSize size MEMBER size READ get_size)
+
 public:
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char *database_folder = "map_templates";
 
-	CMapTemplate(const std::string &identifier) : data_entry(identifier), CDataType(identifier)
+	CMapTemplate(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
 	
 	~CMapTemplate();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
@@ -94,15 +100,36 @@ public:
 	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
 	const CMapTemplate *GetTopMapTemplate() const;
+
+	const QSize &get_size() const
+	{
+		return this->size;
+	}
+
+	int get_width() const
+	{
+		return this->get_size().width();
+	}
+
+	int get_height() const
+	{
+		return this->get_size().height();
+	}
+
+	int get_area() const
+	{
+		return this->get_width() * this->get_height();
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
-	std::string Name;
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;
 	std::string TerrainImage;
 	std::string OverlayTerrainImage;
-	int Width = 0;
-	int Height = 0;
+private:
+	QSize size = QSize(0, 0);
+public:
 	int Scale = 1;												/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int SurfaceLayer = 0;										/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
@@ -137,4 +164,6 @@ public:
 	std::vector<CSite *> Sites;
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
+
+	friend int CclDefineMapTemplate(lua_State *l);
 };

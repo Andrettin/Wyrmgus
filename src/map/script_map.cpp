@@ -794,7 +794,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			}
 		}
 
-		if (pos.x < 0 || pos.x >= map_template->Width || pos.y < 0 || pos.y >= map_template->Height) {
+		if (pos.x < 0 || pos.x >= map_template->get_width() || pos.y < 0 || pos.y >= map_template->get_height()) {
 			break;
 		}
 
@@ -1642,7 +1642,7 @@ static int CclDefineMapTemplate(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			map_template->Name = LuaToString(l, -1);
+			map_template->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Plane")) {
 			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
 			if (!plane) {
@@ -1670,9 +1670,9 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "OverlayTerrainImage")) {
 			map_template->OverlayTerrainImage = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
-			map_template->Width = LuaToNumber(l, -1);
+			map_template->size.setWidth(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Height")) {
-			map_template->Height = LuaToNumber(l, -1);
+			map_template->size.setHeight(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Scale")) {
 			map_template->Scale = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "OutputTerrainImage")) {
@@ -1738,8 +1738,8 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 	
 	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
-		map_template->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map_template->Width - 1) / 2);
-		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->Height - 1) / 2);
+		map_template->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map_template->get_width() - 1) / 2);
+		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->get_height() - 1) / 2);
 	}
 	
 	return 0;
@@ -2127,7 +2127,7 @@ static int CclGetMapTemplateData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, map_template->Name.c_str());
+		lua_pushstring(l, map_template->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (map_template->World != nullptr) {

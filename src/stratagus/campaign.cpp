@@ -178,10 +178,10 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 				if (key == "map_template") {
 					map_template = CMapTemplate::get(value);
 					if (map_size.x == 0) {
-						map_size.x = map_template->Width;
+						map_size.x = map_template->get_width();
 					}
 					if (map_size.y == 0) {
-						map_size.y = map_template->Height;
+						map_size.y = map_template->get_height();
 					}
 				} else if (key == "start_x") {
 					start_pos.x = std::stoi(value);

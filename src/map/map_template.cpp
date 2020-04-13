@@ -96,7 +96,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "plane") {
 			value = FindAndReplaceString(value, "_", "-");
 			CPlane *plane = CPlane::GetPlane(value);
@@ -128,9 +128,9 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "overlay_terrain_image") {
 			this->OverlayTerrainImage = value;
 		} else if (key == "width") {
-			this->Width = std::stoi(value);
+			this->size.setWidth(std::stoi(value));
 		} else if (key == "height") {
-			this->Height = std::stoi(value);
+			this->size.setHeight(std::stoi(value));
 		} else if (key == "scale") {
 			this->Scale = std::stoi(value);
 		} else if (key == "priority") {
@@ -409,7 +409,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		return;
 	}
 	
-	if (template_start_pos.x < 0 || template_start_pos.x >= this->Width || template_start_pos.y < 0 || template_start_pos.y >= this->Height) {
+	if (template_start_pos.x < 0 || template_start_pos.x >= this->get_width() || template_start_pos.y < 0 || template_start_pos.y >= this->get_height()) {
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), template_start_pos.x, template_start_pos.y);
 		return;
 	}
@@ -417,8 +417,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	
 	if (z >= (int)CMap::Map.MapLayers.size()) {
-		int width = std::min(this->Width * this->Scale, CMap::Map.Info.MapWidth);
-		int height = std::min(this->Height * this->Scale, CMap::Map.Info.MapHeight);
+		int width = std::min(this->get_width() * this->Scale, CMap::Map.Info.MapWidth);
+		int height = std::min(this->get_height() * this->Scale, CMap::Map.Info.MapHeight);
 		if (current_campaign) {
 			//applies the map size set for the campaign for this map layer; for the first map layer that is already Map.Info.Width/Height, so it isn't necessary here
 			width = current_campaign->MapSizes[z].x;
@@ -478,7 +478,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		}
 	}
 	
-	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + (this->Width * this->Scale)), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + (this->Height * this->Scale)));
+	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + (this->get_width() * this->Scale)), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + (this->get_height() * this->Scale)));
 	if (!CMap::Map.Info.IsPointOnMap(map_start_pos, z)) {
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), map_start_pos.x, map_start_pos.y);
 		return;
@@ -486,7 +486,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	
 	bool has_base_map = !this->TerrainFile.empty() || !this->TerrainImage.empty();
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->Name.c_str());
+	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->get_name().c_str());
 	
 	if (this->BaseTerrainType) {
 		for (int x = map_start_pos.x; x < map_end.x; ++x) {
@@ -589,7 +589,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	this->ApplySubtemplates(template_start_pos, map_start_pos, z, true);
 	
 	if (!has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 		
 		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 			int map_width = (map_end.x - map_start_pos.x);
@@ -607,7 +607,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.c_str());
+	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
 
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
@@ -645,7 +645,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
 	if (has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 		
 		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 			int map_width = (map_end.x - map_start_pos.x);
@@ -663,7 +663,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
-	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->get_name().c_str());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
 	if (current_campaign != nullptr) {
@@ -745,11 +745,11 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 */
 void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
 {
-	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
 		CMapTemplate *subtemplate = this->Subtemplates[i];
-		Vec2i subtemplate_pos(subtemplate->SubtemplatePosition - Vec2i((subtemplate->Width - 1) / 2, (subtemplate->Height - 1) / 2));
+		Vec2i subtemplate_pos(subtemplate->SubtemplatePosition - Vec2i((subtemplate->get_width() - 1) / 2, (subtemplate->get_height() - 1) / 2));
 		bool found_location = false;
 		
 		if (subtemplate->UpperTemplate && (subtemplate_pos.x < 0 || subtemplate_pos.y < 0)) { //if has no given position, but has an upper template, use its coordinates instead
@@ -772,7 +772,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					continue;
 				}
 				Vec2i min_pos(map_start_pos);
-				Vec2i max_pos(map_end.x - subtemplate->Width, map_end.y - subtemplate->Height);
+				Vec2i max_pos(map_end.x - subtemplate->get_width(), map_end.y - subtemplate->get_height());
 				
 				if (subtemplate->MinPos.x != -1) {
 					min_pos.x += subtemplate->MinPos.x;
@@ -785,11 +785,11 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				
 				if (subtemplate->MaxPos.x != -1) {
 					max_pos.x += subtemplate->MaxPos.x;
-					max_pos.x -= this->Width;
+					max_pos.x -= this->get_width();
 				}
 				if (subtemplate->MaxPos.y != -1) {
 					max_pos.y += subtemplate->MaxPos.y;
-					max_pos.y -= this->Height;
+					max_pos.y -= this->get_height();
 				}
 				
 				//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
@@ -800,8 +800,8 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						continue;
 					}
 					
-					Vec2i min_adjacency_pos = adjacent_template_pos - MaxAdjacentTemplateDistance - Vec2i(subtemplate->Width, subtemplate->Height);
-					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->Width, adjacent_template->Height) + MaxAdjacentTemplateDistance;
+					Vec2i min_adjacency_pos = adjacent_template_pos - MaxAdjacentTemplateDistance - Vec2i(subtemplate->get_width(), subtemplate->get_height());
+					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->get_width(), adjacent_template->get_height()) + MaxAdjacentTemplateDistance;
 					min_pos.x = std::max(min_pos.x, min_adjacency_pos.x);
 					min_pos.y = std::max(min_pos.y, min_adjacency_pos.y);
 					max_pos.x = std::min(max_pos.x, max_adjacency_pos.x);
@@ -819,11 +819,11 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					subtemplate_pos = potential_positions[SyncRand(potential_positions.size())];
 					potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), subtemplate_pos), potential_positions.end());
 
-					bool on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos, z) && CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->Width - 1, subtemplate_pos.y + subtemplate->Height - 1), z);
+					bool on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos, z) && CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->get_width() - 1, subtemplate_pos.y + subtemplate->get_height() - 1), z);
 
 					bool on_subtemplate_area = false;
-					for (int x = 0; x < subtemplate->Width; ++x) {
-						for (int y = 0; y < subtemplate->Height; ++y) {
+					for (int x = 0; x < subtemplate->get_width(); ++x) {
+						for (int y = 0; y < subtemplate->get_height(); ++y) {
 							if (CMap::Map.IsPointInASubtemplateArea(subtemplate_pos + Vec2i(x, y), z)) {
 								on_subtemplate_area = true;
 								break;
@@ -859,7 +859,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y < CMap::Map.Info.MapHeights[z]) {
 				subtemplate->Apply(Vec2i(0, 0), subtemplate_pos, z);
 				
-				CMap::Map.MapLayers[z]->SubtemplateAreas.push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + subtemplate->Width - 1, subtemplate_pos.y + subtemplate->Height - 1), subtemplate));
+				CMap::Map.MapLayers[z]->SubtemplateAreas.push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + subtemplate->get_width() - 1, subtemplate_pos.y + subtemplate->get_height() - 1), subtemplate));
 			}
 		}
 	}
@@ -875,7 +875,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 */
 void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
 {
-	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	CDate start_date;
 	if (current_campaign != nullptr) {
@@ -1119,7 +1119,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 
 void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random) const
 {
-	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 
 	for (size_t i = 0; i < this->PlaneConnectors.size(); ++i) {
 		const CUnitType *type = std::get<1>(this->PlaneConnectors[i]);
@@ -1301,7 +1301,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 
 void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
 {
-	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	CDate start_date;
 	if (current_campaign) {
