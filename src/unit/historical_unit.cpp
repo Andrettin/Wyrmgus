@@ -92,10 +92,6 @@ void historical_unit::check() const
 		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have a unit type.");
 	}
 
-	if (this->Faction == nullptr) {
-		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have a faction.");
-	}
-
 	if (this->HistoricalLocations.empty()) {
 		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have any historical locations.");
 	}
