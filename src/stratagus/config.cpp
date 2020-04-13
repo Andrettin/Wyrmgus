@@ -66,7 +66,7 @@
 #include "ui/button_level.h"
 #include "ui/icon.h"
 #include "unit/historical_unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "util/util.h"
 #include "world.h"
 

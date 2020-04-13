@@ -45,7 +45,7 @@
 #include "player.h"
 #include "translate.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
 #include "upgrade/upgrade.h"
 

@@ -39,7 +39,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

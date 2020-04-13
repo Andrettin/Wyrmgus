@@ -77,7 +77,7 @@
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 //Wyrmgus end
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"

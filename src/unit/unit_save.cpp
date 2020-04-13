@@ -48,7 +48,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

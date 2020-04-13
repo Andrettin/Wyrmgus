@@ -46,7 +46,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
 #include "world.h"
 
@@ -54,15 +54,14 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC (16 * 3)  /// integer scale factor
+static constexpr int MINIMAP_FAC = 16 * 3;  /// integer scale factor
 
 /// unit attacked are shown red for at least this amount of cycles
-#define ATTACK_RED_DURATION (1 * CYCLES_PER_SECOND)
+static constexpr int ATTACK_RED_DURATION = 1 * CYCLES_PER_SECOND;
 /// unit attacked are shown blinking for this amount of cycles
-#define ATTACK_BLINK_DURATION (7 * CYCLES_PER_SECOND)
+static constexpr int ATTACK_BLINK_DURATION = 7 * CYCLES_PER_SECOND;
 
-#define SCALE_PRECISION 100
-
+static constexpr int SCALE_PRECISION = 100;
 
 /*----------------------------------------------------------------------------
 --  Variables

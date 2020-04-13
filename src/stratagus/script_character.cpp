@@ -48,7 +48,7 @@
 #include "script.h"
 #include "spells.h"
 #include "time/timeline.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------

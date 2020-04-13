@@ -67,9 +67,9 @@
 #include "script.h"
 #include "spells.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
-#define ANIMATIONS_MAXANIM 4096
+static constexpr int ANIMATIONS_MAXANIM = 4096;
 
 struct LabelsStruct {
 	CAnimation *Anim;

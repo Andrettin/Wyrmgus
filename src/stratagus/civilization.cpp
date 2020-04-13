@@ -34,7 +34,7 @@
 #include "player.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"

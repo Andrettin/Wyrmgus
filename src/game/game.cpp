@@ -90,7 +90,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "util/exception_util.h"
@@ -99,7 +99,6 @@
 //Wyrmgus end
 #include "version.h"
 #include "video.h"
-
 
 extern void CleanGame();
 

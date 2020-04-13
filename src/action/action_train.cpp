@@ -51,7 +51,7 @@
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 
 /// How many resources the player gets back if canceling training

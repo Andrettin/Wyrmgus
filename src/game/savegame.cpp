@@ -53,16 +53,11 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "version.h"
 
 extern void StartMap(const std::string &filename, bool clean);
-
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

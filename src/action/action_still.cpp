@@ -60,7 +60,7 @@
 #include "spells.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

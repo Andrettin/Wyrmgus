@@ -41,8 +41,7 @@
 #include "player.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
-
+#include "unit/unit_type.h"
 
 /// Callback for changed tile (with direction mask)
 static void EditorChangeSurrounding(const Vec2i &pos, int d);

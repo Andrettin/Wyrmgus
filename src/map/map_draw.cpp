@@ -43,9 +43,8 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
-
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
 {

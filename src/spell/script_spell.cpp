@@ -57,9 +57,8 @@
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
 #include "spell/spell_teleport.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-
 
 // **************************************************************************
 // Action parsers for spellAction

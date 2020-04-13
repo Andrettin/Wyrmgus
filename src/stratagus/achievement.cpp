@@ -33,7 +33,7 @@
 #include "config.h"
 #include "player.h"
 #include "quest.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "util/string_util.h"
 
 /**

@@ -74,7 +74,7 @@
 #include "ui/ui.h"
 #include "unit/unit_manager.h"
 //Wyrmgus end
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade_modifier.h"

@@ -51,7 +51,7 @@
 #include "translate.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /// How many resources the player gets back if canceling building
 static constexpr int CancelBuildingCostsFactor = 75;

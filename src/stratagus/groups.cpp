@@ -39,7 +39,7 @@
 #include "iolib.h"
 #include "script.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -48,7 +48,7 @@
 /**
 **  How many groups supported
 */
-#define NUM_GROUPS 10
+static constexpr int NUM_GROUPS = 10;
 
 /**
 **  Defines a group of units.

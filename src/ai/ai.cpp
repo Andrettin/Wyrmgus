@@ -168,7 +168,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"

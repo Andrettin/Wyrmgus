@@ -49,7 +49,7 @@
 #include "player.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"

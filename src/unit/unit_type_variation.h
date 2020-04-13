@@ -34,7 +34,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "ui/icon.h"
-#include "unit/unittype.h" //for the image layers enum
+#include "unit/unit_type.h" //for the image layers enum
 #include "upgrade/upgrade_structs.h" //for the costs enum
 
 /*----------------------------------------------------------------------------

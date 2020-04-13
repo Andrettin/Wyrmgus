@@ -63,17 +63,13 @@
 #include "ui/button_action.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus start
 #include "ui/ui.h"
 #include "util/util.h"
 //Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

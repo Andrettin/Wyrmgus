@@ -52,7 +52,7 @@
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start

@@ -43,7 +43,7 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "video.h"
 

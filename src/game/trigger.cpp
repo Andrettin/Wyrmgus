@@ -50,7 +50,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "util/string_util.h"
 

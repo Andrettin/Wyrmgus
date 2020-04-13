@@ -31,7 +31,7 @@
 
 #include "stratagus.h"
 
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
@@ -76,9 +76,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class CUnitType unittype.h
+**  @class CUnitType unit_type.h
 **
-**  \#include "unit/unittype.h"
+**  \#include "unit/unit_type.h"
 **
 **  This class contains the information that is shared between all
 **  units of the same type and determins if a unit is a building,
@@ -390,9 +390,9 @@
 */
 /**
 **
-**  @class ResourceInfo unittype.h
+**  @class ResourceInfo unit_type.h
 **
-** \#include "unit/unittype.h"
+** \#include "unit/unit_type.h"
 **
 **    This class contains information about how a unit will harvest a resource.
 **
