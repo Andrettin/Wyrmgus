@@ -1036,7 +1036,6 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 	}
 	
 	for (size_t i = 0; i < campaign->map_templates.size(); ++i) {
-		campaign->map_templates[i]->CurrentStartPos = campaign->MapTemplateStartPos[i];
 		campaign->map_templates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
 	}
 }
