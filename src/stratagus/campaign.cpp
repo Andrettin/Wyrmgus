@@ -167,7 +167,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "map_template") {
-			CMapTemplate *map_template = nullptr;
+			stratagus::map_template *map_template = nullptr;
 			Vec2i start_pos(0, 0);
 			Vec2i map_size(0, 0);
 				
@@ -176,7 +176,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "map_template") {
-					map_template = CMapTemplate::get(value);
+					map_template = stratagus::map_template::get(value);
 					if (map_size.x == 0) {
 						map_size.x = map_template->get_width();
 					}
@@ -201,7 +201,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->MapTemplates.push_back(map_template);
+			this->map_templates.push_back(map_template);
 			this->MapTemplateStartPos.push_back(start_pos);
 			this->MapSizes.push_back(map_size);
 		} else {

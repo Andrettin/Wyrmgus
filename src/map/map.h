@@ -94,7 +94,6 @@ class CGraphic;
 class CPlayer;
 class CFile;
 class CMapLayer;
-class CMapTemplate;
 class CPlane;
 class CRegion;
 class CSite;
@@ -103,6 +102,10 @@ class CUniqueItem;
 class CUnit;
 class CUnitType;
 class CWorld;
+
+namespace stratagus {
+	class map_template;
+}
 
 /*----------------------------------------------------------------------------
 --  Map
@@ -275,12 +278,12 @@ public:
 	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z);
 	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *overlay_terrain, const int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
-	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate = nullptr) const;
-	Vec2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
-	Vec2i GetSubtemplateEndPos(const CMapTemplate *subtemplate) const;
-	CMapLayer *GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const;
-	std::vector<CUnit *> GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const;
-	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
+	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate = nullptr) const;
+	Vec2i get_subtemplate_pos(const stratagus::map_template *subtemplate) const;
+	Vec2i get_subtemplate_end_pos(const stratagus::map_template *subtemplate) const;
+	CMapLayer *get_subtemplate_map_layer(const stratagus::map_template *subtemplate) const;
+	std::vector<CUnit *> get_map_template_layer_connectors(const stratagus::map_template *map_template) const;
+	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
 	
 	void SetCurrentPlane(CPlane *plane);

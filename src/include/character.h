@@ -47,7 +47,6 @@ class CDependency;
 class CFaction;
 class CFile;
 class CHistoricalLocation;
-class CMapTemplate;
 class CLanguage;
 class CPersistentItem;
 class CProvince;

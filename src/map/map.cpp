@@ -362,7 +362,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		random_pos = potential_positions[SyncRand(potential_positions.size())];
 		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
 		
-		if (!this->Info.IsPointOnMap(random_pos, z) || (this->IsPointInASubtemplateArea(random_pos, z) && GameCycle == 0)) {
+		if (!this->Info.IsPointOnMap(random_pos, z) || (this->is_point_in_a_subtemplate_area(random_pos, z) && GameCycle == 0)) {
 			continue;
 		}
 		
@@ -482,7 +482,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			if (this->IsPointInASubtemplateArea(pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
+			if (this->is_point_in_a_subtemplate_area(pos, z) && !this->is_point_in_a_subtemplate_area(adjacent_pos, z)) {
 				continue;
 			}
 			CTerrainType *top_terrain = GetTileTopTerrain(pos, false, z);
@@ -678,15 +678,15 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainT
 **
 **	@return	True if the tile is in a subtemplate area, or false otherwise
 */
-bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate) const
+bool CMap::is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate) const
 {
-	for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-		if (subtemplate && subtemplate != std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
+	for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
+		if (subtemplate && subtemplate != std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
 			continue;
 		}
 		
-		Vec2i min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
-		Vec2i max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
+		Vec2i min_pos = std::get<0>(this->MapLayers[z]->subtemplate_areas[i]);
+		Vec2i max_pos = std::get<1>(this->MapLayers[z]->subtemplate_areas[i]);
 		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
 			return true;
 		}
@@ -702,19 +702,19 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTe
 **
 **	@return	The subtemplate's position if found, or (-1, -1) otherwise
 */
-Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
+Vec2i CMap::get_subtemplate_pos(const stratagus::map_template *subtemplate) const
 {
 	if (!subtemplate) {
 		return Vec2i(-1, -1);
 	}
 	
-	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
+	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
 	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
 		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
 		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
+			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
+				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
+					return std::get<0>(Map.MapLayers[z]->subtemplate_areas[i]);
 				}
 			}
 		}
@@ -730,19 +730,19 @@ Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
 **
 **	@return	The subtemplate's end position if found, or (-1, -1) otherwise
 */
-Vec2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
+Vec2i CMap::get_subtemplate_end_pos(const stratagus::map_template *subtemplate) const
 {
 	if (!subtemplate) {
 		return Vec2i(-1, -1);
 	}
 	
-	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
+	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
 	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
 		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
 		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::get<1>(Map.MapLayers[z]->SubtemplateAreas[i]);
+			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
+				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
+					return std::get<1>(Map.MapLayers[z]->subtemplate_areas[i]);
 				}
 			}
 		}
@@ -758,18 +758,18 @@ Vec2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
 **
 **	@return	The subtemplate's map layer if found, or null otherwise
 */
-CMapLayer *CMap::GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const
+CMapLayer *CMap::get_subtemplate_map_layer(const stratagus::map_template *subtemplate) const
 {
 	if (!subtemplate) {
 		return nullptr;
 	}
 	
-	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
+	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
 	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
 		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
 		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
+			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
+				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
 					return this->MapLayers[z];
 				}
 			}
@@ -786,7 +786,7 @@ CMapLayer *CMap::GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const
 **
 **	@return	A list of the connector units
 */
-std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const
+std::vector<CUnit *> CMap::get_map_template_layer_connectors(const stratagus::map_template *map_template) const
 {
 	std::vector<CUnit *> layer_connectors;
 	
@@ -794,7 +794,7 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 		return layer_connectors;
 	}
 	
-	const CMapTemplate *main_template = map_template->GetTopMapTemplate();
+	const stratagus::map_template *main_template = map_template->GetTopMapTemplate();
 	if (main_template && main_template->Plane && main_template->World) {
 		const bool is_main_template = main_template == map_template;
 		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
@@ -803,9 +803,9 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
 				const Vec2i unit_pos = connector_unit->GetTileCenterPos();
 				
-				if (is_main_template && this->IsPointInASubtemplateArea(unit_pos, z)) {
+				if (is_main_template && this->is_point_in_a_subtemplate_area(unit_pos, z)) {
 					continue;
-				} else if (!is_main_template && !this->IsPointInASubtemplateArea(unit_pos, z, map_template)) {
+				} else if (!is_main_template && !this->is_point_in_a_subtemplate_area(unit_pos, z, map_template)) {
 					continue;
 				}
 
@@ -825,7 +825,7 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 **
 **	@return	True if the tile is adjacent to a non-subtemplate area tile, or false otherwise
 */
-bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const
+bool CMap::is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const
 {
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -835,7 +835,7 @@ bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) co
 			
 			Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 			
-			if (Map.Info.IsPointOnMap(adjacent_pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
+			if (Map.Info.IsPointOnMap(adjacent_pos, z) && !this->is_point_in_a_subtemplate_area(adjacent_pos, z)) {
 				return true;
 			}
 		}
@@ -2580,7 +2580,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 					continue;
 				}
 				
-				if (this->IsPointInASubtemplateArea(tile_pos, z)) {
+				if (this->is_point_in_a_subtemplate_area(tile_pos, z)) {
 					continue;
 				}
 				
@@ -2590,9 +2590,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	}
 	
 	if (generated_terrain->UseSubtemplateBordersAsSeeds) {
-		for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			const Vec2i subtemplate_min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
-			const Vec2i subtemplate_max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
+		for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
+			const Vec2i subtemplate_min_pos = std::get<0>(this->MapLayers[z]->subtemplate_areas[i]);
+			const Vec2i subtemplate_max_pos = std::get<1>(this->MapLayers[z]->subtemplate_areas[i]);
 			
 			for (int x = subtemplate_min_pos.x; x <= subtemplate_max_pos.x; ++x) {
 				for (int y = subtemplate_min_pos.y; y <= subtemplate_max_pos.y; ++y) {
@@ -2603,7 +2603,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 						continue;
 					}
 					
-					if (!IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
+					if (!this->is_point_adjacent_to_non_subtemplate_area(tile_pos, z)) {
 						continue;
 					}
 					
@@ -2629,7 +2629,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		random_pos = potential_positions[SyncRand(potential_positions.size())];
 		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
 		
-		if (!this->Info.IsPointOnMap(random_pos, z) || this->IsPointInASubtemplateArea(random_pos, z)) {
+		if (!this->Info.IsPointOnMap(random_pos, z) || this->is_point_in_a_subtemplate_area(random_pos, z)) {
 			continue;
 		}
 		
@@ -2696,7 +2696,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 						&& (!preserve_coastline || ((terrain_type->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain_type, z)
 						&& (!(terrain_type->Flags & MapFieldUnpassable) || (!this->TileBordersUnit(diagonal_pos, z) && !this->TileBordersUnit(vertical_pos, z) && !this->TileBordersUnit(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
-						&& !this->IsPointInASubtemplateArea(diagonal_pos, z) && !this->IsPointInASubtemplateArea(vertical_pos, z) && !this->IsPointInASubtemplateArea(horizontal_pos, z)
+						&& !this->is_point_in_a_subtemplate_area(diagonal_pos, z) && !this->is_point_in_a_subtemplate_area(vertical_pos, z) && !this->is_point_in_a_subtemplate_area(horizontal_pos, z)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}
@@ -2792,9 +2792,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				
 				//tiles within a subtemplate area can only be used as seeds, they cannot be modified themselves
 				if (
-					(this->IsPointInASubtemplateArea(diagonal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(diagonal_pos, z)))
-					|| (this->IsPointInASubtemplateArea(vertical_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(vertical_pos, z)))
-					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(horizontal_pos, z)))
+					(this->is_point_in_a_subtemplate_area(diagonal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(diagonal_pos, z)))
+					|| (this->is_point_in_a_subtemplate_area(vertical_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(vertical_pos, z)))
+					|| (this->is_point_in_a_subtemplate_area(horizontal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(horizontal_pos, z)))
 				) {
 					continue;
 				}
@@ -2829,7 +2829,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
 			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
 			
-			if (!this->IsPointInASubtemplateArea(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
 				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
 				}
@@ -2845,7 +2845,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 			}
 			
-			if (!this->IsPointInASubtemplateArea(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
 				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z))) {
 					this->Field(adjacent_pos_horizontal, z)->RemoveOverlayTerrain();
 				}
@@ -2861,7 +2861,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 			}
 			
-			if (!this->IsPointInASubtemplateArea(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
 				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z))) {
 					this->Field(adjacent_pos_vertical, z)->RemoveOverlayTerrain();
 				}

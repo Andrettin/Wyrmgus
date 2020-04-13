@@ -42,7 +42,6 @@
 ----------------------------------------------------------------------------*/
 
 class CFaction;
-class CMapTemplate;
 class CRegion;
 class CUnit;
 class CUnitType;
@@ -50,6 +49,7 @@ class CUniqueItem;
 
 namespace stratagus {
 	class civilization;
+	class map_template;
 	class unit_class;
 }
 
@@ -69,7 +69,7 @@ public:
 	std::string Name;
 	bool Major = false;											/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	Vec2i Position = Vec2i(-1, -1);								/// Position of the site in its map template
-	CMapTemplate *MapTemplate = nullptr;						/// Map template where this site is located
+	stratagus::map_template *map_template = nullptr;						/// Map template where this site is located
 	CUnit *SiteUnit = nullptr;									/// Unit which represents this site
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
 	std::vector<CFaction *> Cores;						/// Factions which have this site as a core

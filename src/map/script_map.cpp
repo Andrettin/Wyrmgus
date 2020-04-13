@@ -670,7 +670,7 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 static int CclSetMapTemplateTileTerrain(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	std::string terrain_ident = LuaToString(l, 2);
 	CTerrainType *terrain = nullptr;
@@ -702,7 +702,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 static int CclSetMapTemplateTileLabel(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	std::string label_string = LuaToString(l, 2);
 	
@@ -717,7 +717,7 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 static int CclSetMapTemplatePathway(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	std::string terrain_ident = LuaToString(l, 2);
 	CTerrainType *terrain = nullptr;
@@ -812,7 +812,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 static int CclSetMapTemplateResource(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
@@ -845,7 +845,7 @@ static int CclSetMapTemplateResource(lua_State *l)
 static int CclSetMapTemplateUnit(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
@@ -886,7 +886,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 static int CclSetMapTemplateHero(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	CCharacter *hero = CCharacter::GetCharacter(LuaToString(l, 2));
 	if (hero == nullptr) {
@@ -920,7 +920,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 static int CclSetMapTemplateLayerConnector(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
@@ -966,7 +966,7 @@ static std::string map_terrains[64][64];
 static int CclCreateMapTemplateTerrainFile(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
+	stratagus::map_template *map_template = stratagus::map_template::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -1022,7 +1022,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 
 void ApplyMapTemplate(const std::string &map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
 {
-	CMapTemplate *map_template = CMapTemplate::get(map_template_ident);
+	stratagus::map_template *map_template = stratagus::map_template::get(map_template_ident);
 	
 	map_template->Apply(Vec2i(template_start_x, template_start_y), Vec2i(map_start_x, map_start_y), z);
 }
@@ -1035,9 +1035,9 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 		return;
 	}
 	
-	for (size_t i = 0; i < campaign->MapTemplates.size(); ++i) {
-		campaign->MapTemplates[i]->CurrentStartPos = campaign->MapTemplateStartPos[i];
-		campaign->MapTemplates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
+	for (size_t i = 0; i < campaign->map_templates.size(); ++i) {
+		campaign->map_templates[i]->CurrentStartPos = campaign->MapTemplateStartPos[i];
+		campaign->map_templates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
 	}
 }
 //Wyrmgus end
@@ -1633,7 +1633,7 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
+	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 	
 	Vec2i subtemplate_position_top_left(-1, -1);
 	
@@ -1684,7 +1684,7 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "PixelTileSize")) {
 			CclGetPos(l, &map_template->PixelTileSize.x, &map_template->PixelTileSize.y);
 		} else if (!strcmp(value, "MainTemplate")) {
-			CMapTemplate *main_template = CMapTemplate::get(LuaToString(l, -1));
+			stratagus::map_template *main_template = stratagus::map_template::get(LuaToString(l, -1));
 			map_template->MainTemplate = main_template;
 			main_template->Subtemplates.push_back(map_template);
 			if (main_template->Plane) {
@@ -1771,8 +1771,8 @@ static int CclDefineSite(lua_State *l)
 		} else if (!strcmp(value, "Position")) {
 			CclGetPos(l, &site->Position.x, &site->Position.y);
 		} else if (!strcmp(value, "MapTemplate")) {
-			CMapTemplate *map_template = CMapTemplate::get(LuaToString(l, -1));
-			site->MapTemplate = map_template;
+			stratagus::map_template *map_template = stratagus::map_template::get(LuaToString(l, -1));
+			site->map_template = map_template;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -1978,15 +1978,15 @@ static int CclDefineSite(lua_State *l)
 		site->Cores.clear();
 	}
 	
-	if (site->MapTemplate) {
+	if (site->map_template) {
 		if (site->Position.x != -1 && site->Position.y != -1) {
-			if (site->MapTemplate->SitesByPosition.find(std::pair<int, int>(site->Position.x, site->Position.y)) != site->MapTemplate->SitesByPosition.end()) {
-				LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->MapTemplate->Ident.c_str());
+			if (site->map_template->SitesByPosition.find(std::pair<int, int>(site->Position.x, site->Position.y)) != site->map_template->SitesByPosition.end()) {
+				LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->map_template->Ident.c_str());
 			}
-			site->MapTemplate->SitesByPosition[std::pair<int, int>(site->Position.x, site->Position.y)] = site;
+			site->map_template->SitesByPosition[std::pair<int, int>(site->Position.x, site->Position.y)] = site;
 		}
 		
-		site->MapTemplate->Sites.push_back(site);
+		site->map_template->Sites.push_back(site);
 	}
 	
 	return 0;
@@ -2123,7 +2123,7 @@ static int CclGetMapTemplateData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = CMapTemplate::get(map_template_ident);
+	stratagus::map_template *map_template = stratagus::map_template::get(map_template_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -2143,23 +2143,23 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushnumber(l, map_template->CurrentStartPos.y);
 		return 1;
 	} else if (!strcmp(data, "MapStartPosX")) {
-		Vec2i pos = CMap::Map.GetSubtemplatePos(map_template);
+		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);
 		lua_pushnumber(l, pos.x);
 		return 1;
 	} else if (!strcmp(data, "MapStartPosY")) {
-		Vec2i pos = CMap::Map.GetSubtemplatePos(map_template);
+		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosX")) {
-		Vec2i pos = CMap::Map.GetSubtemplateEndPos(map_template);
+		Vec2i pos = CMap::Map.get_subtemplate_end_pos(map_template);
 		lua_pushnumber(l, pos.x);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosY")) {
-		Vec2i pos = CMap::Map.GetSubtemplateEndPos(map_template);
+		Vec2i pos = CMap::Map.get_subtemplate_end_pos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
-		const CMapLayer *map_layer = CMap::Map.GetSubtemplateMapLayer(map_template);
+		const CMapLayer *map_layer = CMap::Map.get_subtemplate_map_layer(map_template);
 		if (map_layer) {
 			lua_pushnumber(l, map_layer->ID);
 		} else {

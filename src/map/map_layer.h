@@ -40,7 +40,6 @@
 ----------------------------------------------------------------------------*/
 
 class CMapField;
-class CMapTemplate;
 class CPlane;
 class CScheduledSeason;
 class CScheduledTimeOfDay;
@@ -50,6 +49,10 @@ class CTimeOfDay;
 class CTimeOfDaySchedule;
 class CUnit;
 class CWorld;
+
+namespace stratagus {
+	class map_template;
+}
 
 class CMapLayer
 {
@@ -147,6 +150,6 @@ public:
 	int SurfaceLayer = 0;						/// the surface layer for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
 	PixelSize PixelTileSize = PixelSize(32, 32);	/// the pixel tile size for the map layer
-	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
+	std::vector<std::tuple<Vec2i, Vec2i, stratagus::map_template *>> subtemplate_areas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };

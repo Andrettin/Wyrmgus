@@ -40,10 +40,13 @@
 ----------------------------------------------------------------------------*/
 
 class CFaction;
-class CMapTemplate;
 class CQuest;
 class LuaCallback;
 struct lua_State;
+
+namespace stratagus {
+	class map_template;
+}
 
 class CCampaign : public CDataType
 {
@@ -95,7 +98,7 @@ private:
 	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
 	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
 public:
-	std::vector<CMapTemplate *> MapTemplates;	/// Map templates used by the campaign
+	std::vector<stratagus::map_template *> map_templates; //map templates used by the campaign
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 	

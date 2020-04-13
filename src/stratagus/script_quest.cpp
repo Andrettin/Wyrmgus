@@ -444,14 +444,14 @@ static int CclDefineCampaign(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "MapTemplates")) {
-			campaign->MapTemplates.clear();
+			campaign->map_templates.clear();
 			campaign->MapSizes.clear();
 			campaign->MapTemplateStartPos.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string map_template_ident = LuaToString(l, -1, j + 1);
-				CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
-				campaign->MapTemplates.push_back(map_template);
+				stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+				campaign->map_templates.push_back(map_template);
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
@@ -469,8 +469,8 @@ static int CclDefineCampaign(lua_State *l)
 			}
 		} else if (!strcmp(value, "MapTemplate")) {
 			std::string map_template_ident = LuaToString(l, -1);
-			CMapTemplate *map_template = CMapTemplate::get_or_add(map_template_ident, nullptr);
-			campaign->MapTemplates.push_back(map_template);
+			stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+			campaign->map_templates.push_back(map_template);
 		} else if (!strcmp(value, "MapTemplateStartPos")) {
 			Vec2i map_template_start_pos;
 			CclGetPos(l, &map_template_start_pos.x, &map_template_start_pos.y);
@@ -546,8 +546,8 @@ static int CclGetCampaignData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "MapTemplate")) {
-		if (!campaign->MapTemplates.empty()) {
-			lua_pushstring(l, campaign->MapTemplates[0]->Ident.c_str());
+		if (!campaign->map_templates.empty()) {
+			lua_pushstring(l, campaign->map_templates[0]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

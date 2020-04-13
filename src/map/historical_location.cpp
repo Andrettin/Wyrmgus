@@ -63,15 +63,12 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->Date = CDate::FromString(value);
 		} else if (key == "map_template") {
-			this->MapTemplate = CMapTemplate::get(value);
-			if (!this->MapTemplate) {
-				fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
-			}
+			this->map_template = stratagus::map_template::get(value);
 		} else if (key == "site") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Site = CSite::GetSite(value);
 			if (this->Site) {
-				this->MapTemplate = this->Site->MapTemplate;
+				this->map_template = this->Site->map_template;
 				this->Position = this->Site->Position;
 			} else {
 				fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
@@ -89,7 +86,7 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 		fprintf(stderr, "Historical location has no date.\n");
 	}
 	
-	if (!this->MapTemplate) {
+	if (!this->map_template) {
 		fprintf(stderr, "Historical location has no map template.\n");
 	}
 }

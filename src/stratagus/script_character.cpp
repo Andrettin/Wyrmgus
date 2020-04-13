@@ -463,7 +463,7 @@ static int CclDefineCharacter(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				historical_location->MapTemplate = CMapTemplate::get(LuaToString(l, -1, j + 1));
+				historical_location->map_template = stratagus::map_template::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
@@ -475,7 +475,7 @@ static int CclDefineCharacter(lua_State *l)
 					if (!historical_location->Site) {
 						LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 					}
-					historical_location->MapTemplate = historical_location->Site->MapTemplate;
+					historical_location->map_template = historical_location->Site->map_template;
 					historical_location->Position = historical_location->Site->Position;
 				}
 				lua_pop(l, 1);

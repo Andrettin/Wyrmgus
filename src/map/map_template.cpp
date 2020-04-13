@@ -64,20 +64,11 @@
 #include "video.h"
 #include "world.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 static constexpr int MaxAdjacentTemplateDistance = 16;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-/**
-**	@brief	Destructor
-*/
-CMapTemplate::~CMapTemplate()
+map_template::~map_template()
 {
 	for (CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 		delete generated_terrain;
@@ -89,7 +80,7 @@ CMapTemplate::~CMapTemplate()
 **
 **	@param	config_data	The configuration data
 */
-void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
+void map_template::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -148,7 +139,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "max_y") {
 			this->MaxPos.y = std::stoi(value);
 		} else if (key == "main_template") {
-			CMapTemplate *main_template = CMapTemplate::get(value);
+			map_template *main_template = map_template::get(value);
 			this->MainTemplate = main_template;
 			main_template->Subtemplates.push_back(this);
 			if (main_template->Plane) {
@@ -159,19 +150,19 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			}
 			this->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (key == "upper_template") {
-			CMapTemplate *upper_template = CMapTemplate::get(value);
+			map_template *upper_template = map_template::get(value);
 			if (upper_template) {
 				this->UpperTemplate = upper_template;
 				upper_template->LowerTemplate = this;
 			}
 		} else if (key == "lower_template") {
-			CMapTemplate *lower_template = CMapTemplate::get(value);
+			map_template *lower_template = map_template::get(value);
 			if (lower_template) {
 				this->LowerTemplate = lower_template;
 				lower_template->UpperTemplate = this;
 			}
 		} else if (key == "adjacent_template") {
-			CMapTemplate *adjacent_template = CMapTemplate::get(value);
+			map_template *adjacent_template = map_template::get(value);
 			if (adjacent_template) {
 				this->AdjacentTemplates.push_back(adjacent_template);
 				if (std::find(adjacent_template->AdjacentTemplates.begin(), adjacent_template->AdjacentTemplates.end(), this) == adjacent_template->AdjacentTemplates.end()) {
@@ -249,7 +240,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority
-		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](CMapTemplate *a, CMapTemplate *b) {
+		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](map_template *a, map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
 			} else {
@@ -259,7 +250,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
+void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
 	std::string terrain_file;
 	if (overlay) {
@@ -318,7 +309,7 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 //	SaveMapTemplatePNG(filename.c_str(), this, overlay);
 }
 
-void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
+void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
 	std::string terrain_file;
 	if (overlay) {
@@ -403,7 +394,7 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	CGraphic::Free(terrain_image);
 }
 
-void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const
+void map_template::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
 	if (SaveGameLoading) {
 		return;
@@ -516,8 +507,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		overlay_filename += "_overlay";
 		overlay_filename += ".png";
 		
-		SaveMapTemplatePNG(filename.c_str(), this, false);
-		SaveMapTemplatePNG(overlay_filename.c_str(), this, true);
+		save_map_template_png(filename.c_str(), this, false);
+		save_map_template_png(overlay_filename.c_str(), this, true);
 	}
 
 	if (current_campaign) {
@@ -557,7 +548,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		for (int x = surrounding_start_pos.x; x < surrounding_end.x; ++x) {
 			for (int y = surrounding_start_pos.y; y < surrounding_end.y; y += (surrounding_end.y - surrounding_start_pos.y - 1)) {
 				Vec2i surrounding_pos(x, y);
-				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
+				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.is_point_in_a_subtemplate_area(surrounding_pos, z)) {
 					continue;
 				}
 				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrainType);
@@ -566,7 +557,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
 			for (int y = surrounding_start_pos.y; y < surrounding_end.y; ++y) {
 				Vec2i surrounding_pos(x, y);
-				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
+				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.is_point_in_a_subtemplate_area(surrounding_pos, z)) {
 					continue;
 				}
 				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrainType);
@@ -676,7 +667,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer && CPlayer::Players[i]->Type != PlayerRescueActive) {
 			continue;
 		}
-		if (CMap::Map.IsPointInASubtemplateArea(CPlayer::Players[i]->StartPos, z)) {
+		if (CMap::Map.is_point_in_a_subtemplate_area(CPlayer::Players[i]->StartPos, z)) {
 			continue;
 		}
 		if (CPlayer::Players[i]->StartPos.x < map_start_pos.x || CPlayer::Players[i]->StartPos.y < map_start_pos.y || CPlayer::Players[i]->StartPos.x >= map_end.x || CPlayer::Players[i]->StartPos.y >= map_end.y || CPlayer::Players[i]->StartMapLayer != z) {
@@ -687,7 +678,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			CUnitType *worker_type = PlayerRaces.Factions[CPlayer::Players[i]->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
+			CUnitType *worker_type = PlayerRaces.Factions[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((worker_type->TileSize - 1) / 2);
 				
@@ -743,24 +734,24 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 **	@param	z					The map layer
 **	@param	random				Whether it is subtemplates with a random position that should be applied, or ones with a fixed one
 */
-void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
+void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
 {
 	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
-		CMapTemplate *subtemplate = this->Subtemplates[i];
+		map_template *subtemplate = this->Subtemplates[i];
 		Vec2i subtemplate_pos(subtemplate->SubtemplatePosition - Vec2i((subtemplate->get_width() - 1) / 2, (subtemplate->get_height() - 1) / 2));
 		bool found_location = false;
 		
 		if (subtemplate->UpperTemplate && (subtemplate_pos.x < 0 || subtemplate_pos.y < 0)) { //if has no given position, but has an upper template, use its coordinates instead
-			subtemplate_pos = CMap::Map.GetSubtemplatePos(subtemplate->UpperTemplate);
+			subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->UpperTemplate);
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
 				found_location = true;
 			}
 		}
 		
 		if (subtemplate->LowerTemplate && (subtemplate_pos.x < 0 || subtemplate_pos.y < 0)) { //if has no given position, but has a lower template, use its coordinates instead
-			subtemplate_pos = CMap::Map.GetSubtemplatePos(subtemplate->LowerTemplate);
+			subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->LowerTemplate);
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
 				found_location = true;
 			}
@@ -793,8 +784,8 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				}
 				
 				//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
-				for (const CMapTemplate *adjacent_template : subtemplate->AdjacentTemplates) {
-					Vec2i adjacent_template_pos = CMap::Map.GetSubtemplatePos(adjacent_template);
+				for (const map_template *adjacent_template : subtemplate->AdjacentTemplates) {
+					Vec2i adjacent_template_pos = CMap::Map.get_subtemplate_pos(adjacent_template);
 					
 					if (!CMap::Map.Info.IsPointOnMap(adjacent_template_pos, z)) {
 						continue;
@@ -824,7 +815,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 					bool on_subtemplate_area = false;
 					for (int x = 0; x < subtemplate->get_width(); ++x) {
 						for (int y = 0; y < subtemplate->get_height(); ++y) {
-							if (CMap::Map.IsPointInASubtemplateArea(subtemplate_pos + Vec2i(x, y), z)) {
+							if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
 								on_subtemplate_area = true;
 								break;
 							}
@@ -859,7 +850,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y < CMap::Map.Info.MapHeights[z]) {
 				subtemplate->Apply(Vec2i(0, 0), subtemplate_pos, z);
 				
-				CMap::Map.MapLayers[z]->SubtemplateAreas.push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + subtemplate->get_width() - 1, subtemplate_pos.y + subtemplate->get_height() - 1), subtemplate));
+				CMap::Map.MapLayers[z]->subtemplate_areas.push_back(std::tuple<Vec2i, Vec2i, map_template *>(subtemplate_pos, Vec2i(subtemplate_pos.x + subtemplate->get_width() - 1, subtemplate_pos.y + subtemplate->get_height() - 1), subtemplate));
 			}
 		}
 	}
@@ -873,7 +864,7 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 **	@param	z					The map layer
 **	@param	random				Whether it is sites with a random position that should be applied, or ones with a fixed one
 */
-void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
+void map_template::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
 {
 	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
@@ -1117,7 +1108,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 	}
 }
 
-void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random) const
+void map_template::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random) const
 {
 	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 
@@ -1216,7 +1207,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		Vec2i unit_offset((type->TileSize - 1) / 2);
 
 		//add the connecting destination
-		const CMapTemplate *other_template = nullptr;
+		const map_template *other_template = nullptr;
 		if (surface_layer == (this->SurfaceLayer + 1)) {
 			other_template = this->LowerTemplate;
 		}
@@ -1233,7 +1224,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			}
 			
 			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
-			std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
+			std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
 			for (const CUnit *connector : other_layer_connectors) {
 				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->Plane == this->Plane && connector->ConnectingDestination->MapLayer->World == this->World && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
 					already_implemented = true;
@@ -1250,7 +1241,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		} else {
 			if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) {
 				//if the upper/lower layer has a surface layer connector to this layer that has no connecting destination, and this connector leads to that surface layer, place this connection in the same position as the other one
-				std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
+				std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
 				for (const CUnit *potential_connector : other_layer_connectors) {
 					if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
 						unit_pos = potential_connector->GetTileCenterPos();
@@ -1274,7 +1265,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		
 		//get the nearest compatible connector in the target map layer / template
-		std::vector<CUnit *> other_layer_connectors = CMap::Map.GetMapTemplateLayerConnectors(other_template);
+		std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
 		CUnit *best_layer_connector = nullptr;
 		int best_distance = -1;
 		for (size_t j = 0; j < other_layer_connectors.size(); ++j) {
@@ -1299,7 +1290,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 	}
 }
 
-void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
+void map_template::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random) const
 {
 	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
@@ -1530,7 +1521,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 **
 **	@return	True if it is a subtemplate area, or false otherwise
 */
-bool CMapTemplate::IsSubtemplateArea() const
+bool map_template::IsSubtemplateArea() const
 {
 	return this->MainTemplate != nullptr;
 }
@@ -1540,7 +1531,7 @@ bool CMapTemplate::IsSubtemplateArea() const
 **
 **	@return	The topmost map template for this one (which can be itself if it isn't a subtemplate area)
 */
-const CMapTemplate *CMapTemplate::GetTopMapTemplate() const
+const map_template *map_template::GetTopMapTemplate() const
 {
 	if (this->MainTemplate != nullptr) {
 		return this->MainTemplate->GetTopMapTemplate();
@@ -1557,7 +1548,7 @@ const CMapTemplate *CMapTemplate::GetTopMapTemplate() const
 **
 **	@return	The best position if found, or an invalid one otherwise
 */
-Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const
+Vec2i map_template::GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const
 {
 	Vec2i pos(-1, -1);
 	in_another_map_template = false;
@@ -1570,7 +1561,7 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
 		CHistoricalLocation *historical_location = historical_location_list[i];
 		if (start_date.ContainsDate(historical_location->Date)) {
-			if (historical_location->MapTemplate == this) {
+			if (historical_location->map_template == this) {
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;
 				} else if (random) {
@@ -1586,6 +1577,8 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 	}
 	
 	return pos;
+}
+
 }
 
 /**

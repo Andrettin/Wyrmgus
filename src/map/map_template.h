@@ -54,6 +54,8 @@ class CUnitType;
 class CWorld;
 struct lua_State;
 
+int CclDefineMapTemplate(lua_State *l);
+
 class CGeneratedTerrain
 {
 public:
@@ -73,7 +75,9 @@ public:
 	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
-class CMapTemplate : public stratagus::named_data_entry, public stratagus::data_type<CMapTemplate>, public CDataType
+namespace stratagus {
+
+class map_template : public named_data_entry, public data_type<map_template>, public CDataType
 {
 	Q_OBJECT
 
@@ -83,11 +87,11 @@ public:
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char *database_folder = "map_templates";
 
-	CMapTemplate(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
 	
-	~CMapTemplate();
+	~map_template();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
@@ -99,7 +103,7 @@ public:
 	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false) const;
 	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
-	const CMapTemplate *GetTopMapTemplate() const;
+	const map_template *GetTopMapTemplate() const;
 
 	const QSize &get_size() const
 	{
@@ -140,17 +144,17 @@ public:
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
 	Vec2i CurrentStartPos = Vec2i(0, 0);
 	PixelSize PixelTileSize = PixelSize(32, 32);
-	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
-	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
-	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer
-	std::vector<const CMapTemplate *> AdjacentTemplates;		/// Map templates adjacent to this one
+	map_template *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
+	map_template *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
+	map_template *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer
+	std::vector<const map_template *> AdjacentTemplates;		/// Map templates adjacent to this one
 	CPlane *Plane = nullptr;
 	CWorld *World = nullptr;
 	CTerrainType *BaseTerrainType = nullptr;
 	CTerrainType *BaseOverlayTerrainType = nullptr;
 	CTerrainType *BorderTerrainType = nullptr;
 	CTerrainType *SurroundingTerrainType = nullptr;
-	std::vector<CMapTemplate *> Subtemplates;
+	std::vector<map_template *> Subtemplates;
 	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
@@ -165,5 +169,7 @@ public:
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 
-	friend int CclDefineMapTemplate(lua_State *l);
+	friend int ::CclDefineMapTemplate(lua_State *l);
 };
+
+}

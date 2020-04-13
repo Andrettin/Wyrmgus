@@ -50,8 +50,11 @@
 #include "vec2i.h"
 
 class CFont;
-class CMapTemplate;
 class CTimeOfDay;
+
+namespace stratagus {
+	class map_template;
+}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 extern char ForceUseOpenGL;
@@ -599,7 +602,7 @@ extern void SaveMapPNG(const char *name);
 
 //Wyrmgus start
 /// Save a map template's terrain to a PNG file
-extern void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, const bool overlay);
+extern void save_map_template_png(const char *name, const stratagus::map_template *map_template, const bool overlay);
 //Wyrmgus end
 
 /// Set the current callbacks

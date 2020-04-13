@@ -46,7 +46,6 @@ class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
-class CMapTemplate;
 
 namespace stratagus {
 	class unit_class;

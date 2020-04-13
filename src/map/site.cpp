@@ -128,7 +128,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "position_y") {
 			this->Position.y = std::stoi(value);
 		} else if (key == "map_template") {
-			this->MapTemplate = CMapTemplate::get(value);
+			this->map_template = stratagus::map_template::get(value);
 		} else if (key == "core") {
 			value = FindAndReplaceString(value, "_", "-");
 			
@@ -246,16 +246,16 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		this->Cores.clear();
 	}
 	
-	if (this->MapTemplate) {
+	if (this->map_template) {
 		if (this->Position.x != -1 && this->Position.y != -1) {
-			if (this->MapTemplate->SitesByPosition.find(std::pair<int, int>(this->Position.x, this->Position.y)) == this->MapTemplate->SitesByPosition.end()) {
-				this->MapTemplate->SitesByPosition[std::pair<int, int>(this->Position.x, this->Position.y)] = this;
+			if (this->map_template->SitesByPosition.find(std::pair<int, int>(this->Position.x, this->Position.y)) == this->map_template->SitesByPosition.end()) {
+				this->map_template->SitesByPosition[std::pair<int, int>(this->Position.x, this->Position.y)] = this;
 			} else {
-				fprintf(stderr, "Position (%d, %d) of map template \"%s\" already has a site.", this->Position.x, this->Position.y, this->MapTemplate->Ident.c_str());
+				fprintf(stderr, "Position (%d, %d) of map template \"%s\" already has a site.", this->Position.x, this->Position.y, this->map_template->Ident.c_str());
 			}
 		}
 		
-		this->MapTemplate->Sites.push_back(this);
+		this->map_template->Sites.push_back(this);
 	}
 }
 

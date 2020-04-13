@@ -151,7 +151,7 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 			CHistoricalLocation *historical_location = new CHistoricalLocation;
 			historical_location->ProcessConfigData(child_config_data);
 				
-			if (historical_location->Date.Year == 0 || !historical_location->MapTemplate) {
+			if (historical_location->Date.Year == 0 || !historical_location->map_template) {
 				delete historical_location;
 				continue;
 			}
