@@ -772,6 +772,11 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->TileSize.x == 1 && this->GeneratedNeutralUnits[i].first->TileSize.y == 1; // group small resources
 		CMap::Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
+
+	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
+	if (this->IsSubtemplateArea()) {
+		CMap::Map.MapLayers[z]->subtemplate_areas.push_back(std::tuple<Vec2i, Vec2i, map_template *>(map_start_pos, map_end - Vec2i(1, 1), this));
+	}
 }
 
 /**
@@ -786,8 +791,7 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 {
 	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	
-	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
-		map_template *subtemplate = this->Subtemplates[i];
+	for (map_template *subtemplate : this->Subtemplates) {
 		Vec2i subtemplate_pos(subtemplate->SubtemplatePosition - Vec2i((subtemplate->get_width() - 1) / 2, (subtemplate->get_height() - 1) / 2));
 		bool found_location = false;
 		
@@ -924,8 +928,11 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						break;
 					}
 				}
-			}
-			else {
+
+				if (!found_location) {
+					fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
+				}
+			} else {
 				if (random) {
 					continue;
 				}
@@ -933,8 +940,7 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				subtemplate_pos.y = map_start_pos.y + subtemplate_pos.y - template_start_pos.y;
 				found_location = true;
 			}
-		}
-		else {
+		} else {
 			if (random) {
 				continue;
 			}
@@ -943,8 +949,6 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 		if (found_location) {
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y < CMap::Map.Info.MapHeights[z]) {
 				subtemplate->Apply(Vec2i(0, 0), subtemplate_pos, z);
-				
-				CMap::Map.MapLayers[z]->subtemplate_areas.push_back(std::tuple<Vec2i, Vec2i, map_template *>(subtemplate_pos, Vec2i(subtemplate_pos.x + subtemplate->get_width() - 1, subtemplate_pos.y + subtemplate->get_height() - 1), subtemplate));
 			}
 		}
 	}
