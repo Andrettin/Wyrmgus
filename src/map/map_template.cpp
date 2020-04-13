@@ -242,10 +242,12 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 
 void map_template::initialize()
 {
-	if (!this->Subtemplates.empty()) { //if this template has subtemplates, sort them according to priority
+	if (!this->Subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
 		std::sort(this->Subtemplates.begin(), this->Subtemplates.end(), [](map_template *a, map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
+			} else if (a->get_area() != b->get_area()) {
+				return a->get_area() > b->get_area();
 			} else {
 				return a->Ident < b->Ident;
 			}
