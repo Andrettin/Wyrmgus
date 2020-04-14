@@ -1425,6 +1425,11 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
 endif()
 
+if (MSVC)
+	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "/ignore:4099")
+endif()
+
 if(APPLE)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDLmain")
 endif()
