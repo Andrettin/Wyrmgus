@@ -844,20 +844,12 @@ static int CclDefineUnitType(lua_State *l)
 						variation->ItemsNotEquipped.push_back(type);
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
-						if (terrain) {
-							variation->Terrains.push_back(terrain);
-						} else {
-							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
-						}
+						const stratagus::terrain_type *terrain = stratagus::terrain_type::get(terrain_ident);
+						variation->Terrains.push_back(terrain);
 					} else if (!strcmp(value, "terrain-forbidden")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
-						if (terrain) {
-							variation->TerrainsForbidden.push_back(terrain);
-						} else {
-							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
-						}
+						const stratagus::terrain_type *terrain = stratagus::terrain_type::get(terrain_ident);
+						variation->TerrainsForbidden.push_back(terrain);
 					} else if (!strcmp(value, "season")) {
 						const std::string season_ident = LuaToString(l, -1, k + 1);
 						CSeason *season = CSeason::GetSeason(season_ident);
@@ -1838,10 +1830,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			type->Species->Type = type;
 		} else if (!strcmp(value, "TerrainType")) {
-			type->TerrainType = CTerrainType::GetTerrainType(LuaToString(l, -1));
-			if (!type->TerrainType) {
-				LuaError(l, "Terrain type doesn't exist.");
-			}
+			type->TerrainType = stratagus::terrain_type::get(LuaToString(l, -1));
 			type->TerrainType->UnitType = type;
 		} else if (!strcmp(value, "WeaponClasses")) {
 			type->WeaponClasses.clear();
@@ -3803,10 +3792,7 @@ static int CclDefineSpecies(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
-				if (terrain == nullptr) {
-					LuaError(l, "Terrain doesn't exist.");
-				}
+				stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
 				species->Terrains.push_back(terrain);
 			}
 		} else if (!strcmp(value, "EvolvesFrom")) {

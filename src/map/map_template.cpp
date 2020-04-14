@@ -176,37 +176,17 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "overland") {
 			this->Overland = string::to_bool(value);
 		} else if (key == "base_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->BaseTerrainType = terrain_type;
-			} else {
-				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
-			}
+			terrain_type *terrain_type = terrain_type::get(value);
+			this->BaseTerrainType = terrain_type;
 		} else if (key == "base_overlay_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->BaseOverlayTerrainType = terrain_type;
-			} else {
-				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
-			}
+			terrain_type *terrain_type = terrain_type::get(value);
+			this->BaseOverlayTerrainType = terrain_type;
 		} else if (key == "unusable_area_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->unusable_area_terrain_type = terrain_type;
-			} else {
-				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
-			}
+			terrain_type *terrain_type = terrain_type::get(value);
+			this->unusable_area_terrain_type = terrain_type;
 		} else if (key == "unusable_area_overlay_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->unusable_area_overlay_terrain_type = terrain_type;
-			} else {
-				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
-			}
+			terrain_type *terrain_type = terrain_type::get(value);
+			this->unusable_area_overlay_terrain_type = terrain_type;
 		} else if (key == "output_terrain_image") {
 			this->OutputTerrainImage = string::to_bool(value);
 		} else {
@@ -349,9 +329,9 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 				continue;
 			}
 			std::string terrain_character = line_str.substr(i, 1);
-			CTerrainType *terrain = nullptr;
-			if (CTerrainType::TerrainTypesByCharacter.find(terrain_character) != CTerrainType::TerrainTypesByCharacter.end()) {
-				terrain = CTerrainType::TerrainTypesByCharacter.find(terrain_character)->second;
+			terrain_type *terrain = nullptr;
+			if (terrain_type::TerrainTypesByCharacter.find(terrain_character) != terrain_type::TerrainTypesByCharacter.end()) {
+				terrain = terrain_type::TerrainTypesByCharacter.find(terrain_character)->second;
 			}
 			if (terrain) {
 				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
@@ -418,13 +398,13 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 				continue;
 			}
 
-			CTerrainType *terrain = nullptr;
+			terrain_type *terrain = nullptr;
 			short terrain_feature_id = -1;
 			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainFeatureColorToIndex.end()) {
 				terrain_feature_id = TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
 				terrain = TerrainFeatures[terrain_feature_id]->TerrainType;
-			} else if (CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(r, g, b)) != CTerrainType::TerrainTypesByColor.end()) {
-				terrain = CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(r, g, b))->second;
+			} else if (terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(r, g, b)) != terrain_type::TerrainTypesByColor.end()) {
+				terrain = terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(r, g, b))->second;
 			}
 			for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {
 				for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
@@ -601,7 +581,7 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 				continue;
 			}
 			if (current_campaign->GetStartDate().ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).Year == 0) {
-				CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
+				terrain_type *historical_terrain = std::get<1>(HistoricalTerrains[i]);
 				
 				for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
 					for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {
@@ -1744,8 +1724,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->TerrainType = CTerrainType::GetTerrainType(value);
+			this->TerrainType = stratagus::terrain_type::get(value);
 		} else if (key == "seed_count") {
 			this->SeedCount = std::stoi(value);
 		} else if (key == "expansion_chance") {
@@ -1757,11 +1736,8 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "use_subtemplate_borders_as_seeds") {
 			this->UseSubtemplateBordersAsSeeds = string::to_bool(value);
 		} else if (key == "target_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
-			if (target_terrain_type) {
-				this->TargetTerrainTypes.push_back(target_terrain_type);
-			}
+			const stratagus::terrain_type *target_terrain_type = stratagus::terrain_type::get(value);
+			this->TargetTerrainTypes.push_back(target_terrain_type);
 		} else {
 			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
 		}
@@ -1781,7 +1757,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 */
 bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
 {
-	const CTerrainType *top_terrain = tile->GetTopTerrain();
+	const stratagus::terrain_type *top_terrain = tile->GetTopTerrain();
 	
 	if (top_terrain == this->TerrainType) { //top terrain is the same as the one for the generation, so the tile can be used as a seed
 		return true;

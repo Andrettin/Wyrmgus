@@ -1783,7 +1783,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	UnitUnderCursor = NoUnitP;
 
 	//Wyrmgus start
-	CTerrainType::LoadTerrainTypeGraphics();
+	stratagus::terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD

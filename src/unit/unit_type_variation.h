@@ -46,8 +46,11 @@ class CConstruction;
 class CGraphic;
 class CPlayerColorGraphic;
 class CSeason;
-class CTerrainType;
 class CUnitType;
+
+namespace stratagus {
+	class terrain_type;
+}
 
 class CUnitTypeVariation
 {
@@ -88,8 +91,8 @@ public:
 	std::vector<int> ItemClassesNotEquipped;
 	std::vector<const CUnitType *> ItemsEquipped;
 	std::vector<const CUnitType *> ItemsNotEquipped;
-	std::vector<const CTerrainType *> Terrains;
-	std::vector<const CTerrainType *> TerrainsForbidden;
+	std::vector<const stratagus::terrain_type *> Terrains;
+	std::vector<const stratagus::terrain_type *> TerrainsForbidden;
 	std::vector<const CSeason *> Seasons;
 	std::vector<const CSeason *> ForbiddenSeasons;
 

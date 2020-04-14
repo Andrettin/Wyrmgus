@@ -2923,7 +2923,7 @@ CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident)
 	return nullptr;
 }
 
-bool CSpecies::CanEvolveToAUnitType(CTerrainType *terrain, bool sapient_only)
+bool CSpecies::CanEvolveToAUnitType(stratagus::terrain_type *terrain, bool sapient_only)
 {
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
 		if (
@@ -2936,7 +2936,7 @@ bool CSpecies::CanEvolveToAUnitType(CTerrainType *terrain, bool sapient_only)
 	return false;
 }
 
-CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
+CSpecies *CSpecies::GetRandomEvolution(stratagus::terrain_type *terrain)
 {
 	std::vector<CSpecies *> potential_evolutions;
 	

@@ -42,94 +42,30 @@
 #include "util/string_util.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CTerrainType *> CTerrainType::TerrainTypes;
-std::map<std::string, CTerrainType *> CTerrainType::TerrainTypesByIdent;
-std::map<std::string, CTerrainType *> CTerrainType::TerrainTypesByCharacter;
-std::map<std::tuple<int, int, int>, CTerrainType *> CTerrainType::TerrainTypesByColor;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a terrain type
-**
-**	@param	ident	The terrain type's string identifier
-**
-**	@return	The terrain type if found, null otherwise
-*/
-CTerrainType *CTerrainType::GetTerrainType(const std::string &ident, const bool should_find)
-{
-	if (TerrainTypesByIdent.find(ident) != TerrainTypesByIdent.end()) {
-		return TerrainTypesByIdent.find(ident)->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid terrain type: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a terrain type
-**
-**	@param	ident	The terrain type's string identifier
-**
-**	@return	The terrain type if found, otherwise a new terrain type is created and returned
-*/
-CTerrainType *CTerrainType::GetOrAddTerrainType(const std::string &ident)
-{
-	CTerrainType *terrain_type = GetTerrainType(ident, false);
-	
-	if (!terrain_type) {
-		terrain_type = new CTerrainType;
-		terrain_type->Ident = ident;
-		terrain_type->ID = CTerrainType::TerrainTypes.size();
-		TerrainTypes.push_back(terrain_type);
-		TerrainTypesByIdent[ident] = terrain_type;
-	}
-	
-	return terrain_type;
-}
+std::map<std::string, terrain_type *> terrain_type::TerrainTypesByCharacter;
+std::map<std::tuple<int, int, int>, terrain_type *> terrain_type::TerrainTypesByColor;
 
 /**
 **	@brief	Load the graphics of the terrain types
 */
-void CTerrainType::LoadTerrainTypeGraphics()
+void terrain_type::LoadTerrainTypeGraphics()
 {
-	for (std::vector<CTerrainType *>::iterator it = TerrainTypes.begin(); it != TerrainTypes.end(); ++it) {
-		if ((*it)->Graphics) {
-			(*it)->Graphics->Load();
+	for (terrain_type *terrain_type : terrain_type::get_all()) {
+		if (terrain_type->Graphics) {
+			terrain_type->Graphics->Load();
 		}
-		for (std::map<const CSeason *, CGraphic *>::iterator sub_it = (*it)->SeasonGraphics.begin(); sub_it != (*it)->SeasonGraphics.end(); ++sub_it) {
+		for (std::map<const CSeason *, CGraphic *>::iterator sub_it = terrain_type->SeasonGraphics.begin(); sub_it != terrain_type->SeasonGraphics.end(); ++sub_it) {
 			sub_it->second->Load();
 		}
-		if ((*it)->ElevationGraphics) {
-			(*it)->ElevationGraphics->Load();
+		if (terrain_type->ElevationGraphics) {
+			terrain_type->ElevationGraphics->Load();
 		}
-		if ((*it)->PlayerColorGraphics) {
-			(*it)->PlayerColorGraphics->Load();
+		if (terrain_type->PlayerColorGraphics) {
+			terrain_type->PlayerColorGraphics->Load();
 		}
 	}
-}
-
-/**
-**	@brief	Remove the existing terrain types
-*/
-void CTerrainType::ClearTerrainTypes()
-{
-	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		delete TerrainTypes[i];
-	}
-	TerrainTypes.clear();
-	TerrainTypesByIdent.clear();
-	TerrainTypesByCharacter.clear();
-	TerrainTypesByColor.clear();
 }
 
 /**
@@ -139,7 +75,7 @@ void CTerrainType::ClearTerrainTypes()
 **
 **	@return	The terrain flag if it exists, or 0 otherwise
 */
-unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
+unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 {
 	if (flag_name == "land") {
 		return MapFieldLandAllowed;
@@ -192,7 +128,7 @@ unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
 /**
 **	@brief	Destructor
 */
-CTerrainType::~CTerrainType()
+terrain_type::~terrain_type()
 {
 	if (this->Graphics) {
 		CGraphic::Free(this->Graphics);
@@ -213,7 +149,7 @@ CTerrainType::~CTerrainType()
 **
 **	@param	config_data	The configuration data
 */
-void CTerrainType::ProcessConfigData(const CConfigData *config_data)
+void terrain_type::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string graphics_file;
 	std::string elevation_graphics_file;
@@ -224,20 +160,20 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "character") {
 			this->Character = value;
 			
-			if (CTerrainType::TerrainTypesByCharacter.find(this->Character) != CTerrainType::TerrainTypesByCharacter.end()) {
+			if (terrain_type::TerrainTypesByCharacter.find(this->Character) != terrain_type::TerrainTypesByCharacter.end()) {
 				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", this->Character.c_str());
 				continue;
 			} else {
-				CTerrainType::TerrainTypesByCharacter[this->Character] = this;
+				terrain_type::TerrainTypesByCharacter[this->Character] = this;
 			}
 		} else if (key == "color") {
 			this->Color = CColor::FromString(value);
 			
-			if (CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != CTerrainType::TerrainTypesByColor.end()) {
+			if (terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != terrain_type::TerrainTypesByColor.end()) {
 				fprintf(stderr, "Color is already used by another terrain type.\n");
 				continue;
 			}
@@ -245,7 +181,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Color is already used by a terrain feature.\n");
 				continue;
 			}
-			CTerrainType::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
+			terrain_type::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
 		} else if (key == "overlay") {
 			this->Overlay = string::to_bool(value);
 		} else if (key == "buildable") {
@@ -259,7 +195,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->Resource = GetResourceIdByName(value.c_str());
 		} else if (key == "flag") {
 			value = FindAndReplaceString(value, "_", "-");
-			unsigned long flag = CTerrainType::GetTerrainFlagByName(value);
+			unsigned long flag = terrain_type::GetTerrainFlagByName(value);
 			if (flag) {
 				this->Flags |= flag;
 			}
@@ -283,19 +219,16 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "pixel_height") {
 			this->PixelTileSize.y = std::stoi(value);
 		} else if (key == "base_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *base_terrain_type = GetTerrainType(value);
+			terrain_type *base_terrain_type = terrain_type::get(value);
 			this->BaseTerrainTypes.push_back(base_terrain_type);
 		} else if (key == "inner_border_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *border_terrain_type = GetTerrainType(value);
+			terrain_type *border_terrain_type = terrain_type::get(value);
 			this->InnerBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
 			border_terrain_type->OuterBorderTerrains.push_back(this);
 			border_terrain_type->BorderTerrains.push_back(this);
 		} else if (key == "outer_border_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *border_terrain_type = GetTerrainType(value);
+			terrain_type *border_terrain_type = terrain_type::get(value);
 			this->OuterBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
 			border_terrain_type->InnerBorderTerrains.push_back(this);
@@ -357,13 +290,8 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "terrain_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					CTerrainType *transition_terrain = CTerrainType::GetTerrainType(value);
-					if (!transition_terrain) {
-						fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", value.c_str());
-					} else {
-						transition_terrain_id = transition_terrain->ID;
-					}
+					terrain_type *transition_terrain = terrain_type::get(value);
+					transition_terrain_id = transition_terrain->ID;
 				} else if (key == "transition_type") {
 					value = FindAndReplaceString(value, "_", "-");
 					transition_type = GetTransitionTypeIdByName(value);
@@ -419,7 +347,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The graphics
 */
-CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
+CGraphic *terrain_type::GetGraphics(const CSeason *season) const
 {
 	std::map<const CSeason *, CGraphic *>::const_iterator find_iterator = this->SeasonGraphics.find(season);
 	
@@ -428,4 +356,6 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 	} else {
 		return this->Graphics;
 	}
+}
+
 }

@@ -62,7 +62,6 @@ class CButtonLevel;
 class CFaction;
 class CPlane;
 class CWorld;
-class CTerrainType;
 class CUniqueItem;
 //Wyrmgus end
 struct lua_State;
@@ -73,6 +72,7 @@ class LuaCallback;
 enum class UnitTypeType;
 
 namespace stratagus {
+	class terrain_type;
 	class unit_class;
 }
 
@@ -657,13 +657,12 @@ public:
 class CBuildRestrictionTerrain : public CBuildRestriction
 {
 public:
-	CBuildRestrictionTerrain() : RestrictTerrainType(nullptr) {};
 	virtual ~CBuildRestrictionTerrain() {};
 	virtual void Init();
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	std::string RestrictTerrainTypeName;
-	CTerrainType *RestrictTerrainType;
+	stratagus::terrain_type *RestrictTerrainType = nullptr;
 };
 //Wyrmgus end
 
@@ -749,8 +748,8 @@ public:
 class CSpecies
 {
 public:
-	bool CanEvolveToAUnitType(CTerrainType *terrain = nullptr, bool sapient_only = false);
-	CSpecies *GetRandomEvolution(CTerrainType *terrain);
+	bool CanEvolveToAUnitType(stratagus::terrain_type *terrain = nullptr, bool sapient_only = false);
+	CSpecies *GetRandomEvolution(stratagus::terrain_type *terrain);
 	
 	int Era = -1;					/// Era ID
 	bool Sapient = false;			/// Whether the species is sapient
@@ -766,7 +765,7 @@ public:
 	CPlane *HomePlane = nullptr;
 	CWorld *Homeworld = nullptr;
 	CUnitType *Type = nullptr;
-	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
+	std::vector<stratagus::terrain_type *> Terrains;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
 };
@@ -884,7 +883,7 @@ public:
 	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	CSpecies *Species;
-	CTerrainType *TerrainType;
+	stratagus::terrain_type *TerrainType;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end

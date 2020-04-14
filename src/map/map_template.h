@@ -48,11 +48,14 @@ class CHistoricalLocation;
 class CMapField;
 class CPlane;
 class CSite;
-class CTerrainType;
 class CUniqueItem;
 class CUnitType;
 class CWorld;
 struct lua_State;
+
+namespace stratagus {
+	class terrain_type;
+}
 
 int CclDefineMapTemplate(lua_State *l);
 
@@ -66,13 +69,13 @@ public:
 	bool CanTileBePartOfExpansion(const CMapField *tile) const;
 	bool CanRemoveTileOverlayTerrain(const CMapField *tile) const;
 
-	CTerrainType *TerrainType = nullptr;
+	stratagus::terrain_type *TerrainType = nullptr;
 	int SeedCount = 0;
 	int ExpansionChance = 50; //50% chance to expand to a tile by default
 	int MaxPercent = 0; //the maximum percentage of tiles in the map subtemplate that should have the generated terrain type as their top tile
 	bool UseExistingAsSeeds = false; //whether to use existing tiles of the given terrain in the map layer as seeds for this terrain generation
 	bool UseSubtemplateBordersAsSeeds = false; //whether to use the border tiles of subtemplates that have the given terrain as seeds for this terrain generation
-	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
+	std::vector<const stratagus::terrain_type *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
 namespace stratagus {
@@ -246,12 +249,12 @@ public:
 
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
-	CTerrainType *get_unusable_area_terrain_type() const
+	terrain_type *get_unusable_area_terrain_type() const
 	{
 		return this->unusable_area_terrain_type;
 	}
 	
-	CTerrainType *get_unusable_area_overlay_terrain_type() const
+	terrain_type *get_unusable_area_overlay_terrain_type() const
 	{
 		return this->unusable_area_overlay_terrain_type;
 	}
@@ -288,13 +291,13 @@ public:
 	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
 	CPlane *Plane = nullptr;
 	CWorld *World = nullptr;
-	CTerrainType *BaseTerrainType = nullptr;
-	CTerrainType *BaseOverlayTerrainType = nullptr;
-	CTerrainType *BorderTerrainType = nullptr;
-	CTerrainType *SurroundingTerrainType = nullptr;
+	terrain_type *BaseTerrainType = nullptr;
+	terrain_type *BaseOverlayTerrainType = nullptr;
+	terrain_type *BorderTerrainType = nullptr;
+	terrain_type *SurroundingTerrainType = nullptr;
 private:
-	CTerrainType *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
-	CTerrainType *unusable_area_overlay_terrain_type = nullptr;
+	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
+	terrain_type *unusable_area_overlay_terrain_type = nullptr;
 public:
 	std::vector<map_template *> Subtemplates;
 	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
@@ -309,7 +312,7 @@ public:
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<CSite *> Sites;
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
-	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains; //terrain changes
+	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 
 	friend int ::CclDefineMapTemplate(lua_State *l);
 };

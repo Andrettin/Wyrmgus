@@ -122,7 +122,7 @@ public:
 	std::string Ident;
 	std::string Name;
 	CColor Color;
-	CTerrainType *TerrainType = nullptr;
+	stratagus::terrain_type *TerrainType = nullptr;
 	CPlane *Plane = nullptr;
 	CWorld *World = nullptr;
 	std::map<int, std::string> CulturalNames; //names for the terrain feature for each different culture/civilization
@@ -208,7 +208,7 @@ public:
 	void ClearMapLayers();
 	
 	//Wyrmgus start
-	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
+	void SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, int z);
 	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
@@ -221,7 +221,7 @@ public:
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
-	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type) const;
+	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
 	void GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template);
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
@@ -236,8 +236,8 @@ public:
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const;
 	
 	//Wyrmgus start
-	CTerrainType *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
-	CTerrainType *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
+	stratagus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
+	stratagus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end
@@ -267,16 +267,16 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
-	bool TileBordersTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const;
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain, const int z) const;
+	bool TileBordersTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const;
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
-	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z) const;
-	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *overlay_terrain, const int z);
-	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const CTerrainType *terrain_type, const CTerrainType *overlay_terrain_type, const int z) const;
-	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
+	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const;
+	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const stratagus::terrain_type *overlay_terrain, const int z);
+	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type, const int z) const;
+	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain, const int z);
 	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate = nullptr) const;
 	std::pair<Vec2i, Vec2i> get_subtemplate_rect(const stratagus::map_template *subtemplate) const;
 	Vec2i get_subtemplate_pos(const stratagus::map_template *subtemplate) const;
@@ -348,7 +348,7 @@ public:
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	static std::map<PixelSize, CGraphic *> FogGraphics;      /// graphics for fog of war, mapped to their respective pixel sizes
 	//Wyrmgus start
-	CTerrainType *BorderTerrain;      	/// terrain type for borders
+	stratagus::terrain_type *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<CUnit *> SiteUnits;	/// the town hall / settlement site units

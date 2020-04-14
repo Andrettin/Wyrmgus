@@ -72,7 +72,7 @@ CMapField::CMapField() :
 **
 **	@return	The terrain of the tile for the given overlay parameter
 */
-CTerrainType *CMapField::GetTerrain(const bool overlay) const
+stratagus::terrain_type *CMapField::GetTerrain(const bool overlay) const
 {
 	if (overlay) {
 		return this->OverlayTerrain;
@@ -89,7 +89,7 @@ CTerrainType *CMapField::GetTerrain(const bool overlay) const
 **
 **	@return	The topmost terrain of the tile
 */
-CTerrainType *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+stratagus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
 		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
@@ -146,7 +146,7 @@ bool CMapField::IsDestroyedForestTile() const
 **
 **	@param	terrain_type	The new terrain type for the tile
 */
-void CMapField::SetTerrain(CTerrainType *terrain_type)
+void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 {
 	if (!terrain_type) {
 		return;
@@ -376,12 +376,12 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CTerrainType *terrain = CTerrainType::GetTerrainType(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
+	stratagus::terrain_type *terrain = stratagus::terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
 	if (terrain->Overlay) {
 		if (terrain->Flags & MapFieldForest) {
-			this->SetTerrain(CTerrainType::GetTerrainType(tileset.solidTerrainTypes[3].TerrainName));
+			this->SetTerrain(stratagus::terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
 		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
-			this->SetTerrain(CTerrainType::GetTerrainType(tileset.solidTerrainTypes[2].TerrainName));
+			this->SetTerrain(stratagus::terrain_type::get(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
 	this->SetTerrain(terrain);
@@ -556,7 +556,7 @@ void CMapField::parse(lua_State *l)
 			this->Terrain = terrain_feature->TerrainType;
 			this->TerrainFeature = terrain_feature;
 		} else {
-			this->Terrain = CTerrainType::GetTerrainType(terrain_ident);
+			this->Terrain = stratagus::terrain_type::get(terrain_ident);
 		}
 	}
 	
@@ -567,7 +567,7 @@ void CMapField::parse(lua_State *l)
 			this->OverlayTerrain = overlay_terrain_feature->TerrainType;
 			this->TerrainFeature = overlay_terrain_feature;
 		} else {
-			this->OverlayTerrain = CTerrainType::GetTerrainType(overlay_terrain_ident);
+			this->OverlayTerrain = stratagus::terrain_type::get(overlay_terrain_ident);
 		}
 	}
 	
@@ -576,12 +576,12 @@ void CMapField::parse(lua_State *l)
 	
 	std::string seen_terrain_ident = LuaToString(l, -1, 5);
 	if (!seen_terrain_ident.empty()) {
-		this->playerInfo.SeenTerrain = CTerrainType::GetTerrainType(seen_terrain_ident);
+		this->playerInfo.SeenTerrain = stratagus::terrain_type::get(seen_terrain_ident);
 	}
 	
 	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 6);
 	if (!seen_overlay_terrain_ident.empty()) {
-		this->playerInfo.SeenOverlayTerrain = CTerrainType::GetTerrainType(seen_overlay_terrain_ident);
+		this->playerInfo.SeenOverlayTerrain = stratagus::terrain_type::get(seen_overlay_terrain_ident);
 	}
 	
 	this->SolidTile = LuaToNumber(l, -1, 7);
@@ -604,28 +604,28 @@ void CMapField::parse(lua_State *l)
 //		if (!strcmp(value, "explored")) {
 		if (!strcmp(value, "transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+			this->TransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "overlay-transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+			this->OverlayTransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->playerInfo.SeenTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+			this->playerInfo.SeenTransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-overlay-transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->playerInfo.SeenOverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+			this->playerInfo.SeenOverlayTransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "explored")) {
 		//Wyrmgus end
 			++j;

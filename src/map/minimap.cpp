@@ -330,7 +330,7 @@ void CMinimap::Reload()
 */
 //Wyrmgus start
 //static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
-static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, CTerrainType *terrain, const CSeason *season)
+static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, stratagus::terrain_type *terrain, const CSeason *season)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -395,9 +395,9 @@ void CMinimap::UpdateTerrain(int z)
 	if (UseOpenGL) {
 		SDL_LockSurface(CMap::Map.TileGraphic->Surface);
 		//Wyrmgus start
-		for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-			if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-				SDL_LockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+		for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
+			if (terrain_type->GetGraphics(season)) {
+				SDL_LockSurface(terrain_type->GetGraphics(season)->Surface);
 			}
 		}
 		//Wyrmgus end
@@ -420,14 +420,14 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus start
 //			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
 			const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
-			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
+			stratagus::terrain_type *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
 				terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
 				tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
 			}
 			
-			CTerrainType *base_terrain = mf.playerInfo.SeenTerrain;
+			stratagus::terrain_type *base_terrain = mf.playerInfo.SeenTerrain;
 			int base_tile = mf.playerInfo.SeenSolidTile;
 			if (!base_terrain) {
 				base_terrain = mf.Terrain;
@@ -544,9 +544,9 @@ void CMinimap::UpdateTerrain(int z)
 	}
 	SDL_UnlockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+	for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
+		if (terrain_type->GetGraphics(season)) {
+			SDL_UnlockSurface(terrain_type->GetGraphics(season)->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -615,9 +615,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_LockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-			SDL_LockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+	for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
+		if (terrain_type->GetGraphics(season)) {
+			SDL_LockSurface(terrain_type->GetGraphics(season)->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -666,14 +666,14 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			}
 			*/
 			const CMapField &mf = *CMap::Map.MapLayers[z]->Field(x + y);
-			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
+			stratagus::terrain_type *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
 				terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
 				tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
 			}
 			
-			CTerrainType *base_terrain = mf.playerInfo.SeenTerrain;
+			stratagus::terrain_type *base_terrain = mf.playerInfo.SeenTerrain;
 			int base_tile = mf.playerInfo.SeenSolidTile;
 			if (!base_terrain) {
 				base_terrain = mf.Terrain;
@@ -793,9 +793,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_UnlockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+	for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
+		if (terrain_type->GetGraphics(season)) {
+			SDL_UnlockSurface(terrain_type->GetGraphics(season)->Surface);
 		}
 	}
 	//Wyrmgus end

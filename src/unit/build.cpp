@@ -474,7 +474,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 //Wyrmgus start
 void CBuildRestrictionTerrain::Init()
 {
-	this->RestrictTerrainType = CTerrainType::GetTerrainType(this->RestrictTerrainTypeName);
+	this->RestrictTerrainType = stratagus::terrain_type::get(this->RestrictTerrainTypeName);
 }
 
 /**
@@ -490,7 +490,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 				continue;
 			}
 			Vec2i tile_pos(x, y);
-			CTerrainType *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->Overlay, z);
+			stratagus::terrain_type *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->Overlay, z);
 			if (this->RestrictTerrainType == terrain) {
 				return true;
 			}

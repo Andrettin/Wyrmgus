@@ -363,7 +363,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				spell->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "terrain_type") {
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
+			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				terrain_type->ProcessConfigData(config_data);
 			}

@@ -467,7 +467,7 @@ void SaveMapPNG(const char *name)
 			srcRect.x = Map.TileGraphic->frame_map[tile].x;
 			srcRect.y = Map.TileGraphic->frame_map[tile].y;
 			*/
-			const CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
+			const stratagus::terrain_type *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
 			unsigned short int tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
 
 			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;
@@ -583,9 +583,9 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 			
 			for (unsigned int i = 0; i < line_str.length(); ++i) {
 				std::string terrain_character = line_str.substr(i, 1);
-				CTerrainType *terrain = nullptr;
-				if (CTerrainType::TerrainTypesByCharacter.find(terrain_character) != CTerrainType::TerrainTypesByCharacter.end()) {
-					terrain = CTerrainType::TerrainTypesByCharacter.find(terrain_character)->second;
+				stratagus::terrain_type *terrain = nullptr;
+				if (stratagus::terrain_type::TerrainTypesByCharacter.find(terrain_character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
+					terrain = stratagus::terrain_type::TerrainTypesByCharacter.find(terrain_character)->second;
 				}
 				Uint8 red = 0;
 				Uint8 green = 0;
@@ -608,11 +608,11 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 			y += 1;
 		}
 	} else {
-		std::map<int, std::map<int, CTerrainType *>> terrain_map;
+		std::map<int, std::map<int, stratagus::terrain_type *>> terrain_map;
 		for (size_t i = 0; i < map_template->HistoricalTerrains.size(); ++i) {
 			if (std::get<2>(map_template->HistoricalTerrains[i]).Year == 0) {
 				Vec2i terrain_pos = std::get<0>(map_template->HistoricalTerrains[i]);
-				CTerrainType *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
+				stratagus::terrain_type *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
 				if (terrain_type->Overlay == overlay) {
 					terrain_map[terrain_pos.y][terrain_pos.x] = terrain_type;
 				}
@@ -626,9 +626,9 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 				row[x * 3 + 2] = 0;
 			}
 			
-			for (std::map<int, CTerrainType *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
+			for (std::map<int, stratagus::terrain_type *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
 				int x = iterator->first;
-				CTerrainType *terrain_type = iterator->second;
+				stratagus::terrain_type *terrain_type = iterator->second;
 				
 				Uint8 red = 0;
 				Uint8 green = 0;

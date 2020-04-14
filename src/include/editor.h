@@ -43,9 +43,11 @@
 class CUnitType;
 //Wyrmgus start
 class CUnit;
-class CTerrainType;
 //Wyrmgus end
 
+namespace stratagus {
+	class terrain_type;
+}
 
 enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running
@@ -76,7 +78,7 @@ public:
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 	//Wyrmgus start
 //	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
-	std::vector<CTerrainType *> ShownTileTypes;        /// Shown editor tile-type table.
+	std::vector<stratagus::terrain_type *> ShownTileTypes;        /// Shown editor tile-type table.
 	//Wyrmgus end
 
 	bool TerrainEditable;        /// Is the terrain editable ?

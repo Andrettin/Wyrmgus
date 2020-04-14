@@ -156,7 +156,6 @@ void CleanModules()
 	CleanMissileTypes();
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
-	CTerrainType::ClearTerrainTypes();
 	CTimeOfDay::ClearTimesOfDay();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
 	CSeason::ClearSeasons();
@@ -221,7 +220,7 @@ void LoadModules()
 	//Wyrmgus end
 	UI.Load();
 	//Wyrmgus start
-	CTerrainType::LoadTerrainTypeGraphics();
+	stratagus::terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();

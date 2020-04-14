@@ -192,7 +192,7 @@ static EditorSliderListener *editorSliderListener;
 */
 //Wyrmgus start
 //static void EditTile(const Vec2i &pos, int tile)
-static void EditTile(const Vec2i &pos, CTerrainType *terrain)
+static void EditTile(const Vec2i &pos, stratagus::terrain_type *terrain)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
@@ -256,7 +256,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 */
 //Wyrmgus start
 //static void EditTilesInternal(const Vec2i &pos, int tile, int size)
-static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
+static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain, int size)
 //Wyrmgus end
 {
 	Vec2i minPos = pos;
@@ -288,7 +288,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		CTerrainType *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, UI.CurrentMapLayer->ID);
+		stratagus::terrain_type *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, UI.CurrentMapLayer->ID);
 		
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
@@ -304,7 +304,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 									
-							CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
+							stratagus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
 							if (tile_terrain->Overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
@@ -349,7 +349,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 					
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
-							CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+							stratagus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 							if (!adjacent_terrain || adjacent_terrain == CMap::Map.GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
 								continue;
 							}
@@ -359,7 +359,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 							
 							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), CMap::Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) == adjacent_terrain->BorderTerrains.end()) {
 								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
-									CTerrainType *border_terrain = adjacent_terrain->BorderTerrains[j];
+									stratagus::terrain_type *border_terrain = adjacent_terrain->BorderTerrains[j];
 									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), CMap::Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
 										CMap::Map.SetTileTerrain(adjacent_pos, border_terrain, UI.CurrentMapLayer->ID);
 										changed_tiles.push_back(adjacent_pos);
@@ -372,7 +372,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (CMap::Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
-												CTerrainType *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+												stratagus::terrain_type *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
@@ -436,7 +436,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 */
 //Wyrmgus start
 //static void EditTiles(const Vec2i &pos, int tile, int size)
-static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
+static void EditTiles(const Vec2i &pos, stratagus::terrain_type *terrain, int size)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -961,7 +961,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	x -= 1;
 	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	const CTerrainType *terrain = Editor.ShownTileTypes[0];
+	const stratagus::terrain_type *terrain = Editor.ShownTileTypes[0];
 	terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
 	//Wyrmgus end
 
@@ -1073,7 +1073,7 @@ static void DrawTileIcons()
 
 //			Map.TileGraphic->DrawFrameClip(tile, x, y);
 
-			const CTerrainType *terrain = Editor.ShownTileTypes[i];
+			const stratagus::terrain_type *terrain = Editor.ShownTileTypes[i];
 
 			if (terrain->GetGraphics() && terrain->SolidTiles.size() > 0) {
 				terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
@@ -1287,7 +1287,7 @@ static void DrawMapCursor()
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			//Wyrmgus start
 //			const unsigned short tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
-			const CTerrainType *terrain = Editor.ShownTileTypes[Editor.SelectedTileIndex];
+			const stratagus::terrain_type *terrain = Editor.ShownTileTypes[Editor.SelectedTileIndex];
 			//Wyrmgus end
 			PushClipping();
 			UI.MouseViewport->SetClipping();
@@ -1424,9 +1424,9 @@ static void DrawEditorInfo()
 	std::string terrain_name;
 	if (mf.Terrain) {
 		if (mf.OverlayTerrain) {
-			terrain_name = mf.OverlayTerrain->Name + " (" + mf.Terrain->Name + ")";
+			terrain_name = mf.OverlayTerrain->get_name() + " (" + mf.Terrain->get_name() + ")";
 		} else {
-			terrain_name = mf.Terrain->Name;
+			terrain_name = mf.Terrain->get_name();
 		}
 	}
 	snprintf(buf, sizeof(buf), "%s", terrain_name.c_str());
@@ -2140,7 +2140,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 //				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
 //				const int base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 //				UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
-				UI.StatusLine.Set(Editor.ShownTileTypes[i]->Name);
+				UI.StatusLine.Set(Editor.ShownTileTypes[i]->get_name());
 				//Wyrmgus end
 				Editor.CursorTileIndex = i;
 				return true;
@@ -2551,9 +2551,9 @@ void CEditor::Init()
 	//Wyrmgus start
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
-	for (size_t i = 0; i < CTerrainType::TerrainTypes.size(); ++i) {
-		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
-			Editor.ShownTileTypes.push_back(CTerrainType::TerrainTypes[i]);
+	for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
+		if (!terrain_type->Hidden && terrain_type->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
+			Editor.ShownTileTypes.push_back(terrain_type);
 		}
 	}
 	//Wyrmgus end

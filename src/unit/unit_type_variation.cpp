@@ -156,17 +156,12 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			const CUnitType *unit_type = CUnitType::get(value);
 			this->ItemsNotEquipped.push_back(unit_type);
 		} else if (key == "terrain") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type != nullptr) {
-				this->Terrains.push_back(terrain_type);
-			}
+			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
+			this->Terrains.push_back(terrain_type);
 		} else if (key == "forbidden_terrain") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type != nullptr) {
-				this->TerrainsForbidden.push_back(terrain_type);
-			}
+			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
+			this->TerrainsForbidden.push_back(terrain_type);
 		} else if (key == "season") {
 			value = FindAndReplaceString(value, "_", "-");
 			const CSeason *season = CSeason::GetSeason(value);
