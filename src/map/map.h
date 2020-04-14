@@ -118,19 +118,14 @@ static constexpr int MaxMapHeight = 512; /// max map height supported
 class CTerrainFeature
 {
 public:
-	CTerrainFeature() :
-		ID(-1), TerrainType(nullptr), Plane(nullptr), World(nullptr)
-	{
-	}
-	
-	int ID;
+	int ID = -1;
 	std::string Ident;
 	std::string Name;
 	CColor Color;
-	CTerrainType *TerrainType;
-	CPlane *Plane;
-	CWorld *World;
-	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
+	CTerrainType *TerrainType = nullptr;
+	CPlane *Plane = nullptr;
+	CWorld *World = nullptr;
+	std::map<int, std::string> CulturalNames; //names for the terrain feature for each different culture/civilization
 };
 //Wyrmgus end
 

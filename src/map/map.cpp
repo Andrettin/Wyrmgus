@@ -780,6 +780,8 @@ std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const stratagus::map_template
 			}
 		}
 	}
+
+	return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
 }
 
 /**
