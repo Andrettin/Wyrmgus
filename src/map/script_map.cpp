@@ -2136,10 +2136,10 @@ static int CclGetMapTemplateData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "CurrentStartPosX")) {
-		lua_pushnumber(l, map_template->CurrentStartPos.x);
+		lua_pushnumber(l, map_template->get_current_start_pos().x());
 		return 1;
 	} else if (!strcmp(data, "CurrentStartPosY")) {
-		lua_pushnumber(l, map_template->CurrentStartPos.y);
+		lua_pushnumber(l, map_template->get_current_start_pos().y());
 		return 1;
 	} else if (!strcmp(data, "MapStartPosX")) {
 		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);

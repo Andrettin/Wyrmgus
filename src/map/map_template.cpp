@@ -449,7 +449,7 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		return;
 	}
 
-	this->CurrentStartPos = template_start_pos;
+	this->current_start_pos = template_start_pos;
 
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	

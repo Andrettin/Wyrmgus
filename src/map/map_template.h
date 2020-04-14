@@ -188,6 +188,11 @@ public:
 		return offset;
 	}
 
+	const QPoint &get_current_start_pos() const
+	{
+		return this->current_start_pos;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
 	std::string TerrainFile;
@@ -197,15 +202,17 @@ public:
 private:
 	QSize size = QSize(0, 0);
 public:
-	int Scale = 1;												/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
-	int SurfaceLayer = 0;										/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
+	int Scale = 1; //1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
+	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
-	bool Overland = false;										/// Whether this is an overland map
+	bool Overland = false; //whether this is an overland map
 	bool OutputTerrainImage = false;
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
-	Vec2i CurrentStartPos = Vec2i(0, 0);
+private:
+	QPoint current_start_pos = QPoint(0, 0);
+public:
 	PixelSize PixelTileSize = PixelSize(32, 32);
 	map_template *MainTemplate = nullptr; //main template in which this one is located, if this is a subtemplate
 	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
@@ -234,7 +241,7 @@ public:
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<CSite *> Sites;
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
-	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
+	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains; //terrain changes
 
 	friend int ::CclDefineMapTemplate(lua_State *l);
 };
