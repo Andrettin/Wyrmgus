@@ -496,10 +496,10 @@ static void CleanupOutput()
 
 	struct stat st;
 	if (stat(stdoutFile.c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stdoutFile.c_str());
+		std::filesystem::remove(stdoutFile);
 	}
 	if (stat(stderrFile.c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stderrFile.c_str());
+		std::filesystem::remove(stderrFile);
 	}
 }
 

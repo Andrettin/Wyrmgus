@@ -881,8 +881,8 @@ void SaveHeroes()
 	path += "/";
 	path += "heroes.lua";
 
-	if (CanAccessFile(path.c_str())) {
-		unlink(path.c_str());
+	if (std::filesystem::exists(path)) {
+		std::filesystem::remove(path);
 	}
 }
 
@@ -911,8 +911,8 @@ void SaveHero(CCharacter *hero)
 	path += ".lua";
 	old_path += hero->GetFullName();
 	old_path += ".lua";
-	if (CanAccessFile(old_path.c_str())) {
-		unlink(old_path.c_str());
+	if (std::filesystem::exists(old_path)) {
+		std::filesystem::remove(old_path);
 	}
 
 	FILE *fd = fopen(path.c_str(), "w");
@@ -1131,8 +1131,8 @@ void DeleteCustomHero(const std::string &hero_full_name)
 	}
 	path += hero->Ident;
 	path += ".lua";	
-	if (CanAccessFile(path.c_str())) {
-		unlink(path.c_str());
+	if (std::filesystem::exists(path)) {
+		std::filesystem::remove(path);
 	}
 	
 	CustomHeroes.erase(hero_full_name);
@@ -1184,8 +1184,8 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 		}
 		path += hero->Ident;
 		path += ".lua";
-		if (CanAccessFile(path.c_str())) {
-			unlink(path.c_str());
+		if (std::filesystem::exists(path)) {
+			std::filesystem::remove(path);
 		}
 
 		//now, update the hero
