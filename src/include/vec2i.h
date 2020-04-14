@@ -38,6 +38,16 @@ public:
 
 	template <typename T2>
 	Vec2T(Vec2T<T2> v) : x(v.x), y(v.y) {}
+
+	Vec2T(const QPoint &point) : x(point.x()), y(point.y())
+	{
+	}
+
+	operator QPoint() const
+	{
+		return QPoint(this->x, this->y);
+	}
+
 public:
 	T x;
 	T y;
