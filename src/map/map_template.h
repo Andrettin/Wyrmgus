@@ -77,11 +77,12 @@ public:
 
 namespace stratagus {
 
-class map_template : public named_data_entry, public data_type<map_template>, public CDataType
+class map_template final : public named_data_entry, public data_type<map_template>, public CDataType
 {
 	Q_OBJECT
 
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
+	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -188,12 +189,72 @@ public:
 		return offset;
 	}
 
+	bool is_circle() const
+	{
+		return this->circle;
+	}
+
+	bool contains_pos(const QPoint &pos) const
+	{
+		const QPoint &start_pos = this->get_current_start_pos();
+		const QPoint end_pos = this->get_current_end_pos();
+		return pos.x() >= start_pos.x() && pos.y() >= start_pos.y() && pos.x() <= end_pos.x() && pos.y() <= end_pos.y();
+	}
+
 	const QPoint &get_current_start_pos() const
 	{
 		return this->current_start_pos;
 	}
 
+	QPoint get_current_end_pos() const
+	{
+		const QPoint &start_pos = this->get_current_start_pos();
+		return QPoint(start_pos.x() + this->get_width() - 1, start_pos.y() + this->get_height() - 1);
+	}
+
+	//whether a position relative to the entire map is a usable part of the map template
+	bool is_map_pos_usable(const QPoint &pos) const
+	{
+		if (!this->contains_pos(pos)) {
+			return false;
+		}
+
+		return this->is_pos_usable(pos - this->get_current_start_pos());
+	}
+
+	//whether a position relative to the map template itself is a usable part of it
+	bool is_pos_usable(const QPoint &pos) const
+	{
+		if (this->is_circle()) {
+			const QPoint start_pos(0, 0);
+			const QPoint end_pos = QPoint(this->get_width() - 1, this->get_height() - 1);
+
+			const double middle_x = (end_pos.x() + start_pos.x()) / 2;
+			const double middle_y = (end_pos.y() + start_pos.y()) / 2;
+			const double radius = ((middle_x - start_pos.x()) + (middle_y - start_pos.y())) / 2;
+
+			const double rel_x = pos.x() - middle_x;
+			const double rel_y = pos.y() - middle_y;
+			const double my = radius * radius - rel_x * rel_x;
+			if ((rel_y * rel_y) > my) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
+
+	CTerrainType *get_unusable_area_terrain_type() const
+	{
+		return this->unusable_area_terrain_type;
+	}
+	
+	CTerrainType *get_unusable_area_overlay_terrain_type() const
+	{
+		return this->unusable_area_overlay_terrain_type;
+	}
 	
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;
@@ -207,6 +268,9 @@ public:
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
 	bool Overland = false; //whether this is an overland map
 	bool OutputTerrainImage = false;
+private:
+	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
+public:
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
@@ -228,6 +292,10 @@ public:
 	CTerrainType *BaseOverlayTerrainType = nullptr;
 	CTerrainType *BorderTerrainType = nullptr;
 	CTerrainType *SurroundingTerrainType = nullptr;
+private:
+	CTerrainType *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
+	CTerrainType *unusable_area_overlay_terrain_type = nullptr;
+public:
 	std::vector<map_template *> Subtemplates;
 	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity

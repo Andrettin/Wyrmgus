@@ -2988,7 +2988,7 @@ bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const 
 	return false;
 }
 
-void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z)
+void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template)
 {
 	if (SaveGameLoading) {
 		return;
@@ -3002,7 +3002,11 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	bool has_tile_with_missing_terrain = false;
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			const Vec2i tile_pos(x, y);
+			const QPoint tile_pos(x, y);
+
+			if (!map_template->is_map_pos_usable(tile_pos)) {
+				continue;
+			}
 
 			if (!this->is_point_adjacent_to_non_subtemplate_area(tile_pos, z)) {
 				continue;

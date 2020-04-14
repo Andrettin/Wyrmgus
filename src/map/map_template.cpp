@@ -83,6 +83,8 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->set_name(value);
+		} else if (key == "circle") {
+			this->circle = string::to_bool(value);
 		} else if (key == "plane") {
 			value = FindAndReplaceString(value, "_", "-");
 			CPlane *plane = CPlane::GetPlane(value);
@@ -186,6 +188,22 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
 			if (terrain_type) {
 				this->BaseOverlayTerrainType = terrain_type;
+			} else {
+				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
+			}
+		} else if (key == "unusable_area_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			if (terrain_type) {
+				this->unusable_area_terrain_type = terrain_type;
+			} else {
+				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
+			}
+		} else if (key == "unusable_area_overlay_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			if (terrain_type) {
+				this->unusable_area_overlay_terrain_type = terrain_type;
 			} else {
 				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
 			}
@@ -540,6 +558,25 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		}
 	}
 	
+	if (this->get_unusable_area_terrain_type() != nullptr) {
+		for (int x = map_start_pos.x; x < map_end.x; ++x) {
+			for (int y = map_start_pos.y; y < map_end.y; ++y) {
+				const QPoint tile_pos(x, y);
+				if (this->is_map_pos_usable(tile_pos)) {
+					continue;
+				}
+
+				CMap::Map.Field(tile_pos, z)->SetTerrain(this->get_unusable_area_terrain_type());
+				
+				if (this->get_unusable_area_overlay_terrain_type()) {
+					CMap::Map.Field(tile_pos, z)->SetTerrain(this->get_unusable_area_overlay_terrain_type());
+				} else {
+					CMap::Map.Field(tile_pos, z)->RemoveOverlayTerrain();
+				}
+			}
+		}
+	}
+	
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 	
@@ -625,7 +662,7 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 	this->ApplySubtemplates(template_start_pos, map_start_pos, z, false);
 	this->ApplySubtemplates(template_start_pos, map_start_pos, z, true);
 
-	CMap::Map.GenerateMissingTerrain(map_start_pos, map_end - Vec2i(1, 1), z);
+	CMap::Map.GenerateMissingTerrain(map_start_pos, map_end - Vec2i(1, 1), z, this);
 	
 	if (!has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
@@ -910,23 +947,30 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						continue;
 					}
 
-					bool on_subtemplate_area = false;
+					bool on_usable_area = true;
 					for (int x = (map_template::MinAdjacentTemplateDistance * -1) - west_offset; x < (subtemplate->get_width() + map_template::MinAdjacentTemplateDistance + east_offset); ++x) {
 						for (int y = (map_template::MinAdjacentTemplateDistance * -1) - north_offset; y < (subtemplate->get_height() + map_template::MinAdjacentTemplateDistance + south_offset); ++y) {
 							if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
-								on_subtemplate_area = true;
+								on_usable_area = false;
+								break;
+							}
+
+							if (!this->is_map_pos_usable(subtemplate_pos + Vec2i(x, y))) {
+								on_usable_area = false;
 								break;
 							}
 						}
-						if (on_subtemplate_area) {
+						if (!on_usable_area) {
 							break;
 						}
 					}
 
-					if (!on_subtemplate_area) {
-						found_location = true;
-						break;
+					if (!on_usable_area) {
+						continue;
 					}
+
+					found_location = true;
+					break;
 				}
 
 				if (!found_location) {
