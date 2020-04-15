@@ -46,6 +46,8 @@ namespace stratagus {
 
 class world final : public detailed_data_entry, public data_type<world>, public CDataType
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "world";
 	static constexpr const char *database_folder = "worlds";
