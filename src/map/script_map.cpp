@@ -1635,7 +1635,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
 		} else if (!strcmp(value, "MainTemplate")) {
 			stratagus::map_template *main_template = stratagus::map_template::get(LuaToString(l, -1));
-			map_template->MainTemplate = main_template;
+			map_template->main_template = main_template;
 			main_template->Subtemplates.push_back(map_template);
 			if (main_template->Plane) {
 				map_template->Plane = main_template->Plane;

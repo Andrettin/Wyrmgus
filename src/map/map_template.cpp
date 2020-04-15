@@ -128,7 +128,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->MaxPos.y = std::stoi(value);
 		} else if (key == "main_template") {
 			map_template *main_template = map_template::get(value);
-			this->MainTemplate = main_template;
+			this->main_template = main_template;
 			main_template->Subtemplates.push_back(this);
 			if (main_template->Plane) {
 				this->Plane = main_template->Plane;
@@ -1638,7 +1638,7 @@ void map_template::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 */
 bool map_template::IsSubtemplateArea() const
 {
-	return this->MainTemplate != nullptr;
+	return this->get_main_template() != nullptr;
 }
 
 /**
@@ -1648,8 +1648,8 @@ bool map_template::IsSubtemplateArea() const
 */
 const map_template *map_template::GetTopMapTemplate() const
 {
-	if (this->MainTemplate != nullptr) {
-		return this->MainTemplate->GetTopMapTemplate();
+	if (this->get_main_template() != nullptr) {
+		return this->get_main_template()->GetTopMapTemplate();
 	} else {
 		return this;
 	}

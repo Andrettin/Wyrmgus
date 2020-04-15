@@ -88,7 +88,10 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
+	Q_PROPERTY(stratagus::map_template* main_template MEMBER main_template READ get_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
+	Q_PROPERTY(stratagus::terrain_type *unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type *unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -139,7 +142,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
 			if (std::find(map_template->NorthOfTemplates.begin(), map_template->NorthOfTemplates.end(), this) == map_template->NorthOfTemplates.end()) {
 				continue;
 			}
@@ -154,7 +157,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
 			if (std::find(map_template->SouthOfTemplates.begin(), map_template->SouthOfTemplates.end(), this) == map_template->SouthOfTemplates.end()) {
 				continue;
 			}
@@ -169,7 +172,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
 			if (std::find(map_template->WestOfTemplates.begin(), map_template->WestOfTemplates.end(), this) == map_template->WestOfTemplates.end()) {
 				continue;
 			}
@@ -184,7 +187,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->MainTemplate->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
 			if (std::find(map_template->EastOfTemplates.begin(), map_template->EastOfTemplates.end(), this) == map_template->EastOfTemplates.end()) {
 				continue;
 			}
@@ -255,6 +258,11 @@ public:
 		return this->world;
 	}
 
+	map_template *get_main_template() const
+	{
+		return this->main_template;
+	}
+
 	const std::filesystem::path &get_terrain_file() const
 	{
 		return this->terrain_file;
@@ -319,7 +327,7 @@ public:
 private:
 	QPoint current_start_pos = QPoint(0, 0);
 public:
-	map_template *MainTemplate = nullptr; //main template in which this one is located, if this is a subtemplate
+	map_template *main_template = nullptr; //main template in which this one is located, if this is a subtemplate
 	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
 	map_template *LowerTemplate = nullptr; //map template corresponding to this one in the lower layer
 	std::vector<const map_template *> AdjacentTemplates; //map templates adjacent to this one

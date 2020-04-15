@@ -40,6 +40,8 @@
 #include "database/sml_operator.h"
 #include "database/sml_parser.h"
 #include "database/sml_property.h"
+#include "map/map_template.h"
+#include "map/terrain_type.h"
 #include "sound/sound.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
@@ -143,10 +145,14 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
 		} else if (property_class_name == "CIcon*") {
 			new_property_value = QVariant::fromValue(CIcon::get(property.get_value()));
+		} else if (property_class_name == "stratagus::map_template*") {
+			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "stratagus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
 		} else if (property_class_name == "stratagus::sound*") {
 			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
+		} else if (property_class_name == "stratagus::terrain_type*") {
+			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
 		} else if (property_class_name == "stratagus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
 		} else if (property_class_name == "stratagus::world*") {
