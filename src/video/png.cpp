@@ -514,11 +514,11 @@ void SaveMapPNG(const char *name)
 void save_map_template_png(const char *name, const stratagus::map_template *map_template, const bool overlay)
 {
 	bool use_terrain_file = true;
-	std::string terrain_file;
+	std::filesystem::path terrain_file;
 	if (overlay) {
-		terrain_file = map_template->OverlayTerrainFile;
+		terrain_file = map_template->get_overlay_terrain_file();
 	} else {
-		terrain_file = map_template->TerrainFile;
+		terrain_file = map_template->get_terrain_file();
 	}
 	
 	if (terrain_file.empty()) {
@@ -565,7 +565,7 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 	unsigned char *row = new unsigned char[imageWidth * 3];
 	
 	if (use_terrain_file) {
-		const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
+		const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 			
 		if (!CanAccessFile(terrain_filename.c_str())) {
 			fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());

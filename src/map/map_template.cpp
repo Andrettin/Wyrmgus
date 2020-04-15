@@ -103,13 +103,13 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 				UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
 			}
 		} else if (key == "terrain_file") {
-			this->TerrainFile = value;
+			this->terrain_file = value;
 		} else if (key == "overlay_terrain_file") {
-			this->OverlayTerrainFile = value;
+			this->overlay_terrain_file = value;
 		} else if (key == "terrain_image") {
-			this->TerrainImage = value;
+			this->terrain_image = value;
 		} else if (key == "overlay_terrain_image") {
-			this->OverlayTerrainImage = value;
+			this->overlay_terrain_image = value;
 		} else if (key == "width") {
 			this->size.setWidth(std::stoi(value));
 		} else if (key == "height") {
@@ -282,18 +282,18 @@ void map_template::initialize()
 
 void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
-	std::string terrain_file;
+	std::filesystem::path terrain_file;
 	if (overlay) {
-		terrain_file = this->OverlayTerrainFile;
+		terrain_file = this->get_overlay_terrain_file();
 	} else {
-		terrain_file = this->TerrainFile;
+		terrain_file = this->get_terrain_file();
 	}
 	
 	if (terrain_file.empty()) {
 		return;
 	}
 	
-	const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
+	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 		
 	if (!CanAccessFile(terrain_filename.c_str())) {
 		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
@@ -341,11 +341,11 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 
 void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
-	std::string terrain_file;
+	std::filesystem::path terrain_file;
 	if (overlay) {
-		terrain_file = this->OverlayTerrainImage;
+		terrain_file = this->get_overlay_terrain_image();
 	} else {
-		terrain_file = this->TerrainImage;
+		terrain_file = this->get_terrain_image();
 	}
 	
 	if (terrain_file.empty()) {
@@ -353,7 +353,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 		return;
 	}
 	
-	const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
+	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 		
 	if (!CanAccessFile(terrain_filename.c_str())) {
 		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
@@ -503,7 +503,7 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		return;
 	}
 	
-	bool has_base_map = !this->TerrainFile.empty() || !this->TerrainImage.empty();
+	bool has_base_map = !this->get_terrain_file().empty() || !this->get_terrain_image().empty();
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->get_name().c_str());
 	
@@ -1653,6 +1653,15 @@ const map_template *map_template::GetTopMapTemplate() const
 	} else {
 		return this;
 	}
+}
+
+void map_template::set_terrain_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_terrain_file()) {
+		return;
+	}
+
+	this->terrain_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
 /**

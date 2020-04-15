@@ -88,6 +88,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
+	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -254,6 +255,38 @@ public:
 		return this->world;
 	}
 
+	const std::filesystem::path &get_terrain_file() const
+	{
+		return this->terrain_file;
+	}
+
+	void set_terrain_file(const std::filesystem::path &filepath);
+
+	QString get_terrain_file_qstring() const
+	{
+		return QString::fromStdString(this->get_terrain_file().string());
+	}
+
+	void set_terrain_file_qstring(const QString &filepath)
+	{
+		this->set_terrain_file(filepath.toStdString());
+	}
+
+	const std::filesystem::path &get_overlay_terrain_file() const
+	{
+		return this->overlay_terrain_file;
+	}
+
+	const std::filesystem::path &get_terrain_image() const
+	{
+		return this->terrain_image;
+	}
+
+	const std::filesystem::path &get_overlay_terrain_image() const
+	{
+		return this->overlay_terrain_image;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
 	terrain_type *get_unusable_area_terrain_type() const
@@ -266,11 +299,11 @@ public:
 		return this->unusable_area_overlay_terrain_type;
 	}
 	
-	std::string TerrainFile;
-	std::string OverlayTerrainFile;
-	std::string TerrainImage;
-	std::string OverlayTerrainImage;
 private:
+	std::filesystem::path terrain_file;
+	std::filesystem::path overlay_terrain_file;
+	std::filesystem::path terrain_image;
+	std::filesystem::path overlay_terrain_image;
 	QSize size = QSize(0, 0);
 public:
 	int Scale = 1; //1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile

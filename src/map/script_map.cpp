@@ -1601,13 +1601,13 @@ static int CclDefineMapTemplate(lua_State *l)
 				UI.SurfaceLayerButtons.resize(map_template->SurfaceLayer + 1);
 			}
 		} else if (!strcmp(value, "TerrainFile")) {
-			map_template->TerrainFile = LuaToString(l, -1);
+			map_template->terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
-			map_template->OverlayTerrainFile = LuaToString(l, -1);
+			map_template->overlay_terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "TerrainImage")) {
-			map_template->TerrainImage = LuaToString(l, -1);
+			map_template->terrain_image = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainImage")) {
-			map_template->OverlayTerrainImage = LuaToString(l, -1);
+			map_template->overlay_terrain_image = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
 			map_template->size.setWidth(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Height")) {
