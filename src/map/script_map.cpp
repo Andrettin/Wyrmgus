@@ -1635,15 +1635,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
 		} else if (!strcmp(value, "MainTemplate")) {
 			stratagus::map_template *main_template = stratagus::map_template::get(LuaToString(l, -1));
-			map_template->main_template = main_template;
-			main_template->Subtemplates.push_back(map_template);
-			if (main_template->Plane) {
-				map_template->Plane = main_template->Plane;
-			}
-			if (main_template->get_world()) {
-				map_template->world = main_template->get_world();
-			}
-			map_template->SurfaceLayer = main_template->SurfaceLayer;
+			map_template->set_main_template(main_template);
 		} else if (!strcmp(value, "BaseTerrainType")) {
 			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
 			map_template->BaseTerrainType = terrain_type;

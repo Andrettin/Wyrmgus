@@ -128,15 +128,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->MaxPos.y = std::stoi(value);
 		} else if (key == "main_template") {
 			map_template *main_template = map_template::get(value);
-			this->main_template = main_template;
-			main_template->Subtemplates.push_back(this);
-			if (main_template->Plane) {
-				this->Plane = main_template->Plane;
-			}
-			if (main_template->world) {
-				this->world = main_template->world;
-			}
-			this->SurfaceLayer = main_template->SurfaceLayer;
+			this->set_main_template(main_template);
 		} else if (key == "upper_template") {
 			map_template *upper_template = map_template::get(value);
 			if (upper_template != nullptr) {
@@ -230,8 +222,8 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 
 void map_template::initialize()
 {
-	if (!this->Subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
-		std::sort(this->Subtemplates.begin(), this->Subtemplates.end(), [](const map_template *a, const map_template *b) {
+	if (!this->subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
+		std::sort(this->subtemplates.begin(), this->subtemplates.end(), [](const map_template *a, const map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
 				//give priority to the template if the other template's position depends on its own
@@ -792,7 +784,7 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 {
 	Vec2i map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x + this->get_width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y + this->get_height()));
 	
-	for (map_template *subtemplate : this->Subtemplates) {
+	for (map_template *subtemplate : this->get_subtemplates()) {
 		Vec2i subtemplate_pos(subtemplate->SubtemplatePosition - Vec2i((subtemplate->get_width() - 1) / 2, (subtemplate->get_height() - 1) / 2));
 		bool found_location = false;
 		
@@ -918,14 +910,23 @@ void map_template::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 								on_usable_area = false;
 								break;
 							}
-
-							if (!this->is_map_pos_usable(subtemplate_pos + Vec2i(x, y))) {
-								on_usable_area = false;
-								break;
-							}
 						}
 						if (!on_usable_area) {
 							break;
+						}
+					}
+
+					if (on_usable_area) {
+						for (int x = -west_offset; x < (subtemplate->get_width() + east_offset); ++x) {
+							for (int y = -north_offset; y < (subtemplate->get_height() + south_offset); ++y) {
+								if (!this->is_map_pos_usable(subtemplate_pos + Vec2i(x, y))) {
+									on_usable_area = false;
+									break;
+								}
+							}
+							if (!on_usable_area) {
+								break;
+							}
 						}
 					}
 

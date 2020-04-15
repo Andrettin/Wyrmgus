@@ -88,7 +88,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
-	Q_PROPERTY(stratagus::map_template* main_template MEMBER main_template READ get_main_template)
+	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
 	Q_PROPERTY(stratagus::terrain_type *unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type *unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
@@ -142,7 +142,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->get_subtemplates()) {
 			if (std::find(map_template->NorthOfTemplates.begin(), map_template->NorthOfTemplates.end(), this) == map_template->NorthOfTemplates.end()) {
 				continue;
 			}
@@ -157,7 +157,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->get_subtemplates()) {
 			if (std::find(map_template->SouthOfTemplates.begin(), map_template->SouthOfTemplates.end(), this) == map_template->SouthOfTemplates.end()) {
 				continue;
 			}
@@ -172,7 +172,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->get_subtemplates()) {
 			if (std::find(map_template->WestOfTemplates.begin(), map_template->WestOfTemplates.end(), this) == map_template->WestOfTemplates.end()) {
 				continue;
 			}
@@ -187,7 +187,7 @@ public:
 	{
 		int offset = 0;
 
-		for (const map_template *map_template : this->get_main_template()->Subtemplates) {
+		for (const map_template *map_template : this->get_main_template()->get_subtemplates()) {
 			if (std::find(map_template->EastOfTemplates.begin(), map_template->EastOfTemplates.end(), this) == map_template->EastOfTemplates.end()) {
 				continue;
 			}
@@ -261,6 +261,29 @@ public:
 	map_template *get_main_template() const
 	{
 		return this->main_template;
+	}
+
+	void set_main_template(map_template *map_template) 
+	{
+		if (map_template == this->get_main_template()) {
+			return;
+		}
+
+		this->main_template = map_template;
+		main_template->subtemplates.push_back(this);
+
+		if (main_template->Plane) {
+			this->Plane = main_template->Plane;
+		}
+		if (main_template->get_world() != nullptr) {
+			this->world = main_template->get_world();
+		}
+		this->SurfaceLayer = main_template->SurfaceLayer;
+	}
+
+	const std::vector<map_template *> &get_subtemplates() const
+	{
+		return this->subtemplates;
 	}
 
 	const std::filesystem::path &get_terrain_file() const
@@ -346,8 +369,8 @@ public:
 private:
 	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
 	terrain_type *unusable_area_overlay_terrain_type = nullptr;
+	std::vector<map_template *> subtemplates;
 public:
-	std::vector<map_template *> Subtemplates;
 	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
