@@ -705,6 +705,7 @@ set(stratagus_util_HDRS
 	src/util/exception_util.h
 	src/util/qunique_ptr.h
 	src/util/singleton.h
+	src/util/size_util.h
 	src/util/string_util.h
 	src/util/type_traits.h
 	src/util/util.h
