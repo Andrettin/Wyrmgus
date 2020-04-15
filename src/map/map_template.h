@@ -269,7 +269,6 @@ public:
 	int Scale = 1; //1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
-	bool Overland = false; //whether this is an overland map
 	bool OutputTerrainImage = false;
 private:
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
@@ -280,7 +279,6 @@ public:
 private:
 	QPoint current_start_pos = QPoint(0, 0);
 public:
-	PixelSize PixelTileSize = PixelSize(32, 32);
 	map_template *MainTemplate = nullptr; //main template in which this one is located, if this is a subtemplate
 	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
 	map_template *LowerTemplate = nullptr; //map template corresponding to this one in the lower layer

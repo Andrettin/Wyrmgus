@@ -443,8 +443,8 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 	if (!only_visible) {
 		minPos.x = 0;
 		minPos.y = 0;
-		maxPos.x = UI.CurrentMapLayer->GetWidth() - 1;
-		maxPos.y = UI.CurrentMapLayer->GetHeight() - 1;
+		maxPos.x = UI.CurrentMapLayer->get_width() - 1;
+		maxPos.y = UI.CurrentMapLayer->get_height() - 1;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
@@ -770,8 +770,8 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 */
 int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -852,7 +852,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 int SelectArmy()
 {
 	const Vec2i minPos(0, 0);
-	const Vec2i maxPos(UI.CurrentMapLayer->GetWidth() - 1, UI.CurrentMapLayer->GetHeight() - 1);
+	const Vec2i maxPos(UI.CurrentMapLayer->get_width() - 1, UI.CurrentMapLayer->get_height() - 1);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
@@ -916,8 +916,8 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	if (Selected.empty()) {
 		return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
-	const Vec2i tilePos0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i tilePos1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i tilePos0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i tilePos1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -961,8 +961,8 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 */
 int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -1014,8 +1014,8 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 */
 int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -1083,8 +1083,8 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -1156,8 +1156,8 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft, UI.CurrentMapLayer->ID);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright, UI.CurrentMapLayer->ID);
+	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 

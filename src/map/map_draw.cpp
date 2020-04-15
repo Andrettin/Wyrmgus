@@ -31,6 +31,7 @@
 
 #include "viewport.h"
 
+#include "database/defines.h"
 #include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -44,6 +45,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/size_util.h"
 #include "video.h"
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
@@ -113,7 +115,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
+	const PixelPos mapPixelPos = relPos + CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos);
 
 	return mapPixelPos;
 }
@@ -121,7 +123,7 @@ PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
+	const PixelDiff relPos = mapPixelPos - CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -130,7 +132,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
+	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos);
 
 	return tilePos;
 }
@@ -138,7 +140,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
+	const PixelPos mapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos);
 
 	return MapToScreenPixelPos(mapPos);
 }
@@ -148,7 +150,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
 
-	return topLeft + CMap::Map.GetCurrentPixelTileSize() / 2;
+	return topLeft + stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2;
 }
 
 /**
@@ -167,27 +169,27 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetWidth() : CMap::Map.Info.MapWidth) * CMap::Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetHeight() : CMap::Map.Info.MapHeight) * CMap::Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
-	this->MapPos.x = x / CMap::Map.GetCurrentPixelTileSize().x;
-	if (x < 0 && x % CMap::Map.GetCurrentPixelTileSize().x) {
+	this->MapPos.x = x / stratagus::defines::get()->get_tile_width();
+	if (x < 0 && x % stratagus::defines::get()->get_tile_width()) {
 		this->MapPos.x--;
 	}
-	this->MapPos.y = y / CMap::Map.GetCurrentPixelTileSize().y;
-	if (y < 0 && y % CMap::Map.GetCurrentPixelTileSize().y) {
+	this->MapPos.y = y / stratagus::defines::get()->get_tile_height();
+	if (y < 0 && y % stratagus::defines::get()->get_tile_height()) {
 		this->MapPos.y--;
 	}
-	this->Offset.x = x % CMap::Map.GetCurrentPixelTileSize().x;
+	this->Offset.x = x % stratagus::defines::get()->get_tile_width();
 	if (this->Offset.x < 0) {
-		this->Offset.x += CMap::Map.GetCurrentPixelTileSize().x;
+		this->Offset.x += stratagus::defines::get()->get_tile_width();
 	}
-	this->Offset.y = y % CMap::Map.GetCurrentPixelTileSize().y;
+	this->Offset.y = y % stratagus::defines::get()->get_tile_height();
 	if (this->Offset.y < 0) {
-		this->Offset.y += CMap::Map.GetCurrentPixelTileSize().y;
+		this->Offset.y += stratagus::defines::get()->get_tile_height();
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / CMap::Map.GetCurrentPixelTileSize().x + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / CMap::Map.GetCurrentPixelTileSize().y + 1;
+	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / stratagus::defines::get()->get_tile_width() + 1;
+	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / stratagus::defines::get()->get_tile_height() + 1;
 }
 
 /**
@@ -198,7 +200,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer) + offset;
+	const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos) + offset;
 
 	this->Set(mapPixelPos);
 }
@@ -244,22 +246,22 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int ey = this->BottomRightPos.y;
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
-	const int map_max = UI.CurrentMapLayer->GetWidth() * UI.CurrentMapLayer->GetHeight();
+	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
 	const CSeason *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
-		dy += CMap::Map.GetCurrentPixelTileSize().y;
+		dy += stratagus::defines::get()->get_tile_height();
 	}
-	sy *=  UI.CurrentMapLayer->GetWidth();
+	sy *=  UI.CurrentMapLayer->get_width();
 
 	while (dy <= ey && sy  < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
-		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->GetWidth())) {
+		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
 			if (sx - sy < 0) {
 				++sx;
-				dx += CMap::Map.GetCurrentPixelTileSize().x;
+				dx += stratagus::defines::get()->get_tile_width();
 				continue;
 			}
 			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
@@ -372,10 +374,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus end
 			++sx;
-			dx += CMap::Map.GetCurrentPixelTileSize().x;
+			dx += stratagus::defines::get()->get_tile_width();
 		}
-		sy += UI.CurrentMapLayer->GetWidth();
-		dy += CMap::Map.GetCurrentPixelTileSize().y;
+		sy += UI.CurrentMapLayer->get_width();
+		dy += stratagus::defines::get()->get_tile_height();
 	}
 }
 

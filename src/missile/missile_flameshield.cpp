@@ -36,6 +36,7 @@
 #include "missile.h"
 
 #include "actions.h"
+#include "database/defines.h"
 #include "map/map_layer.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -73,8 +74,8 @@ void MissileFlameShield::Action()
 	const int iy = unit->IY;
 	const int uw = unit->Type->TileSize.x;
 	const int uh = unit->Type->TileSize.y;
-	this->position.x = upos.x * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
-	this->position.y = upos.y * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * CMap::Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
+	this->position.x = upos.x * stratagus::defines::get()->get_tile_width() + ix + uw * stratagus::defines::get()->get_tile_width() / 2 + dx - 16;
+	this->position.y = upos.y * stratagus::defines::get()->get_tile_height() + iy + uh * stratagus::defines::get()->get_tile_height() / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitAction::Die) {
 		this->TTL = index;
 	}

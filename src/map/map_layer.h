@@ -57,7 +57,12 @@ namespace stratagus {
 class CMapLayer
 {
 public:
-	CMapLayer(const int width, const int height);
+	CMapLayer(const QSize &size);
+
+	CMapLayer(const int width, const int height) : CMapLayer(QSize(width, height))
+	{
+	}
+
 	~CMapLayer();
 	
 	/**
@@ -79,7 +84,7 @@ public:
 	*/
 	CMapField *Field(const int x, const int y) const
 	{
-		return this->Field(x + y * this->Width);
+		return this->Field(x + y * this->get_width());
 	}
 	
 	/**
@@ -97,19 +102,24 @@ public:
 	Vec2i GetPosFromIndex(unsigned int index) const
 	{
 		Vec2i pos;
-		pos.x = index % this->Width;
-		pos.y = index / this->Width;
+		pos.x = index % this->get_width();
+		pos.y = index / this->get_width();
 		return pos;
 	}
-	
-	int GetWidth() const
+
+	const QSize &get_size() const
 	{
-		return this->Width;
+		return this->size;
 	}
 	
-	int GetHeight() const
+	int get_width() const
 	{
-		return this->Height;
+		return this->get_size().width();
+	}
+	
+	int get_height() const
+	{
+		return this->get_size().height();
 	}
 	
 	void DoPerCycleLoop();
@@ -135,8 +145,7 @@ public:
 	int ID = -1;
 private:
 	CMapField *Fields = nullptr;				/// fields on the map layer
-	int Width = 0;								/// the width in tiles of the map layer
-	int Height = 0;								/// the height in tiles of the map layer
+	QSize size;									/// the size in tiles of the map layer
 public:
 	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
@@ -144,12 +153,10 @@ public:
 	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-	bool Overland = false;						/// whether the map layer is an overland map
 	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer
 	CWorld *World = nullptr;					/// the world pointer (if any) for the map layer
 	int SurfaceLayer = 0;						/// the surface layer for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
-	PixelSize PixelTileSize = PixelSize(32, 32);	/// the pixel tile size for the map layer
 	std::vector<std::tuple<Vec2i, Vec2i, stratagus::map_template *>> subtemplate_areas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };

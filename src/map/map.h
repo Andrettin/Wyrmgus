@@ -229,11 +229,11 @@ public:
 	void ClearOverlayTile(const Vec2i &pos, int z);
 
 	/// convert map pixelpos coordinates into tilepos
-	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const;
+	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
 	/// convert tilepos coordinates into map pixel pos (take the top left of the tile)
-	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const;
+	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const;
 	/// convert tilepos coordinates into map pixel pos (take the center of the tile)
-	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const;
+	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
 	
 	//Wyrmgus start
 	stratagus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
@@ -293,8 +293,6 @@ public:
 	CPlane *GetCurrentPlane() const;
 	CWorld *GetCurrentWorld() const;
 	int GetCurrentSurfaceLayer() const;
-	PixelSize GetCurrentPixelTileSize() const;
-	PixelSize GetMapLayerPixelTileSize(int map_layer) const;
 	//Wyrmgus end
 
 	//UnitCache
@@ -329,7 +327,7 @@ public:
 
 private:
 	/// Build tables for fog of war
-	void InitFogOfWar(PixelSize pixel_tile_size);
+	void InitFogOfWar();
 
 	//Wyrmgus start
 	/*
@@ -346,7 +344,7 @@ public:
 	CTileset *Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     /// graphic for all the tiles
-	static std::map<PixelSize, CGraphic *> FogGraphics;      /// graphics for fog of war, mapped to their respective pixel sizes
+	static CGraphic *FogGraphics; //graphics for fog of war
 	//Wyrmgus start
 	stratagus::terrain_type *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there

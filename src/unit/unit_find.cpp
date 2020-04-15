@@ -664,7 +664,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(startUnit.MapLayer->GetWidth(), startUnit.MapLayer->GetHeight());
+	terrainTraversal.SetSize(startUnit.MapLayer->get_width(), startUnit.MapLayer->get_height());
 	if (unit.Type->BoolFlag[RAIL_INDEX].value) {
 		terrainTraversal.SetDiagonalAllowed(false);
 	}
@@ -1665,7 +1665,7 @@ bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsign
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(src_unit.MapLayer->GetWidth(), src_unit.MapLayer->GetHeight());
+	terrainTraversal.SetSize(src_unit.MapLayer->get_width(), src_unit.MapLayer->get_height());
 	terrainTraversal.SetDiagonalAllowed(false);
 	terrainTraversal.Init();
 

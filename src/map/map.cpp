@@ -36,6 +36,7 @@
 
 #include "map/map.h"
 
+#include "database/defines.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
@@ -72,6 +73,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/size_util.h"
 #include "util/vector_util.h"
 #include "version.h"
 #include "video.h"
@@ -273,23 +275,23 @@ void CMap::Reveal(bool only_person_players)
 --  Map queries
 ----------------------------------------------------------------------------*/
 
-Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const
+Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos) const
 {
-	const Vec2i tilePos(mapPos.x / GetMapLayerPixelTileSize(map_layer).x, mapPos.y / GetMapLayerPixelTileSize(map_layer).y);
+	const Vec2i tilePos(mapPos.x / stratagus::defines::get()->get_tile_width(), mapPos.y / stratagus::defines::get()->get_tile_height());
 
 	return tilePos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const
+PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
 {
-	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1).x, tilePos.y * GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1).y);
+	PixelPos mapPixelPos(tilePos.x * stratagus::defines::get()->get_tile_width(), tilePos.y * stratagus::defines::get()->get_tile_height());
 
 	return mapPixelPos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const
+PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
 {
-	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1) / 2;
+	return TilePosToMapPixelPos_TopLeft(tilePos) + stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2;
 }
 
 //Wyrmgus start
@@ -1030,24 +1032,6 @@ int CMap::GetCurrentSurfaceLayer() const
 		return 0;
 	}
 }
-
-PixelSize CMap::GetCurrentPixelTileSize() const
-{
-	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->PixelTileSize;
-	} else {
-		return PixelSize(32, 32);
-	}
-}
-
-PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
-{
-	if (map_layer >= 0 && map_layer < (int) Map.MapLayers.size()) {
-		return Map.MapLayers[map_layer]->PixelTileSize;
-	} else {
-		return PixelSize(32, 32);
-	}
-}
 //Wyrmgus end
 
 /**
@@ -1208,12 +1192,12 @@ void ChangeCurrentMapLayer(const int z)
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->get_width(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->get_height());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = CMap::Map.MapLayers[z];
 	UI.Minimap.UpdateCache = true;
-	UI.SelectedViewport->Set(new_viewport_map_pos, CMap::Map.GetCurrentPixelTileSize() / 2);
+	UI.SelectedViewport->Set(new_viewport_map_pos, stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2);
 	UpdateSurfaceLayerButtons();
 }
 
@@ -1357,7 +1341,7 @@ bool CMapInfo::IsPointOnMap(const Vec2i &pos, const int z) const
 */
 bool CMapInfo::IsPointOnMap(const int x, const int y, const CMapLayer *map_layer) const
 {
-	return (map_layer && x >= 0 && y >= 0 && x < map_layer->GetWidth() && y < map_layer->GetHeight());
+	return (map_layer && x >= 0 && y >= 0 && x < map_layer->get_width() && y < map_layer->get_height());
 }
 
 /**
@@ -1470,9 +1454,7 @@ void CMap::Create()
 */
 void CMap::Init()
 {
-	for (std::map<PixelSize, CGraphic *>::iterator iterator = this->FogGraphics.begin(); iterator != this->FogGraphics.end(); ++iterator) {
-		InitFogOfWar(iterator->first);
-	}
+	this->InitFogOfWar();
 }
 
 /**
@@ -1544,11 +1526,6 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"season\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->SeasonSchedule ? this->MapLayers[z]->SeasonSchedule->Ident.c_str() : "", this->MapLayers[z]->Season ? this->MapLayers[z]->Season->ID : 0, this->MapLayers[z]->RemainingSeasonHours);
-	}
-	file.printf("  },\n");
-	file.printf("  \"pixel-tile-size\", {\n");
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {%d, %d},\n", this->MapLayers[z]->PixelTileSize.x, this->MapLayers[z]->PixelTileSize.y);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");

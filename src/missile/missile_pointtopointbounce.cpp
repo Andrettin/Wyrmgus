@@ -35,6 +35,7 @@
 
 #include "missile.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 
 /**
@@ -47,7 +48,7 @@ void MissilePointToPointBounce::Action()
 		if (this->State < 2 * this->Type->NumBounces - 1 && this->TotalStep) {
 			const PixelPos step = (this->destination - this->source);
 
-			this->destination += step * ((CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x + CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y) * 3) / 4 / this->TotalStep;
+			this->destination += step * ((stratagus::defines::get()->get_tile_width() + stratagus::defines::get()->get_tile_height()) * 3) / 4 / this->TotalStep;
 			this->State++; // !(State & 1) to initialise
 			this->source = this->position;
 			PointToPointMissile(*this);

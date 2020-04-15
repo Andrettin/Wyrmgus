@@ -1020,7 +1020,7 @@ void DrawPopups()
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-					PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
+					PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
 					std::string unit_name;
 					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
@@ -1045,7 +1045,7 @@ void DrawPopups()
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
 				} else if (mf.TerrainFeature) {
-					PixelPos tile_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
+					PixelPos tile_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
 					std::string terrain_feature_name = mf.TerrainFeature->Name;
 					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(CPlayer::Players[mf.Owner]->Race) != mf.TerrainFeature->CulturalNames.end()) {
@@ -1858,7 +1858,7 @@ void CenterOnMessage()
 		return;
 	}
 	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }

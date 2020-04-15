@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cursor.cpp - The cursors. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Nehal Mistry,
 //                                 Jimmy Salmon and Andrettin
 //
@@ -38,6 +36,7 @@
 #include "intern_video.h"
 
 #include "civilization.h"
+#include "database/defines.h"
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -297,8 +296,8 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * CMap::Map.GetCurrentPixelTileSize().x + 1;
+		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize());
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * stratagus::defines::get()->get_tile_width() + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -348,8 +347,8 @@ void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, screenPos.x + w * CMap::Map.GetCurrentPixelTileSize().x,
-										 screenPos.y + h * CMap::Map.GetCurrentPixelTileSize().y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y, 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * stratagus::defines::get()->get_tile_width(),
+										 screenPos.y + h * stratagus::defines::get()->get_tile_height(), stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height(), 95);
 		}
 	}
 	PopClipping();

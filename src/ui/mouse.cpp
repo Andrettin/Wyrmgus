@@ -978,7 +978,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	if (Selected.empty()) {
 		return;
 	}
-	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
+	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos);
 	CUnit *dest;            // unit under the cursor if any.
 
 	if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
@@ -1411,7 +1411,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos));
 		return;
 	}
 
@@ -1604,7 +1604,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
 				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 				//  Minimap move viewpoint
-				UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
+				UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos));
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -1643,7 +1643,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//  Minimap move viewpoint
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos));
 		CursorStartScreenPos = CursorScreenPos;
 		return;
 	}
@@ -2298,7 +2298,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
-			SendCommand(CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID));
+			SendCommand(CMap::Map.MapPixelPosToTilePos(mapPixelPos));
 		}
 		return;
 	}
@@ -2310,7 +2310,7 @@ static void UISelectStateButtonDown(unsigned)
 		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
+			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos);
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
@@ -2324,7 +2324,7 @@ static void UISelectStateButtonDown(unsigned)
 			}
 			SendCommand(cursorTilePos);
 		} else {
-			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
+			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos));
 		}
 		return;
 	}
@@ -2462,10 +2462,10 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 	const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos));
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
+			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos);
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}

@@ -46,6 +46,7 @@
 #include "character.h"
 #include "commands.h"
 //Wyrmgus end
+#include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -185,7 +186,7 @@ enum {
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer) / 2;
+	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * stratagus::defines::get()->get_tile_size() / 2;
 
 	const int w = this->GetUnitType().BoxWidth;
 	const int h = this->GetUnitType().BoxHeight;
@@ -485,7 +486,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(build->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * stratagus::defines::get()->get_tile_size()) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}

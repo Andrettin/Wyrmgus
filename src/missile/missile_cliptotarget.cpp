@@ -35,6 +35,7 @@
 
 #include "missile.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "unit/unit.h"
@@ -47,8 +48,8 @@ void MissileClipToTarget::Action()
 	this->Wait = this->Type->Sleep;
 
 	if (this->TargetUnit != nullptr) {
-		this->position.x = this->TargetUnit->tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).x + this->TargetUnit->IX;
-		this->position.y = this->TargetUnit->tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).y + this->TargetUnit->IY;
+		this->position.x = this->TargetUnit->tilePos.x * stratagus::defines::get()->get_tile_width() + this->TargetUnit->IX;
+		this->position.y = this->TargetUnit->tilePos.y * stratagus::defines::get()->get_tile_height() + this->TargetUnit->IY;
 	}
 
 	if (this->NextMissileFrame(1, 0)) {

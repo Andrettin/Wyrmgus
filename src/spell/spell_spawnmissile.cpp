@@ -249,7 +249,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		if (target) {
 			*res = target->GetMapPixelPosCenter();
 		} else {
-			*res = CMap::Map.TilePosToMapPixelPos_Center(goalPos, caster.MapLayer);
+			*res = CMap::Map.TilePosToMapPixelPos_Center(goalPos);
 		}
 	}
 	res->x += location.AddX;

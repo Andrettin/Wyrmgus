@@ -202,7 +202,7 @@ void StartMap(const std::string &filename, bool clean)
 		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
 			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 		}
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos));
 
 		//  Play the game.
 		GameMainLoop();
@@ -376,8 +376,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 			//Wyrmgus end
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
-						const int miniMapX = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth();
-						const int miniMapY = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight();
+						const int miniMapX = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->get_width();
+						const int miniMapY = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->get_height();
 						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
 							continue;
 						}
@@ -423,8 +423,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 //			if (CPlayer::Players[i]->Type != PlayerNobody) {
 			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
 			//Wyrmgus end
-				rect.x = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth() - rectSize / 2;
-				rect.y = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight() - rectSize / 2;
+				rect.x = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->get_width() - rectSize / 2;
+				rect.y = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->get_height() - rectSize / 2;
 				rect.w = rect.h = rectSize;
 				SDL_FillRect(preview, &rect, CPlayer::Players[i]->Color);
 			}
@@ -865,8 +865,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("-- Tiles Map\n");
 			//Wyrmgus start
 			for (const CMapLayer *map_layer : map.MapLayers) {
-				for (int y = 0; y < map_layer->GetHeight(); ++y) {
-					for (int x = 0; x < map_layer->GetWidth(); ++x) {
+				for (int y = 0; y < map_layer->get_height(); ++y) {
+					for (int x = 0; x < map_layer->get_width(); ++x) {
 						//Wyrmgus start
 						const CMapField &mf = *map_layer->Field(x, y);
 	//					const int tile = mf.getGraphicTile();
@@ -1859,7 +1859,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 	}
 	UpdateSurfaceLayerButtons();
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos));
 
 	//
 	// Various hacks which must be done after the map is loaded.

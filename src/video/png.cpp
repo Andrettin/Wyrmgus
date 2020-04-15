@@ -34,6 +34,8 @@
 #include <png.h>
 
 #include "stratagus.h"
+
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -45,10 +47,6 @@
 #include "video.h"
 #include "iolib.h"
 #include "iocompat.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -441,8 +439,8 @@ void SaveMapPNG(const char *name)
 		return;
 	}
 
-	const size_t imageWidth = UI.CurrentMapLayer->GetWidth() * CMap::Map.GetCurrentPixelTileSize().x;
-	const size_t imageHeight = UI.CurrentMapLayer->GetHeight() * CMap::Map.GetCurrentPixelTileSize().y;
+	const size_t imageWidth = UI.CurrentMapLayer->get_width() * stratagus::defines::get()->get_tile_width();
+	const size_t imageHeight = UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_tile_height();
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -456,8 +454,8 @@ void SaveMapPNG(const char *name)
 	SDL_Surface *mapImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
 		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
 
-	for (int i = 0; i < UI.CurrentMapLayer->GetHeight(); ++i) {
-		for (int j = 0; j < UI.CurrentMapLayer->GetWidth(); ++j) {
+	for (int i = 0; i < UI.CurrentMapLayer->get_height(); ++i) {
+		for (int j = 0; j < UI.CurrentMapLayer->get_width(); ++j) {
 			const CMapField &mf = *UI.CurrentMapLayer->Field(i, j);
 			SDL_Rect srcRect, dstRect;
 			//Wyrmgus start
@@ -473,10 +471,10 @@ void SaveMapPNG(const char *name)
 			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;
 			srcRect.y = terrain->GetGraphics()->frame_map[tile].y;
 			//Wyrmgus end
-			dstRect.x = i * CMap::Map.GetCurrentPixelTileSize().x;
-			dstRect.y = j * CMap::Map.GetCurrentPixelTileSize().y;
-			srcRect.w = dstRect.w = CMap::Map.GetCurrentPixelTileSize().x;
-			srcRect.h = dstRect.h = CMap::Map.GetCurrentPixelTileSize().y;
+			dstRect.x = i * stratagus::defines::get()->get_tile_width();
+			dstRect.y = j * stratagus::defines::get()->get_tile_height();
+			srcRect.w = dstRect.w = stratagus::defines::get()->get_tile_width();
+			srcRect.h = dstRect.h = stratagus::defines::get()->get_tile_height();
 			//Wyrmgus start
 //			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
 			SDL_BlitSurface(terrain->GetGraphics()->Surface, &srcRect, mapImage, &dstRect);

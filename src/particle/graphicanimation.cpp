@@ -31,6 +31,7 @@
 
 #include "particle.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "player.h"
@@ -76,10 +77,10 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	}
 
 	PixelSize graphicSize(g->Width, g->Height);
-	PixelDiff margin(CMap::Map.GetCurrentPixelTileSize().x - 1, CMap::Map.GetCurrentPixelTileSize().y - 1);
+	PixelDiff margin(stratagus::defines::get()->get_tile_width() - 1, stratagus::defines::get()->get_tile_height() - 1);
 	PixelPos position(pos.x, pos.y);
-	Vec2i minPos = CMap::Map.MapPixelPosToTilePos(position, UI.CurrentMapLayer->ID);
-	Vec2i maxPos = CMap::Map.MapPixelPosToTilePos(position + graphicSize + margin, UI.CurrentMapLayer->ID);
+	Vec2i minPos = CMap::Map.MapPixelPosToTilePos(position);
+	Vec2i maxPos = CMap::Map.MapPixelPosToTilePos(position + graphicSize + margin);
 	//Wyrmgus start
 //	CMap::Map.Clamp(minPos);
 //	CMap::Map.Clamp(maxPos);

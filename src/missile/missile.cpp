@@ -37,6 +37,7 @@
 #include "actions.h"
 #include "animation.h"
 #include "config.h"
+#include "database/defines.h"
 #include "font.h"
 #include "iolib.h"
 #include "luacallback.h"
@@ -973,7 +974,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	// If Firing from inside a Bunker
 	CUnit *from = unit.GetFirstContainer();
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	const PixelPos startPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(from->tilePos, from->MapLayer) + PixelSize(from->Type->GetHalfTilePixelSize(from->MapLayer->ID).x, from->Type->GetHalfTilePixelSize(from->MapLayer->ID).y)
+	const PixelPos startPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(from->tilePos) + PixelSize(from->Type->GetHalfTilePixelSize().x, from->Type->GetHalfTilePixelSize().y)
 								   + unit.Type->MissileOffsets[dir][0];
 
 	Vec2i dpos;
@@ -1003,7 +1004,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		//Wyrmgus end
 	}
 
-	PixelPos destPixelPos = CMap::Map.TilePosToMapPixelPos_Center(dpos, CMap::Map.MapLayers[z]);
+	PixelPos destPixelPos = CMap::Map.TilePosToMapPixelPos_Center(dpos);
 	//Wyrmgus start
 //	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
 	Missile *missile = MakeMissile(*unit.GetMissile().Missile, startPixelPos, destPixelPos, z);
@@ -1020,7 +1021,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	if (missile->Type->Pierce) {
 		for (int i = 0; i < (unit.GetModifiedVariable(ATTACKRANGE_INDEX) - unit.MapDistanceTo(dpos, z)); ++i) {
 			const PixelPos diff(missile->destination - missile->source);
-			missile->destination += diff * ((CMap::Map.GetMapLayerPixelTileSize(missile->MapLayer).x + CMap::Map.GetMapLayerPixelTileSize(missile->MapLayer).y) * 3) / 4 / Distance(missile->source, missile->destination);
+			missile->destination += diff * ((stratagus::defines::get()->get_tile_width() + stratagus::defines::get()->get_tile_height()) * 3) / 4 / Distance(missile->source, missile->destination);
 		}
 	}
 	
@@ -1039,9 +1040,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
 {
 	PixelSize missileSize(missile.Type->Width(), missile.Type->Height());
-	PixelDiff margin(CMap::Map.GetMapLayerPixelTileSize(missile.MapLayer).x - 1, CMap::Map.GetMapLayerPixelTileSize(missile.MapLayer).y - 1);
-	boxMin = CMap::Map.MapPixelPosToTilePos(missile.position, missile.MapLayer);
-	boxMax = CMap::Map.MapPixelPosToTilePos(missile.position + missileSize + margin, missile.MapLayer);
+	PixelDiff margin(stratagus::defines::get()->get_tile_width() - 1, stratagus::defines::get()->get_tile_height() - 1);
+	boxMin = CMap::Map.MapPixelPosToTilePos(missile.position);
+	boxMax = CMap::Map.MapPixelPosToTilePos(missile.position + missileSize + margin);
 	//Wyrmgus start
 //	CMap::Map.Clamp(boxMin);
 //	CMap::Map.Clamp(boxMax);
@@ -1322,7 +1323,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 		if (shouldHit) {
 			// search for blocking units
 			std::vector<CUnit *> blockingUnits;
-			const Vec2i missilePos = CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer);
+			const Vec2i missilePos = CMap::Map.MapPixelPosToTilePos(position);
 			//Wyrmgus start
 //			Select(missilePos, missilePos, blockingUnits);
 			Select(missilePos, missilePos, blockingUnits, missile.MapLayer);
@@ -1337,7 +1338,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
 								if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
-									missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, unit.MapLayer);
+									missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 								}
 							} else {
 								missile.position = position;
@@ -1359,7 +1360,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
 						if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
-							missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, unit.MapLayer);
+							missile.position = CMap::Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 						}
 						missile.DestroyMissile = 1;
 						return true;
@@ -1419,7 +1420,7 @@ bool PointToPointMissile(Missile &missile)
 
 		if (missile.Type->Pierce) {
 			const PixelPos posInt((int)pos.x + missile.Type->size.x / 2, (int)pos.y + missile.Type->size.y / 2);
-			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt, missile.MapLayer));
+			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt));
 		}
 	}
 
@@ -1430,7 +1431,7 @@ bool PointToPointMissile(Missile &missile)
 		 pos.y += (double)diff.y / missile.TotalStep) {
 		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 								(int)pos.y + missile.Type->size.y / 2);
-		const Vec2i tilePos(CMap::Map.MapPixelPosToTilePos(position, missile.MapLayer));
+		const Vec2i tilePos(CMap::Map.MapPixelPosToTilePos(position));
 
 		if (CMap::Map.Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
 			return true;
@@ -1640,7 +1641,7 @@ void Missile::MissileHit(CUnit *unit)
 		return;
 	}
 
-	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(pixelPos, this->MapLayer);
+	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(pixelPos);
 
 	if (!CMap::Map.Info.IsPointOnMap(pos, this->MapLayer)) {
 		// FIXME: this should handled by caller?
@@ -1948,7 +1949,7 @@ void MissileActions()
 int ViewPointDistanceToMissile(const Missile &missile)
 {
 	const PixelPos pixelPos = missile.position + missile.Type->size / 2;
-	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(pixelPos, missile.MapLayer);
+	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(pixelPos);
 
 	return ViewPointDistance(tilePos);
 }

@@ -43,9 +43,18 @@ public:
 	{
 	}
 
+	Vec2T(const QSize &size) : x(size.width()), y(size.height())
+	{
+	}
+
 	operator QPoint() const
 	{
 		return QPoint(this->x, this->y);
+	}
+
+	operator QSize() const
+	{
+		return QSize(this->x, this->y);
 	}
 
 public:
@@ -121,6 +130,14 @@ inline const Vec2T<T> &operator *= (Vec2T<T> &lhs, int rhs)
 }
 
 template <typename T>
+inline const Vec2T<T> &operator *= (Vec2T<T> &lhs, const QSize &rhs)
+{
+	lhs.x *= rhs.width();
+	lhs.y *= rhs.height();
+	return lhs;
+}
+
+template <typename T>
 inline const Vec2T<T> &operator /= (Vec2T<T> &lhs, int rhs)
 {
 	lhs.x /= rhs;
@@ -188,6 +205,15 @@ inline Vec2T<T> operator * (int lhs, const Vec2T<T> &rhs)
 	Vec2T<T> res(rhs);
 
 	res *= lhs;
+	return res;
+}
+
+template <typename T>
+inline Vec2T<T> operator * (const Vec2T<T> &lhs, const QSize &rhs)
+{
+	Vec2T<T> res(lhs);
+
+	res *= rhs;
 	return res;
 }
 

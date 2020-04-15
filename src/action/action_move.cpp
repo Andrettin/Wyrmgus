@@ -40,6 +40,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -276,8 +277,8 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
-					table[i]->IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
-					table[i]->IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
+					table[i]->IX = -posd.x * stratagus::defines::get()->get_tile_width();
+					table[i]->IY = -posd.y * stratagus::defines::get()->get_tile_height();
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -307,8 +308,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
-		unit.IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
+		unit.IX = -posd.x * stratagus::defines::get()->get_tile_width();
+		unit.IY = -posd.y * stratagus::defines::get()->get_tile_height();
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -340,7 +341,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x * 2) || abs(unit.IY) > (CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y * 2)) {
+	if (abs(unit.IX) > (stratagus::defines::get()->get_tile_width() * 2) || abs(unit.IY) > (stratagus::defines::get()->get_tile_height() * 2)) {
 		unit.IX = 0;
 		unit.IY = 0;
 #ifdef DEBUG

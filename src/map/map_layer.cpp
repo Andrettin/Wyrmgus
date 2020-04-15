@@ -65,9 +65,9 @@ extern bool enableOAML;
 /**
 **	@brief	Constructor
 */
-CMapLayer::CMapLayer(const int width, const int height) : Width(width), Height(height)
+CMapLayer::CMapLayer(const QSize &size) : size(size)
 {
-	const int max_tile_index = this->Width * this->Height;
+	const int max_tile_index = this->get_width() * this->get_height();
 
 	this->Fields = new CMapField[max_tile_index];
 }
@@ -102,7 +102,7 @@ void CMapLayer::DoPerCycleLoop()
 	if (GameCycle > 0) {
 		//do tile animation
 		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-			const int max_tile_index = this->Width * this->Height;
+			const int max_tile_index = this->get_width() * this->get_height();
 			for (int i = 0; i < max_tile_index; ++i) {
 				CMapField &mf = *this->Field(i);
 				
@@ -424,8 +424,8 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 	this->Season = season;
 	
 	//update map layer tiles affected by the season change
-	for (int x = 0; x < this->Width; x++) {
-		for (int y = 0; y < this->Height; y++) {
+	for (int x = 0; x < this->get_width(); x++) {
+		for (int y = 0; y < this->get_height(); y++) {
 			const CMapField &mf = *this->Field(x, y);
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap

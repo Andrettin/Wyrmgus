@@ -49,6 +49,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "database/defines.h"
 #include "game.h"
 #include "editor.h"
 //Wyrmgus start
@@ -3245,7 +3246,7 @@ void MarkUnitFieldFlags(const CUnit &unit)
 			mf->Flags |= flags;
 			++mf;
 		} while (--w);
-		index += unit.MapLayer->GetWidth();
+		index += unit.MapLayer->get_width();
 	} while (--h);
 }
 
@@ -3293,7 +3294,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 			mf->UnitCache.for_each(funct);
 			++mf;
 		} while (--w);
-		index += unit.MapLayer->GetWidth();
+		index += unit.MapLayer->get_width();
 	} while (--h);
 }
 
@@ -4449,7 +4450,7 @@ void UnitCountSeen(CUnit &unit)
 					}
 					++mf;
 				} while (--x);
-				index += unit.MapLayer->GetWidth();
+				index += unit.MapLayer->get_width();
 			} while (--y);
 			unit.VisCount[p] = newv;
 		}
@@ -4562,11 +4563,11 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_height = variation->FrameHeight;
 	}
 
-	int x = tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX - (frame_width - Type->TileSize.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x) / 2 + Type->OffsetX;
-	int y = tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y + IY - (frame_height - Type->TileSize.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y) / 2 + Type->OffsetY;
+	int x = tilePos.x * stratagus::defines::get()->get_tile_width() + IX - (frame_width - Type->TileSize.x * stratagus::defines::get()->get_tile_width()) / 2 + Type->OffsetX;
+	int y = tilePos.y * stratagus::defines::get()->get_tile_height() + IY - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_tile_height()) / 2 + Type->OffsetY;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;
+	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	//Wyrmgus start
@@ -5327,7 +5328,7 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::GetMapPixelPosTopLeft() const
 {
-	const PixelPos pos(tilePos.x * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX, tilePos.y * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID).y + IY);
+	const PixelPos pos(tilePos.x * stratagus::defines::get()->get_tile_width() + IX, tilePos.y * stratagus::defines::get()->get_tile_height() + IY);
 	return pos;
 }
 
@@ -5349,7 +5350,7 @@ Vec2i CUnit::GetHalfTileSize() const
 
 PixelSize CUnit::GetTilePixelSize() const
 {
-	return PixelSize(this->GetTileSize()) * CMap::Map.GetMapLayerPixelTileSize(this->MapLayer->ID);
+	return PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size();
 }
 
 PixelSize CUnit::GetHalfTilePixelSize() const
@@ -7090,7 +7091,7 @@ static void HitUnit_Burning(CUnit &target)
 
 	if (fire) {
 		const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
-		const PixelDiff offset(0, -CMap::Map.GetMapLayerPixelTileSize(target.MapLayer->ID).y);
+		const PixelDiff offset(0, -stratagus::defines::get()->get_tile_height());
 		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer->ID);
 
 		missile->SourceUnit = &target;

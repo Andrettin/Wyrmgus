@@ -38,6 +38,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
+#include "database/defines.h"
 #include "dialogue.h"
 #include "editor.h"
 //Wyrmgus start
@@ -135,15 +136,15 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 
 	if (fast) {
 		//Wyrmgus start
-//		stepx = (int)(speed * vp->MapWidth / 2 * CMap::Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4);
-//		stepy = (int)(speed * vp->MapHeight / 2 * CMap::Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4);
-		stepx = (int)(speed * CMap::Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4 * 4);
-		stepy = (int)(speed * CMap::Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4 * 4);
+//		stepx = (int)(speed * vp->MapWidth / 2 * stratagus::defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4);
+//		stepy = (int)(speed * vp->MapHeight / 2 * stratagus::defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * stratagus::defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4 * 4);
+		stepy = (int)(speed * stratagus::defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4 * 4);
 		//Wyrmgus end
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)(speed * CMap::Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * CMap::Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * stratagus::defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4);
+		stepy = (int)(speed * stratagus::defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);

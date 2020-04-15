@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name minimap.cpp - The minimap source file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer and Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -35,6 +33,7 @@
 
 #include "map/minimap.h"
 
+#include "database/defines.h"
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -436,19 +435,19 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
+			int tilepitch = terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
 			const int bpp = terrain->GetGraphics(season)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
+			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
 			//assumes the BPP for the base terrain is the same as for the top terrain (which may be an overlay)
 			//Wyrmgus end
 	
-			const int xofs = CMap::Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
-			const int yofs = CMap::Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
+			const int xofs = stratagus::defines::get()->get_tile_width() * (tile % tilepitch);
+			const int yofs = stratagus::defines::get()->get_tile_height() * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = CMap::Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
-			const int base_yofs = CMap::Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
+			const int base_xofs = stratagus::defines::get()->get_tile_width() * (base_tile % base_tilepitch);
+			const int base_yofs = stratagus::defines::get()->get_tile_height() * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -682,18 +681,18 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
+			int tilepitch = terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
 			const int bpp = terrain->GetGraphics(season)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / CMap::Map.GetCurrentPixelTileSize().x;
+			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
 			//Wyrmgus end
 	
-			const int xofs = CMap::Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
-			const int yofs = CMap::Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
+			const int xofs = stratagus::defines::get()->get_tile_width() * (tile % tilepitch);
+			const int yofs = stratagus::defines::get()->get_tile_height() * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = CMap::Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
-			const int base_yofs = CMap::Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
+			const int base_xofs = stratagus::defines::get()->get_tile_width() * (base_tile % base_tilepitch);
+			const int base_yofs = stratagus::defines::get()->get_tile_height() * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1020,7 +1019,7 @@ void CMinimap::Update()
 				//Wyrmgus start
 //				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 //				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
-				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->GetWidth());
+				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->get_width());
 				visiontype = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
 				//Wyrmgus end
 			}

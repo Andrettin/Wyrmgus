@@ -38,6 +38,7 @@
 
 #include "civilization.h"
 #include "commands.h"
+#include "database/defines.h"
 #include "font.h"
 #include "game.h"
 #include "guichan.h"
@@ -447,7 +448,7 @@ static void EditTiles(const Vec2i &pos, stratagus::terrain_type *terrain, int si
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos(UI.CurrentMapLayer->GetWidth() - size, UI.CurrentMapLayer->GetHeight() - size);
+	const Vec2i mpos(UI.CurrentMapLayer->get_width() - size, UI.CurrentMapLayer->get_height() - size);
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
@@ -933,21 +934,21 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	Video.DrawVLine(color, x + 3, y + 3, Map.GetCurrentPixelTileSize().y + 3);
 	Video.DrawVLine(color, x + 4, y + 3, Map.GetCurrentPixelTileSize().y + 3);
 	*/
-	Video.DrawVLine(ColorGray, x + CMap::Map.GetCurrentPixelTileSize().x + 4 - 1, y + 5 - 1, CMap::Map.GetCurrentPixelTileSize().y - 1 - 1); // _|
-	Video.DrawVLine(ColorGray, x + CMap::Map.GetCurrentPixelTileSize().x + 5 - 1, y + 5 - 1, CMap::Map.GetCurrentPixelTileSize().y - 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + CMap::Map.GetCurrentPixelTileSize().y + 4 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + CMap::Map.GetCurrentPixelTileSize().y + 5 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawVLine(ColorGray, x + stratagus::defines::get()->get_tile_width() + 4 - 1, y + 5 - 1, stratagus::defines::get()->get_tile_height() - 1 - 1); // _|
+	Video.DrawVLine(ColorGray, x + stratagus::defines::get()->get_tile_width() + 5 - 1, y + 5 - 1, stratagus::defines::get()->get_tile_height() - 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + stratagus::defines::get()->get_tile_height() + 4 - 1, stratagus::defines::get()->get_tile_width() + 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + stratagus::defines::get()->get_tile_height() + 5 - 1, stratagus::defines::get()->get_tile_width() + 1 - 1);
 
 	Uint32 color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
-	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, CMap::Map.GetCurrentPixelTileSize().x + 1 - 1);
-	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, CMap::Map.GetCurrentPixelTileSize().y + 3 - 1);
-	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, CMap::Map.GetCurrentPixelTileSize().y + 3 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, stratagus::defines::get()->get_tile_width() + 1 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, stratagus::defines::get()->get_tile_width() + 1 - 1);
+	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, stratagus::defines::get()->get_tile_height() + 3 - 1);
+	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, stratagus::defines::get()->get_tile_height() + 3 - 1);
 	
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, CMap::Map.GetCurrentPixelTileSize().x + 7, CMap::Map.GetCurrentPixelTileSize().y + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, CMap::Map.GetCurrentPixelTileSize().x + 5, CMap::Map.GetCurrentPixelTileSize().y + 5);
+	Video.DrawRectangleClip(color, x, y, stratagus::defines::get()->get_tile_width() + 7, stratagus::defines::get()->get_tile_height() + 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, stratagus::defines::get()->get_tile_width() + 5, stratagus::defines::get()->get_tile_height() + 5);
 	//Wyrmgus end
 
 	if (flags & IconClicked) {
@@ -966,7 +967,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
-		Video.DrawRectangleClip(ColorGreen, x, y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
+		Video.DrawRectangleClip(ColorGreen, x, y, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 	}
 }
 
@@ -1056,7 +1057,7 @@ static void DrawTileIcons()
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24;
-	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - CMap::Map.GetCurrentPixelTileSize().y) {
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - stratagus::defines::get()->get_tile_height()) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
@@ -1064,7 +1065,7 @@ static void DrawTileIcons()
 //		x = UI.ButtonPanel.X + 10;
 		x = UI.ButtonPanel.X + 10 + 6;
 		//Wyrmgus end
-		while (x < UI.ButtonPanel.X + ButtonPanelWidth - CMap::Map.GetCurrentPixelTileSize().x) {
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - stratagus::defines::get()->get_tile_width()) {
 			if (i >= (int) Editor.ShownTileTypes.size()) {
 				break;
 			}
@@ -1079,28 +1080,28 @@ static void DrawTileIcons()
 				terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
 			}
 			//Wyrmgus end
-			Video.DrawRectangleClip(ColorGray, x, y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
+			Video.DrawRectangleClip(ColorGray, x, y, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 
 			if (i == Editor.SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-					CMap::Map.GetCurrentPixelTileSize().x - 2, CMap::Map.GetCurrentPixelTileSize().y - 2);
+					stratagus::defines::get()->get_tile_width() - 2, stratagus::defines::get()->get_tile_height() - 2);
 			}
 			if (i == Editor.CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-					CMap::Map.GetCurrentPixelTileSize().x + 2, CMap::Map.GetCurrentPixelTileSize().y + 2);
+					stratagus::defines::get()->get_tile_width() + 2, stratagus::defines::get()->get_tile_height() + 2);
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
 
 			//Wyrmgus start
-//			x += CMap::Map.GetCurrentPixelTileSize().x + 8;
-			x += CMap::Map.GetCurrentPixelTileSize().x + 30; // to allow 5 tile types per row with the new UI
+//			x += stratagus::defines::get()->get_tile_width() + 8;
+			x += stratagus::defines::get()->get_tile_width() + 30; // to allow 5 tile types per row with the new UI
 			//Wyrmgus end
 			++i;
 		}
 		//Wyrmgus start
-//		y += CMap::Map.GetCurrentPixelTileSize().y + 2;
-		y += CMap::Map.GetCurrentPixelTileSize().y + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
+//		y += stratagus::defines::get()->get_tile_height() + 2;
+		y += stratagus::defines::get()->get_tile_height() + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
 		//Wyrmgus end
 	}
 }
@@ -1294,12 +1295,12 @@ static void DrawMapCursor()
 
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
-				screenPosIt.y = screenPos.y + j * CMap::Map.GetCurrentPixelTileSize().y;
+				screenPosIt.y = screenPos.y + j * stratagus::defines::get()->get_tile_height();
 				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
-					screenPosIt.x = screenPos.x + i * CMap::Map.GetCurrentPixelTileSize().x;
+					screenPosIt.x = screenPos.x + i * stratagus::defines::get()->get_tile_width();
 					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
@@ -1312,7 +1313,7 @@ static void DrawMapCursor()
 					//Wyrmgus end
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, CMap::Map.GetCurrentPixelTileSize().x * TileCursorSize, CMap::Map.GetCurrentPixelTileSize().y * TileCursorSize);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, stratagus::defines::get()->get_tile_width() * TileCursorSize, stratagus::defines::get()->get_tile_height() * TileCursorSize);
 			PopClipping();
 		} else {
 			// If there is an unit under the cursor, it's selection thing
@@ -1320,18 +1321,18 @@ static void DrawMapCursor()
 			if (UnitUnderCursor != nullptr) {
 				PushClipping();
 				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, CMap::Map.GetCurrentPixelTileSize().x, CMap::Map.GetCurrentPixelTileSize().y);
+				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 				PopClipping();
 			}
 		}
 	}
 }
 
-static void DrawCross(const PixelPos &topleft_pos, const PixelSize &size, Uint32 color)
+static void DrawCross(const PixelPos &topleft_pos, const QSize &size, Uint32 color)
 {
 	const PixelPos lt = topleft_pos;
-	const PixelPos lb(topleft_pos.x, topleft_pos.y + size.y);
-	const PixelPos rt(topleft_pos.x + size.x, topleft_pos.y);
+	const PixelPos lb(topleft_pos.x, topleft_pos.y + size.height());
+	const PixelPos rt(topleft_pos.x + size.width(), topleft_pos.y);
 	const PixelPos rb = topleft_pos + size;
 
 	Video.DrawLineClip(color, lt, rb);
@@ -1355,7 +1356,7 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, CMap::Map.GetCurrentPixelTileSize(), CPlayer::Players[i]->Color);
+					DrawCross(startScreenPos, stratagus::defines::get()->get_tile_size(), CPlayer::Players[i]->Color);
 				}
 			}
 		}
@@ -1627,7 +1628,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
-			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
+			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos));
 		}
 		return;
 	}
@@ -2121,7 +2122,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 
 	int i = Editor.TileIndex;
 	by = UI.ButtonPanel.Y + 24;
-	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - CMap::Map.GetCurrentPixelTileSize().y) {
+	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - stratagus::defines::get()->get_tile_height()) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
@@ -2129,12 +2130,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 //		bx = UI.ButtonPanel.X + 10;
 		bx = UI.ButtonPanel.X + 10 + 6;
 		//Wyrmgus end
-		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - CMap::Map.GetCurrentPixelTileSize().x) {
+		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - stratagus::defines::get()->get_tile_width()) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
 				break;
 			}
-			if (bx < screenPos.x && screenPos.x < bx + CMap::Map.GetCurrentPixelTileSize().x
-				&& by < screenPos.y && screenPos.y < by + CMap::Map.GetCurrentPixelTileSize().y) {
+			if (bx < screenPos.x && screenPos.x < bx + stratagus::defines::get()->get_tile_width()
+				&& by < screenPos.y && screenPos.y < by + stratagus::defines::get()->get_tile_height()) {
 				//Wyrmgus start
 //				const int tile = Editor.ShownTileTypes[i];
 //				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
@@ -2146,14 +2147,14 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				return true;
 			}
 			//Wyrmgus start
-//			bx += CMap::Map.GetCurrentPixelTileSize().x + 8;
-			bx += CMap::Map.GetCurrentPixelTileSize().x + 30;
+//			bx += stratagus::defines::get()->get_tile_width() + 8;
+			bx += stratagus::defines::get()->get_tile_width() + 30;
 			//Wyrmgus end
 			i++;
 		}
 		//Wyrmgus start
-//		by += CMap::Map.GetCurrentPixelTileSize().y + 2;
-		by += CMap::Map.GetCurrentPixelTileSize().y + 18;
+//		by += stratagus::defines::get()->get_tile_height() + 2;
+		by += stratagus::defines::get()->get_tile_height() + 18;
 		//Wyrmgus end
 	}
 	return false;
@@ -2203,7 +2204,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			}
 		}
 		UI.MouseWarpPos = CursorStartScreenPos;
-		UI.MouseViewport->Set(tilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
+		UI.MouseViewport->Set(tilePos, stratagus::defines::get()->get_tile_size() / 2);
 		return;
 	}
 
@@ -2222,18 +2223,18 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
-			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, stratagus::defines::get()->get_tile_size() / 2);
 		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
-			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, stratagus::defines::get()->get_tile_size() / 2);
 		}
 
 		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
-			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, stratagus::defines::get()->get_tile_size() / 2);
 		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
-			UI.SelectedViewport->Set(vpTilePos, CMap::Map.GetCurrentPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, stratagus::defines::get()->get_tile_size() / 2);
 		}
 
 		// Scroll the map, if cursor moves outside the viewport.
@@ -2259,7 +2260,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToMinimap();
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos));
 		return;
 	}
 
@@ -2331,10 +2332,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 //		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
 //			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + Map.GetCurrentPixelTileSize().x + 7
 		if (UI.InfoPanel.X + 11 + TILE_ICON_X < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + CMap::Map.GetCurrentPixelTileSize().x + 7
+			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + stratagus::defines::get()->get_tile_width() + 7
 		//Wyrmgus end
 			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorScreenPos.y
-			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + CMap::Map.GetCurrentPixelTileSize().y + 7) {
+			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + stratagus::defines::get()->get_tile_height() + 7) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = cursor_on::button;
@@ -2343,8 +2344,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		}
 	}
 
-	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Width : CMap::Map.GetCurrentPixelTileSize().x + 7;
-	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Height : CMap::Map.GetCurrentPixelTileSize().y + 7;
+	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Width : stratagus::defines::get()->get_tile_width() + 7;
+	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Height : stratagus::defines::get()->get_tile_height() + 7;
 	//Wyrmgus start
 //	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
 //		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
@@ -2493,7 +2494,7 @@ void CEditor::Init()
 
 		//Wyrmgus start
 		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
-			int max_tile_index = map_layer->GetWidth() * map_layer->GetHeight();
+			int max_tile_index = map_layer->get_width() * map_layer->get_height();
 			for (int i = 0; i < max_tile_index; ++i) {
 				//Wyrmgus start
 	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
@@ -2552,7 +2553,7 @@ void CEditor::Init()
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
-		if (!terrain_type->Hidden && terrain_type->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
+		if (!terrain_type->Hidden) {
 			Editor.ShownTileTypes.push_back(terrain_type);
 		}
 	}

@@ -798,8 +798,8 @@ public:
 
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
-	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
-	PixelSize GetTilePixelSize(const int map_layer) const;
+	PixelSize GetHalfTilePixelSize() const { return GetTilePixelSize() / 2; }
+	PixelSize GetTilePixelSize() const;
 	Vec2i GetTileCenterPosOffset() const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;

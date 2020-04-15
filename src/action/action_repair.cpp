@@ -40,6 +40,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -322,7 +323,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {

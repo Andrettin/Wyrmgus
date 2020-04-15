@@ -37,6 +37,7 @@
 #include "action/action_resource.h"
 #include "civilization.h"
 #include "config.h"
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -416,9 +417,9 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 */
 static char CalculateStereo(const CUnit &unit)
 {
-	int stereo = ((unit.tilePos.x * CMap::Map.GetCurrentPixelTileSize().x + unit.Type->TileSize.x * CMap::Map.GetCurrentPixelTileSize().x / 2 +
-				   unit.IX - UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
+	int stereo = ((unit.tilePos.x * stratagus::defines::get()->get_tile_width() + unit.Type->TileSize.x * stratagus::defines::get()->get_tile_width() / 2 +
+				   unit.IX - UI.SelectedViewport->MapPos.x * stratagus::defines::get()->get_tile_width()) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * stratagus::defines::get()->get_tile_width())) - 128;
 	clamp(&stereo, -128, 127);
 	return stereo;
 }
@@ -523,8 +524,8 @@ void PlayMissileSound(const Missile &missile, stratagus::sound *sound)
 		return;
 	}
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
-				   UI.SelectedViewport->MapPos.x * CMap::Map.GetCurrentPixelTileSize().x) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * CMap::Map.GetCurrentPixelTileSize().x)) - 128;
+				   UI.SelectedViewport->MapPos.x * stratagus::defines::get()->get_tile_width()) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * stratagus::defines::get()->get_tile_width())) - 128;
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
@@ -729,8 +730,8 @@ void InitSoundClient()
 		GameSounds.ChatMessage.MapSound();
 	}
 
-	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + CMap::Map.GetCurrentPixelTileSize().x) / CMap::Map.GetCurrentPixelTileSize().x;
-	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + CMap::Map.GetCurrentPixelTileSize().y) / CMap::Map.GetCurrentPixelTileSize().y;
+	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + stratagus::defines::get()->get_tile_width()) / stratagus::defines::get()->get_tile_width();
+	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + stratagus::defines::get()->get_tile_height()) / stratagus::defines::get()->get_tile_height();
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }

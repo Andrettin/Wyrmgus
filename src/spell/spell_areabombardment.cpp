@@ -32,6 +32,7 @@
 
 #include "spell/spell_areabombardment.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 #include "missile.h"
 #include "script.h"
@@ -100,14 +101,14 @@
 			dpos.y = goalPos.y + SyncRand() % 5 - 2;
 		} while (!CMap::Map.Info.IsPointOnMap(dpos, z));
 
-		const PixelPos dest = CMap::Map.TilePosToMapPixelPos_Center(dpos, CMap::Map.MapLayers[z]);
+		const PixelPos dest = CMap::Map.TilePosToMapPixelPos_Center(dpos);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest, z);
 			if (mis->Type->BlizzardSpeed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * CMap::Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->BlizzardSpeed;
+				mis->Delay = i * mis->Type->Sleep * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->BlizzardSpeed;
 			} else if (mis->Type->Speed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * CMap::Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->Speed;
+				mis->Delay = i * mis->Type->Sleep * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->Speed;
 			} else {
 				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;
 			}

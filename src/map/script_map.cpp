@@ -37,6 +37,7 @@
 
 #include "campaign.h"
 #include "civilization.h"
+#include "database/defines.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h"
@@ -151,8 +152,8 @@ static int CclStratagusMap(lua_State *l)
 						const int width = LuaToNumber(l, -1, 1);
 						const int height = LuaToNumber(l, -1, 2);
 						CMapLayer *map_layer = new CMapLayer(width, height);
-						CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
-						CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
+						CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
+						CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
 						map_layer->ID = CMap::Map.MapLayers.size();
 						CMap::Map.MapLayers.push_back(map_layer);
 						lua_pop(l, 1);
@@ -201,22 +202,6 @@ static int CclStratagusMap(lua_State *l)
 							CMap::Map.MapLayers[z]->Season = CMap::Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons[season];
 						}
 						CMap::Map.MapLayers[z]->RemainingSeasonHours = LuaToNumber(l, -1, 3);
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "pixel-tile-size")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument for \"pixel-tile-size\"");
-					}
-					const int subsubargs = lua_rawlen(l, -1);
-					for (int z = 0; z < subsubargs; ++z) {
-						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument for \"pixel-tile-size\"");
-						}
-						lua_rawgeti(l, -1, z + 1);
-						PixelSize pixel_tile_size(LuaToNumber(l, -1, 1), LuaToNumber(l, -1, 2));
-						CMap::Map.MapLayers[z]->PixelTileSize = pixel_tile_size;
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -371,7 +356,7 @@ static int CclCenterMap(lua_State *l)
 	LuaCheckArgs(l, 2);
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos));
 	return 0;
 }
 
@@ -559,20 +544,15 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 {
 	std::string FogGraphicFile;
 
-	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
 	
-	PixelSize pixel_tile_size(32, 32);
-	if (lua_istable(l, 2)) {
-		CclGetPos(l, &pixel_tile_size.x, &pixel_tile_size.y, 2);
+	if (CMap::FogGraphics != nullptr) {
+		CGraphic::Free(CMap::FogGraphics);
+		CMap::FogGraphics = nullptr;
 	}
 	
-	if (CMap::FogGraphics.find(pixel_tile_size) != CMap::FogGraphics.end()) {
-		CGraphic::Free(CMap::FogGraphics[pixel_tile_size]);
-		CMap::FogGraphics.erase(pixel_tile_size);
-	}
-	
-	CMap::FogGraphics[pixel_tile_size] = CGraphic::New(FogGraphicFile, pixel_tile_size.x, pixel_tile_size.y);
+	CMap::FogGraphics = CGraphic::New(FogGraphicFile, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 
 	return 0;
 }
@@ -1376,12 +1356,6 @@ static int CclDefineTerrainType(lua_State *l)
 			terrain->SolidAnimationFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Resource")) {
 			terrain->Resource = GetResourceIdByName(LuaToString(l, -1));
-		} else if (!strcmp(value, "PixelSize")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			terrain->PixelTileSize.x = LuaToNumber(l, -1, 1);
-			terrain->PixelTileSize.y = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "BaseTerrainTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1566,22 +1540,21 @@ static int CclDefineTerrainType(lua_State *l)
 		}
 	}
 	
-	//save the graphics here, so that we can take the pixel tile size into account
 	if (!graphics_file.empty()) {
 		if (CGraphic::Get(graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
+			CGraphic *graphics = CGraphic::New(graphics_file, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 		}
 		terrain->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
+			CGraphic *graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 		}
 		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
 		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
 		}
 		terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}
@@ -1650,8 +1623,6 @@ static int CclDefineMapTemplate(lua_State *l)
 			CclGetPos(l, &map_template->SubtemplatePosition.x, &map_template->SubtemplatePosition.y);
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
 			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
-		} else if (!strcmp(value, "PixelTileSize")) {
-			CclGetPos(l, &map_template->PixelTileSize.x, &map_template->PixelTileSize.y);
 		} else if (!strcmp(value, "MainTemplate")) {
 			stratagus::map_template *main_template = stratagus::map_template::get(LuaToString(l, -1));
 			map_template->MainTemplate = main_template;

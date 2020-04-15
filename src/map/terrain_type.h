@@ -91,7 +91,6 @@ public:
 	bool Buildable = false;										/// Whether structures can be built upon this terrain type
 	bool AllowSingle = false;									/// Whether this terrain type has transitions for single tiles
 	bool Hidden = false;
-	PixelSize PixelTileSize = PixelSize(32, 32);
 	CUnitType *UnitType = nullptr;
 //private:
 	CGraphic *Graphics = nullptr;

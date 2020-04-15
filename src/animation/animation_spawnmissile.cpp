@@ -39,6 +39,7 @@
 #include "action/action_spellcast.h"
 
 #include "actions.h"
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "missile.h"
@@ -69,11 +70,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
-		start.y = goal->tilePos.y * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
+		start.x = goal->tilePos.x * stratagus::defines::get()->get_tile_width() + goal->IX + moff.x + startx;
+		start.y = goal->tilePos.y * stratagus::defines::get()->get_tile_height() + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
-		start.y = (goal->tilePos.y + starty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
+		start.x = (goal->tilePos.x + startx) * stratagus::defines::get()->get_tile_width() + stratagus::defines::get()->get_tile_width() / 2 + moff.x;
+		start.y = (goal->tilePos.y + starty) * stratagus::defines::get()->get_tile_height() + stratagus::defines::get()->get_tile_height() / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -88,24 +89,24 @@
 				return;
 			} else if (goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::AttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
 			} else if (goal->CurrentAction() == UnitAction::SpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
 				dest.y += desty;
 			} else {
-				dest.x += destx * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-				dest.y += desty * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+				dest.x += destx * stratagus::defines::get()->get_tile_width();
+				dest.y += desty * stratagus::defines::get()->get_tile_height();
 			}
 		} else if (flags & SM_Pixel) {
 			dest.x = target->GetMapPixelPosCenter().x + destx;
 			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
-			dest.y = (target->tilePos.y + desty) * CMap::Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
+			dest.x = (target->tilePos.x + destx) * stratagus::defines::get()->get_tile_width();
+			dest.y = (target->tilePos.y + desty) * stratagus::defines::get()->get_tile_height();
 			dest += target->GetTilePixelSize() / 2;
 		}
 	} else {
@@ -113,12 +114,12 @@
 			dest.x = goal->GetMapPixelPosCenter().x + destx;
 			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
-			dest.y = (goal->tilePos.y + desty) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
+			dest.x = (goal->tilePos.x + destx) * stratagus::defines::get()->get_tile_width();
+			dest.y = (goal->tilePos.y + desty) * stratagus::defines::get()->get_tile_height();
 			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
-	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest, unit.MapLayer->ID);
+	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest);
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)

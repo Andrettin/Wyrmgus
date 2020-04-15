@@ -40,6 +40,7 @@
 #include "character.h" //for the gender identifiers
 //Wyrmgus end
 #include "commands.h"
+#include "database/defines.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -452,7 +453,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * stratagus::defines::get()->get_tile_size()) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }

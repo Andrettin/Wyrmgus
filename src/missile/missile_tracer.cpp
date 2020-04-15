@@ -91,7 +91,7 @@ static bool TracerMissile(Missile &missile)
 
 		if (missile.Type->Pierce) {
 			const PixelPos posInt((int)pos.x, (int)pos.y);
-			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt, missile.MapLayer));
+			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt));
 		}
 	}
 

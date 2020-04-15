@@ -35,6 +35,7 @@
 
 #include "missile.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 
 /**
@@ -56,8 +57,8 @@ void MissileWhirlwind::Action()
 
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
-	const PixelPos centerOffset(CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x / 2, CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y);
-	const Vec2i center = CMap::Map.MapPixelPosToTilePos(pixelCenter + centerOffset, this->MapLayer);
+	const PixelPos centerOffset(stratagus::defines::get()->get_tile_width() / 2, stratagus::defines::get()->get_tile_height());
+	const Vec2i center = CMap::Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
 
 	//Wyrmgus start
 	Assert(this->Type->AttackSpeed);
@@ -75,7 +76,7 @@ void MissileWhirlwind::Action()
 			newPos.x = center.x + SyncRand() % 5 - 2;
 			newPos.y = center.y + SyncRand() % 5 - 2;
 		} while (!CMap::Map.Info.IsPointOnMap(newPos, this->MapLayer));
-		this->destination = CMap::Map.TilePosToMapPixelPos_Center(newPos, CMap::Map.MapLayers[this->MapLayer]);
+		this->destination = CMap::Map.TilePosToMapPixelPos_Center(newPos);
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_

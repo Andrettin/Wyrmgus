@@ -3429,11 +3429,11 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position
-	if (unit.MapLayer) {
+	if (unit.MapLayer != nullptr) {
 		unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
-		unit.Variable[POSX_INDEX].Max = unit.MapLayer->GetWidth();
+		unit.Variable[POSX_INDEX].Max = unit.MapLayer->get_width();
 		unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
-		unit.Variable[POSY_INDEX].Max = unit.MapLayer->GetHeight();
+		unit.Variable[POSY_INDEX].Max = unit.MapLayer->get_height();
 	}
 
 	// Target Position

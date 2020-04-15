@@ -123,10 +123,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->Scale = std::stoi(value);
 		} else if (key == "priority") {
 			this->Priority = std::stoi(value);
-		} else if (key == "pixel_tile_width") {
-			this->PixelTileSize.x = std::stoi(value);
-		} else if (key == "pixel_tile_height") {
-			this->PixelTileSize.y = std::stoi(value);
 		} else if (key == "min_x") {
 			this->MinPos.x = std::stoi(value);
 		} else if (key == "min_y") {
@@ -173,8 +169,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "east_of") {
 			const map_template *east_of_template = map_template::get(value);
 			this->EastOfTemplates.push_back(east_of_template);
-		} else if (key == "overland") {
-			this->Overland = string::to_bool(value);
 		} else if (key == "base_terrain_type") {
 			terrain_type *terrain_type = terrain_type::get(value);
 			this->BaseTerrainType = terrain_type;
@@ -204,7 +198,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "unit_type") {
-					value = FindAndReplaceString(value, "_", "-");
 					unit_type = CUnitType::get(value);
 				} else if (key == "quantity") {
 					quantity = std::stoi(value);
@@ -462,21 +455,17 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 	
 		CMapLayer *map_layer = new CMapLayer(width, height);
 		map_layer->ID = CMap::Map.MapLayers.size();
-		CMap::Map.Info.MapWidths.push_back(map_layer->GetWidth());
-		CMap::Map.Info.MapHeights.push_back(map_layer->GetHeight());
+		CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
+		CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
 		map_layer->Plane = this->Plane;
 		map_layer->World = this->World;
 		map_layer->SurfaceLayer = this->SurfaceLayer;
-		map_layer->PixelTileSize = this->PixelTileSize;
-		map_layer->Overland = this->Overland;
 		CMap::Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			CMap::Map.MapLayers[z]->Plane = this->Plane;
 			CMap::Map.MapLayers[z]->World = this->World;
 			CMap::Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
-			CMap::Map.MapLayers[z]->PixelTileSize = this->PixelTileSize;
-			CMap::Map.MapLayers[z]->Overland = this->Overland;
 		}
 	}
 
