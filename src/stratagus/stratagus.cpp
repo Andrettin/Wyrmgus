@@ -938,6 +938,15 @@ void load_database(const bool initial_definition)
 	}
 }
 
+void load_defines()
+{
+	try {
+		stratagus::database::get()->load_defines();
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error loading defines."));
+	}
+}
+
 void initialize_database()
 {
 	try {

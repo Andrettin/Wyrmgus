@@ -336,10 +336,6 @@ void database::load(const bool initial_definition)
 		const module *module = kv_pair.second;
 
 		try {
-			if (!initial_definition) {
-				defines::get()->load(path); //load the defines after initial definition so that they can refer to data entries
-			}
-
 			//create or process data entries for each data type
 			for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
 				metadata->get_processing_function()(initial_definition);
@@ -349,6 +345,24 @@ void database::load(const bool initial_definition)
 				std::throw_with_nested(std::runtime_error("Failed to process database for the \"" + module->get_identifier() + "\" module."));
 			} else {
 				std::throw_with_nested(std::runtime_error("Failed to process database."));
+			}
+		}
+	}
+}
+
+void database::load_defines()
+{
+	for (const auto &kv_pair : database::get()->get_data_paths_with_module()) {
+		const std::filesystem::path &path = kv_pair.first;
+		const module *module = kv_pair.second;
+
+		try {
+			defines::get()->load(path);
+		} catch (...) {
+			if (module != nullptr) {
+				std::throw_with_nested(std::runtime_error("Failed to load the defines for the \"" + module->get_identifier() + "\" module."));
+			} else {
+				std::throw_with_nested(std::runtime_error("Failed to load defines."));
 			}
 		}
 	}
