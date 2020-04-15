@@ -55,6 +55,16 @@ public:
 		return this->tile_size;
 	}
 
+	int get_tile_width() const
+	{
+		return this->get_tile_size().width();
+	}
+
+	int get_tile_height() const
+	{
+		return this->get_tile_size().height();
+	}
+
 	const QSize &get_icon_size() const
 	{
 		return this->icon_size;
