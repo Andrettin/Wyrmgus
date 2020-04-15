@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name province.h - The province headerfile. */
-//
 //      (c) Copyright 2016-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -50,8 +48,11 @@ class CSpecies;
 class CTerrainFeature;
 class CUnitType;
 class CUpgrade;
-class CWorld;
 class WorldMapTile;
+
+namespace stratagus {
+	class world;
+}
 
 /**
 **  Indexes into era array.
@@ -112,13 +113,12 @@ class CProvince
 public:
 	CProvince() :
 		ID(-1),
-		Water(false), Coastal(false),
-		World(nullptr)
+		Water(false), Coastal(false)
 	{
 	}
 	
 	std::string Name;
-	CWorld *World;
+	stratagus::world *world = nullptr;
 	int ID;																/// ID of this province
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
@@ -141,8 +141,7 @@ public:
 	WorldMapTile() :
 		Terrain(-1), Resource(-1),
 		Capital(false),
-		Position(-1, -1),
-		World(nullptr)
+		Position(-1, -1)
 	{
 	}
 
@@ -150,7 +149,7 @@ public:
 	int Resource;								/// The tile's resource, if any
 	bool Capital;								/// Whether the tile is its province's capital
 	Vec2i Position;								/// Position of the tile
-	CWorld *World;
+	stratagus::world *world = nullptr;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
 	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization

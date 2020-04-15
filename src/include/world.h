@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name world.h - The world header file. */
-//
 //      (c) Copyright 2016-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,10 +27,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
@@ -46,23 +42,25 @@ class CSpecies;
 class CTerrainFeature;
 class CTimeOfDaySchedule;
 
-class CWorld : public CDataType
+namespace stratagus {
+
+class world final : public detailed_data_entry, public data_type<world>, public CDataType
 {
 public:
-	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);
-	static CWorld *GetOrAddWorld(const std::string &ident);
-	static void ClearWorlds();
-	
-	static std::vector<CWorld *> Worlds;								/// Worlds
-	static std::map<std::string, CWorld *> WorldsByIdent;
+	static constexpr const char *class_identifier = "world";
+	static constexpr const char *database_folder = "worlds";
+
+	static world *add(const std::string &identifier, const stratagus::module *module);
+
+	world(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	{
+	}
+
+	~world();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
 	int ID = -1;														/// ID of this world
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
 	CPlane *Plane = nullptr;
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
@@ -70,3 +68,5 @@ public:
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world
 };
+
+}

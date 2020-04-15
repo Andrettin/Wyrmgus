@@ -174,13 +174,9 @@ static int CclDefineProvince(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != nullptr) {
-				province->World = world;
-				world->Provinces.push_back(province);
-			} else {
-				LuaError(l, "World doesn't exist.");
-			}
+			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			province->world = world;
+			world->Provinces.push_back(province);
 		} else if (!strcmp(value, "Water")) {
 			province->Water = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coastal")) {
@@ -339,7 +335,7 @@ static int CclDefineProvince(lua_State *l)
 		}
 	}
 	
-	if (province->World == nullptr) {
+	if (province->world == nullptr) {
 		LuaError(l, "Province \"%s\" is not assigned to any world." _C_ province->Name.c_str());
 	}
 	
@@ -370,12 +366,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != nullptr) {
-				tile->World = world;
-			} else {
-				LuaError(l, "World doesn't exist.");
-			}
+			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			tile->world = world;
 		} else if (!strcmp(value, "Terrain")) {
 			int terrain = GetWorldMapTerrainTypeId(LuaToString(l, -1));
 			if (terrain != -1) {
@@ -574,7 +566,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 		}
 	}
 	
-	if (tile->World == nullptr) {
+	if (tile->world == nullptr) {
 		LuaError(l, "Tile (%d, %d) is not assigned to any world." _C_ tile->Position.x _C_ tile->Position.y);
 	}
 	
@@ -639,26 +631,23 @@ static int CclGetWorldData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string world_ident = LuaToString(l, 1);
-	CWorld *world = CWorld::GetWorld(world_ident);
-	if (!world) {
-		LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
-	}
+	stratagus::world *world = stratagus::world::get(world_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, world->Name.c_str());
+		lua_pushstring(l, world->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "ID")) {
 		lua_pushnumber(l, world->ID);
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, world->Description.c_str());
+		lua_pushstring(l, world->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, world->Background.c_str());
+		lua_pushstring(l, world->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, world->Quote.c_str());
+		lua_pushstring(l, world->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Plane")) {
 		if (world->Plane) {
@@ -711,8 +700,8 @@ static int CclGetProvinceData(lua_State *l)
 		lua_pushstring(l, province->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (province->World != nullptr) {
-			lua_pushstring(l, province->World->Ident.c_str());
+		if (province->world != nullptr) {
+			lua_pushstring(l, province->world->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -743,10 +732,10 @@ static int CclGetPlanes(lua_State *l)
 
 static int CclGetWorlds(lua_State *l)
 {
-	lua_createtable(l, CWorld::Worlds.size(), 0);
-	for (size_t i = 1; i <= CWorld::Worlds.size(); ++i)
+	lua_createtable(l, stratagus::world::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::world::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CWorld::Worlds[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::world::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

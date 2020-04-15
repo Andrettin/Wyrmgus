@@ -61,7 +61,6 @@ class MissileType;
 class CButtonLevel;
 class CFaction;
 class CPlane;
-class CWorld;
 class CUniqueItem;
 //Wyrmgus end
 struct lua_State;
@@ -74,6 +73,7 @@ enum class UnitTypeType;
 namespace stratagus {
 	class terrain_type;
 	class unit_class;
+	class world;
 }
 
 static constexpr int UnitSides = 8;
@@ -763,7 +763,7 @@ public:
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	CPlane *HomePlane = nullptr;
-	CWorld *Homeworld = nullptr;
+	stratagus::world *Homeworld = nullptr;
 	CUnitType *Type = nullptr;
 	std::vector<stratagus::terrain_type *> Terrains;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve

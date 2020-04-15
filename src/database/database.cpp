@@ -45,6 +45,7 @@
 #include "unit/unit_class.h"
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
+#include "world.h"
 
 namespace stratagus {
 
@@ -148,6 +149,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
 		} else if (property_class_name == "stratagus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
+		} else if (property_class_name == "stratagus::world*") {
+			new_property_value = QVariant::fromValue(world::get(property.get_value()));
 		} else {
 			throw std::runtime_error("Unknown type (\"" + property_class_name + "\") for object reference property \"" + std::string(property_name) + "\" (\"" + property_class_name + "\").");
 		}

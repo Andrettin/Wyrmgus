@@ -56,6 +56,7 @@ enum class Diplomacy;
 
 namespace stratagus {
 	class unit_class;
+	class world;
 }
 
 class GrandStrategyWorldMapTile : public WorldMapTile
@@ -250,7 +251,7 @@ public:
 	int MinYear;
 	int MaxYear;
 	int HistoricalYear;
-	CWorld *World;
+	stratagus::world *World;
 	LuaCallback *Conditions;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionConditions;

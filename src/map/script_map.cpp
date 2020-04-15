@@ -217,7 +217,7 @@ static int CclStratagusMap(lua_State *l)
 						}
 						lua_rawgeti(l, -1, z + 1);
 						CMap::Map.MapLayers[z]->Plane = CPlane::GetPlane(LuaToString(l, -1, 1), false);
-						CMap::Map.MapLayers[z]->World = CWorld::GetWorld(LuaToString(l, -1, 2), false);
+						CMap::Map.MapLayers[z]->world = stratagus::world::try_get(LuaToString(l, -1, 2));
 						CMap::Map.MapLayers[z]->SurfaceLayer = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
@@ -916,8 +916,8 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
 	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
-		if (CWorld::GetWorld(realm, false)) {
-			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, CWorld::GetWorld(realm), unique));
+		if (stratagus::world::try_get(realm)) {
+			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>(ipos, unittype, stratagus::world::get(realm), unique));
 		} else if (CPlane::GetPlane(realm, false)) {
 			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, CPlane::GetPlane(realm), unique));
 		} else {
@@ -1592,11 +1592,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			map_template->Plane = plane;
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (!world) {
-				LuaError(l, "World doesn't exist.");
-			}
-			map_template->World = world;
+			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			map_template->world = world;
 			map_template->Plane = world->Plane;
 		} else if (!strcmp(value, "SurfaceLayer")) {
 			map_template->SurfaceLayer = LuaToNumber(l, -1);
@@ -1630,8 +1627,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			if (main_template->Plane) {
 				map_template->Plane = main_template->Plane;
 			}
-			if (main_template->World) {
-				map_template->World = main_template->World;
+			if (main_template->get_world()) {
+				map_template->world = main_template->get_world();
 			}
 			map_template->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (!strcmp(value, "BaseTerrainType")) {
@@ -1985,14 +1982,10 @@ static int CclDefineTerrainFeature(lua_State *l)
 				LuaError(l, "Plane doesn't exist.");
 			}
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != nullptr) {
-				terrain_feature->World = world;
-				world->TerrainFeatures.push_back(terrain_feature);
-				terrain_feature->Plane = world->Plane;
-			} else {
-				LuaError(l, "World doesn't exist.");
-			}
+			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			terrain_feature->world = world;
+			world->TerrainFeatures.push_back(terrain_feature);
+			terrain_feature->Plane = world->Plane;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -2011,7 +2004,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 		}
 	}
 	
-	if (terrain_feature->Plane == nullptr && terrain_feature->World == nullptr) {
+	if (terrain_feature->Plane == nullptr && terrain_feature->world == nullptr) {
 		LuaError(l, "Terrain feature \"%s\" is not assigned to any world or plane." _C_ terrain_feature->Ident.c_str());
 	}
 	
@@ -2067,8 +2060,8 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushstring(l, map_template->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (map_template->World != nullptr) {
-			lua_pushstring(l, map_template->World->Ident.c_str());
+		if (map_template->get_world() != nullptr) {
+			lua_pushstring(l, map_template->get_world()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2206,8 +2199,8 @@ static int CclGetTerrainFeatureData(lua_State *l)
 		lua_pushstring(l, terrain_feature->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (terrain_feature->World != nullptr) {
-			lua_pushstring(l, terrain_feature->World->Ident.c_str());
+		if (terrain_feature->world != nullptr) {
+			lua_pushstring(l, terrain_feature->world->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

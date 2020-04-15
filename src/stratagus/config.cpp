@@ -398,7 +398,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				upgrade->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "world") {
-			CWorld *world = CWorld::GetOrAddWorld(ident);
+			stratagus::world *world = stratagus::world::get_or_add(ident, nullptr);
 			if (!define_only) {
 				world->ProcessConfigData(config_data);
 			}

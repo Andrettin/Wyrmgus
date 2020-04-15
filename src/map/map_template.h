@@ -50,7 +50,6 @@ class CPlane;
 class CSite;
 class CUniqueItem;
 class CUnitType;
-class CWorld;
 struct lua_State;
 
 namespace stratagus {
@@ -80,12 +79,15 @@ public:
 
 namespace stratagus {
 
+class world;
+
 class map_template final : public named_data_entry, public data_type<map_template>, public CDataType
 {
 	Q_OBJECT
 
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
+	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -247,6 +249,11 @@ public:
 		return true;
 	}
 
+	world *get_world() const
+	{
+		return this->world;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
 	terrain_type *get_unusable_area_terrain_type() const
@@ -288,7 +295,9 @@ public:
 	std::vector<const map_template *> WestOfTemplates; //map templates to which this one is to the west of
 	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
 	CPlane *Plane = nullptr;
-	CWorld *World = nullptr;
+private:
+	world *world = nullptr;
+public:
 	terrain_type *BaseTerrainType = nullptr;
 	terrain_type *BaseOverlayTerrainType = nullptr;
 	terrain_type *BorderTerrainType = nullptr;
@@ -305,7 +314,7 @@ public:
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
 	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<CSite *> Sites;

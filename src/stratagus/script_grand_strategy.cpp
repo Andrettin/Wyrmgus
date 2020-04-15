@@ -140,12 +140,8 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 		} else if (!strcmp(value, "HistoricalYear")) {
 			event->HistoricalYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != nullptr) {
-				event->World = world;
-			} else {
-				LuaError(l, "World doesn't exist.");
-			}
+			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			event->World = world;
 		} else if (!strcmp(value, "Conditions")) {
 			event->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Options")) {

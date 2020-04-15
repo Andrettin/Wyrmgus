@@ -3779,13 +3779,9 @@ static int CclDefineSpecies(lua_State *l)
 			}
 		} else if (!strcmp(value, "Homeworld")) {
 			std::string world_ident = LuaToString(l, -1);
-			CWorld *world = CWorld::GetWorld(world_ident);
-			if (world) {
-				species->Homeworld = world;
-				world->Species.push_back(species);
-			} else {
-				LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
-			}
+			stratagus::world *world = stratagus::world::get(world_ident);
+			species->Homeworld = world;
+			world->Species.push_back(species);
 		} else if (!strcmp(value, "Terrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

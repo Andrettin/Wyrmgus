@@ -2401,7 +2401,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->Plane || UI.CurrentMapLayer->World != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->World)) {
+				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->Plane || UI.CurrentMapLayer->world != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
 					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
 				}
 				PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
@@ -3027,7 +3027,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-					CMap::Map.SetCurrentWorld(CWorld::Worlds[i]);
+					CMap::Map.SetCurrentWorld(stratagus::world::get_all()[i]);
 					if (button.Callback) {
 						button.Callback->action("");
 					}

@@ -4521,7 +4521,7 @@ bool CPlayer::IsVassalOf(const CPlayer &player, bool include_indirect) const
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
-	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->World == CMap::Map.MapLayers[this->StartMapLayer]->World && CMap::Map.MapLayers[player.StartMapLayer]->Plane == CMap::Map.MapLayers[this->StartMapLayer]->Plane);
+	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->world == CMap::Map.MapLayers[this->StartMapLayer]->world && CMap::Map.MapLayers[player.StartMapLayer]->Plane == CMap::Map.MapLayers[this->StartMapLayer]->Plane);
 }
 
 /**

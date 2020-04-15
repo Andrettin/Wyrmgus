@@ -772,8 +772,8 @@ std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const stratagus::map_template
 	}
 
 	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+	if (main_template && subtemplate != main_template && main_template->Plane && main_template->get_world()) {
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
@@ -836,8 +836,8 @@ CMapLayer *CMap::get_subtemplate_map_layer(const stratagus::map_template *subtem
 	}
 	
 	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+	if (main_template && subtemplate != main_template && main_template->Plane && main_template->get_world()) {
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
@@ -866,9 +866,9 @@ std::vector<CUnit *> CMap::get_map_template_layer_connectors(const stratagus::ma
 	}
 	
 	const stratagus::map_template *main_template = map_template->GetTopMapTemplate();
-	if (main_template && main_template->Plane && main_template->World) {
+	if (main_template && main_template->Plane && main_template->get_world()) {
 		const bool is_main_template = main_template == map_template;
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
@@ -957,16 +957,16 @@ void CMap::SetCurrentPlane(CPlane *plane)
 	}
 }
 
-void CMap::SetCurrentWorld(CWorld *world)
+void CMap::SetCurrentWorld(stratagus::world *world)
 {
-	if (UI.CurrentMapLayer->World == world) {
+	if (UI.CurrentMapLayer->world == world) {
 		return;
 	}
 	
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
+		if (Map.MapLayers[z]->world == world && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
 			map_layer = z;
 			break;
 		}
@@ -974,7 +974,7 @@ void CMap::SetCurrentWorld(CWorld *world)
 	
 	if (map_layer == -1) {
 		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			if (Map.MapLayers[z]->World == world) {
+			if (Map.MapLayers[z]->world == world) {
 				map_layer = z;
 				break;
 			}
@@ -995,7 +995,7 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == this->GetCurrentPlane() && Map.MapLayers[z]->World == this->GetCurrentWorld() && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+		if (Map.MapLayers[z]->Plane == this->GetCurrentPlane() && Map.MapLayers[z]->world == this->GetCurrentWorld() && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			map_layer = z;
 			break;
 		}
@@ -1015,10 +1015,10 @@ CPlane *CMap::GetCurrentPlane() const
 	}
 }
 
-CWorld *CMap::GetCurrentWorld() const
+stratagus::world *CMap::GetCurrentWorld() const
 {
 	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->World;
+		return UI.CurrentMapLayer->world;
 	} else {
 		return nullptr;
 	}
@@ -1158,10 +1158,10 @@ void PreprocessMap()
 int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, const int surface_layer)
 {
 	CPlane *plane = CPlane::GetPlane(plane_ident, false);
-	CWorld *world = CWorld::GetWorld(world_ident, false);
+	stratagus::world *world = stratagus::world::try_get(world_ident);
 
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->World == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->world == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			return z;
 		}
 	}
@@ -1530,7 +1530,7 @@ void CMap::Save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\", %d},\n", this->MapLayers[z]->Plane ? this->MapLayers[z]->Plane->Ident.c_str() : "", this->MapLayers[z]->World ? this->MapLayers[z]->World->Ident.c_str() : "", this->MapLayers[z]->SurfaceLayer);
+		file.printf("  {\"%s\", \"%s\", %d},\n", this->MapLayers[z]->Plane ? this->MapLayers[z]->Plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->Ident.c_str() : "", this->MapLayers[z]->SurfaceLayer);
 	}
 	file.printf("  },\n");
 	file.printf("  \"landmasses\", {\n");

@@ -94,14 +94,9 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "world") {
-			value = FindAndReplaceString(value, "_", "-");
-			CWorld *world = CWorld::GetWorld(value);
-			if (world) {
-				this->World = world;
-				this->Plane = this->World->Plane;
-			} else {
-				fprintf(stderr, "World \"%s\" does not exist.\n", value.c_str());
-			}
+			stratagus::world *world = world::get(value);
+			this->world = world;
+			this->Plane = this->world->Plane;
 		} else if (key == "surface_layer") {
 			this->SurfaceLayer = std::stoi(value);
 			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
@@ -138,8 +133,8 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			if (main_template->Plane) {
 				this->Plane = main_template->Plane;
 			}
-			if (main_template->World) {
-				this->World = main_template->World;
+			if (main_template->world) {
+				this->world = main_template->world;
 			}
 			this->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (key == "upper_template") {
@@ -458,22 +453,22 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 		CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
 		CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
 		map_layer->Plane = this->Plane;
-		map_layer->World = this->World;
+		map_layer->world = this->get_world();
 		map_layer->SurfaceLayer = this->SurfaceLayer;
 		CMap::Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			CMap::Map.MapLayers[z]->Plane = this->Plane;
-			CMap::Map.MapLayers[z]->World = this->World;
+			CMap::Map.MapLayers[z]->world = this->get_world();
 			CMap::Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
 		}
 	}
 
 	if (!this->IsSubtemplateArea()) {
 		if (Editor.Running == EditorNotRunning) {
-			if (this->World && this->World->SeasonSchedule) {
-				CMap::Map.MapLayers[z]->SeasonSchedule = this->World->SeasonSchedule;
-			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule) {
+			if (this->get_world() != nullptr && this->get_world()->SeasonSchedule) {
+				CMap::Map.MapLayers[z]->SeasonSchedule = this->get_world()->SeasonSchedule;
+			} else if (!this->get_world() && this->Plane && this->Plane->SeasonSchedule) {
 				CMap::Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
 			} else {
 				CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
@@ -489,9 +484,9 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 				&& !GameSettings.Inside
 				&& !GameSettings.NoTimeOfDay
 			) {
-				if (this->World && this->World->TimeOfDaySchedule) {
-					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->World->TimeOfDaySchedule;
-				} else if (!this->World && this->Plane && this->Plane->TimeOfDaySchedule) {
+				if (this->get_world() && this->get_world()->TimeOfDaySchedule) {
+					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->get_world()->TimeOfDaySchedule;
+				} else if (!this->get_world() && this->Plane && this->Plane->TimeOfDaySchedule) {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->Plane->TimeOfDaySchedule;
 				} else {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
@@ -1293,7 +1288,7 @@ void map_template::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (CMap::Map.MapLayers[second_z]->World == std::get<2>(this->WorldConnectors[i])) {
+			if (CMap::Map.MapLayers[second_z]->world == std::get<2>(this->WorldConnectors[i])) {
 				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
 					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
 						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
@@ -1337,7 +1332,7 @@ void map_template::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
 			std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
 			for (const CUnit *connector : other_layer_connectors) {
-				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->Plane == this->Plane && connector->ConnectingDestination->MapLayer->World == this->World && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
+				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->Plane == this->Plane && connector->ConnectingDestination->MapLayer->world == this->get_world() && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
 					already_implemented = true;
 					break;
 				}

@@ -146,7 +146,6 @@ void CleanModules()
 	CTimeline::ClearTimelines();
 	CleanUnits();
 	CleanUnitTypeVariables();
-	CWorld::ClearWorlds();
 	CleanPlayers();
 	CleanSelections();
 	CleanGroups();

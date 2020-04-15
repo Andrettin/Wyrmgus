@@ -101,10 +101,10 @@ class CTileset;
 class CUniqueItem;
 class CUnit;
 class CUnitType;
-class CWorld;
 
 namespace stratagus {
 	class map_template;
+	class world;
 }
 
 /*----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ public:
 	CColor Color;
 	stratagus::terrain_type *TerrainType = nullptr;
 	CPlane *Plane = nullptr;
-	CWorld *World = nullptr;
+	stratagus::world *world = nullptr;
 	std::map<int, std::string> CulturalNames; //names for the terrain feature for each different culture/civilization
 };
 //Wyrmgus end
@@ -288,10 +288,10 @@ public:
 	bool IsLayerUnderground(int z) const;
 	
 	void SetCurrentPlane(CPlane *plane);
-	void SetCurrentWorld(CWorld *world);
+	void SetCurrentWorld(stratagus::world *world);
 	void SetCurrentSurfaceLayer(int surface_layer);
 	CPlane *GetCurrentPlane() const;
-	CWorld *GetCurrentWorld() const;
+	stratagus::world *GetCurrentWorld() const;
 	int GetCurrentSurfaceLayer() const;
 	//Wyrmgus end
 
