@@ -33,7 +33,7 @@
 
 namespace stratagus::size {
 
-QPoint to_point(const QSize &size)
+inline QPoint to_point(const QSize &size)
 {
 	return QPoint(size.width(), size.height());
 }
