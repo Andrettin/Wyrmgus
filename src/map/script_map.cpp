@@ -1330,6 +1330,19 @@ static int CclDefineTerrainType(lua_State *l)
 			} else {
 				stratagus::terrain_type::TerrainTypesByCharacter[terrain->Character] = terrain;
 			}
+		} else if (!strcmp(value, "CharacterAliases")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				const std::string character = LuaToString(l, -1, j + 1);
+				if (stratagus::terrain_type::TerrainTypesByCharacter.find(character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
+					LuaError(l, "Character \"%s\" is already used by another terrain type." _C_ character.c_str());
+				} else {
+					stratagus::terrain_type::TerrainTypesByCharacter[character] = terrain;
+				}
+			}
 		} else if (!strcmp(value, "Color")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

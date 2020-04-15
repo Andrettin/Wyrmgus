@@ -171,6 +171,13 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				terrain_type::TerrainTypesByCharacter[this->Character] = this;
 			}
+		} else if (key == "character_alias") {
+			if (terrain_type::TerrainTypesByCharacter.find(value) != terrain_type::TerrainTypesByCharacter.end()) {
+				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", value.c_str());
+				continue;
+			} else {
+				terrain_type::TerrainTypesByCharacter[value] = this;
+			}
 		} else if (key == "color") {
 			this->Color = CColor::FromString(value);
 			
