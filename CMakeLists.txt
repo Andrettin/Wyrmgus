@@ -1366,6 +1366,7 @@ target_precompile_headers(stratagus PRIVATE
 	<QAudioFormat>
 	<QColor>
 	<QDateTime>
+	<QImage>
 	<QMetaProperty>
 	<QObject>
 	<QPoint>

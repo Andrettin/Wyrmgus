@@ -525,45 +525,11 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 		use_terrain_file = false;
 	}
 	
-	FILE *fp = fopen(name, "wb");
-	if (fp == nullptr) {
-		return;
-	}
-
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-	if (png_ptr == nullptr) {
-		fclose(fp);
-		return;
-	}
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == nullptr) {
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, nullptr);
-		return;
-	}
-
-	if (setjmp(png_jmpbuf(png_ptr))) {
-		/* If we get here, we had a problem reading the file */
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return;
-	}
+	QImage image(map_template->get_size(), QImage::Format_RGBA8888);
 
 	const size_t imageWidth = map_template->get_width();
 	const size_t imageHeight = map_template->get_height();
 
-	/* set up the output control if you are using standard C streams */
-	png_init_io(png_ptr, fp);
-
-	png_set_IHDR(png_ptr, info_ptr, imageWidth, imageHeight, 8,
-		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-		PNG_FILTER_TYPE_DEFAULT);
-
-	png_write_info(png_ptr, info_ptr);
-
-	unsigned char *row = new unsigned char[imageWidth * 3];
-	
 	if (use_terrain_file) {
 		const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 			
@@ -594,14 +560,11 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 					blue = terrain->Color.B;
 				}
 				
-				row[x * 3 + 0] = red;
-				row[x * 3 + 1] = green;
-				row[x * 3 + 2] = blue;
+				const QColor color(red, green, blue);
+				image.setPixelColor(QPoint(x, y), color);
 
 				x += 1;
 			}
-			
-			png_write_row(png_ptr, row);
 			
 			y += 1;
 		}
@@ -619,9 +582,7 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 		
 		for (int y = 0; y < map_template->get_height(); ++y) {
 			for (int x = 0; x < map_template->get_width(); ++x) {
-				row[x * 3 + 0] = 0;
-				row[x * 3 + 1] = 0;
-				row[x * 3 + 2] = 0;
+				image.setPixelColor(QPoint(x, y), QColor(0, 0, 0));
 			}
 			
 			for (std::map<int, stratagus::terrain_type *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
@@ -637,22 +598,12 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 					blue = terrain_type->Color.B;
 				}
 				
-				row[x * 3 + 0] = red;
-				row[x * 3 + 1] = green;
-				row[x * 3 + 2] = blue;
+				const QColor color(red, green, blue);
+				image.setPixelColor(QPoint(x, y), color);
 			}
-			
-			png_write_row(png_ptr, row);
 		}
 	}
-	
-	delete[] row;
 
-	png_write_end(png_ptr, info_ptr);
-
-	/* clean up after the write, and free any memory allocated */
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-
-	fclose(fp);
+	image.save(name);
 }
 //Wyrmgus end

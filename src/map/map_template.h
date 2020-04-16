@@ -92,6 +92,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
 	Q_PROPERTY(stratagus::terrain_type *unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type *unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
+	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -329,6 +330,11 @@ public:
 	{
 		return this->unusable_area_overlay_terrain_type;
 	}
+
+	bool outputs_terrain_image() const
+	{
+		return this->output_terrain_image;
+	}
 	
 private:
 	std::filesystem::path terrain_file;
@@ -340,8 +346,8 @@ public:
 	int Scale = 1; //1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
-	bool OutputTerrainImage = false;
 private:
+	bool output_terrain_image = false;
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
 public:
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);

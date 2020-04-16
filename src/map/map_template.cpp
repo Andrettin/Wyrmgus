@@ -169,7 +169,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			terrain_type *terrain_type = terrain_type::get(value);
 			this->unusable_area_overlay_terrain_type = terrain_type;
 		} else if (key == "output_terrain_image") {
-			this->OutputTerrainImage = string::to_bool(value);
+			this->output_terrain_image = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
 		}
@@ -328,7 +328,7 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 //		filename += "-overlay";
 //	}
 //	filename += ".png";
-//	SaveMapTemplatePNG(filename.c_str(), this, overlay);
+//	save_map_template_png(filename.c_str(), this, overlay);
 }
 
 void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
@@ -536,7 +536,7 @@ void map_template::Apply(const Vec2i &template_start_pos, const Vec2i &map_start
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 	
-	if (this->OutputTerrainImage) {
+	if (this->outputs_terrain_image()) {
 		std::string filename = this->Ident;
 		filename = FindAndReplaceString(filename, "-", "_");
 		filename += ".png";

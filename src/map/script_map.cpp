@@ -1628,7 +1628,7 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "Scale")) {
 			map_template->Scale = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "OutputTerrainImage")) {
-			map_template->OutputTerrainImage = LuaToBoolean(l, -1);
+			map_template->output_terrain_image = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
 			CclGetPos(l, &map_template->SubtemplatePosition.x, &map_template->SubtemplatePosition.y);
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
