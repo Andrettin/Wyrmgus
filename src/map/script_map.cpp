@@ -1625,8 +1625,6 @@ static int CclDefineMapTemplate(lua_State *l)
 			map_template->size.setWidth(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Height")) {
 			map_template->size.setHeight(LuaToNumber(l, -1));
-		} else if (!strcmp(value, "Scale")) {
-			map_template->Scale = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "OutputTerrainImage")) {
 			map_template->output_terrain_image = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
@@ -2072,10 +2070,10 @@ static int CclGetMapTemplateData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "CurrentStartPosX")) {
-		lua_pushnumber(l, map_template->get_current_start_pos().x());
+		lua_pushnumber(l, map_template->get_current_map_start_pos().x());
 		return 1;
 	} else if (!strcmp(data, "CurrentStartPosY")) {
-		lua_pushnumber(l, map_template->get_current_start_pos().y());
+		lua_pushnumber(l, map_template->get_current_map_start_pos().y());
 		return 1;
 	} else if (!strcmp(data, "MapStartPosX")) {
 		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);

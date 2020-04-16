@@ -27,20 +27,12 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CCharacter;
 class CFaction;
@@ -87,10 +79,14 @@ class map_template final : public named_data_entry, public data_type<map_templat
 
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
+	Q_PROPERTY(QPoint start_pos MEMBER start_pos READ get_start_pos)
+	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
 	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
 	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
+	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring WRITE set_overlay_terrain_file_qstring)
 	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring WRITE set_terrain_image_qstring)
+	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring WRITE set_overlay_terrain_image_qstring)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
@@ -112,11 +108,11 @@ public:
 
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
-	void Apply(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z);
-	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
-	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
-	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false) const;
-	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
+	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
+	void ApplySubtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void ApplySites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
 	const map_template *GetTopMapTemplate() const;
 
@@ -135,9 +131,44 @@ public:
 		return this->get_size().height();
 	}
 
+	const QPoint &get_start_pos() const
+	{
+		return this->start_pos;
+	}
+
+	const QPoint &get_end_pos() const
+	{
+		return this->end_pos;
+	}
+
+	QSize get_applied_size() const;
+
+	int get_applied_width() const
+	{
+		return this->get_applied_size().width();
+	}
+
+	int get_applied_height() const
+	{
+		return this->get_applied_size().height();
+	}
+
+	QSize get_applied_size_with_dependent_template_offsets() const
+	{
+		QSize applied_size = this->get_applied_size();
+		applied_size += QSize(this->GetDependentTemplatesWestOffset() + this->GetDependentTemplatesEastOffset(), this->GetDependentTemplatesNorthOffset() + this->GetDependentTemplatesSouthOffset());
+		return applied_size;
+	}
+
 	int get_area() const
 	{
 		return this->get_width() * this->get_height();
+	}
+
+	int get_applied_area_with_dependent_template_offsets() const
+	{
+		const QSize applied_size = this->get_applied_size_with_dependent_template_offsets();
+		return applied_size.width() * applied_size.height();
 	}
 
 	int GetDependentTemplatesNorthOffset() const
@@ -207,20 +238,20 @@ public:
 
 	bool contains_pos(const QPoint &pos) const
 	{
-		const QPoint &start_pos = this->get_current_start_pos();
-		const QPoint end_pos = this->get_current_end_pos();
+		const QPoint &start_pos = this->get_current_map_start_pos();
+		const QPoint end_pos = this->get_current_map_end_pos();
 		return pos.x() >= start_pos.x() && pos.y() >= start_pos.y() && pos.x() <= end_pos.x() && pos.y() <= end_pos.y();
 	}
 
-	const QPoint &get_current_start_pos() const
+	const QPoint &get_current_map_start_pos() const
 	{
-		return this->current_start_pos;
+		return this->current_map_start_pos;
 	}
 
-	QPoint get_current_end_pos() const
+	QPoint get_current_map_end_pos() const
 	{
-		const QPoint &start_pos = this->get_current_start_pos();
-		return QPoint(start_pos.x() + this->get_width() - 1, start_pos.y() + this->get_height() - 1);
+		const QPoint &start_pos = this->get_current_map_start_pos();
+		return QPoint(start_pos.x() + this->get_applied_width() - 1, start_pos.y() + this->get_applied_height() - 1);
 	}
 
 	//whether a position relative to the entire map is a usable part of the map template
@@ -230,7 +261,7 @@ public:
 			return false;
 		}
 
-		return this->is_pos_usable(pos - this->get_current_start_pos());
+		return this->is_pos_usable(pos - this->get_current_map_start_pos());
 	}
 
 	//whether a position relative to the map template itself is a usable part of it
@@ -238,7 +269,7 @@ public:
 	{
 		if (this->is_circle()) {
 			const QPoint start_pos(0, 0);
-			const QPoint end_pos = QPoint(this->get_width() - 1, this->get_height() - 1);
+			const QPoint end_pos = QPoint(this->get_applied_width() - 1, this->get_applied_height() - 1);
 
 			const double middle_x = (end_pos.x() + start_pos.x()) / 2;
 			const double middle_y = (end_pos.y() + start_pos.y()) / 2;
@@ -310,6 +341,18 @@ public:
 		return this->overlay_terrain_file;
 	}
 
+	void set_overlay_terrain_file(const std::filesystem::path &filepath);
+
+	QString get_overlay_terrain_file_qstring() const
+	{
+		return QString::fromStdString(this->get_overlay_terrain_file().string());
+	}
+
+	void set_overlay_terrain_file_qstring(const QString &filepath)
+	{
+		this->set_overlay_terrain_file(filepath.toStdString());
+	}
+
 	const std::filesystem::path &get_terrain_image() const
 	{
 		return this->terrain_image;
@@ -330,6 +373,18 @@ public:
 	const std::filesystem::path &get_overlay_terrain_image() const
 	{
 		return this->overlay_terrain_image;
+	}
+
+	void set_overlay_terrain_image(const std::filesystem::path &filepath);
+
+	QString get_overlay_terrain_image_qstring() const
+	{
+		return QString::fromStdString(this->get_overlay_terrain_image().string());
+	}
+
+	void set_overlay_terrain_image_qstring(const QString &filepath)
+	{
+		this->set_overlay_terrain_image(filepath.toStdString());
 	}
 
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
@@ -356,7 +411,6 @@ private:
 	std::filesystem::path overlay_terrain_image;
 	QSize size = QSize(0, 0);
 public:
-	int Scale = 1; //1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
 private:
@@ -364,10 +418,14 @@ private:
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
 public:
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
+private:
+	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used
+	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
+public:
 	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
 private:
-	QPoint current_start_pos = QPoint(0, 0);
+	QPoint current_map_start_pos = QPoint(0, 0);
 public:
 	map_template *main_template = nullptr; //main template in which this one is located, if this is a subtemplate
 	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
