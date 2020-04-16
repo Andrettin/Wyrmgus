@@ -90,8 +90,9 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
 	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
-	Q_PROPERTY(stratagus::terrain_type *unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type *unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
+	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring WRITE set_terrain_image_qstring)
+	Q_PROPERTY(stratagus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 
 public:
@@ -312,6 +313,18 @@ public:
 	const std::filesystem::path &get_terrain_image() const
 	{
 		return this->terrain_image;
+	}
+
+	void set_terrain_image(const std::filesystem::path &filepath);
+
+	QString get_terrain_image_qstring() const
+	{
+		return QString::fromStdString(this->get_terrain_image().string());
+	}
+
+	void set_terrain_image_qstring(const QString &filepath)
+	{
+		this->set_terrain_image(filepath.toStdString());
 	}
 
 	const std::filesystem::path &get_overlay_terrain_image() const

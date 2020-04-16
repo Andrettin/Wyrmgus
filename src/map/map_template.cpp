@@ -1665,6 +1665,15 @@ void map_template::set_terrain_file(const std::filesystem::path &filepath)
 	this->terrain_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
+void map_template::set_terrain_image(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_terrain_image()) {
+		return;
+	}
+
+	this->terrain_image = database::get_maps_path(this->get_module()) / filepath;
+}
+
 /**
 **	@brief	Gets the best map position from a list of historical locations
 **
