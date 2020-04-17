@@ -71,6 +71,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/container_util.h"
 #include "util/size_util.h"
 #include "util/vector_util.h"
 #include "version.h"
@@ -1141,14 +1142,21 @@ void PreprocessMap()
 	*/
 
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+				const QPoint tile_pos(ix, iy);
+				CMap::Map.CalculateTileTransitions(tile_pos, false, z);
+				CMap::Map.CalculateTileTransitions(tile_pos, true, z);
+			}
+		}
+
+		//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
 		CMap::Map.generate_settlement_territories(z);
 
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
 				CMapField &mf = *CMap::Map.Field(tile_pos, z);
-				CMap::Map.CalculateTileTransitions(tile_pos, false, z);
-				CMap::Map.CalculateTileTransitions(tile_pos, true, z);
 				CMap::Map.CalculateTileLandmass(tile_pos, z);
 				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
 				CMap::Map.CalculateTileTerrainFeature(tile_pos, z);
@@ -3063,7 +3071,7 @@ void CMap::generate_settlement_territories(const int z)
 		return;
 	}
 
-	std::vector<QPoint> seeds;
+	stratagus::point_set seeds;
 
 	for (const CUnit *site_unit : this->site_units) {
 		if (site_unit->MapLayer->ID != z) {
@@ -3075,67 +3083,18 @@ void CMap::generate_settlement_territories(const int z)
 				QPoint tile_pos(x, y);
 				this->Field(tile_pos, z)->set_settlement(site_unit->settlement);
 
-				seeds.push_back(std::move(tile_pos));
+				if (!this->tile_borders_other_settlement_territory(tile_pos, z)) {
+					continue;
+				}
+
+				seeds.insert(std::move(tile_pos));
 			}
 		}
 	}
 
-	//expand seeds
-	while (!seeds.empty()) {
-		QPoint seed_pos = seeds[SyncRand(seeds.size())];
-		stratagus::vector::remove(seeds, seed_pos);
-
-		stratagus::site *settlement = this->Field(seed_pos, z)->get_settlement();
-
-		std::vector<QPoint> adjacent_positions;
-		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
-			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				const QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
-				const QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
-				const QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
-
-				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
-					continue;
-				}
-
-				CMapField *diagonal_tile = this->Field(diagonal_pos, z);
-				CMapField *vertical_tile = this->Field(vertical_pos, z);
-				CMapField *horizontal_tile = this->Field(horizontal_pos, z);
-
-				if ( //the tiles must either have no settlement, or have the settlement we want to assign
-					(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
-					|| (vertical_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != settlement)
-					|| (horizontal_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != settlement)
-				) {
-					continue;
-				}
-
-				if (diagonal_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != nullptr) { //at least one of the tiles being expanded to must have no assigned settlement
-					continue;
-				}
-
-				adjacent_positions.push_back(diagonal_pos);
-			}
-		}
-
-		if (adjacent_positions.size() > 0) {
-			if (adjacent_positions.size() > 1) {
-				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
-			}
-
-			QPoint adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-			QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
-			QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
-
-			this->Field(adjacent_pos, z)->set_settlement(settlement);
-			this->Field(adjacent_pos_horizontal, z)->set_settlement(settlement);
-			this->Field(adjacent_pos_vertical, z)->set_settlement(settlement);
-
-			seeds.push_back(adjacent_pos);
-			seeds.push_back(adjacent_pos_horizontal);
-			seeds.push_back(adjacent_pos_vertical);
-		}
-	}
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed));
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldCoastAllowed);
+	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement
 	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
@@ -3188,6 +3147,79 @@ void CMap::generate_settlement_territories(const int z)
 	}
 
 	this->calculate_settlement_territory_border_tiles(z);
+}
+
+stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags)
+{
+	//the seeds blocked by the block flags are stored, and then returned by the function
+	stratagus::point_set blocked_seeds;
+
+	//expand seeds
+	while (!seeds.empty()) {
+		const QPoint seed_pos = seeds[SyncRand(seeds.size())];
+		stratagus::vector::remove(seeds, seed_pos);
+
+		CMapField *seed_tile = this->Field(seed_pos, z);
+
+		//tiles with a block flag can be expanded to, but they can't serve as a basis for further expansion
+		if (seed_tile->CheckMask(block_flags)) {
+			blocked_seeds.insert(seed_pos);
+			continue;
+		}
+
+		stratagus::site *settlement = seed_tile->get_settlement();
+
+		std::vector<QPoint> adjacent_positions;
+		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
+			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
+				const QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
+				const QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
+				const QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
+
+				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
+					continue;
+				}
+
+				CMapField *diagonal_tile = this->Field(diagonal_pos, z);
+				CMapField *vertical_tile = this->Field(vertical_pos, z);
+				CMapField *horizontal_tile = this->Field(horizontal_pos, z);
+
+				if ( //the tiles must either have no settlement, or have the settlement we want to assign
+					(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
+					|| (vertical_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != settlement)
+					|| (horizontal_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != settlement)
+					) {
+					continue;
+				}
+
+				if (diagonal_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != nullptr) { //at least one of the tiles being expanded to must have no assigned settlement
+					continue;
+				}
+
+				adjacent_positions.push_back(diagonal_pos);
+			}
+		}
+
+		if (adjacent_positions.size() > 0) {
+			if (adjacent_positions.size() > 1) {
+				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
+			}
+
+			QPoint adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+			QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
+			QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
+
+			this->Field(adjacent_pos, z)->set_settlement(settlement);
+			this->Field(adjacent_pos_horizontal, z)->set_settlement(settlement);
+			this->Field(adjacent_pos_vertical, z)->set_settlement(settlement);
+
+			seeds.push_back(adjacent_pos);
+			seeds.push_back(adjacent_pos_horizontal);
+			seeds.push_back(adjacent_pos_vertical);
+		}
+	}
+
+	return blocked_seeds;
 }
 
 void CMap::calculate_settlement_territory_border_tiles(const int z)

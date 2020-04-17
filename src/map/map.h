@@ -80,6 +80,7 @@
 #include "color.h"
 #include "map/tile.h"
 #include "time/date.h"
+#include "util/point_container.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -221,6 +222,7 @@ public:
 	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
 	void GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template);
 	void generate_settlement_territories(const int z);
+	stratagus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0);
 	void calculate_settlement_territory_border_tiles(const int z);
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
