@@ -1915,11 +1915,16 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 
 stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
+	const CMapField *tile = CMap::Map.Field(pos, z);
+
+	if (tile->get_owner() == this || (this->HasNeutralFactionType() && tile->get_owner() != nullptr)) {
+		return tile->get_settlement();
+	}
+
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	
-	for (size_t i = 0; i < CMap::Map.site_units.size(); ++i) {
-		CUnit *settlement_unit = CMap::Map.site_units[i];
+	for (CUnit *settlement_unit : CMap::Map.site_units) {
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
