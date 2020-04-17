@@ -3466,7 +3466,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			int faction_id = this->Type->Faction;
-			if (this->Player->Race == civilization_id && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
+			if (this->Player->Faction != -1 && this->Player->Race == civilization_id && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 				faction_id = this->Player->Faction;
 			}
 			const CFaction *faction = nullptr;
