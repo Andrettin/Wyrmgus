@@ -229,11 +229,8 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						CSite *site = CSite::GetSite(LuaToString(l, -1, k + 1));
-						if (!site) {
-							LuaError(l, "Site doesn't exist.");
-						}
-						objective->Settlement = site;
+						stratagus::site *site = stratagus::site::get(LuaToString(l, -1, k + 1));
+						objective->settlement = site;
 					} else if (!strcmp(value, "faction")) {
 						CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
 						if (!faction) {

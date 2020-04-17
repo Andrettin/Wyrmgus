@@ -40,10 +40,10 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CSite;
 
 namespace stratagus {
 	class map_template;
+	class site;
 }
 
 class CHistoricalLocation
@@ -55,5 +55,5 @@ public:
 	CDate Date; //the historical location's date
 	stratagus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
 	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
-	CSite *Site = nullptr; //the historical location's site (if any)
+	stratagus::site *site = nullptr; //the historical location's site (if any)
 };

@@ -972,7 +972,7 @@ void DrawMapLayerButtons()
 		if (UI.PlaneButtons[i].X != -1) {
 			DrawUIButton(UI.PlaneButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerPlane && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.PlaneButtons[i].Clicked || CMap::Map.GetCurrentPlane() == CPlane::Planes[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.PlaneButtons[i].Clicked || CMap::Map.GetCurrentPlane() == stratagus::plane::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.PlaneButtons[i].X, UI.PlaneButtons[i].Y,
 				UI.PlaneButtons[i].Text
 			);
@@ -1243,7 +1243,7 @@ void DrawPopups()
 	*/
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-		DrawGenericPopup(CPlane::Planes[ButtonUnderCursor]->Name, UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(stratagus::plane::get_all()[ButtonUnderCursor]->get_name(), UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 		DrawGenericPopup(stratagus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {

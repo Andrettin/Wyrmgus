@@ -41,9 +41,7 @@ class CCharacter;
 class CDeityDomain;
 class CFaction;
 class CGraphic;
-class CPlane;
 class CProvince;
-class CSite;
 class CSpecies;
 class CTerrainFeature;
 class CUnitType;
@@ -51,6 +49,7 @@ class CUpgrade;
 class WorldMapTile;
 
 namespace stratagus {
+	class site;
 	class world;
 }
 
@@ -102,10 +101,10 @@ public:
 	
 	std::string Ident;
 	std::string Name;
-	int ID;																/// ID of this province
-	std::vector<CProvince *> Provinces;									/// Provinces which belong to this region
-	std::vector<CSite *> Sites;											/// Sites which belong to this region
-	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
+	int ID;											/// ID of this province
+	std::vector<CProvince *> Provinces;				/// Provinces which belong to this region
+	std::vector<stratagus::site *> sites;			/// Sites which belong to this region
+	std::map<int, int> HistoricalPopulation;		/// Historical population, mapped to the year
 };
 
 class CProvince

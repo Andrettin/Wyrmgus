@@ -471,12 +471,9 @@ static int CclDefineCharacter(lua_State *l)
 					CclGetPos(l, &historical_location->Position.x, &historical_location->Position.y);
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
-					historical_location->Site = CSite::GetSite(site_ident);
-					if (!historical_location->Site) {
-						LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
-					}
-					historical_location->map_template = historical_location->Site->map_template;
-					historical_location->Position = historical_location->Site->Position;
+					historical_location->site = stratagus::site::get(site_ident);
+					historical_location->map_template = historical_location->site->map_template;
+					historical_location->Position = historical_location->site->Position;
 				}
 				lua_pop(l, 1);
 

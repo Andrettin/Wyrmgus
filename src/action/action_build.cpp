@@ -67,7 +67,7 @@
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSite *settlement);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const stratagus::site *settlement);
 //Wyrmgus end
 
 enum {
@@ -87,7 +87,7 @@ enum {
 
 //Wyrmgus start
 ///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, stratagus::site *settlement)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
@@ -97,7 +97,7 @@ enum {
 	order->goalPos = pos;
 	//Wyrmgus start
 	order->MapLayer = z;
-	order->Settlement = settlement;
+	order->settlement = settlement;
 	//Wyrmgus end
 	if (building.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
 		order->Range = builder.Type->RepairRange;
@@ -124,8 +124,8 @@ enum {
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
-	if (this->Settlement) {
-		file.printf(" \"settlement\", \"%s\",", this->Settlement->Ident.c_str());
+	if (this->settlement) {
+		file.printf(" \"settlement\", \"%s\",", this->settlement->Ident.c_str());
 	}
 	//Wyrmgus end
 
@@ -164,7 +164,7 @@ enum {
 		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "settlement")) {
 		++j;
-		this->Settlement = CSite::GetSite(LuaToString(l, -1, j + 1));
+		this->settlement = stratagus::site::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus end
 	} else {
 		return false;
@@ -224,7 +224,7 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
 //		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
-		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
+		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->settlement);
 		//Wyrmgus end
 	}
 }
@@ -275,7 +275,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 			if (unit.Player->AiEnabled) {
 				//Wyrmgus start
 //				AiCanNotReach(unit, this->GetUnitType());
-				AiCanNotReach(unit, this->GetUnitType(), CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
+				AiCanNotReach(unit, this->GetUnitType(), CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->settlement);
 				//Wyrmgus end
 			}
 			return true;
@@ -290,7 +290,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 }
 
-static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, CSite *settlement)
+static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, stratagus::site *settlement)
 {
 	const CPlayer &player = *unit.Player;
 	bool isOk = true;
@@ -429,7 +429,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 							_("Unable to create building %s"), type.GetDefaultName(unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
+			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->settlement);
 		}
 		return false;
 	}
@@ -584,7 +584,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 
 		if (ontop != nullptr) {
 			//Wyrmgus start
-			if (CheckLimit(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement) == false) {
+			if (CheckLimit(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->settlement) == false) {
 				this->Finished = true;
 				return ;
 			}
@@ -624,7 +624,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		if (unit.Player->AiEnabled) {
 			//Wyrmgus start
 //			AiCanNotBuild(unit, type);
-			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
+			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->settlement);
 			//Wyrmgus end
 		}
 		this->Finished = true;

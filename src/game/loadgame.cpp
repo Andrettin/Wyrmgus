@@ -134,12 +134,10 @@ void CleanModules()
 	CleanMissiles();
 	CPantheon::ClearPantheons();
 	//Wyrmgus start
-	CPlane::ClearPlanes();
 	CleanProvinces();
 	CleanQuests();
 	CReligion::ClearReligions();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
-	CSite::ClearSites();
 	CleanTexts();
 	CleanUniqueItems();
 	//Wyrmgus end

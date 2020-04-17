@@ -58,7 +58,7 @@ static constexpr int CancelBuildingCostsFactor = 75;
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSite *settlement);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const stratagus::site *settlement);
 //Wyrmgus end
 
 /* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
@@ -189,7 +189,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
 			|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->get_unit_class() == type.get_unit_class())
 		) {
-			if (!objective->Settlement || objective->Settlement == unit.Settlement) {
+			if (!objective->settlement || objective->settlement == unit.settlement) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		}
@@ -446,7 +446,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID), unit.Settlement);
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID), unit.settlement);
 	//Wyrmgus end
 }
 

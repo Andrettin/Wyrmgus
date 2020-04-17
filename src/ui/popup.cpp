@@ -631,7 +631,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "Encyclopedia")) {
 			condition->Encyclopedia = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "SettlementName")) {
-			condition->SettlementName = LuaToBoolean(l, -1);
+			condition->settlement_name = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "CanActiveHarvest")) {
 			condition->CanActiveHarvest = LuaToBoolean(l, -1);
 		//Wyrmgus end

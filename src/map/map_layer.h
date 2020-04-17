@@ -40,7 +40,6 @@
 ----------------------------------------------------------------------------*/
 
 class CMapField;
-class CPlane;
 class CScheduledSeason;
 class CScheduledTimeOfDay;
 class CSeason;
@@ -51,6 +50,7 @@ class CUnit;
 
 namespace stratagus {
 	class map_template;
+	class plane;
 	class world;
 }
 
@@ -153,7 +153,7 @@ public:
 	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer
+	stratagus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
 	stratagus::world *world = nullptr;			/// the world pointer (if any) for the map layer
 	int SurfaceLayer = 0;						/// the surface layer for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers

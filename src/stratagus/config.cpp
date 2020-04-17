@@ -328,7 +328,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				pantheon->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "plane") {
-			CPlane *plane = CPlane::GetOrAddPlane(ident);
+			stratagus::plane *plane = stratagus::plane::get_or_add(ident, nullptr);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
 			}
@@ -353,7 +353,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				season_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "site") {
-			CSite *site = CSite::GetOrAddSite(ident);
+			stratagus::site *site = stratagus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
 			}

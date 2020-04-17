@@ -38,11 +38,14 @@
 class CUnit;
 class CFile;
 class CQuest;
-class CSite;
 class CSpell;
 class CUnitType;
 class CUpgrade;
 enum class Diplomacy;
+
+namespace stratagus {
+	class site;
+}
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -125,7 +128,7 @@ extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush,
 /// Prepare command build
 //Wyrmgus start
 //extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, CSite *settlement = nullptr);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, stratagus::site *settlement = nullptr);
 //Wyrmgus end
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);

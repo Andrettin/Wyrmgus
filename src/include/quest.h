@@ -41,13 +41,13 @@ class CCharacter;
 class CDialogue;
 class CFaction;
 class CQuest;
-class CSite;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
 
 namespace stratagus {
+	class site;
 	class unit_class;
 }
 
@@ -91,7 +91,7 @@ public:
 	const CUpgrade *Upgrade = nullptr;
 	const CCharacter *Character = nullptr;
 	const CUniqueItem *Unique = nullptr;
-	const CSite *Settlement = nullptr;
+	const stratagus::site *settlement = nullptr;
 	const CFaction *Faction = nullptr;
 };
 

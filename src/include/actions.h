@@ -81,7 +81,6 @@ enum class UnitAction : char {
 class CAnimation;
 class CConstructionFrame;
 class CFile;
-class CSite;
 class CUnit;
 class CUnitType;
 class CUpgrade;
@@ -89,6 +88,10 @@ class PathFinderInput;
 class CSpell;
 class CViewport;
 struct lua_State;
+
+namespace stratagus {
+	class site;
+}
 
 /**
 **  Unit order structure.
@@ -141,7 +144,7 @@ public:
 	static COrder *NewActionBoard(CUnit &unit);
 	//Wyrmgus start
 //	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, stratagus::site *settlement);
 	//Wyrmgus end
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);

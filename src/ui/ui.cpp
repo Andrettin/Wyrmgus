@@ -483,7 +483,7 @@ void UpdateSurfaceLayerButtons()
 	unsigned int last_surface_layer = 0;
 	if (UI.CurrentMapLayer) {
 		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			if (UI.CurrentMapLayer->Plane == CMap::Map.MapLayers[z]->Plane && UI.CurrentMapLayer->world == CMap::Map.MapLayers[z]->world && CMap::Map.MapLayers[z]->SurfaceLayer > (int) last_surface_layer) {
+			if (UI.CurrentMapLayer->plane == CMap::Map.MapLayers[z]->plane && UI.CurrentMapLayer->world == CMap::Map.MapLayers[z]->world && CMap::Map.MapLayers[z]->SurfaceLayer > (int) last_surface_layer) {
 				last_surface_layer = CMap::Map.MapLayers[z]->SurfaceLayer;
 			}
 		}

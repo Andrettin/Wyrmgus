@@ -500,7 +500,7 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 //Wyrmgus start
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
-CUnitType *SettlementSiteUnitType;
+CUnitType *settlement_site_unit_type;
 
 std::vector<CSpecies *> Species;
 std::vector<CSpeciesGenus *> SpeciesGenuses;

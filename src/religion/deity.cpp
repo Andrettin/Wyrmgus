@@ -181,11 +181,8 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "home_plane") {
-			value = FindAndReplaceString(value, "_", "-");
-			CPlane *plane = CPlane::GetPlane(value);
-			if (plane) {
-				this->HomePlane = plane;
-			}
+			stratagus::plane *plane = stratagus::plane::get(value);
+			this->home_plane = plane;
 		} else if (key == "deity_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::get(value);

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name plane.h - The plane header file. */
-//
 //      (c) Copyright 2016-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,15 +27,9 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CDeityDomain;
 class CSchoolOfMagic;
@@ -45,27 +37,30 @@ class CSeasonSchedule;
 class CSpecies;
 class CTimeOfDaySchedule;
 
-class CPlane : public CDataType
+namespace stratagus {
+
+class plane : public detailed_data_entry, public data_type<plane>, public CDataType
 {
+	Q_OBJECT
+
 public:
-	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
-	static CPlane *GetOrAddPlane(const std::string &ident);
-	static void ClearPlanes();
-	
-	static std::vector<CPlane *> Planes; //planes
-	static std::map<std::string, CPlane *> PlanesByIdent;
+	static constexpr const char *class_identifier = "plane";
+	static constexpr const char *database_folder = "planes";
+
+	static plane *add(const std::string &identifier, const stratagus::module *module);
+
+	plane(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	{
+	}
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
 	int ID = -1; //ID of this plane
-	std::string Ident;
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
 	std::vector<CDeityDomain *> EmpoweredDeityDomains; ///deity domains empowered in this plane
 	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic; ///schools of magic empowered in this plane
 	std::vector<CSpecies *> Species; ///species in this plane
 };
+
+}

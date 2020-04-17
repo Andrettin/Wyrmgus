@@ -216,7 +216,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->Plane = CPlane::GetPlane(LuaToString(l, -1, 1), false);
+						CMap::Map.MapLayers[z]->plane = stratagus::plane::try_get(LuaToString(l, -1, 1));
 						CMap::Map.MapLayers[z]->world = stratagus::world::try_get(LuaToString(l, -1, 2));
 						CMap::Map.MapLayers[z]->SurfaceLayer = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
@@ -703,10 +703,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetPos(l, &start_pos.x, &start_pos.y, 3);
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 3);
-		CSite *site = CSite::GetSite(site_ident);
-		if (!site) {
-			LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
-		}
+		stratagus::site *site = stratagus::site::get(site_ident);
 		start_pos.x = site->Position.x;
 		start_pos.y = site->Position.y;
 	}
@@ -716,10 +713,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetPos(l, &end_pos.x, &end_pos.y, 4);
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 4);
-		CSite *site = CSite::GetSite(site_ident);
-		if (!site) {
-			LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
-		}
+		stratagus::site *site = stratagus::site::get(site_ident);
 		end_pos.x = site->Position.x;
 		end_pos.y = site->Position.y;
 	}
@@ -918,8 +912,8 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		std::string realm = LuaToString(l, 4);
 		if (stratagus::world::try_get(realm)) {
 			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>(ipos, unittype, stratagus::world::get(realm), unique));
-		} else if (CPlane::GetPlane(realm, false)) {
-			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, CPlane::GetPlane(realm), unique));
+		} else if (stratagus::plane::try_get(realm)) {
+			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, stratagus::plane *, CUniqueItem *>(ipos, unittype, stratagus::plane::try_get(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -1599,15 +1593,12 @@ static int CclDefineMapTemplate(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			map_template->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
-			if (!plane) {
-				LuaError(l, "Plane doesn't exist.");
-			}
-			map_template->Plane = plane;
+			stratagus::plane *plane = stratagus::plane::get(LuaToString(l, -1));
+			map_template->plane = plane;
 		} else if (!strcmp(value, "World")) {
 			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
 			map_template->world = world;
-			map_template->Plane = world->Plane;
+			map_template->plane = world->get_plane();
 		} else if (!strcmp(value, "SurfaceLayer")) {
 			map_template->SurfaceLayer = LuaToNumber(l, -1);
 			if (map_template->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
@@ -1628,7 +1619,9 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "OutputTerrainImage")) {
 			map_template->output_terrain_image = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
-			CclGetPos(l, &map_template->SubtemplatePosition.x, &map_template->SubtemplatePosition.y);
+			Vec2i subtemplate_pos;
+			CclGetPos(l, &subtemplate_pos.x, &subtemplate_pos.y);
+			map_template->subtemplate_pos = subtemplate_pos;
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
 			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
 		} else if (!strcmp(value, "MainTemplate")) {
@@ -1678,8 +1671,8 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 	
 	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
-		map_template->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map_template->get_width() - 1) / 2);
-		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->get_height() - 1) / 2);
+		map_template->subtemplate_pos.setX(subtemplate_position_top_left.x + ((map_template->get_width() - 1) / 2));
+		map_template->subtemplate_pos.setY(subtemplate_position_top_left.y + ((map_template->get_height() - 1) / 2));
 	}
 	
 	return 0;
@@ -1698,14 +1691,14 @@ static int CclDefineSite(lua_State *l)
 	}
 
 	std::string site_ident = LuaToString(l, 1);
-	CSite *site = CSite::GetOrAddSite(site_ident);
+	stratagus::site *site = stratagus::site::get_or_add(site_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			site->Name = LuaToString(l, -1);
+			site->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
 			site->Major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Position")) {
@@ -1739,9 +1732,9 @@ static int CclDefineSite(lua_State *l)
 				
 				site->Cores.push_back(faction);
 				faction->Cores.push_back(site);
-				faction->Sites.push_back(site);
+				faction->sites.push_back(site);
 				if (faction->civilization) {
-					faction->civilization->Sites.push_back(site);
+					faction->civilization->sites.push_back(site);
 				}
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
@@ -1903,7 +1896,7 @@ static int CclDefineSite(lua_State *l)
 					LuaError(l, "Region doesn't exist.");
 				}
 				site->Regions.push_back(region);
-				region->Sites.push_back(site);
+				region->sites.push_back(site);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1920,13 +1913,13 @@ static int CclDefineSite(lua_State *l)
 	
 	if (site->map_template) {
 		if (site->Position.x != -1 && site->Position.y != -1) {
-			if (site->map_template->SitesByPosition.find(std::pair<int, int>(site->Position.x, site->Position.y)) != site->map_template->SitesByPosition.end()) {
+			if (site->map_template->sites_by_position.find(site->Position) != site->map_template->sites_by_position.end()) {
 				LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->map_template->Ident.c_str());
 			}
-			site->map_template->SitesByPosition[std::pair<int, int>(site->Position.x, site->Position.y)] = site;
+			site->map_template->sites_by_position[site->Position] = site;
 		}
 		
-		site->map_template->Sites.push_back(site);
+		site->map_template->sites.push_back(site);
 	}
 	
 	return 0;
@@ -1978,17 +1971,13 @@ static int CclDefineTerrainFeature(lua_State *l)
 			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1));
 			terrain_feature->TerrainType = terrain;
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
-			if (plane != nullptr) {
-				terrain_feature->Plane = plane;
-			} else {
-				LuaError(l, "Plane doesn't exist.");
-			}
+			stratagus::plane *plane = stratagus::plane::get(LuaToString(l, -1));
+			terrain_feature->plane = plane;
 		} else if (!strcmp(value, "World")) {
 			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
 			terrain_feature->world = world;
 			world->TerrainFeatures.push_back(terrain_feature);
-			terrain_feature->Plane = world->Plane;
+			terrain_feature->plane = world->get_plane();
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -2007,7 +1996,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 		}
 	}
 	
-	if (terrain_feature->Plane == nullptr && terrain_feature->world == nullptr) {
+	if (terrain_feature->plane == nullptr && terrain_feature->world == nullptr) {
 		LuaError(l, "Terrain feature \"%s\" is not assigned to any world or plane." _C_ terrain_feature->Ident.c_str());
 	}
 	
@@ -2070,10 +2059,10 @@ static int CclGetMapTemplateData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "CurrentStartPosX")) {
-		lua_pushnumber(l, map_template->get_current_map_start_pos().x());
+		lua_pushnumber(l, map_template->current_start_pos.x());
 		return 1;
 	} else if (!strcmp(data, "CurrentStartPosY")) {
-		lua_pushnumber(l, map_template->get_current_map_start_pos().y());
+		lua_pushnumber(l, map_template->current_start_pos.y());
 		return 1;
 	} else if (!strcmp(data, "MapStartPosX")) {
 		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);
@@ -2117,14 +2106,11 @@ static int CclGetSiteData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	const std::string site_ident = LuaToString(l, 1);
-	const CSite *site = CSite::GetSite(site_ident);
-	if (!site) {
-		LuaError(l, "Site \"%s\" doesn't exist." _C_ site_ident.c_str());
-	}
+	const stratagus::site *site = stratagus::site::get(site_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, site->Name.c_str());
+		lua_pushstring(l, site->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "PosX")) {
 		lua_pushnumber(l, site->Position.x);
@@ -2133,43 +2119,43 @@ static int CclGetSiteData(lua_State *l)
 		lua_pushnumber(l, site->Position.y);
 		return 1;
 	} else if (!strcmp(data, "MapPosX")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, site->SiteUnit->tilePos.x);
+		if (site->site_unit) {
+			lua_pushnumber(l, site->site_unit->tilePos.x);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapPosY")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, site->SiteUnit->tilePos.y);
+		if (site->site_unit) {
+			lua_pushnumber(l, site->site_unit->tilePos.y);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosX")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, site->SiteUnit->GetTileCenterPos().x);
+		if (site->site_unit) {
+			lua_pushnumber(l, site->site_unit->GetTileCenterPos().x);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosY")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, site->SiteUnit->GetTileCenterPos().y);
+		if (site->site_unit) {
+			lua_pushnumber(l, site->site_unit->GetTileCenterPos().y);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
-		if (site->SiteUnit && site->SiteUnit->MapLayer) {
-			lua_pushnumber(l, site->SiteUnit->MapLayer->ID);
+		if (site->site_unit && site->site_unit->MapLayer) {
+			lua_pushnumber(l, site->site_unit->MapLayer->ID);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "SiteUnit")) {
-		if (site->SiteUnit) {
-			lua_pushnumber(l, UnitNumber(*site->SiteUnit));
+		if (site->site_unit) {
+			lua_pushnumber(l, UnitNumber(*site->site_unit));
 		} else {
 			lua_pushnumber(l, -1);
 		}

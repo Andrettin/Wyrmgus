@@ -41,7 +41,9 @@
 #include "database/sml_parser.h"
 #include "database/sml_property.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
+#include "plane.h"
 #include "sound/sound.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
@@ -149,6 +151,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "stratagus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
+		} else if (property_class_name == "stratagus::plane*") {
+			new_property_value = QVariant::fromValue(plane::get(property.get_value()));
+		} else if (property_class_name == "stratagus::site*") {
+			new_property_value = QVariant::fromValue(site::get(property.get_value()));
 		} else if (property_class_name == "stratagus::sound*") {
 			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
 		} else if (property_class_name == "stratagus::terrain_type*") {

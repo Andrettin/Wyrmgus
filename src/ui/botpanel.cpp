@@ -504,7 +504,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->SettlementName && !(button.Action == ButtonCmd::Unit && UnitManager.GetSlotUnit(button.Value).Settlement)) {
+	if (condition->settlement_name && !(button.Action == ButtonCmd::Unit && UnitManager.GetSlotUnit(button.Value).settlement)) {
 		return false;
 	}
 	

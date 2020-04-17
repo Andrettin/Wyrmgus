@@ -1145,8 +1145,8 @@ void CPlayer::Save(CFile &file) const
 		if (objective->Unique) {
 			file.printf("\"unique\", \"%s\",", objective->Unique->Ident.c_str());
 		}
-		if (objective->Settlement) {
-			file.printf("\"settlement\", \"%s\",", objective->Settlement->Ident.c_str());
+		if (objective->settlement) {
+			file.printf("\"settlement\", \"%s\",", objective->settlement->Ident.c_str());
 		}
 		if (objective->Faction) {
 			file.printf("\"faction\", \"%s\",", objective->Faction->Ident.c_str());
@@ -1857,13 +1857,13 @@ bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 	return false;
 }
 
-bool CPlayer::HasSettlement(const CSite *settlement) const
+bool CPlayer::HasSettlement(const stratagus::site *settlement) const
 {
 	if (!settlement) {
 		return false;
 	}
 	
-	if (settlement->SiteUnit && settlement->SiteUnit->Player == this) {
+	if (settlement->site_unit && settlement->site_unit->Player == this) {
 		return true;
 	}
 
@@ -1913,13 +1913,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
-CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
+stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	
-	for (size_t i = 0; i < CMap::Map.SiteUnits.size(); ++i) {
-		CUnit *settlement_unit = CMap::Map.SiteUnits[i];
+	for (size_t i = 0; i < CMap::Map.site_units.size(); ++i) {
+		CUnit *settlement_unit = CMap::Map.site_units[i];
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
@@ -1934,13 +1934,13 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 	}
 	
 	if (best_hall) {
-		return best_hall->Settlement;
+		return best_hall->settlement;
 	} else {
 		return nullptr;
 	}
 }
 
-bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSite *settlement) const
+bool CPlayer::HasUnitBuilder(const CUnitType *type, const stratagus::site *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
 		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
@@ -1963,7 +1963,7 @@ bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSite *settlement) con
 				} else {
 					for (int i = 0; i < this->GetUnitCount(); ++i) {
 						CUnit &unit = this->GetUnit(i);
-						if (unit.Type == AiHelpers.Upgrade[type->Slot][j] && unit.Settlement == settlement) {
+						if (unit.Type == AiHelpers.Upgrade[type->Slot][j] && unit.settlement == settlement) {
 							return true;
 						}
 					}
@@ -2016,7 +2016,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		//check if the required core settlements are owned by the player
 		if (CCampaign::GetCurrentCampaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
-				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitAction::Built) {
+				if (!faction->Cores[i]->site_unit || faction->Cores[i]->site_unit->Player != this || faction->Cores[i]->site_unit->CurrentAction() == UnitAction::Built) {
 					return false;
 				}
 			}
@@ -2790,7 +2790,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		objective->Upgrade = quest->Objectives[i]->Upgrade;
 		objective->Character = quest->Objectives[i]->Character;
 		objective->Unique = quest->Objectives[i]->Unique;
-		objective->Settlement = quest->Objectives[i]->Settlement;
+		objective->settlement = quest->Objectives[i]->settlement;
 		objective->Faction = quest->Objectives[i]->Faction;
 		this->QuestObjectives.push_back(objective);
 	}
@@ -2891,11 +2891,11 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 
 			bool validated = false;
 			for (const CUnitType *unit_type : unit_types) {
-				if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+				if (objective->settlement && !this->HasSettlement(objective->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 					continue;
 				}
 
-				if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependencies(unit_type, this)) {
+				if (!this->HasUnitBuilder(unit_type, objective->settlement) || !CheckDependencies(unit_type, this)) {
 					continue;
 				}
 
@@ -2956,7 +2956,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					return false;
 				}
 				
-				if (objective->Settlement && !faction_player->HasSettlement(objective->Settlement)) {
+				if (objective->settlement && !faction_player->HasSettlement(objective->settlement)) {
 					return false;
 				}
 			}
@@ -3052,12 +3052,12 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 				bool validated = false;
 				std::string validation_error;
 				for (const CUnitType *unit_type : unit_types) {
-					if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+					if (objective->settlement && !this->HasSettlement(objective->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 						validation_error = "You no longer hold the required settlement.";
 						continue;
 					}
 
-					if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependencies(unit_type, this)) {
+					if (!this->HasUnitBuilder(unit_type, objective->settlement) || !CheckDependencies(unit_type, this)) {
 						validation_error = "You can no longer produce the required unit.";
 						continue;
 					}
@@ -3121,7 +3121,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					return "The target no longer exists.";
 				}
 				
-				if (objective->Settlement && !faction_player->HasSettlement(objective->Settlement)) {
+				if (objective->settlement && !faction_player->HasSettlement(objective->settlement)) {
 					return "The target no longer exists.";
 				}
 			}
@@ -4521,7 +4521,7 @@ bool CPlayer::IsVassalOf(const CPlayer &player, bool include_indirect) const
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
-	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->world == CMap::Map.MapLayers[this->StartMapLayer]->world && CMap::Map.MapLayers[player.StartMapLayer]->Plane == CMap::Map.MapLayers[this->StartMapLayer]->Plane);
+	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->world == CMap::Map.MapLayers[this->StartMapLayer]->world && CMap::Map.MapLayers[player.StartMapLayer]->plane == CMap::Map.MapLayers[this->StartMapLayer]->plane);
 }
 
 /**

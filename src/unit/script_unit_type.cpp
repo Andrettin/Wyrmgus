@@ -3769,18 +3769,14 @@ static int CclDefineSpecies(lua_State *l)
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
-			std::string plane_ident = LuaToString(l, -1);
-			CPlane *plane = CPlane::GetPlane(plane_ident);
-			if (plane) {
-				species->HomePlane = plane;
-				plane->Species.push_back(species);
-			} else {
-				LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
-			}
+			const std::string plane_ident = LuaToString(l, -1);
+			stratagus::plane *plane = stratagus::plane::get(plane_ident);
+			species->home_plane = plane;
+			plane->Species.push_back(species);
 		} else if (!strcmp(value, "Homeworld")) {
-			std::string world_ident = LuaToString(l, -1);
+			const std::string world_ident = LuaToString(l, -1);
 			stratagus::world *world = stratagus::world::get(world_ident);
-			species->Homeworld = world;
+			species->homeworld = world;
 			world->Species.push_back(species);
 		} else if (!strcmp(value, "Terrains")) {
 			if (!lua_istable(l, -1)) {
@@ -3885,15 +3881,15 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->ChildUpgrade.c_str());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
-		if (species->HomePlane != nullptr) {
-			lua_pushstring(l, species->HomePlane->Ident.c_str());
+		if (species->home_plane != nullptr) {
+			lua_pushstring(l, species->home_plane->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
-		if (species->Homeworld != nullptr) {
-			lua_pushstring(l, species->Homeworld->Ident.c_str());
+		if (species->homeworld != nullptr) {
+			lua_pushstring(l, species->homeworld->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3979,7 +3975,7 @@ static int CclGetSpeciesGenusData(lua_State *l)
 static int CclSetSettlementSiteUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	SettlementSiteUnitType = CUnitType::get(LuaToString(l, 1));
+	settlement_site_unit_type = CUnitType::get(LuaToString(l, 1));
 
 	return 0;
 }

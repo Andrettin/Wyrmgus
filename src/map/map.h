@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.h - The map header file. */
-//
 //      (c) Copyright 1998-2020 by Vladi Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon and Andrettin
 //
@@ -94,9 +92,7 @@ class CGraphic;
 class CPlayer;
 class CFile;
 class CMapLayer;
-class CPlane;
 class CRegion;
-class CSite;
 class CTileset;
 class CUniqueItem;
 class CUnit;
@@ -104,6 +100,8 @@ class CUnitType;
 
 namespace stratagus {
 	class map_template;
+	class plane;
+	class site;
 	class world;
 }
 
@@ -123,7 +121,7 @@ public:
 	std::string Name;
 	CColor Color;
 	stratagus::terrain_type *TerrainType = nullptr;
-	CPlane *Plane = nullptr;
+	stratagus::plane *plane = nullptr;
 	stratagus::world *world = nullptr;
 	std::map<int, std::string> CulturalNames; //names for the terrain feature for each different culture/civilization
 };
@@ -287,10 +285,10 @@ public:
 	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
 	
-	void SetCurrentPlane(CPlane *plane);
+	void SetCurrentPlane(stratagus::plane *plane);
 	void SetCurrentWorld(stratagus::world *world);
 	void SetCurrentSurfaceLayer(int surface_layer);
-	CPlane *GetCurrentPlane() const;
+	stratagus::plane *GetCurrentPlane() const;
 	stratagus::world *GetCurrentWorld() const;
 	int GetCurrentSurfaceLayer() const;
 	//Wyrmgus end
@@ -349,7 +347,7 @@ public:
 	stratagus::terrain_type *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
-	std::vector<CUnit *> SiteUnits;	/// the town hall / settlement site units
+	std::vector<CUnit *> site_units;	/// the town hall / settlement site units
 	std::vector<CMapLayer *> MapLayers;				/// the map layers composing the map
 	//Wyrmgus end
 

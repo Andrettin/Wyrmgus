@@ -498,7 +498,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
-	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == settlement_site_unit_type && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		for (CUnitType *unit_type : CUnitType::get_all()) {
 			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
 				if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
@@ -2401,7 +2401,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->Plane || UI.CurrentMapLayer->world != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
+				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->plane || UI.CurrentMapLayer->world != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
 					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
 				}
 				PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
@@ -3009,7 +3009,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-					CMap::Map.SetCurrentPlane(CPlane::Planes[i]);
+					CMap::Map.SetCurrentPlane(stratagus::plane::get_all()[i]);
 					if (button.Callback) {
 						button.Callback->action("");
 					}

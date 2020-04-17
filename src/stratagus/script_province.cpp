@@ -584,26 +584,23 @@ static int CclGetPlaneData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string plane_ident = LuaToString(l, 1);
-	CPlane *plane = CPlane::GetPlane(plane_ident);
-	if (!plane) {
-		LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
-	}
+	stratagus::plane *plane = stratagus::plane::get(plane_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, plane->Name.c_str());
+		lua_pushstring(l, plane->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "ID")) {
 		lua_pushnumber(l, plane->ID);
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, plane->Description.c_str());
+		lua_pushstring(l, plane->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, plane->Background.c_str());
+		lua_pushstring(l, plane->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, plane->Quote.c_str());
+		lua_pushstring(l, plane->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
 		lua_createtable(l, plane->Species.size(), 0);
@@ -650,8 +647,8 @@ static int CclGetWorldData(lua_State *l)
 		lua_pushstring(l, world->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Plane")) {
-		if (world->Plane) {
-			lua_pushstring(l, world->Plane->Ident.c_str());
+		if (world->get_plane()) {
+			lua_pushstring(l, world->get_plane()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -721,10 +718,10 @@ static int CclGetProvinceData(lua_State *l)
 
 static int CclGetPlanes(lua_State *l)
 {
-	lua_createtable(l, CPlane::Planes.size(), 0);
-	for (size_t i = 1; i <= CPlane::Planes.size(); ++i)
+	lua_createtable(l, stratagus::plane::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::plane::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CPlane::Planes[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::plane::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

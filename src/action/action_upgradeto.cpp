@@ -382,7 +382,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 					(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
 					|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->get_unit_class() == newtype.get_unit_class())
 				) {
-					if (!objective->Settlement || objective->Settlement == unit.Settlement) {
+					if (!objective->settlement || objective->settlement == unit.settlement) {
 						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 					}
 				}

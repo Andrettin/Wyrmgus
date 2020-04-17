@@ -43,12 +43,13 @@
 class CDeityDomain;
 class CFaction;
 class CPantheon;
-class CPlane;
 class CReligion;
 class CUpgrade;
+struct lua_State;
 
 namespace stratagus {
 	class civilization;
+	class plane;
 }
 
 static constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; //major deities can only have up to three domains
@@ -69,6 +70,11 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	std::string GetCulturalName(const stratagus::civilization *civilization) const;
+
+	stratagus::plane *get_home_plane() const
+	{
+		return this->home_plane;
+	}
 	
 	int Gender = 0;								//deity's gender
 	bool Major = false;							//whether the deity is a major one or not
@@ -77,7 +83,9 @@ public:
 	std::string Background;
 	std::string Quote;
 	CPantheon *Pantheon = nullptr;				//pantheon to which the deity belongs
-	CPlane *HomePlane = nullptr;				//the home plane of the deity
+private:
+	stratagus::plane *home_plane = nullptr;				//the home plane of the deity
+public:
 	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;							//deity's icon
@@ -88,4 +96,6 @@ public:
 	std::vector<CFaction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
 	std::map<const stratagus::civilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+
+	friend int CclDefineDeity(lua_State *l);
 };

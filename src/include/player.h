@@ -73,11 +73,9 @@ class CFile;
 class CGraphic;
 class CLanguage;
 class CProvince;
-class CPlane;
 class CPlayerQuestObjective;
 class CQuest;
 class CReligion;
-class CSite;
 class CUnit;
 class CUnitType;
 class PlayerAi;
@@ -91,6 +89,7 @@ struct lua_State;
 namespace stratagus {
 	class age;
 	class civilization;
+	class site;
 	class unit_class;
 }
 
@@ -248,10 +247,10 @@ public:
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(const int upgrade_class) const;
-	bool HasSettlement(const CSite *settlement) const;
+	bool HasSettlement(const stratagus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
-	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
-	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = nullptr) const;
+	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	bool HasUnitBuilder(const CUnitType *type, const stratagus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
@@ -714,8 +713,8 @@ public:
 private:
 	std::vector<std::string> ship_names;									/// Ship names for the faction
 public:
-	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)
-	std::vector<CSite *> Sites;											/// Sites used for this faction if it needs a randomly-generated settlement
+	std::vector<stratagus::site *> Cores; /// Core sites of this faction (required to found it)
+	std::vector<stratagus::site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
 	std::map<int, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates

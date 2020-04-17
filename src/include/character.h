@@ -52,7 +52,6 @@ class CPersistentItem;
 class CProvince;
 class CQuest;
 class CReligion;
-class CSite;
 class CUnitType;
 class CUnit;
 class CUpgrade;
@@ -60,6 +59,7 @@ class LuaCallback;
 
 namespace stratagus {
 	class civilization;
+	class site;
 }
 
 /**

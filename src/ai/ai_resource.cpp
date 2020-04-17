@@ -67,7 +67,7 @@ static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = nullptr);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr);
 //Wyrmgus end
 
 /**
@@ -313,7 +313,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 */
 //Wyrmgus start
 //static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = nullptr)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -910,7 +910,7 @@ static bool AiRequestSupply()
 */
 //Wyrmgus start
 //static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSite *settlement = nullptr)
+static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, stratagus::site *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -924,7 +924,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 			continue;
 		}
 		
-		if (settlement && unit.Settlement != settlement) {
+		if (settlement && unit.settlement != settlement) {
 			continue;
 		}
 		//Wyrmgus end
@@ -951,7 +951,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 */
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, CSite *settlement)
+static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, stratagus::site *settlement)
 //Wyrmgus end
 {
 	// Find equivalents unittypes.
@@ -1176,10 +1176,10 @@ static void AiCheckingWork()
 		CUnitType &type = *queuep->Type;
 		
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
-			queuep->Settlement
+			queuep->settlement
 			&& (
-				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->Player != AiPlayer->Player)
-				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->Player->Index != PlayerNumNeutral)
+				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->site_unit->Player != AiPlayer->Player)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->site_unit->Player->Index != PlayerNumNeutral)
 			)
 		) {
 			AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
@@ -1210,7 +1210,7 @@ static void AiCheckingWork()
 		} else if (queuep->Want > queuep->Made && queuep->Wait <= GameCycle) {
 			//Wyrmgus start
 //			if (AiMakeUnit(type, queuep->Pos)) {
-			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->Landmass, queuep->Settlement)) {
+			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->Landmass, queuep->settlement)) {
 			//Wyrmgus end
 				++queuep->Made;
 				queuep->Wait = 0;
@@ -2324,8 +2324,8 @@ void AiCheckSettlementConstruction()
 	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, town_hall_type);
 						
 	//check settlement units to see if can build in one
-	for (size_t i = 0; i < CMap::Map.SiteUnits.size(); ++i) {
-		CUnit *settlement_unit = CMap::Map.SiteUnits[i];
+	for (size_t i = 0; i < CMap::Map.site_units.size(); ++i) {
+		CUnit *settlement_unit = CMap::Map.site_units[i];
 		
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
@@ -2344,7 +2344,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (AiGetUnitTypeRequestedCount(*AiPlayer, town_hall_type, 0, settlement_unit->Settlement) > 0) { //already requested
+		if (AiGetUnitTypeRequestedCount(*AiPlayer, town_hall_type, 0, settlement_unit->settlement) > 0) { //already requested
 			continue;
 		}
 		
@@ -2361,7 +2361,7 @@ void AiCheckSettlementConstruction()
 			// The type is available
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
-				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 				requested_settlement = true;
 				break;
 			}
@@ -2592,7 +2592,7 @@ static void AiCheckMinecartConstruction()
 		return;
 	}
 	
-	std::vector<CSite *> potential_settlements;
+	std::vector<stratagus::site *> potential_settlements;
 		
 	for (size_t res = 0; res < CResource::Resources.size(); ++res) {
 		if (res >= (int) AiHelpers.Mines.size()) {
@@ -2610,13 +2610,13 @@ static void AiCheckMinecartConstruction()
 					
 			for (size_t j = 0; j < mine_table.size(); ++j) {
 				const CUnit *mine_unit = mine_table[j];
-				CSite *mine_settlement = mine_unit->Settlement;
+				stratagus::site *mine_settlement = mine_unit->settlement;
 						
 				if (!mine_settlement) {
 					continue;
 				}
 						
-				const CUnit *town_hall_unit = mine_settlement->SiteUnit;
+				const CUnit *town_hall_unit = mine_settlement->site_unit;
 				
 				if (!town_hall_unit) {
 					continue;
@@ -2716,7 +2716,7 @@ void AiCheckWorkers()
 */
 //Wyrmgus start
 //void AiAddUnitTypeRequest(CUnitType &type, int count)
-void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, CSite *settlement, const Vec2i pos, int z)
+void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, stratagus::site *settlement, const Vec2i pos, int z)
 //Wyrmgus end
 {
 	AiBuildQueue queue;
@@ -2725,7 +2725,7 @@ void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, 
 	queue.Want = count;
 	queue.Made = 0;
 	queue.Landmass = landmass;
-	queue.Settlement = settlement;
+	queue.settlement = settlement;
 	queue.Pos = pos;
 	queue.MapLayer = z;
 	AiPlayer->UnitTypeBuilt.push_back(queue);

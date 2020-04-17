@@ -31,18 +31,20 @@
 
 #include "actions.h"
 
-class CSite;
+namespace stratagus {
+	class site;
+}
 
 class COrder_Build : public COrder
 {
 	//Wyrmgus start
 //	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, stratagus::site *settlement);
 	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0)
-	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0), MapLayer(0), Settlement(nullptr)
+	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0), MapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;
@@ -86,6 +88,6 @@ private:
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
-	CSite *Settlement;
+	stratagus::site *settlement = nullptr;
 	//Wyrmgus end
 };

@@ -1436,7 +1436,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	//Wyrmgus start
 	int z = -1;
 	int landmass = 0;
-	CSite *settlement = nullptr;
+	stratagus::site *settlement = nullptr;
 	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
@@ -1454,7 +1454,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		} else if (!strcmp(value, "landmass")) {
 			landmass = LuaToNumber(l, offset, k + 1);
 		} else if (!strcmp(value, "settlement")) {
-			settlement = CSite::GetSite(LuaToString(l, offset, k + 1));
+			settlement = stratagus::site::get(LuaToString(l, offset, k + 1));
 		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);
@@ -1471,7 +1471,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			//Wyrmgus start
 			queue.MapLayer = z;
 			queue.Landmass = landmass;
-			queue.Settlement = settlement;
+			queue.settlement = settlement;
 			//Wyrmgus end
 
 			ai->UnitTypeBuilt.push_back(queue);

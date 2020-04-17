@@ -340,10 +340,10 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "family-name")) {
 			unit->FamilyName = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "settlement")) {
-			unit->Settlement = CSite::GetSite(LuaToString(l, 2, j + 1));
-			if (type->BoolFlag[TOWNHALL_INDEX].value || SettlementSiteUnitType == type) {
-				unit->Settlement->SiteUnit = unit;
-				CMap::Map.SiteUnits.push_back(unit);
+			unit->settlement = stratagus::site::get(LuaToString(l, 2, j + 1));
+			if (type->BoolFlag[TOWNHALL_INDEX].value || settlement_site_unit_type == type) {
+				unit->settlement->site_unit = unit;
+				CMap::Map.site_units.push_back(unit);
 			}
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::get(LuaToString(l, 2, j + 1));
@@ -1742,8 +1742,8 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushboolean(l, false);
 		}
 	} else if (!strcmp(value, "Settlement")) {
-		if (unit->Settlement != nullptr) {
-			lua_pushstring(l, unit->Settlement->Ident.c_str());
+		if (unit->settlement != nullptr) {
+			lua_pushstring(l, unit->settlement->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

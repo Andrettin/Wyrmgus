@@ -163,7 +163,7 @@ public:
 	void UpdatePersonalName(bool update_settlement_name = true);
 	void UpdateExtraName();
 	void UpdateSettlement();
-	void UpdateBuildingSettlementAssignment(CSite *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
+	void UpdateBuildingSettlementAssignment(stratagus::site *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit
@@ -520,7 +520,7 @@ public:
 	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
 	std::string FamilyName;	/// Unit's family name
 	CCharacter *Character;	/// Pointer to the character represented by this unit
-	CSite *Settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
+	stratagus::site *settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has

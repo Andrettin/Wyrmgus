@@ -462,7 +462,7 @@ void CUnit::Init()
 	Stats = nullptr;
 	//Wyrmgus start
 	Character = nullptr;
-	Settlement = nullptr;
+	this->settlement = nullptr;
 	Trait = nullptr;
 	Prefix = nullptr;
 	Suffix = nullptr;
@@ -592,10 +592,10 @@ void CUnit::Release(bool final)
 	Type = nullptr;
 	//Wyrmgus start
 	Character = nullptr;
-	if (this->Settlement && this->Settlement->SiteUnit == this) {
-		this->Settlement->SiteUnit = nullptr;
+	if (this->settlement != nullptr && this->settlement->site_unit == this) {
+		this->settlement->site_unit = nullptr;
 	}
-	Settlement = nullptr;
+	this->settlement = nullptr;
 	Trait = nullptr;
 	Prefix = nullptr;
 	Suffix = nullptr;
@@ -663,12 +663,12 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 			this->SetSpell(replaced_unit.Spell);
 		}
 	}
-	if (replaced_unit.Settlement != nullptr) {
-		this->Settlement = replaced_unit.Settlement;
+	if (replaced_unit.settlement != nullptr) {
+		this->settlement = replaced_unit.settlement;
 		if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
-			this->Settlement->SiteUnit = this;
-			CMap::Map.SiteUnits.erase(std::remove(CMap::Map.SiteUnits.begin(), CMap::Map.SiteUnits.end(), &replaced_unit), CMap::Map.SiteUnits.end());
-			CMap::Map.SiteUnits.push_back(this);
+			this->settlement->site_unit = this;
+			CMap::Map.site_units.erase(std::remove(CMap::Map.site_units.begin(), CMap::Map.site_units.end(), &replaced_unit), CMap::Map.site_units.end());
+			CMap::Map.site_units.push_back(this);
 		}
 	}
 	
@@ -3427,7 +3427,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Settlement))) {
+	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && !this->settlement))) {
 		this->UpdateSettlement();
 	}
 }
@@ -3459,8 +3459,8 @@ void CUnit::UpdateSettlement()
 		return;
 	}
 	
-	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
-		if (!this->Settlement) {
+	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == settlement_site_unit_type) {
+		if (!this->settlement) {
 			int civilization_id = this->Type->civilization;
 			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
 				civilization_id = this->Player->Race;
@@ -3479,38 +3479,38 @@ void CUnit::UpdateSettlement()
 				faction = PlayerRaces.Factions[faction_id];
 			}
 
-			std::vector<CSite *> potential_settlements;
+			std::vector<stratagus::site *> potential_settlements;
 			if (civilization) {
-				for (CSite *site : civilization->Sites) {
-					if (!site->SiteUnit) {
+				for (stratagus::site *site : civilization->sites) {
+					if (!site->site_unit) {
 						potential_settlements.push_back(site);
 					}
 				}
 			}
 			
 			if (potential_settlements.empty() && faction) {
-				for (CSite *site : faction->Sites) {
-					if (!site->SiteUnit) {
+				for (stratagus::site *site : faction->sites) {
+					if (!site->site_unit) {
 						potential_settlements.push_back(site);
 					}
 				}
 			}
 			
 			if (potential_settlements.empty()) {
-				for (CSite *site : CSite::Sites) {
-					if (!site->SiteUnit) {
+				for (stratagus::site *site : stratagus::site::get_all()) {
+					if (!site->site_unit) {
 						potential_settlements.push_back(site);
 					}
 				}
 			}
 			
 			if (potential_settlements.size() > 0) {
-				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
-				this->Settlement->SiteUnit = this;
-				CMap::Map.SiteUnits.push_back(this);
+				this->settlement = potential_settlements[SyncRand(potential_settlements.size())];
+				this->settlement->site_unit = this;
+				CMap::Map.site_units.push_back(this);
 			}
 		}
-		if (this->Settlement) {
+		if (this->settlement != nullptr) {
 			this->UpdateBuildingSettlementAssignment();
 		}
 	} else {
@@ -3518,11 +3518,11 @@ void CUnit::UpdateSettlement()
 			return;
 		}
 		
-		this->Settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->TileSize);
+		this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->TileSize);
 	}
 }
 
-void CUnit::UpdateBuildingSettlementAssignment(CSite *old_settlement)
+void CUnit::UpdateBuildingSettlementAssignment(stratagus::site *old_settlement)
 {
 	if (Editor.Running != EditorNotRunning) {
 		return;
@@ -3538,10 +3538,10 @@ void CUnit::UpdateBuildingSettlementAssignment(CSite *old_settlement)
 		}
 		for (int i = 0; i < CPlayer::Players[p]->GetUnitCount(); ++i) {
 			CUnit *settlement_unit = &CPlayer::Players[p]->GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->Type == SettlementSiteUnitType || this->MapLayer != settlement_unit->MapLayer) {
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->Type == settlement_site_unit_type || this->MapLayer != settlement_unit->MapLayer) {
 				continue;
 			}
-			if (old_settlement && settlement_unit->Settlement != old_settlement) {
+			if (old_settlement && settlement_unit->settlement != old_settlement) {
 				continue;
 			}
 			settlement_unit->UpdateSettlement();
@@ -4141,12 +4141,12 @@ void UnitLost(CUnit &unit)
 						temp->SetSpell(unit.Spell);
 					}
 				}
-				if (unit.Settlement != nullptr) {
+				if (unit.settlement != nullptr) {
 					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
-						temp->Settlement = unit.Settlement;
-						temp->Settlement->SiteUnit = temp;
-						CMap::Map.SiteUnits.erase(std::remove(CMap::Map.SiteUnits.begin(), CMap::Map.SiteUnits.end(), &unit), CMap::Map.SiteUnits.end());
-						CMap::Map.SiteUnits.push_back(temp);
+						temp->settlement = unit.settlement;
+						temp->settlement->site_unit = temp;
+						CMap::Map.site_units.erase(std::remove(CMap::Map.site_units.begin(), CMap::Map.site_units.end(), &unit), CMap::Map.site_units.end());
+						CMap::Map.site_units.push_back(temp);
 					}
 				}
 				if (type.GivesResource && unit.ResourcesHeld != 0) {
@@ -4158,8 +4158,8 @@ void UnitLost(CUnit &unit)
 				//Wyrmgus end
 			}
 		//Wyrmgus start
-		} else if (unit.Settlement && unit.Settlement->SiteUnit == &unit) {
-			unit.Settlement->SiteUnit = nullptr;
+		} else if (unit.settlement && unit.settlement->site_unit == &unit) {
+			unit.settlement->site_unit = nullptr;
 		//Wyrmgus end
 		}
 	}
@@ -6318,8 +6318,9 @@ bool CUnit::LevelCheck(const int level) const
 
 bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 {
-	const CPlane *plane = this->MapLayer->Plane;
-	if (plane) {
+	const stratagus::plane *plane = this->MapLayer->plane;
+
+	if (plane != nullptr) {
 		if (!plane->EmpoweredDeityDomains.empty()) {
 			for (const CDeityDomain *deity_domain : ability->DeityDomains) {
 				if (std::find(plane->EmpoweredDeityDomains.begin(), plane->EmpoweredDeityDomains.end(), deity_domain) != plane->EmpoweredDeityDomains.end()) {
@@ -6721,8 +6722,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
-	if (unit.Settlement) {
-		unit.UpdateBuildingSettlementAssignment(unit.Settlement);
+	if (unit.settlement) {
+		unit.UpdateBuildingSettlementAssignment(unit.settlement);
 	}
 	//Wyrmgus end
 	
@@ -6935,7 +6936,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	for (size_t i = 0; i < attacker.Player->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = attacker.Player->QuestObjectives[i];
 		if (
-			(objective->ObjectiveType == ObjectiveType::DestroyUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end() && (!objective->Settlement || objective->Settlement == target.Settlement))
+			(objective->ObjectiveType == ObjectiveType::DestroyUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end() && (!objective->settlement || objective->settlement == target.settlement))
 			|| (objective->ObjectiveType == ObjectiveType::DestroyHero && target.Character && objective->Character == target.Character)
 			|| (objective->ObjectiveType == ObjectiveType::DestroyUnique && target.Unique && objective->Unique == target.Unique)
 		) {

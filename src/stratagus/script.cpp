@@ -1430,12 +1430,12 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
-				int civilization = unit->Settlement->SiteUnit->Type->civilization;
-				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type == PlayerRaces.Factions[unit->Settlement->SiteUnit->Player->Faction]->get_class_unit_type(unit->Settlement->SiteUnit->Type->get_unit_class()))) {
-					civilization = unit->Settlement->SiteUnit->Player->Race;
+			if (unit != nullptr && unit->settlement != nullptr && unit->settlement->site_unit != nullptr) {
+				int civilization = unit->settlement->site_unit->Type->civilization;
+				if (civilization != -1 && unit->settlement->site_unit->Player->Faction != -1 && (unit->settlement->site_unit->Player->Race == civilization || unit->settlement->site_unit->Type == PlayerRaces.Factions[unit->settlement->site_unit->Player->Faction]->get_class_unit_type(unit->settlement->site_unit->Type->get_unit_class()))) {
+					civilization = unit->settlement->site_unit->Player->Race;
 				}
-				return unit->Settlement->GetCulturalName(civilization != -1 ? stratagus::civilization::get_all()[civilization] : nullptr);
+				return unit->settlement->GetCulturalName(civilization != -1 ? stratagus::civilization::get_all()[civilization] : nullptr);
 			} else {
 				return std::string("");
 			}
@@ -1641,7 +1641,7 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == CPlayer::GetThisPlayer() && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitAction::Built;
+					bool has_settlement = (**faction).Cores[i]->site_unit && (**faction).Cores[i]->site_unit->Player == CPlayer::GetThisPlayer() && (**faction).Cores[i]->site_unit->CurrentAction() != UnitAction::Built;
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}

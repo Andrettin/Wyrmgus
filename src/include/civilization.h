@@ -200,7 +200,7 @@ private:
 	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for the civilization
 public:
 	std::vector<CDeity *> Deities;
-	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
+	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 

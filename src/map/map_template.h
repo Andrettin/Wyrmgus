@@ -32,14 +32,13 @@
 #include "data_type.h"
 #include "map/tile.h"
 #include "time/date.h"
+#include "util/point_container.h"
 #include "vec2i.h"
 
 class CCharacter;
 class CFaction;
 class CHistoricalLocation;
 class CMapField;
-class CPlane;
-class CSite;
 class CUniqueItem;
 class CUnitType;
 struct lua_State;
@@ -71,6 +70,8 @@ public:
 
 namespace stratagus {
 
+class plane;
+class site;
 class world;
 
 class map_template final : public named_data_entry, public data_type<map_template>, public CDataType
@@ -81,6 +82,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(QPoint start_pos MEMBER start_pos READ get_start_pos)
 	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
+	Q_PROPERTY(QPoint subtemplate_pos MEMBER subtemplate_pos READ get_subtemplate_pos)
+	Q_PROPERTY(stratagus::plane* plane MEMBER plane READ get_plane)
 	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
 	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
@@ -110,7 +113,7 @@ public:
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void ApplySubtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
-	void ApplySites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
@@ -286,6 +289,11 @@ public:
 		return true;
 	}
 
+	plane *get_plane() const
+	{
+		return this->plane;
+	}
+
 	world *get_world() const
 	{
 		return this->world;
@@ -304,14 +312,6 @@ public:
 
 		this->main_template = map_template;
 		main_template->subtemplates.push_back(this);
-
-		if (main_template->Plane) {
-			this->Plane = main_template->Plane;
-		}
-		if (main_template->get_world() != nullptr) {
-			this->world = main_template->get_world();
-		}
-		this->SurfaceLayer = main_template->SurfaceLayer;
 	}
 
 	const std::vector<map_template *> &get_subtemplates() const
@@ -387,6 +387,11 @@ public:
 		this->set_overlay_terrain_image(filepath.toStdString());
 	}
 
+	const QPoint &get_subtemplate_pos() const
+	{
+		return this->subtemplate_pos;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
 	terrain_type *get_unusable_area_terrain_type() const
@@ -416,17 +421,17 @@ public:
 private:
 	bool output_terrain_image = false;
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
-public:
-	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 private:
+	QPoint subtemplate_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used
 	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
 public:
-	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
-	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
+	QPoint MinPos = QPoint(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
+	QPoint MaxPos = QPoint(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
 private:
 	QPoint current_map_start_pos = QPoint(0, 0);
 public:
+	QPoint current_start_pos = QPoint(0, 0);
 	map_template *main_template = nullptr; //main template in which this one is located, if this is a subtemplate
 	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
 	map_template *LowerTemplate = nullptr; //map template corresponding to this one in the lower layer
@@ -435,8 +440,8 @@ public:
 	std::vector<const map_template *> SouthOfTemplates; //map templates to which this one is to the north of
 	std::vector<const map_template *> WestOfTemplates; //map templates to which this one is to the west of
 	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
-	CPlane *Plane = nullptr;
 private:
+	plane *plane = nullptr;
 	world *world = nullptr;
 public:
 	terrain_type *BaseTerrainType = nullptr;
@@ -454,12 +459,12 @@ public:
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
 	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
-	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::plane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
-	std::vector<CSite *> Sites;
-	std::map<std::pair<int, int>, CSite *> SitesByPosition;
+	std::vector<site *> sites;
+	point_map<site *> sites_by_position;
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 
 	friend int ::CclDefineMapTemplate(lua_State *l);

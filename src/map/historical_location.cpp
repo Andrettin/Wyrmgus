@@ -65,14 +65,9 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "map_template") {
 			this->map_template = stratagus::map_template::get(value);
 		} else if (key == "site") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Site = CSite::GetSite(value);
-			if (this->Site) {
-				this->map_template = this->Site->map_template;
-				this->Position = this->Site->Position;
-			} else {
-				fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
-			}
+			this->site = stratagus::site::get(value);
+			this->map_template = this->site->map_template;
+			this->Position = this->site->Position;
 		} else if (key == "x") {
 			this->Position.x = std::stoi(value);
 		} else if (key == "y") {

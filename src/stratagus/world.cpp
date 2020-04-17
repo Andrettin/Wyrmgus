@@ -75,8 +75,7 @@ void world::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quote") {
 			this->set_quote(value);
 		} else if (key == "plane") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Plane = CPlane::GetPlane(value);
+			this->plane = plane::get(value);
 		} else if (key == "time_of_day_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(value);

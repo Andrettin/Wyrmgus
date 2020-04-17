@@ -35,7 +35,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CPlane;
 class CProvince;
 class CSeasonSchedule;
 class CSpecies;
@@ -43,6 +42,8 @@ class CTerrainFeature;
 class CTimeOfDaySchedule;
 
 namespace stratagus {
+
+class plane;
 
 class world final : public detailed_data_entry, public data_type<world>, public CDataType
 {
@@ -62,8 +63,15 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
+	plane *get_plane() const
+	{
+		return this->plane;
+	}
+
 	int ID = -1;														/// ID of this world
-	CPlane *Plane = nullptr;
+private:
+	plane *plane = nullptr;
+public:
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world

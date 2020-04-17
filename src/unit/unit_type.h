@@ -60,7 +60,6 @@ class MissileType;
 //Wyrmgus start
 class CButtonLevel;
 class CFaction;
-class CPlane;
 class CUniqueItem;
 //Wyrmgus end
 struct lua_State;
@@ -71,6 +70,7 @@ class LuaCallback;
 enum class UnitTypeType;
 
 namespace stratagus {
+	class plane;
 	class terrain_type;
 	class unit_class;
 	class world;
@@ -762,8 +762,8 @@ public:
 	CSpeciesGenus *Genus = nullptr;
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
-	CPlane *HomePlane = nullptr;
-	stratagus::world *Homeworld = nullptr;
+	stratagus::plane *home_plane = nullptr;
+	stratagus::world *homeworld = nullptr;
 	CUnitType *Type = nullptr;
 	std::vector<stratagus::terrain_type *> Terrains;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
@@ -1186,7 +1186,7 @@ extern CUnitTypeVar UnitTypeVar;
 //Wyrmgus start
 extern std::vector<std::vector<CUnitType *>> ClassUnitTypes; //list of unit types belonging to each class
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
-extern CUnitType *SettlementSiteUnitType;
+extern CUnitType *settlement_site_unit_type;
 
 extern std::vector<CSpecies *> Species;
 extern std::vector<CSpeciesGenus *> SpeciesGenuses;

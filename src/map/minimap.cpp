@@ -1360,9 +1360,9 @@ void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 		++NumMinimapEvents;
 	} else {
 		CMapLayer *event_map_layer = CMap::Map.MapLayers[z];
-		if (event_map_layer->Plane != nullptr && CMap::Map.GetCurrentPlane() != event_map_layer->Plane && UI.PlaneButtons[event_map_layer->Plane->ID].X != -1) {
-			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[event_map_layer->Plane->ID].X + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Width / 2);
-			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[event_map_layer->Plane->ID].Y + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Height / 2);
+		if (event_map_layer->plane != nullptr && CMap::Map.GetCurrentPlane() != event_map_layer->plane && UI.PlaneButtons[event_map_layer->plane->ID].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[event_map_layer->plane->ID].X + (UI.PlaneButtons[event_map_layer->plane->ID].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[event_map_layer->plane->ID].Y + (UI.PlaneButtons[event_map_layer->plane->ID].Style->Height / 2);
 		} else if (event_map_layer->world != nullptr && CMap::Map.GetCurrentWorld() != event_map_layer->world && UI.WorldButtons[event_map_layer->world->ID].X != -1) {
 			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[event_map_layer->world->ID].X + (UI.WorldButtons[event_map_layer->world->ID].Style->Width / 2);
 			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[event_map_layer->world->ID].Y + (UI.WorldButtons[event_map_layer->world->ID].Style->Height / 2);

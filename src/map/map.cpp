@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.cpp - The map source file. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Vladi Shabanski,
 //                                 Francois Beerten and Andrettin
 //
@@ -378,7 +376,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeType::Fly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
 			} else {
 				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
@@ -772,8 +770,8 @@ std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const stratagus::map_template
 	}
 
 	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->get_world()) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
+	if (main_template && subtemplate != main_template && main_template->get_plane() && main_template->get_world()) {
+		const int z = GetMapLayer(main_template->get_plane()->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
@@ -836,8 +834,8 @@ CMapLayer *CMap::get_subtemplate_map_layer(const stratagus::map_template *subtem
 	}
 	
 	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->Plane && main_template->get_world()) {
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
+	if (main_template && subtemplate != main_template && main_template->get_plane() && main_template->get_world()) {
+		const int z = GetMapLayer(main_template->get_plane()->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
@@ -866,9 +864,9 @@ std::vector<CUnit *> CMap::get_map_template_layer_connectors(const stratagus::ma
 	}
 	
 	const stratagus::map_template *main_template = map_template->GetTopMapTemplate();
-	if (main_template && main_template->Plane && main_template->get_world()) {
+	if (main_template && main_template->get_plane() && main_template->get_world()) {
 		const bool is_main_template = main_template == map_template;
-		const int z = GetMapLayer(main_template->Plane->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
+		const int z = GetMapLayer(main_template->get_plane()->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
@@ -928,16 +926,16 @@ bool CMap::IsLayerUnderground(int z) const
 	return false;
 }
 
-void CMap::SetCurrentPlane(CPlane *plane)
+void CMap::SetCurrentPlane(stratagus::plane *plane)
 {
-	if (UI.CurrentMapLayer->Plane == plane) {
+	if (UI.CurrentMapLayer->plane == plane) {
 		return;
 	}
 	
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
+		if (Map.MapLayers[z]->plane == plane && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
 			map_layer = z;
 			break;
 		}
@@ -945,7 +943,7 @@ void CMap::SetCurrentPlane(CPlane *plane)
 	
 	if (map_layer == -1) {
 		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			if (Map.MapLayers[z]->Plane == plane) {
+			if (Map.MapLayers[z]->plane == plane) {
 				map_layer = z;
 				break;
 			}
@@ -995,7 +993,7 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == this->GetCurrentPlane() && Map.MapLayers[z]->world == this->GetCurrentWorld() && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+		if (Map.MapLayers[z]->plane == this->GetCurrentPlane() && Map.MapLayers[z]->world == this->GetCurrentWorld() && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			map_layer = z;
 			break;
 		}
@@ -1006,10 +1004,10 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 	}
 }
 
-CPlane *CMap::GetCurrentPlane() const
+stratagus::plane *CMap::GetCurrentPlane() const
 {
 	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->Plane;
+		return UI.CurrentMapLayer->plane;
 	} else {
 		return nullptr;
 	}
@@ -1157,11 +1155,11 @@ void PreprocessMap()
 //Wyrmgus start
 int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, const int surface_layer)
 {
-	CPlane *plane = CPlane::GetPlane(plane_ident, false);
+	stratagus::plane *plane = stratagus::plane::try_get(plane_ident);
 	stratagus::world *world = stratagus::world::try_get(world_ident);
 
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->world == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+		if (CMap::Map.MapLayers[z]->plane == plane && CMap::Map.MapLayers[z]->world == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			return z;
 		}
 	}
@@ -1469,7 +1467,7 @@ void CMap::Clean()
 	//Wyrmgus start
 	this->ClearMapLayers();
 	this->BorderLandmasses.clear();
-	this->SiteUnits.clear();
+	this->site_units.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -1530,7 +1528,7 @@ void CMap::Save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\", %d},\n", this->MapLayers[z]->Plane ? this->MapLayers[z]->Plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->Ident.c_str() : "", this->MapLayers[z]->SurfaceLayer);
+		file.printf("  {\"%s\", \"%s\", %d},\n", this->MapLayers[z]->plane ? this->MapLayers[z]->plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->Ident.c_str() : "", this->MapLayers[z]->SurfaceLayer);
 	}
 	file.printf("  },\n");
 	file.printf("  \"landmasses\", {\n");
@@ -2325,7 +2323,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->Index != PlayerNumNeutral) {
 					new_owner = unit->Player->Index;
 					break;
-				} else if (unit->Player->Index == PlayerNumNeutral && (unit->Type == SettlementSiteUnitType || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
+				} else if (unit->Player->Index == PlayerNumNeutral && (unit->Type == settlement_site_unit_type || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
 					must_have_no_owner = true;
 					break;
 				}
@@ -2970,8 +2968,6 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	if (SaveGameLoading) {
 		return;
 	}
-
-	Vec2i random_pos(0, 0);
 
 	std::vector<Vec2i> seeds;
 

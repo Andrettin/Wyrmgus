@@ -87,17 +87,12 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "circle") {
 			this->circle = string::to_bool(value);
 		} else if (key == "plane") {
-			value = FindAndReplaceString(value, "_", "-");
-			CPlane *plane = CPlane::GetPlane(value);
-			if (plane) {
-				this->Plane = plane;
-			} else {
-				fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
-			}
+			stratagus::plane *plane = plane::get(value);
+			this->plane = plane;
 		} else if (key == "world") {
 			stratagus::world *world = world::get(value);
 			this->world = world;
-			this->Plane = this->world->Plane;
+			this->plane = this->world->get_plane();
 		} else if (key == "surface_layer") {
 			this->SurfaceLayer = std::stoi(value);
 			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
@@ -118,13 +113,13 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "priority") {
 			this->Priority = std::stoi(value);
 		} else if (key == "min_x") {
-			this->MinPos.x = std::stoi(value);
+			this->MinPos.setX(std::stoi(value));
 		} else if (key == "min_y") {
-			this->MinPos.y = std::stoi(value);
+			this->MinPos.setY(std::stoi(value));
 		} else if (key == "max_x") {
-			this->MaxPos.x = std::stoi(value);
+			this->MaxPos.setX(std::stoi(value));
 		} else if (key == "max_y") {
-			this->MaxPos.y = std::stoi(value);
+			this->MaxPos.setY(std::stoi(value));
 		} else if (key == "main_template") {
 			map_template *main_template = map_template::get(value);
 			this->set_main_template(main_template);
@@ -221,6 +216,20 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 
 void map_template::initialize()
 {
+	if (this->get_main_template() != nullptr) {
+		if (!this->get_main_template()->is_initialized()) {
+			this->get_main_template()->initialize();
+		}
+
+		if (this->get_main_template()->get_plane() != nullptr) {
+			this->plane = this->get_main_template()->get_plane();
+		}
+		if (this->get_main_template()->get_world() != nullptr) {
+			this->world = this->get_main_template()->get_world();
+		}
+		this->SurfaceLayer = this->get_main_template()->SurfaceLayer;
+	}
+
 	if (!this->subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
 		std::sort(this->subtemplates.begin(), this->subtemplates.end(), [](const map_template *a, const map_template *b) {
 			if (a->Priority != b->Priority) {
@@ -440,7 +449,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		return;
 	}
 
-	this->current_map_start_pos = template_start_pos;
+	this->current_map_start_pos = map_start_pos;
+	this->current_start_pos = template_start_pos;
 
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	
@@ -457,13 +467,13 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		map_layer->ID = CMap::Map.MapLayers.size();
 		CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
 		CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
-		map_layer->Plane = this->Plane;
+		map_layer->plane = this->get_plane();
 		map_layer->world = this->get_world();
 		map_layer->SurfaceLayer = this->SurfaceLayer;
 		CMap::Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
-			CMap::Map.MapLayers[z]->Plane = this->Plane;
+			CMap::Map.MapLayers[z]->plane = this->get_plane();
 			CMap::Map.MapLayers[z]->world = this->get_world();
 			CMap::Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
 		}
@@ -473,8 +483,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (Editor.Running == EditorNotRunning) {
 			if (this->get_world() != nullptr && this->get_world()->SeasonSchedule) {
 				CMap::Map.MapLayers[z]->SeasonSchedule = this->get_world()->SeasonSchedule;
-			} else if (!this->get_world() && this->Plane && this->Plane->SeasonSchedule) {
-				CMap::Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
+			} else if (!this->get_world() && this->get_plane() && this->get_plane()->SeasonSchedule) {
+				CMap::Map.MapLayers[z]->SeasonSchedule = this->get_plane()->SeasonSchedule;
 			} else {
 				CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
 			}
@@ -491,8 +501,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 			) {
 				if (this->get_world() && this->get_world()->TimeOfDaySchedule) {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->get_world()->TimeOfDaySchedule;
-				} else if (!this->get_world() && this->Plane && this->Plane->TimeOfDaySchedule) {
-					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->Plane->TimeOfDaySchedule;
+				} else if (!this->get_world() && this->get_plane() && this->get_plane()->TimeOfDaySchedule) {
+					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->get_plane()->TimeOfDaySchedule;
 				} else {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
 				}
@@ -686,7 +696,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (current_campaign != nullptr) {
 		this->ApplyConnectors(template_start_pos, map_start_pos, map_end, z);
 	}
-	this->ApplySites(template_start_pos, map_start_pos, map_end, z);
+	this->apply_sites(template_start_pos, map_start_pos, map_end, z);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z);
 	
 	bool generated_random_terrain = false;
@@ -717,7 +727,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (current_campaign != nullptr) {
 		this->ApplyConnectors(template_start_pos, map_start_pos, map_end, z, true);
 	}
-	this->ApplySites(template_start_pos, map_start_pos, map_end, z, true);
+	this->apply_sites(template_start_pos, map_start_pos, map_end, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z, true);
 
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -799,7 +809,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
 	for (map_template *subtemplate : this->get_subtemplates()) {
-		Vec2i subtemplate_pos(subtemplate->SubtemplatePosition - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
+		Vec2i subtemplate_pos(subtemplate->get_subtemplate_pos() - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
 		bool found_location = false;
 		
 		if (subtemplate->UpperTemplate && (subtemplate_pos.x < 0 || subtemplate_pos.y < 0)) { //if has no given position, but has an upper template, use its coordinates instead
@@ -824,21 +834,21 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 				Vec2i min_pos(map_start_pos);
 				Vec2i max_pos(map_end.x() - subtemplate->get_applied_width(), map_end.y() - subtemplate->get_applied_height());
 				
-				if (subtemplate->MinPos.x != -1) {
-					min_pos.x += subtemplate->MinPos.x;
+				if (subtemplate->MinPos.x() != -1) {
+					min_pos.x += subtemplate->MinPos.x();
 					min_pos.x -= template_start_pos.x();
 				}
-				if (subtemplate->MinPos.y != -1) {
-					min_pos.y += subtemplate->MinPos.y;
+				if (subtemplate->MinPos.y() != -1) {
+					min_pos.y += subtemplate->MinPos.y();
 					min_pos.y -= template_start_pos.y();
 				}
 				
-				if (subtemplate->MaxPos.x != -1) {
-					max_pos.x += subtemplate->MaxPos.x;
+				if (subtemplate->MaxPos.x() != -1) {
+					max_pos.x += subtemplate->MaxPos.x();
 					max_pos.x -= this->get_applied_width();
 				}
-				if (subtemplate->MaxPos.y != -1) {
-					max_pos.y += subtemplate->MaxPos.y;
+				if (subtemplate->MaxPos.y() != -1) {
+					max_pos.y += subtemplate->MaxPos.y();
 					max_pos.y -= this->get_applied_height();
 				}
 				
@@ -972,6 +982,8 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y < CMap::Map.Info.MapHeights[z]) {
 				subtemplate->Apply(subtemplate->get_start_pos(), subtemplate_pos, z);
 			}
+		} else {
+			throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
 		}
 	}
 }
@@ -984,7 +996,7 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 **	@param	z					The map layer
 **	@param	random				Whether it is sites with a random position that should be applied, or ones with a fixed one
 */
-void map_template::ApplySites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
+void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	CDate start_date;
@@ -992,20 +1004,18 @@ void map_template::ApplySites(const QPoint &template_start_pos, const QPoint &ma
 		start_date = current_campaign->GetStartDate();
 	}
 
-	for (size_t site_index = 0; site_index < this->Sites.size(); ++site_index) {
-		CSite *site = this->Sites[site_index];
-		
+	for (site *site : this->sites) {
 		Vec2i site_raw_pos(site->Position);
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
-		Vec2i unit_offset((SettlementSiteUnitType->TileSize - 1) / 2);
+		Vec2i unit_offset((settlement_site_unit_type->TileSize - 1) / 2);
 			
 		if (random) {
 			if (site_raw_pos.x != -1 || site_raw_pos.y != -1) {
 				continue;
 			}
-			if (SettlementSiteUnitType) {
-				site_pos = CMap::Map.GenerateUnitLocation(SettlementSiteUnitType, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			if (settlement_site_unit_type) {
+				site_pos = CMap::Map.GenerateUnitLocation(settlement_site_unit_type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
 				site_pos += unit_offset;
 			}
 		} else {
@@ -1018,14 +1028,14 @@ void map_template::ApplySites(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 
-		if (site->Major && SettlementSiteUnitType) { //add a settlement site for major sites
-			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileSize - 1), z)) {
+		if (site->Major && settlement_site_unit_type) { //add a settlement site for major sites
+			if (!UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->TileSize - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
 			}
-			CUnit *unit = CreateUnit(site_pos - unit_offset, *SettlementSiteUnitType, CPlayer::Players[PlayerNumNeutral], z, true);
-			unit->Settlement = site;
-			unit->Settlement->SiteUnit = unit;
-			CMap::Map.SiteUnits.push_back(unit);
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true);
+			unit->settlement = site;
+			unit->settlement->site_unit = unit;
+			CMap::Map.site_units.push_back(unit);
 		}
 		
 		for (size_t j = 0; j < site->HistoricalResources.size(); ++j) {
@@ -1038,7 +1048,7 @@ void map_template::ApplySites(const QPoint &template_start_pos, const QPoint &ma
 			) {
 				const CUnitType *type = std::get<2>(site->HistoricalResources[j]);
 				if (!type) {
-					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
+					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
 					continue;
 				}
 				Vec2i unit_offset((type->TileSize - 1) / 2);
@@ -1130,7 +1140,7 @@ void map_template::ApplySites(const QPoint &template_start_pos, const QPoint &ma
 					continue;
 				}
 				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->Major) {
-					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
+					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
 					continue;
 				}
 				Vec2i unit_offset((unit_type->TileSize - 1) / 2);
@@ -1256,7 +1266,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (CMap::Map.MapLayers[second_z]->Plane == std::get<2>(this->PlaneConnectors[i])) {
+			if (CMap::Map.MapLayers[second_z]->plane == std::get<2>(this->PlaneConnectors[i])) {
 				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
 					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
 						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
@@ -1343,7 +1353,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
 			std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
 			for (const CUnit *connector : other_layer_connectors) {
-				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->Plane == this->Plane && connector->ConnectingDestination->MapLayer->world == this->get_world() && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
+				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->plane == this->get_plane() && connector->ConnectingDestination->MapLayer->world == this->get_world() && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
 					already_implemented = true;
 					break;
 				}
@@ -1745,8 +1755,8 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;
 				} else if (random) {
-					if (historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-						pos = historical_location->Site->SiteUnit->GetTileCenterPos();
+					if (historical_location->site != nullptr && historical_location->site->site_unit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+						pos = historical_location->site->site_unit->GetTileCenterPos();
 					}
 				}
 			} else {
