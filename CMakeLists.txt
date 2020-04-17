@@ -410,6 +410,7 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
+	src/util/point_container.cpp
 	src/util/util.cpp
 )
 source_group(util FILES ${util_SRCS})
@@ -703,6 +704,7 @@ set(stratagus_upgrade_HDRS
 set(stratagus_util_HDRS
 	src/util/container_util.h
 	src/util/exception_util.h
+	src/util/point_container.h
 	src/util/point_util.h
 	src/util/qunique_ptr.h
 	src/util/singleton.h
