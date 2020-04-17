@@ -784,7 +784,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus start
 			if (
 				(mf->Flags & MapFieldDesert)
-				&& mf->Owner != unit.Player->Index
+				&& mf->get_owner() != unit.Player
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
 				&& unit.MapLayer->GetTimeOfDay()
 				&& unit.MapLayer->GetTimeOfDay()->Day

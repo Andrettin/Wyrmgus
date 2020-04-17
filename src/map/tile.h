@@ -143,6 +143,7 @@ class CTerrainFeature;
 struct lua_State;
 
 namespace stratagus {
+	class site;
 	class terrain_type;
 }
 
@@ -263,6 +264,23 @@ public:
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
+
+	CPlayer *get_owner() const;
+
+	stratagus::site *get_settlement() const
+	{
+		return this->settlement;
+	}
+
+	void set_settlement(stratagus::site *settlement)
+	{
+		if (settlement == this->get_settlement()) {
+			return;
+		}
+
+		this->settlement = settlement;
+	}
+
 public:
 	//Wyrmgus start
 //	unsigned short Flags;      /// field flags
@@ -286,11 +304,13 @@ public:
 	//Wyrmgus start
 //	unsigned char Value;       /// HP for walls / wood regeneration
 	short Value;       /// HP for walls/ Wood Regeneration
-	int Landmass;			   /// To which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
-	short Owner;			   /// To which player (if any) this tile belongs to
-	short OwnershipBorderTile;	/// The transition type of the border between this tile's owner, and other players' tiles, if applicable)
+	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
+	short OwnershipBorderTile;	/// the transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	//Wyrmgus end
-	CUnitCache UnitCache;      /// A unit on the map field.
+private:
+	stratagus::site *settlement = nullptr;
+public:
+	CUnitCache UnitCache;      /// a unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
 };

@@ -213,7 +213,6 @@ public:
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
 	void CalculateTileTerrainFeature(const Vec2i &pos, int z);
-	void CalculateTileOwnership(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustMap();
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
@@ -221,6 +220,8 @@ public:
 	void GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
 	void GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template);
+	void generate_settlement_territories(const int z);
+	void calculate_settlement_territory_border_tiles(const int z);
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
@@ -267,7 +268,8 @@ public:
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
 	bool TileBordersTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain_type *new_terrain, const int z) const;
-	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
+	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
+	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
@@ -437,14 +439,6 @@ extern MapMarkerFunc MapMarkTileRadarJammer;
 /// Unmark a tile as jammed, decrease is jamming'ness
 extern MapMarkerFunc MapUnmarkTileRadarJammer;
 
-//Wyrmgus start
-/// Mark a tile for ownership
-extern MapMarkerFunc MapMarkTileOwnership;
-
-/// Unmark a tile for ownership
-extern MapMarkerFunc MapUnmarkTileOwnership;
-//Wyrmgus end
-
 //
 // in map_wall.c
 //
@@ -552,14 +546,3 @@ inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w,
 {
 	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer, z);
 }
-
-//Wyrmgus start
-inline void MapMarkOwnership(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
-{
-	MapSight(player, pos, w, h, range, MapMarkTileOwnership, z);
-}
-inline void MapUnmarkOwnership(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
-{
-	MapSight(player, pos, w, h, range, MapUnmarkTileOwnership, z);
-}
-//Wyrmgus end

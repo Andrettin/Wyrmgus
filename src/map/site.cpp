@@ -31,9 +31,12 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "map/map.h"
+#include "map/map_layer.h"
 #include "map/map_template.h"
 #include "player.h" //for factions
 #include "province.h" //for regions
+#include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
@@ -206,6 +209,60 @@ std::string site::GetCulturalName(const stratagus::civilization *civilization) c
 	}
 	
 	return this->get_name();
+}
+
+void site::set_site_unit(CUnit *unit)
+{
+	if (unit == this->get_site_unit()) {
+		return;
+	}
+
+	this->site_unit = unit;
+
+	if (this->site_unit != nullptr && this->site_unit->Player != nullptr && this->site_unit->Player->Index != PlayerNumNeutral) {
+		this->set_owner(this->site_unit->Player);
+	} else {
+		this->set_owner(nullptr);
+	}
+}
+
+void site::set_owner(CPlayer *player)
+{
+	if (player == this->get_owner()) {
+		return;
+	}
+
+	this->owner = player;
+	this->update_border_tile_graphics();
+}
+
+void site::update_border_tile_graphics()
+{
+	if (this->get_site_unit() != nullptr) {
+		const int z = this->get_site_unit()->MapLayer->ID;
+		for (const QPoint &tile_pos : this->border_tiles) {
+			CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+
+			//update adjacent tiles with different settlements as well
+			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+					if (x_offset == 0 && y_offset == 0) {
+						continue;
+					}
+
+					const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
+					if (!CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						continue;
+					}
+
+					CMapField *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
+					if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
+						CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
+					}
+				}
+			}
+		}
+	}
 }
 
 }

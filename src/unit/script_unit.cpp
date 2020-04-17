@@ -342,7 +342,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = stratagus::site::get(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || settlement_site_unit_type == type) {
-				unit->settlement->site_unit = unit;
+				unit->settlement->set_site_unit(unit);
 				CMap::Map.site_units.push_back(unit);
 			}
 		} else if (!strcmp(value, "trait")) {
@@ -1022,6 +1022,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
+		unit->MapLayer = CMap::Map.MapLayers[z];
 		unit->ReplaceOnTop(*on_top);
 		unit->Place(ipos, z);
 		UpdateForNewUnit(*unit, 0);

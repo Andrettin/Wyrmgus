@@ -533,7 +533,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain
 	return true;
 }
 
-bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
+bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse) const
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -549,6 +549,27 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
 		}
 	}
 		
+	return false;
+}
+
+bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int z) const
+{
+	stratagus::site *tile_settlement = this->Field(pos, z)->get_settlement();
+
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			const QPoint adjacent_pos(pos.x() + sub_x, pos.y() + sub_y);
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+
+			stratagus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
+			if (tile_settlement != adjacent_tile_settlement) {
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -1118,17 +1139,21 @@ void PreprocessMap()
 		}
 	}
 	*/
+
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		CMap::Map.generate_settlement_territories(z);
+
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
-				CMapField &mf = *CMap::Map.Field(ix, iy, z);
-				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
-				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
-				CMap::Map.CalculateTileLandmass(Vec2i(ix, iy), z);
-				CMap::Map.CalculateTileOwnership(Vec2i(ix, iy), z);
-				CMap::Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
+				const QPoint tile_pos(ix, iy);
+				CMapField &mf = *CMap::Map.Field(tile_pos, z);
+				CMap::Map.CalculateTileTransitions(tile_pos, false, z);
+				CMap::Map.CalculateTileTransitions(tile_pos, true, z);
+				CMap::Map.CalculateTileLandmass(tile_pos, z);
+				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+				CMap::Map.CalculateTileTerrainFeature(tile_pos, z);
 				mf.UpdateSeenTile();
-				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
+				UI.Minimap.UpdateXY(tile_pos, z);
 				if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf, z);
 				}
@@ -1780,23 +1805,6 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 			}
 		}
 	}
-	
-	if (terrain->Overlay) {
-		if ((terrain->Flags & MapFieldUnpassable) || (old_terrain && (old_terrain->Flags & MapFieldUnpassable))) {
-			Map.CalculateTileOwnership(pos, z);
-			
-			for (int x_offset = -16; x_offset <= 16; ++x_offset) {
-				for (int y_offset = -16; y_offset <= 16; ++y_offset) {
-					if (x_offset != 0 || y_offset != 0) {
-						Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-						if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-							Map.CalculateTileOwnership(adjacent_pos, z);
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 //Wyrmgus start
@@ -1835,21 +1843,6 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
-				}
-			}
-		}
-	}
-	
-	if (old_terrain->Flags & MapFieldUnpassable) {
-		Map.CalculateTileOwnership(pos, z);
-			
-		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
-			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
-				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						Map.CalculateTileOwnership(adjacent_pos, z);
-					}
 				}
 			}
 		}
@@ -1920,21 +1913,6 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
-				}
-			}
-		}
-	}
-	
-	if (mf.OverlayTerrain->Flags & MapFieldUnpassable) {
-		Map.CalculateTileOwnership(pos, z);
-			
-		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
-			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
-				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						Map.CalculateTileOwnership(adjacent_pos, z);
-					}
 				}
 			}
 		}
@@ -2301,97 +2279,6 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
-{
-	if (!this->Info.IsPointOnMap(pos, z)) {
-		return;
-	}
-
-	CMapField &mf = *this->Field(pos, z);
-	
-	int new_owner = -1;
-	bool must_have_no_owner = false;
-	
-	if (mf.Flags & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
-		const CUnitCache &cache = mf.UnitCache;
-		for (size_t i = 0; i != cache.size(); ++i) {
-			CUnit *unit = cache[i];
-			if (!unit) {
-				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
-			}
-			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
-				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->Index != PlayerNumNeutral) {
-					new_owner = unit->Player->Index;
-					break;
-				} else if (unit->Player->Index == PlayerNumNeutral && (unit->Type == settlement_site_unit_type || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
-					must_have_no_owner = true;
-					break;
-				}
-			}
-		}
-	}
-
-	if (new_owner == -1 && !must_have_no_owner) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
-		std::vector<unsigned long> obstacle_flags;
-		obstacle_flags.push_back(MapFieldCoastAllowed);
-		obstacle_flags.push_back(MapFieldUnpassable);
-
-		std::vector<CUnit *> table;
-		Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), table, z);
-		for (size_t i = 0; i != table.size(); ++i) {
-			CUnit *unit = table[i];
-			if (!unit) {
-				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit within the tile's range is null.\n", pos.x, pos.y);
-			}
-			if (unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapDistanceTo(pos, z) <= unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-				bool obstacle_check = true;
-				for (size_t j = 0; j < obstacle_flags.size(); ++j) {
-					bool obstacle_subcheck = false;
-					for (int x = 0; x < unit->Type->TileSize.x; ++x) {
-						for (int y = 0; y < unit->Type->TileSize.y; ++y) {
-							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
-								obstacle_subcheck = true;
-								break;
-							}
-						}
-						if (obstacle_subcheck) {
-							break;
-						}
-					}
-					if (!obstacle_subcheck) {
-						obstacle_check = false;
-						break;
-					}
-				}
-				if (!obstacle_check) {
-					continue;
-				}
-				new_owner = unit->Player->Index;
-				break;
-			}
-		}
-	}
-	
-	if (new_owner != mf.Owner) {
-		mf.Owner = new_owner;
-		
-		this->CalculateTileOwnershipTransition(pos, z);
-		
-		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-							
-						this->CalculateTileOwnershipTransition(adjacent_pos, z);
-					}
-				}
-			}
-		}
-	}
-}
-
 void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 {
 	if (!this->Info.IsPointOnMap(pos, z)) {
@@ -2406,7 +2293,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	
 	mf.OwnershipBorderTile = -1;
 
-	if (mf.Owner == -1) {
+	if (mf.get_owner() == nullptr) {
 		return;
 	}
 	
@@ -2418,7 +2305,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-					if (adjacent_mf.Owner != mf.Owner) {
+					if (adjacent_mf.get_owner() != mf.get_owner()) {
 						adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
 				}
@@ -3166,6 +3053,159 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 			//set the terrain and overlay terrain to the same as the most-neighbored one
 			tile->SetTerrain(best_terrain_type_pair.first);
 			tile->SetTerrain(best_terrain_type_pair.second);
+		}
+	}
+}
+
+void CMap::generate_settlement_territories(const int z)
+{
+	if (SaveGameLoading) {
+		return;
+	}
+
+	std::vector<QPoint> seeds;
+
+	for (const CUnit *site_unit : this->site_units) {
+		if (site_unit->MapLayer->ID != z) {
+			continue;
+		}
+
+		for (int x = site_unit->tilePos.x; x < (site_unit->tilePos.x + site_unit->Type->GetTileSize().x); ++x) {
+			for (int y = site_unit->tilePos.y; y < (site_unit->tilePos.y + site_unit->Type->GetTileSize().y); ++y) {
+				QPoint tile_pos(x, y);
+				this->Field(tile_pos, z)->set_settlement(site_unit->settlement);
+
+				seeds.push_back(std::move(tile_pos));
+			}
+		}
+	}
+
+	//expand seeds
+	while (!seeds.empty()) {
+		QPoint seed_pos = seeds[SyncRand(seeds.size())];
+		stratagus::vector::remove(seeds, seed_pos);
+
+		stratagus::site *settlement = this->Field(seed_pos, z)->get_settlement();
+
+		std::vector<QPoint> adjacent_positions;
+		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
+			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
+				const QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
+				const QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
+				const QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
+
+				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
+					continue;
+				}
+
+				CMapField *diagonal_tile = this->Field(diagonal_pos, z);
+				CMapField *vertical_tile = this->Field(vertical_pos, z);
+				CMapField *horizontal_tile = this->Field(horizontal_pos, z);
+
+				if ( //the tiles must either have no settlement, or have the settlement we want to assign
+					(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
+					|| (vertical_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != settlement)
+					|| (horizontal_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != settlement)
+				) {
+					continue;
+				}
+
+				if (diagonal_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != nullptr) { //at least one of the tiles being expanded to must have no assigned settlement
+					continue;
+				}
+
+				adjacent_positions.push_back(diagonal_pos);
+			}
+		}
+
+		if (adjacent_positions.size() > 0) {
+			if (adjacent_positions.size() > 1) {
+				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
+			}
+
+			QPoint adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+			QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
+			QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
+
+			this->Field(adjacent_pos, z)->set_settlement(settlement);
+			this->Field(adjacent_pos_horizontal, z)->set_settlement(settlement);
+			this->Field(adjacent_pos_vertical, z)->set_settlement(settlement);
+
+			seeds.push_back(adjacent_pos);
+			seeds.push_back(adjacent_pos_horizontal);
+			seeds.push_back(adjacent_pos_vertical);
+		}
+	}
+
+	//set the settlement of the remaining tiles without any to their most-neighbored settlement
+	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
+		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
+			const QPoint tile_pos(x, y);
+
+			CMapField *tile = this->Field(x, y, z);
+
+			if (tile->get_settlement() != nullptr) {
+				continue;
+			}
+
+			std::map<stratagus::site *, int> settlement_neighbor_count;
+
+			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+					if (x_offset == 0 && y_offset == 0) {
+						continue;
+					}
+
+					QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
+
+					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+						continue;
+					}
+
+					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
+					stratagus::site *adjacent_settlement = adjacent_tile->get_settlement();
+
+					if (adjacent_settlement == nullptr) {
+						continue;
+					}
+
+					settlement_neighbor_count[adjacent_settlement]++;
+				}
+			}
+
+			stratagus::site *best_settlement = nullptr;
+			int best_settlement_neighbor_count = 0;
+			for (const auto &kv_pair : settlement_neighbor_count) {
+				if (kv_pair.second > best_settlement_neighbor_count) {
+					best_settlement = kv_pair.first;
+					best_settlement_neighbor_count = kv_pair.second;
+				}
+			}
+
+			//set the settlement to the same as the most-neighbored one
+			tile->set_settlement(best_settlement);
+		}
+	}
+
+	this->calculate_settlement_territory_border_tiles(z);
+}
+
+void CMap::calculate_settlement_territory_border_tiles(const int z)
+{
+	for (stratagus::site *site : stratagus::site::get_all()) {
+		site->clear_border_tiles();
+	}
+
+	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
+		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
+			const QPoint tile_pos(x, y);
+			if (this->tile_borders_other_settlement_territory(tile_pos, z)) {
+				const CMapField *tile = this->Field(x, y, z);
+				stratagus::site *settlement = tile->get_settlement();
+				if (settlement != nullptr) {
+					settlement->add_border_tile(tile_pos);
+				}
+			}
 		}
 	}
 }

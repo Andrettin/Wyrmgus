@@ -287,12 +287,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.TransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
 					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
 						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
 					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
-						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.get_owner()->Index, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				if (mf.OverlayTerrain && mf.OverlayTransitionTiles.size() == 0) {
@@ -300,7 +300,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTerrain->GetGraphics(season)->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 					if (mf.OverlayTerrain->PlayerColorGraphics) {
-						mf.OverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
+						mf.OverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.get_owner() != nullptr) ? mf.get_owner()->Index : PlayerNumNeutral, mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
@@ -308,15 +308,15 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 					if (mf.OverlayTransitionTiles[i].first->PlayerColorGraphics) {
-						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlayTransitionTiles[i].second, dx, dy, false);
+						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.get_owner() != nullptr) ? mf.get_owner()->Index : PlayerNumNeutral, mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
 					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
 						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
 					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
-						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.get_owner()->Index, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
@@ -334,12 +334,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenTransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable_seen) {
+				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable_seen) {
 					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
 						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
 					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
-						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.get_owner()->Index, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
@@ -347,7 +347,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenOverlayTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 					if (mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics) {
-						mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
+						mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.get_owner() != nullptr) ? mf.get_owner()->Index : PlayerNumNeutral, mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
@@ -355,15 +355,15 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics) {
-						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
+						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.get_owner() != nullptr) ? mf.get_owner()->Index : PlayerNumNeutral, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable_seen) {
+				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable_seen) {
 					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
 						CMap::Map.BorderTerrain->GetGraphics(season)->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
 					if (CMap::Map.BorderTerrain->PlayerColorGraphics) {
-						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+						CMap::Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.get_owner()->Index, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {

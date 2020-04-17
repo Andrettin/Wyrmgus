@@ -592,8 +592,8 @@ void CUnit::Release(bool final)
 	Type = nullptr;
 	//Wyrmgus start
 	Character = nullptr;
-	if (this->settlement != nullptr && this->settlement->site_unit == this) {
-		this->settlement->site_unit = nullptr;
+	if (this->settlement != nullptr && this->settlement->get_site_unit() == this) {
+		this->settlement->set_site_unit(nullptr);
 	}
 	this->settlement = nullptr;
 	Trait = nullptr;
@@ -666,7 +666,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	if (replaced_unit.settlement != nullptr) {
 		this->settlement = replaced_unit.settlement;
 		if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
-			this->settlement->site_unit = this;
+			this->settlement->set_site_unit(this);
 			CMap::Map.site_units.erase(std::remove(CMap::Map.site_units.begin(), CMap::Map.site_units.end(), &replaced_unit), CMap::Map.site_units.end());
 			CMap::Map.site_units.push_back(this);
 		}
@@ -2928,6 +2928,15 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		}
 		
 		this->UpdateSoldUnits();
+
+		if (this->settlement != nullptr && this->settlement->get_site_unit() == this) {
+			//update settlement ownership
+			if (player.Index != PlayerNumNeutral) {
+				this->settlement->set_owner(&player);
+			} else {
+				this->settlement->set_owner(nullptr);
+			}
+		}
 	}
 	//Wyrmgus end
 }
@@ -3108,13 +3117,6 @@ void MapMarkUnitSight(CUnit &unit)
 							   unit.Type->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
 		}
 	}
-
-	//Wyrmgus start
-	if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-		MapMarkOwnership(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-						   unit.Type->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer->ID);
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -3149,13 +3151,6 @@ void MapUnmarkUnitSight(CUnit &unit)
 		}
 		
 	}
-	
-	//Wyrmgus start
-	if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-		MapUnmarkOwnership(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-							 unit.Type->TileSize.y, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer->ID);
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -3482,7 +3477,7 @@ void CUnit::UpdateSettlement()
 			std::vector<stratagus::site *> potential_settlements;
 			if (civilization) {
 				for (stratagus::site *site : civilization->sites) {
-					if (!site->site_unit) {
+					if (!site->get_site_unit()) {
 						potential_settlements.push_back(site);
 					}
 				}
@@ -3490,7 +3485,7 @@ void CUnit::UpdateSettlement()
 			
 			if (potential_settlements.empty() && faction) {
 				for (stratagus::site *site : faction->sites) {
-					if (!site->site_unit) {
+					if (!site->get_site_unit()) {
 						potential_settlements.push_back(site);
 					}
 				}
@@ -3498,7 +3493,7 @@ void CUnit::UpdateSettlement()
 			
 			if (potential_settlements.empty()) {
 				for (stratagus::site *site : stratagus::site::get_all()) {
-					if (!site->site_unit) {
+					if (!site->get_site_unit()) {
 						potential_settlements.push_back(site);
 					}
 				}
@@ -3506,7 +3501,7 @@ void CUnit::UpdateSettlement()
 			
 			if (potential_settlements.size() > 0) {
 				this->settlement = potential_settlements[SyncRand(potential_settlements.size())];
-				this->settlement->site_unit = this;
+				this->settlement->set_site_unit(this);
 				CMap::Map.site_units.push_back(this);
 			}
 		}
@@ -3774,6 +3769,8 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != nullptr) {
+		unit->MapLayer = CMap::Map.MapLayers[z];
+
 		Vec2i res_pos;
 		const int heading = SyncRand() % 256;
 		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
@@ -4144,7 +4141,7 @@ void UnitLost(CUnit &unit)
 				if (unit.settlement != nullptr) {
 					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
 						temp->settlement = unit.settlement;
-						temp->settlement->site_unit = temp;
+						temp->settlement->set_site_unit(temp);
 						CMap::Map.site_units.erase(std::remove(CMap::Map.site_units.begin(), CMap::Map.site_units.end(), &unit), CMap::Map.site_units.end());
 						CMap::Map.site_units.push_back(temp);
 					}
@@ -4158,8 +4155,8 @@ void UnitLost(CUnit &unit)
 				//Wyrmgus end
 			}
 		//Wyrmgus start
-		} else if (unit.settlement && unit.settlement->site_unit == &unit) {
-			unit.settlement->site_unit = nullptr;
+		} else if (unit.settlement && unit.settlement->get_site_unit() == &unit) {
+			unit.settlement->set_site_unit(nullptr);
 		//Wyrmgus end
 		}
 	}

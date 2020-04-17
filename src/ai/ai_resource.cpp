@@ -1178,8 +1178,8 @@ static void AiCheckingWork()
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 			queuep->settlement
 			&& (
-				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->site_unit->Player != AiPlayer->Player)
-				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->site_unit->Player->Index != PlayerNumNeutral)
+				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->get_site_unit()->Player != AiPlayer->Player)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->get_site_unit()->Player->Index != PlayerNumNeutral)
 			)
 		) {
 			AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
@@ -2616,7 +2616,7 @@ static void AiCheckMinecartConstruction()
 					continue;
 				}
 						
-				const CUnit *town_hall_unit = mine_settlement->site_unit;
+				const CUnit *town_hall_unit = mine_settlement->get_site_unit();
 				
 				if (!town_hall_unit) {
 					continue;

@@ -1034,7 +1034,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true);
 			unit->settlement = site;
-			unit->settlement->site_unit = unit;
+			unit->settlement->set_site_unit(unit);
 			CMap::Map.site_units.push_back(unit);
 		}
 		
@@ -1755,8 +1755,8 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;
 				} else if (random) {
-					if (historical_location->site != nullptr && historical_location->site->site_unit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-						pos = historical_location->site->site_unit->GetTileCenterPos();
+					if (historical_location->site != nullptr && historical_location->site->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+						pos = historical_location->site->get_site_unit()->GetTileCenterPos();
 					}
 				}
 			} else {

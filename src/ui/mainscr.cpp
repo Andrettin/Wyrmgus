@@ -1048,8 +1048,8 @@ void DrawPopups()
 					PixelPos tile_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
 					std::string terrain_feature_name = mf.TerrainFeature->Name;
-					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(CPlayer::Players[mf.Owner]->Race) != mf.TerrainFeature->CulturalNames.end()) {
-						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(CPlayer::Players[mf.Owner]->Race)->second;
+					if (mf.get_owner() != nullptr && mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race) != mf.TerrainFeature->CulturalNames.end()) {
+						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race)->second;
 					}
 					if (!Preference.NoStatusLineTooltips) {
 						CLabel label(GetGameFont());

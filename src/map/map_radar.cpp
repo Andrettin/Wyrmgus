@@ -197,23 +197,3 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
 	MapUnmarkTileRadarJammer(player, CMap::Map.getIndex(x, y, z), z);
 }
-
-void MapMarkTileOwnership(const CPlayer &player, const unsigned int index, int z)
-{
-}
-
-void MapMarkTileOwnership(const CPlayer &player, int x, int y, int z)
-{
-	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
-	MapMarkTileOwnership(player, CMap::Map.getIndex(x, y, z), z);
-}
-
-void MapUnmarkTileOwnership(const CPlayer &player, const unsigned int index, int z)
-{
-}
-
-void MapUnmarkTileOwnership(const CPlayer &player, int x, int y, int z)
-{
-	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
-	MapUnmarkTileOwnership(player, CMap::Map.getIndex(x, y, z), z);
-}

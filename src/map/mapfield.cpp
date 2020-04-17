@@ -40,6 +40,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player.h"
@@ -52,7 +53,6 @@ CMapField::CMapField() :
 	cost(0),
 	Value(0),
 	Landmass(0),
-	Owner(-1),
 	OwnershipBorderTile(-1),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
@@ -409,7 +409,7 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, %2d", (TerrainFeature && !TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, Owner);
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (TerrainFeature && !TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -591,7 +591,10 @@ void CMapField::parse(lua_State *l)
 	this->Value = LuaToNumber(l, -1, 11);
 	this->cost = LuaToNumber(l, -1, 12);
 	this->Landmass = LuaToNumber(l, -1, 13);
-	this->Owner = LuaToNumber(l, -1, 14);
+	const std::string settlement_identifier = LuaToString(l, -1, 14);
+	if (!settlement_identifier.empty()) {
+		this->settlement = stratagus::site::get(settlement_identifier);
+	}
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -736,6 +739,21 @@ bool CMapField::RockOnMap() const
 bool CMapField::isAWall() const
 {
 	return CheckMask(MapFieldWall);
+}
+
+CPlayer *CMapField::get_owner() const
+{
+	if (this->get_settlement() == nullptr) {
+		return nullptr;
+	}
+
+	const CUnit *site_unit = this->get_settlement()->get_site_unit();
+
+	if (site_unit == nullptr || site_unit->Player->Index == PlayerNumNeutral) {
+		return nullptr;
+	}
+
+	return site_unit->Player;
 }
 
 //

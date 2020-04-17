@@ -1863,7 +1863,7 @@ bool CPlayer::HasSettlement(const stratagus::site *settlement) const
 		return false;
 	}
 	
-	if (settlement->site_unit && settlement->site_unit->Player == this) {
+	if (settlement->get_site_unit() && settlement->get_site_unit()->Player == this) {
 		return true;
 	}
 
@@ -2016,7 +2016,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		//check if the required core settlements are owned by the player
 		if (CCampaign::GetCurrentCampaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
-				if (!faction->Cores[i]->site_unit || faction->Cores[i]->site_unit->Player != this || faction->Cores[i]->site_unit->CurrentAction() == UnitAction::Built) {
+				if (!faction->Cores[i]->get_site_unit() || faction->Cores[i]->get_site_unit()->Player != this || faction->Cores[i]->get_site_unit()->CurrentAction() == UnitAction::Built) {
 					return false;
 				}
 			}

@@ -496,11 +496,8 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	std::vector<unsigned long> obstacle_flags;
 	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
 	
-	if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
-	} else {
-		if (CMap::Map.IsLayerUnderground(z)) {
-			obstacle_flags.push_back(MapFieldAirUnpassable);
-		}
+	if (CMap::Map.IsLayerUnderground(z)) {
+		obstacle_flags.push_back(MapFieldAirUnpassable);
 	}
 	//Wyrmgus end
 	
@@ -558,11 +555,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			marker(player, mpos, z);
 			//Wyrmgus end
 #endif
-			//Wyrmgus start
-			if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
-				CMap::Map.CalculateTileOwnership(mpos, z);
-			}
-			//Wyrmgus end
 		}
 	}
 	for (int offsety = 0; offsety < h; ++offsety) {
@@ -615,11 +607,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			marker(player, mpos, z);
 			//Wyrmgus end
 #endif
-			//Wyrmgus start
-			if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
-				CMap::Map.CalculateTileOwnership(mpos, z);
-			}
-			//Wyrmgus end
 		}
 	}
 	// bottom hemi-cycle
@@ -678,11 +665,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			marker(player, mpos, z);
 			//Wyrmgus end
 #endif
-			//Wyrmgus start
-			if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
-				CMap::Map.CalculateTileOwnership(mpos, z);
-			}
-			//Wyrmgus end
 		}
 	}
 }

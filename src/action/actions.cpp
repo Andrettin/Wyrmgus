@@ -480,9 +480,9 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			unit.Type->BoolFlag[ORGANIC_INDEX].value
-			&& CMap::Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)
-			&& (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert)
-			&& unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Owner != unit.Player->Index
+			&& CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)
+			&& (unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldDesert)
+			&& unit.MapLayer->Field(unit.tilePos)->get_owner() != unit.Player
 			&& unit.MapLayer->GetTimeOfDay()
 			&& unit.MapLayer->GetTimeOfDay()->Day
 			&& unit.Variable[HYDRATING_INDEX].Value <= 0
