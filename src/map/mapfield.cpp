@@ -747,13 +747,7 @@ CPlayer *CMapField::get_owner() const
 		return nullptr;
 	}
 
-	const CUnit *site_unit = this->get_settlement()->get_site_unit();
-
-	if (site_unit == nullptr || site_unit->Player->Index == PlayerNumNeutral) {
-		return nullptr;
-	}
-
-	return site_unit->Player;
+	return this->get_settlement()->get_owner();
 }
 
 //
