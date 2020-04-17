@@ -3224,8 +3224,12 @@ stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&s
 
 void CMap::calculate_settlement_territory_border_tiles(const int z)
 {
-	for (stratagus::site *site : stratagus::site::get_all()) {
-		site->clear_border_tiles();
+	for (const CUnit *site_unit : this->site_units) {
+		if (site_unit->MapLayer->ID != z) {
+			continue;
+		}
+
+		site_unit->settlement->clear_border_tiles();
 	}
 
 	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
