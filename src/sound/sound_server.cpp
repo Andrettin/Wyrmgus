@@ -74,7 +74,7 @@ static bool EffectsEnabled = true;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
-	CSample *Sample;       /// sample to play
+	stratagus::sample *Sample;       /// sample to play
 	Origin *Unit;          /// pointer to unit, who plays the sound, if any
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
@@ -94,7 +94,7 @@ static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
 
 static struct {
-	CSample *Sample;       /// Music sample
+	stratagus::sample *Sample;       /// Music sample
 	void (*FinishedCallback)(); /// Callback for when music finishes playing
 } MusicChannel;
 
@@ -220,7 +220,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 **
 **  @todo          Can mix faster if signed 8 bit buffers are used.
 */
-static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
+static int MixSampleToStereo32(stratagus::sample *sample, int index, unsigned char volume,
 							   char stereo, int *buffer, int size)
 {
 	static int buf[SOUND_BUFFER_SIZE / 2];
@@ -240,9 +240,9 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 
 	Assert(!(index & 1));
 
-	size = std::min((sample->Len - index) * div / 2, size);
+	size = std::min((sample->get_length() - index) * div / 2, size);
 
-	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->get_format().sampleRate(), sample->get_format().sampleSize() / 8, sample->get_format().channelCount(), size * 2 / div);
+	size = ConvertToStereo32((char *)(sample->get_buffer() + index), (char *)buf, sample->get_format().sampleRate(), sample->get_format().sampleSize() / 8, sample->get_format().channelCount(), size * 2 / div);
 
 	size /= 2;
 	for (int i = 0; i < size; i += 2) {
@@ -270,16 +270,16 @@ static int MixChannelsToStereo32(int *buffer, int size)
 		if (Channels[channel].Playing && Channels[channel].Sample) {
 			//Wyrmgus start
 			if ((Channels[channel].Point & 1)) {
-				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->Len);
+				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->get_length());
 			}
 			//Wyrmgus end
 			int i = MixSampleToStereo32(Channels[channel].Sample,
 										Channels[channel].Point, Channels[channel].Volume,
 										Channels[channel].Stereo, buffer, size);
 			Channels[channel].Point += i;
-			Assert(Channels[channel].Point <= Channels[channel].Sample->Len);
+			Assert(Channels[channel].Point <= Channels[channel].Sample->get_length());
 
-			if (Channels[channel].Point == Channels[channel].Sample->Len) {
+			if (Channels[channel].Point == Channels[channel].Sample->get_length()) {
 				ChannelFinished(channel);
 				++new_free_channels;
 			}
@@ -393,7 +393,7 @@ static int FillThread(void *)
 /**
 **  Check if this sound is already playing
 */
-bool SampleIsPlaying(CSample *sample)
+bool SampleIsPlaying(stratagus::sample *sample)
 {
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (Channels[i].Sample == sample && Channels[i].Playing) {
@@ -451,7 +451,7 @@ static void ChannelFinished(int channel)
 /**
 **  Put a sound request in the next free channel.
 */
-static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origin *origin)
+static int FillChannel(stratagus::sample *sample, unsigned char volume, char stereo, Origin *origin)
 {
 	Assert(NextFreeChannel < MaxChannels);
 
@@ -570,7 +570,7 @@ void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
 /**
 **  Get the sample playing on a channel
 */
-CSample *GetChannelSample(int channel)
+stratagus::sample *GetChannelSample(int channel)
 {
 	if (channel < 0 || channel >= MaxChannels) {
 		return nullptr;
@@ -608,43 +608,6 @@ void StopAllChannels()
 	SDL_UnlockMutex(Audio.Lock);
 }
 
-static std::unique_ptr<CSample> load_sample_internal(const std::filesystem::path &filepath)
-{
-	auto decoder = stratagus::make_qunique<QAudioDecoder>();
-	decoder->moveToThread(QApplication::instance()->thread());
-	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
-
-	auto sample = std::make_unique<CSample>();
-
-	QEventLoop loop;
-	loop.connect(decoder.get(), &QAudioDecoder::bufferReady, [&]() {
-		const QAudioBuffer buffer = decoder->read();
-
-		unsigned char *new_buffer = new unsigned char[sample->Len + buffer.byteCount()];
-		memcpy(new_buffer, sample->Buffer, sample->Len);
-		delete[] sample->Buffer;
-		sample->Buffer = new_buffer;
-		memcpy(sample->Buffer + sample->Len, buffer.constData(), buffer.byteCount());
-		sample->Len += buffer.byteCount();
-	});
-	loop.connect(decoder.get(), &QAudioDecoder::finished, &loop, &QEventLoop::quit);
-	loop.connect(decoder.get(), qOverload<QAudioDecoder::Error>(&QAudioDecoder::error), &loop, &QEventLoop::quit);
-
-	decoder->start();
-	loop.exec();
-
-	if (decoder->error() != QAudioDecoder::NoError) {
-		fprintf(stderr, decoder->errorString().toStdString().c_str());
-		return nullptr;
-	}
-
-	const QAudioFormat format = decoder->audioFormat();
-	sample->set_format(decoder->audioFormat());
-
-	return sample;
-}
-
-
 /**
 **  Load a sample
 **
@@ -654,16 +617,50 @@ static std::unique_ptr<CSample> load_sample_internal(const std::filesystem::path
 **
 **  @todo  Add streaming, caching support.
 */
-std::unique_ptr<CSample> LoadSample(const std::filesystem::path &filepath)
+std::unique_ptr<stratagus::sample> LoadSample(const std::filesystem::path &filepath)
 {
 	const std::string filename = LibraryFileName(filepath.string().c_str());
-	std::unique_ptr<CSample> sample = load_sample_internal(filename);
-
-	if (sample == nullptr) {
-		fprintf(stderr, "Can't load the \"%s\" sound.\n", filepath.string().c_str());
-	}
-
+	auto sample = std::make_unique<stratagus::sample>(filename);
 	return sample;
+}
+
+namespace stratagus {
+
+sample::sample(const std::filesystem::path &filepath)
+{
+	QAudioDecoder *decoder = new QAudioDecoder;
+	decoder->moveToThread(QApplication::instance()->thread());
+	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
+
+	sample::decoding_loop->connect(decoder, &QAudioDecoder::bufferReady, [this, decoder]() {
+		const QAudioBuffer buffer = decoder->read();
+		this->read_audio_buffer(buffer);
+	});
+
+	sample::decoding_loop->connect(decoder, &QAudioDecoder::finished, [this, decoder]() {
+		this->format = decoder->audioFormat();
+		decoder->deleteLater();
+		sample::decrement_decoding_loop_counter();
+	});
+
+	sample::decoding_loop->connect(decoder, qOverload<QAudioDecoder::Error>(&QAudioDecoder::error), [this, decoder]() {
+		throw std::runtime_error(decoder->errorString().toStdString());
+	});
+
+	sample::decoding_loop_counter++;
+	decoder->start();
+}
+
+void sample::read_audio_buffer(const QAudioBuffer &buffer)
+{
+	unsigned char *new_buffer = new unsigned char[this->get_length() + buffer.byteCount()];
+	memcpy(new_buffer, this->get_buffer(), this->get_length());
+	delete[] this->buffer;
+	this->buffer = new_buffer;
+	memcpy(this->buffer + this->get_length(), buffer.constData(), buffer.byteCount());
+	this->length += buffer.byteCount();
+}
+
 }
 
 /**
@@ -673,7 +670,7 @@ std::unique_ptr<CSample> LoadSample(const std::filesystem::path &filepath)
 **
 **  @return        Channel number, -1 for error
 */
-int PlaySample(CSample *sample, Origin *origin)
+int PlaySample(stratagus::sample *sample, Origin *origin)
 {
 	int channel = -1;
 
@@ -739,7 +736,7 @@ void SetMusicFinishedCallback(void (*callback)())
 **
 **  @return        0 if music is playing, -1 if not.
 */
-int PlayMusic(CSample *sample)
+int PlayMusic(stratagus::sample *sample)
 {
 	if (sample) {
 		StopMusic();
@@ -766,7 +763,7 @@ int PlayMusic(const std::string &file)
 	}
 	const std::string name = LibraryFileName(file.c_str());
 	DebugPrint("play music %s\n" _C_ name.c_str());
-	CSample *sample = LoadSample(name).release();
+	stratagus::sample *sample = LoadSample(name).release();
 
 	if (sample) {
 		StopMusic();

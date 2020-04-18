@@ -82,7 +82,7 @@ int DistanceSilent;              /// silent distance
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static CSample *SimpleChooseSample(const stratagus::sound &sound)
+static stratagus::sample *SimpleChooseSample(const stratagus::sound &sound)
 {
 	if (sound.Number == ONE_SOUND) {
 		return sound.get_samples().front().get();
@@ -96,9 +96,9 @@ static CSample *SimpleChooseSample(const stratagus::sound &sound)
 /**
 **  Choose the sample to play
 */
-static CSample *ChooseSample(stratagus::sound *sound, bool selection, Origin &source)
+static stratagus::sample *ChooseSample(stratagus::sound *sound, bool selection, Origin &source)
 {
-	CSample *result = nullptr;
+	stratagus::sample *result = nullptr;
 
 	if (!sound || !SoundEnabled()) {
 		return nullptr;
@@ -558,7 +558,7 @@ void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always)
 	}
 	Origin source = {nullptr, 0};
 
-	CSample *sample = ChooseSample(sound, false, source);
+	stratagus::sample *sample = ChooseSample(sound, false, source);
 
 	if (!always && SampleIsPlaying(sample)) {
 		return;
@@ -737,6 +737,15 @@ void InitSoundClient()
 }
 
 namespace stratagus {
+
+void sound::initialize_all()
+{
+	sample::initialize_decoding_loop();
+
+	data_type::initialize_all();
+
+	sample::run_decoding_loop();
+}
 
 sound::sound(const std::string &identifier) : data_entry(identifier)
 {

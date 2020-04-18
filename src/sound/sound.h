@@ -42,7 +42,6 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CSample;
 class CUnit;
 class LuaActionListener;
 class Missile;
@@ -124,6 +123,8 @@ extern stratagus::sound *RegisterSound(const std::string &identifier, const std:
 
 namespace stratagus {
 
+class sample;
+
 class sound final : public data_entry, public data_type<sound>
 {
 	Q_OBJECT
@@ -136,6 +137,8 @@ class sound final : public data_entry, public data_type<sound>
 public:
 	static constexpr const char *class_identifier = "sound";
 	static constexpr const char *database_folder = "sounds";
+
+	static void initialize_all();
 
 	sound(const std::string &identifier);
 	virtual ~sound() override;
@@ -152,7 +155,7 @@ public:
 	Q_INVOKABLE void add_file(const std::filesystem::path &filepath);
 	Q_INVOKABLE void remove_file(const std::filesystem::path &filepath);
 
-	const std::vector<std::unique_ptr<CSample>> &get_samples() const
+	const std::vector<std::unique_ptr<sample>> &get_samples() const
 	{
 		return this->samples;
 	}
@@ -200,7 +203,7 @@ public:
 
 private:
 	std::vector<std::filesystem::path> files; //the paths to the sound files
-	std::vector<std::unique_ptr<CSample>> samples; //the sound's samples, one for each file
+	std::vector<std::unique_ptr<sample>> samples; //the sound's samples, one for each file
 	sound *first_sound = nullptr; //selected sound
 	sound *second_sound = nullptr; //annoyed sound
 

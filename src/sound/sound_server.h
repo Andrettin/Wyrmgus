@@ -36,6 +36,8 @@
 
 #include "sound/sound.h"
 
+#include <QAudioBuffer>
+
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
@@ -43,36 +45,66 @@
 static constexpr int MaxVolume = 255;
 static constexpr int SOUND_BUFFER_SIZE = 65536;
 
+namespace stratagus {
+
 /**
 **  RAW samples.
 */
-class CSample
+class sample final
 {
 public:
-	virtual ~CSample() {}
+	static void initialize_decoding_loop()
+	{
+		sample::decoding_loop = std::make_unique<QEventLoop>();
+	}
+
+	static void run_decoding_loop()
+	{
+		sample::decoding_loop->exec();
+		sample::decoding_loop.reset();
+	}
+
+private:
+	static void decrement_decoding_loop_counter()
+	{
+		sample::decoding_loop_counter--;
+		if (sample::decoding_loop_counter == 0) {
+			sample::decoding_loop->quit();
+		}
+	}
+
+	static inline std::unique_ptr<QEventLoop> decoding_loop;
+	static inline int decoding_loop_counter = 0;
+
+public:
+	sample(const std::filesystem::path &filepath);
 
 	virtual int Read(void *buf, int len) { return 0; }
 
-	unsigned char *Buffer = nullptr; //sample buffer
-	int Len = 0; //length of filled buffer
+	void read_audio_buffer(const QAudioBuffer &buffer);
+
+	const unsigned char *get_buffer() const
+	{
+		return this->buffer;
+	}
+
+	int get_length() const
+	{
+		return this->length;
+	}
 
 	const QAudioFormat &get_format() const
 	{
 		return this->format;
 	}
 
-	void set_format(const QAudioFormat &format)
-	{
-		if (format == this->get_format()) {
-			return;
-		}
-
-		this->format = format;
-	}
-
 private:
+	unsigned char *buffer = nullptr; //sample buffer
+	int length = 0; //length of the filled buffer
 	QAudioFormat format;
 };
+
+}
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -89,7 +121,7 @@ extern void SetChannelVoiceGroup(int channel, UnitVoiceGroup voice);
 /// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));
 /// Get the sample playing on a channel
-extern CSample *GetChannelSample(int channel);
+extern stratagus::sample *GetChannelSample(int channel);
 /// Stop a channel
 extern void StopChannel(int channel);
 /// Stop all channels
@@ -98,11 +130,11 @@ extern void StopAllChannels();
 /// Check if this unit plays some sound
 extern bool UnitSoundIsPlaying(Origin *origin);
 /// Check, if this sample is already playing
-extern bool SampleIsPlaying(CSample *sample);
+extern bool SampleIsPlaying(stratagus::sample *sample);
 /// Load a sample
-extern std::unique_ptr<CSample> LoadSample(const std::filesystem::path &filepath);
+extern std::unique_ptr<stratagus::sample> LoadSample(const std::filesystem::path &filepath);
 /// Play a sample
-extern int PlaySample(CSample *sample, Origin *origin = nullptr);
+extern int PlaySample(stratagus::sample *sample, Origin *origin = nullptr);
 
 /// Set effects volume
 extern void SetEffectsVolume(int volume);
@@ -116,7 +148,7 @@ extern bool IsEffectsEnabled();
 /// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)());
 /// Play a music file
-extern int PlayMusic(CSample *sample);
+extern int PlayMusic(stratagus::sample *sample);
 /// Play a music file
 extern int PlayMusic(const std::string &file);
 /// Play a music track
