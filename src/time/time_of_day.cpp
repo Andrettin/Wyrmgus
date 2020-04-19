@@ -80,71 +80,14 @@ void time_of_day::process_sml_scope(const sml_data &scope)
 	}
 }
 
-void time_of_day::ProcessConfigData(const CConfigData *config_data)
+void time_of_day::initialize()
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "dawn") {
-			this->dawn = string::to_bool(value);
-		} else if (key == "day") {
-			this->day = string::to_bool(value);
-		} else if (key == "dusk") {
-			this->dusk = string::to_bool(value);
-		} else if (key == "night") {
-			this->night = string::to_bool(value);
-		} else {
-			fprintf(stderr, "Invalid time of day property: \"%s\".\n", key.c_str());
-		}
+	if (this->G != nullptr) {
+		this->G->Load();
+		this->G->UseDisplayFormat();
 	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "color_modification") {
-			this->ColorModification.ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "image") {
-			std::string file;
-			Vec2i size(0, 0);
-				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					size.x = std::stoi(value);
-				} else if (key == "height") {
-					size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
-			
-			if (size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CGraphic::New(file, size.x, size.y);
-			this->G->Load();
-			this->G->UseDisplayFormat();
-		} else {
-			fprintf(stderr, "Invalid time of day property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
+
+	data_entry::initialize();
 }
 
 /**

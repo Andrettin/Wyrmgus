@@ -36,7 +36,7 @@ class CGraphic;
 
 namespace stratagus {
 
-class time_of_day : public named_data_entry, public data_type<time_of_day>, public CDataType
+class time_of_day : public named_data_entry, public data_type<time_of_day>
 {
 	Q_OBJECT
 
@@ -56,12 +56,19 @@ public:
 		return time_of_day;
 	}
 
-	time_of_day(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	time_of_day(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void initialize() override;
+
+	virtual void check() const override
+	{
+		if (this->G == nullptr) {
+			throw std::runtime_error("Time of day \"" + this->get_identifier() + "\" has no icon.");
+		}
+	}
 
 	bool is_dawn() const
 	{

@@ -372,11 +372,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				timeline->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "time_of_day") {
-			stratagus::time_of_day *time_of_day = stratagus::time_of_day::get_or_add(ident, nullptr);
-			if (!define_only) {
-				time_of_day->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "time_of_day_schedule") {
 			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(ident);
 			if (!define_only) {

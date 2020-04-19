@@ -1235,7 +1235,7 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 		if (schedule) {
 			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
 				CScheduledTimeOfDay *time_of_day = schedule->ScheduledTimesOfDay[i];
-				if (time_of_day->TimeOfDay->Ident == time_of_day_ident)  {
+				if (time_of_day->TimeOfDay->get_identifier() == time_of_day_ident)  {
 					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day);
 					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(CMap::Map.MapLayers[z]->GetSeason());
 					break;
