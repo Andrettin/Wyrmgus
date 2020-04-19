@@ -903,10 +903,12 @@ void DrawResources()
 /**
 **	@brief	Draw the time of day
 */
-void DrawTime() {
-	if (UI.CurrentMapLayer) {
-		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->GetTimeOfDay();
-		if (time_of_day) {
+void DrawTime()
+{
+	if (UI.CurrentMapLayer != nullptr) {
+		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
+		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+		if (time_of_day != nullptr) {
 			UI.TimeOfDayPanel.G = time_of_day->G;
 		} else {
 			UI.TimeOfDayPanel.G = nullptr;
@@ -1213,7 +1215,9 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + UI.TimeOfDayPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetTimeOfDay()->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
+		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (

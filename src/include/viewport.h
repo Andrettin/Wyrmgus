@@ -78,6 +78,7 @@ public:
 	PixelPos TilePosToScreen_TopLeft(const Vec2i &tilePos) const;
 	/// convert tilepos coordonates into screen (take the center of the tile)
 	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
+	QPoint screen_center_to_tile_pos() const;
 
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const Vec2i &tilePos, const PixelDiff &offset);

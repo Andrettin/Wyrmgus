@@ -153,6 +153,12 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 	return topLeft + stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2;
 }
 
+/// convert tilepos coordonates into screen (take the center of the tile)
+QPoint CViewport::screen_center_to_tile_pos() const
+{
+	return this->ScreenToTilePos(this->TopLeftPos + this->GetPixelSize() / 2);
+}
+
 /**
 **  Change viewpoint of map viewport v to tilePos.
 **
