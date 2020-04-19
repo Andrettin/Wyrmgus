@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name time_of_day.h - The time of day header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,38 +27,73 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "color.h"
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CGraphic;
 
-class CTimeOfDay : public CDataType
+namespace stratagus {
+
+class time_of_day : public named_data_entry, public data_type<time_of_day>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(bool dawn MEMBER dawn READ is_dawn)
+	Q_PROPERTY(bool day MEMBER day READ is_day)
+	Q_PROPERTY(bool dusk MEMBER dusk READ is_dusk)
+	Q_PROPERTY(bool night MEMBER night READ is_night)
+
 public:
-	static CTimeOfDay *GetTimeOfDay(const std::string &ident, const bool should_find = true);
-	static CTimeOfDay *GetOrAddTimeOfDay(const std::string &ident);
-	static void ClearTimesOfDay();
-	
-	static std::vector<CTimeOfDay *> TimesOfDay;	/// Times of day
-	static std::map<std::string, CTimeOfDay *> TimesOfDayByIdent;
-	
+	static constexpr const char *class_identifier = "time_of_day";
+	static constexpr const char *database_folder = "times_of_day";
+
+	static time_of_day *add(const std::string &identifier, const stratagus::module *module)
+	{
+		time_of_day *time_of_day = data_type::add(identifier, module);
+		time_of_day->ID = time_of_day::get_all().size() - 1;
+		return time_of_day;
+	}
+
+	time_of_day(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	{
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+
+	bool is_dawn() const
+	{
+		return this->dawn;
+	}
+
+	bool is_day() const
+	{
+		return this->day;
+	}
+
+	bool is_dusk() const
+	{
+		return this->dusk;
+	}
+
+	bool is_night() const
+	{
+		return this->night;
+	}
+
 	bool HasColorModification() const;
 
-	std::string Name;							/// Name of the time of day
 	int ID = -1;								/// The ID of this time of day
-	bool Dawn = false;							/// Whether this is a dawn time of day
-	bool Day = false;							/// Whether this is a day time of day
-	bool Dusk = false;							/// Whether this is a dusk time of day
-	bool Night = false;							/// Whether this is a night time of day
+private:
+	bool dawn = false;							/// Whether this is a dawn time of day
+	bool day = false;							/// Whether this is a day time of day
+	bool dusk = false;							/// Whether this is a dusk time of day
+	bool night = false;							/// Whether this is a night time of day
+public:
 	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
 	CGraphic *G = nullptr;
 };
+
+}

@@ -3182,9 +3182,9 @@ void UpdateUnitSightRange(CUnit &unit)
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
 	if (unit.MapLayer) {
-		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Day) {
+		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->is_day()) {
 			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-		} else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Night) {
+		} else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->is_night()) {
 			unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 		}
 	}

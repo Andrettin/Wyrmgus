@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2018-2020 by Andrettin
-//
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
 //      the Free Software Foundation; only version 2 of the License.
@@ -25,10 +23,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "time/time_of_day.h"
@@ -38,94 +32,70 @@
 #include "util/string_util.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CTimeOfDay *> CTimeOfDay::TimesOfDay;
-std::map<std::string, CTimeOfDay *> CTimeOfDay::TimesOfDayByIdent;
-	
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a time of day
-**
-**	@param	ident		The time of day's string identifier
-**	@param	should_find	Whether it is an error if the time of day could not be found; this is true by default
-**
-**	@return	The time of day if found, or null otherwise
-*/
-CTimeOfDay *CTimeOfDay::GetTimeOfDay(const std::string &ident, const bool should_find)
+void time_of_day::process_sml_scope(const sml_data &scope)
 {
-	std::map<std::string, CTimeOfDay *>::const_iterator find_iterator = TimesOfDayByIdent.find(ident);
-	
-	if (find_iterator != TimesOfDayByIdent.end()) {
-		return find_iterator->second;
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "image") {
+		std::filesystem::path filepath;
+		Vec2i size(0, 0);
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			if (key == "file") {
+				filepath = database::get_graphics_path(this->get_module()) / value;
+			} else if (key == "width") {
+				size.x = std::stoi(value);
+			} else if (key == "height") {
+				size.y = std::stoi(value);
+			} else {
+				throw std::runtime_error("Invalid image property: \"" + key + "\".");
+			}
+		});
+
+		if (filepath.empty()) {
+			throw std::runtime_error("Image has no file.");
+		}
+
+		if (size.x == 0) {
+			throw std::runtime_error("Image has no width.");
+		}
+
+		if (size.y == 0) {
+			throw std::runtime_error("Image has no height.");
+		}
+
+		this->G = CGraphic::New(filepath.string(), size.x, size.y);
+	} else if (tag == "color_modification") {
+		const std::vector<std::string> &values = scope.get_values();
+		this->ColorModification.R = std::stoi(values[0]);
+		this->ColorModification.G = std::stoi(values[1]);
+		this->ColorModification.B = std::stoi(values[2]);
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid time of day: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
 }
 
-/**
-**	@brief	Get or add a time of day
-**
-**	@param	ident	The time of day's string identifier
-**
-**	@return	The time of day if found, or a newly-created one otherwise
-*/
-CTimeOfDay *CTimeOfDay::GetOrAddTimeOfDay(const std::string &ident)
-{
-	CTimeOfDay *time_of_day = GetTimeOfDay(ident, false);
-	
-	if (!time_of_day) {
-		time_of_day = new CTimeOfDay;
-		time_of_day->Ident = ident;
-		time_of_day->ID = TimesOfDay.size();
-		TimesOfDay.push_back(time_of_day);
-		TimesOfDayByIdent[ident] = time_of_day;
-	}
-	
-	return time_of_day;
-}
-
-/**
-**	@brief	Remove the existing times of day
-*/
-void CTimeOfDay::ClearTimesOfDay()
-{
-	for (size_t i = 0; i < TimesOfDay.size(); ++i) {
-		delete TimesOfDay[i];
-	}
-	TimesOfDay.clear();
-}
-
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
+void time_of_day::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "dawn") {
-			this->Dawn = string::to_bool(value);
+			this->dawn = string::to_bool(value);
 		} else if (key == "day") {
-			this->Day = string::to_bool(value);
+			this->day = string::to_bool(value);
 		} else if (key == "dusk") {
-			this->Dusk = string::to_bool(value);
+			this->dusk = string::to_bool(value);
 		} else if (key == "night") {
-			this->Night = string::to_bool(value);
+			this->night = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid time of day property: \"%s\".\n", key.c_str());
 		}
@@ -182,7 +152,9 @@ void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	Whether the time of day modifies the color of graphics
 */
-bool CTimeOfDay::HasColorModification() const
+bool time_of_day::HasColorModification() const
 {
 	return this->ColorModification.R != 0 || this->ColorModification.G != 0 || this->ColorModification.B != 0;
+}
+
 }

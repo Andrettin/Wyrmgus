@@ -905,7 +905,7 @@ void DrawResources()
 */
 void DrawTime() {
 	if (UI.CurrentMapLayer) {
-		const CTimeOfDay *time_of_day = UI.CurrentMapLayer->GetTimeOfDay();
+		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->GetTimeOfDay();
 		if (time_of_day) {
 			UI.TimeOfDayPanel.G = time_of_day->G;
 		} else {
@@ -1213,7 +1213,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + UI.TimeOfDayPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetTimeOfDay()->Name.c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetTimeOfDay()->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (

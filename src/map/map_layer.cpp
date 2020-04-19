@@ -324,8 +324,8 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 	}
 #endif
 
-	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);
-	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Night) != (old_time_of_day && old_time_of_day->TimeOfDay->Night);
+	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->is_day()) != (old_time_of_day && old_time_of_day->TimeOfDay->is_day());
+	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->is_night()) != (old_time_of_day && old_time_of_day->TimeOfDay->is_night());
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
@@ -351,7 +351,7 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 **
 **	@return	The map layer's current time of day
 */
-CTimeOfDay *CMapLayer::GetTimeOfDay() const
+stratagus::time_of_day *CMapLayer::GetTimeOfDay() const
 {
 	if (!this->TimeOfDay) {
 		return nullptr;

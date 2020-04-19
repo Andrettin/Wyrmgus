@@ -153,7 +153,6 @@ void CleanModules()
 	CleanMissileTypes();
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
-	CTimeOfDay::ClearTimesOfDay();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
 	CSeason::ClearSeasons();
 	CSeasonSchedule::ClearSeasonSchedules();

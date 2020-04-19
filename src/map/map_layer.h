@@ -44,13 +44,13 @@ class CScheduledSeason;
 class CScheduledTimeOfDay;
 class CSeason;
 class CSeasonSchedule;
-class CTimeOfDay;
 class CTimeOfDaySchedule;
 class CUnit;
 
 namespace stratagus {
 	class map_template;
 	class plane;
+	class time_of_day;
 	class world;
 }
 
@@ -133,7 +133,7 @@ private:
 public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
 	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
-	CTimeOfDay *GetTimeOfDay() const;
+	stratagus::time_of_day *GetTimeOfDay() const;
 private:
 	void DecrementRemainingSeasonHours();
 	void IncrementSeason();

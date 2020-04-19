@@ -50,10 +50,10 @@
 #include "vec2i.h"
 
 class CFont;
-class CTimeOfDay;
 
 namespace stratagus {
 	class map_template;
+	class time_of_day;
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -79,7 +79,7 @@ protected:
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		//Wyrmgus start
 //		Refs(1), Resized(false)
-		Refs(1), TimeOfDay(nullptr), Resized(false), Grayscale(false)
+		Refs(1), Resized(false), Grayscale(false)
 		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), NumTextures(0)
@@ -151,7 +151,7 @@ public:
 	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
-	SDL_Surface *SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped = false);
+	SDL_Surface *SetTimeOfDay(stratagus::time_of_day *time_of_day, bool flipped = false);
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
@@ -191,7 +191,7 @@ public:
 	int GraphicWidth;			/// Original graphic width
 	int GraphicHeight;			/// Original graphic height
 	int Refs;					/// Uses of this graphic
-	CTimeOfDay *TimeOfDay;		/// Time of day for this graphic
+	stratagus::time_of_day *TimeOfDay = nullptr;		/// Time of day for this graphic
 	bool Resized;				/// Image has been resized
 	//Wyrmgus start
 	bool Grayscale;
@@ -238,7 +238,7 @@ protected:
 
 public:
 	//Wyrmgus start
-	void MakePlayerColorSurface(int player_color, bool flipped = false, CTimeOfDay *time_of_day = nullptr);
+	void MakePlayerColorSurface(int player_color, bool flipped = false, stratagus::time_of_day *time_of_day = nullptr);
 	//Wyrmgus end
 	//Wyrmgus start
 	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
@@ -551,15 +551,15 @@ extern int LoadGraphicPNG(CGraphic *g);
 /// Make an OpenGL texture
 //Wyrmgus start
 //extern void MakeTexture(CGraphic *graphic);
-extern void MakeTexture(CGraphic *graphic, CTimeOfDay *time_of_day = nullptr);
+extern void MakeTexture(CGraphic *graphic, stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 //Wyrmgus start
-extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, const int ow, const int oh, const CTimeOfDay *time_of_day = nullptr);
+extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
 //extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, CTimeOfDay *time_of_day = nullptr);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 
 /// Regenerate Window screen if needed
