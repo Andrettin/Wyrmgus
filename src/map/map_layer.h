@@ -134,6 +134,7 @@ public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
 	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
 	stratagus::time_of_day *GetTimeOfDay() const;
+	stratagus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
 private:
 	void DecrementRemainingSeasonHours();
 	void IncrementSeason();

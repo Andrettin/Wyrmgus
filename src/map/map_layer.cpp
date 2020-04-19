@@ -35,6 +35,7 @@
 
 #include "map/map_layer.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -358,6 +359,16 @@ stratagus::time_of_day *CMapLayer::GetTimeOfDay() const
 	}
 	
 	return this->TimeOfDay->TimeOfDay;
+}
+
+stratagus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
+{
+	const CMapField *tile = this->Field(tile_pos);
+	if (tile->Flags & MapFieldUnderground) {
+		return stratagus::defines::get()->get_underground_time_of_day();
+	}
+
+	return this->GetTimeOfDay();
 }
 
 /**

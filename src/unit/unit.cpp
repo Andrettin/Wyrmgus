@@ -3181,10 +3181,11 @@ void UpdateUnitSightRange(CUnit &unit)
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (unit.MapLayer) {
-		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->is_day()) {
+	const stratagus::time_of_day *time_of_day = unit.get_center_tile_time_of_day();
+	if (time_of_day != nullptr) {
+		if (time_of_day->is_day()) {
 			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-		} else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->is_night()) {
+		} else if (time_of_day->is_night()) {
 			unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 		}
 	}
@@ -3581,16 +3582,18 @@ void CUnit::XPChanged()
 */
 static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 {
-	const CMapLayer *old_map_layer = unit.MapLayer;
+	const stratagus::time_of_day *old_time_of_day = unit.get_center_tile_time_of_day();
 	
 	CUnit *unit_inside = unit.UnitInside;
 
 	unit.tilePos = pos;
 	unit.Offset = CMap::Map.getIndex(pos, z);
 	unit.MapLayer = CMap::Map.MapLayers[z];
-	
+
+	const stratagus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
+
 	//Wyrmgus start
-	if (!SaveGameLoading && old_map_layer != unit.MapLayer) {
+	if (!SaveGameLoading && old_time_of_day != new_time_of_day) {
 		UpdateUnitSightRange(unit);
 	}
 	//Wyrmgus end
@@ -5354,15 +5357,10 @@ PixelSize CUnit::GetHalfTilePixelSize() const
 	return this->GetTilePixelSize() / 2;
 }
 
-Vec2i CUnit::GetTileCenterPos() const
-{
-	return this->tilePos + this->Type->GetTileCenterPosOffset();
-}
-
-const CMapField *CUnit::get_center_tile() const
+QPoint CUnit::get_center_tile_pos() const
 {
 	const CUnit *first_container = this->GetFirstContainer();
-	return first_container->MapLayer->Field(first_container->GetTileCenterPos());
+	return first_container->tilePos + first_container->Type->GetTileCenterPosOffset();
 }
 
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
@@ -6554,13 +6552,12 @@ std::string CUnit::GetMessageName() const
 
 const stratagus::time_of_day *CUnit::get_center_tile_time_of_day() const
 {
-	//get the time of day for the unit's tile
-	const CMapField *tile = this->get_center_tile();
-	if (tile->Flags & MapFieldUnderground) {
-		return stratagus::defines::get()->get_underground_time_of_day();
+	if (this->MapLayer == nullptr) {
+		return nullptr;
 	}
 
-	return this->MapLayer->GetTimeOfDay();
+	//get the time of day for the unit's tile
+	return this->MapLayer->get_tile_time_of_day(this->get_center_tile_pos());
 }
 
 /**

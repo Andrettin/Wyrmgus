@@ -369,8 +369,7 @@ public:
 	Vec2i GetHalfTileSize() const;
 	PixelSize GetTilePixelSize() const;
 	PixelSize GetHalfTilePixelSize() const;
-	Vec2i GetTileCenterPos() const;
-	const CMapField *get_center_tile() const;
+	QPoint get_center_tile_pos() const;
 	
 	CUnit *GetFirstContainer() const;
 

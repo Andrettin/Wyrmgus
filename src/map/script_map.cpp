@@ -2138,14 +2138,14 @@ static int CclGetSiteData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosX")) {
 		if (site->get_site_unit()) {
-			lua_pushnumber(l, site->get_site_unit()->GetTileCenterPos().x);
+			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().x());
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosY")) {
 		if (site->get_site_unit()) {
-			lua_pushnumber(l, site->get_site_unit()->GetTileCenterPos().y);
+			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().y());
 		} else {
 			lua_pushnumber(l, -1);
 		}

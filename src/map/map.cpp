@@ -892,7 +892,7 @@ std::vector<CUnit *> CMap::get_map_template_layer_connectors(const stratagus::ma
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
-				const Vec2i unit_pos = connector_unit->GetTileCenterPos();
+				const Vec2i unit_pos = connector_unit->get_center_tile_pos();
 				
 				if (is_main_template && this->is_point_in_a_subtemplate_area(unit_pos, z)) {
 					continue;

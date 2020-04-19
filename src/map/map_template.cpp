@@ -1371,7 +1371,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 				std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
 				for (const CUnit *potential_connector : other_layer_connectors) {
 					if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-						unit_pos = potential_connector->GetTileCenterPos();
+						unit_pos = potential_connector->get_center_tile_pos();
 						break;
 					}
 				}
@@ -1399,7 +1399,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			CUnit *potential_connector = other_layer_connectors[j];
 			
 			if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-				int distance = potential_connector->MapDistanceTo(unit->GetTileCenterPos(), potential_connector->MapLayer->ID);
+				int distance = potential_connector->MapDistanceTo(unit->get_center_tile_pos(), potential_connector->MapLayer->ID);
 				if (best_distance == -1 || distance < best_distance) {
 					best_layer_connector = potential_connector;
 					best_distance = distance;
@@ -1756,7 +1756,7 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 					pos = map_start_pos + historical_location->Position - template_start_pos;
 				} else if (random) {
 					if (historical_location->site != nullptr && historical_location->site->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-						pos = historical_location->site->get_site_unit()->GetTileCenterPos();
+						pos = historical_location->site->get_site_unit()->get_center_tile_pos();
 					}
 				}
 			} else {
