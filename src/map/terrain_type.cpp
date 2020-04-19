@@ -120,6 +120,8 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldStoneFloor;
 	} else if (flag_name == "stumps") {
 		return MapFieldStumps;
+	} else if (flag_name == "underground") {
+		return MapFieldUnderground;
 	} else {
 		fprintf(stderr, "Flag \"%s\" doesn't exist.\n", flag_name.c_str());
 		return 0;

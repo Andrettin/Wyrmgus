@@ -1269,6 +1269,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	} else if (!strcmp(flag_name, "stumps")) {
 		flag = MapFieldStumps;
 	//Wyrmgus end
+	} else if (!strcmp(flag_name, "underground")) {
+		flag = MapFieldUnderground;
 	} else if (!strcmp(flag_name, "wall")) {
 		flag = MapFieldWall;
 	} else if (!strcmp(flag_name, "rock")) {
@@ -1455,6 +1457,8 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldStoneFloor;
 				} else if (tile_flag == "stumps") {
 					terrain->Flags |= MapFieldStumps;
+				} else if (tile_flag == "underground") {
+					terrain->Flags |= MapFieldUnderground;
 				} else {
 					LuaError(l, "Flag \"%s\" doesn't exist." _C_ tile_flag.c_str());
 				}

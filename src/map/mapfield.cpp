@@ -691,6 +691,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {
 			this->Flags |= MapFieldStumps;
+		} else if (!strcmp(value, "underground")) {
+			this->Flags |= MapFieldUnderground;
 		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
