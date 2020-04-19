@@ -69,6 +69,10 @@ struct lua_State;
 
 typedef COrder *COrderPtr;
 
+namespace stratagus {
+	class time_of_day;
+}
+
 /*
 ** Configuration of the small (unit) AI.
 */
@@ -366,6 +370,7 @@ public:
 	PixelSize GetTilePixelSize() const;
 	PixelSize GetHalfTilePixelSize() const;
 	Vec2i GetTileCenterPos() const;
+	const CMapField *get_center_tile() const;
 	
 	CUnit *GetFirstContainer() const;
 
@@ -455,6 +460,8 @@ public:
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	//Wyrmgus end
+
+	const stratagus::time_of_day *get_center_tile_time_of_day() const;
 
 public:
 	class CUnitManagerData
@@ -873,8 +880,8 @@ extern void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const
 //Wyrmgus end
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos);
-extern void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos);
+extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
+extern void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
 //Wyrmgus end
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);

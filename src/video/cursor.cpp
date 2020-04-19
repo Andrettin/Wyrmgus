@@ -230,7 +230,11 @@ void DrawBuildingCursor()
 #endif
 	PushClipping();
 	vp.SetClipping();
-	
+
+	const QPoint center_tile_pos = mpos + CursorBuilding->GetTileCenterPosOffset();
+	const bool is_underground = UI.CurrentMapLayer->Field(center_tile_pos)->Flags & MapFieldUnderground;
+	const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+
 //	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer()) && CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->ShadowSprite) {
 		DrawShadow(*CursorBuilding, CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->ShadowSprite, CursorBuilding->StillFrame, screenPos);
@@ -239,59 +243,59 @@ void DrawBuildingCursor()
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), BackpackImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), BackpackImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), MountImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), MountImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, CPlayer::GetThisPlayer()->Index,
 //				 CursorBuilding->StillFrame, screenPos);
 	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)
 	if (CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer()) && CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->Sprite) {
 		DrawUnitType(*CursorBuilding, CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->Sprite, CPlayer::GetThisPlayer()->Index,
-				CursorBuilding->StillFrame, screenPos);
+				CursorBuilding->StillFrame, screenPos, time_of_day);
 	} else {
 		DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, CPlayer::GetThisPlayer()->Index,
-				CursorBuilding->StillFrame, screenPos);
+				CursorBuilding->StillFrame, screenPos, time_of_day);
 	}
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), HairImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), HairImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), PantsImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), PantsImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), HelmetImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), HelmetImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), BootsImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), BootsImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), LeftArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), LeftArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingLeftArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingLeftArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ShieldImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ShieldImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 	
 	if (CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightHandImageLayer) != nullptr) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingRightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingRightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), WeaponImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), WeaponImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 		
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightHandImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightHandImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 	} else {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), WeaponImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), WeaponImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), RightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingRightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), ClothingRightArmImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 	}
 
 	if (CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer()) && CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->LightSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->LightSprite, CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->LightSprite, CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 	} else if (CursorBuilding->LightSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos);
+		DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 	}
 	//Wyrmgus end
 	

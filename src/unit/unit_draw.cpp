@@ -725,7 +725,7 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos)
+void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
@@ -740,15 +740,15 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 	} else {
@@ -760,14 +760,14 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 		}
 	}
 }
 
-void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
@@ -782,15 +782,15 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, false);
+				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawFrameClip(frame, pos.x, pos.y, false);
+				sprite->DrawFrameClip(frame, pos.x, pos.y, time_of_day);
 			}
 		}
 	} else {
@@ -802,9 +802,9 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
-			sprite->DrawFrameClip(frame, pos.x, pos.y, false);
+			sprite->DrawFrameClip(frame, pos.x, pos.y, time_of_day);
 		}
 	}
 }
@@ -1024,7 +1024,7 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 							//Wyrmgus start
 //							 const CUnitType &type, int frame, const PixelPos &screenPos)
-							 const CUnit &unit, const CUnitType &type, int frame, const PixelPos &screenPos)
+							 const CUnit &unit, const CUnitType &type, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 							//Wyrmgus end
 {
 	PixelPos pos = screenPos;
@@ -1035,18 +1035,18 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			const CConstruction &construction = *type.Construction;
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 		//Wyrmgus end
@@ -1070,9 +1070,9 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		if (variation && variation->Sprite) {
-			variation->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			variation->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 		} else {
-			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 		}
 		//Wyrmgus end
 	}
@@ -1190,13 +1190,15 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 //	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
+
+	const stratagus::time_of_day *time_of_day = this->get_center_tile_time_of_day();
 	
 	//Wyrmgus start
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player, frame, screenPos); // draw the mount just before the body
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player, frame, screenPos, time_of_day); // draw the mount just before the body
 	
 	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
 	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day);
 	}
 	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south); if the position of the arms in the southeast frame is inverted, don't draw the left arm yet either
@@ -1214,9 +1216,9 @@ void CUnit::Draw(const CViewport &vp) const
 		)
 	) {
 		//draw the shield before the left arm if not facing south
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos, time_of_day);
 
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, time_of_day);
 	}
 	
 	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
@@ -1232,9 +1234,9 @@ void CUnit::Draw(const CViewport &vp) const
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day);
 	}
 	//Wyrmgus end
 
@@ -1281,21 +1283,21 @@ void CUnit::Draw(const CViewport &vp) const
 	if (state == 1) {
 		if (under_construction && cframe) {
 			const PixelPos pos(screenPos + type->GetHalfTilePixelSize());
-			DrawConstruction(player, cframe, *this, *type, frame, pos);
+			DrawConstruction(player, cframe, *this, *type, frame, pos, time_of_day);
 		} else {
-			DrawUnitType(*type, sprite, player, frame, screenPos);
+			DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, player, frame, screenPos);
+		DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day);
 	}
 	
 	//Wyrmgus start
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitAction::Die) && frame != type->StillFrame) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos, time_of_day);
 	}
 	if (
 		(this->Direction == LookingN && this->CurrentAction() != UnitAction::Die)
@@ -1309,20 +1311,20 @@ void CUnit::Draw(const CViewport &vp) const
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day);
 	}
 
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, frame, screenPos, time_of_day);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos, time_of_day);
 	
 	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
 	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitAction::Die) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day);
 	}
 	
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos, time_of_day);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos, time_of_day);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos, time_of_day);
 	
 	//draw the left arm just after the body if facing south
 	if (
@@ -1338,9 +1340,9 @@ void CUnit::Draw(const CViewport &vp) const
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos, time_of_day);
 	}
 
 	//draw the right arm just after the body if not facing north
@@ -1357,15 +1359,15 @@ void CUnit::Draw(const CViewport &vp) const
 		)
 	) {
 		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitAction::Die && this->GetLayerSprite(RightHandImageLayer) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day);
 		} else {
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day);
 		}
 	}
 
@@ -1378,13 +1380,13 @@ void CUnit::Draw(const CViewport &vp) const
 			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitAction::Die
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day);
 	}
 
 	if (variation && variation->LightSprite) {
-		DrawOverlay(*type, variation->LightSprite, player, frame, screenPos);
+		DrawOverlay(*type, variation->LightSprite, player, frame, screenPos, time_of_day);
 	} else if (type->LightSprite) {
-		DrawOverlay(*type, type->LightSprite, player, frame, screenPos);
+		DrawOverlay(*type, type->LightSprite, player, frame, screenPos, time_of_day);
 	}
 	//Wyrmgus end
 	

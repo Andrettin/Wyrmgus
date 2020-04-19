@@ -154,7 +154,7 @@ void CIcon::DrawIcon(const PixelPos &pos, const int player) const
 	if (player != -1 ) {
 		//Wyrmgus start
 //		this->G->DrawPlayerColorFrameClip(player, this->get_frame(), pos.x, pos.y);
-		this->G->DrawPlayerColorFrameClip(player, this->get_frame(), pos.x, pos.y, true);
+		this->G->DrawPlayerColorFrameClip(player, this->get_frame(), pos.x, pos.y, nullptr);
 		//Wyrmgus end
 	} else {
 		this->G->DrawFrameClip(this->get_frame(), pos.x, pos.y);

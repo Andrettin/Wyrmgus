@@ -5359,6 +5359,12 @@ Vec2i CUnit::GetTileCenterPos() const
 	return this->tilePos + this->Type->GetTileCenterPosOffset();
 }
 
+const CMapField *CUnit::get_center_tile() const
+{
+	const CUnit *first_container = this->GetFirstContainer();
+	return first_container->MapLayer->Field(first_container->GetTileCenterPos());
+}
+
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
 {
 	if (!upgrade) {
@@ -6545,6 +6551,17 @@ std::string CUnit::GetMessageName() const
 	return name + " (" + GetTypeName() + ")";
 }
 //Wyrmgus end
+
+const stratagus::time_of_day *CUnit::get_center_tile_time_of_day() const
+{
+	//get the time of day for the unit's tile
+	const CMapField *tile = this->get_center_tile();
+	if (tile->Flags & MapFieldUnderground) {
+		return stratagus::defines::get()->get_underground_time_of_day();
+	}
+
+	return this->MapLayer->GetTimeOfDay();
+}
 
 /**
 **  Let an unit die.

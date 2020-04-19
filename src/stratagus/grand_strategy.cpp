@@ -88,7 +88,7 @@ void CGrandStrategyGame::DrawInterface()
 		for (size_t i = 0; i < stored_resources.size(); ++i) {
 			int x = 154 + (100 * i);
 			int y = 0;
-			UI.Resources[stored_resources[i]].G->DrawFrameClip(0, x, y, true);
+			UI.Resources[stored_resources[i]].G->DrawFrameClip(0, x, y, nullptr);
 			
 			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
 			int income = 0;

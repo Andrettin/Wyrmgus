@@ -1354,7 +1354,7 @@ static void DrawStartLocations()
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
 
 				if (type) {
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
+					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, nullptr);
 				} else { // Draw a cross
 					DrawCross(startScreenPos, stratagus::defines::get()->get_tile_size(), CPlayer::Players[i]->Color);
 				}

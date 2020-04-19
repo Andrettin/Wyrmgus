@@ -1064,7 +1064,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 			std::string sub_second = sub.substr(cost_symbol_pos + 5 + std::to_string((long long) res).length(), sub.length() - cost_symbol_pos - (5 + std::to_string((long long) res).length()));
 			label.Draw(x, y_off, sub_first);
 			x_offset += font.getWidth(sub_first);
-			UI.Resources[res].G->DrawFrameClip(UI.Resources[res].IconFrame, x + x_offset, y + ((font.getHeight() - UI.Resources[res].G->Height) / 2), true);
+			UI.Resources[res].G->DrawFrameClip(UI.Resources[res].IconFrame, x + x_offset, y + ((font.getHeight() - UI.Resources[res].G->Height) / 2), nullptr);
 			x_offset += UI.Resources[res].G->Width;
 			label.Draw(x + x_offset, y_off, sub_second);
 		} else {

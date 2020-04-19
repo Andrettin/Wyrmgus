@@ -72,6 +72,7 @@ enum class UnitTypeType;
 namespace stratagus {
 	class plane;
 	class terrain_type;
+	class time_of_day;
 	class unit_class;
 	class world;
 }
@@ -1220,7 +1221,7 @@ extern CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident);
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-						 int player, int frame, const PixelPos &screenPos);
+						 int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 //Wyrmgus start

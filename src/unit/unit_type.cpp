@@ -2359,7 +2359,7 @@ void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	//Wyrmgus start
 	if (sprite == nullptr) {
@@ -2400,15 +2400,15 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 	} else {
@@ -2420,9 +2420,9 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
 		}
 	}
 	//Wyrmgus end

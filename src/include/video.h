@@ -116,12 +116,12 @@ public:
 #endif
 	//Wyrmgus start
 //	void DrawFrameClip(unsigned frame, int x, int y) const;
-	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
 	//Wyrmgus end
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
 	//Wyrmgus end
 
 	// Draw frame flipped horizontally
@@ -131,12 +131,12 @@ public:
 #endif
 	//Wyrmgus start
 //	void DrawFrameClipX(unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr);
+	void DrawFrameClipX(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
 	//Wyrmgus end
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr);
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
 	//Wyrmgus end
 
 
@@ -151,7 +151,7 @@ public:
 	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
-	SDL_Surface *SetTimeOfDay(stratagus::time_of_day *time_of_day, bool flipped = false);
+	SDL_Surface *SetTimeOfDay(const stratagus::time_of_day *time_of_day, bool flipped = false);
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
@@ -238,17 +238,17 @@ protected:
 
 public:
 	//Wyrmgus start
-	void MakePlayerColorSurface(int player_color, bool flipped = false, stratagus::time_of_day *time_of_day = nullptr);
+	void MakePlayerColorSurface(int player_color, bool flipped = false, const stratagus::time_of_day *time_of_day = nullptr);
 	//Wyrmgus end
 	//Wyrmgus start
 	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y);
 //	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 //	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
-	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true);
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int show_percent = 100);
-	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
-	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int show_percent = 100);
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr);
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr);
+	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 	//Wyrmgus end
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
@@ -551,7 +551,7 @@ extern int LoadGraphicPNG(CGraphic *g);
 /// Make an OpenGL texture
 //Wyrmgus start
 //extern void MakeTexture(CGraphic *graphic);
-extern void MakeTexture(CGraphic *graphic, stratagus::time_of_day *time_of_day = nullptr);
+extern void MakeTexture(CGraphic *graphic, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 //Wyrmgus start
 extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
@@ -559,7 +559,7 @@ extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, cons
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
 //extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, stratagus::time_of_day *time_of_day = nullptr);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 
 /// Regenerate Window screen if needed
