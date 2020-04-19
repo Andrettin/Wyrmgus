@@ -495,10 +495,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	//Wyrmgus start
 	std::vector<unsigned long> obstacle_flags;
 	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
-	
-	if (CMap::Map.IsLayerUnderground(z)) {
-		obstacle_flags.push_back(MapFieldAirUnpassable);
-	}
+	obstacle_flags.push_back(MapFieldAirUnpassable);
 	//Wyrmgus end
 	
 	// Up hemi-cyle

@@ -297,16 +297,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	input.SetMinRange(this->MinRange);
 	int distance = this->Range;
-	//Wyrmgus start
-//	if (GameSettings.Inside) {
-//		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
-//	}
-	if (CMap::Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
+	if (input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
 		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
 			distance = 1;
 		}
 	}
-	//Wyrmgus end
 	input.SetMaxRange(distance);
 }
 
@@ -493,7 +488,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitAction::Move) {
 					if ((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) || (!this->HasGoal() && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
-						if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 							CommandStopUnit(*table[i]);
 						}
 					}
@@ -513,10 +508,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == 0 && !this->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
 		if (unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
-			//Wyrmgus start
-//			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-			if (!CMap::Map.IsLayerUnderground(MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
-			//Wyrmgus end
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 				err = PF_REACHED;
 			}
 		}
@@ -531,10 +523,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal && unit.MapDistanceTo(*goal) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
-			//Wyrmgus start
-//			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-			if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
-			//Wyrmgus end
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 				// Reached another unit, now attacking it
 				unsigned char oldDir = unit.Direction;
 				//Wyrmgus start
@@ -563,10 +552,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			 || (!goal && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))))
 			//Wyrmgus end
 			&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
-			//Wyrmgus start
-//			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-			if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
-			//Wyrmgus end
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 				// Reached wall or ground, now attacking it
 				unsigned char oldDir = unit.Direction;
 				UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
@@ -709,10 +695,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.GetModifiedVariable(ATTACKRANGE_INDEX)
-		//Wyrmgus start
-//		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
-		|| (CMap::Map.IsLayerUnderground(this->MapLayer) && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable, MapLayer) == false)) {
-		//Wyrmgus end
+		|| (CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable, MapLayer) == false)) {
 		//Wyrmgus start
 		// towers don't chase after goal
 		/*
@@ -819,10 +802,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					&& !(unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.Variable[SPEED_INDEX].Value > goal.Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal.GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
 				) {
 					//Wyrmgus end
-					//Wyrmgus start
-//					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-					if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
-					//Wyrmgus end
+					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 						//Wyrmgus start
 //						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 						const Vec2i dir = PixelSize(PixelSize(goal.tilePos) * stratagus::defines::get()->get_tile_size()) + goal.GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
@@ -847,7 +827,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			//Wyrmgus start
 			// add instance for attack ground without moving
 			} else if (this->Action == UnitAction::AttackGround && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.Type->MinAttackRange < unit.MapDistanceTo(this->goalPos, this->MapLayer)) {
-				if (!CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 					// Reached wall or ground, now attacking it
 					unsigned char oldDir = unit.Direction;
 					UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);

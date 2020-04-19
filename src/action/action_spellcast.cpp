@@ -190,7 +190,7 @@
 	//Wyrmgus start
 //	input.SetMaxRange(this->Range);
 	int distance = this->Range;
-	if (CMap::Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
+	if (input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
 		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
 			distance = 1;
 		}
@@ -336,7 +336,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 	
 	//Wyrmgus start
-	bool obstacle_check = !CMap::Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
+	bool obstacle_check = CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
 	//Wyrmgus end
 
 	//Wyrmgus start

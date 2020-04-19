@@ -935,19 +935,6 @@ bool CMap::is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int
 	return false;
 }
 
-bool CMap::IsLayerUnderground(int z) const
-{
-	if (GameSettings.Inside) {
-		return true;
-	}
-	
-	if (this->MapLayers[z]->SurfaceLayer > 0) {
-		return true;
-	}
-
-	return false;
-}
-
 void CMap::SetCurrentPlane(stratagus::plane *plane)
 {
 	if (UI.CurrentMapLayer->plane == plane) {
