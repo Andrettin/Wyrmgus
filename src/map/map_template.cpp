@@ -57,6 +57,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/point_util.h"
+#include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 #include "video.h"
@@ -811,161 +812,47 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
 	for (map_template *subtemplate : this->get_subtemplates()) {
-		Vec2i subtemplate_pos(subtemplate->get_subtemplate_pos() - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
+		QPoint subtemplate_pos(subtemplate->get_subtemplate_pos() - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
 		bool found_location = false;
 		
-		if (subtemplate->UpperTemplate && (subtemplate_pos.x < 0 || subtemplate_pos.y < 0)) { //if has no given position, but has an upper template, use its coordinates instead
+		if (subtemplate->UpperTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead
 			subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->UpperTemplate);
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
+			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
 				found_location = true;
 			}
 		}
 		
-		if (subtemplate->LowerTemplate && (subtemplate_pos.x < 0 || subtemplate_pos.y < 0)) { //if has no given position, but has a lower template, use its coordinates instead
+		if (subtemplate->LowerTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has a lower template, use its coordinates instead
 			subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->LowerTemplate);
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
+			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
 				found_location = true;
 			}
 		}
 		
 		if (!found_location) {
-			if (subtemplate_pos.x < 0 || subtemplate_pos.y < 0) {
+			if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
 				if (!random) {
 					continue;
 				}
-				Vec2i min_pos(map_start_pos);
-				Vec2i max_pos(map_end.x() - subtemplate->get_applied_width(), map_end.y() - subtemplate->get_applied_height());
-				
-				if (subtemplate->MinPos.x() != -1) {
-					min_pos.x += subtemplate->MinPos.x();
-					min_pos.x -= template_start_pos.x();
-				}
-				if (subtemplate->MinPos.y() != -1) {
-					min_pos.y += subtemplate->MinPos.y();
-					min_pos.y -= template_start_pos.y();
-				}
-				
-				if (subtemplate->MaxPos.x() != -1) {
-					max_pos.x += subtemplate->MaxPos.x();
-					max_pos.x -= this->get_applied_width();
-				}
-				if (subtemplate->MaxPos.y() != -1) {
-					max_pos.y += subtemplate->MaxPos.y();
-					max_pos.y -= this->get_applied_height();
-				}
-				
-				//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
-				for (const map_template *adjacent_template : subtemplate->AdjacentTemplates) {
-					Vec2i adjacent_template_pos = CMap::Map.get_subtemplate_pos(adjacent_template);
-					
-					if (!CMap::Map.Info.IsPointOnMap(adjacent_template_pos, z)) {
-						fprintf(stderr, "Could not apply adjacency restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), adjacent_template->Ident.c_str());
-						continue;
+
+				QPoint max_adjacent_template_distance = map_template::max_adjacent_template_distance;
+				while (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
+					bool adjacency_restriction_occurred = false;
+					subtemplate_pos = this->generate_subtemplate_position(subtemplate, template_start_pos, map_start_pos, map_end, z, max_adjacent_template_distance, adjacency_restriction_occurred);
+
+					if (adjacency_restriction_occurred) {
+						//double the maximum adjacent template distance for the next try
+						max_adjacent_template_distance.setX(max_adjacent_template_distance.x() * 2);
+						max_adjacent_template_distance.setY(max_adjacent_template_distance.y() * 2);
+					} else {
+						break;
 					}
-					
-					Vec2i min_adjacency_pos = adjacent_template_pos - map_template::MaxAdjacentTemplateDistance - Vec2i(subtemplate->get_applied_width(), subtemplate->get_applied_height());
-					Vec2i max_adjacency_pos = adjacent_template_pos + Vec2i(adjacent_template->get_applied_width(), adjacent_template->get_applied_height()) + map_template::MaxAdjacentTemplateDistance;
-					min_pos.x = std::max(min_pos.x, min_adjacency_pos.x);
-					min_pos.y = std::max(min_pos.y, min_adjacency_pos.y);
-					max_pos.x = std::min(max_pos.x, max_adjacency_pos.x);
-					max_pos.y = std::min(max_pos.y, max_adjacency_pos.y);
 				}
 
-				//bound the minimum and maximum positions depending on whether this template should be to the north, south, west or east of other ones
-				for (const map_template *other_template : subtemplate->NorthOfTemplates) {
-					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
-						fprintf(stderr, "Could not apply \"north of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
-						continue;
-					}
-					max_pos.y = std::min<short>(max_pos.y, other_template_pos.y - (subtemplate->get_applied_height() / 2));
-				}
-				for (const map_template *other_template : subtemplate->SouthOfTemplates) {
-					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
-						fprintf(stderr, "Could not apply \"south of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
-						continue;
-					}
-					min_pos.y = std::max<short>(min_pos.y, other_template_pos.y + other_template->get_applied_height() - (subtemplate->get_applied_height() / 2));
-				}
-				for (const map_template *other_template : subtemplate->WestOfTemplates) {
-					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
-						fprintf(stderr, "Could not apply \"west of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
-						continue;
-					}
-					max_pos.x = std::min<short>(max_pos.x, other_template_pos.x - (subtemplate->get_applied_width() / 2));
-				}
-				for (const map_template *other_template : subtemplate->EastOfTemplates) {
-					Vec2i other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-					if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
-						fprintf(stderr, "Could not apply \"east of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
-						continue;
-					}
-					min_pos.x = std::max<short>(min_pos.x, other_template_pos.x + other_template->get_applied_width() - (subtemplate->get_applied_width() / 2));
-				}
-				
-				std::vector<Vec2i> potential_positions;
-				for (int x = min_pos.x; x <= max_pos.x; ++x) {
-					for (int y = min_pos.y; y <= max_pos.y; ++y) {
-						potential_positions.push_back(Vec2i(x, y));
-					}
-				}
-				
-				while (!potential_positions.empty()) {
-					subtemplate_pos = potential_positions[SyncRand(potential_positions.size())];
-					potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), subtemplate_pos), potential_positions.end());
-
-					//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
-					const int north_offset = subtemplate->GetDependentTemplatesNorthOffset();
-					const int south_offset = subtemplate->GetDependentTemplatesSouthOffset();
-					const int west_offset = subtemplate->GetDependentTemplatesWestOffset();
-					const int east_offset = subtemplate->GetDependentTemplatesEastOffset();
-					const bool top_left_on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos - Vec2i(west_offset, north_offset), z);
-					const bool bottom_right_on_map = CMap::Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->get_applied_width() + east_offset - 1, subtemplate_pos.y + subtemplate->get_applied_height() + south_offset - 1), z);
-					const bool on_map = top_left_on_map && bottom_right_on_map;
-
-					if (!on_map) {
-						continue;
-					}
-
-					bool on_usable_area = true;
-					for (int x = (map_template::MinAdjacentTemplateDistance * -1) - west_offset; x < (subtemplate->get_applied_width() + map_template::MinAdjacentTemplateDistance + east_offset); ++x) {
-						for (int y = (map_template::MinAdjacentTemplateDistance * -1) - north_offset; y < (subtemplate->get_applied_height() + map_template::MinAdjacentTemplateDistance + south_offset); ++y) {
-							if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
-								on_usable_area = false;
-								break;
-							}
-						}
-						if (!on_usable_area) {
-							break;
-						}
-					}
-
-					if (on_usable_area) {
-						for (int x = -west_offset; x < (subtemplate->get_applied_width() + east_offset); ++x) {
-							for (int y = -north_offset; y < (subtemplate->get_applied_height() + south_offset); ++y) {
-								if (!this->is_map_pos_usable(subtemplate_pos + Vec2i(x, y))) {
-									on_usable_area = false;
-									break;
-								}
-							}
-							if (!on_usable_area) {
-								break;
-							}
-						}
-					}
-
-					if (!on_usable_area) {
-						continue;
-					}
-
-					found_location = true;
-					break;
-				}
-
-				if (!found_location) {
+				if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
 					fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
+				} else {
+					found_location = true;
 				}
 			} else {
 				if (random) {
@@ -981,7 +868,7 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 		}
 		
 		if (found_location) {
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y < CMap::Map.Info.MapHeights[z]) {
+			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
 				subtemplate->Apply(subtemplate->get_start_pos(), subtemplate_pos, z);
 			}
 		} else {
@@ -1730,6 +1617,149 @@ void map_template::set_overlay_terrain_image(const std::filesystem::path &filepa
 	}
 
 	this->overlay_terrain_image = database::get_maps_path(this->get_module()) / filepath;
+}
+
+QPoint map_template::generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const
+{
+	QPoint min_pos(map_start_pos);
+	QPoint max_pos(map_end.x() - subtemplate->get_applied_width(), map_end.y() - subtemplate->get_applied_height());
+
+	if (subtemplate->MinPos.x() != -1) {
+		min_pos.setX(min_pos.x() + subtemplate->MinPos.x() - template_start_pos.x());
+	}
+	if (subtemplate->MinPos.y() != -1) {
+		min_pos.setY(min_pos.y() + subtemplate->MinPos.y() - template_start_pos.y());
+	}
+
+	if (subtemplate->MaxPos.x() != -1) {
+		max_pos.setX(max_pos.x() + subtemplate->MaxPos.x() - this->get_applied_width());
+	}
+	if (subtemplate->MaxPos.y() != -1) {
+		max_pos.setY(max_pos.y() + subtemplate->MaxPos.y() - this->get_applied_height());
+	}
+
+	//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
+	for (const map_template *adjacent_template : subtemplate->AdjacentTemplates) {
+		const QPoint adjacent_template_pos = CMap::Map.get_subtemplate_pos(adjacent_template);
+
+		if (!CMap::Map.Info.IsPointOnMap(adjacent_template_pos, z)) {
+			fprintf(stderr, "Could not apply adjacency restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), adjacent_template->Ident.c_str());
+			continue;
+		}
+
+		const QPoint min_adjacency_pos = adjacent_template_pos - max_adjacent_template_distance - size::to_point(subtemplate->get_applied_size());
+		const QPoint max_adjacency_pos = adjacent_template_pos + size::to_point(subtemplate->get_applied_size()) + max_adjacent_template_distance;
+		if (min_adjacency_pos.x() > min_pos.x()) {
+			min_pos.setX(min_adjacency_pos.x());
+			adjacency_restriction_occurred = true;
+		}
+		if (min_adjacency_pos.y() > min_pos.y()) {
+			min_pos.setY(min_adjacency_pos.y());
+			adjacency_restriction_occurred = true;
+		}
+		if (max_adjacency_pos.x() < max_pos.x()) {
+			max_pos.setX(max_adjacency_pos.x());
+			adjacency_restriction_occurred = true;
+		}
+		if (max_adjacency_pos.y() < max_pos.y()) {
+			max_pos.setY(max_adjacency_pos.y());
+			adjacency_restriction_occurred = true;
+		}
+	}
+
+	//bound the minimum and maximum positions depending on whether this template should be to the north, south, west or east of other ones
+	for (const map_template *other_template : subtemplate->NorthOfTemplates) {
+		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+			fprintf(stderr, "Could not apply \"north of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			continue;
+		}
+		max_pos.setY(std::min<short>(max_pos.y(), other_template_pos.y() - (subtemplate->get_applied_height() / 2)));
+	}
+	for (const map_template *other_template : subtemplate->SouthOfTemplates) {
+		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+			fprintf(stderr, "Could not apply \"south of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			continue;
+		}
+		min_pos.setY(std::max<short>(min_pos.y(), other_template_pos.y() + other_template->get_applied_height() - (subtemplate->get_applied_height() / 2)));
+	}
+	for (const map_template *other_template : subtemplate->WestOfTemplates) {
+		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+			fprintf(stderr, "Could not apply \"west of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			continue;
+		}
+		max_pos.setX(std::min<short>(max_pos.x(), other_template_pos.x() - (subtemplate->get_applied_width() / 2)));
+	}
+	for (const map_template *other_template : subtemplate->EastOfTemplates) {
+		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
+		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+			fprintf(stderr, "Could not apply \"east of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			continue;
+		}
+		min_pos.setX(std::max<short>(min_pos.x(), other_template_pos.x() + other_template->get_applied_width() - (subtemplate->get_applied_width() / 2)));
+	}
+
+	std::vector<QPoint> potential_positions;
+	for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+		for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
+			potential_positions.push_back(QPoint(x, y));
+		}
+	}
+
+	while (!potential_positions.empty()) {
+		const QPoint subtemplate_pos = potential_positions[SyncRand(potential_positions.size())];
+		vector::remove(potential_positions, subtemplate_pos);
+
+		//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
+		const int north_offset = subtemplate->GetDependentTemplatesNorthOffset();
+		const int south_offset = subtemplate->GetDependentTemplatesSouthOffset();
+		const int west_offset = subtemplate->GetDependentTemplatesWestOffset();
+		const int east_offset = subtemplate->GetDependentTemplatesEastOffset();
+		const bool top_left_on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos - QPoint(west_offset, north_offset), z);
+		const bool bottom_right_on_map = CMap::Map.Info.IsPointOnMap(QPoint(subtemplate_pos.x() + subtemplate->get_applied_width() + east_offset - 1, subtemplate_pos.y() + subtemplate->get_applied_height() + south_offset - 1), z);
+		const bool on_map = top_left_on_map && bottom_right_on_map;
+
+		if (!on_map) {
+			continue;
+		}
+
+		bool on_usable_area = true;
+		for (int x = (map_template::min_adjacent_template_distance.x() * -1) - west_offset; x < (subtemplate->get_applied_width() + map_template::min_adjacent_template_distance.x() + east_offset); ++x) {
+			for (int y = (map_template::min_adjacent_template_distance.y() * -1) - north_offset; y < (subtemplate->get_applied_height() + map_template::min_adjacent_template_distance.y() + south_offset); ++y) {
+				if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
+					on_usable_area = false;
+					break;
+				}
+			}
+			if (!on_usable_area) {
+				break;
+			}
+		}
+
+		if (on_usable_area) {
+			for (int x = -west_offset; x < (subtemplate->get_applied_width() + east_offset); ++x) {
+				for (int y = -north_offset; y < (subtemplate->get_applied_height() + south_offset); ++y) {
+					if (!this->is_map_pos_usable(subtemplate_pos + Vec2i(x, y))) {
+						on_usable_area = false;
+						break;
+					}
+				}
+				if (!on_usable_area) {
+					break;
+				}
+			}
+		}
+
+		if (!on_usable_area) {
+			continue;
+		}
+
+		return subtemplate_pos;
+	}
+
+	return QPoint(-1, -1);
 }
 
 /**

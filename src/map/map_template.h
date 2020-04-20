@@ -97,8 +97,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 public:
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char *database_folder = "map_templates";
-	static constexpr int MinAdjacentTemplateDistance = 4;
-	static constexpr int MaxAdjacentTemplateDistance = 16;
+	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
+	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
 
 	map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
@@ -116,6 +116,7 @@ public:
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+
 	bool IsSubtemplateArea() const;
 	const map_template *GetTopMapTemplate() const;
 
@@ -183,7 +184,7 @@ public:
 				continue;
 			}
 
-			offset = std::max(offset, map_template::MinAdjacentTemplateDistance + map_template->get_height() + map_template->GetDependentTemplatesNorthOffset());
+			offset = std::max(offset, map_template::min_adjacent_template_distance.y() + map_template->get_height() + map_template->GetDependentTemplatesNorthOffset());
 		}
 
 		return offset;
@@ -198,7 +199,7 @@ public:
 				continue;
 			}
 
-			offset = std::max(offset, map_template::MinAdjacentTemplateDistance + map_template->get_height() + map_template->GetDependentTemplatesSouthOffset());
+			offset = std::max(offset, map_template::min_adjacent_template_distance.y() + map_template->get_height() + map_template->GetDependentTemplatesSouthOffset());
 		}
 
 		return offset;
@@ -213,7 +214,7 @@ public:
 				continue;
 			}
 
-			offset = std::max(offset, map_template::MinAdjacentTemplateDistance + map_template->get_width() + map_template->GetDependentTemplatesWestOffset());
+			offset = std::max(offset, map_template::min_adjacent_template_distance.x() + map_template->get_width() + map_template->GetDependentTemplatesWestOffset());
 		}
 
 		return offset;
@@ -228,7 +229,7 @@ public:
 				continue;
 			}
 
-			offset = std::max(offset, map_template::MinAdjacentTemplateDistance + map_template->get_width() + map_template->GetDependentTemplatesEastOffset());
+			offset = std::max(offset, map_template::min_adjacent_template_distance.x() + map_template->get_width() + map_template->GetDependentTemplatesEastOffset());
 		}
 
 		return offset;
@@ -402,6 +403,8 @@ public:
 		}
 		return count;
 	}
+
+	QPoint generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
 
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
