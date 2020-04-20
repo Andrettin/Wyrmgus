@@ -45,6 +45,7 @@ class defines final : public QObject, public singleton<defines>
 
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
+	Q_PROPERTY(int scale_factor MEMBER scale_factor READ get_scale_factor)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
 
 public:
@@ -77,10 +78,32 @@ public:
 		return this->underground_time_of_day;
 	}
 
+	int get_scale_factor() const
+	{
+		return this->scale_factor;
+	}
+
+	QSize get_scaled_tile_size() const
+	{
+		return this->get_tile_size() * this->get_scale_factor();
+	}
+
+	int get_scaled_tile_width() const
+	{
+		return this->get_tile_size().width() * this->get_scale_factor();
+	}
+
+	int get_scaled_tile_height() const
+	{
+		return this->get_tile_size().height() * this->get_scale_factor();
+	}
+
+
 private:
 	QSize tile_size;
 	QSize icon_size;
 	time_of_day *underground_time_of_day = nullptr;
+	int scale_factor = 1;
 };
 
 }
