@@ -392,6 +392,17 @@ public:
 		return this->subtemplate_pos;
 	}
 
+	size_t get_total_adjacent_template_count() const
+	{
+		//return the total number of adjacent templates on which this template ultimately depends
+		size_t count = 0;
+		for (const map_template *map_template : this->AdjacentTemplates) {
+			count++;
+			count += map_template->get_total_adjacent_template_count();
+		}
+		return count;
+	}
+
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
 	terrain_type *get_unusable_area_terrain_type() const
@@ -417,7 +428,7 @@ private:
 	QSize size = QSize(0, 0);
 public:
 	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
-	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
+	int Priority = 100; //the priority of this map template, for the order of application of subtemplates
 private:
 	bool output_terrain_image = false;
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle

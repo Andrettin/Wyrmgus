@@ -234,8 +234,8 @@ void map_template::initialize()
 		std::sort(this->subtemplates.begin(), this->subtemplates.end(), [](const map_template *a, const map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
-				//give priority to the template if the other template's position depends on its own
 			} else if (
+				//give priority to the template if the other template's position depends on its own
 				(
 					vector::contains(a->AdjacentTemplates, b)
 					|| vector::contains(a->NorthOfTemplates, b)
@@ -269,6 +269,8 @@ void map_template::initialize()
 				)
 			) {
 				return true;
+			} else if (a->get_total_adjacent_template_count() != b->get_total_adjacent_template_count()) {
+				return a->get_total_adjacent_template_count() < b->get_total_adjacent_template_count();
 			} else if (a->get_applied_area_with_dependent_template_offsets() != b->get_applied_area_with_dependent_template_offsets()) {
 				return a->get_applied_area_with_dependent_template_offsets() > b->get_applied_area_with_dependent_template_offsets();
 			} else {
