@@ -439,8 +439,8 @@ void SaveMapPNG(const char *name)
 		return;
 	}
 
-	const size_t imageWidth = UI.CurrentMapLayer->get_width() * stratagus::defines::get()->get_tile_width();
-	const size_t imageHeight = UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_tile_height();
+	const size_t imageWidth = UI.CurrentMapLayer->get_width() * stratagus::defines::get()->get_scaled_tile_width();
+	const size_t imageHeight = UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height();
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -471,10 +471,10 @@ void SaveMapPNG(const char *name)
 			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;
 			srcRect.y = terrain->GetGraphics()->frame_map[tile].y;
 			//Wyrmgus end
-			dstRect.x = i * stratagus::defines::get()->get_tile_width();
-			dstRect.y = j * stratagus::defines::get()->get_tile_height();
-			srcRect.w = dstRect.w = stratagus::defines::get()->get_tile_width();
-			srcRect.h = dstRect.h = stratagus::defines::get()->get_tile_height();
+			dstRect.x = i * stratagus::defines::get()->get_scaled_tile_width();
+			dstRect.y = j * stratagus::defines::get()->get_scaled_tile_height();
+			srcRect.w = dstRect.w = stratagus::defines::get()->get_scaled_tile_width();
+			srcRect.h = dstRect.h = stratagus::defines::get()->get_scaled_tile_height();
 			//Wyrmgus start
 //			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
 			SDL_BlitSurface(terrain->GetGraphics()->Surface, &srcRect, mapImage, &dstRect);

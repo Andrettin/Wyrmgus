@@ -335,9 +335,6 @@ void CTileset::parse(lua_State *l)
 {
 	clear();
 
-	this->pixelTileSize.x = 32;
-	this->pixelTileSize.y = 32;
-
 	const int args = lua_gettop(l);
 	for (int j = 1; j < args; ++j) {
 		const char *value = LuaToString(l, j);
@@ -349,8 +346,6 @@ void CTileset::parse(lua_State *l)
 			this->Ident = LuaToString(l, j);
 		} else if (!strcmp(value, "image")) {
 			this->ImageFile = LuaToString(l, j);
-		} else if (!strcmp(value, "size")) {
-			CclGetPos(l, &this->pixelTileSize.x, &this->pixelTileSize.y, j);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");

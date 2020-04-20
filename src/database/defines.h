@@ -90,12 +90,12 @@ public:
 
 	int get_scaled_tile_width() const
 	{
-		return this->get_tile_size().width() * this->get_scale_factor();
+		return this->get_tile_width() * this->get_scale_factor();
 	}
 
 	int get_scaled_tile_height() const
 	{
-		return this->get_tile_size().height() * this->get_scale_factor();
+		return this->get_tile_height() * this->get_scale_factor();
 	}
 
 

@@ -1068,12 +1068,9 @@ static int CclDefineTileset(lua_State *l)
 {
 	CMap::Map.Tileset->parse(l);
 
-	//  Load and prepare the tileset
-	PixelSize pixelTileSize = CMap::Map.Tileset->getPixelTileSize();
-
 	ShowLoadProgress(_("Loading Tileset \"%s\""), CMap::Map.Tileset->ImageFile.c_str());
-	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, pixelTileSize.x, pixelTileSize.y);
-	CMap::Map.TileGraphic->Load();
+	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, stratagus::defines::get()->get_tile_size());
+	CMap::Map.TileGraphic->Load(false, stratagus::defines::get()->get_scale_factor());
 	return 0;
 }
 /**

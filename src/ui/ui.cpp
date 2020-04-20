@@ -223,8 +223,8 @@ void InitUserInterface()
 	// Calculations
 	//
 	if (CMap::Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::Map.Info.MapWidth * stratagus::defines::get()->get_tile_width() - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::Map.Info.MapHeight * stratagus::defines::get()->get_tile_height() - 1);
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::Map.Info.MapWidth * stratagus::defines::get()->get_scaled_tile_width() - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::Map.Info.MapHeight * stratagus::defines::get()->get_scaled_tile_height() - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -597,10 +597,10 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	//Wyrmgus start
-//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - 1;
-//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_tile_width() - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_tile_height() - 1;
+//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * stratagus::defines::get()->get_scaled_tile_width() - 1;
+//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * stratagus::defines::get()->get_scaled_tile_height() - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_scaled_tile_width() - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

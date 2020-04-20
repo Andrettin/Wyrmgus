@@ -1281,7 +1281,7 @@ Vec2i CUnitType::GetHalfTileSize() const
 
 PixelSize CUnitType::GetTilePixelSize() const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size());
+	return PixelSize(PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_scaled_tile_size());
 }
 
 Vec2i CUnitType::GetTileCenterPosOffset() const
@@ -2370,10 +2370,10 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileSize.x * stratagus::defines::get()->get_tile_width()) / 2;
-//	pos.y -= (type.Height - type.TileSize.y * stratagus::defines::get()->get_tile_height()) / 2;
-	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_tile_width()) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_tile_height()) / 2;
+//	pos.x -= (type.Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
+//	pos.y -= (type.Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
+	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
+	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
 	//Wyrmgus end
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;

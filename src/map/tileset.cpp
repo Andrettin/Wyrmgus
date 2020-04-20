@@ -200,7 +200,6 @@ void CTileset::clear()
 	Ident.clear();
 	//Wyrmgus end
 	ImageFile.clear();
-	pixelTileSize.x = pixelTileSize.y = 0;
 	tiles.clear();
 	TileTypeTable.clear();
 	solidTerrainTypes.clear();

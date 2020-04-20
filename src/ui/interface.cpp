@@ -490,7 +490,7 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	UI.SelectedViewport->Set(SavedMapPosition[position], stratagus::defines::get()->get_tile_size() / 2);
+	UI.SelectedViewport->Set(SavedMapPosition[position], stratagus::defines::get()->get_scaled_tile_size() / 2);
 }
 
 /**
@@ -1447,7 +1447,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_tile_height()) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_left_down;
 			MouseScrollState = ScrollLeftDown;
@@ -1459,7 +1459,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->get_width() * stratagus::defines::get()->get_tile_width()) - 1) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->get_width() * stratagus::defines::get()->get_scaled_tile_width()) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
@@ -1470,7 +1470,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_tile_height()) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_right_down;
 			MouseScrollState = ScrollRightDown;
@@ -1490,7 +1490,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_tile_height()) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_down;
 			MouseScrollState = ScrollDown;

@@ -133,7 +133,7 @@ void CIcon::load()
 		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
 	}
 
-	this->G->Load();
+	this->G->Load(false, stratagus::defines::get()->get_scale_factor());
 	if (Preference.GrayscaleIcons) {
 		this->GScale = this->G->Clone(true);
 	}

@@ -1192,10 +1192,13 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 */
 CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 {
-	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File, this->Width, this->Height);
+	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File, this->Resized ? 0 : this->Width, this->Resized ? 0 : this->Height);
 
 	if (this->IsLoaded()) {
 		g->Load(grayscale);
+		if (this->Resized) {
+			g->Resize(this->GraphicWidth, this->GraphicHeight);
+		}
 	}
 
 	return g;
@@ -1452,7 +1455,7 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 **
 **  @param grayscale  Make a grayscale surface
 */
-void CGraphic::Load(bool grayscale)
+void CGraphic::Load(const bool grayscale, const int scale_factor)
 {
 	if (Surface) {
 		return;
@@ -1512,6 +1515,10 @@ void CGraphic::Load(bool grayscale)
 	}
 #endif
 	GenFramesMap();
+
+	if (scale_factor != 1) {
+		this->Resize(this->GraphicWidth * scale_factor, this->GraphicHeight * scale_factor);
+	}
 }
 
 /**
@@ -2237,6 +2244,8 @@ void CGraphic::Resize(int w, int h)
 		return;
 	}
 
+	const QSize old_size = QSize(this->GraphicWidth, this->GraphicHeight);
+
 	// Resizing the same image multiple times looks horrible
 	// If the image has already been resized then get a clean copy first
 	if (Resized) {
@@ -2343,8 +2352,13 @@ void CGraphic::Resize(int w, int h)
 	if (useckey) {
 		SDL_SetColorKey(Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 	}
-	Width = GraphicWidth = w;
-	Height = GraphicHeight = h;
+	GraphicWidth = w;
+	GraphicHeight = h;
+
+	this->Width *= w;
+	this->Width /= old_size.width();
+	this->Height *= h;
+	this->Height /= old_size.height();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL && Textures) {

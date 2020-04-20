@@ -141,12 +141,18 @@ public:
 
 
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
+
+	static CGraphic *New(const std::string &file, const QSize &size)
+	{
+		return CGraphic::New(file, size.width(), size.height());
+	}
+
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
 
-	void Load(bool grayscale = false);
+	void Load(const bool grayscale = false, const int scale_factor = 1);
 	void Flip();
 	void UseDisplayFormat();
 	void Resize(int w, int h);
@@ -252,6 +258,12 @@ public:
 	//Wyrmgus end
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
+
+	static CPlayerColorGraphic *New(const std::string &file, const QSize &size)
+	{
+		return CPlayerColorGraphic::New(file, size.width(), size.height());
+	}
+
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 	static CPlayerColorGraphic *Get(const std::string &file);
 

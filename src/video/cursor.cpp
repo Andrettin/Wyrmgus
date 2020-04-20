@@ -301,7 +301,7 @@ void DrawBuildingCursor()
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize());
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * stratagus::defines::get()->get_tile_width() + 1;
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * stratagus::defines::get()->get_scaled_tile_width() + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -351,8 +351,8 @@ void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, screenPos.x + w * stratagus::defines::get()->get_tile_width(),
-										 screenPos.y + h * stratagus::defines::get()->get_tile_height(), stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height(), 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * stratagus::defines::get()->get_scaled_tile_width(),
+										 screenPos.y + h * stratagus::defines::get()->get_scaled_tile_height(), stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height(), 95);
 		}
 	}
 	PopClipping();

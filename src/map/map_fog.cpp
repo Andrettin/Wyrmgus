@@ -717,7 +717,7 @@ void VideoDrawOnlyFog(int x, int y)
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-								x, y, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
+								x, y, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height());
 	} else
 #endif
 	{
@@ -938,9 +938,9 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
 	int FogTileVariation = 0;
 	CGraphic *fog_graphic = CMap::Map.FogGraphics;
-	if (sx % 3 == 0 && fog_graphic->Surface->h / stratagus::defines::get()->get_tile_height() >= 3) {
+	if (sx % 3 == 0 && fog_graphic->Surface->h / stratagus::defines::get()->get_scaled_tile_height() >= 3) {
 		FogTileVariation = 2;
-	} else if (sx % 2 == 0 && fog_graphic->Surface->h / stratagus::defines::get()->get_tile_height() >= 2) {
+	} else if (sx % 2 == 0 && fog_graphic->Surface->h / stratagus::defines::get()->get_scaled_tile_height() >= 2) {
 		FogTileVariation = 1;
 	}
 	if (FogTable[fogTileIndex] && FogTable[fogTileIndex] != 16) {
@@ -1045,13 +1045,13 @@ void CViewport::DrawMapFogOfWar() const
 			//Wyrmgus end
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
-				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
+				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height());
 			}
 			++sx;
-			dx += stratagus::defines::get()->get_tile_width();
+			dx += stratagus::defines::get()->get_scaled_tile_width();
 		}
 		sy += UI.CurrentMapLayer->get_width();
-		dy += stratagus::defines::get()->get_tile_height();
+		dy += stratagus::defines::get()->get_scaled_tile_height();
 	}
 }
 
@@ -1069,7 +1069,7 @@ void CMap::InitFogOfWar()
 	Uint8 r, g, b;
 	SDL_Surface *s;
 
-	fog_graphic->Load();
+	fog_graphic->Load(false, stratagus::defines::get()->get_scale_factor());
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -1078,7 +1078,7 @@ void CMap::InitFogOfWar()
 		//
 		// Generate Only Fog surface.
 		//
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height(),
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height(),
 								 32, RMASK, GMASK, BMASK, AMASK);
 
 		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
@@ -1141,13 +1141,13 @@ void CMap::InitFogOfWar()
 		}
 		CGraphic *alpha_fog_graphic = CGraphic::New("");
 		alpha_fog_graphic->Surface = s;
-		alpha_fog_graphic->Width = stratagus::defines::get()->get_tile_width();
-		alpha_fog_graphic->Height = stratagus::defines::get()->get_tile_height();
+		alpha_fog_graphic->Width = stratagus::defines::get()->get_scaled_tile_width();
+		alpha_fog_graphic->Height = stratagus::defines::get()->get_scaled_tile_height();
 		alpha_fog_graphic->GraphicWidth = s->w;
 		alpha_fog_graphic->GraphicHeight = s->h;
 		//Wyrmgus start
 //		alpha_fog_graphic->NumFrames = 16;//1;
-		alpha_fog_graphic->NumFrames = 16 * (s->h / stratagus::defines::get()->get_tile_height());//1;
+		alpha_fog_graphic->NumFrames = 16 * (s->h / stratagus::defines::get()->get_scaled_tile_height());//1;
 		//Wyrmgus end
 		alpha_fog_graphic->GenFramesMap();
 		alpha_fog_graphic->UseDisplayFormat();

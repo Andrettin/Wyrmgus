@@ -387,7 +387,7 @@ void CMinimap::UpdateTerrain(int z)
 	}
 
 	//Wyrmgus start
-//	const int tilepitch = Map.TileGraphic->Surface->w / Map.GetCurrentPixelTileSize().x;
+//	const int tilepitch = Map.TileGraphic->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
 	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -435,19 +435,19 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
+			int tilepitch = terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
 			const int bpp = terrain->GetGraphics(season)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
+			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
 			//assumes the BPP for the base terrain is the same as for the top terrain (which may be an overlay)
 			//Wyrmgus end
 	
-			const int xofs = stratagus::defines::get()->get_tile_width() * (tile % tilepitch);
-			const int yofs = stratagus::defines::get()->get_tile_height() * (tile / tilepitch);
+			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
+			const int yofs = stratagus::defines::get()->get_scaled_tile_height() * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = stratagus::defines::get()->get_tile_width() * (base_tile % base_tilepitch);
-			const int base_yofs = stratagus::defines::get()->get_tile_height() * (base_tile / base_tilepitch);
+			const int base_xofs = stratagus::defines::get()->get_scaled_tile_width() * (base_tile % base_tilepitch);
+			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -594,7 +594,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 
 	//Wyrmgus start
-//	const int tilepitch = Map.TileGraphic->Surface->w / Map.GetCurrentPixelTileSize().x;
+//	const int tilepitch = Map.TileGraphic->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 
@@ -681,18 +681,18 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
+			int tilepitch = terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
 			const int bpp = terrain->GetGraphics(season)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_tile_width();
+			int base_tilepitch = base_terrain->GetGraphics(season)->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
 			//Wyrmgus end
 	
-			const int xofs = stratagus::defines::get()->get_tile_width() * (tile % tilepitch);
-			const int yofs = stratagus::defines::get()->get_tile_height() * (tile / tilepitch);
+			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
+			const int yofs = stratagus::defines::get()->get_scaled_tile_height() * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = stratagus::defines::get()->get_tile_width() * (base_tile % base_tilepitch);
-			const int base_yofs = stratagus::defines::get()->get_tile_height() * (base_tile / base_tilepitch);
+			const int base_xofs = stratagus::defines::get()->get_scaled_tile_width() * (base_tile % base_tilepitch);
+			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

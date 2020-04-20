@@ -4551,8 +4551,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 	//Wyrmgus start
-//	int x = tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (Type->Width - Type->TileSize.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + Type->OffsetX;
-//	int y = tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (Type->Height - Type->TileSize.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
+//	int x = tilePos.x * stratagus::defines::get()->get_tile_width() + IX - (Type->Width - Type->TileSize.x * stratagus::defines::get()->get_tile_width()) / 2 + Type->OffsetX;
+//	int y = tilePos.y * stratagus::defines::get()->get_tile_height() + IY - (Type->Height - Type->TileSize.y * stratagus::defines::get()->get_tile_height()) / 2 + Type->OffsetY;
 
 	int frame_width = Type->Width;
 	int frame_height = Type->Height;
@@ -5349,7 +5349,7 @@ Vec2i CUnit::GetHalfTileSize() const
 
 PixelSize CUnit::GetTilePixelSize() const
 {
-	return PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size();
+	return PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_scaled_tile_size();
 }
 
 PixelSize CUnit::GetHalfTilePixelSize() const

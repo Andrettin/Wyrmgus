@@ -276,21 +276,21 @@ void CMap::Reveal(bool only_person_players)
 
 Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos) const
 {
-	const Vec2i tilePos(mapPos.x / stratagus::defines::get()->get_tile_width(), mapPos.y / stratagus::defines::get()->get_tile_height());
+	const Vec2i tilePos(mapPos.x / stratagus::defines::get()->get_scaled_tile_width(), mapPos.y / stratagus::defines::get()->get_scaled_tile_height());
 
 	return tilePos;
 }
 
 PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
 {
-	PixelPos mapPixelPos(tilePos.x * stratagus::defines::get()->get_tile_width(), tilePos.y * stratagus::defines::get()->get_tile_height());
+	PixelPos mapPixelPos(tilePos.x * stratagus::defines::get()->get_scaled_tile_width(), tilePos.y * stratagus::defines::get()->get_scaled_tile_height());
 
 	return mapPixelPos;
 }
 
 PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
 {
-	return TilePosToMapPixelPos_TopLeft(tilePos) + stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2;
+	return TilePosToMapPixelPos_TopLeft(tilePos) + stratagus::size::to_point(stratagus::defines::get()->get_scaled_tile_size()) / 2;
 }
 
 //Wyrmgus start
@@ -1215,7 +1215,7 @@ void ChangeCurrentMapLayer(const int z)
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = CMap::Map.MapLayers[z];
 	UI.Minimap.UpdateCache = true;
-	UI.SelectedViewport->Set(new_viewport_map_pos, stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2);
+	UI.SelectedViewport->Set(new_viewport_map_pos, stratagus::size::to_point(stratagus::defines::get()->get_scaled_tile_size()) / 2);
 	UpdateSurfaceLayerButtons();
 }
 

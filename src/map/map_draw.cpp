@@ -150,7 +150,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
 
-	return topLeft + stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2;
+	return topLeft + stratagus::size::to_point(stratagus::defines::get()->get_scaled_tile_size()) / 2;
 }
 
 /// convert tilepos coordonates into screen (take the center of the tile)
@@ -175,27 +175,27 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
-	this->MapPos.x = x / stratagus::defines::get()->get_tile_width();
-	if (x < 0 && x % stratagus::defines::get()->get_tile_width()) {
+	this->MapPos.x = x / stratagus::defines::get()->get_scaled_tile_width();
+	if (x < 0 && x % stratagus::defines::get()->get_scaled_tile_width()) {
 		this->MapPos.x--;
 	}
-	this->MapPos.y = y / stratagus::defines::get()->get_tile_height();
-	if (y < 0 && y % stratagus::defines::get()->get_tile_height()) {
+	this->MapPos.y = y / stratagus::defines::get()->get_scaled_tile_height();
+	if (y < 0 && y % stratagus::defines::get()->get_scaled_tile_height()) {
 		this->MapPos.y--;
 	}
-	this->Offset.x = x % stratagus::defines::get()->get_tile_width();
+	this->Offset.x = x % stratagus::defines::get()->get_scaled_tile_width();
 	if (this->Offset.x < 0) {
-		this->Offset.x += stratagus::defines::get()->get_tile_width();
+		this->Offset.x += stratagus::defines::get()->get_scaled_tile_width();
 	}
-	this->Offset.y = y % stratagus::defines::get()->get_tile_height();
+	this->Offset.y = y % stratagus::defines::get()->get_scaled_tile_height();
 	if (this->Offset.y < 0) {
-		this->Offset.y += stratagus::defines::get()->get_tile_height();
+		this->Offset.y += stratagus::defines::get()->get_scaled_tile_height();
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / stratagus::defines::get()->get_tile_width() + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / stratagus::defines::get()->get_tile_height() + 1;
+	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / stratagus::defines::get()->get_scaled_tile_width() + 1;
+	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / stratagus::defines::get()->get_scaled_tile_height() + 1;
 }
 
 /**
@@ -257,7 +257,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 	while (sy  < 0) {
 		sy++;
-		dy += stratagus::defines::get()->get_tile_height();
+		dy += stratagus::defines::get()->get_scaled_tile_height();
 	}
 	sy *=  UI.CurrentMapLayer->get_width();
 
@@ -267,7 +267,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
 			if (sx - sy < 0) {
 				++sx;
-				dx += stratagus::defines::get()->get_tile_width();
+				dx += stratagus::defines::get()->get_scaled_tile_width();
 				continue;
 			}
 			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
@@ -391,10 +391,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus end
 			++sx;
-			dx += stratagus::defines::get()->get_tile_width();
+			dx += stratagus::defines::get()->get_scaled_tile_width();
 		}
 		sy += UI.CurrentMapLayer->get_width();
-		dy += stratagus::defines::get()->get_tile_height();
+		dy += stratagus::defines::get()->get_scaled_tile_height();
 	}
 }
 

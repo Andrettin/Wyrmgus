@@ -214,8 +214,6 @@ public:
 	bool isAWoodTile(unsigned tile) const;
 	bool isARockTile(unsigned tile) const;
 
-	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
-
 	//Wyrmgus start
 //	unsigned getRemovedRockTile() const { return removedRockTile; }
 //	unsigned getRemovedTreeTile() const { return removedTreeTile; }
@@ -294,7 +292,6 @@ public:
 	std::vector<unsigned> removedRockTiles;  /// Tiles placed where trees are gone
 	//Wyrmgus end
 private:
-	PixelSize pixelTileSize;    /// Size of a tile in pixel
 	//Wyrmgus start
 //	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 	//Wyrmgus end

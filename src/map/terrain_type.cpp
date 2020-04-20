@@ -55,16 +55,16 @@ void terrain_type::LoadTerrainTypeGraphics()
 {
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
 		if (terrain_type->Graphics) {
-			terrain_type->Graphics->Load();
+			terrain_type->Graphics->Load(false, defines::get()->get_scale_factor());
 		}
 		for (std::map<const CSeason *, CGraphic *>::iterator sub_it = terrain_type->SeasonGraphics.begin(); sub_it != terrain_type->SeasonGraphics.end(); ++sub_it) {
-			sub_it->second->Load();
+			sub_it->second->Load(false, defines::get()->get_scale_factor());
 		}
 		if (terrain_type->ElevationGraphics) {
-			terrain_type->ElevationGraphics->Load();
+			terrain_type->ElevationGraphics->Load(false, defines::get()->get_scale_factor());
 		}
 		if (terrain_type->PlayerColorGraphics) {
-			terrain_type->PlayerColorGraphics->Load();
+			terrain_type->PlayerColorGraphics->Load(false, defines::get()->get_scale_factor());
 		}
 	}
 }
