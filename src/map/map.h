@@ -472,7 +472,6 @@ inline void SetTileTerrain(const std::string &terrain_ident, int x, int y, int v
 	const Vec2i pos(x, y);
 	SetTileTerrain(terrain_ident, pos, value, z);
 }
-extern void ApplyMapTemplate(const std::string &map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
 extern void ApplyCampaignMap(const std::string &campaign_ident);
 //Wyrmgus end
 
