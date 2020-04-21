@@ -133,7 +133,7 @@ void LoadCursors(const std::string civilization_name)
 
 		if (cursor.G && !cursor.G->IsLoaded()) {
 			UpdateLoadProgress();
-			cursor.G->Load();
+			cursor.G->Load(false, stratagus::defines::get()->get_scale_factor());
 			cursor.G->UseDisplayFormat();
 
 			IncItemsLoaded();
@@ -383,7 +383,7 @@ void DrawCursor()
 	if (GameCursor == nullptr) {
 		return;
 	}
-	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
+	const PixelPos pos = CursorScreenPos - GameCursor->HotPos * stratagus::defines::get()->get_scale_factor();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL &&
@@ -431,7 +431,7 @@ void HideCursor()
 	if (
 #endif
 		!GameRunning && !Editor.Running && GameCursor) {
-		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
+		const PixelPos pos = CursorScreenPos - GameCursor->HotPos * stratagus::defines::get()->get_scale_factor();
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
 		SDL_BlitSurface(HiddenSurface, nullptr, TheScreen, &dstRect);
 	}
