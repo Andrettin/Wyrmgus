@@ -2375,8 +2375,8 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
 	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
 	//Wyrmgus end
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
+	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	/*
