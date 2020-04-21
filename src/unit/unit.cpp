@@ -4552,6 +4552,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 //	int x = tilePos.x * stratagus::defines::get()->get_tile_width() + IX - (Type->Width - Type->TileSize.x * stratagus::defines::get()->get_tile_width()) / 2 + Type->OffsetX;
 //	int y = tilePos.y * stratagus::defines::get()->get_tile_height() + IY - (Type->Height - Type->TileSize.y * stratagus::defines::get()->get_tile_height()) / 2 + Type->OffsetY;
 
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	int frame_width = Type->Width;
 	int frame_height = Type->Height;
 	const CUnitTypeVariation *variation = this->GetVariation();
@@ -4559,9 +4561,11 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_width = variation->FrameWidth;
 		frame_height = variation->FrameHeight;
 	}
+	frame_width *= scale_factor;
+	frame_height *= scale_factor;
 
-	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2 + Type->OffsetX;
-	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY;
+	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2 + Type->OffsetX * scale_factor;
+	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY * scale_factor;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
@@ -5284,6 +5288,7 @@ CUnit *UnitOnScreen(int x, int y)
 		// Check if mouse is over the unit.
 		//
 		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
+		const int scale_factor = stratagus::defines::get()->get_scale_factor();
 		//Wyrmgus start
 //		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
 //						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
@@ -5291,19 +5296,19 @@ CUnit *UnitOnScreen(int x, int y)
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->File.empty()) {
-			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-							  (variation->FrameWidth - variation->Sprite->Width) / 2 + type.BoxOffsetX;
-			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-							  (variation->FrameHeight - variation->Sprite->Height) / 2 + type.BoxOffsetY;
+			unitSpritePos.x = unitSpritePos.x - type.BoxWidth * scale_factor / 2 -
+							  (variation->FrameWidth * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
+			unitSpritePos.y = unitSpritePos.y - type.BoxHeight * scale_factor / 2 -
+							  (variation->FrameHeight * scale_factor - variation->Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		} else {
-			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-							  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
-			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-							  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+			unitSpritePos.x = unitSpritePos.x - type.BoxWidth * scale_factor / 2 -
+							  (type.Width * scale_factor - type.Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
+			unitSpritePos.y = unitSpritePos.y - type.BoxHeight * scale_factor / 2 -
+							  (type.Height * scale_factor - type.Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		}
 		//Wyrmgus end
-		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
-			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
+		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.BoxWidth * scale_factor)
+			&& y >= unitSpritePos.y  && y < (unitSpritePos.y + type.BoxHeight * scale_factor)) {
 			// Check if there are other units on this place
 			candidate = &unit;
 			//Wyrmgus start
