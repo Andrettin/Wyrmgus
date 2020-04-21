@@ -200,16 +200,14 @@ int DoActionMove(CUnit &unit)
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
-		unit.IX = 0;
-		unit.IY = 0;
+		unit.pixel_offset = QPoint(0, 0);
 		//Wyrmgus start
 		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
-					table[i]->IX = 0;
-					table[i]->IY = 0;
+					table[i]->pixel_offset = QPoint(0, 0);
 				}
 			}
 		}
@@ -262,8 +260,8 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
-					table[i]->IX = -posd.x * stratagus::defines::get()->get_tile_width();
-					table[i]->IY = -posd.y * stratagus::defines::get()->get_tile_height();
+					table[i]->pixel_offset.setX(-posd.x * stratagus::defines::get()->get_tile_width());
+					table[i]->pixel_offset.setY(-posd.y * stratagus::defines::get()->get_tile_height());
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -293,8 +291,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * stratagus::defines::get()->get_tile_width();
-		unit.IY = -posd.y * stratagus::defines::get()->get_tile_height();
+		unit.pixel_offset.setX(-posd.x * stratagus::defines::get()->get_tile_width());
+		unit.pixel_offset.setY(-posd.y * stratagus::defines::get()->get_tile_height());
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -309,8 +307,7 @@ int DoActionMove(CUnit &unit)
 	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
 	//Wyrmgus end
 
-	unit.IX += posd.x * move;
-	unit.IY += posd.y * move;
+	unit.pixel_offset += QPoint(posd.x * move, posd.y * move);
 	
 	//Wyrmgus start
 	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
@@ -318,17 +315,15 @@ int DoActionMove(CUnit &unit)
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
-				table[i]->IX += posd.x * move;
-				table[i]->IY += posd.y * move;
+				table[i]->pixel_offset += QPoint(posd.x * move, posd.y * move);
 			}
 		}
 	}
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (stratagus::defines::get()->get_tile_width() * 2) || abs(unit.IY) > (stratagus::defines::get()->get_tile_height() * 2)) {
-		unit.IX = 0;
-		unit.IY = 0;
+	if (abs(unit.get_pixel_offset().x()) > (stratagus::defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (stratagus::defines::get()->get_tile_height() * 2)) {
+		unit.pixel_offset = QPoint(0, 0);
 #ifdef DEBUG
 		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
 #endif
@@ -338,8 +333,7 @@ int DoActionMove(CUnit &unit)
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
-					table[i]->IX = 0;
-					table[i]->IY = 0;
+					table[i]->pixel_offset = QPoint(0, 0);
 				}
 			}
 		}
@@ -349,7 +343,7 @@ int DoActionMove(CUnit &unit)
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
 	// FIXME: this is broken for subtile movement
-	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
+	if (!unit.Anim.Unbreakable && !unit.get_pixel_offset().x() && !unit.get_pixel_offset().y()) {
 		unit.Moving = 0;
 	}
 

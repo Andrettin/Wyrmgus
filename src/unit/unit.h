@@ -370,6 +370,13 @@ public:
 	PixelSize GetTilePixelSize() const;
 	PixelSize GetHalfTilePixelSize() const;
 	QPoint get_center_tile_pos() const;
+
+	const QPoint &get_pixel_offset() const
+	{
+		return this->pixel_offset;
+	}
+
+	QPoint get_scaled_pixel_offset() const;
 	
 	CUnit *GetFirstContainer() const;
 
@@ -543,8 +550,7 @@ public:
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
 
-	signed char IX;         /// X image displacement to map position
-	signed char IY;         /// Y image displacement to map position
+	QPoint pixel_offset;         /// pixel image displacement to map position
 	unsigned char Direction; //: 8; /// angle (0-255) unit looking
 	//Wyrmgus start
 	unsigned char GivesResource;	/// The resource currently given by the unit
@@ -581,13 +587,11 @@ public:
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		_seen_stuff_() : CFrame(nullptr), Type(nullptr), tilePos(-1, -1) {}
-		const CConstructionFrame  *CFrame;  /// Seen construction frame
+		const CConstructionFrame *CFrame = nullptr;  /// Seen construction frame
 		int         Frame;                  /// last seen frame/stage of buildings
-		const CUnitType  *Type;             /// Pointer to last seen unit-type
-		Vec2i       tilePos;                /// Last unit->tilePos Seen
-		signed char IX;                     /// Seen X image displacement to map position
-		signed char IY;                     /// seen Y image displacement to map position
+		const CUnitType *Type = nullptr;             /// Pointer to last seen unit-type
+		Vec2i       tilePos = Vec2i(-1, -1);                /// Last unit->tilePos Seen
+		QPoint pixel_offset;                /// seen pixel image displacement to map position
 		unsigned    UnderConstruction : 1;        /// Unit seen construction
 		unsigned    State : 3;              /// Unit seen build/upgrade state
 unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not

@@ -417,9 +417,9 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 */
 static char CalculateStereo(const CUnit &unit)
 {
-	int stereo = ((unit.tilePos.x * stratagus::defines::get()->get_tile_width() + unit.Type->TileSize.x * stratagus::defines::get()->get_tile_width() / 2 +
-				   unit.IX - UI.SelectedViewport->MapPos.x * stratagus::defines::get()->get_tile_width()) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * stratagus::defines::get()->get_tile_width())) - 128;
+	int stereo = ((unit.tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width() / 2 +
+				   unit.get_scaled_pixel_offset().x() - UI.SelectedViewport->MapPos.x * stratagus::defines::get()->get_scaled_tile_width()) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * stratagus::defines::get()->get_scaled_tile_width())) - 128;
 	clamp(&stereo, -128, 127);
 	return stereo;
 }

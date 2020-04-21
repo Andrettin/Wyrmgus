@@ -2521,7 +2521,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 {
 	if (!type.ShadowFile.empty()) {
 		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
-		type.ShadowSprite->Load();
+		type.ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		if (type.Flip) {
 			type.ShadowSprite->Flip();
 		}
@@ -2541,7 +2541,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (!resinfo->FileWhenLoaded.empty()) {
 				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
 																	 type.Width, type.Height);
-				resinfo->SpriteWhenLoaded->Load();
+				resinfo->SpriteWhenLoaded->Load(false, stratagus::defines::get()->get_scale_factor());
 				if (type.Flip) {
 					resinfo->SpriteWhenLoaded->Flip();
 				}
@@ -2549,7 +2549,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (!resinfo->FileWhenEmpty.empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
 																	type.Width, type.Height);
-				resinfo->SpriteWhenEmpty->Load();
+				resinfo->SpriteWhenEmpty->Load(false, stratagus::defines::get()->get_scale_factor());
 				if (type.Flip) {
 					resinfo->SpriteWhenEmpty->Flip();
 				}
@@ -2559,7 +2559,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 
 	if (!type.File.empty()) {
 		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
-		type.Sprite->Load();
+		type.Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		if (type.Flip) {
 			type.Sprite->Flip();
 		}
@@ -2580,7 +2580,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {
 		type.LightSprite = CGraphic::New(type.LightFile, type.Width, type.Height);
-		type.LightSprite->Load();
+		type.LightSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		if (type.Flip) {
 			type.LightSprite->Flip();
 		}
@@ -2588,7 +2588,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (!type.LayerFiles[i].empty()) {
 			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.Width, type.Height);
-			type.LayerSprites[i]->Load();
+			type.LayerSprites[i]->Load(false, stratagus::defines::get()->get_scale_factor());
 			if (type.Flip) {
 				type.LayerSprites[i]->Flip();
 			}
@@ -2606,14 +2606,14 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 		if (!variation->File.empty()) {
 			variation->Sprite = CPlayerColorGraphic::New(variation->File, frame_width, frame_height);
-			variation->Sprite->Load();
+			variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 			if (type.Flip) {
 				variation->Sprite->Flip();
 			}
 		}
 		if (!variation->ShadowFile.empty()) {
 			variation->ShadowSprite = CGraphic::New(variation->ShadowFile, type.ShadowWidth, type.ShadowHeight);
-			variation->ShadowSprite->Load();
+			variation->ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 			if (type.Flip) {
 				variation->ShadowSprite->Flip();
 			}
@@ -2623,7 +2623,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 		if (!variation->LightFile.empty()) {
 			variation->LightSprite = CGraphic::New(variation->LightFile, frame_width, frame_height);
-			variation->LightSprite->Load();
+			variation->LightSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 			if (type.Flip) {
 				variation->LightSprite->Flip();
 			}
@@ -2631,7 +2631,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		for (int j = 0; j < MaxImageLayers; ++j) {
 			if (!variation->LayerFiles[j].empty()) {
 				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], frame_width, frame_height);
-				variation->LayerSprites[j]->Load();
+				variation->LayerSprites[j]->Load(false, stratagus::defines::get()->get_scale_factor());
 				if (type.Flip) {
 					variation->LayerSprites[j]->Flip();
 				}
@@ -2641,14 +2641,14 @@ void LoadUnitTypeSprite(CUnitType &type)
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (!variation->FileWhenLoaded[j].empty()) {
 				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], frame_width, frame_height);
-				variation->SpriteWhenLoaded[j]->Load();
+				variation->SpriteWhenLoaded[j]->Load(false, stratagus::defines::get()->get_scale_factor());
 				if (type.Flip) {
 					variation->SpriteWhenLoaded[j]->Flip();
 				}
 			}
 			if (!variation->FileWhenEmpty[j].empty()) {
 				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], frame_width, frame_height);
-				variation->SpriteWhenEmpty[j]->Load();
+				variation->SpriteWhenEmpty[j]->Load(false, stratagus::defines::get()->get_scale_factor());
 				if (type.Flip) {
 					variation->SpriteWhenEmpty[j]->Flip();
 				}
@@ -2660,7 +2660,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		for (CUnitTypeVariation *layer_variation : type.LayerVariations[i]) {
 			if (!layer_variation->File.empty()) {
 				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.Width, type.Height);
-				layer_variation->Sprite->Load();
+				layer_variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 				if (type.Flip) {
 					layer_variation->Sprite->Flip();
 				}
@@ -2669,7 +2669,6 @@ void LoadUnitTypeSprite(CUnitType &type)
 	}
 	//Wyrmgus end
 }
-
 
 /**
 ** Return the amount of unit-types.

@@ -155,8 +155,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 #else
 	file.printf("\"stats\", %d,\n  ", unit.Player->Index);
 #endif
-	file.printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
-	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
+	file.printf("\"pixel\", {%d, %d}, ", unit.get_pixel_offset().x(), unit.get_pixel_offset().y());
+	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.pixel_offset.x(), unit.Seen.pixel_offset.y());
 	file.printf("\"frame\", %d, ", unit.Frame);
 	if (unit.Seen.Frame != UnitNotSeen) {
 		file.printf("\"seen\", %d, ", unit.Seen.Frame);

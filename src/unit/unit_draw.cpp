@@ -1131,8 +1131,8 @@ void CUnit::Draw(const CViewport &vp) const
 	} else {
 		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
 
-		screenPos.x += this->Seen.IX * stratagus::defines::get()->get_scale_factor();
-		screenPos.y += this->Seen.IY * stratagus::defines::get()->get_scale_factor();
+		screenPos.x += this->Seen.pixel_offset.x() * stratagus::defines::get()->get_scale_factor();
+		screenPos.y += this->Seen.pixel_offset.y() * stratagus::defines::get()->get_scale_factor();
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
 		under_construction = this->Seen.UnderConstruction;
@@ -1409,8 +1409,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->tilePos.y + c1->Type->TileSize.y - 1) * stratagus::defines::get()->get_tile_height() + c1->IY;
-		const int pos2 = (c2->tilePos.y + c2->Type->TileSize.y - 1) * stratagus::defines::get()->get_tile_height() + c2->IY;
+		const int pos1 = (c1->tilePos.y + c1->Type->TileSize.y - 1) * stratagus::defines::get()->get_tile_height() + c1->get_pixel_offset().y();
+		const int pos2 = (c2->tilePos.y + c2->Type->TileSize.y - 1) * stratagus::defines::get()->get_tile_height() + c2->get_pixel_offset().y();
 		return pos1 == pos2 ?
 			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

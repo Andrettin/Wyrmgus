@@ -625,7 +625,7 @@ static void DumpUnitInfo(CUnit &unit)
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? static_cast<int>(unit.CurrentAction()) : -1,
 			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
-			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
+			unit.tilePos.x, unit.tilePos.y, unit.get_pixel_offset().x(), unit.get_pixel_offset().y());
 #if 0
 	SaveUnit(unit, logf);
 #endif

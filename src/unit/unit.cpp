@@ -487,8 +487,7 @@ void CUnit::Init()
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
-	IX = 0;
-	IY = 0;
+	this->pixel_offset = QPoint(0, 0);
 	Frame = 0;
 	Direction = 0;
 	DamagedType = ANIMATIONS_DEATHTYPES;
@@ -4251,8 +4250,7 @@ static void UnitFillSeenValues(CUnit &unit)
 {
 	// Seen values are undefined for visible units.
 	unit.Seen.tilePos = unit.tilePos;
-	unit.Seen.IY = unit.IY;
-	unit.Seen.IX = unit.IX;
+	unit.Seen.pixel_offset = unit.get_pixel_offset();
 	unit.Seen.Frame = unit.Frame;
 	unit.Seen.Type = unit.Type;
 	unit.Seen.UnderConstruction = unit.UnderConstruction;
@@ -4562,8 +4560,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_height = variation->FrameHeight;
 	}
 
-	int x = tilePos.x * stratagus::defines::get()->get_tile_width() + IX - (frame_width - Type->TileSize.x * stratagus::defines::get()->get_tile_width()) / 2 + Type->OffsetX;
-	int y = tilePos.y * stratagus::defines::get()->get_tile_height() + IY - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_tile_height()) / 2 + Type->OffsetY;
+	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2 + Type->OffsetX;
+	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
@@ -5327,7 +5325,7 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::GetMapPixelPosTopLeft() const
 {
-	const PixelPos pos(tilePos.x * stratagus::defines::get()->get_tile_width() + IX, tilePos.y * stratagus::defines::get()->get_tile_height() + IY);
+	const PixelPos pos(tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x(), tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y());
 	return pos;
 }
 
@@ -5361,6 +5359,11 @@ QPoint CUnit::get_center_tile_pos() const
 {
 	const CUnit *first_container = this->GetFirstContainer();
 	return first_container->tilePos + first_container->Type->GetTileCenterPosOffset();
+}
+
+QPoint CUnit::get_scaled_pixel_offset() const
+{
+	return this->get_pixel_offset() * stratagus::defines::get()->get_scale_factor();
 }
 
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
@@ -6705,8 +6708,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit.IX = (type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2;
-		unit.IY = (type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2;
+		unit.pixel_offset.setX((type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2);
+		unit.pixel_offset.setY((type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2);
 
 		unit.CurrentSightRange = type->CorpseType->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {

@@ -48,8 +48,8 @@ void MissileClipToTarget::Action()
 	this->Wait = this->Type->Sleep;
 
 	if (this->TargetUnit != nullptr) {
-		this->position.x = this->TargetUnit->tilePos.x * stratagus::defines::get()->get_tile_width() + this->TargetUnit->IX;
-		this->position.y = this->TargetUnit->tilePos.y * stratagus::defines::get()->get_tile_height() + this->TargetUnit->IY;
+		this->position.x = this->TargetUnit->tilePos.x * stratagus::defines::get()->get_tile_width() + this->TargetUnit->get_pixel_offset().x();
+		this->position.y = this->TargetUnit->tilePos.y * stratagus::defines::get()->get_tile_height() + this->TargetUnit->get_pixel_offset().y();
 	}
 
 	if (this->NextMissileFrame(1, 0)) {

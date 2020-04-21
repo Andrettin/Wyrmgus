@@ -461,11 +461,15 @@ static int CclUnit(lua_State *l)
 			unit->Stats = &type->Stats[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
 			lua_rawgeti(l, 2, j + 1);
-			CclGetPos(l, &unit->IX , &unit->IY, -1);
+			Vec2i pixel_offset;
+			CclGetPos(l, &pixel_offset.x, &pixel_offset.y, -1);
+			unit->pixel_offset = pixel_offset;
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "seen-pixel")) {
 			lua_rawgeti(l, 2, j + 1);
-			CclGetPos(l, &unit->Seen.IX , &unit->Seen.IY, -1);
+			Vec2i pixel_offset;
+			CclGetPos(l, &pixel_offset.x, &pixel_offset.y, -1);
+			unit->Seen.pixel_offset = pixel_offset;
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "frame")) {
 			unit->Frame = LuaToNumber(l, 2, j + 1);

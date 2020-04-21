@@ -70,8 +70,8 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * stratagus::defines::get()->get_tile_width() + goal->IX + moff.x + startx;
-		start.y = goal->tilePos.y * stratagus::defines::get()->get_tile_height() + goal->IY + moff.y + starty;
+		start.x = goal->tilePos.x * stratagus::defines::get()->get_tile_width() + goal->get_pixel_offset().x() + moff.x + startx;
+		start.y = goal->tilePos.y * stratagus::defines::get()->get_tile_height() + goal->get_pixel_offset().y() + moff.y + starty;
 	} else {
 		start.x = (goal->tilePos.x + startx) * stratagus::defines::get()->get_tile_width() + stratagus::defines::get()->get_tile_width() / 2 + moff.x;
 		start.y = (goal->tilePos.y + starty) * stratagus::defines::get()->get_tile_height() + stratagus::defines::get()->get_tile_height() / 2 + moff.y;
