@@ -1111,6 +1111,7 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h, c
 		g->HashFile = g->File;
 		g->Width = w;
 		g->Height = h;
+		g->original_frame_size = QSize(w, h);
 	} else {
 		++g->Refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
@@ -1147,6 +1148,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, const
 		g->HashFile = g->File;
 		g->Width = w;
 		g->Height = h;
+		g->original_frame_size = QSize(w, h);
 		GraphicHash[g->HashFile] = g;
 	} else {
 		++g->Refs;
@@ -1180,6 +1182,7 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 	delete[] hashfile;
 	g->Width = w;
 	g->Height = h;
+	g->original_frame_size = QSize(w, h);
 	GraphicHash[g->HashFile] = g;
 
 	return g;
@@ -1229,6 +1232,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 	delete[] hashfile;
 	g->Width = w;
 	g->Height = h;
+	g->original_frame_size = QSize(w, h);
 	GraphicHash[g->HashFile] = g;
 
 	return g;
@@ -1473,9 +1477,11 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 
 	if (!Width) {
 		Width = GraphicWidth;
+		this->original_frame_size.setWidth(Width);
 	}
 	if (!Height) {
 		Height = GraphicHeight;
+		this->original_frame_size.setHeight(Height);
 	}
 
 	Assert(Width <= GraphicWidth && Height <= GraphicHeight);

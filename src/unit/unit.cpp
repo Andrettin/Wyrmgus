@@ -6713,8 +6713,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit.pixel_offset.setX((type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2);
-		unit.pixel_offset.setY((type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2);
+		unit.pixel_offset.setX((type->CorpseType->Width - type->CorpseType->Sprite->get_original_frame_size().width()) / 2);
+		unit.pixel_offset.setY((type->CorpseType->Height - type->CorpseType->Sprite->get_original_frame_size().height()) / 2);
 
 		unit.CurrentSightRange = type->CorpseType->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {

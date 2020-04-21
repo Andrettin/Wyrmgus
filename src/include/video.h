@@ -165,6 +165,11 @@ public:
 	virtual int getGraphicHeight() const { return GraphicHeight; }
 	//Wyrmgus end
 
+	const QSize &get_original_frame_size() const
+	{
+		return this->original_frame_size;
+	}
+
 	bool is_tile() const
 	{
 		return this->tile;
@@ -187,6 +192,7 @@ public:
 	void GenFramesMap();
 	int Width = 0;					/// Width of a frame
 	int Height = 0;					/// Height of a frame
+	QSize original_frame_size = QSize(0, 0); //the unscaled frame size
 	int NumFrames = 1;				/// Number of frames
 	int GraphicWidth = 0;			/// Original graphic width
 	int GraphicHeight = 0;			/// Original graphic height
