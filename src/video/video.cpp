@@ -84,6 +84,7 @@
 #include "intern_video.h"
 
 #include "cursor.h"
+#include "database/defines.h"
 #include "font.h"
 #include "iolib.h"
 #include "map/map.h"
@@ -497,3 +498,8 @@ void RestoreColorCyclingSurface()
 }
 
 #endif
+
+int get_scale_factor()
+{
+	return stratagus::defines::get()->get_scale_factor();
+}

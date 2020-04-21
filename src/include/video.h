@@ -699,3 +699,6 @@ extern void RestoreColorCyclingSurface();
 
 /// Does ColorCycling..
 extern void ColorCycle();
+
+//called by tolua++
+extern int get_scale_factor();

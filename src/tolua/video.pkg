@@ -56,3 +56,5 @@ class CColor {
 void SetColorCycleAll(bool value);
 void ClearAllColorCyclingRange();
 void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorIndex);
+
+int get_scale_factor();
