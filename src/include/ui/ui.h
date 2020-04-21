@@ -110,24 +110,18 @@ public:
 class CUIButton
 {
 public:
-	//Wyrmgus start
-//	CUIButton() : X(0), Y(0), Style(nullptr), Callback(nullptr) {}
-	CUIButton() : X(0), Y(0), Clicked(false), HotkeyPressed(false), Style(nullptr), Callback(nullptr) {}
-	//Wyrmgus end
-	~CUIButton() {}
-
 	bool Contains(const PixelPos &screenPos) const;
 
 public:
-	int X;                          /// x coordinate on the screen
-	int Y;                          /// y coordinate on the screen
+	int X = 0;                          /// x coordinate on the screen
+	int Y = 0;                          /// y coordinate on the screen
 	//Wyrmgus start
-	bool Clicked;					/// whether the button is currently clicked or not
-	bool HotkeyPressed;				/// whether the button's hotkey is currently pressed or not
+	bool Clicked = false;					/// whether the button is currently clicked or not
+	bool HotkeyPressed = false;				/// whether the button's hotkey is currently pressed or not
 	//Wyrmgus end
 	std::string Text;               /// button text
-	ButtonStyle *Style;             /// button style
-	LuaActionListener *Callback;    /// callback function
+	ButtonStyle *Style = nullptr;             /// button style
+	LuaActionListener *Callback = nullptr;    /// callback function
 };
 
 static constexpr int MAX_NUM_VIEWPORTS = 8;         /// Number of supported viewports
@@ -225,7 +219,6 @@ public:
 class CFiller
 {
 	struct bits_map {
-		bits_map() : Width(0), Height(0), bstore(nullptr) {}
 		~bits_map();
 
 		void Init(CGraphic *g);
@@ -242,15 +235,13 @@ class CFiller
 			return false;
 		};
 
-		int Width;
-		int Height;
-		unsigned int *bstore;
+		int Width = 0;
+		int Height = 0;
+		unsigned int *bstore = nullptr;
 	};
 
 	bits_map map;
 public:
-	CFiller() : G(nullptr), X(0), Y(0) {}
-
 	void Load();
 
 	bool OnGraphic(int x, int y)
@@ -262,17 +253,14 @@ public:
 		}
 		return false;
 	}
-	CGraphic *G;         /// Graphic
-	int X;               /// X coordinate
-	int Y;               /// Y coordinate
+	CGraphic *G = nullptr;         /// Graphic
+	int X = 0;               /// X coordinate
+	int Y = 0;               /// Y coordinate
 };
 
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(nullptr), X(0), Y(0), ShowCommandKey(true)
-	{}
-
 	void Draw();
 	void Update();
 	void DoClicked(int button);
@@ -310,12 +298,12 @@ private:
 
 
 public:
-	CGraphic *G;
-	int X;
-	int Y;
+	CGraphic *G = nullptr;
+	int X = 0;
+	int Y = 0;
 	std::vector<CUIButton> Buttons;
 	CColor AutoCastBorderColorRGB;
-	bool ShowCommandKey;
+	bool ShowCommandKey = true;
 };
 
 class CPieMenu

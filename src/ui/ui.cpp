@@ -274,9 +274,9 @@ void CUserInterface::Load()
 	//Wyrmgus end
 	
 	//  Load graphics
-	const int size = (int)Fillers.size();
+	const int size = static_cast<int>(this->Fillers.size());
 	for (int i = 0; i < size; ++i) {
-		Fillers[i].Load();
+		this->Fillers[i].Load();
 	}
 
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
@@ -301,27 +301,27 @@ void CUserInterface::Load()
 
 	//Wyrmgus start
 	if (Preference.IconFrameG) {
-		Preference.IconFrameG->Load();
+		Preference.IconFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
 		Preference.IconFrameG->UseDisplayFormat();
 	}
 	if (Preference.PressedIconFrameG) {
-		Preference.PressedIconFrameG->Load();
+		Preference.PressedIconFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
 		Preference.PressedIconFrameG->UseDisplayFormat();
 	}
 	if (Preference.CommandButtonFrameG) {
-		Preference.CommandButtonFrameG->Load();
+		Preference.CommandButtonFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
 		Preference.CommandButtonFrameG->UseDisplayFormat();
 	}
 	if (Preference.BarFrameG) {
-		Preference.BarFrameG->Load();
+		Preference.BarFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
 		Preference.BarFrameG->UseDisplayFormat();
 	}
 	if (Preference.InfoPanelFrameG) {
-		Preference.InfoPanelFrameG->Load();
+		Preference.InfoPanelFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
 		Preference.InfoPanelFrameG->UseDisplayFormat();
 	}
 	if (Preference.ProgressBarG) {
-		Preference.ProgressBarG->Load();
+		Preference.ProgressBarG->Load(false, stratagus::defines::get()->get_scale_factor());
 		Preference.ProgressBarG->UseDisplayFormat();
 	}
 	//Wyrmgus end

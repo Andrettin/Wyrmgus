@@ -34,6 +34,7 @@
 
 #include "stratagus.h"
 
+#include "database/defines.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -2747,11 +2748,15 @@ void CFiller::bits_map::Init(CGraphic *g)
 void CFiller::Load()
 {
 	if (G) {
-		G->Load();
+		G->Load(false, stratagus::defines::get()->get_scale_factor());
 		map.Init(G);
 		G->UseDisplayFormat();
 	}
+
 	//Wyrmgus start
+	this->X *= stratagus::defines::get()->get_scale_factor();
+	this->Y *= stratagus::defines::get()->get_scale_factor();
+
 	if (this->X < 0) {
 		this->X = Video.Width + this->X;
 	}
