@@ -72,21 +72,10 @@ class CGraphic : public gcn::Image
 	};
 
 protected:
-	CGraphic() : Surface(nullptr), SurfaceFlip(nullptr), frame_map(nullptr),
-		//Wyrmgus start
-		DawnSurface(nullptr), DawnSurfaceFlip(nullptr), DuskSurface(nullptr), DuskSurfaceFlip(nullptr), NightSurface(nullptr), NightSurfaceFlip(nullptr),
-		//Wyrmgus end
-		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		//Wyrmgus start
-//		Refs(1), Resized(false)
-		Refs(1), Resized(false), Grayscale(false)
-		//Wyrmgus end
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), NumTextures(0)
-#endif
+	CGraphic(const bool tile = false) : tile(tile)
 	{
-		frameFlip_map = nullptr;
 	}
+
 	~CGraphic() {}
 
 public:
@@ -140,11 +129,11 @@ public:
 	//Wyrmgus end
 
 
-	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
+	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0, const bool tile = false);
 
-	static CGraphic *New(const std::string &file, const QSize &size)
+	static CGraphic *New(const std::string &file, const QSize &size, const bool tile = false)
 	{
-		return CGraphic::New(file, size.width(), size.height());
+		return CGraphic::New(file, size.width(), size.height(), tile);
 	}
 
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
@@ -176,39 +165,47 @@ public:
 	virtual int getGraphicHeight() const { return GraphicHeight; }
 	//Wyrmgus end
 
+	bool is_tile() const
+	{
+		return this->tile;
+	}
+
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
-	SDL_Surface *Surface;      /// Surface
-	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	SDL_Surface *Surface = nullptr;      /// Surface
+	SDL_Surface *SurfaceFlip = nullptr;  /// Flipped surface
 	//Wyrmgus start
-	SDL_Surface *DawnSurface;      /// Surface
-	SDL_Surface *DawnSurfaceFlip;  /// Flipped surface
-	SDL_Surface *DuskSurface;      /// Surface
-	SDL_Surface *DuskSurfaceFlip;  /// Flipped surface
-	SDL_Surface *NightSurface;      /// Surface
-	SDL_Surface *NightSurfaceFlip;  /// Flipped surface
+	SDL_Surface *DawnSurface = nullptr;      /// Surface
+	SDL_Surface *DawnSurfaceFlip = nullptr;  /// Flipped surface
+	SDL_Surface *DuskSurface = nullptr;      /// Surface
+	SDL_Surface *DuskSurfaceFlip = nullptr;  /// Flipped surface
+	SDL_Surface *NightSurface = nullptr;      /// Surface
+	SDL_Surface *NightSurfaceFlip = nullptr;  /// Flipped surface
 	//Wyrmgus end
-	frame_pos_t *frame_map;
-	frame_pos_t *frameFlip_map;
+	frame_pos_t *frame_map = nullptr;
+	frame_pos_t *frameFlip_map = nullptr;
 	void GenFramesMap();
-	int Width;					/// Width of a frame
-	int Height;					/// Height of a frame
-	int NumFrames;				/// Number of frames
-	int GraphicWidth;			/// Original graphic width
-	int GraphicHeight;			/// Original graphic height
-	int Refs;					/// Uses of this graphic
+	int Width = 0;					/// Width of a frame
+	int Height = 0;					/// Height of a frame
+	int NumFrames = 1;				/// Number of frames
+	int GraphicWidth = 0;			/// Original graphic width
+	int GraphicHeight = 0;			/// Original graphic height
+	int Refs = 1;					/// Uses of this graphic
 	stratagus::time_of_day *TimeOfDay = nullptr;		/// Time of day for this graphic
-	bool Resized;				/// Image has been resized
+	bool Resized = false;				/// Image has been resized
 	//Wyrmgus start
-	bool Grayscale;
+	bool Grayscale = false;
 	//Wyrmgus end
+private:
+	bool tile = false; //whether this is a tile graphic, i.e. whether its boundaries should be preserved for tiling when being rescaled
 
+public:
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	GLfloat TextureWidth;      /// Width of the texture
-	GLfloat TextureHeight;     /// Height of the texture
-	GLuint *Textures;          /// Texture names
+	GLfloat TextureWidth = 0.f;      /// Width of the texture
+	GLfloat TextureHeight = 0.f;     /// Height of the texture
+	GLuint *Textures = nullptr;          /// Texture names
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
-	int NumTextures;           /// Number of textures
+	int NumTextures = 0;           /// Number of textures
 #endif
 
 	friend class CFont;
@@ -217,7 +214,7 @@ public:
 class CPlayerColorGraphic : public CGraphic
 {
 protected:
-	CPlayerColorGraphic()
+	CPlayerColorGraphic(const bool tile = false) : CGraphic(tile)
 	{
 		//Wyrmgus start
 		for (int i = 0; i < PlayerColorMax; ++i) {
@@ -257,11 +254,11 @@ public:
 	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 	//Wyrmgus end
 
-	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *New(const std::string &file, const int w = 0, const int h = 0, const bool tile = false);
 
-	static CPlayerColorGraphic *New(const std::string &file, const QSize &size)
+	static CPlayerColorGraphic *New(const std::string &file, const QSize &size, const bool tile = false)
 	{
-		return CPlayerColorGraphic::New(file, size.width(), size.height());
+		return CPlayerColorGraphic::New(file, size.width(), size.height(), tile);
 	}
 
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);

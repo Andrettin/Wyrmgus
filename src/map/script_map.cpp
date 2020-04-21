@@ -552,7 +552,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 		CMap::FogGraphics = nullptr;
 	}
 	
-	CMap::FogGraphics = CGraphic::New(FogGraphicFile, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
+	CMap::FogGraphics = CGraphic::New(FogGraphicFile, stratagus::defines::get()->get_tile_size(), true);
 
 	return 0;
 }
@@ -1069,7 +1069,7 @@ static int CclDefineTileset(lua_State *l)
 	CMap::Map.Tileset->parse(l);
 
 	ShowLoadProgress(_("Loading Tileset \"%s\""), CMap::Map.Tileset->ImageFile.c_str());
-	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, stratagus::defines::get()->get_tile_size());
+	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, stratagus::defines::get()->get_tile_size(), true);
 	CMap::Map.TileGraphic->Load(false, stratagus::defines::get()->get_scale_factor());
 	return 0;
 }
@@ -1543,19 +1543,19 @@ static int CclDefineTerrainType(lua_State *l)
 	
 	if (!graphics_file.empty()) {
 		if (CGraphic::Get(graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(graphics_file, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
+			CGraphic *graphics = CGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size(), true);
 		}
 		terrain->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
+			CGraphic *graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size(), true);
 		}
 		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
 		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, stratagus::defines::get()->get_tile_width(), stratagus::defines::get()->get_tile_height());
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, stratagus::defines::get()->get_tile_size(), true);
 		}
 		terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}

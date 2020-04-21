@@ -283,7 +283,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			if (CGraphic::Get(season_graphics_file) == nullptr) {
-				CGraphic *graphics = CGraphic::New(season_graphics_file, defines::get()->get_tile_width(), defines::get()->get_tile_height());
+				CGraphic *graphics = CGraphic::New(season_graphics_file, defines::get()->get_tile_size(), true);
 			}
 			this->SeasonGraphics[season] = CGraphic::Get(season_graphics_file);
 		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
@@ -327,19 +327,19 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 	
 	if (!graphics_file.empty()) {
 		if (CGraphic::Get(graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(graphics_file, defines::get()->get_tile_width(), defines::get()->get_tile_height());
+			CGraphic *graphics = CGraphic::New(graphics_file, defines::get()->get_tile_size(), true);
 		}
 		this->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_width(), defines::get()->get_tile_height());
+			CGraphic *graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size(), true);
 		}
 		this->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
 		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, defines::get()->get_tile_width(), defines::get()->get_tile_height());
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, defines::get()->get_tile_size(), true);
 		}
 		this->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}

@@ -1092,16 +1092,16 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filename, int w, int h)
+CGraphic *CGraphic::New(const std::string &filename, const int w, const int h, const bool tile)
 {
 	if (filename.empty()) {
-		return new CGraphic;
+		return new CGraphic(tile);
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
 	if (g == nullptr) {
-		g = new CGraphic;
+		g = new CGraphic(tile);
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -1128,16 +1128,16 @@ CGraphic *CGraphic::New(const std::string &filename, int w, int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w, int h)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, const int w, const int h, const bool tile)
 {
 	if (filename.empty()) {
-		return new CPlayerColorGraphic;
+		return new CPlayerColorGraphic(tile);
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == nullptr) {
-		g = new CPlayerColorGraphic;
+		g = new CPlayerColorGraphic(tile);
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -2245,6 +2245,8 @@ void CGraphic::Resize(int w, int h)
 	}
 
 	const QSize old_size = QSize(this->GraphicWidth, this->GraphicHeight);
+	const int frame_width = this->Width * w / old_size.width();
+	const int frame_height = this->Height * h / old_size.height();
 
 	// Resizing the same image multiple times looks horrible
 	// If the image has already been resized then get a clean copy first
@@ -2299,6 +2301,16 @@ void CGraphic::Resize(int w, int h)
 			int iy = (int)fy;
 			fy -= iy;
 			for (int j = 0; j < w; ++j) {
+				if (this->is_tile()) {
+					if ((i % frame_height) == 0 || (i % frame_height) == (frame_height - 1) || (j % frame_width) == 0 || (j % frame_width) == (frame_width - 1)) {
+						//don't apply rescaling algorithm to frame border pixels for tiles, to prevent artifacts when tiling them
+						for (int k = 0; k < bpp; ++k) {
+							data[x * bpp + k] = pixels[(i * GraphicHeight / h) * Surface->pitch + (j * GraphicWidth / w) * bpp + k];
+						}
+						++x;
+						continue;
+					}
+				}
 				float fx = (float)j * GraphicWidth / w;
 				int ix = (int)fx;
 				fx -= ix;
@@ -2355,10 +2367,8 @@ void CGraphic::Resize(int w, int h)
 	GraphicWidth = w;
 	GraphicHeight = h;
 
-	this->Width *= w;
-	this->Width /= old_size.width();
-	this->Height *= h;
-	this->Height /= old_size.height();
+	this->Width = frame_width;
+	this->Height = frame_height;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL && Textures) {
