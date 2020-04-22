@@ -206,7 +206,6 @@ class CUserInterface
 	CUIButton NetworkDiplomacyButton;
 	
 	//Wyrmgus start
-	vector<CUIButton> PlaneButtons;
 	vector<CUIButton> WorldButtons;
 	vector<CUIButton> SurfaceLayerButtons;
 	//Wyrmgus end

@@ -972,17 +972,6 @@ void DrawAge()
 */
 void DrawMapLayerButtons()
 {
-	for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
-		if (UI.PlaneButtons[i].X != -1) {
-			DrawUIButton(UI.PlaneButtons[i].Style,
-				(ButtonAreaUnderCursor == ButtonAreaMapLayerPlane && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.PlaneButtons[i].Clicked || CMap::Map.GetCurrentPlane() == stratagus::plane::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
-				UI.PlaneButtons[i].X, UI.PlaneButtons[i].Y,
-				UI.PlaneButtons[i].Text
-			);
-		}
-	}
-
 	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
@@ -1248,9 +1237,7 @@ void DrawPopups()
 	}
 	*/
 	
-	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-		DrawGenericPopup(stratagus::plane::get_all()[ButtonUnderCursor]->get_name(), UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
-	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
+	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 		DrawGenericPopup(stratagus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
 		std::string surface_layer_string;

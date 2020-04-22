@@ -47,15 +47,12 @@ public:
 	static constexpr const char *class_identifier = "plane";
 	static constexpr const char *database_folder = "planes";
 
-	static plane *add(const std::string &identifier, const stratagus::module *module);
-
 	plane(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 	{
 	}
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	int ID = -1; //ID of this plane
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
 	std::vector<CDeityDomain *> EmpoweredDeityDomains; ///deity domains empowered in this plane

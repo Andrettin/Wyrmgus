@@ -64,7 +64,6 @@ enum _button_area_ {
 	ButtonAreaLevelUpUnit,	 /// Level up unit button
 	ButtonAreaHeroUnit,		 /// Hero unit button
 	ButtonAreaInventory,  /// Transporting button
-	ButtonAreaMapLayerPlane,	/// Plane button
 	ButtonAreaMapLayerWorld,	/// World button
 	ButtonAreaMapLayerSurfaceLayer,	/// Surface layer button
 	ButtonAreaUser           /// User buttons

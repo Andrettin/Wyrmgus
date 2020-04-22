@@ -590,9 +590,6 @@ static int CclGetPlaneData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, plane->get_name().c_str());
 		return 1;
-	} else if (!strcmp(data, "ID")) {
-		lua_pushnumber(l, plane->ID);
-		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, plane->get_description().c_str());
 		return 1;

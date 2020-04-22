@@ -1089,18 +1089,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	}
-	for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
-		const CUIButton &button = UI.PlaneButtons[i];
 
-		if (button.X != -1) {
-			if (button.Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaMapLayerPlane;
-				ButtonUnderCursor = i;
-				CursorOn = cursor_on::button;
-				return;
-			}
-		}
-	}
 	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 		const CUIButton &button = UI.WorldButtons[i];
 
@@ -1113,6 +1102,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	}
+
 	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
 		const CUIButton &button = UI.SurfaceLayerButtons[i];
 
@@ -1422,13 +1412,6 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//Wyrmgus end
 		return;
 	} else {
-		for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
-			const CUIButton &button = UI.PlaneButtons[i];
-
-			if (button.Clicked) {
-				return;
-			}
-		}
 		for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 			const CUIButton &button = UI.WorldButtons[i];
 
@@ -2507,15 +2490,6 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				UI.NetworkDiplomacyButton.Clicked = true;
 				//Wyrmgus end
 			}
-		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-			for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
-				CUIButton &button = UI.PlaneButtons[i];
-
-				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					button.Clicked = true;
-				}
-			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 			for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 				CUIButton &button = UI.WorldButtons[i];
@@ -3000,24 +2974,6 @@ void UIHandleButtonUp(unsigned button)
 			}
 		}
 		
-		//
-		//  Plane buttons
-		//
-		for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
-			CUIButton &button = UI.PlaneButtons[i];
-
-			if (button.Clicked) {
-				button.Clicked = false;
-				if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-					CMap::Map.SetCurrentPlane(stratagus::plane::get_all()[i]);
-					if (button.Callback) {
-						button.Callback->action("");
-					}
-					return;
-				}
-			}
-		}
-
 		//
 		//  World buttons
 		//

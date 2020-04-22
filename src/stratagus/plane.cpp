@@ -38,17 +38,6 @@
 
 namespace stratagus {
 
-
-plane *plane::add(const std::string &identifier, const stratagus::module *module)
-{
-	plane *plane = data_type::add(identifier, module);
-	plane->ID = plane::get_all().size() - 1;
-	UI.PlaneButtons.resize(plane::get_all().size());
-	UI.PlaneButtons[plane->ID].X = -1;
-	UI.PlaneButtons[plane->ID].Y = -1;
-	return plane;
-}
-
 void plane::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
