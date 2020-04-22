@@ -25,7 +25,7 @@ public:
 	static CGraphic *New(const std::string file, const int w = 0, const int h = 0, const bool tile = false);
 	static CGraphic *Get(const std::string file);
 	static void Free(CGraphic *);
-	void Load();
+	void Load(const bool grayscale = false, const int scale_factor = 1);
 	void Resize(int w, int h);
 	//Wyrmgus start
 	virtual std::string &getFile();

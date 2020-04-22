@@ -1833,7 +1833,7 @@ void ImageListBox::draw(gcn::Graphics *graphics)
 
 		y += fontHeight;
 	}
-	img->SetOriginalSize();
+	//img->SetOriginalSize();
 }
 
 void ImageListBox::drawBorder(gcn::Graphics *graphics)
