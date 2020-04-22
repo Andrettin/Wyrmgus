@@ -385,7 +385,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	if (Preference.BarFrameG) {
 		Preference.BarFrameG->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-								this->Width, this->Height);
+								this->Width * scale_factor, this->Height * scale_factor);
 	} else {
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 3 * scale_factor, this->Pos.y - 3 * scale_factor,
 								(this->Width + 4) * scale_factor, (this->Height + 4) * scale_factor);
