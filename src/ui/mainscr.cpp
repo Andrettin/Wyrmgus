@@ -859,7 +859,7 @@ void DrawResources()
 				UI.Resources[i].Font = &GetSmallFont();
 				label.SetFont(*UI.Resources[i].Font);
 
-				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3, tmp);
+				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3 * stratagus::defines::get()->get_scale_factor(), tmp);
 			} else {
 				UI.Resources[i].Text = FormatNumber(resourceAmount);
 				UI.Resources[i].Font = resourceAmount > 99999 ? &GetSmallFont() : &GetGameFont();
@@ -1155,7 +1155,7 @@ void DrawPopups()
 			std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
 			if (!Preference.NoStatusLineTooltips) {
 				CLabel label(GetGameFont());
-				label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
+				label.Draw((2 + 16) *stratagus::defines::get()->get_scale_factor(), Video.Height + (2 - 16) * stratagus::defines::get()->get_scale_factor(), idle_worker_tooltip);
 			}
 			DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 		}
@@ -1166,7 +1166,7 @@ void DrawPopups()
 			std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
 			if (!Preference.NoStatusLineTooltips) {
 				CLabel label(GetGameFont());
-				label.Draw(2 + 16, Video.Height + 2 - 16, level_up_unit_tooltip);
+				label.Draw((2 + 16) *stratagus::defines::get()->get_scale_factor(), Video.Height + (2 - 16) * stratagus::defines::get()->get_scale_factor(), level_up_unit_tooltip);
 			}
 			DrawGenericPopup(level_up_unit_tooltip, UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 		}
@@ -1178,7 +1178,7 @@ void DrawPopups()
 			custom_hero_unit_tooltip += " " + CPlayer::GetThisPlayer()->Heroes[i]->GetMessageName();
 			if (!Preference.NoStatusLineTooltips) {
 				CLabel label(GetGameFont());
-				label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
+				label.Draw((2 + 16) * stratagus::defines::get()->get_scale_factor(), Video.Height + (2 - 16) * stratagus::defines::get()->get_scale_factor(), custom_hero_unit_tooltip);
 			}
 			DrawGenericPopup(custom_hero_unit_tooltip, UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
 		}
@@ -1194,18 +1194,18 @@ void DrawPopups()
 			ba->Value = i;
 			ba->ValueStr = DefaultResourceNames[i];
 			ba->Popup = "popup-resource";
-			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 + GameCursor->G->getHeight() / 2, false);
+			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, false);
 			delete ba;
 			LastDrawnButtonPopup = nullptr;
 		}
 	}
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
-		DrawGenericPopup(_("Food"), UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Food"), UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (
@@ -1219,7 +1219,7 @@ void DrawPopups()
 	) {
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
 		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (
@@ -1231,7 +1231,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->Name.c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->Name.c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
@@ -1244,7 +1244,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.AgePanel.TextY
 		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
 	) {
-		DrawGenericPopup(_(UI.AgePanel.Text.c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.AgePanel.Text.c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	*/
 	

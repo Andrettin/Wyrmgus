@@ -108,14 +108,14 @@ void ShowLoadProgress(const char *fmt, ...)
 		//Wyrmgus start
 //		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
 		if (loadingBackground == nullptr) {
-			Video.FillRectangle(ColorBlack, 0, Video.Height - 18, Video.Width, 18);
+			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * stratagus::defines::get()->get_scale_factor(), Video.Width, 18 * stratagus::defines::get()->get_scale_factor());
 		}
 		//Wyrmgus end
-		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
+		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16 * stratagus::defines::get()->get_scale_factor(), temp);
 		//Wyrmgus start
 //		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		if (loadingBackground == nullptr) {
-			InvalidateArea(0, Video.Height - 18, Video.Width, 18);
+			InvalidateArea(0, Video.Height - 18 * stratagus::defines::get()->get_scale_factor(), Video.Width, 18 * stratagus::defines::get()->get_scale_factor());
 		} else {
 			InvalidateArea(0, 0, Video.Width, Video.Height);
 		}

@@ -35,6 +35,7 @@
 
 #include "font.h"
 
+#include "database/defines.h"
 #include "intern_video.h"
 #include "util/util.h"
 #include "video.h"
@@ -831,7 +832,7 @@ void CFont::Load()
 
 	if (this->G) {
 		//ShowLoadProgress("Loading Font \"%s\"", this->G->File.c_str());
-		this->G->Load();
+		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
 		this->MeasureWidths();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

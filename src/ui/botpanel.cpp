@@ -49,6 +49,7 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
+#include "database/defines.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -913,9 +914,9 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
 	clamp<int>(&x, 0, Video.Width - 1);
 	if (above) {
-		y = y - popupHeight - 10;
+		y = y - popupHeight - 10 * stratagus::defines::get()->get_scale_factor();
 	} else { //below
-		y = y + 10;
+		y = y + 10 * stratagus::defines::get()->get_scale_factor();
 	}
 	clamp<int>(&y, 0, Video.Height - 1);
 
