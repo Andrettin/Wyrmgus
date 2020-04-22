@@ -1899,6 +1899,8 @@ static void DrawInfoPanelBackground(unsigned frame)
 
 static void InfoPanel_draw_no_selection()
 {
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	DrawInfoPanelBackground(0);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
@@ -1906,20 +1908,20 @@ static void InfoPanel_draw_no_selection()
 		DrawUnitInfo(*UnitUnderCursor);
 	} else {
 		// FIXME: need some cool ideas for this.
-		int x = UI.InfoPanel.X + 16;
-		int y = UI.InfoPanel.Y + 8;
+		int x = UI.InfoPanel.X + 16 * scale_factor;
+		int y = UI.InfoPanel.Y + 8 * scale_factor;
 
 		CLabel label(GetGameFont());
 		label.Draw(x, y, NAME);
-		y += 16;
+		y += 16 * scale_factor;
 		label.Draw(x, y,  _("Cycle:"));
-		label.Draw(x + 48, y, GameCycle);
+		label.Draw(x + 48 * scale_factor, y, GameCycle);
 		//Wyrmgus start
 //		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-		label.Draw(x + 110, y, _("Speed:"));
-		label.Draw(x + 110 + 53, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+		label.Draw(x + 110 * scale_factor, y, _("Speed:"));
+		label.Draw(x + (110 + 53) * scale_factor, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		//Wyrmgus end
-		y += 20;
+		y += 20 * scale_factor;
 
 		std::string nc;
 		std::string rc;
@@ -1941,19 +1943,19 @@ static void InfoPanel_draw_no_selection()
 //				label.Draw(x + 15, y, i);
 				//Wyrmgus end
 
-				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
-				Video.FillRectangleClip(CPlayer::Players[i]->Color, x + 1, y + 1, 10, 10);
+				Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
+				Video.FillRectangleClip(CPlayer::Players[i]->Color, x + 1 * scale_factor, y + 1 * scale_factor, 10 * scale_factor, 10 * scale_factor);
 
 				//Wyrmgus start
 //				label.Draw(x + 27, y, CPlayer::Players[i]->Name);
-				label.Draw(x + 15, y, _(CPlayer::Players[i]->Name.c_str()));
+				label.Draw(x + 15 * scale_factor, y, _(CPlayer::Players[i]->Name.c_str()));
 				//the score was appearing on top of the faction name
 //				label.Draw(x + 117, y, CPlayer::Players[i]->Score);
 				//Wyrmgus end
-				y += 14;
+				y += 14 * scale_factor;
 				
 				//Wyrmgus start
-				if ((y + 12) > Video.Height)  { // if the square would overflow the screen, don't draw the player
+				if ((y + 12 * scale_factor) > Video.Height)  { // if the square would overflow the screen, don't draw the player
 					break;
 				}
 				//Wyrmgus end
