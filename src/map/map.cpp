@@ -3091,8 +3091,9 @@ void CMap::generate_settlement_territories(const int z)
 		}
 	}
 
-	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed));
-	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldCoastAllowed);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed), MapFieldUnderground);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldCoastAllowed, MapFieldUnderground);
+	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, 0, MapFieldUnderground);
 	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement
@@ -3148,7 +3149,7 @@ void CMap::generate_settlement_territories(const int z)
 	this->calculate_settlement_territory_border_tiles(z);
 }
 
-stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags)
+stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags, const int same_flags)
 {
 	//the seeds blocked by the block flags are stored, and then returned by the function
 	stratagus::point_set blocked_seeds;
@@ -3158,7 +3159,7 @@ stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&s
 		const QPoint seed_pos = seeds[SyncRand(seeds.size())];
 		stratagus::vector::remove(seeds, seed_pos);
 
-		CMapField *seed_tile = this->Field(seed_pos, z);
+		const CMapField *seed_tile = this->Field(seed_pos, z);
 
 		//tiles with a block flag can be expanded to, but they can't serve as a basis for further expansion
 		if (seed_tile->CheckMask(block_flags)) {
@@ -3167,6 +3168,7 @@ stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&s
 		}
 
 		stratagus::site *settlement = seed_tile->get_settlement();
+		const CMapField *settlement_tile = this->Field(settlement->get_site_unit()->get_center_tile_pos(), z);
 
 		std::vector<QPoint> adjacent_positions;
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -3192,6 +3194,12 @@ stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&s
 				}
 
 				if (diagonal_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != nullptr) { //at least one of the tiles being expanded to must have no assigned settlement
+					continue;
+				}
+
+				//the same flags function similarly to the block flags, but block only if the tile does not contain the same same_flags as the settlement's original tile, and they block expansion to the tile itself, not just expansion from it
+				if ((diagonal_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags) || (vertical_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags) || (horizontal_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags)) {
+					blocked_seeds.insert(seed_pos);
 					continue;
 				}
 
