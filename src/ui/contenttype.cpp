@@ -37,6 +37,7 @@
 
 #include "actions.h"
 #include "action/action_built.h"
+#include "database/defines.h"
 #include "font.h"
 #include "translate.h"
 #include "ui/ui.h"
@@ -375,25 +376,27 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 	//Wyrmgus end
 
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	// Border
 	//Wyrmgus start
 //	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
 //							this->Width + 3, this->Height + 3);
 	if (Preference.BarFrameG) {
-		Preference.BarFrameG->DrawClip(this->Pos.x - 1 - 4, this->Pos.y - 1 - 4);
-		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1, this->Pos.y - 1,
+		Preference.BarFrameG->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
 								this->Width, this->Height);
 	} else {
-		Video.FillRectangleClip(ColorBlack, this->Pos.x - 3, this->Pos.y - 3,
-								this->Width + 4, this->Height + 4);
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - 3 * scale_factor, this->Pos.y - 3 * scale_factor,
+								(this->Width + 4) * scale_factor, (this->Height + 4) * scale_factor);
 	}
 	//Wyrmgus end
 
-	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,
-							(f * this->Width) / 100, this->Height);
+	Video.FillRectangleClip(color, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
+							(this->Width * scale_factor * f) / 100, this->Height * scale_factor);
 	//Wyrmgus start
-	Video.FillRectangleClip(lighter_color, this->Pos.x - 1, this->Pos.y - 1,
-							(f * this->Width) / 100, 1);
+	Video.FillRectangleClip(lighter_color, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
+							(this->Width * scale_factor * f) / 100, 1 * scale_factor);
 	//Wyrmgus end
 }
 
@@ -415,10 +418,13 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	//Wyrmgus end
 		return;
 	}
+
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	int x = this->Pos.x;
 	int y = this->Pos.y;
-	int w = this->width;
-	int h = this->height;
+	int w = this->width * scale_factor;
+	int h = this->height * scale_factor;
 	Assert(w > 0);
 	Assert(h > 4);
 	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
@@ -434,7 +440,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	if (!this->hasBorder) {
 		//Wyrmgus start
 		if (Preference.ProgressBarG) {
-			Preference.ProgressBarG->DrawClip(this->Pos.x - 4, this->Pos.y - 5);
+			Preference.ProgressBarG->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor);
 		}
 		//Wyrmgus end
 		Video.FillRectangleClip(color, x, y, f * w / 100, h);
@@ -448,9 +454,9 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			Video.DrawHLine(ColorWhite, x, y, f * w / 100);
 		}
 	} else {
-		Video.DrawRectangleClip(ColorWhite,  x,     y,     w + 4, h);
-		Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, w + 2, h - 2);
-		Video.FillRectangleClip(color, x + 2, y + 2, f * w / 100, h - 4);
+		Video.DrawRectangleClip(ColorWhite, x, y, w + 4 * scale_factor, h);
+		Video.DrawRectangleClip(ColorBlack, x + 1 * scale_factor, y + 1 * scale_factor, w + 2 * scale_factor, h - 2 * scale_factor);
+		Video.FillRectangleClip(color, x + 2 * scale_factor, y + 2 * scale_factor, f * w / 100, h - 4 * scale_factor);
 	}
 }
 

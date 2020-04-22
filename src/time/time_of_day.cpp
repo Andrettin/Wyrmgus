@@ -28,6 +28,7 @@
 #include "time/time_of_day.h"
 
 #include "config.h"
+#include "database/defines.h"
 #include "mod.h"
 #include "util/string_util.h"
 #include "video.h"
@@ -83,7 +84,7 @@ void time_of_day::process_sml_scope(const sml_data &scope)
 void time_of_day::initialize()
 {
 	if (this->G != nullptr) {
-		this->G->Load();
+		this->G->Load(false, defines::get()->get_scale_factor());
 		this->G->UseDisplayFormat();
 	}
 

@@ -656,7 +656,7 @@ public:
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0),
-		IconFrameG(nullptr), PressedIconFrameG(nullptr), CommandButtonFrameG(nullptr), BarFrameG(nullptr), InfoPanelFrameG(nullptr), ProgressBarG(nullptr) {};
+		IconFrameG(nullptr), PressedIconFrameG(nullptr), CommandButtonFrameG(nullptr), BarFrameG(nullptr), ProgressBarG(nullptr) {};
 		//Wyrmgus end
 
 	bool ShowSightRange;     /// Show sight range.
@@ -691,7 +691,7 @@ public:
 	CGraphic *PressedIconFrameG;
 	CGraphic *CommandButtonFrameG;
 	CGraphic *BarFrameG;
-	CGraphic *InfoPanelFrameG;
+	CGraphic *InfoPanelFrameG = nullptr;
 	CGraphic *ProgressBarG;
 	//Wyrmgus end
 };

@@ -36,6 +36,7 @@
 #include "time/season.h"
 
 #include "config.h"
+#include "database/defines.h"
 #include "mod.h"
 #include "video.h"
 
@@ -160,7 +161,7 @@ void CSeason::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->G = CGraphic::New(file, size.x, size.y);
-			this->G->Load();
+			this->G->Load(false, stratagus::defines::get()->get_scale_factor());
 			this->G->UseDisplayFormat();
 		} else {
 			fprintf(stderr, "Invalid season property: \"%s\".\n", child_config_data->Tag.c_str());

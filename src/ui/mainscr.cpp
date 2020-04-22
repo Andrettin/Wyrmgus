@@ -43,6 +43,7 @@
 #include "ai/ai_local.h"
 #endif
 #include "civilization.h"
+#include "database/defines.h"
 #include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -177,19 +178,20 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	//Wyrmgus start
 	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
 //	if (Preference.IconsShift) {
-		hBar = 4;
-		hAll = 8;
-		y += 2;
+		hBar = 4 * scale_factor;
+		hAll = 8 * scale_factor;
+		y += 2 * scale_factor;
 	} else if (Preference.IconsShift) {
 	//Wyrmgus end
-		hBar = 6;
-		hAll = 10;
+		hBar = 6 * scale_factor;
+		hAll = 10 * scale_factor;
 	} else {
-		hBar = 5;
-		hAll = 7;
+		hBar = 5 * scale_factor;
+		hAll = 7 * scale_factor;
 	}
 	y += unit.Type->Icon.Icon->G->Height;
 	//Wyrmgus start
@@ -198,12 +200,12 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		unit.Type->Icon.Icon->G->Width + 8, hAll);
 	*/
 	if (Preference.BarFrameG) {
-		Preference.BarFrameG->DrawClip(x - 2 - 4, y + 4 - 4);
-		Video.FillRectangleClip(ColorBlack, x - 2, y + 4,
-			unit.Type->Icon.Icon->G->Width + 6 - 2, hBar);
+		Preference.BarFrameG->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
+		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
+			unit.Type->Icon.Icon->G->Width + (6 - 2) * scale_factor, hBar);
 	} else {
-		Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-			unit.Type->Icon.Icon->G->Width + 8, hAll);
+		Video.FillRectangleClip(ColorBlack, x - 4 * scale_factor, y + 2 * scale_factor,
+			unit.Type->Icon.Icon->G->Width + 8 * scale_factor, hAll);
 	}
 	//Wyrmgus end
 
@@ -237,11 +239,11 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 			//Wyrmgus end
 		}
 
-		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
-		Video.FillRectangleClip(color, x - 2, y + 4,
+		f = (f * (unit.Type->Icon.Icon->G->Width + 6 * scale_factor)) / 100;
+		Video.FillRectangleClip(color, x - 2 * scale_factor, y + 4 * scale_factor,
 			f > 1 ? f - 2 : 0, hBar);
 		//Wyrmgus start
-		Video.FillRectangleClip(lighter_color, x - 2, y + 4,
+		Video.FillRectangleClip(lighter_color, x - 2 * scale_factor, y + 4 * scale_factor,
 			f > 1 ? f - 2 : 0, 1);
 		//Wyrmgus end
 	}
@@ -1998,7 +2000,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
 	) {
-		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4, UI.InfoPanel.Y + 93);
+		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4 * stratagus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * stratagus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit);

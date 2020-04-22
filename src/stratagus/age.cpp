@@ -30,6 +30,7 @@
 #include "age.h"
 
 #include "config.h"
+#include "database/defines.h"
 #include "game.h"
 #include "mod.h"
 #include "player.h"
@@ -147,7 +148,7 @@ void age::process_sml_scope(const sml_data &scope)
 void age::initialize()
 {
 	if (this->graphics != nullptr) {
-		this->graphics->Load();
+		this->graphics->Load(false, defines::get()->get_scale_factor());
 		this->graphics->UseDisplayFormat();
 	}
 

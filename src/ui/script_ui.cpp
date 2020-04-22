@@ -36,6 +36,7 @@
 
 #include "ui/ui.h"
 
+#include "database/defines.h"
 #include "font.h"
 #include "map/map.h"
 #include "menus.h"
@@ -516,6 +517,8 @@ static CContentType *CclParseContent(lua_State *l)
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
 			CclGetPos(l, &pos.x, &pos.y);
+			pos.x *= stratagus::defines::get()->get_scale_factor();;
+			pos.y *= stratagus::defines::get()->get_scale_factor();;
 		//Wyrmgus start
 		} else if (!strcmp(key, "TextColor")) {
 			textColor = LuaToString(l, -1);

@@ -281,21 +281,21 @@ void CUserInterface::Load()
 
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
-			Resources[i].G->Load();
+			Resources[i].G->Load(false, stratagus::defines::get()->get_scale_factor());
 			Resources[i].G->UseDisplayFormat();
 		}
 	}
 
 	if (InfoPanel.G) {
-		InfoPanel.G->Load();
+		InfoPanel.G->Load(false, stratagus::defines::get()->get_scale_factor());
 		InfoPanel.G->UseDisplayFormat();
 	}
 	if (ButtonPanel.G) {
-		ButtonPanel.G->Load();
+		ButtonPanel.G->Load(false, stratagus::defines::get()->get_scale_factor());
 		ButtonPanel.G->UseDisplayFormat();
 	}
 	if (PieMenu.G) {
-		PieMenu.G->Load();
+		PieMenu.G->Load(false, stratagus::defines::get()->get_scale_factor());
 		PieMenu.G->UseDisplayFormat();
 	}
 
