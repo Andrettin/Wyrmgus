@@ -136,7 +136,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	//Wyrmgus start
 	const CUnitType &type = *unit.Type;
-	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
+	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	int frame_width = type.Width * scale_factor;
 	int frame_height = type.Height * scale_factor;
@@ -192,7 +192,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	//Wyrmgus start
 	/*
 //	const CUnitType &type = *unit.Type;
-//	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
+//	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
 //	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
 //	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
 	*/
@@ -830,8 +830,8 @@ void ShowOrder(const CUnit &unit)
 	}
 #endif
 	// Get current position
-	const PixelPos mapPos = unit.GetMapPixelPosCenter();
-	PixelPos screenStartPos = CurrentViewport->MapToScreenPixelPos(mapPos);
+	const PixelPos mapPos = unit.get_scaled_map_pixel_pos_center();
+	PixelPos screenStartPos = CurrentViewport->scaled_map_to_screen_pixel_pos(mapPos);
 	const bool flushed = unit.Orders[0]->Finished;
 
 	COrderPtr order;
@@ -884,7 +884,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
-		const PixelPos center(screenPos + type.GetHalfTilePixelSize());
+		const PixelPos center(screenPos + type.get_scaled_half_tile_pixel_size());
 
 		if (Preference.ShowSightRange) {
 			//Wyrmgus start
@@ -1117,7 +1117,7 @@ void CUnit::Draw(const CViewport &vp) const
 	const UnitAction action = this->CurrentAction();
 	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {
-		screenPos = vp.MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
+		screenPos = vp.scaled_map_to_screen_pixel_pos(this->get_scaled_map_pixel_pos_top_left());
 		type = this->Type;
 		frame = this->Frame;
 		state = (action == UnitAction::Built) | ((action == UnitAction::UpgradeTo) << 1);
@@ -1290,7 +1290,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	if (state == 1) {
 		if (under_construction && cframe) {
-			const PixelPos pos(screenPos + type->GetHalfTilePixelSize());
+			const PixelPos pos(screenPos + type->get_scaled_half_tile_pixel_size());
 			DrawConstruction(player, cframe, *this, *type, frame, pos, time_of_day);
 		} else {
 			DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day);

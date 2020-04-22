@@ -58,7 +58,7 @@ void MissileWhirlwind::Action()
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
 	const PixelPos centerOffset(stratagus::defines::get()->get_tile_width() / 2, stratagus::defines::get()->get_tile_height());
-	const Vec2i center = CMap::Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
+	const Vec2i center = CMap::Map.map_pixel_pos_to_tile_pos(pixelCenter + centerOffset);
 
 	//Wyrmgus start
 	Assert(this->Type->AttackSpeed);
@@ -76,7 +76,7 @@ void MissileWhirlwind::Action()
 			newPos.x = center.x + SyncRand() % 5 - 2;
 			newPos.y = center.y + SyncRand() % 5 - 2;
 		} while (!CMap::Map.Info.IsPointOnMap(newPos, this->MapLayer));
-		this->destination = CMap::Map.TilePosToMapPixelPos_Center(newPos);
+		this->destination = CMap::Map.tile_pos_to_map_pixel_pos_center(newPos);
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_

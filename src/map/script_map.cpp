@@ -356,7 +356,7 @@ static int CclCenterMap(lua_State *l)
 	LuaCheckArgs(l, 2);
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos));
+	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(pos));
 	return 0;
 }
 

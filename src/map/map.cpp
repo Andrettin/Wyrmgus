@@ -274,23 +274,38 @@ void CMap::Reveal(bool only_person_players)
 --  Map queries
 ----------------------------------------------------------------------------*/
 
-Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos) const
+Vec2i CMap::map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 {
-	const Vec2i tilePos(mapPos.x / stratagus::defines::get()->get_scaled_tile_width(), mapPos.y / stratagus::defines::get()->get_scaled_tile_height());
+	const Vec2i tilePos(mapPos.x / stratagus::defines::get()->get_tile_width(), mapPos.y / stratagus::defines::get()->get_tile_height());
 
 	return tilePos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
+Vec2i CMap::scaled_map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 {
-	PixelPos mapPixelPos(tilePos.x * stratagus::defines::get()->get_scaled_tile_width(), tilePos.y * stratagus::defines::get()->get_scaled_tile_height());
+	return this->map_pixel_pos_to_tile_pos(mapPos / stratagus::defines::get()->get_scale_factor());
+}
+
+PixelPos CMap::tile_pos_to_map_pixel_pos_top_left(const Vec2i &tilePos) const
+{
+	PixelPos mapPixelPos(tilePos.x * stratagus::defines::get()->get_tile_width(), tilePos.y * stratagus::defines::get()->get_tile_height());
 
 	return mapPixelPos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
+PixelPos CMap::tile_pos_to_scaled_map_pixel_pos_top_left(const Vec2i &tilePos) const
 {
-	return TilePosToMapPixelPos_TopLeft(tilePos) + stratagus::size::to_point(stratagus::defines::get()->get_scaled_tile_size()) / 2;
+	return this->tile_pos_to_map_pixel_pos_top_left(tilePos) * stratagus::defines::get()->get_scale_factor();
+}
+
+PixelPos CMap::tile_pos_to_map_pixel_pos_center(const Vec2i &tilePos) const
+{
+	return this->tile_pos_to_map_pixel_pos_top_left(tilePos) + stratagus::size::to_point(stratagus::defines::get()->get_tile_size()) / 2;
+}
+
+PixelPos CMap::tile_pos_to_scaled_map_pixel_pos_center(const Vec2i &tilePos) const
+{
+	return this->tile_pos_to_scaled_map_pixel_pos_top_left(tilePos) + stratagus::size::to_point(stratagus::defines::get()->get_scaled_tile_size()) / 2;
 }
 
 //Wyrmgus start

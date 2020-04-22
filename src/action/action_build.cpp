@@ -487,7 +487,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * stratagus::defines::get()->get_tile_size()) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
+		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * stratagus::defines::get()->get_tile_size()) + build->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}

@@ -4568,7 +4568,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY * scale_factor;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
+	const PixelPos vpTopLeftMapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	//Wyrmgus start
@@ -5287,7 +5287,7 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
+		PixelPos unitSpritePos = unit.get_scaled_map_pixel_pos_center();
 		const int scale_factor = stratagus::defines::get()->get_scale_factor();
 		//Wyrmgus start
 //		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
@@ -5328,15 +5328,25 @@ CUnit *UnitOnScreen(int x, int y)
 	return candidate;
 }
 
-PixelPos CUnit::GetMapPixelPosTopLeft() const
+PixelPos CUnit::get_map_pixel_pos_top_left() const
 {
-	const PixelPos pos(tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x(), tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y());
+	const PixelPos pos(tilePos.x * stratagus::defines::get()->get_tile_width() + this->get_pixel_offset().x(), tilePos.y * stratagus::defines::get()->get_tile_height() + this->get_pixel_offset().y());
 	return pos;
 }
 
-PixelPos CUnit::GetMapPixelPosCenter() const
+PixelPos CUnit::get_scaled_map_pixel_pos_top_left() const
 {
-	return GetMapPixelPosTopLeft() + this->GetHalfTilePixelSize();
+	return this->get_map_pixel_pos_top_left() * stratagus::defines::get()->get_scale_factor();
+}
+
+PixelPos CUnit::get_map_pixel_pos_center() const
+{
+	return this->get_map_pixel_pos_top_left() + this->get_half_tile_pixel_size();
+}
+
+PixelPos CUnit::get_scaled_map_pixel_pos_center() const
+{
+	return this->get_scaled_map_pixel_pos_top_left() + this->get_scaled_half_tile_pixel_size();
 }
 
 //Wyrmgus start
@@ -5350,14 +5360,24 @@ Vec2i CUnit::GetHalfTileSize() const
 	return this->GetTileSize() / 2;
 }
 
-PixelSize CUnit::GetTilePixelSize() const
+PixelSize CUnit::get_tile_pixel_size() const
 {
-	return PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_scaled_tile_size();
+	return PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size();
 }
 
-PixelSize CUnit::GetHalfTilePixelSize() const
+PixelSize CUnit::get_scaled_tile_pixel_size() const
 {
-	return this->GetTilePixelSize() / 2;
+	return this->get_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
+}
+
+PixelSize CUnit::get_half_tile_pixel_size() const
+{
+	return this->get_tile_pixel_size() / 2;
+}
+
+PixelSize CUnit::get_scaled_half_tile_pixel_size() const
+{
+	return this->get_half_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
 }
 
 QPoint CUnit::get_center_tile_pos() const
@@ -6604,12 +6624,12 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// Catapults,... explodes.
 	//
 	if (type->ExplodeWhenKilled) {
-		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
+		const PixelPos pixelPos = unit.get_map_pixel_pos_center();
 
 		MakeMissile(*type->Explosion.Missile, pixelPos, pixelPos, unit.MapLayer->ID);
 	}
 	if (type->DeathExplosion) {
-		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
+		const PixelPos pixelPos = unit.get_map_pixel_pos_center();
 
 		type->DeathExplosion->pushPreamble();
 		//Wyrmgus start
@@ -6620,7 +6640,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		type->DeathExplosion->run();
 	}
 	if (suicide) {
-		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
+		const PixelPos pixelPos = unit.get_map_pixel_pos_center();
 		
 		if (unit.GetMissile().Missile) {
 			MakeMissile(*unit.GetMissile().Missile, pixelPos, pixelPos, unit.MapLayer->ID);
@@ -7039,7 +7059,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
 
 static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 {
-	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 
 	if ((target.IsVisibleOnMap(*CPlayer::GetThisPlayer()) || ReplayRevealMap) && !DamageMissile.empty()) {
 		const MissileType *mtype = MissileTypeByIdent(DamageMissile);
@@ -7051,7 +7071,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 
 static void HitUnit_ShowImpactMissile(const CUnit &target)
 {
-	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 	const CUnitType &type = *target.Type;
 
 	if (target.Variable[SHIELD_INDEX].Value > 0
@@ -7109,7 +7129,7 @@ static void HitUnit_Burning(CUnit &target)
 	MissileType *fire = MissileBurningBuilding(f);
 
 	if (fire) {
-		const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+		const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 		const PixelDiff offset(0, -stratagus::defines::get()->get_tile_height());
 		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer->ID);
 

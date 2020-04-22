@@ -416,7 +416,7 @@ COrder_Resource::~COrder_Resource()
 			return lastScreenPos;
 		}
 		//Wyrmgus end
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
 	} else {
 		//Wyrmgus start
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
@@ -717,7 +717,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - unit.get_half_tile_pixel_size());
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!

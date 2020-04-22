@@ -190,7 +190,7 @@ static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_g
 		if (unit_group[i]->MapLayer != UI.CurrentMapLayer) {
 			continue;
 		}
-		pos += unit_group[i]->GetMapPixelPosCenter();
+		pos += unit_group[i]->get_scaled_map_pixel_pos_center();
 		map_layer_units++;
 	}
 
@@ -538,7 +538,7 @@ void UiFindIdleWorker()
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
 		}
-		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
+		UI.SelectedViewport->Center(unit->get_scaled_map_pixel_pos_center());
 	}
 }
 
@@ -575,7 +575,7 @@ void UiFindLevelUpUnit()
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
 		}
-		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
+		UI.SelectedViewport->Center(unit->get_scaled_map_pixel_pos_center());
 	}
 }
 
@@ -598,7 +598,7 @@ void UiFindHeroUnit(int hero_index)
 	if (unit->MapLayer != UI.CurrentMapLayer) {
 		ChangeCurrentMapLayer(unit->MapLayer->ID);
 	}
-	UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
+	UI.SelectedViewport->Center(unit->get_scaled_map_pixel_pos_center());
 }
 //Wyrmgus end
 
@@ -1432,9 +1432,9 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		return false;
 	}
 	const PixelPos top_left_pos(UI.MapArea.X, UI.MapArea.Y);
-	const PixelPos top_left_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(top_left_pos);
+	const PixelPos top_left_map_pos = UI.SelectedViewport->screen_to_scaled_map_pixel_pos(top_left_pos);
 	const PixelPos bottom_right_pos(UI.MapArea.EndX, UI.MapArea.EndY);
-	const PixelPos bottom_right_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(bottom_right_pos);
+	const PixelPos bottom_right_map_pos = UI.SelectedViewport->screen_to_scaled_map_pixel_pos(bottom_right_pos);
 //	if (mousePos.x < SCROLL_LEFT) {
 	if (mousePos.x < SCROLL_LEFT && top_left_map_pos.x > 0) {
 	//Wyrmgus end

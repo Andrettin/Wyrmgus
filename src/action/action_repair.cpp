@@ -160,7 +160,7 @@
 		if (this->ReparableTarget->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->ReparableTarget->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -323,7 +323,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
+					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {

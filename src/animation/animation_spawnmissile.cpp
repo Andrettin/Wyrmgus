@@ -89,10 +89,10 @@
 				return;
 			} else if (goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::AttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
+				dest = CMap::Map.tile_pos_to_map_pixel_pos_center(order.GetGoalPos());
 			} else if (goal->CurrentAction() == UnitAction::SpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = CMap::Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
+				dest = CMap::Map.tile_pos_to_map_pixel_pos_center(order.GetGoalPos());
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
@@ -102,24 +102,24 @@
 				dest.y += desty * stratagus::defines::get()->get_tile_height();
 			}
 		} else if (flags & SM_Pixel) {
-			dest.x = target->GetMapPixelPosCenter().x + destx;
-			dest.y = target->GetMapPixelPosCenter().y + desty;
+			dest.x = target->get_map_pixel_pos_center().x + destx;
+			dest.y = target->get_map_pixel_pos_center().y + desty;
 		} else {
 			dest.x = (target->tilePos.x + destx) * stratagus::defines::get()->get_tile_width();
 			dest.y = (target->tilePos.y + desty) * stratagus::defines::get()->get_tile_height();
-			dest += target->GetTilePixelSize() / 2;
+			dest += target->get_tile_pixel_size() / 2;
 		}
 	} else {
 		if ((flags & SM_Pixel)) {
-			dest.x = goal->GetMapPixelPosCenter().x + destx;
-			dest.y = goal->GetMapPixelPosCenter().y + desty;
+			dest.x = goal->get_map_pixel_pos_center().x + destx;
+			dest.y = goal->get_map_pixel_pos_center().y + desty;
 		} else {
 			dest.x = (goal->tilePos.x + destx) * stratagus::defines::get()->get_tile_width();
 			dest.y = (goal->tilePos.y + desty) * stratagus::defines::get()->get_tile_height();
-			dest += goal->GetTilePixelSize() / 2;
+			dest += goal->get_tile_pixel_size() / 2;
 		}
 	}
-	Vec2i destTilePos = CMap::Map.MapPixelPosToTilePos(dest);
+	Vec2i destTilePos = CMap::Map.map_pixel_pos_to_tile_pos(dest);
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)

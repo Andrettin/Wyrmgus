@@ -141,7 +141,7 @@ enum {
 		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -282,8 +282,8 @@ enum {
 					goal->Type->TeleportEffectIn->pushPreamble();
 					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(unit));
 					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(*goal));
-					goal->Type->TeleportEffectIn->pushInteger(unit.GetMapPixelPosCenter().x);
-					goal->Type->TeleportEffectIn->pushInteger(unit.GetMapPixelPosCenter().y);
+					goal->Type->TeleportEffectIn->pushInteger(unit.get_map_pixel_pos_center().x);
+					goal->Type->TeleportEffectIn->pushInteger(unit.get_map_pixel_pos_center().y);
 					goal->Type->TeleportEffectIn->run();
 				}
 				unit.tilePos = goal->Goal->tilePos;
@@ -298,8 +298,8 @@ enum {
 					dest.Type->TeleportEffectOut->pushPreamble();
 					dest.Type->TeleportEffectOut->pushInteger(UnitNumber(unit));
 					dest.Type->TeleportEffectOut->pushInteger(UnitNumber(dest));
-					dest.Type->TeleportEffectOut->pushInteger(unit.GetMapPixelPosCenter().x);
-					dest.Type->TeleportEffectOut->pushInteger(unit.GetMapPixelPosCenter().y);
+					dest.Type->TeleportEffectOut->pushInteger(unit.get_map_pixel_pos_center().x);
+					dest.Type->TeleportEffectOut->pushInteger(unit.get_map_pixel_pos_center().y);
 					dest.Type->TeleportEffectOut->run();
 				}
 

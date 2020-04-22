@@ -198,7 +198,7 @@ void DrawMapArea()
 				if (UI.CurrentMapLayer != vp->Unit->MapLayer) {
 					ChangeCurrentMapLayer(vp->Unit->MapLayer->ID);
 				}
-				vp->Center(vp->Unit->GetMapPixelPosCenter());
+				vp->Center(vp->Unit->get_scaled_map_pixel_pos_center());
 			}
 		}
 		vp->Draw();

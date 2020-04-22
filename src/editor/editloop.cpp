@@ -1628,7 +1628,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
-			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos));
+			UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tilePos));
 		}
 		return;
 	}
@@ -2260,7 +2260,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToMinimap();
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(tilePos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tilePos));
 		return;
 	}
 
@@ -2389,7 +2389,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 		if (UI.MouseViewport) {
 			// Look if there is an unit under the cursor.
-			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			const PixelPos cursorMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
 			UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 
 			if (UnitUnderCursor != nullptr) {

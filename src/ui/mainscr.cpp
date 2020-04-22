@@ -1022,8 +1022,8 @@ void DrawPopups()
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-					PixelPos unit_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
-					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
+					PixelPos unit_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(UnitUnderCursor->tilePos);
+					unit_center_pos = vp->scaled_map_to_screen_pixel_pos(unit_center_pos);
 					std::string unit_name;
 					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
 						if (!UnitUnderCursor->Identified) {
@@ -1047,8 +1047,8 @@ void DrawPopups()
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
 				} else if (mf.TerrainFeature) {
-					PixelPos tile_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos);
-					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
+					PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
+					tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
 					std::string terrain_feature_name = mf.TerrainFeature->Name;
 					if (mf.get_owner() != nullptr && mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race) != mf.TerrainFeature->CulturalNames.end()) {
 						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race)->second;
@@ -1862,7 +1862,7 @@ void CenterOnMessage()
 		return;
 	}
 	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(pos));
+	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }

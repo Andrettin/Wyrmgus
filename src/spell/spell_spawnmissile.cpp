@@ -244,12 +244,12 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 									CUnit &caster, CUnit *target, const Vec2i &goalPos, PixelPos *res)
 {
 	if (location.Base == LocBaseCaster) {
-		*res = caster.GetMapPixelPosCenter();
+		*res = caster.get_map_pixel_pos_center();
 	} else {
 		if (target) {
-			*res = target->GetMapPixelPosCenter();
+			*res = target->get_map_pixel_pos_center();
 		} else {
-			*res = CMap::Map.TilePosToMapPixelPos_Center(goalPos);
+			*res = CMap::Map.tile_pos_to_map_pixel_pos_center(goalPos);
 		}
 	}
 	res->x += location.AddX;

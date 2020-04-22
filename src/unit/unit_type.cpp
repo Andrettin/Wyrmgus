@@ -1279,9 +1279,14 @@ Vec2i CUnitType::GetHalfTileSize() const
 	return this->GetTileSize() / 2;
 }
 
-PixelSize CUnitType::GetTilePixelSize() const
+PixelSize CUnitType::get_tile_pixel_size() const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_scaled_tile_size());
+	return PixelSize(PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size());
+}
+
+PixelSize CUnitType::get_scaled_tile_pixel_size() const
+{
+	return this->get_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
 }
 
 Vec2i CUnitType::GetTileCenterPosOffset() const

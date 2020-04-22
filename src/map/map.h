@@ -230,11 +230,14 @@ public:
 	void ClearOverlayTile(const Vec2i &pos, int z);
 
 	/// convert map pixelpos coordinates into tilepos
-	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
+	Vec2i map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const;
+	Vec2i scaled_map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const;
 	/// convert tilepos coordinates into map pixel pos (take the top left of the tile)
-	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const;
+	PixelPos tile_pos_to_map_pixel_pos_top_left(const Vec2i &tilePos) const;
+	PixelPos tile_pos_to_scaled_map_pixel_pos_top_left(const Vec2i &tilePos) const;
 	/// convert tilepos coordinates into map pixel pos (take the center of the tile)
-	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
+	PixelPos tile_pos_to_map_pixel_pos_center(const Vec2i &tilePos) const;
+	PixelPos tile_pos_to_scaled_map_pixel_pos_center(const Vec2i &tilePos) const;
 	
 	//Wyrmgus start
 	stratagus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;

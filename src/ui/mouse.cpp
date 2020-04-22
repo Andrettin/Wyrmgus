@@ -978,7 +978,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	if (Selected.empty()) {
 		return;
 	}
-	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos);
+	const Vec2i pos = CMap::Map.scaled_map_pixel_pos_to_tile_pos(mapPixelPos);
 	CUnit *dest;            // unit under the cursor if any.
 
 	if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
@@ -1411,7 +1411,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
 		return;
 	}
 
@@ -1527,7 +1527,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		}
 
 		if (show) {
-			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
+			const PixelPos mapPixelPos = vp.screen_to_scaled_map_pixel_pos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
 		}
 		
@@ -1604,7 +1604,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
 				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 				//  Minimap move viewpoint
-				UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos));
+				UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -1643,7 +1643,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//  Minimap move viewpoint
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
 		CursorStartScreenPos = CursorScreenPos;
 		return;
 	}
@@ -2293,12 +2293,12 @@ static void UISelectStateButtonDown(unsigned)
 
 		if (MouseButtons & LeftButton) {
 			const CViewport &vp = *UI.MouseViewport;
-			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
+			const PixelPos mapPixelPos = vp.screen_to_map_pixel_pos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
-			SendCommand(CMap::Map.MapPixelPosToTilePos(mapPixelPos));
+			SendCommand(CMap::Map.map_pixel_pos_to_tile_pos(mapPixelPos));
 		}
 		return;
 	}
@@ -2310,7 +2310,7 @@ static void UISelectStateButtonDown(unsigned)
 		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos);
+			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursorTilePos);
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
@@ -2324,7 +2324,7 @@ static void UISelectStateButtonDown(unsigned)
 			}
 			SendCommand(cursorTilePos);
 		} else {
-			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos));
+			UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));
 		}
 		return;
 	}
@@ -2435,17 +2435,17 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
 				if (!ClickMissile.empty()) {
-					const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+					const PixelPos mapPixelPos = UI.MouseViewport->screen_to_map_pixel_pos(CursorScreenPos);
 
 					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 				}
 			}
-			const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			const PixelPos mapPixelPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
 			DoRightButton(mapPixelPos);
 		}
 	} else if (MouseButtons & LeftButton) { // enter select mode
 		CursorStartScreenPos = CursorScreenPos;
-		CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+		CursorStartMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
 		GameCursor = UI.Cross.Cursor;
 		CurrentCursorState = CursorState::Rectangle;
 	} else if (MouseButtons & MiddleButton) {// enter move map mode
@@ -2462,10 +2462,10 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 	const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos);
+			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursorTilePos);
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
@@ -2551,7 +2551,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-				UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
+				UI.SelectedViewport->Center(Selected[0]->get_scaled_map_pixel_pos_center());
 			}
 			//  clicked on training button
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
@@ -2653,7 +2653,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					if (Selected[0]->MapLayer != UI.CurrentMapLayer) {
 						ChangeCurrentMapLayer(Selected[0]->MapLayer->ID);
 					}
-					UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
+					UI.SelectedViewport->Center(Selected[0]->get_scaled_map_pixel_pos_center());
 				} else if ((1 << button) == RightButton) {
 					std::string encyclopedia_ident = Selected[0]->Type->Ident;
 					std::string encyclopedia_state = "units";
@@ -3107,7 +3107,7 @@ void UIHandleButtonUp(unsigned button)
 		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
 			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y) {
 			PixelPos pos0 = CursorStartMapPos;
-			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			const PixelPos cursorMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
 			PixelPos pos1 = cursorMapPos;
 
 			if (pos0.x > pos1.x) {
@@ -3148,7 +3148,7 @@ void UIHandleButtonUp(unsigned button)
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			CUnit *unit = nullptr;
 			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+				const PixelPos cursorMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
 
 				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 			}

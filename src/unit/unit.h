@@ -361,14 +361,18 @@ public:
 
 	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z);
 
-	PixelPos GetMapPixelPosTopLeft() const;
-	PixelPos GetMapPixelPosCenter() const;
+	PixelPos get_map_pixel_pos_top_left() const;
+	PixelPos get_scaled_map_pixel_pos_top_left() const;
+	PixelPos get_map_pixel_pos_center() const;
+	PixelPos get_scaled_map_pixel_pos_center() const;
 	
 	//Wyrmgus start
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
-	PixelSize GetTilePixelSize() const;
-	PixelSize GetHalfTilePixelSize() const;
+	PixelSize get_tile_pixel_size() const;
+	PixelSize get_scaled_tile_pixel_size() const;
+	PixelSize get_half_tile_pixel_size() const;
+	PixelSize get_scaled_half_tile_pixel_size() const;
 	QPoint get_center_tile_pos() const;
 
 	const QPoint &get_pixel_offset() const

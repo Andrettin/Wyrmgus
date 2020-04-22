@@ -129,7 +129,7 @@ enum {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
 	} else {
 		//Wyrmgus start
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {

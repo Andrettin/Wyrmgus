@@ -261,7 +261,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -528,7 +528,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 				unsigned char oldDir = unit.Direction;
 				//Wyrmgus start
 //				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-				const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
+				const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
 				//Wyrmgus end
 				UnitHeadingFromDeltaXY(unit, dir);
 				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
@@ -728,7 +728,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (goal) {
 		//Wyrmgus start
 //		const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-		const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
+		const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
 		//Wyrmgus end
 		unsigned char oldDir = unit.Direction;
 		UnitHeadingFromDeltaXY(unit, dir);
@@ -805,7 +805,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 						//Wyrmgus start
 //						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
-						const Vec2i dir = PixelSize(PixelSize(goal.tilePos) * stratagus::defines::get()->get_tile_size()) + goal.GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize();
+						const Vec2i dir = PixelSize(PixelSize(goal.tilePos) * stratagus::defines::get()->get_tile_size()) + goal.get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
 						//Wyrmgus end
 						unsigned char oldDir = unit.Direction;
 						UnitHeadingFromDeltaXY(unit, dir);

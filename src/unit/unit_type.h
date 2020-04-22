@@ -798,8 +798,20 @@ public:
 
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
-	PixelSize GetHalfTilePixelSize() const { return GetTilePixelSize() / 2; }
-	PixelSize GetTilePixelSize() const;
+
+	PixelSize get_half_tile_pixel_size() const
+	{
+		return this->get_tile_pixel_size() / 2;
+	}
+
+	PixelSize get_tile_pixel_size() const;
+	PixelSize get_scaled_tile_pixel_size() const;
+
+	PixelSize get_scaled_half_tile_pixel_size() const
+	{
+		return this->get_scaled_tile_pixel_size() / 2;
+	}
+
 	Vec2i GetTileCenterPosOffset() const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;

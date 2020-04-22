@@ -57,7 +57,7 @@ static bool TracerMissile(Missile &missile)
 	Assert(missile.Type != nullptr);
 	Assert(missile.TotalStep != 0);
 	if (missile.TargetUnit) {
-		missile.destination = missile.TargetUnit->GetMapPixelPosTopLeft();
+		missile.destination = missile.TargetUnit->get_map_pixel_pos_top_left();
 	}
 
 	const PixelPos diff = (missile.destination - missile.source);
@@ -91,7 +91,7 @@ static bool TracerMissile(Missile &missile)
 
 		if (missile.Type->Pierce) {
 			const PixelPos posInt((int)pos.x, (int)pos.y);
-			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt));
+			MissileHandlePierce(missile, CMap::Map.map_pixel_pos_to_tile_pos(posInt));
 		}
 	}
 

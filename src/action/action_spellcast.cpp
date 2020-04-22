@@ -166,7 +166,7 @@
 			return lastScreenPos;
 		}
 
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -346,7 +346,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.GetHalfTilePixelSize());
+		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size());
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;

@@ -300,7 +300,7 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize());
+		const PixelPos center(screenPos + CursorBuilding->get_scaled_half_tile_pixel_size());
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * stratagus::defines::get()->get_scaled_tile_width() + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
@@ -366,7 +366,7 @@ void DrawCursor()
 {
 	// Selecting rectangle
 	if (CurrentCursorState == CursorState::Rectangle && CursorStartScreenPos != CursorScreenPos) {
-		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
+		const PixelPos cursorStartScreenPos = UI.MouseViewport->scaled_map_to_screen_pixel_pos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
 	//Wyrmgus start

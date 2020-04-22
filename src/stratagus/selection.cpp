@@ -38,6 +38,7 @@
 #include "ai/ai_local.h" // for AiHelpers
 //Wyrmgus end
 #include "commands.h"
+#include "database/defines.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -736,17 +737,18 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		const CUnitType &type = *unit.Type;
-		PixelPos spritePos = unit.GetMapPixelPosCenter();
+		PixelPos spritePos = unit.get_scaled_map_pixel_pos_center();
 
-		spritePos.x += type.OffsetX - (type.BoxWidth + type.BoxOffsetX) / 2;
-		spritePos.y += type.OffsetY - (type.BoxHeight + type.BoxOffsetY) / 2;
-		if (spritePos.x + type.BoxWidth + type.BoxOffsetX < corner_topleft.x
+		spritePos.x += type.OffsetX * scale_factor - (type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor) / 2;
+		spritePos.y += type.OffsetY * scale_factor - (type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor) / 2;
+		if (spritePos.x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor < corner_topleft.x
 			|| spritePos.x > corner_bottomright.x
-			|| spritePos.y + type.BoxHeight + type.BoxOffsetY < corner_topleft.y
+			|| spritePos.y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor < corner_topleft.y
 			|| spritePos.y > corner_bottomright.y) {
 			continue;
 		}
@@ -770,8 +772,8 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 */
 int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
+	const Vec2i t0 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_topleft);
+	const Vec2i t1 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -916,8 +918,8 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	if (Selected.empty()) {
 		return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
-	const Vec2i tilePos0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i tilePos1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
+	const Vec2i tilePos0 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_topleft);
+	const Vec2i tilePos1 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -961,8 +963,8 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 */
 int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
+	const Vec2i t0 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_topleft);
+	const Vec2i t1 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -1014,8 +1016,8 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 */
 int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
+	const Vec2i t0 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_topleft);
+	const Vec2i t1 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -1083,8 +1085,8 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
+	const Vec2i t0 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_topleft);
+	const Vec2i t1 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
@@ -1156,8 +1158,8 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0 = CMap::Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = CMap::Map.MapPixelPosToTilePos(corner_bottomright);
+	const Vec2i t0 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_topleft);
+	const Vec2i t1 = CMap::Map.scaled_map_pixel_pos_to_tile_pos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 

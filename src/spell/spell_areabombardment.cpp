@@ -101,7 +101,7 @@
 			dpos.y = goalPos.y + SyncRand() % 5 - 2;
 		} while (!CMap::Map.Info.IsPointOnMap(dpos, z));
 
-		const PixelPos dest = CMap::Map.TilePosToMapPixelPos_Center(dpos);
+		const PixelPos dest = CMap::Map.tile_pos_to_map_pixel_pos_center(dpos);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest, z);

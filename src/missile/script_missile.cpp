@@ -393,10 +393,10 @@ static int CclCreateMissile(lua_State *l)
 
 	if (mapRelative == false) {
 		if (sourceUnit != nullptr) {
-			startpos += sourceUnit->GetMapPixelPosTopLeft();
+			startpos += sourceUnit->get_map_pixel_pos_top_left();
 		}
 		if (destUnit != nullptr) {
-			endpos += destUnit->GetMapPixelPosTopLeft();
+			endpos += destUnit->get_map_pixel_pos_top_left();
 		}
 	}
 

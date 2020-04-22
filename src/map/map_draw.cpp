@@ -112,18 +112,28 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 }
 
 // Convert viewport coordinates into map pixel coordinates
-PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
+PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const
+{
+	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / stratagus::defines::get()->get_scale_factor();
+}
+
+PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos);
+	const PixelPos mapPixelPos = relPos + CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
 
 	return mapPixelPos;
 }
 
 // Convert map pixel coordinates into viewport coordinates
-PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
+PixelPos CViewport::map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - CMap::Map.TilePosToMapPixelPos_TopLeft(this->MapPos);
+	return this->scaled_map_to_screen_pixel_pos(mapPixelPos * stratagus::defines::get()->get_scale_factor());
+}
+
+PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
+{
+	const PixelDiff relPos = mapPixelPos - CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -131,8 +141,8 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 /// convert screen coordinate into tilepos
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
-	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = CMap::Map.MapPixelPosToTilePos(mapPixelPos);
+	const PixelPos mapPixelPos = this->screen_to_scaled_map_pixel_pos(screenPixelPos);
+	const Vec2i tilePos = CMap::Map.scaled_map_pixel_pos_to_tile_pos(mapPixelPos);
 
 	return tilePos;
 }
@@ -140,9 +150,9 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos);
+	const PixelPos mapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
 
-	return MapToScreenPixelPos(mapPos);
+	return this->scaled_map_to_screen_pixel_pos(mapPos);
 }
 
 /// convert tilepos coordonates into screen (take the center of the tile)
@@ -206,7 +216,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos) + offset;
+	const PixelPos mapPixelPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos) + offset;
 
 	this->Set(mapPixelPos);
 }
@@ -594,8 +604,8 @@ void CViewport::Draw() const
 //			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
-			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
+			PixelPos unit_center_pos = Map.tile_pos_to_scaled_map_pixel_pos_top_left(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
+			unit_center_pos = scaled_map_to_screen_pixel_pos(unit_center_pos);
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
 				if (!UnitUnderCursor->Identified) {

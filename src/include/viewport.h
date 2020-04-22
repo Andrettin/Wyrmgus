@@ -68,9 +68,11 @@ public:
 	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
 
 	/// Convert screen coordinates into map pixel coordinates
-	PixelPos ScreenToMapPixelPos(const PixelPos &screenPixelPos) const;
+	PixelPos screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const;
+	PixelPos screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const;
 	// Convert map pixel coordinates into screen coordinates
-	PixelPos MapToScreenPixelPos(const PixelPos &mapPixelPos) const;
+	PixelPos map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const;
+	PixelPos scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const;
 
 	/// convert screen coordinate into tilepos
 	Vec2i ScreenToTilePos(const PixelPos &screenPixelPos) const;

@@ -2365,7 +2365,7 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 			}
 			SelectionChanged();
 			ChangeCurrentMapLayer(connection_destination->MapLayer->ID);
-			UI.SelectedViewport->Center(connection_destination->GetMapPixelPosCenter());
+			UI.SelectedViewport->Center(connection_destination->get_scaled_map_pixel_pos_center());
 			break;
 		}
 	}

@@ -202,7 +202,7 @@ void StartMap(const std::string &filename, bool clean)
 		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
 			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 		}
-		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 
 		//  Play the game.
 		GameMainLoop();
@@ -1859,7 +1859,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 	}
 	UpdateSurfaceLayerButtons();
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos));
+	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 
 	//
 	// Various hacks which must be done after the map is loaded.
