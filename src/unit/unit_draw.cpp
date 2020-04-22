@@ -1033,12 +1033,13 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 							//Wyrmgus end
 {
 	PixelPos pos = screenPos;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	if (cframe->File == ConstructionFileConstruction) {
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->Construction) {
 			const CConstruction &construction = *variation->Construction;
-			pos.x -= construction.Width / 2;
-			pos.y -= construction.Height / 2;
+			pos.x -= construction.Width * scale_factor / 2;
+			pos.y -= construction.Height * scale_factor / 2;
 			if (frame < 0) {
 				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
@@ -1046,8 +1047,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			}
 		} else {
 			const CConstruction &construction = *type.Construction;
-			pos.x -= construction.Width / 2;
-			pos.y -= construction.Height / 2;
+			pos.x -= construction.Width * scale_factor / 2;
+			pos.y -= construction.Height * scale_factor / 2;
 			if (frame < 0) {
 				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
@@ -1066,8 +1067,10 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
 		}
-		pos.x += type.OffsetX - frame_width / 2;
-		pos.y += type.OffsetY - frame_height / 2;
+		frame_width *= scale_factor;
+		frame_height *= scale_factor;
+		pos.x += type.OffsetX * scale_factor - frame_width / 2;
+		pos.y += type.OffsetY * scale_factor - frame_height / 2;
 		//Wyrmgus end
 		if (frame < 0) {
 			frame = -frame - 1;
