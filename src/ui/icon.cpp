@@ -234,9 +234,12 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		s.Default.BorderSize = 0;
 	}
 	//Wyrmgus end
+
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	//Wyrmgus start
 	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
-		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46, 38);
+		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
 //			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player, transparent);
@@ -244,16 +247,16 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, true);
+				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, player, true);
 			}
-			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, player, transparent, show_percent);
 			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48, 40);
+				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48 * scale_factor, 40 * scale_factor);
 			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 48, 40);
+				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 48 * scale_factor, 40 * scale_factor);
 			}
 			if (!Preference.CommandButtonFrameG || !(flags & IconCommandButton)) {
-				Preference.PressedIconFrameG->DrawClip(pos.x - 4, pos.y - 4);
+				Preference.PressedIconFrameG->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
 			} else {
 				Preference.CommandButtonFrameG->DrawClip(pos.x - 5, pos.y - 4);
 			}
@@ -264,14 +267,14 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			}
 			DrawUIButton(&s, flags, pos.x, pos.y, text, player, transparent, show_percent);
 			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
+				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 46, 38);
+				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			}
 			if (Preference.CommandButtonFrameG && (flags & IconCommandButton)) {
-				Preference.CommandButtonFrameG->DrawClip(pos.x - 5, pos.y - 4);
+				Preference.CommandButtonFrameG->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);
 			} else {
-				Preference.IconFrameG->DrawClip(pos.x - 4, pos.y - 4);
+				Preference.IconFrameG->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
 			}
 		}
 	//Wyrmgus end
@@ -280,22 +283,22 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	} else if (Preference.IconsShift) {
 	//Wyrmgus end
 		// Left and top edge of Icon
-		Video.DrawHLine(ColorWhite, pos.x - 1, pos.y - 1, 49);
-		Video.DrawVLine(ColorWhite, pos.x - 1, pos.y, 40);
-		Video.DrawVLine(ColorWhite, pos.x, pos.y + 38, 2);
-		Video.DrawHLine(ColorWhite, pos.x + 46, pos.y, 2);
+		Video.DrawHLine(ColorWhite, pos.x - 1 * scale_factor, pos.y - 1 * scale_factor, 49 * scale_factor);
+		Video.DrawVLine(ColorWhite, pos.x - 1 * scale_factor, pos.y, 40 * scale_factor);
+		Video.DrawVLine(ColorWhite, pos.x, pos.y + 38 * scale_factor, 2 * scale_factor);
+		Video.DrawHLine(ColorWhite, pos.x + 46 * scale_factor, pos.y, 2 * scale_factor);
 
 		// Bottom and Right edge of Icon
-		Video.DrawHLine(ColorGray, pos.x + 1, pos.y + 38, 47);
-		Video.DrawHLine(ColorGray, pos.x + 1, pos.y + 39, 47);
-		Video.DrawVLine(ColorGray, pos.x + 46, pos.y + 1, 37);
-		Video.DrawVLine(ColorGray, pos.x + 47, pos.y + 1, 37);
+		Video.DrawHLine(ColorGray, pos.x + 1 * scale_factor, pos.y + 38 * scale_factor, 47 * scale_factor);
+		Video.DrawHLine(ColorGray, pos.x + 1 * scale_factor, pos.y + 39 * scale_factor, 47 * scale_factor);
+		Video.DrawVLine(ColorGray, pos.x + 46 * scale_factor, pos.y + 1 * scale_factor, 37 * scale_factor);
+		Video.DrawVLine(ColorGray, pos.x + 47 * scale_factor, pos.y + 1 * scale_factor, 37 * scale_factor);
 
-		Video.DrawRectangle(ColorBlack, pos.x - 3, pos.y - 3, 52, 44);
-		Video.DrawRectangle(ColorBlack, pos.x - 4, pos.y - 4, 54, 46);
+		Video.DrawRectangle(ColorBlack, pos.x - 3 * scale_factor, pos.y - 3 * scale_factor, 52 * scale_factor, 44 * scale_factor);
+		Video.DrawRectangle(ColorBlack, pos.x - 4 * scale_factor, pos.y - 4 * scale_factor, 54 * scale_factor, 46 * scale_factor);
 
 		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
-			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
+			Video.DrawRectangle(ColorGray, pos.x - 4 * scale_factor, pos.y - 4, 54 * scale_factor, 46 * scale_factor);
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
 			if (show_percent < 100) {
@@ -309,19 +312,19 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, true);
+				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, player, true);
 			}
-			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, player, transparent, show_percent);
 			//Wyrmgus end
 			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x + 1, pos.y + 1, 46, 38);
+				Video.DrawRectangle(ColorGreen, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor, 38 * scale_factor);
 			}			
-			Video.DrawRectangle(ColorGray, pos.x, pos.y, 48, 40);
-			Video.DrawVLine(ColorDarkGray, pos.x - 1, pos.y - 1, 40);
-			Video.DrawHLine(ColorDarkGray, pos.x - 1, pos.y - 1, 49);
-			Video.DrawHLine(ColorDarkGray, pos.x - 1, pos.y + 39, 2);
+			Video.DrawRectangle(ColorGray, pos.x, pos.y, 48 * scale_factor, 40 * scale_factor);
+			Video.DrawVLine(ColorDarkGray, pos.x - 1 * scale_factor, pos.y - 1 * scale_factor, 40 * scale_factor);
+			Video.DrawHLine(ColorDarkGray, pos.x - 1 * scale_factor, pos.y - 1 * scale_factor, 49 * scale_factor);
+			Video.DrawHLine(ColorDarkGray, pos.x - 1 * scale_factor, pos.y + 39 * scale_factor, 2 * scale_factor);
 
-			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
+			Video.DrawRectangle(ColorGray, pos.x - 4 * scale_factor, pos.y - 4 * scale_factor, 54 * scale_factor, 46 * scale_factor);
 		} else {
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
@@ -331,7 +334,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			DrawUIButton(&s, flags, pos.x, pos.y, text, player, transparent, show_percent);
 			//Wyrmgus end
 			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
+				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			}
 		}
 	} else {
