@@ -491,8 +491,8 @@ void UpdateSurfaceLayerButtons()
 	
 	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
 		if (i <= last_surface_layer && last_surface_layer > 0) {
-			UI.SurfaceLayerButtons[i].X = -2;
-			UI.SurfaceLayerButtons[i].Y = Video.Height - 157 + (19  * i);
+			UI.SurfaceLayerButtons[i].X = -2 * stratagus::defines::get()->get_scale_factor();
+			UI.SurfaceLayerButtons[i].Y = Video.Height + (-157 + (19  * i)) * stratagus::defines::get()->get_scale_factor();;
 		} else {
 			UI.SurfaceLayerButtons[i].X = -1;
 			UI.SurfaceLayerButtons[i].Y = -1;
