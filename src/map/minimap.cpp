@@ -454,35 +454,35 @@ void CMinimap::UpdateTerrain(int z)
 			if (UseOpenGL) {
 				Uint32 c;
 
-				if (bpp == 1) {
-					//Wyrmgus start
-//					SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[
-//										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
-					SDL_Color color = terrain->GetGraphics(season)->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season)];
-					if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						color = base_terrain->GetGraphics(season)->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season)];
-					}
-					//Wyrmgus end
-					
-					c = Video.MapRGB(0, color.r, color.g, color.b);
+				if (mf.get_owner() != nullptr && CMap::Map.tile_borders_other_player_territory(QPoint(Minimap2MapX[z][mx], Minimap2MapY[z][my] / CMap::Map.Info.MapWidths[z]), z, this->get_territory_tile_range(z))) {
+					c = mf.get_owner()->Color;
 				} else {
-					//Wyrmgus start
-//					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
-					SDL_PixelFormat *f = terrain->GetGraphics(season)->Surface->format;
-					//Wyrmgus end
-					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
-					//Wyrmgus start
-					if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
-						f = base_terrain->GetGraphics(season)->Surface->format;
-						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+					if (bpp == 1) {
+						SDL_Color color = terrain->GetGraphics(season)->Surface->format->palette->colors[*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season)];
+
+						if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
+							color = base_terrain->GetGraphics(season)->Surface->format->palette->colors[
+								*GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season)];
+						}
+
+						c = Video.MapRGB(0, color.r, color.g, color.b);
+					} else {
+						//Wyrmgus start
+	//					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
+						SDL_PixelFormat *f = terrain->GetGraphics(season)->Surface->format;
+						//Wyrmgus end
+						c = *(Uint32 *) GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
+						//Wyrmgus start
+						if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
+							f = base_terrain->GetGraphics(season)->Surface->format;
+							c = *(Uint32 *) GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+						}
+						//Wyrmgus end
+						c = Video.MapRGB(0,
+							((c & f->Rmask) >> f->Rshift),
+							((c & f->Gmask) >> f->Gshift),
+							((c & f->Bmask) >> f->Bshift));
 					}
-					//Wyrmgus end
-					c = Video.MapRGB(0,
-									 ((c & f->Rmask) >> f->Rshift),
-									 ((c & f->Gmask) >> f->Gshift),
-									 ((c & f->Bmask) >> f->Bshift));
 				}
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapTerrainSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = c;
@@ -699,38 +699,42 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			if (UseOpenGL) {
 				Uint32 c;
 
-				if (bpp == 1) {
-					//Wyrmgus start
-//					const int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
-//					const SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[colorIndex];
-					int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
-					SDL_Color color = terrain->GetGraphics(season)->Surface->format->palette->colors[colorIndex];
-					if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						colorIndex = *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
-						color = base_terrain->GetGraphics(season)->Surface->format->palette->colors[colorIndex];
-					}
-					//Wyrmgus end
-
-					c = Video.MapRGB(0, color.r, color.g, color.b);
+				if (mf.get_owner() != nullptr && CMap::Map.tile_borders_other_player_territory(QPoint(x, y / CMap::Map.Info.MapWidths[z]), z, this->get_territory_tile_range(z))) {
+					c = mf.get_owner()->Color;
 				} else {
-					//Wyrmgus start
-//					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
-					SDL_PixelFormat *f = terrain->GetGraphics(season)->Surface->format;
-					//Wyrmgus end
+					if (bpp == 1) {
+						//Wyrmgus start
+	//					const int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
+	//					const SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[colorIndex];
+						int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
+						SDL_Color color = terrain->GetGraphics(season)->Surface->format->palette->colors[colorIndex];
+						if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
+							colorIndex = *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+							color = base_terrain->GetGraphics(season)->Surface->format->palette->colors[colorIndex];
+						}
+						//Wyrmgus end
 
-					//Wyrmgus start
-//					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
-					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
-					
-					if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
-						f = base_terrain->GetGraphics(season)->Surface->format;
-						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+						c = Video.MapRGB(0, color.r, color.g, color.b);
+					} else {
+						//Wyrmgus start
+	//					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
+						SDL_PixelFormat *f = terrain->GetGraphics(season)->Surface->format;
+						//Wyrmgus end
+
+						//Wyrmgus start
+	//					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
+						c = *(Uint32 *) GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
+
+						if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
+							f = base_terrain->GetGraphics(season)->Surface->format;
+							c = *(Uint32 *) GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+						}
+						//Wyrmgus end
+						c = Video.MapRGB(0,
+							((c & f->Rmask) >> f->Rshift),
+							((c & f->Gmask) >> f->Gshift),
+							((c & f->Bmask) >> f->Bshift));
 					}
-					//Wyrmgus end
-					c = Video.MapRGB(0,
-									 ((c & f->Rmask) >> f->Rshift),
-									 ((c & f->Gmask) >> f->Gshift),
-									 ((c & f->Bmask) >> f->Bshift));
 				}
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapTerrainSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = c;
@@ -1379,4 +1383,9 @@ bool CMinimap::Contains(const PixelPos &screenPos) const
 {
 	return this->X <= screenPos.x && screenPos.x < this->X + this->W
 		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->H;
+}
+
+int CMinimap::get_territory_tile_range(const int z) const
+{
+	return CMap::Map.Info.MapWidths[z] / this->W;
 }

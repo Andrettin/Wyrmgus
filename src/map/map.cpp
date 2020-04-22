@@ -589,6 +589,31 @@ bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int 
 	return false;
 }
 
+bool CMap::tile_borders_other_player_territory(const QPoint &pos, const int z, const int range) const
+{
+	const CPlayer *tile_owner = this->Field(pos, z)->get_owner();
+
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			const QPoint adjacent_pos(pos.x() + sub_x, pos.y() + sub_y);
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+
+			const CPlayer *adjacent_tile_owner = this->Field(adjacent_pos, z)->get_owner();
+			if (tile_owner != adjacent_tile_owner) {
+				return true;
+			}
+
+			if (range >= 1 && this->tile_borders_other_player_territory(adjacent_pos, z, range - 1)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {

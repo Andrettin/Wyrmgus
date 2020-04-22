@@ -309,7 +309,8 @@ static int CclStratagusMap(lua_State *l)
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
-				CMap::Map.CalculateTileOwnershipTransition(Vec2i(ix, iy), z); //so that the correct ownership border is shown after a loaded game
+				const QPoint tile_pos(ix, iy);
+				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z); //so that the correct ownership border is shown after a loaded game
 			}
 		}
 	}

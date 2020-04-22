@@ -240,8 +240,21 @@ void site::update_border_tile_graphics()
 {
 	if (this->get_site_unit() != nullptr) {
 		const int z = this->get_site_unit()->MapLayer->ID;
+		const int minimap_territory_tile_range = UI.Minimap.get_territory_tile_range(z);
 		for (const QPoint &tile_pos : this->border_tiles) {
 			CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+
+			for (int minimap_offset_x = -minimap_territory_tile_range; minimap_offset_x <= minimap_territory_tile_range; ++minimap_offset_x) {
+				for (int minimap_offset_y = -minimap_territory_tile_range; minimap_offset_y <= minimap_territory_tile_range; ++minimap_offset_y) {
+					const QPoint minimap_tile_pos(tile_pos.x() + minimap_offset_x, tile_pos.y() + minimap_offset_y);
+
+					if (!CMap::Map.Info.IsPointOnMap(minimap_tile_pos, z)) {
+						continue;
+					}
+
+					UI.Minimap.UpdateXY(minimap_tile_pos, z);
+				}
+			}
 
 			//update adjacent tiles with different settlements as well
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -258,6 +271,18 @@ void site::update_border_tile_graphics()
 					CMapField *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
 					if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
 						CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
+
+						for (int minimap_offset_x = -minimap_territory_tile_range; minimap_offset_x <= minimap_territory_tile_range; ++minimap_offset_x) {
+							for (int minimap_offset_y = -minimap_territory_tile_range; minimap_offset_y <= minimap_territory_tile_range; ++minimap_offset_y) {
+								const QPoint minimap_tile_pos(adjacent_pos.x() + minimap_offset_x, adjacent_pos.y() + minimap_offset_y);
+
+								if (!CMap::Map.Info.IsPointOnMap(minimap_tile_pos, z)) {
+									continue;
+								}
+
+								UI.Minimap.UpdateXY(minimap_tile_pos, z);
+							}
+						}
 					}
 				}
 			}

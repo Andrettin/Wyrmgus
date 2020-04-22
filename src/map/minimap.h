@@ -79,6 +79,9 @@ public:
 	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;
 
 	bool Contains(const PixelPos &screenPos) const;
+
+	int get_territory_tile_range(const int z) const;
+
 public:
 	int X;
 	int Y;

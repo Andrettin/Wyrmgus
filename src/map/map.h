@@ -275,6 +275,7 @@ public:
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
+	bool tile_borders_other_player_territory(const QPoint &pos, const int z, const int range = 0) const;
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
