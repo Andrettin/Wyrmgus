@@ -235,45 +235,15 @@ void map_template::initialize()
 		std::sort(this->subtemplates.begin(), this->subtemplates.end(), [](const map_template *a, const map_template *b) {
 			if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
-			} else if (
-				//give priority to the template if the other template's position depends on its own
-				(
-					vector::contains(a->AdjacentTemplates, b)
-					|| vector::contains(a->NorthOfTemplates, b)
-					|| vector::contains(a->SouthOfTemplates, b)
-					|| vector::contains(a->WestOfTemplates, b)
-					|| vector::contains(a->EastOfTemplates, b)
-				)
-				&& (
-					!vector::contains(b->AdjacentTemplates, a)
-					&& !vector::contains(b->NorthOfTemplates, a)
-					&& !vector::contains(b->SouthOfTemplates, a)
-					&& !vector::contains(b->WestOfTemplates, a)
-					&& !vector::contains(b->EastOfTemplates, a)
-				)
-			) {
+			//give priority to the template if the other template's position depends on its own
+			} else if (a->is_dependent_on(b)) {
 				return false;
-			} else if (
-				(
-					vector::contains(b->AdjacentTemplates, a)
-					|| vector::contains(b->NorthOfTemplates, a)
-					|| vector::contains(b->SouthOfTemplates, a)
-					|| vector::contains(b->WestOfTemplates, a)
-					|| vector::contains(b->EastOfTemplates, a)
-				)
-				&& (
-					!vector::contains(a->AdjacentTemplates, b)
-					&& !vector::contains(a->NorthOfTemplates, b)
-					&& !vector::contains(a->SouthOfTemplates, b)
-					&& !vector::contains(a->WestOfTemplates, b)
-					&& !vector::contains(a->EastOfTemplates, b)
-				)
-			) {
+			} else if (b->is_dependent_on(a)) {
 				return true;
-			} else if (a->get_total_adjacent_template_count() != b->get_total_adjacent_template_count()) {
-				return a->get_total_adjacent_template_count() < b->get_total_adjacent_template_count();
 			} else if (a->get_applied_area_with_dependent_template_offsets() != b->get_applied_area_with_dependent_template_offsets()) {
 				return a->get_applied_area_with_dependent_template_offsets() > b->get_applied_area_with_dependent_template_offsets();
+			} else if (a->get_total_adjacent_template_count() != b->get_total_adjacent_template_count()) {
+				return a->get_total_adjacent_template_count() < b->get_total_adjacent_template_count();
 			} else {
 				return a->get_identifier() < b->get_identifier();
 			}
@@ -1617,6 +1587,43 @@ void map_template::set_overlay_terrain_image(const std::filesystem::path &filepa
 	}
 
 	this->overlay_terrain_image = database::get_maps_path(this->get_module()) / filepath;
+}
+
+bool map_template::is_dependent_on(const map_template *other_template) const
+{
+	//get whether this map template is dependent on another (i.e. needs it to establish its position)
+
+	for (const map_template *map_template : this->AdjacentTemplates) {
+		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
+			return true;
+		}
+	}
+
+	for (const map_template *map_template : this->NorthOfTemplates) {
+		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
+			return true;
+		}
+	}
+
+	for (const map_template *map_template : this->SouthOfTemplates) {
+		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
+			return true;
+		}
+	}
+
+	for (const map_template *map_template : this->WestOfTemplates) {
+		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
+			return true;
+		}
+	}
+
+	for (const map_template *map_template : this->EastOfTemplates) {
+		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 QPoint map_template::generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const

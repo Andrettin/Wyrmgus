@@ -393,6 +393,8 @@ public:
 		return this->subtemplate_pos;
 	}
 
+	bool is_dependent_on(const map_template *other_template) const;
+
 	size_t get_total_adjacent_template_count() const
 	{
 		//return the total number of adjacent templates on which this template ultimately depends
