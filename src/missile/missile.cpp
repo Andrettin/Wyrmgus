@@ -254,7 +254,7 @@ void MissileType::ProcessConfigData(const CConfigData *config_data)
 void MissileType::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
-		this->G->Load();
+		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
 		if (this->Flip) {
 			this->G->Flip();
 		}
