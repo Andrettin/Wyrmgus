@@ -5431,11 +5431,11 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 {
 	int value = 0;
 	if (variable_type == VariableValue) {
-		value = this->Variable[index].Value;
+		value = this->get_variable_value(index);
 	} else if (variable_type == VariableMax) {
-		value = this->Variable[index].Max;
+		value = this->get_variable_max(index);
 	} else if (variable_type == VariableIncrease) {
-		value = this->Variable[index].Increase;
+		value = this->get_variable_increase(index);
 	}
 	
 	if (index == ATTACKRANGE_INDEX) {
