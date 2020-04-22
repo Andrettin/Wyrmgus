@@ -437,7 +437,7 @@ void LoadDecorations()
 		}
 		UpdateLoadProgress();
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
-		(*i).Sprite->Load();
+		(*i).Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 	}
 }
 

@@ -35,6 +35,7 @@
 
 #include "ui/ui.h"
 
+#include "database/defines.h"
 #include "font.h"
 #include "menus.h"
 #include "player.h"
@@ -86,7 +87,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 	}
 	if (pimage->Sprite) {
-		pimage->Sprite->Load();
+		pimage->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 	}
 	if (pimage->Sprite) {
 		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
