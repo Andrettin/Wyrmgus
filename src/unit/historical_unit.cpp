@@ -103,7 +103,6 @@ void historical_unit::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "historical_location") {
-				delete historical_location;
 			auto location = std::make_unique<historical_location>();
 			location->ProcessConfigData(child_config_data);
 			this->HistoricalLocations.push_back(std::move(location));
