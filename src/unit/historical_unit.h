@@ -46,6 +46,7 @@ class historical_unit : public named_data_entry, public data_type<historical_uni
 	Q_PROPERTY(CUnitType *unit_type MEMBER unit_type READ get_unit_type)
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
+	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 
 public:
 	static constexpr const char *class_identifier = "historical_unit";
@@ -73,6 +74,11 @@ public:
 	{
 		return this->resources_held;
 	}
+
+	bool is_ai_active() const
+	{
+		return this->ai_active;
+	}
 	
 private:
 	CUnitType *unit_type = nullptr; //the unit's unit type
@@ -85,6 +91,7 @@ public:
 	CDate EndDate; //when the unit ends being active (e.g. when it is disbanded)
 private:
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
+	bool ai_active = true; //whether the unit's AI is active
 public:
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations; //historical locations for the unit
 };

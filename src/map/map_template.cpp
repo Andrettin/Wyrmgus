@@ -1439,6 +1439,10 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				unit->Variable[GIVERESOURCE_INDEX].Max = historical_unit->get_resources_held();
 				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 			}
+			if (!historical_unit->is_ai_active()) {
+				unit->Active = 0;
+				unit_player->ChangeUnitTypeAiActiveCount(unit_type, -1);
+			}
 		}
 	}
 	
