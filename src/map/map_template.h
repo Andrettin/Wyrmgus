@@ -91,6 +91,10 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring WRITE set_overlay_terrain_file_qstring)
 	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring WRITE set_terrain_image_qstring)
 	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring WRITE set_overlay_terrain_image_qstring)
+	Q_PROPERTY(stratagus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type*border_overlay_terrain_type MEMBER border_overlay_terrain_type READ get_border_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
@@ -416,6 +420,26 @@ public:
 
 	Vec2i GetBestLocationMapPosition(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
+	terrain_type *get_base_terrain_type() const
+	{
+		return this->base_terrain_type;
+	}
+	
+	terrain_type *get_base_overlay_terrain_type() const
+	{
+		return this->base_overlay_terrain_type;
+	}
+
+	terrain_type *get_border_terrain_type() const
+	{
+		return this->border_terrain_type;
+	}
+	
+	terrain_type *get_border_overlay_terrain_type() const
+	{
+		return this->border_overlay_terrain_type;
+	}
+	
 	terrain_type *get_unusable_area_terrain_type() const
 	{
 		return this->unusable_area_terrain_type;
@@ -466,10 +490,11 @@ public:
 private:
 	plane *plane = nullptr;
 	world *world = nullptr;
+	terrain_type *base_terrain_type = nullptr;
+	terrain_type *base_overlay_terrain_type = nullptr;
+	terrain_type *border_terrain_type = nullptr;
+	terrain_type *border_overlay_terrain_type = nullptr;
 public:
-	terrain_type *BaseTerrainType = nullptr;
-	terrain_type *BaseOverlayTerrainType = nullptr;
-	terrain_type *BorderTerrainType = nullptr;
 	terrain_type *SurroundingTerrainType = nullptr;
 private:
 	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle

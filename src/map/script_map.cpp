@@ -1624,13 +1624,10 @@ static int CclDefineMapTemplate(lua_State *l)
 			map_template->set_main_template(main_template);
 		} else if (!strcmp(value, "BaseTerrainType")) {
 			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
-			map_template->BaseTerrainType = terrain_type;
+			map_template->base_terrain_type = terrain_type;
 		} else if (!strcmp(value, "BaseOverlayTerrainType")) {
 			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
-			map_template->BaseOverlayTerrainType = terrain_type;
-		} else if (!strcmp(value, "BorderTerrainType")) {
-			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
-			map_template->BorderTerrainType = terrain_type;
+			map_template->base_overlay_terrain_type = terrain_type;
 		} else if (!strcmp(value, "SurroundingTerrainType")) {
 			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
 			map_template->SurroundingTerrainType = terrain_type;

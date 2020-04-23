@@ -153,10 +153,10 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->EastOfTemplates.push_back(east_of_template);
 		} else if (key == "base_terrain_type") {
 			terrain_type *terrain_type = terrain_type::get(value);
-			this->BaseTerrainType = terrain_type;
+			this->base_terrain_type = terrain_type;
 		} else if (key == "base_overlay_terrain_type") {
 			terrain_type *terrain_type = terrain_type::get(value);
-			this->BaseOverlayTerrainType = terrain_type;
+			this->base_overlay_terrain_type = terrain_type;
 		} else if (key == "unusable_area_terrain_type") {
 			terrain_type *terrain_type = terrain_type::get(value);
 			this->unusable_area_terrain_type = terrain_type;
@@ -497,14 +497,27 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->get_name().c_str());
 	
-	if (this->BaseTerrainType) {
+	if (this->get_base_terrain_type() != nullptr || this->get_border_terrain_type() != nullptr) {
 		for (int x = map_start_pos.x(); x < map_end.x(); ++x) {
 			for (int y = map_start_pos.y(); y < map_end.y(); ++y) {
+				terrain_type *terrain = nullptr;
+				terrain_type *overlay_terrain = nullptr;
+
+				if (this->get_border_terrain_type() != nullptr && (x == map_start_pos.x() || y == map_start_pos.y() || x == (map_end.x() - 1) || y == (map_end.y() - 1))) {
+					terrain = this->get_border_terrain_type();
+					overlay_terrain = this->get_border_overlay_terrain_type();
+				} else if (this->get_base_terrain_type() != nullptr) {
+					terrain = this->get_base_terrain_type();
+					overlay_terrain = this->get_base_overlay_terrain_type();
+				} else {
+					continue;
+				}
+
 				Vec2i tile_pos(x, y);
-				CMap::Map.Field(tile_pos, z)->SetTerrain(this->BaseTerrainType);
+				CMap::Map.Field(tile_pos, z)->SetTerrain(terrain);
 				
-				if (this->BaseOverlayTerrainType) {
-					CMap::Map.Field(tile_pos, z)->SetTerrain(this->BaseOverlayTerrainType);
+				if (overlay_terrain != nullptr) {
+					CMap::Map.Field(tile_pos, z)->SetTerrain(overlay_terrain);
 				} else {
 					CMap::Map.Field(tile_pos, z)->RemoveOverlayTerrain();
 				}
