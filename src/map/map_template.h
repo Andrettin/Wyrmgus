@@ -80,6 +80,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
+	Q_PROPERTY(bool optional MEMBER optional READ is_optional)
 	Q_PROPERTY(QPoint start_pos MEMBER start_pos READ get_start_pos)
 	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
 	Q_PROPERTY(QPoint subtemplate_pos MEMBER subtemplate_pos READ get_subtemplate_pos)
@@ -238,6 +239,11 @@ public:
 	bool is_circle() const
 	{
 		return this->circle;
+	}
+
+	bool is_optional() const
+	{
+		return this->optional;
 	}
 
 	bool contains_pos(const QPoint &pos) const
@@ -435,8 +441,9 @@ public:
 	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates
 private:
-	bool output_terrain_image = false;
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
+	bool optional = false;
+	bool output_terrain_image = false;
 private:
 	QPoint subtemplate_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used

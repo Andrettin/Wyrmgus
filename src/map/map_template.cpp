@@ -233,13 +233,15 @@ void map_template::initialize()
 
 	if (!this->subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
 		std::sort(this->subtemplates.begin(), this->subtemplates.end(), [](const map_template *a, const map_template *b) {
-			if (a->Priority != b->Priority) {
-				return a->Priority > b->Priority;
 			//give priority to the template if the other template's position depends on its own
-			} else if (a->is_dependent_on(b)) {
+			if (a->is_dependent_on(b)) {
 				return false;
 			} else if (b->is_dependent_on(a)) {
 				return true;
+			} else if (a->is_optional() != b->is_optional()) {
+				return b->is_optional();
+			} else if (a->Priority != b->Priority) {
+				return a->Priority > b->Priority;
 			} else if (a->get_applied_area_with_dependent_template_offsets() != b->get_applied_area_with_dependent_template_offsets()) {
 				return a->get_applied_area_with_dependent_template_offsets() > b->get_applied_area_with_dependent_template_offsets();
 			} else if (a->get_total_adjacent_template_count() != b->get_total_adjacent_template_count()) {
@@ -572,7 +574,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 			}
 		}
 	}
-	
+
 	if (this->IsSubtemplateArea() && this->SurroundingTerrainType) {
 		Vec2i surrounding_start_pos(map_start_pos - Vec2i(1, 1));
 		Vec2i surrounding_end(map_end + Vec2i(1, 1));
@@ -820,7 +822,9 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 				}
 
 				if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
-					fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
+					if (!subtemplate->is_optional()) {
+						fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
+					}
 				} else {
 					found_location = true;
 				}
@@ -841,7 +845,7 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
 				subtemplate->Apply(subtemplate->get_start_pos(), subtemplate_pos, z);
 			}
-		} else {
+		} else if (!subtemplate->is_optional()) {
 			throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
 		}
 	}
