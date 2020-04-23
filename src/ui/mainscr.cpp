@@ -1931,7 +1931,7 @@ static void InfoPanel_draw_no_selection()
 				//Wyrmgus end
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
-				Video.FillRectangleClip(CPlayer::Players[i]->Color, x + 1 * scale_factor, y + 1 * scale_factor, 10 * scale_factor, 10 * scale_factor);
+				Video.FillRectangleClip(CPlayer::Players[i]->Color, x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
 
 				//Wyrmgus start
 //				label.Draw(x + 27, y, CPlayer::Players[i]->Name);
