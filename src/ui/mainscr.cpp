@@ -2055,11 +2055,10 @@ static void InfoPanel_draw_multiple_selection()
 			//Wyrmgus end
 		}
 	}
-	if (Selected.size() > UI.SelectedButtons.size()) {
-		char buf[22];
 
-		sprintf(buf, "+%lu", (long unsigned int)(Selected.size() - UI.SelectedButtons.size()));
-		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
+	if (Selected.size() > UI.SelectedButtons.size()) {
+		const std::string number_str = std::to_string(Selected.size() - UI.SelectedButtons.size());
+		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, number_str.c_str());
 	}
 }
 
