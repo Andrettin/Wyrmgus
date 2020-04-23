@@ -48,6 +48,7 @@
 #include "time/time_of_day.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
+#include "unit/unit_type.h"
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
 #include "world.h"
@@ -164,6 +165,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
 		} else if (property_class_name == "stratagus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
+		} else if (property_class_name == "CUnitType*") {
+			new_property_value = QVariant::fromValue(CUnitType::get(property.get_value()));
 		} else if (property_class_name == "stratagus::world*") {
 			new_property_value = QVariant::fromValue(world::get(property.get_value()));
 		} else {

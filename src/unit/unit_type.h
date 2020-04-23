@@ -775,6 +775,8 @@ public:
 /// @todo n0body: AutoBuildRate not implemented.
 class CUnitType final : public stratagus::detailed_data_entry, public stratagus::data_type<CUnitType>, public CDataType
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "unit_type";
 	static constexpr const char *database_folder = "unit_types";
