@@ -1788,7 +1788,7 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr
 	}
 	
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
-		CHistoricalLocation *historical_location = historical_location_list[i];
+		const std::unique_ptr<historical_location> &historical_location = historical_location_list[i];
 		if (start_date.ContainsDate(historical_location->Date)) {
 			if (historical_location->map_template == this) {
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
