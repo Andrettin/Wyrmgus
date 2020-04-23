@@ -1387,5 +1387,5 @@ bool CMinimap::Contains(const PixelPos &screenPos) const
 
 int CMinimap::get_territory_tile_range(const int z) const
 {
-	return CMap::Map.Info.MapWidths[z] / this->W;
+	return std::max(0, (CMap::Map.Info.MapWidths[z] / this->W) - 1);
 }
