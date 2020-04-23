@@ -70,8 +70,8 @@ void MissileFlameShield::Action()
 		unit = unit->Container;
 	}
 	const Vec2i upos = unit->tilePos;
-	const int ix = unit->IX;
-	const int iy = unit->IY;
+	const int ix = unit->get_pixel_offset().x();
+	const int iy = unit->get_pixel_offset().y();
 	const int uw = unit->Type->TileSize.x;
 	const int uh = unit->Type->TileSize.y;
 	this->position.x = upos.x * stratagus::defines::get()->get_tile_width() + ix + uw * stratagus::defines::get()->get_tile_width() / 2 + dx - 16;
