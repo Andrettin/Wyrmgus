@@ -36,10 +36,42 @@
 
 namespace stratagus {
 
+historical_unit::historical_unit(const std::string &identifier)
+	: named_data_entry(identifier), CDataType(identifier)
+{
+}
+
 historical_unit::~historical_unit()
 {
-	for (size_t i = 0; i < this->HistoricalLocations.size(); ++i) {
-		delete this->HistoricalLocations[i];
+}
+
+void historical_unit::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "faction") {
+		this->Faction = PlayerRaces.GetFaction(FindAndReplaceString(value, "_", "-"));
+	} else if (key == "start_date") {
+		this->StartDate = CDate::FromString(value);
+	} else if (key == "end_date") {
+		this->EndDate = CDate::FromString(value);
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void historical_unit::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "historical_location") {
+		auto location = std::make_unique<historical_location>();
+		database::get()->process_sml_data(location, scope);
+		location->check();
+		this->HistoricalLocations.push_back(std::move(location));
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
@@ -54,7 +86,7 @@ void historical_unit::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quantity") {
 			this->quantity = std::stoi(value);
 		} else if (key == "unit_type") {
-			this->UnitType = CUnitType::get(value);
+			this->unit_type = CUnitType::get(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Faction = PlayerRaces.GetFaction(value);
@@ -71,15 +103,10 @@ void historical_unit::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "historical_location") {
-			CHistoricalLocation *historical_location = new CHistoricalLocation;
-			historical_location->ProcessConfigData(child_config_data);
-				
-			if (historical_location->Date.Year == 0 || !historical_location->map_template) {
 				delete historical_location;
-				continue;
-			}
-			
-			this->HistoricalLocations.push_back(historical_location);
+			auto location = std::make_unique<historical_location>();
+			location->ProcessConfigData(child_config_data);
+			this->HistoricalLocations.push_back(std::move(location));
 		} else {
 			fprintf(stderr, "Invalid historical unit property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -88,7 +115,7 @@ void historical_unit::ProcessConfigData(const CConfigData *config_data)
 
 void historical_unit::check() const
 {
-	if (this->UnitType == nullptr) {
+	if (this->get_unit_type() == nullptr) {
 		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have a unit type.");
 	}
 

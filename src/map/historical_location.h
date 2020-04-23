@@ -42,14 +42,20 @@
 class CConfigData;
 
 namespace stratagus {
-	class map_template;
-	class site;
-}
 
-class CHistoricalLocation
+class map_template;
+class site;
+class sml_data;
+class sml_property;
+
+class historical_location
 {
 public:
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
 	void ProcessConfigData(const CConfigData *config_data);
+	void check();
 	
 public:
 	CDate Date; //the historical location's date
@@ -57,3 +63,5 @@ public:
 	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
 	stratagus::site *site = nullptr; //the historical location's site (if any)
 };
+
+}

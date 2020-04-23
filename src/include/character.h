@@ -46,7 +46,6 @@ class CDeityDomain;
 class CDependency;
 class CFaction;
 class CFile;
-class CHistoricalLocation;
 class CLanguage;
 class CPersistentItem;
 class CProvince;
@@ -59,6 +58,7 @@ class LuaCallback;
 
 namespace stratagus {
 	class civilization;
+	class historical_location;
 	class site;
 }
 
@@ -106,11 +106,6 @@ enum CharacterTitles {
 class CCharacter : public CDataType
 {
 public:
-	CCharacter()
-	{
-		memset(Attributes, 0, sizeof(Attributes));
-	}
-	
 	static CCharacter *GetCharacter(const std::string &ident, const bool should_find = true);
 	static CCharacter *GetOrAddCharacter(const std::string &ident);
 	static void ClearCharacters();
@@ -120,6 +115,7 @@ public:
 	static std::vector<CCharacter *> Characters;
 	static std::map<std::string, CCharacter *> CharactersByIdent;
 	
+	CCharacter();
 	~CCharacter();
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
@@ -192,7 +188,7 @@ public:
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 	std::vector<std::pair<CDate, CFaction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
-	std::vector<CHistoricalLocation *> HistoricalLocations;	/// historical locations of the character
+	std::vector<std::unique_ptr<stratagus::historical_location>> HistoricalLocations;	/// historical locations of the character
 	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 };

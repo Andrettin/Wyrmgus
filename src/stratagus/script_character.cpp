@@ -457,27 +457,28 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CHistoricalLocation *historical_location = new CHistoricalLocation;
+				auto location = std::make_unique<stratagus::historical_location>();
 				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &historical_location->Date);
+				CclGetDate(l, &location->Date);
 				lua_pop(l, 1);
 				++j;
 				
-				historical_location->map_template = stratagus::map_template::get(LuaToString(l, -1, j + 1));
+				location->map_template = stratagus::map_template::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_istable(l, -1)) { //coordinates
-					CclGetPos(l, &historical_location->Position.x, &historical_location->Position.y);
+					CclGetPos(l, &location->Position.x, &location->Position.y);
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
-					historical_location->site = stratagus::site::get(site_ident);
-					historical_location->map_template = historical_location->site->map_template;
-					historical_location->Position = historical_location->site->Position;
+					location->site = stratagus::site::get(site_ident);
+					location->map_template = location->site->map_template;
+					location->Position = location->site->Position;
 				}
 				lua_pop(l, 1);
 
-				character->HistoricalLocations.push_back(historical_location);
+				location->check();
+				character->HistoricalLocations.push_back(std::move(location));
 			}
 		} else if (!strcmp(value, "HistoricalTitles")) {
 			if (!lua_istable(l, -1)) {

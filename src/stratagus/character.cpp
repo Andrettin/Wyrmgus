@@ -120,16 +120,17 @@ void CCharacter::ClearCharacters()
 	CustomHeroes.clear();
 }
 
+CCharacter::CCharacter()
+{
+	memset(Attributes, 0, sizeof(Attributes));
+}
+
 CCharacter::~CCharacter()
 {
 	if (this->Conditions) {
 		delete Conditions;
 	}
 	
-	for (CHistoricalLocation *historical_location : this->HistoricalLocations) {
-		delete historical_location;
-	}
-
 	for (CPersistentItem *item : this->Items) {
 		delete item;
 	}
@@ -343,15 +344,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "historical_location") {
-			CHistoricalLocation *historical_location = new CHistoricalLocation;
-			historical_location->ProcessConfigData(child_config_data);
-				
-			if (historical_location->Date.Year == 0 || !historical_location->map_template) {
-				delete historical_location;
-				continue;
-			}
-			
-			this->HistoricalLocations.push_back(historical_location);
+			auto location = std::make_unique<stratagus::historical_location>();
+			location->ProcessConfigData(child_config_data);
+			this->HistoricalLocations.push_back(std::move(location));
 		} else if (child_config_data->Tag == "historical_title") {
 			int title = -1;
 			CDate start_date;

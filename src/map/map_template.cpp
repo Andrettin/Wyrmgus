@@ -1386,7 +1386,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		
 		CFaction *unit_faction = historical_unit->Faction;
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
-		CUnitType *unit_type = historical_unit->UnitType;
+		CUnitType *unit_type = historical_unit->get_unit_type();
 		
 		bool in_another_map_template = false;
 		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
@@ -1777,7 +1777,7 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 **
 **	@return	The best position if found, or an invalid one otherwise
 */
-Vec2i map_template::GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const
+Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const
 {
 	Vec2i pos(-1, -1);
 	in_another_map_template = false;

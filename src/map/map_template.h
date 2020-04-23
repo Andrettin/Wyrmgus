@@ -37,13 +37,13 @@
 
 class CCharacter;
 class CFaction;
-class CHistoricalLocation;
 class CMapField;
 class CUniqueItem;
 class CUnitType;
 struct lua_State;
 
 namespace stratagus {
+	class historical_location;
 	class terrain_type;
 }
 
@@ -408,7 +408,7 @@ public:
 
 	QPoint generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
 
-	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
+	Vec2i GetBestLocationMapPosition(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
 	terrain_type *get_unusable_area_terrain_type() const
 	{

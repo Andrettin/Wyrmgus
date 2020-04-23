@@ -40,20 +40,36 @@
 #include "map/map_template.h"
 #include "map/site.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
+	
+void historical_location::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+	if (key == "date") {
+		this->Date = CDate::FromString(value);
+	} else if (key == "map_template") {
+		this->map_template = map_template::get(value);
+	} else if (key == "site") {
+		this->site = site::get(value);
+		this->map_template = this->site->map_template;
+		this->Position = this->site->Position;
+	} else if (key == "x") {
+		this->Position.x = std::stoi(value);
+	} else if (key == "y") {
+		this->Position.y = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid historical location property: \"" + key + "\".");
+	}
+}
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
+void historical_location::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
+}
+
+void historical_location::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -63,9 +79,9 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->Date = CDate::FromString(value);
 		} else if (key == "map_template") {
-			this->map_template = stratagus::map_template::get(value);
+			this->map_template = map_template::get(value);
 		} else if (key == "site") {
-			this->site = stratagus::site::get(value);
+			this->site = site::get(value);
 			this->map_template = this->site->map_template;
 			this->Position = this->site->Position;
 		} else if (key == "x") {
@@ -76,12 +92,19 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
 		}
 	}
-	
+
+	this->check();
+}
+
+void historical_location::check()
+{
 	if (this->Date.Year == 0) {
-		fprintf(stderr, "Historical location has no date.\n");
+		throw std::runtime_error("Historical location has no date.");
 	}
-	
-	if (!this->map_template) {
-		fprintf(stderr, "Historical location has no map template.\n");
+
+	if (this->map_template == nullptr) {
+		throw std::runtime_error("Historical location has no map template.");
 	}
+}
+
 }

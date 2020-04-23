@@ -33,15 +33,17 @@
 #include "time/date.h"
 
 class CFaction;
-class CHistoricalLocation;
 class CUnitType;
 
 namespace stratagus {
+
+class historical_location;
 
 class historical_unit : public named_data_entry, public data_type<historical_unit>, public CDataType
 {
 	Q_OBJECT
 
+	Q_PROPERTY(CUnitType *unit_type MEMBER unit_type READ get_unit_type)
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 
@@ -49,14 +51,18 @@ public:
 	static constexpr const char *class_identifier = "historical_unit";
 	static constexpr const char *database_folder = "historical_units";
 
-	historical_unit(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
-	{
-	}
-
+	historical_unit(const std::string &identifier);
 	~historical_unit();
 	
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void check() const override;
+
+	CUnitType *get_unit_type() const
+	{
+		return this->unit_type;
+	}
 
 	int get_quantity() const
 	{
@@ -68,8 +74,9 @@ public:
 		return this->resources_held;
 	}
 	
+private:
+	CUnitType *unit_type = nullptr; //the unit's unit type
 public:
-	CUnitType *UnitType = nullptr; //the unit's unit type
 	CFaction *Faction = nullptr; //the unit's faction
 private:
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
@@ -79,7 +86,7 @@ public:
 private:
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 public:
-	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
+	std::vector<std::unique_ptr<historical_location>> HistoricalLocations; //historical locations for the unit
 };
 
 }
