@@ -1911,6 +1911,9 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
 			mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
 			mf.Flags |= MapFieldGravel;
+			if (mf.Flags & MapFieldUnderground) {
+				mf.Flags &= ~(MapFieldAirUnpassable);
+			}
 		}
 		mf.Value = 0;
 	} else {

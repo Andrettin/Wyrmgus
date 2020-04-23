@@ -252,6 +252,11 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		this->Flags |= MapFieldNoRail;
 	}
 
+	if (terrain_type->Overlay && (this->Flags & MapFieldUnderground) && (this->Flags & MapFieldWall)) {
+		//underground walls are not passable by air units
+		this->Flags |= MapFieldAirUnpassable;
+	}
+
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain_type->Overlay && terrain_type->Resource != -1) {
 		this->Value = CResource::Resources[terrain_type->Resource]->DefaultAmount;
