@@ -47,6 +47,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(int scale_factor MEMBER scale_factor READ get_scale_factor)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
+	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
 
 public:
 	void load(const std::filesystem::path &base_path);
@@ -73,11 +74,6 @@ public:
 		return this->icon_size;
 	}
 
-	time_of_day *get_underground_time_of_day() const
-	{
-		return this->underground_time_of_day;
-	}
-
 	int get_scale_factor() const
 	{
 		return this->scale_factor;
@@ -98,12 +94,22 @@ public:
 		return this->get_tile_height() * this->get_scale_factor();
 	}
 
+	time_of_day *get_underground_time_of_day() const
+	{
+		return this->underground_time_of_day;
+	}
+
+	bool is_documents_modules_loading_enabled() const
+	{
+		return this->documents_modules_loading_enabled;
+	}
 
 private:
 	QSize tile_size;
 	QSize icon_size;
-	time_of_day *underground_time_of_day = nullptr;
 	int scale_factor = 1;
+	time_of_day *underground_time_of_day = nullptr;
+	bool documents_modules_loading_enabled = true;
 };
 
 }
