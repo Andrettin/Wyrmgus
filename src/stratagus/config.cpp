@@ -261,7 +261,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				button_level->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "calendar") {
-			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);
+			stratagus::calendar *calendar = stratagus::calendar::get_or_add(ident, nullptr);
 			if (!define_only) {
 				calendar->ProcessConfigData(config_data);
 			}

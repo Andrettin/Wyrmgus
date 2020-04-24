@@ -40,7 +40,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCalendar;
 class CDeity;
 class CDeityDomain;
 class CDependency;
@@ -57,6 +56,7 @@ class CUpgrade;
 class LuaCallback;
 
 namespace stratagus {
+	class calendar;
 	class civilization;
 	class historical_location;
 	class site;
@@ -127,7 +127,7 @@ public:
 	int GetAttributeModifier(int attribute) const;
 	CReligion *GetReligion() const;
 	CLanguage *GetLanguage() const;
-	CCalendar *GetCalendar() const;
+	stratagus::calendar *get_calendar() const;
 	bool IsParentOf(const std::string &child_full_name) const;
 	bool IsChildOf(const std::string &parent_full_name) const;
 	bool IsSiblingOf(const std::string &sibling_full_name) const;

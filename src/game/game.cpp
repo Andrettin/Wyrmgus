@@ -1637,21 +1637,19 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	
 	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	if (current_campaign) {
-		CCalendar::BaseCalendar->CurrentDate = current_campaign->GetStartDate();
-		CDate::CurrentTotalHours = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
+		stratagus::calendar::base_calendar->CurrentDate = current_campaign->GetStartDate();
+		CDate::CurrentTotalHours = stratagus::calendar::base_calendar->CurrentDate.GetTotalHours(stratagus::calendar::base_calendar);
 	} else {
-		CCalendar::BaseCalendar->CurrentDate.Clear();
-		CCalendar::BaseCalendar->CurrentDate.Year = 1;
-		CCalendar::BaseCalendar->CurrentDate.Month = SyncRand(CCalendar::BaseCalendar->Months.size()) + 1;
-		CCalendar::BaseCalendar->CurrentDate.Day = SyncRand(CCalendar::BaseCalendar->Months[CCalendar::BaseCalendar->CurrentDate.Month - 1]->Days) + 1;
-		CCalendar::BaseCalendar->CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
-		CDate::CurrentTotalHours = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
+		stratagus::calendar::base_calendar->CurrentDate.Clear();
+		stratagus::calendar::base_calendar->CurrentDate.Year = 1;
+		stratagus::calendar::base_calendar->CurrentDate.Month = SyncRand(stratagus::calendar::base_calendar->Months.size()) + 1;
+		stratagus::calendar::base_calendar->CurrentDate.Day = SyncRand(stratagus::calendar::base_calendar->Months[stratagus::calendar::base_calendar->CurrentDate.Month - 1]->Days) + 1;
+		stratagus::calendar::base_calendar->CurrentDate.Hour = SyncRand(stratagus::calendar::base_calendar->HoursPerDay);
+		CDate::CurrentTotalHours = stratagus::calendar::base_calendar->CurrentDate.GetTotalHours(stratagus::calendar::base_calendar);
 	}
 	
-	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
-		CCalendar *calendar = CCalendar::Calendars[i];
-		
-		calendar->CurrentDate = CCalendar::BaseCalendar->CurrentDate.ToCalendar(CCalendar::BaseCalendar, calendar);
+	for (stratagus::calendar *calendar : stratagus::calendar::get_all()) {
+		calendar->CurrentDate = stratagus::calendar::base_calendar->CurrentDate.ToCalendar(stratagus::calendar::base_calendar, calendar);
 		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
 	}
 	

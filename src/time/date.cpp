@@ -58,11 +58,11 @@ CDate CDate::FromString(const std::string &date_str)
 	
 	std::vector<std::string> date_vector = SplitString(date_str, ".");
 	
-	CCalendar *calendar = nullptr;
+	stratagus::calendar *calendar = nullptr;
 	size_t offset = 0;
 	
 	if (date_vector.size() >= 1 && !string::is_number(date_vector[0])) {
-		calendar = CCalendar::GetCalendar(date_vector[0]);
+		calendar = stratagus::calendar::try_get(date_vector[0]);
 		if (calendar) {
 			offset += 1;
 		} else if (!CTimeline::GetTimeline(date_vector[0])) { //is neither a calendar nor a timeline
@@ -138,7 +138,7 @@ void CDate::AddYears(const int years)
 	}
 }
 
-void CDate::AddMonths(const CCalendar *calendar, const int months)
+void CDate::AddMonths(const stratagus::calendar *calendar, const int months)
 {
 	this->Month += months;
 	
@@ -155,7 +155,7 @@ void CDate::AddMonths(const CCalendar *calendar, const int months)
 	}
 }
 
-void CDate::AddDays(const CCalendar *calendar, const int days, const int day_multiplier)
+void CDate::AddDays(const stratagus::calendar *calendar, const int days, const int day_multiplier)
 {
 	int current_day = this->Day;
 	current_day += days * day_multiplier;
@@ -185,7 +185,7 @@ void CDate::AddDays(const CCalendar *calendar, const int days, const int day_mul
 	this->Day = current_day;
 }
 
-void CDate::AddHours(const CCalendar *calendar, const long long int hours, const int day_multiplier)
+void CDate::AddHours(const stratagus::calendar *calendar, const long long int hours, const int day_multiplier)
 {
 	this->AddDays(calendar, hours / calendar->HoursPerDay, day_multiplier);
 	
@@ -204,7 +204,7 @@ void CDate::AddHours(const CCalendar *calendar, const long long int hours, const
 	}
 }
 
-CDate CDate::ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) const
+CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calendar *new_calendar) const
 {
 	if (current_calendar == new_calendar) {
 		return *this;
@@ -234,17 +234,17 @@ CDate CDate::ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) co
 	return date;
 }
 
-CDate CDate::ToBaseCalendar(CCalendar *current_calendar) const
+CDate CDate::ToBaseCalendar(stratagus::calendar *current_calendar) const
 {
-	if (!CCalendar::BaseCalendar) {
+	if (!stratagus::calendar::base_calendar) {
 		fprintf(stderr, "No base calendar has been defined.\n");
 		return *this;
 	}
 	
-	return this->ToCalendar(current_calendar, CCalendar::BaseCalendar);
+	return this->ToCalendar(current_calendar, stratagus::calendar::base_calendar);
 }
 
-std::string CDate::ToString(const CCalendar *calendar) const
+std::string CDate::ToString(const stratagus::calendar *calendar) const
 {
 	std::string date_string;
 	
@@ -256,7 +256,7 @@ std::string CDate::ToString(const CCalendar *calendar) const
 	return date_string;
 }
 
-std::string CDate::ToDisplayString(const CCalendar *calendar, const bool year_only) const
+std::string CDate::ToDisplayString(const stratagus::calendar *calendar, const bool year_only) const
 {
 	std::string display_string;
 	
@@ -295,7 +295,7 @@ std::string CDate::ToDisplayString(const CCalendar *calendar, const bool year_on
 **
 **	@return	The amount of days
 */
-int CDate::GetTotalDays(const CCalendar *calendar) const
+int CDate::GetTotalDays(const stratagus::calendar *calendar) const
 {
 	int days = 0;
 	
@@ -308,7 +308,7 @@ int CDate::GetTotalDays(const CCalendar *calendar) const
 	return days;
 }
 
-unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
+unsigned long long CDate::GetTotalHours(stratagus::calendar *calendar) const
 {
 	CDate date = this->ToBaseCalendar(calendar);
 	
@@ -332,7 +332,7 @@ unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 **
 **	@return	The ID of the day of the week
 */
-int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
+int CDate::GetDayOfTheWeek(const stratagus::calendar *calendar) const
 {
 	if (!calendar->DaysOfTheWeek.empty() && calendar->BaseDayOfTheWeek) {
 		int day_of_the_week = calendar->BaseDayOfTheWeek->ID;
@@ -356,7 +356,7 @@ int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
 */
 void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string)
 {
-	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
+	stratagus::calendar *calendar = stratagus::calendar::try_get(calendar_ident);
 	
 	if (!calendar) {
 		return;
@@ -373,7 +373,7 @@ void SetCurrentDate(const std::string &calendar_ident, const std::string &date_s
 */
 void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week)
 {
-	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
+	stratagus::calendar *calendar = stratagus::calendar::try_get(calendar_ident);
 	
 	if (!calendar || calendar->DaysOfTheWeek.empty() || !calendar->BaseDayOfTheWeek) {
 		return;

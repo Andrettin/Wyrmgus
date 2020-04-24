@@ -803,8 +803,8 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "Language not found.");
 			}
 		} else if (!strcmp(value, "Calendar")) {
-			CCalendar *calendar = CCalendar::GetCalendar(LuaToString(l, -1));
-			civilization->Calendar = calendar;
+			stratagus::calendar *calendar = stratagus::calendar::get(LuaToString(l, -1));
+			civilization->calendar = calendar;
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			civilization->Currency = currency;

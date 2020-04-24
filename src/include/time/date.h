@@ -35,8 +35,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCalendar;
 class CTimeline;
+
+namespace stratagus {
+	class calendar;
+}
 
 static constexpr int BaseCalendarYearOffsetForHours = 10000; //essentially the Human Era
 
@@ -50,16 +53,16 @@ public:
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	void AddYears(const int years);
-	void AddMonths(const CCalendar *calendar, const int months);
-	void AddDays(const CCalendar *calendar, const int days, const int day_multiplier = 1);
-	void AddHours(const CCalendar *calendar, const long long int hours, const int day_multiplier = 1);
-	CDate ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) const;
-	CDate ToBaseCalendar(CCalendar *current_calendar) const;
-	std::string ToString(const CCalendar *calendar) const;
-	std::string ToDisplayString(const CCalendar *calendar, const bool year_only = false) const;
-	int GetTotalDays(const CCalendar *calendar) const;
-	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
-	int GetDayOfTheWeek(const CCalendar *calendar) const;			/// gets the day of the week for this date in a given calendar
+	void AddMonths(const stratagus::calendar *calendar, const int months);
+	void AddDays(const stratagus::calendar *calendar, const int days, const int day_multiplier = 1);
+	void AddHours(const stratagus::calendar *calendar, const long long int hours, const int day_multiplier = 1);
+	CDate ToCalendar(stratagus::calendar *current_calendar, stratagus::calendar *new_calendar) const;
+	CDate ToBaseCalendar(stratagus::calendar *current_calendar) const;
+	std::string ToString(const stratagus::calendar *calendar) const;
+	std::string ToDisplayString(const stratagus::calendar *calendar, const bool year_only = false) const;
+	int GetTotalDays(const stratagus::calendar *calendar) const;
+	unsigned long long GetTotalHours(stratagus::calendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
+	int GetDayOfTheWeek(const stratagus::calendar *calendar) const;			/// gets the day of the week for this date in a given calendar
 	
 	int GetYear() const
 	{

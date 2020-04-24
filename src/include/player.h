@@ -63,7 +63,6 @@ static constexpr int DefaultTradeCost = 30;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCalendar;
 class CCharacter;
 class CCurrency;
 class CDeity;
@@ -88,6 +87,7 @@ struct lua_State;
 
 namespace stratagus {
 	class age;
+	class calendar;
 	class civilization;
 	class site;
 	class unit_class;

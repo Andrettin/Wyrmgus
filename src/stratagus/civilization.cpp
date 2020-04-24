@@ -367,17 +367,17 @@ int civilization::GetForceTypeWeight(int force_type) const
 	return 1;
 }
 
-CCalendar *civilization::GetCalendar() const
+calendar *civilization::get_calendar() const
 {
-	if (this->Calendar) {
-		return this->Calendar;
+	if (this->calendar != nullptr) {
+		return this->calendar;
 	}
 	
-	if (this->parent_civilization) {
-		return this->parent_civilization->GetCalendar();
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_calendar();
 	}
 	
-	return CCalendar::BaseCalendar;
+	return calendar::base_calendar;
 }
 
 CCurrency *civilization::GetCurrency() const

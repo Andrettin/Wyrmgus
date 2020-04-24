@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name calendar.h - The calendar header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -33,6 +31,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
 #include "time/date.h"
 
@@ -40,7 +40,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCalendar;
+namespace stratagus {
+	class calendar;
+}
 
 class CDayOfTheWeek
 {
@@ -50,7 +52,7 @@ public:
 	std::string Ident;
 	std::string Name;
 	int ID = -1;
-	CCalendar *Calendar = nullptr;
+	stratagus::calendar *Calendar = nullptr;
 };
 
 class CMonth
@@ -62,29 +64,36 @@ public:
 	int Days = 0;
 };
 
-class CCalendar : public CDataType
+namespace stratagus {
+
+class calendar : public named_data_entry, public data_type<calendar>, public CDataType
 {
 public:
-	~CCalendar();
+	calendar(const std::string &identifier);
+	~calendar();
 	
-	static CCalendar *GetCalendar(const std::string &ident, const bool should_find = true);
-	static CCalendar *GetOrAddCalendar(const std::string &ident);
-	static void ClearCalendars();
-	
-	static std::vector<CCalendar *> Calendars;
-	static std::map<std::string, CCalendar *> CalendarsByIdent;
-	static CCalendar *BaseCalendar;
-	
+	static constexpr const char *class_identifier = "calendar";
+	static constexpr const char *database_folder = "calendars";
+
+	static void clear()
+	{
+		data_type::clear();
+
+		calendar::base_calendar = nullptr;
+	}
+
+	static calendar *base_calendar;
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void initialize() override;
+	virtual void check() const override;
 private:
 	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
-	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
-	void InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar);
+	void AddChronologicalIntersection(calendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
+	void InheritChronologicalIntersectionsFromCalendar(calendar *intersecting_calendar);
 public:
-	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
+	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(calendar *calendar, const CDate &date) const;
 	
-	std::string Name;
-	bool Initialized = false;
 	int HoursPerDay = DEFAULT_HOURS_PER_DAY;
 	int DaysPerYear = 0;
 	std::string YearLabel;														/// label used for years (e.g. AD)
@@ -96,5 +105,7 @@ public:
 	std::vector<CMonth *> Months;												/// the months in the calendar
 private:
 	std::map<std::string, CDayOfTheWeek *> DaysOfTheWeekByIdent;
-	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
+	std::map<calendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
 };
+
+}

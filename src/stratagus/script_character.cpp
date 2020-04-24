@@ -882,7 +882,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "BirthDate")) {
 		if (character->BirthDate.Year != 0) {
-			lua_pushstring(l, character->BirthDate.ToDisplayString(character->GetCalendar()).c_str());
+			lua_pushstring(l, character->BirthDate.ToDisplayString(character->get_calendar()).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -892,7 +892,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "StartDate")) {
 		if (character->StartDate.Year != 0) {
-			lua_pushstring(l, character->StartDate.ToDisplayString(character->GetCalendar()).c_str());
+			lua_pushstring(l, character->StartDate.ToDisplayString(character->get_calendar()).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -902,7 +902,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "DeathDate")) {
 		if (character->DeathDate.Year != 0) {
-			lua_pushstring(l, character->DeathDate.ToDisplayString(character->GetCalendar()).c_str());
+			lua_pushstring(l, character->DeathDate.ToDisplayString(character->get_calendar()).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

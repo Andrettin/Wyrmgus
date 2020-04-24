@@ -651,13 +651,13 @@ CLanguage *CCharacter::GetLanguage() const
 	return PlayerRaces.get_civilization_language(this->civilization->ID);
 }
 
-CCalendar *CCharacter::GetCalendar() const
+stratagus::calendar *CCharacter::get_calendar() const
 {
 	if (this->civilization) {
-		return this->civilization->GetCalendar();
+		return this->civilization->get_calendar();
 	}
 	
-	return CCalendar::BaseCalendar;
+	return stratagus::calendar::base_calendar;
 }
 
 bool CCharacter::IsParentOf(const std::string &child_ident) const

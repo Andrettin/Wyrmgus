@@ -41,7 +41,6 @@
 ----------------------------------------------------------------------------*/
 
 class CAiBuildingTemplate;
-class CCalendar;
 class CCurrency;
 class CDeity;
 class CForceTemplate;
@@ -54,6 +53,7 @@ int CclDefineCivilization(lua_State *l);
 
 namespace stratagus {
 
+class calendar;
 class unit_class;
 
 class civilization final : public detailed_data_entry, public data_type<civilization>
@@ -119,7 +119,7 @@ public:
 		this->default_color = default_color.toStdString();
 	}
 
-	CCalendar *GetCalendar() const;
+	calendar *get_calendar() const;
 	CCurrency *GetCurrency() const;
 
 	bool is_visible() const
@@ -178,7 +178,9 @@ private:
 public:
 	CUnitSound UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
-	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
+private:
+	calendar *calendar = nullptr;	/// the calendar used by the civilization
+public:
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
 private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor

@@ -36,17 +36,11 @@
 #include "config.h"
 #include "util/string_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CCalendar *> CCalendar::Calendars;
-std::map<std::string, CCalendar *> CCalendar::CalendarsByIdent;
-CCalendar * CCalendar::BaseCalendar = nullptr;
+calendar *calendar::base_calendar = nullptr;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+}
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -88,77 +82,21 @@ void CMonth::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-/**
-**	@brief	Destructor
-*/
-CCalendar::~CCalendar()
+namespace stratagus {
+
+calendar::calendar(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+{
+}
+
+calendar::~calendar()
 {
 	for (size_t i = 0; i < DaysOfTheWeek.size(); ++i) {
 		delete DaysOfTheWeek[i];
 	}
-	DaysOfTheWeek.clear();
 	
 	for (size_t i = 0; i < Months.size(); ++i) {
 		delete Months[i];
 	}
-	Months.clear();
-}
-
-/**
-**	@brief	Get a calendar
-**
-**	@param	ident	The calendar's string identifier
-**	@param	should_find	Whether it is an error if the calendar couldn't be found
-**
-**	@return	A pointer to the calendar if found, null otherwise
-*/
-CCalendar *CCalendar::GetCalendar(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CCalendar *>::const_iterator find_iterator = CalendarsByIdent.find(ident);
-	
-	if (find_iterator != CalendarsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid calendar: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a calendar
-**
-**	@param	ident	The calendar's string identifier
-**
-**	@return	A pointer to the calendar if found, otherwise a new calendar is created and returned
-*/
-CCalendar *CCalendar::GetOrAddCalendar(const std::string &ident)
-{
-	CCalendar *calendar = GetCalendar(ident, false);
-	
-	if (!calendar) {
-		calendar = new CCalendar;
-		calendar->Ident = ident;
-		Calendars.push_back(calendar);
-		CalendarsByIdent[ident] = calendar;
-	}
-	
-	return calendar;
-}
-
-/**
-**	@brief	Remove the existing calendars
-*/
-void CCalendar::ClearCalendars()
-{
-	for (size_t i = 0; i < Calendars.size(); ++i) {
-		delete Calendars[i];
-	}
-	Calendars.clear();
-	
-	BaseCalendar = nullptr;
 }
 
 /**
@@ -166,7 +104,7 @@ void CCalendar::ClearCalendars()
 **
 **	@param	config_data	The configuration data
 */
-void CCalendar::ProcessConfigData(const CConfigData *config_data)
+void calendar::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string base_day_of_the_week;
 	
@@ -175,11 +113,11 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "base_calendar") {
 			bool is_base_calendar = string::to_bool(value);
 			if (is_base_calendar) {
-				CCalendar::BaseCalendar = this;
+				calendar::base_calendar = this;
 			}
 		} else if (key == "year_label") {
 			this->YearLabel = value;
@@ -208,7 +146,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			this->Months.push_back(month);
 			this->DaysPerYear += month->Days;
 		} else if (child_config_data->Tag == "chronological_intersection") {
-			CCalendar *calendar = nullptr;
+			calendar *calendar = nullptr;
 			CDate date;
 			CDate intersecting_date;
 				
@@ -217,11 +155,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "calendar") {
-					value = FindAndReplaceString(value, "_", "-");
-					calendar = CCalendar::GetCalendar(value);
-					if (!calendar) {
-						fprintf(stderr, "Calendar \"%s\" does not exist.\n", value.c_str());
-					}
+					calendar = calendar::get(value);
 				} else if (key == "date") {
 					date = CDate::FromString(value);
 				} else if (key == "intersecting_date") {
@@ -251,22 +185,28 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid calendar property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
-	if (this->Months.empty()) {
-		fprintf(stderr, "No months have been defined for calendar \"%s\".\n", this->Ident.c_str());
-	}
-	
-	this->Initialized = true;
-	
+
 	if (!base_day_of_the_week.empty()) {
 		this->BaseDayOfTheWeek = this->GetDayOfTheWeekByIdent(base_day_of_the_week);
 	}
-	
+
+	this->initialize();
+}
+
+void calendar::initialize()
+{
 	//inherit the intersection points from the intersecting calendar that it has with third calendars
-	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = this->ChronologicalIntersections.begin(); iterator != this->ChronologicalIntersections.end(); ++iterator) {
-		CCalendar *intersecting_calendar = iterator->first;
-		
+	for (std::map<calendar *, std::map<CDate, CDate>>::iterator iterator = this->ChronologicalIntersections.begin(); iterator != this->ChronologicalIntersections.end(); ++iterator) {
+		calendar *intersecting_calendar = iterator->first;
+
 		this->InheritChronologicalIntersectionsFromCalendar(intersecting_calendar);
+	}
+}
+
+void calendar::check() const
+{
+	if (this->Months.empty()) {
+		throw std::runtime_error("No months have been defined for calendar \"" + this->get_identifier() + "\".");
 	}
 }
 
@@ -277,7 +217,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	A pointer to the day of the week if found, null otherwise
 */
-CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
+CDayOfTheWeek *calendar::GetDayOfTheWeekByIdent(const std::string &ident)
 {
 	if (this->DaysOfTheWeekByIdent.find(ident) != this->DaysOfTheWeekByIdent.end()) {
 		return this->DaysOfTheWeekByIdent.find(ident)->second;
@@ -293,7 +233,7 @@ CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
 **	@param	date					The date in this calendar for the intersection
 **	@param	intersecting_date		The date in the other calendar for the intersection
 */
-void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date)
+void calendar::AddChronologicalIntersection(calendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date)
 {
 	if (!intersecting_calendar) {
 		return;
@@ -315,16 +255,16 @@ void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, c
 **
 **	@param	intersecting_calendar	A pointer to the calendar from which the intersections are being inherited
 */
-void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar)
+void calendar::InheritChronologicalIntersectionsFromCalendar(calendar *intersecting_calendar)
 {
-	if (!intersecting_calendar || !intersecting_calendar->Initialized) {
+	if (!intersecting_calendar || !intersecting_calendar->is_initialized()) {
 		return;
 	}
 	
-	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = intersecting_calendar->ChronologicalIntersections.begin(); iterator != intersecting_calendar->ChronologicalIntersections.end(); ++iterator) {
-		CCalendar *third_calendar = iterator->first;
+	for (std::map<calendar *, std::map<CDate, CDate>>::iterator iterator = intersecting_calendar->ChronologicalIntersections.begin(); iterator != intersecting_calendar->ChronologicalIntersections.end(); ++iterator) {
+		calendar *third_calendar = iterator->first;
 		
-		if (third_calendar == this || !third_calendar->Initialized) {
+		if (third_calendar == this || !third_calendar->is_initialized()) {
 			continue;
 		}
 		
@@ -342,7 +282,7 @@ void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *interse
 **
 **	@return	The closest chronological intersection with the other calendar for the given date
 */
-std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const
+std::pair<CDate, CDate> calendar::GetBestChronologicalIntersectionForDate(calendar *calendar, const CDate &date) const
 {
 	std::pair<CDate, CDate> chronological_intersection(*(new CDate), *(new CDate));
 	
@@ -385,4 +325,6 @@ std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCale
 	}
 	
 	return chronological_intersection;
+}
+
 }
