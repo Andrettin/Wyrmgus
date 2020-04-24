@@ -136,8 +136,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->plane = plane;
 		} else if (key == "world") {
 			stratagus::world *world = world::get(value);
-			this->world = world;
-			this->plane = this->world->get_plane();
+			this->set_world(world);
 		} else if (key == "surface_layer") {
 			this->SurfaceLayer = std::stoi(value);
 			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
@@ -1618,6 +1617,16 @@ QSize map_template::get_applied_size() const
 	return applied_size;
 }
 
+void map_template::set_world(stratagus::world *world)
+{
+	if (world == this->get_world()) {
+		return;
+	}
+
+	this->world = world;
+	this->plane = this->world->get_plane();
+}
+
 void map_template::set_terrain_file(const std::filesystem::path &filepath)
 {
 	if (filepath == this->get_terrain_file()) {
@@ -1789,8 +1798,8 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 		const int south_offset = subtemplate->GetDependentTemplatesSouthOffset();
 		const int west_offset = subtemplate->GetDependentTemplatesWestOffset();
 		const int east_offset = subtemplate->GetDependentTemplatesEastOffset();
-		const bool top_left_on_map = CMap::Map.Info.IsPointOnMap(subtemplate_pos - QPoint(west_offset, north_offset), z);
-		const bool bottom_right_on_map = CMap::Map.Info.IsPointOnMap(QPoint(subtemplate_pos.x() + subtemplate->get_applied_width() + east_offset - 1, subtemplate_pos.y() + subtemplate->get_applied_height() + south_offset - 1), z);
+		const bool top_left_on_map = this->contains_pos(subtemplate_pos - QPoint(west_offset, north_offset));
+		const bool bottom_right_on_map = this->contains_pos(QPoint(subtemplate_pos.x() + subtemplate->get_applied_width() + east_offset - 1, subtemplate_pos.y() + subtemplate->get_applied_height() + south_offset - 1));
 		const bool on_map = top_left_on_map && bottom_right_on_map;
 
 		if (!on_map) {

@@ -2950,7 +2950,7 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 				Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
 				Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
 				Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
-				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
+				if (!this->Info.IsPointOnMap(diagonal_pos, z) || diagonal_pos.x < min_pos.x || diagonal_pos.y < min_pos.y || diagonal_pos.x > max_pos.x || diagonal_pos.y > max_pos.y) {
 					continue;
 				}
 

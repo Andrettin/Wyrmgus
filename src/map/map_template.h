@@ -85,7 +85,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
 	Q_PROPERTY(QPoint subtemplate_pos MEMBER subtemplate_pos READ get_subtemplate_pos)
 	Q_PROPERTY(stratagus::plane* plane MEMBER plane READ get_plane)
-	Q_PROPERTY(stratagus::world* world MEMBER world READ get_world)
+	Q_PROPERTY(stratagus::world* world READ get_world WRITE set_world)
 	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring WRITE set_overlay_terrain_file_qstring)
@@ -311,6 +311,8 @@ public:
 	{
 		return this->world;
 	}
+
+	void set_world(world *world);
 
 	map_template *get_main_template() const
 	{
