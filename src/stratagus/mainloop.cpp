@@ -420,23 +420,7 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		if (GameCycle > 0) {
-			if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
-				CDate::CurrentTotalHours++;
-				
-				for (stratagus::calendar *calendar : stratagus::calendar::get_all()) {
-					calendar->CurrentDate.AddHours(calendar, 1, DEFAULT_DAY_MULTIPLIER_PER_YEAR);
-					
-					if (calendar->CurrentDayOfTheWeek != -1 && CDate::CurrentTotalHours % calendar->HoursPerDay == 0) { //day passed in the calendar
-						calendar->CurrentDayOfTheWeek++;
-						calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
-					}
-				}
-				
-				for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-					CMapLayer *map_layer = CMap::Map.MapLayers[z];
-					map_layer->DoPerHourLoop();
-				}
-			}
+			stratagus::game::get()->do_cycle();
 		}
 		
 		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled

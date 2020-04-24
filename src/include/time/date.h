@@ -187,10 +187,6 @@ public:
 	}
 };
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string);
+extern void SetCurrentDate(const std::string &date_string);
 extern void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week);
 extern void SetCurrentTotalHours(const unsigned long long hours);

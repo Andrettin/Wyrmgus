@@ -47,8 +47,21 @@ public:
 		this->current_campaign = campaign;
 	}
 
+	const QDateTime &get_current_date() const
+	{
+		return this->current_date;
+	}
+
+	void set_current_date(const QDateTime &date)
+	{
+		this->current_date = date;
+	}
+
+	void do_cycle();
+
 private:
 	campaign *current_campaign = nullptr;
+	QDateTime current_date;
 };
 
 }

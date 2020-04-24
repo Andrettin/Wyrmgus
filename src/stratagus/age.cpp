@@ -64,15 +64,6 @@ void age::set_current_age(age *age)
 	}
 
 	age::current_age = age;
-
-	if (GameCycle > 0 && !SaveGameLoading) {
-		if (age::current_age && age::current_age->year_boost > 0) {
-			//boost the current date's year by a certain amount; this is done so that we can both have a slower passage of years in-game (for seasons and character lifetimes to be more sensible), while still not having overly old dates in later ages
-			for (calendar *calendar : calendar::get_all()) {
-				calendar->CurrentDate.AddHours(calendar, (long long) age::current_age->year_boost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
-			}
-		}
-	}
 }
 
 //check which age fits the current overall situation best, out of the ages each player is in

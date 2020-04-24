@@ -41,7 +41,6 @@ class age final : public named_data_entry, public data_type<age>
 	Q_OBJECT
 
 	Q_PROPERTY(int priority MEMBER priority)
-	Q_PROPERTY(int year_boost MEMBER year_boost)
 
 public:
 	static constexpr const char *class_identifier = "age";
@@ -88,7 +87,6 @@ public:
 private:
 	CGraphic *graphics = nullptr;
 	int priority = 0;
-	int year_boost = 0;
 	CDependency *predependency = nullptr;
 	CDependency *dependency = nullptr;
 };

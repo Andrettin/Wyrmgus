@@ -132,6 +132,30 @@ bool DefiningData = false;
 extern gcn::Gui *Gui;
 static std::vector<gcn::Container *> Containers;
 
+namespace stratagus {
+
+void game::do_cycle()
+{
+	if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
+		CDate::CurrentTotalHours++;
+
+		this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
+
+		for (calendar *calendar : calendar::get_all()) {
+			if (calendar->CurrentDayOfTheWeek != -1 && CDate::CurrentTotalHours % calendar->HoursPerDay == 0) { //day passed in the calendar
+				calendar->CurrentDayOfTheWeek++;
+				calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
+			}
+		}
+
+		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
+			map_layer->DoPerHourLoop();
+		}
+	}
+}
+
+}
+
 /**
 **  Save game settings.
 **
@@ -1637,20 +1661,22 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	
 	const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
 	if (current_campaign) {
-		stratagus::calendar::default_calendar->CurrentDate = current_campaign->get_start_date();
-		CDate::CurrentTotalHours = stratagus::calendar::default_calendar->CurrentDate.GetTotalHours(stratagus::calendar::default_calendar);
+		stratagus::game::get()->set_current_date(current_campaign->get_start_date());
 	} else {
-		stratagus::calendar::default_calendar->CurrentDate.Clear();
-		stratagus::calendar::default_calendar->CurrentDate.Year = 1;
-		stratagus::calendar::default_calendar->CurrentDate.Month = SyncRand(stratagus::calendar::default_calendar->Months.size()) + 1;
-		stratagus::calendar::default_calendar->CurrentDate.Day = SyncRand(stratagus::calendar::default_calendar->Months[stratagus::calendar::default_calendar->CurrentDate.Month - 1]->Days) + 1;
-		stratagus::calendar::default_calendar->CurrentDate.Hour = SyncRand(stratagus::calendar::default_calendar->HoursPerDay);
-		CDate::CurrentTotalHours = stratagus::calendar::default_calendar->CurrentDate.GetTotalHours(stratagus::calendar::default_calendar);
+		const int year = 1;
+		const int month = SyncRand(stratagus::calendar::default_calendar->Months.size()) + 1;
+		const int day = SyncRand(stratagus::calendar::default_calendar->Months[month - 1]->Days) + 1;
+		const int hour = SyncRand(stratagus::calendar::default_calendar->HoursPerDay);
+		QDate date(year, month, day);;
+		QDateTime date_time(date, QTime(hour, 0));
+		stratagus::game::get()->set_current_date(date_time);
 	}
 	
+	CDate::CurrentTotalHours = CDate(stratagus::game::get()->get_current_date()).GetTotalHours(stratagus::calendar::default_calendar);
+
 	for (stratagus::calendar *calendar : stratagus::calendar::get_all()) {
-		calendar->CurrentDate = stratagus::calendar::default_calendar->CurrentDate.ToCalendar(stratagus::calendar::default_calendar, calendar);
-		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
+		const CDate calendar_date = CDate(stratagus::game::get()->get_current_date()).ToCalendar(stratagus::calendar::default_calendar, calendar);
+		calendar->CurrentDayOfTheWeek = calendar_date.GetDayOfTheWeek(calendar);
 	}
 	
 	stratagus::age::current_age = nullptr;

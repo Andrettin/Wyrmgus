@@ -27,30 +27,19 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "time/date.h"
 
-#include "time/calendar.h"
-#include "time/timeline.h"
 #include "civilization.h"
+#include "game.h"
 #include "player.h"
 #include "quest.h"
+#include "time/calendar.h"
+#include "time/timeline.h"
 #include "util/string_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 unsigned long long CDate::CurrentTotalHours = 0;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 CDate CDate::FromString(const std::string &date_str)
 {
@@ -339,15 +328,9 @@ int CDate::GetDayOfTheWeek(const stratagus::calendar *calendar) const
 **	@param	calendar_ident	The calendar's string identifier
 **	@param	date_string		The date's string representation
 */
-void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string)
+void SetCurrentDate(const std::string &date_string)
 {
-	stratagus::calendar *calendar = stratagus::calendar::try_get(calendar_ident);
-	
-	if (!calendar) {
-		return;
-	}
-	
-	calendar->CurrentDate = CDate::FromString(date_string);
+	stratagus::game::get()->set_current_date(string::to_date(date_string));
 }
 
 /**

@@ -45,6 +45,7 @@
 #include "civilization.h"
 #include "database/defines.h"
 #include "font.h"
+#include "game.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "menus.h"
@@ -937,7 +938,7 @@ void DrawTime()
 		
 		if (calendar) {
 			if (UI.DatePanel.TextX != -1) {
-				std::string date_string = calendar->CurrentDate.ToDisplayString(calendar, true);
+				std::string date_string = CDate(stratagus::game::get()->get_current_date()).ToDisplayString(calendar, true);
 				
 				CLabel label(GetGameFont());
 				label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);

@@ -702,6 +702,7 @@ set(stratagus_upgrade_HDRS
 
 set(stratagus_util_HDRS
 	src/util/container_util.h
+	src/util/date_util.h
 	src/util/exception_util.h
 	src/util/point_container.h
 	src/util/point_util.h

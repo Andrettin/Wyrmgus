@@ -55,6 +55,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/date_util.h"
 #include "version.h"
 
 extern void StartMap(const std::string &filename, bool clean);
@@ -161,12 +162,13 @@ int SaveGame(const std::string &filename)
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
 	file.printf("SetCurrentTotalHours(%llu)\n", CDate::CurrentTotalHours);
+	const QDateTime &current_date = stratagus::game::get()->get_current_date();
+	if (current_date.isValid()) {
+		file.printf("SetCurrentDate(\"%s\")\n", date::to_string(current_date));
+	}
 	for (const stratagus::calendar *calendar : stratagus::calendar::get_all()) {
 		if (calendar->CurrentDayOfTheWeek != -1) {
 			file.printf("SetCurrentDayOfTheWeek(\"%s\", %d)\n", calendar->Ident.c_str(), calendar->CurrentDayOfTheWeek);
-		}
-		if (calendar->CurrentDate.Year != 0) {
-			file.printf("SetCurrentDate(\"%s\", \"%s\")\n", calendar->Ident.c_str(), calendar->CurrentDate.ToString(stratagus::calendar::default_calendar).c_str());
 		}
 	}
 	if (stratagus::age::current_age) {
