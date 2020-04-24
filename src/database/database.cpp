@@ -349,25 +349,17 @@ void database::load(const bool initial_definition)
 			return a->get_database_dependency_count() < b->get_database_dependency_count();
 		});
 
+		this->process_modules();
 		this->parse();
 	}
 
-	for (const auto &kv_pair : database::get()->get_data_paths_with_module()) {
-		const std::filesystem::path &path = kv_pair.first;
-		const module *module = kv_pair.second;
-
-		try {
-			//create or process data entries for each data type
-			for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-				metadata->get_processing_function()(initial_definition);
-			}
-		} catch (...) {
-			if (module != nullptr) {
-				std::throw_with_nested(std::runtime_error("Failed to process database for the \"" + module->get_identifier() + "\" module."));
-			} else {
-				std::throw_with_nested(std::runtime_error("Failed to process database."));
-			}
+	try {
+		//create or process data entries for each data type
+		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
+			metadata->get_processing_function()(initial_definition);
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to process database."));
 	}
 }
 
@@ -417,7 +409,9 @@ void database::register_metadata(std::unique_ptr<data_type_metadata> &&metadata)
 
 void database::process_modules()
 {
-	this->process_modules_at_dir(database::get_modules_path());
+	if (std::filesystem::exists(database::get_modules_path())) {
+		this->process_modules_at_dir(database::get_modules_path());
+	}
 
 	if (defines::get()->is_documents_modules_loading_enabled() && std::filesystem::exists(database::get_documents_modules_path())) {
 		this->process_modules_at_dir(database::get_documents_modules_path());

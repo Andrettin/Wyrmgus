@@ -110,7 +110,7 @@ public:
 			throw std::runtime_error("No writable documents path found.");
 		}
 
-		std::filesystem::path documents_path(documents_path_str +  "/Iron Barons");
+		std::filesystem::path documents_path(documents_path_str +  "/Wyrmsun");
 		return documents_path;
 	}
 
