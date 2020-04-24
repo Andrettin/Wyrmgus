@@ -377,7 +377,7 @@ calendar *civilization::get_calendar() const
 		return this->parent_civilization->get_calendar();
 	}
 	
-	return calendar::base_calendar;
+	return calendar::default_calendar;
 }
 
 CCurrency *civilization::GetCurrency() const

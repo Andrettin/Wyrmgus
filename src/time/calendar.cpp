@@ -38,7 +38,7 @@
 
 namespace stratagus {
 
-calendar *calendar::base_calendar = nullptr;
+calendar *calendar::default_calendar = nullptr;
 
 }
 
@@ -117,7 +117,7 @@ void calendar::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "base_calendar") {
 			bool is_base_calendar = string::to_bool(value);
 			if (is_base_calendar) {
-				calendar::base_calendar = this;
+				calendar::default_calendar = this;
 			}
 		} else if (key == "year_label") {
 			this->YearLabel = value;
@@ -195,12 +195,32 @@ void calendar::ProcessConfigData(const CConfigData *config_data)
 
 void calendar::initialize()
 {
+	if (this->base_calendar != nullptr) {
+		if (this->base_calendar == this) {
+			throw std::runtime_error("The base calendar of \"" + this->get_identifier() + "\" is itself.");
+		}
+
+		if (this->base_calendar->is_any_base_calendar(this)) {
+			throw std::runtime_error("The base calendar of \"" + this->get_identifier() + "\" is \"" + this->base_calendar->get_identifier() + "\", which creates a circular dependency.");
+		}
+
+		if (!this->base_calendar->is_initialized()) {
+			this->base_calendar->initialize();
+		}
+
+		//calculate the year offset to the Gregorian calendar based on the offset to the base calendar
+		this->year_offset += this->base_calendar->get_year_offset();
+		this->base_calendar = nullptr;
+	}
+
 	//inherit the intersection points from the intersecting calendar that it has with third calendars
 	for (std::map<calendar *, std::map<CDate, CDate>>::iterator iterator = this->ChronologicalIntersections.begin(); iterator != this->ChronologicalIntersections.end(); ++iterator) {
 		calendar *intersecting_calendar = iterator->first;
 
 		this->InheritChronologicalIntersectionsFromCalendar(intersecting_calendar);
 	}
+
+	data_entry::initialize();
 }
 
 void calendar::check() const

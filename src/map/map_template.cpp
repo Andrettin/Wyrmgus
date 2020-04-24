@@ -611,7 +611,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 			if (history_pos.x < template_start_pos.x() || history_pos.x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z]) || history_pos.y < template_start_pos.y() || history_pos.y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
 				continue;
 			}
-			if (current_campaign->GetStartDate().ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).Year == 0) {
+			if (current_campaign->get_start_date() >= std::get<2>(HistoricalTerrains[i]) || std::get<2>(HistoricalTerrains[i]).Year == 0) {
 				terrain_type *historical_terrain = std::get<1>(HistoricalTerrains[i]);
 				
 				Vec2i real_pos(map_start_pos.x() + history_pos.x - template_start_pos.x(), map_start_pos.y() + history_pos.y - template_start_pos.y());
@@ -921,7 +921,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign != nullptr) {
-		start_date = current_campaign->GetStartDate();
+		start_date = current_campaign->get_start_date();
 	}
 
 	for (site *site : this->sites) {
@@ -1342,7 +1342,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign) {
-		start_date = current_campaign->GetStartDate();
+		start_date = current_campaign->get_start_date();
 	}
 
 	for (size_t i = 0; i < this->Units.size(); ++i) {
@@ -1849,7 +1849,7 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr
 	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign) {
-		start_date = current_campaign->GetStartDate();
+		start_date = current_campaign->get_start_date();
 	}
 	
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {

@@ -29,12 +29,16 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
-#include "time/date.h"
 
 namespace stratagus {
 
 class timeline : public named_data_entry, public data_type<timeline>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(stratagus::timeline* parent_timeline MEMBER parent_timeline READ get_parent_timeline)
+	Q_PROPERTY(QDateTime point_of_divergence MEMBER point_of_divergence READ get_point_of_divergence)
+
 public:
 	static constexpr const char *class_identifier = "timeline";
 	static constexpr const char *database_folder = "timelines";
@@ -43,9 +47,47 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
-	
-	CDate PointOfDivergence; /// The point of divergence for this timeline
+	timeline *get_parent_timeline() const
+	{
+		return this->parent_timeline;
+	}
+
+	const QDateTime &get_point_of_divergence() const
+	{
+		return this->point_of_divergence;
+	}
+
+	bool derives_from_timeline(const timeline *timeline) const
+	{
+		if (this->get_parent_timeline() == nullptr) {
+			return false;
+		}
+
+		if (timeline == this->get_parent_timeline()) {
+			return true;
+		}
+
+		return this->get_parent_timeline()->derives_from_timeline(timeline);
+	}
+
+	bool contains_timeline_date(const timeline *timeline, const QDateTime &date) const
+	{
+		if (timeline == this) {
+			return true;
+		} else if (this->get_parent_timeline() == nullptr && timeline != nullptr) {
+			return false;
+		}
+
+		if (timeline == this->get_parent_timeline()) {
+			return date < this->point_of_divergence;
+		}
+
+		return this->get_parent_timeline()->contains_timeline_date(timeline, date);
+	}
+
+private:
+	timeline *parent_timeline = nullptr; //the timeline from which this one derives (null means the default timeline)
+	QDateTime point_of_divergence; //the point of divergence from the parent timeline
 };
 
 }

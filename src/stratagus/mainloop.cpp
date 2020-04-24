@@ -569,7 +569,7 @@ void GameMainLoop()
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
 		const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr) {
-			const CDate &start_date = current_campaign->GetStartDate();
+			const CDate start_date = current_campaign->get_start_date();
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->Faction != -1) {
 					if (start_date.Year) {

@@ -42,6 +42,24 @@ public:
 	static CDate FromString(const std::string &date_str);
 	
 	static unsigned long long CurrentTotalHours;				/// Current total in-game hours, counting from 1 January 10000 BC 00:00
+
+	CDate()
+	{
+	}
+
+	CDate(const QDateTime &date_time)
+	{
+		const QDate date = date_time.date();
+		this->Year = date.year();
+		this->Month = date.month();
+		this->Day = date.day();
+		this->Hour = date_time.time().hour();
+	}
+
+	operator QDateTime() const
+	{
+		return QDateTime(QDate(this->Year, this->Month, this->Day), QTime(this->Hour, 0));
+	}
 	
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
@@ -81,7 +99,6 @@ public:
 	int Month = 1;
 	int Day = 1;
 	int Hour = DEFAULT_HOURS_PER_DAY / 2;
-	stratagus::timeline *timeline = nullptr;
 	
 	bool operator <(const CDate &rhs) const
 	{

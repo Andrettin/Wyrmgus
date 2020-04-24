@@ -60,6 +60,11 @@ namespace stratagus {
 
 class calendar : public named_data_entry, public data_type<calendar>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(stratagus::calendar* base_calendar MEMBER base_calendar)
+	Q_PROPERTY(int year_offset MEMBER year_offset READ get_year_offset)
+
 public:
 	static constexpr const char *class_identifier = "calendar";
 	static constexpr const char *database_folder = "calendars";
@@ -68,10 +73,10 @@ public:
 	{
 		data_type::clear();
 
-		calendar::base_calendar = nullptr;
+		calendar::default_calendar = nullptr;
 	}
 
-	static calendar *base_calendar;
+	static calendar *default_calendar;
 
 	calendar(const std::string &identifier);
 	~calendar();
@@ -79,13 +84,36 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+
 private:
 	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
 	void AddChronologicalIntersection(calendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
 	void InheritChronologicalIntersectionsFromCalendar(calendar *intersecting_calendar);
 public:
 	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(calendar *calendar, const CDate &date) const;
+
+	bool is_any_base_calendar(calendar *calendar) const
+	{
+		if (this->base_calendar == nullptr) {
+			return false;
+		}
+
+		if (this->base_calendar == calendar) {
+			return true;
+		}
+
+		return this->base_calendar->is_any_base_calendar(calendar);
+	}
+
+	int get_year_offset() const
+	{
+		return this->year_offset;
+	}
 	
+private:
+	calendar *base_calendar = nullptr; //the base calendar, used to ultimately calculate the year offset to the Gregorian calendar from
+	int year_offset = 0; //the offset from the Gregorian calendar, in years
+public:
 	int HoursPerDay = DEFAULT_HOURS_PER_DAY;
 	int DaysPerYear = 0;
 	std::string YearLabel;														/// label used for years (e.g. AD)

@@ -72,9 +72,6 @@ CDate CDate::FromString(const std::string &date_str)
 	
 	if (date_vector.size() >= (1 + offset) && !string::is_number(date_vector[0 + offset])) {
 		stratagus::timeline *timeline = stratagus::timeline::get(date_vector[0 + offset]);
-		if (timeline) {
-			date.timeline = timeline;
-		}
 		offset += 1;
 	}
 	
@@ -107,20 +104,11 @@ void CDate::Clear()
 	this->Month = 1;
 	this->Day = 1;
 	this->Hour = DEFAULT_HOURS_PER_DAY / 2;
-	this->timeline = nullptr;
 }
 
 bool CDate::ContainsDate(const CDate &date) const
 {
-	if (this->timeline == date.timeline) {
-		return *this >= date;
-	}
-	
-	if (this->timeline) {
-		return this->timeline->PointOfDivergence.ContainsDate(date);
-	}
-	
-	return false;
+	return *this >= date;
 }
 
 void CDate::AddYears(const int years)
@@ -209,7 +197,6 @@ CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calend
 	}
 	
 	CDate date;
-	date.timeline = this->timeline;
 	date.Year = this->Year;
 	date.Month = this->Month;
 	date.Day = this->Day;
@@ -234,12 +221,12 @@ CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calend
 
 CDate CDate::ToBaseCalendar(stratagus::calendar *current_calendar) const
 {
-	if (!stratagus::calendar::base_calendar) {
+	if (!stratagus::calendar::default_calendar) {
 		fprintf(stderr, "No base calendar has been defined.\n");
 		return *this;
 	}
 	
-	return this->ToCalendar(current_calendar, stratagus::calendar::base_calendar);
+	return this->ToCalendar(current_calendar, stratagus::calendar::default_calendar);
 }
 
 std::string CDate::ToString(const stratagus::calendar *calendar) const

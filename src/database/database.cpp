@@ -46,6 +46,7 @@
 #include "plane.h"
 #include "sound/sound.h"
 #include "time/time_of_day.h"
+#include "time/timeline.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

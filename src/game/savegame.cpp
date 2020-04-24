@@ -166,7 +166,7 @@ int SaveGame(const std::string &filename)
 			file.printf("SetCurrentDayOfTheWeek(\"%s\", %d)\n", calendar->Ident.c_str(), calendar->CurrentDayOfTheWeek);
 		}
 		if (calendar->CurrentDate.Year != 0) {
-			file.printf("SetCurrentDate(\"%s\", \"%s\")\n", calendar->Ident.c_str(), calendar->CurrentDate.ToString(stratagus::calendar::base_calendar).c_str());
+			file.printf("SetCurrentDate(\"%s\", \"%s\")\n", calendar->Ident.c_str(), calendar->CurrentDate.ToString(stratagus::calendar::default_calendar).c_str());
 		}
 	}
 	if (stratagus::age::current_age) {

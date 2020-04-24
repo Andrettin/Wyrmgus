@@ -3201,15 +3201,6 @@ void CclGetDate(lua_State *l, CDate *d, const int offset)
 		d->Year = LuaToNumber(l, offset, 1);
 		d->Month = LuaToNumber(l, offset, 2);
 		d->Day = LuaToNumber(l, offset, 3);
-		lua_rawgeti(l, offset, 4);
-		if (lua_isnil(l, -1)) {
-			d->timeline = nullptr;
-		} else {
-			std::string timeline_ident = LuaToString(l, -1);
-			stratagus::timeline *timeline = stratagus::timeline::get(timeline_ident);
-			d->timeline = timeline;
-		}
-		lua_pop(l, 1);
 	}
 }
 //Wyrmgus end

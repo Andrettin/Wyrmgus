@@ -35,6 +35,7 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
+#include "time/timeline.h"
 #include "util/string_util.h"
 
 namespace stratagus {
@@ -44,8 +45,10 @@ void campaign::initialize_all()
 	campaign::sort_instances([](campaign *a, campaign *b) {
 		if (a->GetSpecies() != b->GetSpecies()) {
 			return a->GetSpecies() < b->GetSpecies();
-		} else if (a->GetStartDate() != b->GetStartDate()) {
-			return a->GetStartDate() < b->GetStartDate();
+		} else if (a->get_timeline() != b->get_timeline()) {
+			return a->get_timeline()->get_point_of_divergence() < b->get_timeline()->get_point_of_divergence();
+		} else if (a->get_start_date() != b->get_start_date()) {
+			return a->get_start_date() < b->get_start_date();
 		} else {
 			return a->get_identifier() < b->get_identifier();
 		}
@@ -80,8 +83,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "sandbox") {
 			this->Sandbox = string::to_bool(value);
 		} else if (key == "start_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->StartDate = CDate::FromString(value);
+			this->start_date = string::to_date(value);
 		} else if (key == "required_quest") {
 			value = FindAndReplaceString(value, "_", "-");
 			CQuest *quest = GetQuest(value);
@@ -162,6 +164,17 @@ bool campaign::IsAvailable() const
 	}
 
 	return true;
+}
+
+bool campaign::contains_timeline_date(const stratagus::timeline *timeline, const QDateTime &date) const
+{
+	if (this->get_timeline() == timeline) {
+		return date <= this->get_start_date();
+	} else if (this->get_timeline() == nullptr) {
+		return false;
+	}
+
+	return this->get_timeline()->contains_timeline_date(timeline, date);
 }
 
 }

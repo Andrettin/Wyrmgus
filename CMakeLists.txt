@@ -360,7 +360,6 @@ set(time_SRCS
 	src/time/time_of_day.cpp
 	src/time/time_of_day_schedule.cpp
 	src/time/time_period_schedule.cpp
-	src/time/timeline.cpp
 )
 source_group(time FILES ${time_SRCS})
 

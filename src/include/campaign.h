@@ -44,9 +44,15 @@ int CclGetCampaignData(lua_State *l);
 namespace stratagus {
 
 class map_template;
+class timeline;
 
 class campaign : public named_data_entry, public data_type<campaign>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date)
+	Q_PROPERTY(stratagus::timeline* timeline MEMBER timeline READ get_timeline)
+
 public:
 	static constexpr const char *class_identifier = "campaign";
 	static constexpr const char *database_folder = "campaigns";
@@ -60,9 +66,14 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	const CDate &GetStartDate() const
+	const QDateTime &get_start_date() const
 	{
-		return this->StartDate;
+		return this->start_date;
+	}
+
+	timeline *get_timeline() const
+	{
+		return this->timeline;
 	}
 	
 	CFaction *GetFaction() const
@@ -79,9 +90,12 @@ public:
 
 	bool IsAvailable() const;
 
+	bool contains_timeline_date(const timeline *timeline, const QDateTime &date) const;
+
 private:
 	std::string Description;		/// Description of the campaign
-	CDate StartDate;				/// The starting date of the campaign
+	QDateTime start_date; //the starting date of the campaign
+	timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign

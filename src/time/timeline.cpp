@@ -31,16 +31,5 @@
 
 namespace stratagus {
 
-void timeline::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "point_of_divergence") {
-		this->PointOfDivergence = CDate::FromString(value);
-	} else {
-		data_entry::process_sml_property(property);
-	}
-}
 
 }
