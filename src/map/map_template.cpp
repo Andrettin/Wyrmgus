@@ -72,6 +72,31 @@ map_template::~map_template()
 	}
 }
 
+void map_template::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "adjacent_template") {
+		map_template *adjacent_template = map_template::get(value);
+		this->AdjacentTemplates.push_back(adjacent_template);
+	} else if (key == "north_of") {
+		const map_template *north_of_template = map_template::get(value);
+		this->NorthOfTemplates.push_back(north_of_template);
+	} else if (key == "south_of") {
+		const map_template *south_of_template = map_template::get(value);
+		this->SouthOfTemplates.push_back(south_of_template);
+	} else if (key == "west_of") {
+		const map_template *west_of_template = map_template::get(value);
+		this->WestOfTemplates.push_back(west_of_template);
+	} else if (key == "east_of") {
+		const map_template *east_of_template = map_template::get(value);
+		this->EastOfTemplates.push_back(east_of_template);
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
 void map_template::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
