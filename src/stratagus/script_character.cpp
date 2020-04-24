@@ -472,8 +472,8 @@ static int CclDefineCharacter(lua_State *l)
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
 					location->site = stratagus::site::get(site_ident);
-					location->map_template = location->site->map_template;
-					location->Position = location->site->Position;
+					location->map_template = location->site->get_map_template();
+					location->Position = location->site->get_pos();
 				}
 				lua_pop(l, 1);
 

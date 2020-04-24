@@ -53,8 +53,8 @@ void historical_location::process_sml_property(const sml_property &property)
 		this->map_template = map_template::get(value);
 	} else if (key == "site") {
 		this->site = site::get(value);
-		this->map_template = this->site->map_template;
-		this->Position = this->site->Position;
+		this->map_template = this->site->get_map_template();
+		this->Position = this->site->get_pos();
 	} else if (key == "x") {
 		this->Position.x = std::stoi(value);
 	} else if (key == "y") {
@@ -82,8 +82,8 @@ void historical_location::ProcessConfigData(const CConfigData *config_data)
 			this->map_template = map_template::get(value);
 		} else if (key == "site") {
 			this->site = site::get(value);
-			this->map_template = this->site->map_template;
-			this->Position = this->site->Position;
+			this->map_template = this->site->get_map_template();
+			this->Position = this->site->get_pos();
 		} else if (key == "x") {
 			this->Position.x = std::stoi(value);
 		} else if (key == "y") {

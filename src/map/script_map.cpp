@@ -705,8 +705,8 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 3);
 		stratagus::site *site = stratagus::site::get(site_ident);
-		start_pos.x = site->Position.x;
-		start_pos.y = site->Position.y;
+		start_pos.x = site->get_pos().x();
+		start_pos.y = site->get_pos().y();
 	}
 	
 	Vec2i end_pos;
@@ -715,8 +715,8 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 4);
 		stratagus::site *site = stratagus::site::get(site_ident);
-		end_pos.x = site->Position.x;
-		end_pos.y = site->Position.y;
+		end_pos.x = site->get_pos().x();
+		end_pos.y = site->get_pos().y();
 	}
 	
 	CDate date;
@@ -1692,9 +1692,11 @@ static int CclDefineSite(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			site->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
-			site->Major = LuaToBoolean(l, -1);
+			site->major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Position")) {
-			CclGetPos(l, &site->Position.x, &site->Position.y);
+			Vec2i pos;
+			CclGetPos(l, &pos.x, &pos.y);
+			site->pos = pos;
 		} else if (!strcmp(value, "MapTemplate")) {
 			stratagus::map_template *map_template = stratagus::map_template::get(LuaToString(l, -1));
 			site->map_template = map_template;
@@ -1895,25 +1897,6 @@ static int CclDefineSite(lua_State *l)
 		}
 	}
 	
-	if (!site->Major && !site->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
-		for (size_t i = 0; i < site->Cores.size(); ++i) {
-			CFaction *core_faction = site->Cores[i];
-			core_faction->Cores.erase(std::remove(core_faction->Cores.begin(), core_faction->Cores.end(), site), core_faction->Cores.end());
-		}
-		site->Cores.clear();
-	}
-	
-	if (site->map_template) {
-		if (site->Position.x != -1 && site->Position.y != -1) {
-			if (site->map_template->sites_by_position.find(site->Position) != site->map_template->sites_by_position.end()) {
-				LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->map_template->Ident.c_str());
-			}
-			site->map_template->sites_by_position[site->Position] = site;
-		}
-		
-		site->map_template->sites.push_back(site);
-	}
-	
 	return 0;
 }
 
@@ -2105,10 +2088,10 @@ static int CclGetSiteData(lua_State *l)
 		lua_pushstring(l, site->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "PosX")) {
-		lua_pushnumber(l, site->Position.x);
+		lua_pushnumber(l, site->get_pos().x());
 		return 1;
 	} else if (!strcmp(data, "PosY")) {
-		lua_pushnumber(l, site->Position.y);
+		lua_pushnumber(l, site->get_pos().y());
 		return 1;
 	} else if (!strcmp(data, "MapPosX")) {
 		if (site->get_site_unit() != nullptr) {

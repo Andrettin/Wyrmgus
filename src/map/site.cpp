@@ -40,6 +40,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 
 namespace stratagus {
 
@@ -52,13 +53,13 @@ void site::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "major") {
-			this->Major = string::to_bool(value);
+			this->major = string::to_bool(value);
 		} else if (key == "position_x") {
-			this->Position.x = std::stoi(value);
+			this->pos.setX(std::stoi(value));
 		} else if (key == "position_y") {
-			this->Position.y = std::stoi(value);
+			this->pos.setY(std::stoi(value));
 		} else if (key == "map_template") {
-			this->map_template = stratagus::map_template::get(value);
+			this->map_template = map_template::get(value);
 		} else if (key == "core") {
 			value = FindAndReplaceString(value, "_", "-");
 			
@@ -96,7 +97,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const stratagus::civilization *civilization = stratagus::civilization::get(key);
+				const civilization *civilization = civilization::get(key);
 				this->CulturalNames[civilization] = value;
 			}
 		} else if (child_config_data->Tag == "historical_owner") {
@@ -125,7 +126,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 		} else if (child_config_data->Tag == "historical_building") {
 			CDate start_date;
 			CDate end_date;
-			const stratagus::unit_class *building_class = nullptr;
+			const unit_class *building_class = nullptr;
 			CUniqueItem *unique = nullptr;
 			CFaction *building_owner_faction = nullptr;
 				
@@ -140,7 +141,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					end_date = CDate::FromString(value);
 				} else if (key == "building_class") {
-					building_class = stratagus::unit_class::get(value);
+					building_class = unit_class::get(value);
 				} else if (key == "unique") {
 					value = FindAndReplaceString(value, "_", "-");
 					unique = GetUniqueItem(value);
@@ -163,28 +164,31 @@ void site::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const stratagus::unit_class *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
+			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
 		} else {
 			fprintf(stderr, "Invalid site property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
-	if (!this->Major && !this->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
+}
+
+void site::initialize()
+{
+	if (!this->is_major() && !this->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
 		for (CFaction *core_faction : this->Cores) {
-			core_faction->Cores.erase(std::remove(core_faction->Cores.begin(), core_faction->Cores.end(), this), core_faction->Cores.end());
+			vector::remove(core_faction->Cores, this);
 		}
 		this->Cores.clear();
 	}
-	
-	if (this->map_template) {
-		if (this->Position.x != -1 && this->Position.y != -1) {
-			if (this->map_template->sites_by_position.find(this->Position) == this->map_template->sites_by_position.end()) {
-				this->map_template->sites_by_position[this->Position] = this;
+
+	if (this->get_map_template() != nullptr) {
+		if (this->get_pos().x() != -1 && this->get_pos().y() != -1) {
+			if (this->map_template->sites_by_position.find(this->get_pos()) == this->map_template->sites_by_position.end()) {
+				this->map_template->sites_by_position[this->get_pos()] = this;
 			} else {
-				fprintf(stderr, "Position (%d, %d) of map template \"%s\" already has a site.", this->Position.x, this->Position.y, this->map_template->Ident.c_str());
+				throw std::runtime_error("Position (" + std::to_string(this->get_pos().x()) + ", " + std::to_string(this->get_pos().y()) + ") of map template \"" + this->map_template->get_identifier() + "\" already has a site.");
 			}
 		}
-		
+
 		this->map_template->sites.push_back(this);
 	}
 }
@@ -196,13 +200,10 @@ void site::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The cultural name if present, or the default name otherwise
 */
-/**
-**  
-*/
-std::string site::GetCulturalName(const stratagus::civilization *civilization) const
+std::string site::GetCulturalName(const civilization *civilization) const
 {
 	if (civilization != nullptr) {
-		std::map<const stratagus::civilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+		const auto find_iterator = this->CulturalNames.find(civilization);
 		if (find_iterator != this->CulturalNames.end()) {
 			return find_iterator->second;
 		}

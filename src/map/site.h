@@ -53,6 +53,10 @@ class site : public named_data_entry, public data_type<site>, public CDataType
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool major MEMBER major READ is_major)
+	Q_PROPERTY(stratagus::map_template* map_template MEMBER map_template READ get_map_template)
+	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
+
 public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
@@ -62,7 +66,24 @@ public:
 	}
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	std::string GetCulturalName(const stratagus::civilization *civilization) const;
+	virtual void initialize() override;
+
+	std::string GetCulturalName(const civilization *civilization) const;
+
+	bool is_major() const
+	{
+		return this->major;
+	}
+
+	map_template *get_map_template() const
+	{
+		return this->map_template;
+	}
+
+	const QPoint &get_pos() const
+	{
+		return this->pos;
+	}
 
 	CUnit *get_site_unit() const
 	{
@@ -90,20 +111,20 @@ public:
 
 	void update_border_tile_graphics();
 
-	bool Major = false;											/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
-	Vec2i Position = Vec2i(-1, -1);								/// Position of the site in its map template
-	stratagus::map_template *map_template = nullptr;						/// Map template where this site is located
 private:
+	bool major = false; /// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
+	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
+	map_template *map_template = nullptr; /// Map template where this site is located
 	CPlayer *owner = nullptr;
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 public:
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
 	std::vector<CFaction *> Cores;						/// Factions which have this site as a core
-	std::map<const stratagus::civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
+	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
 	std::map<CDate, const CFaction *> HistoricalOwners;				/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, const stratagus::unit_class *, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 private:
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement

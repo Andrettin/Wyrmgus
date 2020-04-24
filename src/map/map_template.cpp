@@ -900,13 +900,13 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 	}
 
 	for (site *site : this->sites) {
-		Vec2i site_raw_pos(site->Position);
+		const QPoint site_raw_pos = site->get_pos();
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
 		Vec2i unit_offset((settlement_site_unit_type->TileSize - 1) / 2);
 			
 		if (random) {
-			if (site_raw_pos.x != -1 || site_raw_pos.y != -1) {
+			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
 				continue;
 			}
 			if (settlement_site_unit_type) {
@@ -914,7 +914,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				site_pos += unit_offset;
 			}
 		} else {
-			if (site_raw_pos.x == -1 && site_raw_pos.y == -1) {
+			if (site_raw_pos.x() == -1 && site_raw_pos.y() == -1) {
 				continue;
 			}
 		}
@@ -923,9 +923,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		if (site->Major && settlement_site_unit_type) { //add a settlement site for major sites
+		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
 			if (!UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->TileSize - 1), z)) {
-				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
+				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 			}
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true);
 			unit->settlement = site;
@@ -1034,14 +1034,14 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				if (unit_type->TerrainType) {
 					continue;
 				}
-				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->Major) {
+				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_major()) {
 					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
 					continue;
 				}
 				Vec2i unit_offset((unit_type->TileSize - 1) / 2);
 				if (first_building) {
 					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(unit_type->TileSize - 1), z)) {
-						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
+						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 					}
 				}
 				CUnit *unit = nullptr;
