@@ -520,7 +520,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CCampaign::GetCurrentCampaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (stratagus::campaign::GetCurrentCampaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}

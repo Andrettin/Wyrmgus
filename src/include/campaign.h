@@ -27,46 +27,42 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CFaction;
 class CQuest;
 class LuaCallback;
 struct lua_State;
 
-namespace stratagus {
-	class map_template;
-}
+int CclDefineCampaign(lua_State *l);
+int CclGetCampaignData(lua_State *l);
 
-class CCampaign : public CDataType
+namespace stratagus {
+
+class map_template;
+
+class campaign : public named_data_entry, public data_type<campaign>, public CDataType
 {
 public:
-	CCampaign(const std::string &ident, const int id) : CDataType(ident), ID(id)
-	{
-	}
-	
-	static CCampaign *GetCampaign(const std::string &ident, const bool should_find = true);
-	static CCampaign *GetOrAddCampaign(const std::string &ident);
-	static void ClearCampaigns();
-	static void SetCurrentCampaign(CCampaign *campaign);
-	static CCampaign *GetCurrentCampaign();
+	static constexpr const char *class_identifier = "campaign";
+	static constexpr const char *database_folder = "campaigns";
+
+	static void initialize_all();
+	static void SetCurrentCampaign(campaign *campaign);
+	static campaign *GetCurrentCampaign();
 
 private:
-	static std::vector<CCampaign *> Campaigns;
-	static std::map<std::string, CCampaign *> CampaignsByIdent;
-	static CCampaign *CurrentCampaign;
+	static campaign *CurrentCampaign;
 	
 public:
+	campaign(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	{
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	const CDate &GetStartDate() const
@@ -89,27 +85,22 @@ public:
 	bool IsAvailable() const;
 
 private:
-	std::string Name;				/// Name of the campaign
 	std::string Description;		/// Description of the campaign
-	int ID = -1;
 	CDate StartDate;				/// The starting date of the campaign
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
 	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
 public:
-	std::vector<stratagus::map_template *> map_templates; //map templates used by the campaign
+	std::vector<map_template *> map_templates; //map templates used by the campaign
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 	
-	friend int CclDefineCampaign(lua_State *l);
-	friend int CclGetCampaignData(lua_State *l);
-	friend int CclGetCampaigns(lua_State *l);
+	friend int ::CclDefineCampaign(lua_State *l);
+	friend int ::CclGetCampaignData(lua_State *l);
 };
 
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
+}
 
 extern void SetCurrentCampaign(const std::string &campaign_ident);
 extern std::string GetCurrentCampaign();

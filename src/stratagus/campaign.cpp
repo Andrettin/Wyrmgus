@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "campaign.h"
@@ -40,86 +36,35 @@
 #include "quest.h"
 #include "util/string_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CCampaign *> CCampaign::Campaigns;
-std::map<std::string, CCampaign *> CCampaign::CampaignsByIdent;
-CCampaign *CCampaign::CurrentCampaign = nullptr;
+campaign *campaign::CurrentCampaign = nullptr;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a campaign
-**
-**	@param	ident	The campaign's string identifier
-**
-**	@return	The campaign if found, or null otherwise
-*/
-CCampaign *CCampaign::GetCampaign(const std::string &ident, const bool should_find)
+void campaign::initialize_all()
 {
-	std::map<std::string, CCampaign *>::const_iterator find_iterator = CampaignsByIdent.find(ident);
-	
-	if (find_iterator != CampaignsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid campaign: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
+	campaign::sort_instances([](campaign *a, campaign *b) {
+		if (a->GetSpecies() != b->GetSpecies()) {
+			return a->GetSpecies() < b->GetSpecies();
+		} else if (a->GetStartDate() != b->GetStartDate()) {
+			return a->GetStartDate() < b->GetStartDate();
+		} else {
+			return a->get_identifier() < b->get_identifier();
+		}
+	});
 }
 
-/**
-**	@brief	Get or add a campaign
-**
-**	@param	ident	The campaign's string identifier
-**
-**	@return	The campaign if found, otherwise a new campaign is created and returned
-*/
-CCampaign *CCampaign::GetOrAddCampaign(const std::string &ident)
+void campaign::SetCurrentCampaign(campaign *campaign)
 {
-	CCampaign *campaign = GetCampaign(ident, false);
-	
-	if (!campaign) {
-		campaign = new CCampaign(ident, Campaigns.size());
-		Campaigns.push_back(campaign);
-		CampaignsByIdent[ident] = campaign;
-	}
-	
-	return campaign;
-}
-
-/**
-**	@brief	Remove the existing campaigns
-*/
-void CCampaign::ClearCampaigns()
-{
-	for (CCampaign *campaign : Campaigns) {
-		delete campaign;
-	}
-	Campaigns.clear();
-}
-
-/**
-**	@brief	Set the current campaign
-*/
-void CCampaign::SetCurrentCampaign(CCampaign *campaign)
-{
-	if (campaign == CCampaign::CurrentCampaign) {
+	if (campaign == campaign::CurrentCampaign) {
 		return;
 	}
 	
-	CCampaign::CurrentCampaign = campaign;
+	campaign::CurrentCampaign = campaign;
 }
 
-CCampaign *CCampaign::GetCurrentCampaign()
+campaign *campaign::GetCurrentCampaign()
 {
-	return CCampaign::CurrentCampaign;
+	return campaign::CurrentCampaign;
 }
 
 /**
@@ -127,14 +72,14 @@ CCampaign *CCampaign::GetCurrentCampaign()
 **
 **	@param	config_data	The configuration data
 */
-void CCampaign::ProcessConfigData(const CConfigData *config_data)
+void campaign::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "description") {
 			this->Description = value;
 		} else if (key == "faction") {
@@ -167,7 +112,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "map_template") {
-			stratagus::map_template *map_template = nullptr;
+			map_template *map_template = nullptr;
 			Vec2i start_pos(0, 0);
 			Vec2i map_size(0, 0);
 				
@@ -176,7 +121,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "map_template") {
-					map_template = stratagus::map_template::get(value);
+					map_template = map_template::get(value);
 					if (map_size.x == 0) {
 						map_size.x = map_template->get_width();
 					}
@@ -208,19 +153,9 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid campaign property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-
-	std::sort(CCampaign::Campaigns.begin(), CCampaign::Campaigns.end(), [](CCampaign *a, CCampaign *b) {
-		if (a->GetSpecies() != b->GetSpecies()) {
-			return a->GetSpecies() < b->GetSpecies();
-		} else if (a->GetStartDate() != b->GetStartDate()) {
-			return a->GetStartDate() < b->GetStartDate();
-		} else {
-			return a->GetIdent() < b->GetIdent();
-		}
-		});
 }
 
-std::string CCampaign::GetSpecies() const
+std::string campaign::GetSpecies() const
 {
 	if (this->Faction && this->Faction->civilization) {
 		return PlayerRaces.Species[this->Faction->civilization->ID];
@@ -229,7 +164,7 @@ std::string CCampaign::GetSpecies() const
 	return std::string();
 }
 
-bool CCampaign::IsAvailable() const
+bool campaign::IsAvailable() const
 {
 	if (this->IsHidden()) {
 		return false;
@@ -244,6 +179,8 @@ bool CCampaign::IsAvailable() const
 	return true;
 }
 
+}
+
 /**
 **	@brief	Set the current campaign
 **
@@ -252,17 +189,12 @@ bool CCampaign::IsAvailable() const
 void SetCurrentCampaign(const std::string &campaign_ident)
 {
 	if (campaign_ident.empty()) {
-		CCampaign::SetCurrentCampaign(nullptr);
+		stratagus::campaign::SetCurrentCampaign(nullptr);
 		return;
 	}
 	
-	CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
-	
-	if (!campaign) {
-		return;
-	}
-	
-	CCampaign::SetCurrentCampaign(campaign);
+	stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
+	stratagus::campaign::SetCurrentCampaign(campaign);
 }
 
 /**
@@ -272,7 +204,7 @@ void SetCurrentCampaign(const std::string &campaign_ident)
 */
 std::string GetCurrentCampaign()
 {
-	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+	const stratagus::campaign *current_campaign = stratagus::campaign::GetCurrentCampaign();
 	
 	if (!current_campaign) {
 		return "";

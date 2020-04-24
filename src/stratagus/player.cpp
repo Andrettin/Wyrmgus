@@ -2019,7 +2019,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	
 	if (!pre) {
 		//check if the required core settlements are owned by the player
-		if (CCampaign::GetCurrentCampaign() != nullptr) { //only check for settlements in the Scenario mode
+		if (stratagus::campaign::GetCurrentCampaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
 				if (!faction->Cores[i]->get_site_unit() || faction->Cores[i]->get_site_unit()->Player != this || faction->Cores[i]->get_site_unit()->CurrentAction() == UnitAction::Built) {
 					return false;
@@ -2660,7 +2660,7 @@ void CPlayer::UpdateLevelUpUnits()
 
 void CPlayer::UpdateQuestPool()
 {
-	if (CCampaign::GetCurrentCampaign() == nullptr) { // in-game quests only while playing the campaign mode
+	if (stratagus::campaign::GetCurrentCampaign() == nullptr) { // in-game quests only while playing the campaign mode
 		return;
 	}
 

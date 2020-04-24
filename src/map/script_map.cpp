@@ -987,11 +987,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	const CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
-	
-	if (!campaign) {
-		return;
-	}
+	const stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
 	
 	for (size_t i = 0; i < campaign->map_templates.size(); ++i) {
 		campaign->map_templates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);

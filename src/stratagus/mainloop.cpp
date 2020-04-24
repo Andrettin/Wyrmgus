@@ -567,7 +567,7 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
-		const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+		const stratagus::campaign *current_campaign = stratagus::campaign::GetCurrentCampaign();
 		if (current_campaign != nullptr) {
 			const CDate &start_date = current_campaign->GetStartDate();
 			for (int i = 0; i < NumPlayers; ++i) {

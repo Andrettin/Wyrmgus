@@ -728,7 +728,7 @@ void CTrigger::InitActiveTriggers()
 		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
 			continue;
 		}
-		if (trigger->CampaignOnly && CCampaign::GetCurrentCampaign() == nullptr) {
+		if (trigger->CampaignOnly && stratagus::campaign::GetCurrentCampaign() == nullptr) {
 		}
 		CTrigger::ActiveTriggers.push_back(trigger);
 	}
