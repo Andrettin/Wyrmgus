@@ -72,6 +72,25 @@ map_template::~map_template()
 	}
 }
 
+void map_template::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
+		scope.for_each_property([&](const sml_property &property) {
+			CUnitType *unit_type = CUnitType::get(property.get_key());
+			const int quantity = std::stoi(property.get_value());
+
+			if (tag == "generated_neutral_units") {
+				this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+			} else if (tag == "player_location_generated_neutral_units") {
+				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+			}
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 /**
 **	@brief	Process data provided by a configuration file
 **
