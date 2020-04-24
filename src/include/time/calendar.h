@@ -69,9 +69,6 @@ namespace stratagus {
 class calendar : public named_data_entry, public data_type<calendar>, public CDataType
 {
 public:
-	calendar(const std::string &identifier);
-	~calendar();
-	
 	static constexpr const char *class_identifier = "calendar";
 	static constexpr const char *database_folder = "calendars";
 
@@ -83,6 +80,9 @@ public:
 	}
 
 	static calendar *base_calendar;
+
+	calendar(const std::string &identifier);
+	~calendar();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;

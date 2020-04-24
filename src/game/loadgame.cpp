@@ -140,7 +140,6 @@ void CleanModules()
 	CleanTexts();
 	CleanUniqueItems();
 	//Wyrmgus end
-	CTimeline::ClearTimelines();
 	CleanUnits();
 	CleanUnitTypeVariables();
 	CleanPlayers();

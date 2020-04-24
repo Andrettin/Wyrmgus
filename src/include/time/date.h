@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name date.h - The date header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -31,14 +29,9 @@
 
 #include "stratagus.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CTimeline;
-
 namespace stratagus {
 	class calendar;
+	class timeline;
 }
 
 static constexpr int BaseCalendarYearOffsetForHours = 10000; //essentially the Human Era
@@ -88,7 +81,7 @@ public:
 	int Month = 1;
 	int Day = 1;
 	int Hour = DEFAULT_HOURS_PER_DAY / 2;
-	CTimeline *Timeline = nullptr;
+	stratagus::timeline *timeline = nullptr;
 	
 	bool operator <(const CDate &rhs) const
 	{

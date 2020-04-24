@@ -65,17 +65,15 @@ CDate CDate::FromString(const std::string &date_str)
 		calendar = stratagus::calendar::try_get(date_vector[0]);
 		if (calendar) {
 			offset += 1;
-		} else if (!CTimeline::GetTimeline(date_vector[0])) { //is neither a calendar nor a timeline
+		} else if (stratagus::timeline::try_get(date_vector[0]) == nullptr) { //is neither a calendar nor a timeline
 			fprintf(stderr, "Calendar \"%s\" does not exist.\n", date_vector[0].c_str());
 		}
 	}
 	
 	if (date_vector.size() >= (1 + offset) && !string::is_number(date_vector[0 + offset])) {
-		CTimeline *timeline = CTimeline::GetTimeline(date_vector[0 + offset]);
+		stratagus::timeline *timeline = stratagus::timeline::get(date_vector[0 + offset]);
 		if (timeline) {
-			date.Timeline = timeline;
-		} else {
-			fprintf(stderr, "Timeline \"%s\" does not exist.\n", date_vector[0 + offset].c_str());
+			date.timeline = timeline;
 		}
 		offset += 1;
 	}
@@ -105,21 +103,21 @@ CDate CDate::FromString(const std::string &date_str)
 
 void CDate::Clear()
 {
-	Year = 0;
-	Month = 1;
-	Day = 1;
-	Hour = DEFAULT_HOURS_PER_DAY / 2;
-	Timeline = nullptr;
+	this->Year = 0;
+	this->Month = 1;
+	this->Day = 1;
+	this->Hour = DEFAULT_HOURS_PER_DAY / 2;
+	this->timeline = nullptr;
 }
 
 bool CDate::ContainsDate(const CDate &date) const
 {
-	if (this->Timeline == date.Timeline) {
+	if (this->timeline == date.timeline) {
 		return *this >= date;
 	}
 	
-	if (this->Timeline) {
-		return this->Timeline->PointOfDivergence.ContainsDate(date);
+	if (this->timeline) {
+		return this->timeline->PointOfDivergence.ContainsDate(date);
 	}
 	
 	return false;
@@ -211,7 +209,7 @@ CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calend
 	}
 	
 	CDate date;
-	date.Timeline = this->Timeline;
+	date.timeline = this->timeline;
 	date.Year = this->Year;
 	date.Month = this->Month;
 	date.Day = this->Day;

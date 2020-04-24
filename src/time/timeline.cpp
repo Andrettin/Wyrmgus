@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name timeline.cpp - The timeline source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,74 +25,22 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "time/timeline.h"
 
-#include "config.h"
+namespace stratagus {
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CTimeline *> CTimeline::Timelines;
-std::map<std::string, CTimeline *> CTimeline::TimelinesByIdent;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Get a timeline
-*/
-CTimeline *CTimeline::GetTimeline(const std::string &ident)
+void timeline::process_sml_property(const sml_property &property)
 {
-	if (TimelinesByIdent.find(ident) != TimelinesByIdent.end()) {
-		return TimelinesByIdent.find(ident)->second;
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "point_of_divergence") {
+		this->PointOfDivergence = CDate::FromString(value);
+	} else {
+		data_entry::process_sml_property(property);
 	}
-	
-	return nullptr;
 }
 
-CTimeline *CTimeline::GetOrAddTimeline(const std::string &ident)
-{
-	CTimeline *timeline = GetTimeline(ident);
-	
-	if (!timeline) {
-		timeline = new CTimeline;
-		timeline->Ident = ident;
-		timeline->ID = Timelines.size();
-		Timelines.push_back(timeline);
-		TimelinesByIdent[ident] = timeline;
-	}
-	
-	return timeline;
-}
-
-void CTimeline::ClearTimelines()
-{
-	for (size_t i = 0; i < Timelines.size(); ++i) {
-		delete Timelines[i];
-	}
-	Timelines.clear();
-}
-
-void CTimeline::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "point_of_divergence") {
-			this->PointOfDivergence = CDate::FromString(value);
-		} else {
-			fprintf(stderr, "Invalid timeline property: \"%s\".\n", key.c_str());
-		}
-	}
 }

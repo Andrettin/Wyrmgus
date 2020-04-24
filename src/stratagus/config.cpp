@@ -60,7 +60,6 @@
 #include "time/season_schedule.h"
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
-#include "time/timeline.h"
 #include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
@@ -366,11 +365,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				terrain_type->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "timeline") {
-			CTimeline *timeline = CTimeline::GetOrAddTimeline(ident);
-			if (!define_only) {
-				timeline->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "time_of_day_schedule") {
 			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(ident);

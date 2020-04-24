@@ -575,42 +575,42 @@ void CCharacter::GenerateMissingDates()
 		this->DeathDate.Year = this->BirthDate.Year + 60;
 		this->DeathDate.Month = this->BirthDate.Month;
 		this->DeathDate.Day = this->BirthDate.Day;
-		this->DeathDate.Timeline = this->BirthDate.Timeline;
+		this->DeathDate.timeline = this->BirthDate.timeline;
 	}
 	
 	if (this->BirthDate.Year == 0 && this->DeathDate.Year != 0) { //if the character is missing a birth date so far, give it 60 years before the death date
 		this->BirthDate.Year = this->DeathDate.Year - 60;
 		this->BirthDate.Month = this->DeathDate.Month;
 		this->BirthDate.Day = this->DeathDate.Day;
-		this->BirthDate.Timeline = this->DeathDate.Timeline;
+		this->BirthDate.timeline = this->DeathDate.timeline;
 	}
 	
 	if (this->StartDate.Year == 0 && this->BirthDate.Year != 0) { //if the character is missing a start date so far, give it +30 years after the birth date
 		this->StartDate.Year = this->BirthDate.Year + 30;
 		this->StartDate.Month = this->BirthDate.Month;
 		this->StartDate.Day = this->BirthDate.Day;
-		this->StartDate.Timeline = this->BirthDate.Timeline;
+		this->StartDate.timeline = this->BirthDate.timeline;
 	}
 	
 	if (this->BirthDate.Year == 0 && this->StartDate.Year != 0) { //if the character is missing a birth date so far, give it 30 years before the start date
 		this->BirthDate.Year = this->StartDate.Year - 30;
 		this->BirthDate.Month = this->StartDate.Month;
 		this->BirthDate.Day = this->StartDate.Day;
-		this->BirthDate.Timeline = this->StartDate.Timeline;
+		this->BirthDate.timeline = this->StartDate.timeline;
 	}
 	
 	if (this->DeathDate.Year == 0 && this->StartDate.Year != 0) { //if the character is missing a death date so far, give it +30 years after the start date
 		this->DeathDate.Year = this->StartDate.Year + 30;
 		this->DeathDate.Month = this->StartDate.Month;
 		this->DeathDate.Day = this->StartDate.Day;
-		this->DeathDate.Timeline = this->StartDate.Timeline;
+		this->DeathDate.timeline = this->StartDate.timeline;
 	}
 	
 	if (this->StartDate.Year == 0 && this->DeathDate.Year != 0) { //if the character is missing a start date so far, give it 30 years before the death date
 		this->StartDate.Year = this->DeathDate.Year - 30;
 		this->StartDate.Month = this->DeathDate.Month;
 		this->StartDate.Day = this->DeathDate.Day;
-		this->StartDate.Timeline = this->DeathDate.Timeline;
+		this->StartDate.timeline = this->DeathDate.timeline;
 	}
 }
 

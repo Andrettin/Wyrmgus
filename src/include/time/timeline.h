@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name timeline.h - The timeline header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,30 +27,25 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "data_type.h"
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "time/date.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-class CTimeline : public CDataType
+class timeline : public named_data_entry, public data_type<timeline>
 {
 public:
-	static CTimeline *GetTimeline(const std::string &ident);
-	static CTimeline *GetOrAddTimeline(const std::string &ident);
-	static void ClearTimelines();
+	static constexpr const char *class_identifier = "timeline";
+	static constexpr const char *database_folder = "timelines";
+
+	timeline(const std::string &identifier) : named_data_entry(identifier)
+	{
+	}
+
+	virtual void process_sml_property(const sml_property &property) override;
 	
-	static std::vector<CTimeline *> Timelines;
-	static std::map<std::string, CTimeline *> TimelinesByIdent;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	int ID = -1;
-	std::string Name;
-	CDate PointOfDivergence;											/// The point of divergence for this timeline
+	CDate PointOfDivergence; /// The point of divergence for this timeline
 };
+
+}

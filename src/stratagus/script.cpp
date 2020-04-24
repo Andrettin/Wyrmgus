@@ -3203,14 +3203,11 @@ void CclGetDate(lua_State *l, CDate *d, const int offset)
 		d->Day = LuaToNumber(l, offset, 3);
 		lua_rawgeti(l, offset, 4);
 		if (lua_isnil(l, -1)) {
-			d->Timeline = nullptr;
+			d->timeline = nullptr;
 		} else {
 			std::string timeline_ident = LuaToString(l, -1);
-			CTimeline *timeline = CTimeline::GetTimeline(timeline_ident);
-			if (!timeline) {
-				LuaError(l, "Timeline \"%s\" doesn't exist." _C_ timeline_ident.c_str());
-			}
-			d->Timeline = timeline;
+			stratagus::timeline *timeline = stratagus::timeline::get(timeline_ident);
+			d->timeline = timeline;
 		}
 		lua_pop(l, 1);
 	}
