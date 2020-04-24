@@ -35,6 +35,7 @@
 
 #include "campaign.h"
 #include "config.h"
+#include "game.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -728,7 +729,7 @@ void CTrigger::InitActiveTriggers()
 		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
 			continue;
 		}
-		if (trigger->CampaignOnly && stratagus::campaign::GetCurrentCampaign() == nullptr) {
+		if (trigger->CampaignOnly && stratagus::game::get()->get_current_campaign() == nullptr) {
 		}
 		CTrigger::ActiveTriggers.push_back(trigger);
 	}

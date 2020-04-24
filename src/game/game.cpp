@@ -1635,7 +1635,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		InitSyncRand();
 	}
 	
-	const stratagus::campaign *current_campaign = stratagus::campaign::GetCurrentCampaign();
+	const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
 	if (current_campaign) {
 		stratagus::calendar::base_calendar->CurrentDate = current_campaign->GetStartDate();
 		CDate::CurrentTotalHours = stratagus::calendar::base_calendar->CurrentDate.GetTotalHours(stratagus::calendar::base_calendar);

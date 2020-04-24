@@ -52,12 +52,7 @@ public:
 	static constexpr const char *database_folder = "campaigns";
 
 	static void initialize_all();
-	static void SetCurrentCampaign(campaign *campaign);
-	static campaign *GetCurrentCampaign();
 
-private:
-	static campaign *CurrentCampaign;
-	
 public:
 	campaign(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{

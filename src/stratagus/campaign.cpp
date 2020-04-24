@@ -31,14 +31,13 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "game.h"
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
 #include "util/string_util.h"
 
 namespace stratagus {
-
-campaign *campaign::CurrentCampaign = nullptr;
 
 void campaign::initialize_all()
 {
@@ -51,20 +50,6 @@ void campaign::initialize_all()
 			return a->get_identifier() < b->get_identifier();
 		}
 	});
-}
-
-void campaign::SetCurrentCampaign(campaign *campaign)
-{
-	if (campaign == campaign::CurrentCampaign) {
-		return;
-	}
-	
-	campaign::CurrentCampaign = campaign;
-}
-
-campaign *campaign::GetCurrentCampaign()
-{
-	return campaign::CurrentCampaign;
 }
 
 /**
@@ -189,12 +174,12 @@ bool campaign::IsAvailable() const
 void SetCurrentCampaign(const std::string &campaign_ident)
 {
 	if (campaign_ident.empty()) {
-		stratagus::campaign::SetCurrentCampaign(nullptr);
+		stratagus::game::get()->set_current_campaign(nullptr);
 		return;
 	}
 	
 	stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
-	stratagus::campaign::SetCurrentCampaign(campaign);
+	stratagus::game::get()->set_current_campaign(campaign);
 }
 
 /**
@@ -204,7 +189,7 @@ void SetCurrentCampaign(const std::string &campaign_ident)
 */
 std::string GetCurrentCampaign()
 {
-	const stratagus::campaign *current_campaign = stratagus::campaign::GetCurrentCampaign();
+	const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
 	
 	if (!current_campaign) {
 		return "";

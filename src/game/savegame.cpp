@@ -131,7 +131,7 @@ int SaveGame(const std::string &filename)
 	//Wyrmgus start
 //	file.printf("function SetTile() end\n");
 	file.printf("function SetTileTerrain() end\n");
-	stratagus::campaign *current_campaign = stratagus::campaign::GetCurrentCampaign();
+	stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
 	if (current_campaign != nullptr) {
 		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
 	}

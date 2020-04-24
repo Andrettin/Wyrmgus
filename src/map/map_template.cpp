@@ -471,7 +471,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	this->current_map_start_pos = map_start_pos;
 	this->current_start_pos = template_start_pos;
 
-	const campaign *current_campaign = campaign::GetCurrentCampaign();
+	const campaign *current_campaign = game::get()->get_current_campaign();
 	
 	if (z >= (int)CMap::Map.MapLayers.size()) {
 		int width = std::min(this->get_applied_width(), CMap::Map.Info.MapWidth);
@@ -918,7 +918,7 @@ void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPo
 */
 void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	const campaign *current_campaign = campaign::GetCurrentCampaign();
+	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign != nullptr) {
 		start_date = current_campaign->GetStartDate();
@@ -1339,7 +1339,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 
 void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	const campaign *current_campaign = campaign::GetCurrentCampaign();
+	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign) {
 		start_date = current_campaign->GetStartDate();
@@ -1846,7 +1846,7 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr
 {
 	Vec2i pos(-1, -1);
 	in_another_map_template = false;
-	const campaign *current_campaign = campaign::GetCurrentCampaign();
+	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign) {
 		start_date = current_campaign->GetStartDate();

@@ -51,6 +51,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "font.h"
+#include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -520,7 +521,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (stratagus::campaign::GetCurrentCampaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (stratagus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}

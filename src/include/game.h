@@ -9,7 +9,7 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,6 +27,31 @@
 //
 
 #pragma once
+
+#include "util/singleton.h"
+
+namespace stratagus {
+
+class campaign;
+
+class game final : public singleton<game>
+{
+public:
+	campaign *get_current_campaign() const
+	{
+		return this->current_campaign;
+	}
+
+	void set_current_campaign(campaign *campaign)
+	{
+		this->current_campaign = campaign;
+	}
+
+private:
+	campaign *current_campaign = nullptr;
+};
+
+}
 
 class CFile;
 //Wyrmgus start
