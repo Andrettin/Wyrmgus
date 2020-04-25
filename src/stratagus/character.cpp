@@ -57,6 +57,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -420,7 +421,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), this->Abilities[i]) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
-				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), this->Abilities[i]), this->Abilities.end());
+				stratagus::vector::remove(this->Abilities, this->Abilities[i]);
 			}
 		}
 	}

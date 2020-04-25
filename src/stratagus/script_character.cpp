@@ -51,6 +51,7 @@
 #include "time/timeline.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/vector_util.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -540,7 +541,7 @@ static int CclDefineCharacter(lua_State *l)
 		int ability_count = (int) character->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
-				character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
+				stratagus::vector::remove(character->Abilities, character->Abilities[i]);
 			}
 		}
 	}

@@ -83,6 +83,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/util.h"
+#include "util/vector_util.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -2359,7 +2360,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	if (!IsNetworkGame() && unit.Character != nullptr) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
 			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
-				unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
+				stratagus::vector::remove(unit.Character->Abilities, upgrade);
 				SaveHero(unit.Character);
 			}
 		}

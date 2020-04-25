@@ -94,6 +94,7 @@
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -1009,7 +1010,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	}
 	
 	for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
-		this->Character->Abilities.erase(std::remove(this->Character->Abilities.begin(), this->Character->Abilities.end(), abilities_to_remove[i]), this->Character->Abilities.end());
+		stratagus::vector::remove(this->Character->Abilities, abilities_to_remove[i]);
 		SaveHero(this->Character);
 	}
 	
