@@ -251,9 +251,9 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			}
 			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, player, transparent, show_percent);
 			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48 * scale_factor, 40 * scale_factor);
+				Video.DrawRectangle(ColorGreen, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
 			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 48 * scale_factor, 40 * scale_factor);
+				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
 			}
 			if (!Preference.CommandButtonFrameG || !(flags & IconCommandButton)) {
 				Preference.PressedIconFrameG->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
