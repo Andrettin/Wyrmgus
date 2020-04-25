@@ -186,19 +186,19 @@ enum {
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * stratagus::defines::get()->get_tile_size() / 2;
+	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * stratagus::defines::get()->get_scaled_tile_size() / 2;
 
-	const int w = this->GetUnitType().BoxWidth;
-	const int h = this->GetUnitType().BoxHeight;
+	const int w = this->GetUnitType().BoxWidth * stratagus::defines::get()->get_scale_factor();
+	const int h = this->GetUnitType().BoxHeight * stratagus::defines::get()->get_scale_factor();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
 	//Wyrmgus start
 //	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 //	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 //	Video.FillCircleClip(ColorGreen, targetPos, 3);
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * stratagus::defines::get()->get_scale_factor());
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorGreen, targetPos, 3);
+		Video.FillCircleClip(ColorGreen, targetPos, 3 * stratagus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end
 	return targetPos;

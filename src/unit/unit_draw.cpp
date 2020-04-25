@@ -668,9 +668,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->BoxWidth) / 2 - width;
+		x += (unit.Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->BoxWidth * stratagus::defines::get()->get_scale_factor()) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height() + unit.Type->BoxHeight) / 2 - height;
+		y += (unit.Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height() + unit.Type->BoxHeight * stratagus::defines::get()->get_scale_factor()) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
