@@ -166,11 +166,6 @@ int SaveGame(const std::string &filename)
 	if (current_date.isValid()) {
 		file.printf("SetCurrentDate(\"%s\")\n", date::to_string(current_date));
 	}
-	for (const stratagus::calendar *calendar : stratagus::calendar::get_all()) {
-		if (calendar->CurrentDayOfTheWeek != -1) {
-			file.printf("SetCurrentDayOfTheWeek(\"%s\", %d)\n", calendar->Ident.c_str(), calendar->CurrentDayOfTheWeek);
-		}
-	}
 	if (stratagus::age::current_age) {
 		file.printf("SetCurrentAge(\"%s\")\n", stratagus::age::current_age->get_identifier().c_str());
 	}

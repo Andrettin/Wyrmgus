@@ -647,11 +647,11 @@ CLanguage *CCharacter::GetLanguage() const
 
 stratagus::calendar *CCharacter::get_calendar() const
 {
-	if (this->civilization) {
+	if (this->civilization != nullptr) {
 		return this->civilization->get_calendar();
 	}
 	
-	return stratagus::calendar::default_calendar;
+	return nullptr;
 }
 
 bool CCharacter::IsParentOf(const std::string &child_ident) const

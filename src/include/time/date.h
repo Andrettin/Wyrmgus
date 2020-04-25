@@ -39,10 +39,19 @@ static constexpr int BaseCalendarYearOffsetForHours = 10000; //essentially the H
 class CDate
 {
 public:
+	static constexpr int months_per_year = 12;
+	static constexpr int days_per_year = 365;
+	static constexpr int hours_per_day = 24;
+	static constexpr const char *default_year_label = "AD";
+	static constexpr const char *default_negative_year_label = "BC";
+
 	static CDate FromString(const std::string &date_str);
 	
 	static unsigned long long CurrentTotalHours;				/// Current total in-game hours, counting from 1 January 10000 BC 00:00
 
+	static QCalendar calendar;
+
+public:
 	CDate()
 	{
 	}
@@ -64,16 +73,15 @@ public:
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	void AddYears(const int years);
-	void AddMonths(const stratagus::calendar *calendar, const int months);
-	void AddDays(const stratagus::calendar *calendar, const int days, const int day_multiplier = 1);
-	void AddHours(const stratagus::calendar *calendar, const long long int hours, const int day_multiplier = 1);
+	void AddMonths(const int months);
+	void AddDays(const int days, const int day_multiplier = 1);
+	void AddHours(const long long int hours, const int day_multiplier = 1);
 	CDate ToCalendar(stratagus::calendar *current_calendar, stratagus::calendar *new_calendar) const;
 	CDate ToBaseCalendar(stratagus::calendar *current_calendar) const;
 	std::string ToString(const stratagus::calendar *calendar) const;
 	std::string ToDisplayString(const stratagus::calendar *calendar, const bool year_only = false) const;
-	int GetTotalDays(const stratagus::calendar *calendar) const;
-	unsigned long long GetTotalHours(stratagus::calendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
-	int GetDayOfTheWeek(const stratagus::calendar *calendar) const;			/// gets the day of the week for this date in a given calendar
+	int GetTotalDays() const;
+	unsigned long long GetTotalHours() const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	
 	int GetYear() const
 	{
@@ -188,5 +196,4 @@ public:
 };
 
 extern void SetCurrentDate(const std::string &date_string);
-extern void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week);
 extern void SetCurrentTotalHours(const unsigned long long hours);

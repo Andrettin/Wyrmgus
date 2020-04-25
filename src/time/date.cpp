@@ -39,7 +39,10 @@
 #include "time/timeline.h"
 #include "util/string_util.h"
 
+#include <QCalendar>
+
 unsigned long long CDate::CurrentTotalHours = 0;
+QCalendar CDate::calendar;
 
 CDate CDate::FromString(const std::string &date_str)
 {
@@ -113,68 +116,68 @@ void CDate::AddYears(const int years)
 	}
 }
 
-void CDate::AddMonths(const stratagus::calendar *calendar, const int months)
+void CDate::AddMonths(const int months)
 {
 	this->Month += months;
 	
 	if (this->Month > 0) {
-		while (this->Month > (int) calendar->Months.size()) {
-			this->Month -= static_cast<char>(calendar->Months.size());
+		while (this->Month > CDate::months_per_year) {
+			this->Month -= CDate::months_per_year;
 			this->AddYears(1);
 		}
 	} else {
 		while (this->Month <= 0) {
-			this->Month += static_cast<char>(calendar->Months.size());
+			this->Month += CDate::months_per_year;
 			this->AddYears(-1);
 		}
 	}
 }
 
-void CDate::AddDays(const stratagus::calendar *calendar, const int days, const int day_multiplier)
+void CDate::AddDays(const int days, const int day_multiplier)
 {
 	int current_day = this->Day;
 	current_day += days * day_multiplier;
 	
 	if (current_day > 0) {
-		while (current_day > calendar->DaysPerYear) {
-			current_day -= calendar->DaysPerYear;
+		while (current_day > CDate::days_per_year) {
+			current_day -= CDate::days_per_year;
 			this->AddYears(1);
 		}
 		
-		while (current_day > calendar->Months[this->Month - 1]->Days) {
-			current_day -= calendar->Months[this->Month - 1]->Days;
-			this->AddMonths(calendar, 1);
+		while (current_day > CDate::calendar.daysInMonth(this->Month)) {
+			current_day -= CDate::calendar.daysInMonth(this->Month);
+			this->AddMonths(1);
 		}
 	} else {
-		while (current_day <= (-calendar->DaysPerYear + 1)) {
-			current_day += calendar->DaysPerYear;
+		while (current_day <= (-CDate::days_per_year + 1)) {
+			current_day += CDate::days_per_year;
 			this->AddYears(-1);
 		}
 		
 		while (current_day <= 0) {
-			current_day += calendar->Months[this->Month - 1]->Days;
-			this->AddMonths(calendar, -1);
+			current_day += CDate::calendar.daysInMonth(this->Month);
+			this->AddMonths(-1);
 		}
 	}
 
 	this->Day = current_day;
 }
 
-void CDate::AddHours(const stratagus::calendar *calendar, const long long int hours, const int day_multiplier)
+void CDate::AddHours(const long long int hours, const int day_multiplier)
 {
-	this->AddDays(calendar, hours / calendar->HoursPerDay, day_multiplier);
+	this->AddDays(hours / CDate::hours_per_day, day_multiplier);
 	
-	this->Hour += hours % calendar->HoursPerDay;
+	this->Hour += hours % CDate::hours_per_day;
 	
 	if (this->Hour >= 0) {
-		while (this->Hour >= calendar->HoursPerDay) {
-			this->Hour -= calendar->HoursPerDay;
-			this->AddDays(calendar, 1, day_multiplier);
+		while (this->Hour >= CDate::hours_per_day) {
+			this->Hour -= CDate::hours_per_day;
+			this->AddDays(1, day_multiplier);
 		}
 	} else {
 		while (this->Hour < 0) {
-			this->Hour += calendar->HoursPerDay;
-			this->AddDays(calendar, -1, day_multiplier);
+			this->Hour += CDate::hours_per_day;
+			this->AddDays(-1, day_multiplier);
 		}
 	}
 }
@@ -184,38 +187,28 @@ CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calend
 	if (current_calendar == new_calendar) {
 		return *this;
 	}
+
+	const int old_year_offset = current_calendar ? current_calendar->get_year_offset() : 0;
+	const int new_year_offset = new_calendar ? new_calendar->get_year_offset() : 0;
 	
 	CDate date;
-	date.Year = this->Year;
+	date.Year = this->Year + new_year_offset - old_year_offset;
 	date.Month = this->Month;
 	date.Day = this->Day;
 	date.Hour = this->Hour;
-	
-	std::pair<CDate, CDate> chronological_intersection = current_calendar->GetBestChronologicalIntersectionForDate(new_calendar, *this);
-	
-	if (chronological_intersection.first.Year != 0) { //whether the chronological intersection returned is valid
-		if (current_calendar->DaysPerYear == new_calendar->DaysPerYear) { //if the quantity of days per year is the same in both calendars, then we can just use the year difference in the intersection to get the resulting year for this date in the new calendar
-			date.Year += chronological_intersection.second.Year - chronological_intersection.first.Year;
-		} else if (current_calendar->HoursPerDay == new_calendar->HoursPerDay) { //if the quantity of days per years is different, but the hours in a day are the same, add the year difference in days
-			date.AddDays(new_calendar, chronological_intersection.second.Year * new_calendar->DaysPerYear - chronological_intersection.first.Year * current_calendar->DaysPerYear);
-		} else {
-			date.AddHours(new_calendar, (long long int) chronological_intersection.second.Year * new_calendar->DaysPerYear * new_calendar->HoursPerDay - (long long int) chronological_intersection.first.Year * current_calendar->DaysPerYear * current_calendar->HoursPerDay);
-		}
-	} else {
-		fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to calendar \"%s\", as no chronological intersections are present.\n", current_calendar->Ident.c_str(), new_calendar->Ident.c_str());
-	}
 	
 	return date;
 }
 
 CDate CDate::ToBaseCalendar(stratagus::calendar *current_calendar) const
 {
-	if (!stratagus::calendar::default_calendar) {
-		fprintf(stderr, "No base calendar has been defined.\n");
-		return *this;
-	}
+	CDate date;
+	date.Year = this->Year - current_calendar->get_year_offset();
+	date.Month = this->Month;
+	date.Day = this->Day;
+	date.Hour = this->Hour;
 	
-	return this->ToCalendar(current_calendar, stratagus::calendar::default_calendar);
+	return date;
 }
 
 std::string CDate::ToString(const stratagus::calendar *calendar) const
@@ -240,22 +233,18 @@ std::string CDate::ToDisplayString(const stratagus::calendar *calendar, const bo
 	
 	display_string += std::to_string((long long) abs(this->Year));
 	
-	if (!calendar) {
-		fprintf(stderr, "Calendar does not exist.\n");
-		return display_string;
-	}
-	
+	display_string += " ";
 	if (this->Year < 0) {
-		if (!calendar->NegativeYearLabel.empty()) {
-			display_string += " " + calendar->NegativeYearLabel;
+		if (calendar == nullptr || !calendar->get_negative_year_label().empty()) {
+			display_string += calendar->get_negative_year_label();
 		} else {
-			fprintf(stderr, "Calendar \"%s\" has no negative year label.\n", calendar->Ident.c_str());
+			display_string += CDate::default_negative_year_label;
 		}
 	} else {
-		if (!calendar->YearLabel.empty()) {
-			display_string += " " + calendar->YearLabel;
+		if (calendar == nullptr || !calendar->get_year_label().empty()) {
+			display_string += calendar->get_year_label();
 		} else {
-			fprintf(stderr, "Calendar \"%s\" has no year label.\n", calendar->Ident.c_str());
+			display_string += CDate::default_year_label;
 		}
 	}
 	
@@ -269,57 +258,32 @@ std::string CDate::ToDisplayString(const stratagus::calendar *calendar, const bo
 **
 **	@return	The amount of days
 */
-int CDate::GetTotalDays(const stratagus::calendar *calendar) const
+int CDate::GetTotalDays() const
 {
 	int days = 0;
 	
-	days += (this->Year < 0 ? this->Year : this->Year - 1) * calendar->DaysPerYear;
-	for (int i = 0; i < (this->Month - 1); ++i) {
-		days += calendar->Months[i]->Days;
+	days += (this->Year < 0 ? this->Year : this->Year - 1) * CDate::days_per_year;
+	for (int i = 1; i <= this->Month; ++i) {
+		days += CDate::calendar.daysInMonth(i);
 	}
 	days += this->Day - 1;
 	
 	return days;
 }
 
-unsigned long long CDate::GetTotalHours(stratagus::calendar *calendar) const
+unsigned long long CDate::GetTotalHours() const
 {
-	CDate date = this->ToBaseCalendar(calendar);
-	
-	unsigned long long hours = date.Hour;
+	unsigned long long hours = this->Hour;
 	
 	unsigned long long days = 0;
-	days += (date.Year - 1 + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear;
-	for (int i = 0; i < (date.Month - 1); ++i) {
-		days += calendar->Months[i]->Days;
+	days += (this->Year - 1 + BaseCalendarYearOffsetForHours) * CDate::days_per_year;
+	for (int i = 1; i <= this->Month; ++i) {
+		days += calendar.daysInMonth(i);
 	}
-	days += date.Day - 1;
-	hours += days * calendar->HoursPerDay;
+	days += this->Day - 1;
+	hours += days * CDate::hours_per_day;
 	
 	return hours;
-}
-
-/**
-**	@brief	Get the day of the week for this date in a calendar (this date is presumed to already be in the calendar)
-**
-**	@param	calendar	The calendar
-**
-**	@return	The ID of the day of the week
-*/
-int CDate::GetDayOfTheWeek(const stratagus::calendar *calendar) const
-{
-	if (!calendar->DaysOfTheWeek.empty() && calendar->BaseDayOfTheWeek) {
-		int day_of_the_week = calendar->BaseDayOfTheWeek->ID;
-		
-		day_of_the_week += this->GetTotalDays(calendar) % calendar->DaysOfTheWeek.size();
-		if (day_of_the_week < 0) {
-			day_of_the_week += calendar->DaysOfTheWeek.size();
-		}
-		
-		return day_of_the_week;
-	}
-	
-	return -1;
 }
 
 /**
@@ -331,23 +295,6 @@ int CDate::GetDayOfTheWeek(const stratagus::calendar *calendar) const
 void SetCurrentDate(const std::string &date_string)
 {
 	stratagus::game::get()->set_current_date(string::to_date(date_string));
-}
-
-/**
-**	@brief	Set the current day of the week for a particular calendar
-**
-**	@param	calendar_ident	The calendar's string identifier
-**	@param	day_of_the_week	The day of the week's ID
-*/
-void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week)
-{
-	stratagus::calendar *calendar = stratagus::calendar::try_get(calendar_ident);
-	
-	if (!calendar || calendar->DaysOfTheWeek.empty() || !calendar->BaseDayOfTheWeek) {
-		return;
-	}
-	
-	calendar->CurrentDayOfTheWeek = day_of_the_week;
 }
 
 /**

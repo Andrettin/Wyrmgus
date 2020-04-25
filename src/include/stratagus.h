@@ -176,7 +176,7 @@ static constexpr int CYCLES_PER_MINUTE = (CYCLES_PER_SECOND * 60);
 
 static constexpr int CYCLES_PER_IN_GAME_HOUR = (CYCLES_PER_SECOND * 10); // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
 
-static constexpr int DEFAULT_DAY_MULTIPLIER_PER_YEAR = (DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY * CYCLES_PER_IN_GAME_HOUR / CYCLES_PER_SECOND / 60 / 60); //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
+static constexpr int DEFAULT_DAY_MULTIPLIER_PER_YEAR = (DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY * CYCLES_PER_IN_GAME_HOUR / CYCLES_PER_SECOND / 60 / 60); //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, with months and years still not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
 
 static constexpr int HOUR_MULTIPLIER_DIVIDER = 4; //for calculating the multipliers for schedules; the maximum duration length will be the default multiplier * the HOUR_MULTIPLIER_DIVIDER
 

@@ -259,11 +259,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				button_level->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "calendar") {
-			stratagus::calendar *calendar = stratagus::calendar::get_or_add(ident, nullptr);
-			if (!define_only) {
-				calendar->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "campaign") {
 			stratagus::campaign *campaign = stratagus::campaign::get_or_add(ident, nullptr);
 			if (!define_only) {

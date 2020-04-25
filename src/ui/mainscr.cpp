@@ -936,13 +936,11 @@ void DrawTime()
 	if (CPlayer::GetThisPlayer()) {
 		stratagus::calendar *calendar = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_calendar();
 		
-		if (calendar) {
-			if (UI.DatePanel.TextX != -1) {
-				std::string date_string = CDate(stratagus::game::get()->get_current_date()).ToDisplayString(calendar, true);
-				
-				CLabel label(GetGameFont());
-				label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
-			}
+		if (UI.DatePanel.TextX != -1) {
+			std::string date_string = CDate(stratagus::game::get()->get_current_date()).ToDisplayString(calendar, true);
+
+			CLabel label(GetGameFont());
+			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
 		}
 	}
 }

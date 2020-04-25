@@ -101,6 +101,8 @@
 #include "version.h"
 #include "video.h"
 
+#include <QCalendar>
+
 extern void CleanGame();
 
 /*----------------------------------------------------------------------------
@@ -140,13 +142,6 @@ void game::do_cycle()
 		CDate::CurrentTotalHours++;
 
 		this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
-
-		for (calendar *calendar : calendar::get_all()) {
-			if (calendar->CurrentDayOfTheWeek != -1 && CDate::CurrentTotalHours % calendar->HoursPerDay == 0) { //day passed in the calendar
-				calendar->CurrentDayOfTheWeek++;
-				calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
-			}
-		}
 
 		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
 			map_layer->DoPerHourLoop();
@@ -1664,21 +1659,16 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		stratagus::game::get()->set_current_date(current_campaign->get_start_date());
 	} else {
 		const int year = 1;
-		const int month = SyncRand(stratagus::calendar::default_calendar->Months.size()) + 1;
-		const int day = SyncRand(stratagus::calendar::default_calendar->Months[month - 1]->Days) + 1;
-		const int hour = SyncRand(stratagus::calendar::default_calendar->HoursPerDay);
+		const int month = SyncRand(CDate::months_per_year) + 1;
+		const int day = SyncRand(CDate::calendar.daysInMonth(month - 1)) + 1;
+		const int hour = SyncRand(CDate::hours_per_day);
 		QDate date(year, month, day);;
 		QDateTime date_time(date, QTime(hour, 0));
 		stratagus::game::get()->set_current_date(date_time);
 	}
 	
-	CDate::CurrentTotalHours = CDate(stratagus::game::get()->get_current_date()).GetTotalHours(stratagus::calendar::default_calendar);
+	CDate::CurrentTotalHours = CDate(stratagus::game::get()->get_current_date()).GetTotalHours();
 
-	for (stratagus::calendar *calendar : stratagus::calendar::get_all()) {
-		const CDate calendar_date = CDate(stratagus::game::get()->get_current_date()).ToCalendar(stratagus::calendar::default_calendar, calendar);
-		calendar->CurrentDayOfTheWeek = calendar_date.GetDayOfTheWeek(calendar);
-	}
-	
 	stratagus::age::current_age = nullptr;
 	//Wyrmgus end
 
