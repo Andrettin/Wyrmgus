@@ -146,6 +146,7 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
+#include "faction.h"
 #include "grand_strategy.h"
 #include "iolib.h"
 //Wyrmgus start

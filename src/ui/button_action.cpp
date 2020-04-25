@@ -34,6 +34,7 @@
 #include "ui/button_action.h"
 
 #include "config.h"
+#include "faction.h"
 #include "trigger.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"

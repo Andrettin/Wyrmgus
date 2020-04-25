@@ -45,6 +45,9 @@
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "editor.h"
+//Wyrmgus end
+#include "faction.h"
+//Wyrmgus start
 #include "font.h"
 #include "game.h"
 #include "iocompat.h"
@@ -589,158 +592,6 @@ std::string PlayerRace::TranslateName(const std::string &name, CLanguage *langua
 	}
 	
 	return new_name;
-}
-
-namespace stratagus {
-
-faction::~faction()
-{
-	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second.size(); ++i) {
-			delete iterator->second[i];
-		}
-	}
-	
-	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
-		delete this->AiBuildingTemplates[i];
-	}
-
-	if (this->Conditions) {
-		delete Conditions;
-	}
-
-	this->UIFillers.clear();
-}
-
-int faction::GetUpgradePriority(const CUpgrade *upgrade) const
-{
-	if (!upgrade) {
-		fprintf(stderr, "Error in faction::GetUpgradePriority: the upgrade is null.\n");
-	}
-	
-	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
-		return this->UpgradePriorities.find(upgrade)->second;
-	}
-	
-	if (this->civilization == nullptr) {
-		fprintf(stderr, "Error in faction::GetUpgradePriority: the faction has no civilization.\n");
-	}
-	
-	return this->civilization->GetUpgradePriority(upgrade);
-}
-
-int faction::GetForceTypeWeight(int force_type) const
-{
-	if (force_type == -1) {
-		fprintf(stderr, "Error in faction::GetForceTypeWeight: the force_type is -1.\n");
-	}
-	
-	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
-		return this->ForceTypeWeights.find(force_type)->second;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[this->ParentFaction]->GetForceTypeWeight(force_type);
-	}
-	
-	if (this->civilization == nullptr) {
-		fprintf(stderr, "Error in faction::GetForceTypeWeight: the faction has no civilization.\n");
-	}
-	
-	return this->civilization->GetForceTypeWeight(force_type);
-}
-
-/**
-**	@brief	Get the faction's currency
-**
-**	@return	The faction's currency
-*/
-CCurrency *faction::GetCurrency() const
-{
-	if (this->Currency) {
-		return this->Currency;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[this->ParentFaction]->GetCurrency();
-	}
-	
-	if (this->civilization != nullptr) {
-		return this->civilization->GetCurrency();
-	}
-	
-	return nullptr;
-}
-
-std::vector<CForceTemplate *> faction::GetForceTemplates(int force_type) const
-{
-	if (force_type == -1) {
-		fprintf(stderr, "Error in faction::GetForceTemplates: the force_type is -1.\n");
-	}
-	
-	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
-		return this->ForceTemplates.find(force_type)->second;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[this->ParentFaction]->GetForceTemplates(force_type);
-	}
-	
-	if (this->civilization == nullptr) {
-		fprintf(stderr, "Error in faction::GetForceTemplates: the faction has no civilization.\n");
-	}
-	
-	return this->civilization->GetForceTemplates(force_type);
-}
-
-std::vector<CAiBuildingTemplate *> faction::GetAiBuildingTemplates() const
-{
-	if (this->AiBuildingTemplates.size() > 0) {
-		return this->AiBuildingTemplates;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[this->ParentFaction]->GetAiBuildingTemplates();
-	}
-	
-	if (this->civilization == nullptr) {
-		fprintf(stderr, "Error in faction::GetAiBuildingTemplates: the faction has no civilization.\n");
-	}
-	
-	return this->civilization->GetAiBuildingTemplates();
-}
-
-const std::vector<std::string> &faction::get_ship_names() const
-{
-	if (this->ship_names.size() > 0) {
-		return this->ship_names;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[this->ParentFaction]->get_ship_names();
-	}
-	
-	return this->civilization->get_ship_names();
-}
-
-CUnitType *faction::get_class_unit_type(const stratagus::unit_class *unit_class) const
-{
-	if (unit_class == nullptr) {
-		return nullptr;
-	}
-
-	auto find_iterator = this->class_unit_types.find(unit_class);
-	if (find_iterator != this->class_unit_types.end()) {
-		return find_iterator->second;
-	}
-
-	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[this->ParentFaction]->get_class_unit_type(unit_class);
-	}
-
-	return this->civilization->get_class_unit_type(unit_class);
-}
-
 }
 
 CDynasty::~CDynasty()

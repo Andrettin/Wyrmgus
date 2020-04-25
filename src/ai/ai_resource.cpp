@@ -40,6 +40,7 @@
 #include "action/action_repair.h"
 #include "action/action_resource.h"
 #include "commands.h"
+#include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"

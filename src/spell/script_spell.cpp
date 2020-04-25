@@ -36,6 +36,7 @@
 #include "spells.h"
 
 #include "civilization.h"
+#include "faction.h"
 #include "luacallback.h"
 //Wyrmgus start
 #include "player.h" // for making user of PlayerRaces

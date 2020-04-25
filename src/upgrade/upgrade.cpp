@@ -47,6 +47,9 @@
 #include "config.h"
 //Wyrmgus start
 #include "editor.h"
+//Wyrmgus end
+#include "faction.h"
+//Wyrmgus start
 #include "game.h"
 #include "grand_strategy.h"
 //Wyrmgus end

@@ -38,6 +38,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "civilization.h"
+#include "faction.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end

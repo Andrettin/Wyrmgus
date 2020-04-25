@@ -50,6 +50,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "faction.h"
 #include "font.h"
 #include "game.h"
 //Wyrmgus start

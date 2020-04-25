@@ -31,6 +31,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "faction.h"
 #include "game.h"
 #include "map/map_template.h"
 #include "player.h"

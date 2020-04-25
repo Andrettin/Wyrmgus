@@ -44,6 +44,7 @@
 #include "currency.h"
 //Wyrmgus start
 #include "editor.h"
+#include "faction.h"
 #include "font.h"
 #include "grand_strategy.h"
 #include "item.h"

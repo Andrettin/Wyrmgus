@@ -36,6 +36,7 @@
 #include "province.h"
 
 #include "civilization.h"
+#include "faction.h"
 #include "iolib.h"
 #include "map/tileset.h"
 #include "plane.h"

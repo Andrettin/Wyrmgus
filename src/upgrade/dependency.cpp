@@ -35,6 +35,7 @@
 #include "age.h"
 #include "character.h"
 #include "config.h"
+#include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "player.h"

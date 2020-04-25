@@ -50,6 +50,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "editor.h"
+#include "faction.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"

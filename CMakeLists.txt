@@ -319,6 +319,7 @@ set(stratagusmain_SRCS
 	src/stratagus/construct.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
+	src/stratagus/faction.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
@@ -789,6 +790,7 @@ set(stratagus_generic_HDRS
 	src/include/world.h
 	src/include/SetupConsole_win32.h
 	src/stratagus/achievement.h
+	src/stratagus/faction.h
 )
 
 source_group(include FILES ${stratagus_generic_HDRS})

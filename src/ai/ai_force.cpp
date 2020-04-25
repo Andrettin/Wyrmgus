@@ -39,6 +39,7 @@
 #include "action/action_attack.h"
 #include "action/action_board.h"
 #include "commands.h"
+#include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"

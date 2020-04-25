@@ -31,7 +31,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <signal.h>
+#include <csignal>
 
 #include "stratagus.h"
 
@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
+#include "faction.h"
 #include "font.h"
 #include "game.h"
 //Wyrmgus start

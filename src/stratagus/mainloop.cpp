@@ -41,6 +41,7 @@
 #include "database/defines.h"
 #include "dialogue.h"
 #include "editor.h"
+#include "faction.h"
 //Wyrmgus start
 #include "font.h"
 //Wyrmgus end

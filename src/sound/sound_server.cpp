@@ -38,6 +38,7 @@
 #include "sound/sound_server.h"
 
 #include "civilization.h"
+#include "faction.h"
 #include "iocompat.h"
 #include "iolib.h"
 //Wyrmgus start

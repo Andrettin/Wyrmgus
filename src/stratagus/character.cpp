@@ -36,6 +36,7 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "config.h"
+#include "faction.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"

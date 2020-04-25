@@ -38,10 +38,9 @@
 #include "campaign.h"
 #include "civilization.h"
 #include "database/defines.h"
-//Wyrmgus start
 #include "editor.h"
+#include "faction.h"
 #include "game.h"
-//Wyrmgus end
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"

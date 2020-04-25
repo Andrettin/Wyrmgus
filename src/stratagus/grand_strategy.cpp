@@ -37,6 +37,7 @@
 
 #include "character.h"
 #include "civilization.h"
+#include "faction.h"
 #include "game.h"	// for loading screen elements
 #include "font.h"	// for grand strategy mode tooltip drawing
 #include "iolib.h"

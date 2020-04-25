@@ -33,6 +33,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "editor.h"
+#include "faction.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"

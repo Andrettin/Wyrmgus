@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "editor.h" //for personal name generation
 //Wyrmgus end
+#include "faction.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map.h"

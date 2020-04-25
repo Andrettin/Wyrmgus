@@ -36,6 +36,7 @@
 #include "commands.h"
 
 #include "actions.h"
+#include "faction.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end

@@ -50,6 +50,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "database/defines.h"
+#include "faction.h"
 #include "game.h"
 #include "editor.h"
 //Wyrmgus start

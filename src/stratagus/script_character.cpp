@@ -37,6 +37,7 @@
 
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
+#include "faction.h"
 #include "grand_strategy.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
