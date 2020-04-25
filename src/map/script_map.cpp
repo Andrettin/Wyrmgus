@@ -1721,12 +1721,7 @@ static int CclDefineSite(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
 				
-				site->Cores.push_back(faction);
-				faction->Cores.push_back(site);
-				faction->sites.push_back(site);
-				if (faction->get_civilization()) {
-					faction->get_civilization()->sites.push_back(site);
-				}
+				site->add_core(faction);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {

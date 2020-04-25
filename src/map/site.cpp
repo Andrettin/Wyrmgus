@@ -64,12 +64,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			this->map_template = map_template::get(value);
 		} else if (key == "core") {
 			faction *faction = faction::get(value);
-			this->Cores.push_back(faction);
-			faction->Cores.push_back(this);
-			faction->sites.push_back(this);
-			if (faction->get_civilization()) {
-				faction->get_civilization()->sites.push_back(this);
-			}
+			this->add_core(faction);
 		} else if (key == "region") {
 			value = FindAndReplaceString(value, "_", "-");
 			
@@ -161,11 +156,15 @@ void site::ProcessConfigData(const CConfigData *config_data)
 
 void site::initialize()
 {
-	if (!this->is_major() && !this->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
-		for (faction *core_faction : this->Cores) {
+	for (faction *core_faction : this->get_cores()) {
+		core_faction->get_civilization()->sites.push_back(this);
+	}
+
+	if (!this->is_major() && !this->get_cores().empty()) { //if the site is a minor one, but has faction cores, remove them
+		for (faction *core_faction : this->get_cores()) {
 			vector::remove(core_faction->Cores, this);
 		}
-		this->Cores.clear();
+		this->cores.clear();
 	}
 
 	if (this->get_map_template() != nullptr) {
@@ -288,6 +287,24 @@ void site::update_border_tile_graphics()
 			}
 		}
 	}
+}
+
+QVariantList site::get_cores_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_cores());
+}
+
+void site::add_core(faction *faction)
+{
+	this->cores.push_back(faction);
+	faction->sites.push_back(this);
+}
+
+
+void site::remove_core(faction *faction)
+{
+	vector::remove(this->cores, faction);
+	vector::remove(faction->sites, this);
 }
 
 }

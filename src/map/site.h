@@ -57,6 +57,7 @@ class site : public named_data_entry, public data_type<site>, public CDataType
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
+	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "site";
@@ -137,6 +138,16 @@ public:
 
 	void update_border_tile_graphics();
 
+	const std::vector<faction *> &get_cores() const
+	{
+		return this->cores;
+	}
+
+	QVariantList get_cores_qvariant_list() const;
+
+	Q_INVOKABLE void add_core(faction *faction);
+	Q_INVOKABLE void remove_core(faction *faction);
+
 private:
 	bool major = false; /// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
@@ -146,7 +157,9 @@ private:
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 public:
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
-	std::vector<faction *> Cores;						/// Factions which have this site as a core
+private:
+	std::vector<faction *> cores;						/// Factions which have this site as a core
+public:
 	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site

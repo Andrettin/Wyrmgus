@@ -291,6 +291,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	if (property_name == "dependencies") {
 		module *module_value = database::get()->get_module(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(module *, module_value));
+	} else if (property_name == "factions" || property_name == "cores") {
+		faction *faction_value = faction::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(faction *, faction_value));
 	} else if (property_name == "files") {
 		const std::filesystem::path filepath(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::filesystem::path &, filepath));
