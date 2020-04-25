@@ -40,7 +40,7 @@ class module final : public QObject
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(QString name READ get_name_qstring)
 	Q_PROPERTY(QVariantList dependencies READ get_dependencies_qvariant_list)
 
 public:
@@ -62,14 +62,14 @@ public:
 		return this->name;
 	}
 
+	Q_INVOKABLE void set_name(const std::string &name)
+	{
+		this->name = name;
+	}
+
 	QString get_name_qstring() const
 	{
 		return QString::fromStdString(this->get_name());
-	}
-
-	void set_name_qstring(const QString &name)
-	{
-		this->name = name.toStdString();
 	}
 
 	const std::filesystem::path &get_path() const

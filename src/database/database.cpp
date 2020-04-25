@@ -80,6 +80,19 @@ void database::process_sml_property_for_object(QObject *object, const sml_proper
 		if (property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) {
 			database::modify_list_property_for_object(object, property_name, property.get_operator(), property.get_value());
 			return;
+		} else if (property_type == QVariant::String) {
+			if (property.get_operator() != sml_operator::assignment) {
+				throw std::runtime_error("Only the assignment operator is available for string properties.");
+			}
+
+			const std::string method_name = "set_" + property.get_key();
+
+			const bool success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, property.get_value()));
+
+			if (!success) {
+				throw std::runtime_error("Failed to set value for string property \"" + property.get_key() + "\".");
+			}
+			return;
 		} else {
 			QVariant new_property_value = database::process_sml_property_value(property, meta_property, object);
 			bool success = object->setProperty(property_name, new_property_value);
@@ -127,12 +140,6 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 		}
 
 		new_property_value = value;
-	} else if (property_type == QVariant::String) {
-		if (property.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for string properties.");
-		}
-
-		new_property_value = QString::fromStdString(property.get_value());
 	} else if (property_type == QVariant::DateTime) {
 		if (property.get_operator() != sml_operator::assignment) {
 			throw std::runtime_error("Only the assignment operator is available for date-time properties.");

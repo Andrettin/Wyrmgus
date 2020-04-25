@@ -39,7 +39,7 @@ class named_data_entry : public data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString name READ get_name_qstring WRITE set_name_qstring)
+	Q_PROPERTY(QString name READ get_name_qstring)
 
 public:
 	named_data_entry(const std::string &identifier) : data_entry(identifier)
@@ -51,7 +51,7 @@ public:
 		return this->name;
 	}
 
-	void set_name(const std::string &name)
+	Q_INVOKABLE void set_name(const std::string &name)
 	{
 		this->name = name;
 	}
@@ -59,11 +59,6 @@ public:
 	QString get_name_qstring() const
 	{
 		return QString::fromStdString(this->get_name());
-	}
-
-	void set_name_qstring(const QString &name)
-	{
-		this->set_name(name.toStdString());
 	}
 
 private:

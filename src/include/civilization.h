@@ -62,8 +62,8 @@ class civilization final : public detailed_data_entry, public data_type<civiliza
 
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
-	Q_PROPERTY(QString interface READ get_interface_qstring WRITE set_interface_qstring)
-	Q_PROPERTY(QString default_color READ get_default_color_qstring WRITE set_default_color_qstring)
+	Q_PROPERTY(QString interface READ get_interface_qstring)
+	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 
 public:
@@ -99,9 +99,9 @@ public:
 		return QString::fromStdString(this->interface);
 	}
 
-	void set_interface_qstring(const QString &interface)
+	Q_INVOKABLE void set_interface(const std::string &interface)
 	{
-		this->interface = interface.toStdString();
+		this->interface = interface;
 	}
 
 	const std::string &get_default_color() const
@@ -114,9 +114,9 @@ public:
 		return QString::fromStdString(this->default_color);
 	}
 
-	void set_default_color_qstring(const QString &default_color)
+	Q_INVOKABLE void set_default_color(const std::string &default_color)
 	{
-		this->default_color = default_color.toStdString();
+		this->default_color = default_color;
 	}
 
 	calendar *get_calendar() const;

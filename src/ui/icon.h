@@ -109,7 +109,7 @@ class CIcon final : public stratagus::data_entry, public stratagus::data_type<CI
 	Q_OBJECT
 
 	Q_PROPERTY(int frame MEMBER frame READ get_frame)
-	Q_PROPERTY(QString file READ get_file_qstring WRITE set_file_qstring)
+	Q_PROPERTY(QString file READ get_file_qstring)
 
 public:
 	static constexpr const char *class_identifier = "icon";
@@ -147,9 +147,9 @@ public:
 		return QString::fromStdString(this->get_file().string());
 	}
 
-	void set_file_qstring(const QString &file)
+	Q_INVOKABLE void set_file(const std::string &filepath)
 	{
-		this->set_file(file.toStdString());
+		this->set_file(std::filesystem::path(filepath));
 	}
 
 	int get_frame() const

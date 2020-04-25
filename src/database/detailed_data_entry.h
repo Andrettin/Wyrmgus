@@ -40,9 +40,9 @@ class detailed_data_entry : public named_data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString description READ get_description_qstring WRITE set_description_qstring)
-	Q_PROPERTY(QString quote READ get_quote_qstring WRITE set_quote_qstring)
-	Q_PROPERTY(QString background READ get_background_qstring WRITE set_background_qstring)
+	Q_PROPERTY(QString description READ get_description_qstring)
+	Q_PROPERTY(QString quote READ get_quote_qstring)
+	Q_PROPERTY(QString background READ get_background_qstring)
 
 public:
 	detailed_data_entry(const std::string &identifier) : named_data_entry(identifier)
@@ -54,7 +54,7 @@ public:
 		return this->description;
 	}
 
-	void set_description(const std::string &description)
+	Q_INVOKABLE void set_description(const std::string &description)
 	{
 		this->description = description;
 	}
@@ -64,17 +64,12 @@ public:
 		return QString::fromStdString(this->get_description());
 	}
 
-	void set_description_qstring(const QString &description)
-	{
-		this->set_description(description.toStdString());
-	}
-
 	const std::string &get_quote() const
 	{
 		return this->quote;
 	}
 
-	void set_quote(const std::string &quote)
+	Q_INVOKABLE void set_quote(const std::string &quote)
 	{
 		this->quote = quote;
 	}
@@ -84,17 +79,12 @@ public:
 		return QString::fromStdString(this->get_quote());
 	}
 
-	void set_quote_qstring(const QString &quote)
-	{
-		this->quote = quote.toStdString();
-	}
-
 	const std::string &get_background() const
 	{
 		return this->background;
 	}
 
-	void set_background(const std::string &background)
+	Q_INVOKABLE void set_background(const std::string &background)
 	{
 		this->background = background;
 	}
@@ -102,11 +92,6 @@ public:
 	QString get_background_qstring() const
 	{
 		return QString::fromStdString(this->get_background());
-	}
-
-	void set_background_qstring(const QString &background)
-	{
-		this->set_background(background.toStdString());
 	}
 
 private:

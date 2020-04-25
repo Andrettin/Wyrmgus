@@ -101,7 +101,7 @@ class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::
 
 	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring WRITE set_requirements_string_qstring)
+	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
 	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
@@ -162,9 +162,9 @@ public:
 		return QString::fromStdString(this->get_requirements_string());
 	}
 
-	void set_requirements_string_qstring(const QString &requirements_string)
+	Q_INVOKABLE void set_requirements_string(const std::string &requirements_string)
 	{
-		this->requirements_string = requirements_string.toStdString();
+		this->requirements_string = requirements_string;
 	}
 
 	bool is_ability() const

@@ -87,10 +87,10 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(stratagus::plane* plane MEMBER plane READ get_plane)
 	Q_PROPERTY(stratagus::world* world READ get_world WRITE set_world)
 	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
-	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring WRITE set_terrain_file_qstring)
-	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring WRITE set_overlay_terrain_file_qstring)
-	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring WRITE set_terrain_image_qstring)
-	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring WRITE set_overlay_terrain_image_qstring)
+	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
+	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
+	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring)
+	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring)
 	Q_PROPERTY(stratagus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
@@ -346,9 +346,9 @@ public:
 		return QString::fromStdString(this->get_terrain_file().string());
 	}
 
-	void set_terrain_file_qstring(const QString &filepath)
+	Q_INVOKABLE void set_terrain_file(const std::string &filepath)
 	{
-		this->set_terrain_file(filepath.toStdString());
+		this->set_terrain_file(std::filesystem::path(filepath));
 	}
 
 	const std::filesystem::path &get_overlay_terrain_file() const
@@ -363,9 +363,9 @@ public:
 		return QString::fromStdString(this->get_overlay_terrain_file().string());
 	}
 
-	void set_overlay_terrain_file_qstring(const QString &filepath)
+	Q_INVOKABLE void set_overlay_terrain_file(const std::string &filepath)
 	{
-		this->set_overlay_terrain_file(filepath.toStdString());
+		this->set_overlay_terrain_file(std::filesystem::path(filepath));
 	}
 
 	const std::filesystem::path &get_terrain_image() const
@@ -380,9 +380,9 @@ public:
 		return QString::fromStdString(this->get_terrain_image().string());
 	}
 
-	void set_terrain_image_qstring(const QString &filepath)
+	Q_INVOKABLE void set_terrain_image(const std::string &filepath)
 	{
-		this->set_terrain_image(filepath.toStdString());
+		this->set_terrain_image(std::filesystem::path(filepath));
 	}
 
 	const std::filesystem::path &get_overlay_terrain_image() const
@@ -397,9 +397,9 @@ public:
 		return QString::fromStdString(this->get_overlay_terrain_image().string());
 	}
 
-	void set_overlay_terrain_image_qstring(const QString &filepath)
+	Q_INVOKABLE void set_overlay_terrain_image(const std::string &filepath)
 	{
-		this->set_overlay_terrain_image(filepath.toStdString());
+		this->set_overlay_terrain_image(std::filesystem::path(filepath));
 	}
 
 	const QPoint &get_subtemplate_pos() const
