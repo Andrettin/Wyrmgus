@@ -988,8 +988,13 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 {
 	const stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
 	
-	for (size_t i = 0; i < campaign->map_templates.size(); ++i) {
-		campaign->map_templates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
+	for (size_t i = 0; i < campaign->get_map_templates().size(); ++i) {
+		stratagus::map_template *map_template = campaign->get_map_templates()[i];
+		QPoint start_pos(0, 0);
+		if (i < campaign->MapTemplateStartPos.size()) {
+			start_pos = campaign->MapTemplateStartPos[i];
+		}
+		map_template->Apply(start_pos, Vec2i(0, 0), i);
 	}
 }
 //Wyrmgus end

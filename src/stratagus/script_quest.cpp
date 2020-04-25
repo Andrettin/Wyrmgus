@@ -415,7 +415,7 @@ static int CclDefineCampaign(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			campaign->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
-			campaign->Description = LuaToString(l, -1);
+			campaign->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			campaign->faction = stratagus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
@@ -513,7 +513,7 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushstring(l, campaign->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, campaign->Description.c_str());
+		lua_pushstring(l, campaign->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
 		lua_pushnumber(l, campaign->get_start_date().date().year());
@@ -547,16 +547,32 @@ static int CclGetCampaignData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "MapWidth")) {
-		lua_pushnumber(l, campaign->MapSizes[0].x);
+		if (!campaign->MapSizes.empty()) {
+			lua_pushnumber(l, campaign->MapSizes[0].x);
+		} else {
+			lua_pushnumber(l, campaign->get_map_templates().front()->get_applied_width());
+		}
 		return 1;
 	} else if (!strcmp(data, "MapHeight")) {
-		lua_pushnumber(l, campaign->MapSizes[0].y);
+		if (!campaign->MapSizes.empty()) {
+			lua_pushnumber(l, campaign->MapSizes[0].y);
+		} else {
+			lua_pushnumber(l, campaign->get_map_templates().front()->get_applied_height());
+		}
 		return 1;
 	} else if (!strcmp(data, "MapTemplateStartPosX")) {
-		lua_pushnumber(l, campaign->MapTemplateStartPos[0].x);
+		if (!campaign->MapTemplateStartPos.empty()) {
+			lua_pushnumber(l, campaign->MapTemplateStartPos[0].x);
+		} else {
+			lua_pushnumber(l, 0);
+		}
 		return 1;
 	} else if (!strcmp(data, "MapTemplateStartPosY")) {
-		lua_pushnumber(l, campaign->MapTemplateStartPos[0].y);
+		if (!campaign->MapTemplateStartPos.empty()) {
+			lua_pushnumber(l, campaign->MapTemplateStartPos[0].y);
+		} else {
+			lua_pushnumber(l, 0);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

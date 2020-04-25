@@ -28,7 +28,7 @@
 #pragma once
 
 #include "database/data_type.h"
-#include "database/named_data_entry.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
@@ -42,16 +42,20 @@ int CclGetCampaignData(lua_State *l);
 
 namespace stratagus {
 
+class calendar;
 class faction;
 class map_template;
 class timeline;
 
-class campaign : public named_data_entry, public data_type<campaign>, public CDataType
+class campaign : public detailed_data_entry, public data_type<campaign>, public CDataType
 {
 	Q_OBJECT
 
 	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date)
+	Q_PROPERTY(stratagus::calendar* start_date_calendar MEMBER start_date_calendar)
 	Q_PROPERTY(stratagus::timeline* timeline MEMBER timeline READ get_timeline)
+	Q_PROPERTY(stratagus::faction*faction MEMBER faction READ get_faction)
+	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "campaign";
@@ -60,11 +64,12 @@ public:
 	static void initialize_all();
 
 public:
-	campaign(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	campaign(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 	{
 	}
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void initialize() override;
 	
 	const QDateTime &get_start_date() const
 	{
@@ -92,16 +97,30 @@ public:
 
 	bool contains_timeline_date(const timeline *timeline, const QDateTime &date) const;
 
+	const std::vector<map_template *> &get_map_templates() const
+	{
+		return this->map_templates;
+	}
+
+	QVariantList get_map_templates_qvariant_list() const;
+
+	Q_INVOKABLE void add_map_template(map_template *map_template)
+	{
+		this->map_templates.push_back(map_template);
+	}
+
+	Q_INVOKABLE void remove_map_template(map_template *map_template);
+
 private:
-	std::string Description;		/// Description of the campaign
-	QDateTime start_date; //the starting date of the campaign
+	QDateTime start_date; //the starting date for the campaign
+	calendar *start_date_calendar = nullptr; //the calendar for the start date
 	timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
 	faction *faction = nullptr;	/// Which faction the player plays as in the campaign
-public:
 	std::vector<map_template *> map_templates; //map templates used by the campaign
+public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 	

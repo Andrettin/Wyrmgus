@@ -476,7 +476,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (z >= (int)CMap::Map.MapLayers.size()) {
 		int width = std::min(this->get_applied_width(), CMap::Map.Info.MapWidth);
 		int height = std::min(this->get_applied_height(), CMap::Map.Info.MapHeight);
-		if (current_campaign) {
+		if (current_campaign != nullptr && z < static_cast<int>(current_campaign->MapSizes.size())) {
 			//applies the map size set for the campaign for this map layer; for the first map layer that is already Map.Info.Width/Height, so it isn't necessary here
 			width = current_campaign->MapSizes[z].x;
 			height = current_campaign->MapSizes[z].y;

@@ -36,8 +36,11 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
+#include "time/calendar.h"
 #include "time/timeline.h"
+#include "util/container_util.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 
 namespace stratagus {
 
@@ -70,7 +73,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "description") {
-			this->Description = value;
+			this->set_description(value);
 		} else if (key == "faction") {
 			stratagus::faction *faction = faction::get(value);
 			this->faction = faction;
@@ -138,6 +141,20 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
+void campaign::initialize()
+{
+	if (this->start_date_calendar != nullptr) {
+		if (!this->start_date_calendar->is_initialized()) {
+			this->start_date_calendar->initialize();
+		}
+
+		this->start_date = this->start_date.addYears(this->start_date_calendar->get_year_offset());
+		this->start_date_calendar = nullptr;
+	}
+
+	data_entry::initialize();
+}
+
 std::string campaign::GetSpecies() const
 {
 	if (this->get_faction() != nullptr && this->get_faction()->get_civilization() != nullptr) {
@@ -171,6 +188,16 @@ bool campaign::contains_timeline_date(const stratagus::timeline *timeline, const
 	}
 
 	return this->get_timeline()->contains_timeline_date(timeline, date);
+}
+
+QVariantList campaign::get_map_templates_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_map_templates());
+}
+
+void campaign::remove_map_template(map_template *map_template)
+{
+	vector::remove(this->map_templates, map_template);
 }
 
 }
