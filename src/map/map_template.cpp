@@ -948,6 +948,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
+		site->load_history();
+
 		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
 			if (!UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->TileSize - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
@@ -990,11 +992,14 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 		
-		const faction *site_owner = nullptr;
-		for (std::map<CDate, const faction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
-			if (start_date.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
-				site_owner = owner_iterator->second;
-				break;
+		const faction *site_owner = site->get_owner_faction();
+		if (site_owner == nullptr) {
+			//fall back to the old historical owners functionality
+			for (std::map<CDate, const faction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
+				if (start_date.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
+					site_owner = owner_iterator->second;
+					break;
+				}
 			}
 		}
 		
@@ -1041,6 +1046,62 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		}
 		
 		bool first_building = true;
+		for (const unit_class *building_class : site->get_building_classes()) {
+			const CUnitType *unit_type = site_owner->get_class_unit_type(building_class);
+
+			if (unit_type == nullptr) {
+				continue;
+			}
+
+			if (unit_type->TerrainType) {
+				throw std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site.");
+			}
+
+			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_major()) {
+				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a major one.");
+			}
+
+			const QPoint unit_offset = unit_type->get_tile_center_pos_offset();
+			if (first_building) {
+				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + QPoint(unit_type->TileSize - 1), z)) {
+					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on (" + std::to_string(site_raw_pos.x()) + ", " + std::to_string(site_raw_pos.y()) + "), but it cannot be there.");
+				}
+			}
+
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true);
+
+			if (first_building) {
+				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) { //if one building is representing a minor site, make it have the site's name
+					unit->Name = site->GetCulturalName(site_owner->get_civilization());
+				}
+				first_building = false;
+			}
+
+			if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+				unit->UpdateBuildingSettlementAssignment();
+			}
+
+			if (pathway_type) {
+				for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
+					for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
+						if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
+							continue;
+						}
+						CMapField &mf = *unit->MapLayer->Field(x, y);
+						if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+							continue;
+						}
+						const QPoint pathway_pos(x, y);
+						if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer->ID)) {
+							continue;
+						}
+
+						mf.SetTerrain(pathway_type->TerrainType);
+					}
+				}
+			}
+		}
+
 		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
 			if (
 				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
@@ -1465,7 +1526,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			
 			if (unit_pos.x == -1 || unit_pos.y == -1) {
 				unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
-				unit_pos += unit_type->GetTileCenterPosOffset();
+				unit_pos += Vec2i(unit_type->get_tile_center_pos_offset());
 			}
 		} else {
 			if (random) {
@@ -1490,7 +1551,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		}
 		for (int i = 0; i < historical_unit->get_quantity(); ++i) {
 			//item units only use factions to generate special properties for them
-			CUnit *unit = CreateUnit(unit_pos - unit_type->GetTileCenterPosOffset(), *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
 			if (unit_type->BoolFlag[ITEM_INDEX].value) {
 				unit->GenerateSpecialProperties(nullptr, unit_player, false);
 			}
@@ -1568,7 +1629,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		} else {
 			hero_player = CPlayer::Players[PlayerNumNeutral];
 		}
-		CUnit *unit = CreateUnit(hero_pos - character->Type->GetTileCenterPosOffset(), *character->Type, hero_player, z);
+		CUnit *unit = CreateUnit(hero_pos - character->Type->get_tile_center_pos_offset(), *character->Type, hero_player, z);
 		unit->SetCharacter(character->Ident);
 		unit->Active = 0;
 		hero_player->ChangeUnitTypeAiActiveCount(character->Type, -1);

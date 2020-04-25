@@ -44,7 +44,9 @@ struct lua_State;
 namespace stratagus {
 	class faction;
 	class historical_location;
+	class site;
 	class terrain_type;
+	class unit_class;
 }
 
 int CclDefineMapTemplate(lua_State *l);

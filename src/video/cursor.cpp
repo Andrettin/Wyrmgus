@@ -231,7 +231,7 @@ void DrawBuildingCursor()
 	PushClipping();
 	vp.SetClipping();
 
-	const QPoint center_tile_pos = mpos + CursorBuilding->GetTileCenterPosOffset();
+	const QPoint center_tile_pos = mpos + CursorBuilding->get_tile_center_pos_offset();
 	const bool is_underground = UI.CurrentMapLayer->Field(center_tile_pos)->Flags & MapFieldUnderground;
 	const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 

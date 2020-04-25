@@ -814,7 +814,7 @@ public:
 		return this->get_scaled_tile_pixel_size() / 2;
 	}
 
-	Vec2i GetTileCenterPosOffset() const;
+	QPoint get_tile_center_pos_offset() const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start

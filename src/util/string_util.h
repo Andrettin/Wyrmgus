@@ -131,9 +131,9 @@ inline QDateTime to_date(const std::string &date_str)
 
 inline std::string get_singular_form(const std::string &str)
 {
-	std::string singular_form;
-
-	if (str.substr(str.size() - 2, 2) == "ys") {
+	if (str.substr(str.size() - 4, 4) == "sses") {
+		return str.substr(0, str.size() - 2); //e.g. "classes"
+	} else if (str.substr(str.size() - 2, 2) == "ys") {
 		return str.substr(0, str.size() - 2);
 	} else if (str.substr(str.size() - 3, 3) == "ies") {
 		if (str != "species") {

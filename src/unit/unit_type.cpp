@@ -1286,8 +1286,9 @@ PixelSize CUnitType::get_scaled_tile_pixel_size() const
 	return this->get_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
 }
 
-Vec2i CUnitType::GetTileCenterPosOffset() const
+QPoint CUnitType::get_tile_center_pos_offset() const
 {
+	//the offset from the tile's top-left position to its center tile
 	return (this->GetTileSize() - 1) / 2;
 }
 	

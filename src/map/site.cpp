@@ -40,6 +40,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "util/container_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -222,6 +223,17 @@ void site::set_owner(CPlayer *player)
 
 	this->owner = player;
 	this->update_border_tile_graphics();
+	this->owner_faction = player ? player->get_faction() : nullptr;
+}
+
+QVariantList site::get_building_classes_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_building_classes());
+}
+
+void site::remove_building_class(unit_class *building_class)
+{
+	vector::remove_one(this->building_classes, building_class);
 }
 
 void site::update_border_tile_graphics()

@@ -5384,7 +5384,7 @@ PixelSize CUnit::get_scaled_half_tile_pixel_size() const
 QPoint CUnit::get_center_tile_pos() const
 {
 	const CUnit *first_container = this->GetFirstContainer();
-	return first_container->tilePos + first_container->Type->GetTileCenterPosOffset();
+	return first_container->tilePos + first_container->Type->get_tile_center_pos_offset();
 }
 
 QPoint CUnit::get_scaled_pixel_offset() const

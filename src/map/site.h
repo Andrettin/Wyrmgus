@@ -31,7 +31,6 @@
 #include "database/named_data_entry.h"
 #include "data_type.h"
 #include "time/date.h"
-#include "vec2i.h"
 
 class CPlayer;
 class CRegion;
@@ -56,6 +55,8 @@ class site : public named_data_entry, public data_type<site>, public CDataType
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(stratagus::map_template* map_template MEMBER map_template READ get_map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
+	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
+	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "site";
@@ -67,6 +68,12 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
+
+	virtual void reset_history() override
+	{
+		this->owner_faction = nullptr;
+		this->building_classes.clear();
+	}
 
 	std::string GetCulturalName(const civilization *civilization) const;
 
@@ -99,6 +106,25 @@ public:
 
 	void set_owner(CPlayer *player);
 
+	faction *get_owner_faction() const
+	{
+		return this->owner_faction;
+	}
+
+	const std::vector<unit_class *> &get_building_classes() const
+	{
+		return this->building_classes;
+	}
+
+	QVariantList get_building_classes_qvariant_list() const;
+
+	Q_INVOKABLE void add_building_class(unit_class *building_class)
+	{
+		this->building_classes.push_back(building_class);
+	}
+
+	Q_INVOKABLE void remove_building_class(unit_class *building_class);
+
 	void add_border_tile(const QPoint &tile_pos)
 	{
 		this->border_tiles.push_back(tile_pos);
@@ -116,12 +142,14 @@ private:
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
 	map_template *map_template = nullptr; /// Map template where this site is located
 	CPlayer *owner = nullptr;
+	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is set to its player owner's faction
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 public:
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
 	std::vector<faction *> Cores;						/// Factions which have this site as a core
 	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
-	std::map<CDate, const faction *> HistoricalOwners;				/// Historical owners of the site
+	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start
+	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date

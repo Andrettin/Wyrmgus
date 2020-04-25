@@ -294,6 +294,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "files") {
 		const std::filesystem::path filepath(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::filesystem::path &, filepath));
+	} else if (property_name == "unit_classes" || property_name == "building_classes") {
+		unit_class *unit_class_value = unit_class::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(unit_class *, unit_class_value));
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {

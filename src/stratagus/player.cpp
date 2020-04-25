@@ -1316,6 +1316,15 @@ void CPlayer::set_civilization(int civilization)
 	}
 }
 
+stratagus::faction *CPlayer::get_faction() const
+{
+	if (this->Faction != -1) {
+		return stratagus::faction::get_all()[this->Faction];
+	}
+
+	return nullptr;
+}
+
 /**
 **  Change player faction.
 **

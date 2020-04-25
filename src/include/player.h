@@ -237,6 +237,7 @@ public:
 	//Wyrmgus start
 	const stratagus::civilization *get_civilization() const;
 	void set_civilization(int civilization);
+	stratagus::faction *get_faction() const;
 	void SetFaction(const stratagus::faction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
