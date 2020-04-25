@@ -140,8 +140,8 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 
 std::string campaign::GetSpecies() const
 {
-	if (this->get_faction() != nullptr && this->get_faction()->civilization != nullptr) {
-		return PlayerRaces.Species[this->get_faction()->civilization->ID];
+	if (this->get_faction() != nullptr && this->get_faction()->get_civilization() != nullptr) {
+		return PlayerRaces.Species[this->get_faction()->get_civilization()->ID];
 	}
 
 	return std::string();

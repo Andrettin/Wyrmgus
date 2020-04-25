@@ -252,7 +252,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->civilization == -1 || caster.Type->civilization != condition->FactionEquivalent->civilization->ID || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->civilization == -1 || caster.Type->civilization != condition->FactionEquivalent->get_civilization()->ID || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

@@ -46,6 +46,7 @@
 #include "map/terrain_type.h"
 #include "plane.h"
 #include "sound/sound.h"
+#include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "time/timeline.h"
 #include "ui/icon.h"
@@ -154,6 +155,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 
 		if (property_class_name == "stratagus::age*") {
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
+		} else if (property_class_name == "stratagus::calendar*") {
+			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
 		} else if (property_class_name == "stratagus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {

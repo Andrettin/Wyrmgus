@@ -30,13 +30,13 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "player.h" //for certain enums
-#include "ui/icon.h"
 
 class CAiBuildingTemplate;
 class CCurrency;
 class CDeity;
 class CDynasty;
 class CForceTemplate;
+class CIcon;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
@@ -45,11 +45,15 @@ int CclDefineFaction(lua_State *l);
 
 namespace stratagus {
 
+class civilization;
 class unit_class;
 
 class faction : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
+
+	Q_PROPERTY(stratagus::civilization *civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(CIcon *icon MEMBER icon READ get_icon)
 
 public:
 	static constexpr const char *class_identifier = "faction";
@@ -68,11 +72,30 @@ public:
 
 	~faction();
 
+	virtual void process_sml_property(const sml_property &property);
+	virtual void process_sml_scope(const sml_data &scope);
+	virtual void initialize() override;
 	virtual void check() const override;
+
+	civilization *get_civilization() const
+	{
+		return this->civilization;
+	}
+
+	CIcon *get_icon() const
+	{
+		return this->icon;
+	}
 	
+	CCurrency *GetCurrency() const;
+
+	faction_tier get_default_tier() const
+	{
+		return this->default_tier;
+	}
+
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
-	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &get_ship_names() const;
@@ -102,14 +125,18 @@ public:
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
+private:
 	stratagus::civilization *civilization = nullptr; //faction civilization
+public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
-	int DefaultTier = FactionTierBarony;								/// default faction tier
+private:
+	faction_tier default_tier = faction_tier::barony;					/// default faction tier
+public:
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
 	int ParentFaction = -1;												/// parent faction of this faction
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
-	IconConfig Icon;													/// Faction's icon
+	CIcon *icon = nullptr;												/// Faction's icon
 	CCurrency *Currency = nullptr;										/// The faction's currency
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
@@ -117,8 +144,8 @@ public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
-	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
+	std::string Titles[MaxGovernmentTypes][static_cast<int>(faction_tier::count)];			/// this faction's title for each government type and faction tier
+	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for a particular faction
@@ -134,7 +161,7 @@ public:
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
-	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
+	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 	std::map<std::pair<CDate, faction *>, Diplomacy> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource

@@ -1838,11 +1838,11 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction
 	if (potential_names.size() == 0 && this->civilization != -1) {
 		int civilization_id = this->civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this == faction->get_class_unit_type(this->get_unit_class())) {
-				civilization_id = faction->civilization->ID;
+			if (faction && civilization_id != faction->get_civilization()->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->get_civilization()->ID] && this == faction->get_class_unit_type(this->get_unit_class())) {
+				civilization_id = faction->get_civilization()->ID;
 			}
 			stratagus::civilization *civilization = stratagus::civilization::get_all()[civilization_id];
-			if (faction && faction->civilization != civilization) {
+			if (faction && faction->get_civilization() != civilization) {
 				faction = nullptr;
 			}
 			if (this->Faction != -1 && !faction) {

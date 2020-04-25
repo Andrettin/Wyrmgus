@@ -468,16 +468,16 @@ enum FactionTypes {
 	MaxFactionTypes
 };
 
-enum FactionTiers {
-	FactionTierNoFactionTier,
-	FactionTierBarony,
-	FactionTierCounty,
-	FactionTierDuchy,
-	FactionTierGrandDuchy,
-	FactionTierKingdom,
-	FactionTierEmpire,
+enum class faction_tier {
+	none,
+	barony,
+	county,
+	duchy,
+	grand_duchy,
+	kingdom,
+	empire,
 	
-	MaxFactionTiers
+	count
 };
 
 enum ForceTypes {

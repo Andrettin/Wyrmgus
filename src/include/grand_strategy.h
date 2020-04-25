@@ -154,7 +154,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
+		Faction(-1), civilization(-1), FactionTier(faction_tier::barony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -180,7 +180,7 @@ public:
 	int Faction;														/// The faction's ID (-1 = none).
 	int civilization;													/// Civilization of the faction (-1 = none).
 	int GovernmentType;													/// Government type of the faction (-1 = none).
-	int FactionTier;													/// What is the tier of this faction (barony, etc.).
+	faction_tier FactionTier;													/// What is the tier of this faction (barony, etc.).
 	CGrandStrategyProvince *Capital;									/// Capital province of this faction
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;									/// Provinces owned by this faction
@@ -310,10 +310,9 @@ extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPo
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern std::string GetDiplomacyStateNameById(int diplomacy_state);
 extern Diplomacy GetDiplomacyStateIdByName(std::string diplomacy_state);
-extern std::string GetFactionTierNameById(int faction_tier);
-extern int GetFactionTierIdByName(std::string faction_tier);
+extern std::string GetFactionTierNameById(const faction_tier tier);
+extern faction_tier GetFactionTierIdByName(const std::string &tier);
 extern int GetProvinceId(std::string province_name);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
@@ -340,8 +339,6 @@ extern std::string GetProvinceOwner(std::string province_name);
 extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
 extern void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
 extern std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
-extern void SetFactionTier(std::string civilization_name, std::string faction_name, std::string faction_tier_name);
-extern std::string GetFactionTier(std::string civilization_name, std::string faction_name);
 extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name);

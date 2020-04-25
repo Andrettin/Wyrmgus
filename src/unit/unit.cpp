@@ -3399,8 +3399,8 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	if (this->Player->Faction != -1) {
 		faction = stratagus::faction::get_all()[this->Player->Faction];
 		
-		if (civilization_id != -1 && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Type == faction->get_class_unit_type(this->Type->get_unit_class())) {
-			civilization_id = faction->civilization->ID;
+		if (civilization_id != -1 && civilization_id != faction->get_civilization()->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->get_civilization()->ID] && this->Type == faction->get_class_unit_type(this->Type->get_unit_class())) {
+			civilization_id = faction->get_civilization()->ID;
 		}
 	}
 	

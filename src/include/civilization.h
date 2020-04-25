@@ -203,7 +203,7 @@ private:
 public:
 	std::vector<CDeity *> Deities;
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
+	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
 	friend int ::CclDefineCivilization(lua_State *l);

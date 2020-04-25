@@ -1423,9 +1423,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->change_civilization_to != -1 && GameRunning && um->change_civilization_to != player.Race) {
 		player.set_civilization(um->change_civilization_to);
 	}
-	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->civilization->ID != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
-		if (um->ChangeFactionTo->civilization->ID != player.Race) {
-			player.set_civilization(um->ChangeFactionTo->civilization->ID);
+	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->get_civilization()->ID != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
+		if (um->ChangeFactionTo->get_civilization()->ID != player.Race) {
+			player.set_civilization(um->ChangeFactionTo->get_civilization()->ID);
 		}
 		player.SetFaction(um->ChangeFactionTo);
 	}

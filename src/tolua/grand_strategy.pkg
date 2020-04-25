@@ -30,8 +30,6 @@ extern std::string GetProvinceOwner(std::string province_name);
 extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
 extern void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
 extern std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
-extern void SetFactionTier(std::string civilization_name, std::string faction_name, std::string faction_tier_name);
-extern std::string GetFactionTier(std::string civilization_name, std::string faction_name);
 extern void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name);
 extern std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);

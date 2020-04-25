@@ -30,6 +30,7 @@
 #include "faction.h"
 
 #include "civilization.h"
+#include "grand_strategy.h" //for the faction tier string to enum conversion
 #include "luacallback.h"
 
 namespace stratagus {
@@ -49,6 +50,89 @@ faction::~faction()
 	if (this->Conditions) {
 		delete Conditions;
 	}
+}
+
+void faction::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "type") {
+		const int faction_type = GetFactionTypeIdByName(value);
+		if (faction_type != -1) {
+			this->Type = faction_type;
+		} else {
+			throw std::runtime_error("Faction type \"" + value + "\" doesn't exist.");
+		}
+	} else if (key == "default_tier") {
+		const faction_tier tier = GetFactionTierIdByName(value);
+		if (tier != faction_tier::none) {
+			this->default_tier = tier;
+		} else {
+			throw std::runtime_error("Faction tier \"" + value + "\" doesn't exist.");
+		}
+	} else if (key == "faction_upgrade") {
+		this->FactionUpgrade = value;
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void faction::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "colors") {
+		this->Colors.clear(); //remove previously defined colors
+
+		for (const std::string &value : values) {
+			const int color = GetPlayerColorIndexByName(value);
+			if (color != -1) {
+				this->Colors.push_back(color);
+			} else {
+				throw std::runtime_error("Player color \"" + value + "\" doesn't exist.");
+			}
+		}
+	} else if (tag == "develops_from") {
+		for (const std::string &value : values) {
+			faction *other_faction = faction::get(value);
+			this->DevelopsFrom.push_back(other_faction);
+			other_faction->DevelopsTo.push_back(this);
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void faction::initialize()
+{
+	if (this->Type == FactionTypeTribe) {
+		this->DefiniteArticle = true;
+	}
+
+	if (this->ParentFaction != -1) {
+		const faction *parent_faction = faction::get_all()[this->ParentFaction];
+
+		if (this->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
+			this->FactionUpgrade = parent_faction->FactionUpgrade;
+		}
+
+		//inherit button icons from parent civilization, for button actions which none are specified
+		for (std::map<ButtonCmd, IconConfig>::const_iterator iterator = parent_faction->ButtonIcons.begin(); iterator != parent_faction->ButtonIcons.end(); ++iterator) {
+			if (this->ButtonIcons.find(iterator->first) == this->ButtonIcons.end()) {
+				this->ButtonIcons[iterator->first] = iterator->second;
+			}
+		}
+
+		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = parent_faction->HistoricalUpgrades.begin(); iterator != parent_faction->HistoricalUpgrades.end(); ++iterator) {
+			if (this->HistoricalUpgrades.find(iterator->first) == this->HistoricalUpgrades.end()) {
+				this->HistoricalUpgrades[iterator->first] = iterator->second;
+			}
+		}
+	}
+
+	data_entry::initialize();
 }
 
 void faction::check() const

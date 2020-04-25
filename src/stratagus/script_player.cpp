@@ -1029,9 +1029,9 @@ static int CclDefineCivilization(lua_State *l)
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				civilization->MinisterTitles[title][gender][government_type][faction_tier] = LuaToString(l, -1, k + 1);
+				civilization->MinisterTitles[title][gender][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
@@ -1485,7 +1485,7 @@ static int CclGetCivilizationData(lua_State *l)
 		std::vector<std::string> factions;
 		for (stratagus::faction *faction : stratagus::faction::get_all())
 		{
-			if (faction->civilization != civilization) {
+			if (faction->get_civilization() != civilization) {
 				continue;
 			}
 			
@@ -1666,9 +1666,9 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
-			int faction_tier = GetFactionTierIdByName(faction_tier_name);
-			if (faction_tier != -1) {
-				faction->DefaultTier = faction_tier;
+			const faction_tier tier = GetFactionTierIdByName(faction_tier_name);
+			if (tier != faction_tier::none) {
+				faction->default_tier = tier;
 			} else {
 				LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 			}
@@ -1689,9 +1689,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefiniteArticle")) {
 			faction->DefiniteArticle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			faction->Icon.Name = LuaToString(l, -1);
-			faction->Icon.Icon = nullptr;
-			faction->Icon.Load();
+			faction->icon = CIcon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			faction->Currency = currency;
@@ -1723,9 +1721,9 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				faction->Titles[government_type][faction_tier] = LuaToString(l, -1, k + 1);
+				faction->Titles[government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "MinisterTitles")) {
 			if (!lua_istable(l, -1)) {
@@ -1739,9 +1737,9 @@ static int CclDefineFaction(lua_State *l)
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				faction->MinisterTitles[title][gender][government_type][faction_tier] = LuaToString(l, -1, k + 1);
+				faction->MinisterTitles[title][gender][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
 			faction->FactionUpgrade = LuaToString(l, -1);
@@ -1907,11 +1905,11 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string faction_tier_name = LuaToString(l, -1, j + 1);
-				int faction_tier = GetFactionTierIdByName(faction_tier_name);
-				if (faction_tier == -1) {
+				const faction_tier tier = GetFactionTierIdByName(faction_tier_name);
+				if (tier == faction_tier::none) {
 					LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 				}
-				faction->HistoricalTiers[year] = faction_tier;
+				faction->HistoricalTiers[year] = tier;
 			}
 		} else if (!strcmp(value, "HistoricalGovernmentTypes")) {
 			if (!lua_istable(l, -1)) {
@@ -1991,30 +1989,9 @@ static int CclDefineFaction(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-	
-	if (faction->Type == FactionTypeTribe) {
-		faction->DefiniteArticle = true;
-	}
-	
+		
 	if (!parent_faction.empty()) { //process this here
 		faction->ParentFaction = stratagus::faction::get(parent_faction)->ID;
-		
-		if (faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
-			faction->FactionUpgrade = stratagus::faction::get_all()[faction->ParentFaction]->FactionUpgrade;
-		}
-		
-		//inherit button icons from parent civilization, for button actions which none are specified
-		for (std::map<ButtonCmd, IconConfig>::iterator iterator = stratagus::faction::get_all()[faction->ParentFaction]->ButtonIcons.begin(); iterator != stratagus::faction::get_all()[faction->ParentFaction]->ButtonIcons.end(); ++iterator) {
-			if (faction->ButtonIcons.find(iterator->first) == faction->ButtonIcons.end()) {
-				faction->ButtonIcons[iterator->first] = iterator->second;
-			}
-		}
-		
-		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = stratagus::faction::get_all()[faction->ParentFaction]->HistoricalUpgrades.begin(); iterator != stratagus::faction::get_all()[faction->ParentFaction]->HistoricalUpgrades.end(); ++iterator) {
-			if (faction->HistoricalUpgrades.find(iterator->first) == faction->HistoricalUpgrades.end()) {
-				faction->HistoricalUpgrades[iterator->first] = iterator->second;
-			}
-		}
 	} else if (parent_faction.empty()) {
 		faction->ParentFaction = -1; // to allow redefinitions to remove the parent faction setting
 	}
@@ -2461,7 +2438,7 @@ static int CclGetFactions(lua_State *l)
 			if (faction_type != -1 && faction->Type != faction_type) {
 				continue;
 			}
-			if (faction->civilization == civilization) {
+			if (faction->get_civilization() == civilization) {
 				factions.push_back(faction->get_identifier());
 			}
 		}
@@ -2545,8 +2522,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (faction->civilization != nullptr) {
-			lua_pushstring(l, faction->civilization->get_identifier().c_str());
+		if (faction->get_civilization() != nullptr) {
+			lua_pushstring(l, faction->get_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

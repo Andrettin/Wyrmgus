@@ -1454,34 +1454,6 @@ std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std:
 	return "";
 }
 
-void SetFactionTier(std::string civilization_name, std::string faction_name, std::string faction_tier_name)
-{
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-	
-	int faction_tier_id = GetFactionTierIdByName(faction_tier_name);
-	
-	if (faction_tier_id == -1) {
-		return;
-	}
-
-	if (civilization) {
-		int faction = stratagus::faction::get(faction_name)->ID;
-		GrandStrategyGame.Factions[civilization->ID][faction]->FactionTier = faction_tier_id;
-	}
-}
-
-std::string GetFactionTier(std::string civilization_name, std::string faction_name)
-{
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-
-	if (civilization) {
-		int faction = stratagus::faction::get(faction_name)->ID;
-		return GetFactionTierNameById(GrandStrategyGame.Factions[civilization->ID][faction]->FactionTier);
-	}
-	
-	return "";
-}
-
 bool IsGrandStrategyUnit(const CUnitType &type)
 {
 	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "caravan") {
@@ -1627,44 +1599,44 @@ Diplomacy GetDiplomacyStateIdByName(std::string diplomacy_state)
 	}
 }
 
-std::string GetFactionTierNameById(int faction_tier)
+std::string GetFactionTierNameById(const faction_tier tier)
 {
-	if (faction_tier == FactionTierNoFactionTier) {
+	if (tier == faction_tier::none) {
 		return "no-faction-tier";
-	} else if (faction_tier == FactionTierBarony) {
+	} else if (tier == faction_tier::barony) {
 		return "barony";
-	} else if (faction_tier == FactionTierCounty) {
+	} else if (tier == faction_tier::county) {
 		return "county";
-	} else if (faction_tier == FactionTierDuchy) {
+	} else if (tier == faction_tier::duchy) {
 		return "duchy";
-	} else if (faction_tier == FactionTierGrandDuchy) {
+	} else if (tier == faction_tier::grand_duchy) {
 		return "grand-duchy";
-	} else if (faction_tier == FactionTierKingdom) {
+	} else if (tier == faction_tier::kingdom) {
 		return "kingdom";
-	} else if (faction_tier == FactionTierEmpire) {
+	} else if (tier == faction_tier::empire) {
 		return "empire";
 	}
 
 	return "";
 }
 
-int GetFactionTierIdByName(std::string faction_tier)
+faction_tier GetFactionTierIdByName(const std::string &faction_tier)
 {
 	if (faction_tier == "no-faction-tier") {
-		return FactionTierNoFactionTier;
+		return faction_tier::none;
 	} else if (faction_tier == "barony") {
-		return FactionTierBarony;
+		return faction_tier::barony;
 	} else if (faction_tier == "county") {
-		return FactionTierCounty;
+		return faction_tier::county;
 	} else if (faction_tier == "duchy") {
-		return FactionTierDuchy;
+		return faction_tier::duchy;
 	} else if (faction_tier == "grand-duchy") {
-		return FactionTierGrandDuchy;
+		return faction_tier::grand_duchy;
 	} else if (faction_tier == "kingdom") {
-		return FactionTierKingdom;
+		return faction_tier::kingdom;
 	} else if (faction_tier == "empire") {
-		return FactionTierEmpire;
+		return faction_tier::empire;
 	}
 
-	return -1;
+	return faction_tier::none;
 }

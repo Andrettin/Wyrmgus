@@ -658,7 +658,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (current_campaign) {
 		faction *current_faction = current_campaign->get_faction();
 		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->Faction != current_faction->ID) {
-			CPlayer::GetThisPlayer()->set_civilization(current_faction->civilization->ID);
+			CPlayer::GetThisPlayer()->set_civilization(current_faction->get_civilization()->ID);
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);
 			CPlayer::GetThisPlayer()->Resources[CopperCost] = 2500; // give the player enough resources to start up
 			CPlayer::GetThisPlayer()->Resources[WoodCost] = 2500;
@@ -1087,7 +1087,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				}
 				if (first_building) {
 					if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
-						unit->Name = site->GetCulturalName(site_owner->civilization);
+						unit->Name = site->GetCulturalName(site_owner->get_civilization());
 					}
 					first_building = false;
 				}

@@ -1618,7 +1618,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return (**faction).civilization->get_name();
+				return (**faction).get_civilization()->get_name();
 			} else {
 				return std::string("");
 			}

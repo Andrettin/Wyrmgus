@@ -600,7 +600,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				
 			f->printf("DefineFaction(\"%s\", {\n", faction->get_identifier().c_str());
 			f->printf("\tName = \"%s\",\n", faction->get_name().c_str());
-			f->printf("\tCivilization = \"%s\",\n", faction->civilization->get_identifier().c_str());
+			f->printf("\tCivilization = \"%s\",\n", faction->get_civilization()->get_identifier().c_str());
 			if (faction->Type != FactionTypeNoFactionType) {
 				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}

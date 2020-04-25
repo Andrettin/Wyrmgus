@@ -478,7 +478,7 @@ int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
 		return GetFactionClassUpgrade(stratagus::faction::get_all()[faction]->ParentFaction, class_id);
 	}
 	
-	return get_civilization_class_upgrade(stratagus::faction::get_all()[faction]->civilization->ID, class_id);
+	return get_civilization_class_upgrade(stratagus::faction::get_all()[faction]->get_civilization()->ID, class_id);
 }
 
 CLanguage *PlayerRace::get_civilization_language(int civilization)
@@ -529,7 +529,7 @@ std::vector<CFiller> PlayerRace::GetFactionUIFillers(int faction)
 		return GetFactionUIFillers(stratagus::faction::get_all()[faction]->ParentFaction);
 	}
 	
-	return get_civilization_ui_fillers(stratagus::faction::get_all()[faction]->civilization->ID);
+	return get_civilization_ui_fillers(stratagus::faction::get_all()[faction]->get_civilization()->ID);
 }
 
 /**
@@ -1052,7 +1052,7 @@ CPlayer *GetFactionPlayer(const stratagus::faction *faction)
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Race == faction->civilization->ID && CPlayer::Players[i]->Faction == faction->ID) {
+		if (CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
 			return CPlayer::Players[i];
 		}
 	}
@@ -1072,7 +1072,7 @@ CPlayer *GetOrAddFactionPlayer(const stratagus::faction *faction)
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (CPlayer::Players[i]->Type == PlayerNobody) {
 			CPlayer::Players[i]->Type = PlayerComputer;
-			CPlayer::Players[i]->set_civilization(faction->civilization->ID);
+			CPlayer::Players[i]->set_civilization(faction->get_civilization()->ID);
 			CPlayer::Players[i]->SetFaction(faction);
 			CPlayer::Players[i]->AiEnabled = true;
 			CPlayer::Players[i]->AiName = faction->DefaultAI;
@@ -1325,8 +1325,8 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 {
 	int old_faction_id = this->Faction;
 	
-	if (faction && faction->civilization->ID != this->Race) {
-		this->set_civilization(faction->civilization->ID);
+	if (faction && faction->get_civilization()->ID != this->Race) {
+		this->set_civilization(faction->get_civilization()->ID);
 	}
 
 	if (this->Faction != -1) {
@@ -1430,7 +1430,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->civilization->ID] && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->get_civilization()->ID] && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1449,7 +1449,7 @@ void CPlayer::SetRandomFaction()
 	std::vector<stratagus::faction *> local_factions;
 	
 	for (stratagus::faction *faction : stratagus::faction::get_all()) {
-		if (faction->civilization->ID != this->Race) {
+		if (faction->get_civilization()->ID != this->Race) {
 			continue;
 		}
 		if (!faction->Playable) {
@@ -1834,7 +1834,7 @@ bool CPlayer::CanFoundFaction(stratagus::faction *faction, bool pre)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->civilization->ID && CPlayer::Players[i]->Faction == faction->ID) {
+		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
 			// faction is already in use
 			return false;
 		}
@@ -1965,25 +1965,25 @@ std::string CPlayer::GetFactionTitleName() const
 	}
 	
 	stratagus::faction *faction = stratagus::faction::get_all()[this->Faction];
-	int faction_tier = faction->DefaultTier;
+	const faction_tier tier = faction->get_default_tier();
 	int government_type = faction->DefaultGovernmentType;
 	
 	if (faction->Type == FactionTypePolity) {
-		if (!faction->Titles[government_type][faction_tier].empty()) {
-			return faction->Titles[government_type][faction_tier];
+		if (!faction->Titles[government_type][static_cast<int>(tier)].empty()) {
+			return faction->Titles[government_type][static_cast<int>(tier)];
 		} else {
 			if (government_type == GovernmentTypeMonarchy) {
-				if (faction_tier == FactionTierBarony) {
+				if (tier == faction_tier::barony) {
 					return "Barony";
-				} else if (faction_tier == FactionTierCounty) {
+				} else if (tier == faction_tier::county) {
 					return "County";
-				} else if (faction_tier == FactionTierDuchy) {
+				} else if (tier == faction_tier::duchy) {
 					return "Duchy";
-				} else if (faction_tier == FactionTierGrandDuchy) {
+				} else if (tier == faction_tier::grand_duchy) {
 					return "Grand Duchy";
-				} else if (faction_tier == FactionTierKingdom) {
+				} else if (tier == faction_tier::kingdom) {
 					return "Kingdom";
-				} else if (faction_tier == FactionTierEmpire) {
+				} else if (tier == faction_tier::empire) {
 					return "Empire";
 				}
 			} else if (government_type == GovernmentTypeRepublic) {
@@ -2005,42 +2005,42 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 	
 	stratagus::civilization *civilization = stratagus::civilization::get_all()[this->Race];
 	stratagus::faction *faction = stratagus::faction::get_all()[this->Faction];
-	int faction_tier = faction->DefaultTier;
+	const faction_tier tier = faction->get_default_tier();
 	int government_type = faction->DefaultGovernmentType;
 	
 	if (faction->Type == FactionTypePolity) {
-		if (!faction->MinisterTitles[title_type][gender][government_type][faction_tier].empty()) {
-			return faction->MinisterTitles[title_type][gender][government_type][faction_tier];
-		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][faction_tier].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][government_type][faction_tier];
-		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
-			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier];
-		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier];
-		} else if (!faction->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier].empty()) {
-			return faction->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier];
-		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier];
-		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
-			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
-		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
-		} else if (!civilization->MinisterTitles[title_type][gender][government_type][faction_tier].empty()) {
-			return civilization->MinisterTitles[title_type][gender][government_type][faction_tier];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][faction_tier].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][government_type][faction_tier];
-		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
-			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier];
-		} else if (!civilization->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier].empty()) {
-			return civilization->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier];
-		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
-			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		if (!faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
 		}
 	}
 

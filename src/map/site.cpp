@@ -66,8 +66,8 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			this->Cores.push_back(faction);
 			faction->Cores.push_back(this);
 			faction->sites.push_back(this);
-			if (faction->civilization) {
-				faction->civilization->sites.push_back(this);
+			if (faction->get_civilization()) {
+				faction->get_civilization()->sites.push_back(this);
 			}
 		} else if (key == "region") {
 			value = FindAndReplaceString(value, "_", "-");
