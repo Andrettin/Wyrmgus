@@ -81,7 +81,6 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
-#include "unit/historical_unit.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

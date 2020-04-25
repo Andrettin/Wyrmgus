@@ -1509,6 +1509,13 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		faction *unit_faction = historical_unit->Faction;
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 		CUnitType *unit_type = historical_unit->get_unit_type();
+		if (unit_type == nullptr && historical_unit->get_unit_class() != nullptr) {
+			unit_type = unit_faction->get_class_unit_type(historical_unit->get_unit_class());
+		}
+
+		if (unit_type == nullptr) {
+			continue;
+		}
 		
 		bool in_another_map_template = false;
 		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
@@ -1925,7 +1932,7 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr
 	
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
 		const std::unique_ptr<historical_location> &historical_location = historical_location_list[i];
-		if (start_date.ContainsDate(historical_location->Date)) {
+		if (historical_location->Date.Year == 0 || start_date.ContainsDate(historical_location->Date)) {
 			if (historical_location->map_template == this) {
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;

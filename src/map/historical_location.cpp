@@ -55,10 +55,6 @@ void historical_location::process_sml_property(const sml_property &property)
 		this->site = site::get(value);
 		this->map_template = this->site->get_map_template();
 		this->Position = this->site->get_pos();
-	} else if (key == "x") {
-		this->Position.x = std::stoi(value);
-	} else if (key == "y") {
-		this->Position.y = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid historical location property: \"" + key + "\".");
 	}
@@ -66,7 +62,13 @@ void historical_location::process_sml_property(const sml_property &property)
 
 void historical_location::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "pos") {
+		this->Position = scope.to_point();
+	} else {
+		throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
+	}
 }
 
 void historical_location::ProcessConfigData(const CConfigData *config_data)
@@ -98,10 +100,6 @@ void historical_location::ProcessConfigData(const CConfigData *config_data)
 
 void historical_location::check()
 {
-	if (this->Date.Year == 0) {
-		throw std::runtime_error("Historical location has no date.");
-	}
-
 	if (this->map_template == nullptr) {
 		throw std::runtime_error("Historical location has no map template.");
 	}

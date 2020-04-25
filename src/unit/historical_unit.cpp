@@ -114,8 +114,8 @@ void historical_unit::ProcessConfigData(const CConfigData *config_data)
 
 void historical_unit::check() const
 {
-	if (this->get_unit_type() == nullptr) {
-		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" does not have a unit type.");
+	if (this->get_unit_type() == nullptr && this->get_unit_class() == nullptr) {
+		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" has neither a unit type nor a unit class.");
 	}
 
 	if (this->HistoricalLocations.empty()) {
