@@ -73,6 +73,8 @@ public:
 
 	virtual void process_sml_property(const sml_property &property);
 	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date);
+	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date);
 
 	bool is_initialized() const
 	{
@@ -100,11 +102,16 @@ public:
 		this->module = module;
 	}
 
+	void load_history();
+	void load_date_scope(const sml_data &date_scope, const QDateTime &date);
+	virtual void reset_history() {}
+
 private:
 	std::string identifier;
 	std::set<std::string> aliases;
 	bool initialized = false;
 	const module *module = nullptr; //the module to which the data entry belongs, if any
+	std::vector<sml_data> history_data;
 };
 
 }
