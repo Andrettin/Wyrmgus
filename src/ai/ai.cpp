@@ -363,9 +363,9 @@ static void AiCheckUnits()
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
 	if (AiPlayer->Player->Faction != -1 && AiPlayer->Player->NumTownHalls > 0) {
-		std::vector<CFaction *> potential_factions;
-		for (size_t i = 0; i < PlayerRaces.Factions[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
-			CFaction *possible_faction = PlayerRaces.Factions[AiPlayer->Player->Faction]->DevelopsTo[i];
+		std::vector<stratagus::faction *> potential_factions;
+		for (size_t i = 0; i < stratagus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
+			stratagus::faction *possible_faction = stratagus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo[i];
 			
 			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
 				continue;
@@ -380,8 +380,8 @@ static void AiCheckUnits()
 		
 		if (!AiPlayer->Player->Dynasty) { //if the AI player has no dynasty, pick one if available
 			std::vector<CDynasty *> potential_dynasties;
-			for (size_t i = 0; i < PlayerRaces.Factions[AiPlayer->Player->Faction]->Dynasties.size(); ++i) {
-				CDynasty *possible_dynasty = PlayerRaces.Factions[AiPlayer->Player->Faction]->Dynasties[i];
+			for (size_t i = 0; i < stratagus::faction::get_all()[AiPlayer->Player->Faction]->Dynasties.size(); ++i) {
+				CDynasty *possible_dynasty = stratagus::faction::get_all()[AiPlayer->Player->Faction]->Dynasties[i];
 				
 				if (!AiPlayer->Player->CanChooseDynasty(possible_dynasty)) {
 					continue;
@@ -1433,7 +1433,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		CUnitType *requested_unit_type = PlayerRaces.Factions[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
+		CUnitType *requested_unit_type = stratagus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
 			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}

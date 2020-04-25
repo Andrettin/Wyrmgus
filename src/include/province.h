@@ -39,7 +39,6 @@
 
 class CCharacter;
 class CDeityDomain;
-class CFaction;
 class CGraphic;
 class CProvince;
 class CSpecies;
@@ -49,6 +48,7 @@ class CUpgrade;
 class WorldMapTile;
 
 namespace stratagus {
+	class faction;
 	class site;
 	class world;
 }
@@ -122,11 +122,11 @@ public:
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
-	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
+	std::map<stratagus::faction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
+	std::vector<stratagus::faction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<CRegion *> Regions;										/// Regions to which this province belongs
-	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
-	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
+	std::map<int, stratagus::faction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
+	std::map<int, stratagus::faction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
 	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
@@ -150,14 +150,14 @@ public:
 	Vec2i Position;								/// Position of the tile
 	stratagus::world *world = nullptr;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
-	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
+	std::map<std::pair<int, stratagus::faction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization
-	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
+	std::map<std::pair<int, stratagus::faction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
 	std::map<int, std::vector<std::string>> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
-	std::map<CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
-	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this tile
-	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the tile, mapped to the year
-	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
+	std::map<stratagus::faction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::vector<stratagus::faction *> FactionClaims;								/// Factions which have a claim to this tile
+	std::map<int, stratagus::faction *> HistoricalOwners;							/// Historical owners of the tile, mapped to the year
+	std::map<int, stratagus::faction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
 };
 
 /*----------------------------------------------------------------------------

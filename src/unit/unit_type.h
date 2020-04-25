@@ -59,7 +59,6 @@ class CUnitTypeVariation;
 class MissileType;
 //Wyrmgus start
 class CButtonLevel;
-class CFaction;
 class CUniqueItem;
 //Wyrmgus end
 struct lua_State;
@@ -70,6 +69,7 @@ class LuaCallback;
 enum class UnitTypeType;
 
 namespace stratagus {
+	class faction;
 	class plane;
 	class terrain_type;
 	class time_of_day;
@@ -838,9 +838,9 @@ public:
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(CFaction *faction, int gender) const;
-	bool IsPersonalNameValid(const std::string &name, CFaction *faction, int gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(CFaction *faction, int gender) const;
+	std::string GeneratePersonalName(stratagus::faction *faction, int gender) const;
+	bool IsPersonalNameValid(const std::string &name, stratagus::faction *faction, int gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(stratagus::faction *faction, int gender) const;
 	//Wyrmgus end
 
 public:

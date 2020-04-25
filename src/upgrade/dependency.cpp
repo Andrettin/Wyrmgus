@@ -547,9 +547,9 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignor
 		return false;
 	}
 
-	if (player->Faction != -1 && PlayerRaces.Factions[player->Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
-		if (PlayerRaces.Factions[player->Faction]->HolyOrderDeity) {
-			CUpgrade *deity_upgrade = PlayerRaces.Factions[player->Faction]->HolyOrderDeity->DeityUpgrade;
+	if (player->Faction != -1 && stratagus::faction::get_all()[player->Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
+		if (stratagus::faction::get_all()[player->Faction]->HolyOrderDeity) {
+			CUpgrade *deity_upgrade = stratagus::faction::get_all()[player->Faction]->HolyOrderDeity->DeityUpgrade;
 			if (deity_upgrade) {
 				for (CUpgradeModifier *upgrade_modifier : target->UpgradeModifiers) {
 					if (std::find(upgrade_modifier->RemoveUpgrades.begin(), upgrade_modifier->RemoveUpgrades.end(), deity_upgrade) != upgrade_modifier->RemoveUpgrades.end()) {

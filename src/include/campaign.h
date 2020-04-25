@@ -33,7 +33,6 @@
 #include "time/date.h"
 #include "vec2i.h"
 
-class CFaction;
 class CQuest;
 class LuaCallback;
 struct lua_State;
@@ -43,6 +42,7 @@ int CclGetCampaignData(lua_State *l);
 
 namespace stratagus {
 
+class faction;
 class map_template;
 class timeline;
 
@@ -76,9 +76,9 @@ public:
 		return this->timeline;
 	}
 	
-	CFaction *GetFaction() const
+	faction *get_faction() const
 	{
-		return this->Faction;
+		return this->faction;
 	}
 
 	std::string GetSpecies() const;
@@ -99,7 +99,7 @@ private:
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
-	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
+	faction *faction = nullptr;	/// Which faction the player plays as in the campaign
 public:
 	std::vector<map_template *> map_templates; //map templates used by the campaign
 	std::vector<Vec2i> MapSizes;				/// Map sizes

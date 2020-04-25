@@ -48,16 +48,15 @@ extern "C" {
 ----------------------------------------------------------------------------*/
 
 class CDate;
-//Wyrmgus start
-class CFaction;
-//Wyrmgus end
 class CUnit;
 class CUnitType;
-//Wyrmgus start
 class CUpgrade;
-//Wyrmgus end
 class CFile;
 class CFont;
+
+namespace stratagus {
+	class faction;
+}
 
 struct LuaUserData {
 	int Type;
@@ -252,7 +251,7 @@ struct NumberDesc {
 		//Wyrmgus start
 		const CUnitType **Type;     /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
-		CFaction **Faction;			/// Which faction.
+		stratagus::faction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		BinOp binOp;   /// For binary operand.
@@ -317,7 +316,7 @@ struct StringDesc {
 		//Wyrmgus start
 		const CUnitType **Type;     /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
-		CFaction **Faction;			/// Which faction.
+		stratagus::faction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		struct {
@@ -411,7 +410,7 @@ extern const CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type
 //Wyrmgus start
 extern CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
 extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
-extern CFaction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
+extern stratagus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 

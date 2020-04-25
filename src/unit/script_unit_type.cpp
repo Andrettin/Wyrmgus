@@ -1739,12 +1739,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->civilization = civilization->ID;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			CFaction *faction = PlayerRaces.GetFaction(faction_name);
-			if (faction) {
-				type->Faction = faction->ID;
-			} else {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
-			}
+			stratagus::faction *faction = stratagus::faction::get(faction_name);
+			type->Faction = faction->ID;
 		} else if (!strcmp(value, "Description")) {
 			type->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
@@ -1900,7 +1896,7 @@ static int CclDefineUnitType(lua_State *l)
 			civilization->remove_class_unit_type(type);
 		}
 
-		for (CFaction *faction : PlayerRaces.Factions) {
+		for (stratagus::faction *faction : stratagus::faction::get_all()) {
 			faction->remove_class_unit_type(type);
 		}
 		
@@ -1911,7 +1907,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (type->Faction != -1) {
 				int faction_id = type->Faction;
 				if (faction_id != -1) {
-					PlayerRaces.Factions[faction_id]->set_class_unit_type(unit_class, type);
+					stratagus::faction::get_all()[faction_id]->set_class_unit_type(unit_class, type);
 				}
 			} else {
 				if (civilization_id != -1) {
@@ -2346,7 +2342,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (type->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[type->Faction]->Ident.c_str());
+			lua_pushstring(l, stratagus::faction::get_all()[type->Faction]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

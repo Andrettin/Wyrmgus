@@ -178,9 +178,9 @@ void ButtonAction::SetTriggerData() const
 	if (this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility) {
 		TriggerData.Upgrade = CUpgrade::get_all()[this->Value];
 	} else if (this->Action == ButtonCmd::Faction) {
-		TriggerData.Faction = PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
-		if (!PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::try_get(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+		TriggerData.Faction = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
+		if (!stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::try_get(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
 }

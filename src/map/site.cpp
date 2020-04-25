@@ -61,18 +61,12 @@ void site::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "map_template") {
 			this->map_template = map_template::get(value);
 		} else if (key == "core") {
-			value = FindAndReplaceString(value, "_", "-");
-			
-			CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction != nullptr) {
-				this->Cores.push_back(faction);
-				faction->Cores.push_back(this);
-				faction->sites.push_back(this);
-				if (faction->civilization) {
-					faction->civilization->sites.push_back(this);
-				}
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
+			faction *faction = faction::get(value);
+			this->Cores.push_back(faction);
+			faction->Cores.push_back(this);
+			faction->sites.push_back(this);
+			if (faction->civilization) {
+				faction->civilization->sites.push_back(this);
 			}
 		} else if (key == "region") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -102,7 +96,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (child_config_data->Tag == "historical_owner") {
 			CDate date;
-			CFaction *owner_faction = nullptr;
+			faction *owner_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -112,11 +106,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					date = CDate::FromString(value);
 				} else if (key == "faction") {
-					value = FindAndReplaceString(value, "_", "-");
-					owner_faction = PlayerRaces.GetFaction(value);
-					if (!owner_faction) {
-						fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-					}
+					owner_faction = faction::get(value);
 				} else {
 					fprintf(stderr, "Invalid historical owner property: \"%s\".\n", key.c_str());
 				}
@@ -128,7 +118,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			CDate end_date;
 			const unit_class *building_class = nullptr;
 			CUniqueItem *unique = nullptr;
-			CFaction *building_owner_faction = nullptr;
+			faction *building_owner_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -149,11 +139,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 						fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
 					}
 				} else if (key == "faction") {
-					value = FindAndReplaceString(value, "_", "-");
-					building_owner_faction = PlayerRaces.GetFaction(value);
-					if (!building_owner_faction) {
-						fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-					}
+					building_owner_faction = faction::get(value);
 				} else {
 					fprintf(stderr, "Invalid historical building property: \"%s\".\n", key.c_str());
 				}
@@ -164,7 +150,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
+			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, faction *>(start_date, end_date, building_class, unique, building_owner_faction));
 		} else {
 			fprintf(stderr, "Invalid site property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -174,7 +160,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 void site::initialize()
 {
 	if (!this->is_major() && !this->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
-		for (CFaction *core_faction : this->Cores) {
+		for (faction *core_faction : this->Cores) {
 			vector::remove(core_faction->Cores, this);
 		}
 		this->Cores.clear();

@@ -33,7 +33,6 @@
 #include "time/date.h"
 #include "vec2i.h"
 
-class CFaction;
 class CPlayer;
 class CRegion;
 class CUnit;
@@ -46,6 +45,7 @@ int CclDefineSite(lua_State *l);
 namespace stratagus {
 
 class civilization;
+class faction;
 class map_template;
 class unit_class;
 
@@ -119,12 +119,12 @@ private:
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 public:
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
-	std::vector<CFaction *> Cores;						/// Factions which have this site as a core
+	std::vector<faction *> Cores;						/// Factions which have this site as a core
 	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
-	std::map<CDate, const CFaction *> HistoricalOwners;				/// Historical owners of the site
+	std::map<CDate, const faction *> HistoricalOwners;				/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
+	std::vector<std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 private:
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement

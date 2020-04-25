@@ -592,19 +592,19 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (const CFaction *faction : PlayerRaces.Factions) {
+		for (const stratagus::faction *faction : stratagus::faction::get_all()) {
 			if (faction->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
 				
-			f->printf("DefineFaction(\"%s\", {\n", faction->Ident.c_str());
-			f->printf("\tName = \"%s\",\n", faction->Name.c_str());
+			f->printf("DefineFaction(\"%s\", {\n", faction->get_identifier().c_str());
+			f->printf("\tName = \"%s\",\n", faction->get_name().c_str());
 			f->printf("\tCivilization = \"%s\",\n", faction->civilization->get_identifier().c_str());
 			if (faction->Type != FactionTypeNoFactionType) {
 				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
 			if (faction->ParentFaction != -1) {
-				f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[faction->ParentFaction]->Ident.c_str());
+				f->printf("\tParentFaction = \"%s\",\n", stratagus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
 			}
 			if (faction->Colors.size() > 0) {
 				f->printf("\tColors = {");
@@ -636,7 +636,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tCivilization = \"%s\",\n", stratagus::civilization::get_all()[unit_type->civilization]->get_identifier().c_str());
 			}
 			if (unit_type->Faction != -1) {
-				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[unit_type->Faction]->Ident.c_str());
+				f->printf("\tFaction = \"%s\",\n", stratagus::faction::get_all()[unit_type->Faction]->get_identifier().c_str());
 			}
 			if (unit_type->get_unit_class() != nullptr) {
 				f->printf("\tClass = \"%s\",\n", unit_type->get_unit_class()->get_identifier().c_str());
@@ -868,7 +868,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, stratagus::civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, PlayerRaces.Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
+							  i, stratagus::faction::get_all()[CPlayer::Players[i]->Faction]->get_identifier().c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, CPlayer::Players[i]->AiName.c_str());

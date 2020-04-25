@@ -254,8 +254,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
-	if (oldtype.civilization != -1 && oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
+	if (oldtype.civilization != -1 && oldtype.Faction != -1 && !stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
@@ -266,8 +266,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (newtype.civilization != -1 && newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
+	if (newtype.civilization != -1 && newtype.Faction != -1 && !stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 1);
 		}

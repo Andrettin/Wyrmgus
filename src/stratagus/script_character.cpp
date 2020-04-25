@@ -135,12 +135,8 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			character->civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1));
-			if (faction != nullptr) {
-				character->Faction = faction;
-			} else {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
-			}
+			stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1));
+			character->Faction = faction;
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
 			CCharacter *father = CCharacter::GetCharacter(father_ident);
@@ -444,12 +440,9 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string historical_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *historical_faction = PlayerRaces.GetFaction(historical_faction_name);
-				if (!historical_faction) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ historical_faction_name.c_str());
-				}
-				
-				character->HistoricalFactions.push_back(std::pair<CDate, CFaction *>(date, historical_faction));
+				stratagus::faction *historical_faction = stratagus::faction::get(historical_faction_name);
+
+				character->HistoricalFactions.push_back(std::pair<CDate, stratagus::faction *>(date, historical_faction));
 			}
 		} else if (!strcmp(value, "HistoricalLocations")) {
 			if (!lua_istable(l, -1)) {
@@ -503,14 +496,12 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string title_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *title_faction = PlayerRaces.GetFaction(title_faction_name);
-				if (!title_faction) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
-				}
+				stratagus::faction *title_faction = stratagus::faction::get(title_faction_name);
+
 				if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
 					title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = character;
 				}
-				character->HistoricalTitles.push_back(std::tuple<CDate, CDate, CFaction *, int>(start_date, end_date, title_faction, title));
+				character->HistoricalTitles.push_back(std::tuple<CDate, CDate, stratagus::faction *, int>(start_date, end_date, title_faction, title));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -875,7 +866,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (character->Faction != nullptr) {
-			lua_pushstring(l, character->Faction->Ident.c_str());
+			lua_pushstring(l, character->Faction->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

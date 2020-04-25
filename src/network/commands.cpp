@@ -812,7 +812,7 @@ void SendCommandSetFaction(int player, int faction)
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
 		if (faction != -1) {
-			CPlayer::Players[player]->SetFaction(PlayerRaces.Factions[faction]);
+			CPlayer::Players[player]->SetFaction(stratagus::faction::get_all()[faction]);
 		} else {
 			CPlayer::Players[player]->SetFaction(nullptr);
 		}
@@ -1182,7 +1182,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 		//Wyrmgus start
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
-			CPlayer::Players[arg2]->SetFaction(PlayerRaces.Factions[arg3]);
+			CPlayer::Players[arg2]->SetFaction(stratagus::faction::get_all()[arg3]);
 			break;
 		}
 		case ExtendedMessageAutosellResource: {

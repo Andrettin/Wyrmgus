@@ -87,7 +87,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CFaction;
 class CGeneratedTerrain;
 class CGraphic;
 class CPlayer;
@@ -100,6 +99,7 @@ class CUnit;
 class CUnitType;
 
 namespace stratagus {
+	class faction;
 	class map_template;
 	class plane;
 	class site;
@@ -243,7 +243,7 @@ public:
 	stratagus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
 	stratagus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
-	Vec2i GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
+	Vec2i GenerateUnitLocation(const CUnitType *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.

@@ -175,7 +175,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return unit.Type->MapSound.Acknowledgement.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				return stratagus::civilization::get_all()[civilization]->UnitSounds.Acknowledgement.Sound;
@@ -189,7 +189,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			//Wyrmgus start
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				if (stratagus::civilization::get_all()[civilization]->UnitSounds.Attack.Sound) {
@@ -242,7 +242,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			//Wyrmgus start
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				if (stratagus::civilization::get_all()[civilization]->UnitSounds.Build.Sound) {
@@ -262,7 +262,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return unit.Type->MapSound.Ready.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				return stratagus::civilization::get_all()[civilization]->UnitSounds.Ready.Sound;
@@ -277,7 +277,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return unit.Type->MapSound.Selected.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				return stratagus::civilization::get_all()[civilization]->UnitSounds.Selected.Sound;
@@ -292,7 +292,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return unit.Type->MapSound.Help.Sound;
 			} else if (unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				if (unit.Type->BoolFlag[BUILDING_INDEX].value && stratagus::civilization::get_all()[civilization]->UnitSounds.HelpTown.Sound) {
@@ -322,7 +322,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			//Wyrmgus start
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 				int civilization = unit.Type->civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 					civilization = unit.Player->Race;
 				}
 				if (stratagus::civilization::get_all()[civilization]->UnitSounds.Repair.Sound) {
@@ -346,7 +346,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 					//Wyrmgus start
 					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->civilization != -1) {
 						int civilization = unit.Type->civilization;
-						if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == PlayerRaces.Factions[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+						if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
 							civilization = unit.Player->Race;
 						}
 						if (stratagus::civilization::get_all()[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {

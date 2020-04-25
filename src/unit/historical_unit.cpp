@@ -51,7 +51,7 @@ void historical_unit::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "faction") {
-		this->Faction = PlayerRaces.GetFaction(FindAndReplaceString(value, "_", "-"));
+		this->Faction = faction::get(value);
 	} else if (key == "start_date") {
 		this->StartDate = CDate::FromString(value);
 	} else if (key == "end_date") {
@@ -88,8 +88,7 @@ void historical_unit::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "unit_type") {
 			this->unit_type = CUnitType::get(value);
 		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Faction = PlayerRaces.GetFaction(value);
+			this->Faction = faction::get(value);
 		} else if (key == "start_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->StartDate = CDate::FromString(value);

@@ -758,7 +758,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 {
 	if (
 		this->Ministers[title] != nullptr
-		&& (PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
+		&& (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
@@ -844,7 +844,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 
 bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -853,7 +853,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe) {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -879,10 +879,10 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 
 std::string CGrandStrategyFaction::GetFullName()
 {
-	if (PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe) {
-		return PlayerRaces.Factions[this->Faction]->Name;
-	} else if (PlayerRaces.Factions[this->Faction]->Type == FactionTypePolity) {
-//		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Faction]->Name;
+	if (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
+		return stratagus::faction::get_all()[this->Faction]->get_name();
+	} else if (stratagus::faction::get_all()[this->Faction]->Type == FactionTypePolity) {
+//		return this->GetTitle() + " of " + stratagus::faction::get_all()[this->Faction]->Name;
 	}
 	
 	return "";
@@ -1109,9 +1109,9 @@ CGrandStrategyEvent::~CGrandStrategyEvent()
 
 void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Faction]->Name.c_str());	
+//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), stratagus::faction::get_all()[faction->Faction]->Name.c_str());	
 	
-	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Faction]->Ident + "\");");
+	CclCommand("EventFaction = GetFactionFromName(\"" + stratagus::faction::get_all()[faction->Faction]->get_identifier() + "\");");
 	CclCommand("GrandStrategyEvent(EventFaction, \"" + this->Name + "\");");
 	CclCommand("EventFaction = nil;");
 	CclCommand("EventProvince = nil;");
@@ -1124,7 +1124,7 @@ void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 
 bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Faction]->Name.c_str());	
+//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), stratagus::faction::get_all()[faction->Faction]->Name.c_str());	
 	
 	if (this->MinYear && GrandStrategyYear < this->MinYear) {
 		return false;
@@ -1165,7 +1165,7 @@ void SetProvinceOwner(std::string province_name, std::string civilization_name, 
 {
 	int province_id = GetProvinceId(province_name);
 	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-	int faction_id = PlayerRaces.GetFactionIndexByName(faction_name);
+	int faction_id = stratagus::faction::get(faction_name)->ID;
 	
 	if (!civilization || province_id == -1 || !GrandStrategyGame.Provinces[province_id]) {
 		return;
@@ -1238,7 +1238,7 @@ void AddProvinceClaim(std::string province_name, std::string civilization_name, 
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		int faction = stratagus::faction::get(faction_name)->ID;
 		if (faction != -1) {
 			GrandStrategyGame.Provinces[province_id]->AddFactionClaim(civilization->ID, faction);
 		} else {
@@ -1255,10 +1255,8 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (faction != -1) {
-			GrandStrategyGame.Provinces[province_id]->RemoveFactionClaim(civilization->ID, faction);
-		}
+		int faction = stratagus::faction::get(faction_name)->ID;
+		GrandStrategyGame.Provinces[province_id]->RemoveFactionClaim(civilization->ID, faction);
 	}
 }
 
@@ -1337,7 +1335,7 @@ bool ProvinceBordersFaction(std::string province_name, std::string faction_civil
 {
 	int province = GetProvinceId(province_name);
 	stratagus::civilization *civilization = stratagus::civilization::get(faction_civilization_name);
-	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+	int faction = stratagus::faction::get(faction_name)->ID;
 	
 	if (!civilization || faction == -1) {
 		return false;
@@ -1427,7 +1425,7 @@ std::string GetProvinceOwner(std::string province_name)
 		return "";
 	}
 	
-	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Ident;
+	return stratagus::faction::get_all()[GrandStrategyGame.Provinces[province_id]->Owner->Faction]->get_identifier();
 }
 
 void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name)
@@ -1441,10 +1439,8 @@ void SetFactionGovernmentType(std::string civilization_name, std::string faction
 	}
 
 	if (civilization) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (faction != -1) {
-			GrandStrategyGame.Factions[civilization->ID][faction]->GovernmentType = government_type_id;
-		}
+		int faction = stratagus::faction::get(faction_name)->ID;
+		GrandStrategyGame.Factions[civilization->ID][faction]->GovernmentType = government_type_id;
 	}
 }
 
@@ -1468,10 +1464,8 @@ void SetFactionTier(std::string civilization_name, std::string faction_name, std
 	}
 
 	if (civilization) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (faction != -1) {
-			GrandStrategyGame.Factions[civilization->ID][faction]->FactionTier = faction_tier_id;
-		}
+		int faction = stratagus::faction::get(faction_name)->ID;
+		GrandStrategyGame.Factions[civilization->ID][faction]->FactionTier = faction_tier_id;
 	}
 }
 
@@ -1480,10 +1474,8 @@ std::string GetFactionTier(std::string civilization_name, std::string faction_na
 	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
 
 	if (civilization) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (faction != -1) {
-			return GetFactionTierNameById(GrandStrategyGame.Factions[civilization->ID][faction]->FactionTier);
-		}
+		int faction = stratagus::faction::get(faction_name)->ID;
+		return GetFactionTierNameById(GrandStrategyGame.Factions[civilization->ID][faction]->FactionTier);
 	}
 	
 	return "";
@@ -1510,7 +1502,7 @@ void SetFactionMinister(std::string civilization_name, std::string faction_name,
 	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
 	int faction = -1;
 	if (civilization) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		faction = stratagus::faction::get(faction_name)->ID;
 	}
 	int title = GetCharacterTitleIdByName(title_name);
 	
@@ -1526,7 +1518,7 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
 	int faction = -1;
 	if (civilization) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		faction = stratagus::faction::get(faction_name)->ID;
 	}
 	int title = GetCharacterTitleIdByName(title_name);
 	

@@ -232,10 +232,7 @@ static int CclDefineQuest(lua_State *l)
 						stratagus::site *site = stratagus::site::get(LuaToString(l, -1, k + 1));
 						objective->settlement = site;
 					} else if (!strcmp(value, "faction")) {
-						CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
-						if (!faction) {
-							LuaError(l, "Faction doesn't exist.");
-						}
+						stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
 						objective->Faction = faction;
 					} else {
 						printf("\n%s\n", quest->Ident.c_str());
@@ -419,7 +416,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Description")) {
 			campaign->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Faction")) {
-			campaign->Faction = PlayerRaces.GetFaction(LuaToString(l, -1));
+			campaign->faction = stratagus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sandbox")) {
@@ -521,8 +518,8 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushnumber(l, campaign->get_start_date().date().year());
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (campaign->Faction) {
-			lua_pushstring(l, campaign->Faction->Ident.c_str());
+		if (campaign->get_faction() != nullptr) {
+			lua_pushstring(l, campaign->get_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

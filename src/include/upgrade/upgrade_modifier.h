@@ -42,11 +42,11 @@
 
 class CConfigData;
 class CDynasty;
-class CFaction;
 class CUnitType;
 class CUpgrade;
 
 namespace stratagus {
+	class faction;
 	class sml_data;
 	class sml_property;
 }
@@ -96,7 +96,7 @@ public:
 
 	//Wyrmgus start
 	int change_civilization_to = -1;		/// changes the player's civilization to this one
-	CFaction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
+	stratagus::faction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
 	CDynasty *ChangeDynastyTo = nullptr;	/// changes the player's dynasty to this one
 	
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented

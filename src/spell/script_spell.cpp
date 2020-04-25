@@ -195,12 +195,8 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->civilization_equivalent = civilization->ID;
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction) {
-				condition->FactionEquivalent = faction;
-			} else {
-				fprintf(stderr, "Faction \"%s\" doesn't exist.\n", value);
-			}
+			stratagus::faction *faction = stratagus::faction::get(value);
+			condition->FactionEquivalent = faction;
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[value];

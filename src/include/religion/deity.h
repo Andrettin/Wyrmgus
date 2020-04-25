@@ -41,7 +41,6 @@
 ----------------------------------------------------------------------------*/
 
 class CDeityDomain;
-class CFaction;
 class CPantheon;
 class CReligion;
 class CUpgrade;
@@ -49,6 +48,7 @@ struct lua_State;
 
 namespace stratagus {
 	class civilization;
+	class faction;
 	class plane;
 }
 
@@ -93,7 +93,7 @@ public:
 	std::vector<CReligion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
-	std::vector<CFaction *> HolyOrders;			//holy orders of this deity
+	std::vector<stratagus::faction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
 	std::map<const stratagus::civilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 

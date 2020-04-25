@@ -193,14 +193,9 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			CUpgrade *upgrade = CUpgrade::get(value);
 			this->CharacterUpgrade = upgrade;
 		} else if (key == "holy_order") {
-			value = FindAndReplaceString(value, "_", "-");
-			CFaction *holy_order = PlayerRaces.GetFaction(value);
-			if (holy_order) {
-				this->HolyOrders.push_back(holy_order);
-				holy_order->HolyOrderDeity = this;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-			}
+			stratagus::faction *holy_order = stratagus::faction::get(value);
+			this->HolyOrders.push_back(holy_order);
+			holy_order->HolyOrderDeity = this;
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
 		}

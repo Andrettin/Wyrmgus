@@ -193,24 +193,17 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->civilization = stratagus::civilization::get(value);
 		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction) {
-				if (!this->Faction) {
-					this->Faction = faction;
-				}
-				this->Factions.push_back(faction);
-			} else {
-				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
+			stratagus::faction *faction = stratagus::faction::get(value);
+			if (!this->Faction) {
+				this->Faction = faction;
 			}
+			this->Factions.push_back(faction);
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->HairVariation = value;
 		} else if (key == "trait") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Trait = upgrade;
@@ -351,7 +344,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			int title = -1;
 			CDate start_date;
 			CDate end_date;
-			CFaction *title_faction = nullptr;
+			stratagus::faction *title_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -370,11 +363,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					end_date = CDate::FromString(value);
 				} else if (key == "faction") {
-					value = FindAndReplaceString(value, "_", "-");
-					title_faction = PlayerRaces.GetFaction(value);
-					if (!title_faction) {
-						fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
-					}
+					title_faction = stratagus::faction::get(value);
 				} else {
 					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.c_str());
 				}
@@ -394,7 +383,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = this;
 			}
 				
-			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, CFaction *, int>(start_date, end_date, title_faction, title));
+			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, stratagus::faction *, int>(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;

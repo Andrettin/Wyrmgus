@@ -218,7 +218,6 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
 			CIcon *icon = CIcon::get(value);
 			this->icon = icon;
 		} else if (key == "class") {
@@ -234,17 +233,11 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			
 			this->upgrade_class = class_id;
 		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
 			stratagus::civilization *civilization = stratagus::civilization::get(value);
 			this->civilization = civilization;
 		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction) {
-				this->faction = faction->ID;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-			}
+			const stratagus::faction *faction = stratagus::faction::get(value);
+			this->faction = faction->ID;
 		} else if (key == "ability") {
 			this->ability = string::to_bool(value);
 		} else if (key == "weapon") {
@@ -331,12 +324,8 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 
 		this->upgrade_class = class_id;
 	} else if (key == "faction") {
-		const CFaction *faction = PlayerRaces.GetFaction(value);
-		if (faction != nullptr) {
-			this->faction = faction->ID;
-		} else {
-			fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-		}
+		const stratagus::faction *faction = stratagus::faction::get(value);
+		this->faction = faction->ID;
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -385,7 +374,7 @@ void CUpgrade::initialize()
 			if (this->get_faction() != -1) {
 				int faction_id = this->get_faction();
 				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
+					stratagus::faction::get_all()[faction_id]->ClassUpgrades[class_id] = this->ID;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
@@ -540,12 +529,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->civilization = civilization;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			CFaction *faction = PlayerRaces.GetFaction(faction_name);
-			if (faction) {
-				upgrade->faction = faction->ID;
-			} else {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
-			}
+			stratagus::faction *faction = stratagus::faction::get(faction_name);
+			upgrade->faction = faction->ID;
 		} else if (!strcmp(value, "Description")) {
 			upgrade->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
@@ -653,10 +638,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *priority_faction = PlayerRaces.GetFaction(faction_ident);
-				if (!priority_faction) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
-				}
+				stratagus::faction *priority_faction = stratagus::faction::get(faction_ident);
 				++j;
 				
 				int priority = LuaToNumber(l, -1, j + 1);
@@ -748,7 +730,7 @@ static int CclDefineUpgrade(lua_State *l)
 			if (upgrade->get_faction() != -1) {
 				int faction_id = upgrade->get_faction();
 				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
+					stratagus::faction::get_all()[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
@@ -868,11 +850,7 @@ static int CclDefineModifier(lua_State *l)
 			um->change_civilization_to = civilization->ID;
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
-			um->ChangeFactionTo = PlayerRaces.GetFaction(faction_ident);
-			
-			if (um->ChangeFactionTo == nullptr) {
-				LuaError(l, "Faction \"%s\" doesn't exist.'" _C_ faction_ident.c_str());
-			}
+			um->ChangeFactionTo = stratagus::faction::get(faction_ident);
 		} else if (!strcmp(key, "change-dynasty-to")) {
 			std::string dynasty_ident = LuaToString(l, j + 1, 2);
 			um->ChangeDynastyTo = PlayerRaces.GetDynasty(dynasty_ident);
@@ -1145,7 +1123,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (upgrade->get_faction() != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[upgrade->get_faction()]->Ident.c_str());
+			lua_pushstring(l, stratagus::faction::get_all()[upgrade->get_faction()]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

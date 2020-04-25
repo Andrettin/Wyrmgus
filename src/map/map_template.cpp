@@ -655,7 +655,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	if (current_campaign) {
-		CFaction* current_faction = current_campaign->GetFaction();
+		faction *current_faction = current_campaign->get_faction();
 		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->Faction != current_faction->ID) {
 			CPlayer::GetThisPlayer()->set_civilization(current_faction->civilization->ID);
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);
@@ -776,7 +776,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			CUnitType *worker_type = PlayerRaces.Factions[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
+			CUnitType *worker_type = faction::get_all()[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((worker_type->TileSize - 1) / 2);
 				
@@ -989,8 +989,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 		
-		const CFaction *site_owner = nullptr;
-		for (std::map<CDate, const CFaction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
+		const faction *site_owner = nullptr;
+		for (std::map<CDate, const faction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
 			if (start_date.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
 				site_owner = owner_iterator->second;
 				break;
@@ -1045,7 +1045,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
 				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
-				const CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
+				const faction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 				const CUnitType *unit_type = nullptr;
 				if (building_owner) {
 					unit_type = building_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
@@ -1129,7 +1129,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					}
 							
 					CPlayer *unit_player = nullptr;
-					const CFaction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
+					const faction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
 					if (unit_owner) {
 						unit_player = GetOrAddFactionPlayer(unit_owner);
 						if (!unit_player) {
@@ -1444,7 +1444,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		CFaction *unit_faction = historical_unit->Faction;
+		faction *unit_faction = historical_unit->Faction;
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 		CUnitType *unit_type = historical_unit->get_unit_type();
 		
@@ -1519,7 +1519,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		const CFaction *hero_faction = character->Faction;
+		const faction *hero_faction = character->Faction;
 		for (int i = ((int) character->HistoricalFactions.size() - 1); i >= 0; --i) {
 			if (start_date.ContainsDate(character->HistoricalFactions[i].first)) {
 				hero_faction = character->HistoricalFactions[i].second;

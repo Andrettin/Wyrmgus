@@ -70,10 +70,7 @@
 			this->civilization = civilization->ID;
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Faction = PlayerRaces.GetFactionIndexByName(value);
-			if (this->Faction == -1) {
-				fprintf(stderr, "Faction %s doesn't exist.\n", value);
-			}
+			this->Faction = stratagus::faction::get(value)->ID;
 		} else if (!strcmp(value, "detachment")) {
 			this->Detachment = true;
 			--j;
@@ -111,7 +108,7 @@
 	if (this->NewForm == nullptr) {
 		CUnitType *new_unit_type = nullptr;
 		if (this->civilization != -1 && this->Faction != -1 && this->civilization == target->Type->civilization) { //get faction equivalent, if is of the same civilization
-			new_unit_type = PlayerRaces.Factions[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
+			new_unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
 		} else if (this->civilization != -1 && this->civilization != target->Type->civilization) {
 			new_unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(target->Type->get_unit_class());
 		}

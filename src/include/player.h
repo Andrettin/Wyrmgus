@@ -237,7 +237,7 @@ public:
 	//Wyrmgus start
 	const stratagus::civilization *get_civilization() const;
 	void set_civilization(int civilization);
-	void SetFaction(const CFaction *faction);
+	void SetFaction(const stratagus::faction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
 	const std::string &get_interface() const;
@@ -252,7 +252,7 @@ public:
 	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	bool HasUnitBuilder(const CUnitType *type, const stratagus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
-	bool CanFoundFaction(CFaction *faction, bool pre = false);
+	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
 	bool CanRecruitHero(const CCharacter *character, bool ignore_neutral = false) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
@@ -646,10 +646,30 @@ private:
 	bool per_settlement = false;	/// Whether the building should be constructed for each settlement
 };
 
-class CFaction
+int CclDefineFaction(lua_State *l);
+
+namespace stratagus {
+
+class faction : public detailed_data_entry, public data_type<faction>
 {
+	Q_OBJECT
+
 public:
-	~CFaction();
+	static constexpr const char *class_identifier = "faction";
+	static constexpr const char *database_folder = "factions";
+
+	static faction *add(const std::string &identifier, const stratagus::module *module)
+	{
+		faction *faction = data_type::add(identifier, module);
+		faction->ID = faction::get_all().size() - 1;
+		return faction;
+	}
+
+	faction(const std::string &identifier) : detailed_data_entry(identifier)
+	{
+	}
+
+	~faction();
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
@@ -679,16 +699,11 @@ public:
 		}
 	}
 
-	std::string Ident;													/// faction name
-	std::string Name;
-	std::string Description;											/// faction description
-	std::string Quote;													/// faction quote
-	std::string Background;												/// faction background
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
-	stratagus::civilization *civilization = nullptr;								/// faction civilization
+	stratagus::civilization *civilization = nullptr;					/// faction civilization
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
@@ -700,8 +715,8 @@ public:
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
 	std::vector<int> Colors;											/// faction colors
-	std::vector<CFaction *> DevelopsFrom;								/// from which factions can this faction develop
-	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop
+	std::vector<stratagus::faction *> DevelopsFrom;								/// from which factions can this faction develop
+	std::vector<stratagus::faction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
@@ -711,7 +726,7 @@ public:
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:
-	std::vector<std::string> ship_names;									/// Ship names for the faction
+	std::vector<std::string> ship_names;								/// Ship names for the faction
 public:
 	std::vector<stratagus::site *> Cores; /// Core sites of this faction (required to found it)
 	std::vector<stratagus::site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
@@ -722,15 +737,17 @@ public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
-	std::map<std::pair<CDate, CFaction *>, Diplomacy> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
+	std::map<std::pair<CDate, stratagus::faction *>, Diplomacy> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
 	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
 	std::vector<CFiller> UIFillers;
 	
-	std::string Mod;													/// To which mod (or map), if any, this faction belongs
+	std::string Mod;							/// To which mod (or map), if any, this faction belongs
 
-	friend int CclDefineFaction(lua_State *l);
+	friend int ::CclDefineFaction(lua_State *l);
 };
+
+}
 
 class CDynasty
 {
@@ -753,7 +770,7 @@ public:
 	int civilization;													/// dynasty civilization
 	IconConfig Icon;													/// Dynasty's icon
 	LuaCallback *Conditions;
-	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
+	std::vector<stratagus::faction *> Factions;									/// to which factions is this dynasty available
 };
 
 class LanguageWord
@@ -847,8 +864,6 @@ class PlayerRace
 public:
 	void Clean();
 	//Wyrmgus start
-	int GetFactionIndexByName(const std::string &faction_ident) const;
-	CFaction *GetFaction(const std::string &faction_ident) const;
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
 	int get_civilization_class_upgrade(int civilization, int class_id);
@@ -865,7 +880,6 @@ public:
 	std::string civilization_upgrades[MAX_RACES];
 	std::map<int, int> civilization_class_upgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
-	std::vector<CFaction *> Factions;    								/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
 	std::vector<CFiller> civilization_ui_fillers[MAX_RACES];
@@ -953,7 +967,6 @@ extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
 extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player colors
 
-extern std::map<std::string, int> FactionStringToIndex;
 extern std::map<std::string, int> DynastyStringToIndex;
 
 extern bool LanguageCacheOutdated;
@@ -982,8 +995,8 @@ extern void SavePlayers(CFile &file);
 extern void CreatePlayer(int type);
 
 //Wyrmgus start
-extern CPlayer *GetFactionPlayer(const CFaction *faction);
-extern CPlayer *GetOrAddFactionPlayer(const CFaction *faction);
+extern CPlayer *GetFactionPlayer(const stratagus::faction *faction);
+extern CPlayer *GetOrAddFactionPlayer(const stratagus::faction *faction);
 //Wyrmgus end
 
 /// Initialize the computer opponent AI
@@ -1020,7 +1033,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 }
 
 //Wyrmgus start
-extern void SetFactionStringToIndex(const std::string &faction_name, int faction_id);
 extern void NetworkSetFaction(int player, const std::string &faction_name);
 extern int GetPlayerColorIndexByName(const std::string &player_color_name);
 extern std::string GetFactionTypeNameById(int faction_type);

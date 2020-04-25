@@ -32,11 +32,11 @@
 #include "data_type.h"
 #include "time/date.h"
 
-class CFaction;
 class CUnitType;
 
 namespace stratagus {
 
+class faction;
 class historical_location;
 
 class historical_unit : public named_data_entry, public data_type<historical_unit>, public CDataType
@@ -83,7 +83,7 @@ public:
 private:
 	CUnitType *unit_type = nullptr; //the unit's unit type
 public:
-	CFaction *Faction = nullptr; //the unit's faction
+	faction *Faction = nullptr; //the unit's faction
 private:
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
 public:

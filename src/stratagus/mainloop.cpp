@@ -558,7 +558,7 @@ void GameMainLoop()
 				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->Faction != -1) {
 					if (start_date.Year) {
 						stratagus::civilization *civilization = stratagus::civilization::get_all()[CPlayer::Players[i]->Race];
-						CFaction *faction = PlayerRaces.Factions[CPlayer::Players[i]->Faction];
+						stratagus::faction *faction = stratagus::faction::get_all()[CPlayer::Players[i]->Faction];
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 							int upgrade_id = UpgradeIdByIdent(iterator->first);
@@ -594,7 +594,7 @@ void GameMainLoop()
 							}
 						}
 
-						for (std::map<std::pair<CDate, CFaction *>, Diplomacy>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
+						for (std::map<std::pair<CDate, stratagus::faction *>, Diplomacy>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
 							if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
 								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 								if (diplomacy_state_player) {

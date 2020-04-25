@@ -71,13 +71,8 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "description") {
 			this->Description = value;
 		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction) {
-				this->Faction = faction;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-			}
+			stratagus::faction *faction = faction::get(value);
+			this->faction = faction;
 		} else if (key == "hidden") {
 			this->Hidden = string::to_bool(value);
 		} else if (key == "sandbox") {
@@ -144,8 +139,8 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 
 std::string campaign::GetSpecies() const
 {
-	if (this->Faction && this->Faction->civilization) {
-		return PlayerRaces.Species[this->Faction->civilization->ID];
+	if (this->get_faction() != nullptr && this->get_faction()->civilization != nullptr) {
+		return PlayerRaces.Species[this->get_faction()->civilization->ID];
 	}
 
 	return std::string();

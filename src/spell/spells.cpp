@@ -993,13 +993,8 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			const stratagus::civilization *civilization = stratagus::civilization::get(value);
 			this->civilization_equivalent = civilization->ID;
 		} else if (key == "faction_equivalent") {
-			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction) {
-				this->FactionEquivalent = faction;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-			}
+			stratagus::faction *faction = stratagus::faction::get(value);
+			this->FactionEquivalent = faction;
 		} else {
 			key = string::snake_case_to_pascal_case(key);
 			

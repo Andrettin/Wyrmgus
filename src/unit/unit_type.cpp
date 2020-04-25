@@ -715,12 +715,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->civilization = civilization->ID;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
-			if (faction) {
-				this->Faction = faction->ID;
-			} else {
-				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
-			}
+			stratagus::faction *faction = stratagus::faction::get(value);
+			this->Faction = faction->ID;
 		} else if (key == "animations") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Animations = AnimationsByIdent(value);
@@ -1115,7 +1111,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			civilization->remove_class_unit_type(this);
 		}
 
-		for (CFaction *faction : PlayerRaces.Factions) {
+		for (stratagus::faction *faction : stratagus::faction::get_all()) {
 			faction->remove_class_unit_type(this);
 		}
 		
@@ -1125,7 +1121,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
 				if (faction_id != -1) {
-					PlayerRaces.Factions[faction_id]->set_class_unit_type(unit_class, this);
+					stratagus::faction::get_all()[faction_id]->set_class_unit_type(unit_class, this);
 				}
 			} else {
 				if (civilization_id != -1) {
@@ -1793,7 +1789,7 @@ std::string CUnitType::GetNamePlural() const
 	return GetPluralForm(this->get_name());
 }
 
-std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
+std::string CUnitType::GeneratePersonalName(stratagus::faction *faction, int gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
@@ -1808,7 +1804,7 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 	return "";
 }
 
-bool CUnitType::IsPersonalNameValid(const std::string &name, CFaction *faction, int gender) const
+bool CUnitType::IsPersonalNameValid(const std::string &name, stratagus::faction *faction, int gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -1823,7 +1819,7 @@ bool CUnitType::IsPersonalNameValid(const std::string &name, CFaction *faction, 
 	return false;
 }
 
-std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction, int gender) const
+std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction *faction, int gender) const
 {
 	std::vector<std::string> potential_names;
 	
@@ -1849,7 +1845,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 				faction = nullptr;
 			}
 			if (this->Faction != -1 && !faction) {
-				faction = PlayerRaces.Factions[this->Faction];
+				faction = stratagus::faction::get_all()[this->Faction];
 			}
 			
 			if (this->BoolFlag[ORGANIC_INDEX].value) {

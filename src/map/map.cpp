@@ -342,7 +342,7 @@ int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 	return mf.Landmass;
 }
 
-Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
+Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
 {
 	if (SaveGameLoading) {
 		return Vec2i(-1, -1);

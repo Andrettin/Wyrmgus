@@ -45,9 +45,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-class CFaction;
-//Wyrmgus end
 class CMapLayer;
 class CPlayer;
 class CSpell;
@@ -55,6 +52,10 @@ class CUnit;
 class CUnitType;
 struct lua_State;
 class MissileType;
+
+namespace stratagus {
+	class faction;
+}
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -168,7 +169,7 @@ public:
 	char ThrustingWeapon;	/// Caster has a thrusting weapon as the current weapon.
 	char FactionUnit;		/// Caster is a faction-specific unit.
 	int civilization_equivalent;
-	CFaction *FactionEquivalent;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
+	stratagus::faction *FactionEquivalent;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
 	//Wyrmgus end
 
 	char *BoolFlag;         /// User defined boolean flag.

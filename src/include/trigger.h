@@ -40,7 +40,6 @@
 ----------------------------------------------------------------------------*/
 
 class CDependency;
-class CFaction;
 class CFile;
 class CTriggerEffect;
 class CUnit;
@@ -48,6 +47,10 @@ class CUnitType;
 class CUpgrade;
 class LuaCallback;
 struct lua_State;
+
+namespace stratagus {
+	class faction;
+}
 
 /**
 **  Timer structure
@@ -125,7 +128,7 @@ struct TriggerDataType {
 	//Wyrmgus start
 	CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger
-	CFaction *Faction; /// Faction used in trigger
+	stratagus::faction *Faction; /// Faction used in trigger
 	//Wyrmgus end
 };
 

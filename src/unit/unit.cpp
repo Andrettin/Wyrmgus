@@ -953,8 +953,8 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
+	if (this->Type->civilization != -1 && this->Type->Faction != -1 && !stratagus::faction::get_all()[this->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -1428,8 +1428,8 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 			faction = this->Player->Faction;
 		}
 		
-		if (faction != -1 && PlayerRaces.Factions[faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[faction]->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = PlayerRaces.Factions[faction]->ButtonIcons[button_action].Icon;
+		if (faction != -1 && stratagus::faction::get_all()[faction]->ButtonIcons.find(button_action) != stratagus::faction::get_all()[faction]->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = stratagus::faction::get_all()[faction]->ButtonIcons[button_action].Icon;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization].find(button_action) != PlayerRaces.ButtonIcons[civilization].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization][button_action].Icon;
@@ -2478,7 +2478,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->civilization;
-		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
+		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 			civilization_id = this->Player->Race;
 		}
 		
@@ -2977,8 +2977,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
+	if (unit->Type->civilization != -1 && unit->Type->Faction != -1 && !stratagus::faction::get_all()[unit->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -3394,9 +3394,9 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	
 	int civilization_id = this->Type->civilization;
 	
-	CFaction *faction = nullptr;
+	stratagus::faction *faction = nullptr;
 	if (this->Player->Faction != -1) {
-		faction = PlayerRaces.Factions[this->Player->Faction];
+		faction = stratagus::faction::get_all()[this->Player->Faction];
 		
 		if (civilization_id != -1 && civilization_id != faction->civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->civilization->ID] && this->Type == faction->get_class_unit_type(this->Type->get_unit_class())) {
 			civilization_id = faction->civilization->ID;
@@ -3456,7 +3456,7 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == settlement_site_unit_type) {
 		if (!this->settlement) {
 			int civilization_id = this->Type->civilization;
-			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
+			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
 				civilization_id = this->Player->Race;
 			}
 			const stratagus::civilization *civilization = nullptr;
@@ -3465,12 +3465,12 @@ void CUnit::UpdateSettlement()
 			}
 			
 			int faction_id = this->Type->Faction;
-			if (this->Player->Faction != -1 && this->Player->Race == civilization_id && this->Type == PlayerRaces.Factions[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
+			if (this->Player->Faction != -1 && this->Player->Race == civilization_id && this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 				faction_id = this->Player->Faction;
 			}
-			const CFaction *faction = nullptr;
+			const stratagus::faction *faction = nullptr;
 			if (faction_id != -1) {
-				faction = PlayerRaces.Factions[faction_id];
+				faction = stratagus::faction::get_all()[faction_id];
 			}
 
 			std::vector<stratagus::site *> potential_settlements;
@@ -4706,7 +4706,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->is_boots() || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!modifier_upgrade->is_arrows() || EquippedItems[ArrowsItemSlot].size() == 0)
 				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.civilization_upgrades[newplayer.Race])
-				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == PlayerRaces.Factions[newplayer.Faction]->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == stratagus::faction::get_all()[newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -6477,8 +6477,8 @@ CIcon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
-		return PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
+		return stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
 	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
 		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}

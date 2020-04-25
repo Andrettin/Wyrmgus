@@ -1887,7 +1887,7 @@ void AiForceManager::CheckForceRecruitment()
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
 		int force_type_weights[MaxForceTypes];
 		for (int i = 0; i < MaxForceTypes; ++i) {
-			force_type_weights[i] = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTypeWeight(i);
+			force_type_weights[i] = stratagus::faction::get_all()[AiPlayer->Player->Faction]->GetForceTypeWeight(i);
 		}
 		
 		std::vector<int> force_types;
@@ -1901,7 +1901,7 @@ void AiForceManager::CheckForceRecruitment()
 		}
 
 		for (size_t k = 0; k < force_types.size(); ++k) {
-			std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(force_types[k]);
+			std::vector<CForceTemplate *> faction_force_templates = stratagus::faction::get_all()[AiPlayer->Player->Faction]->GetForceTemplates(force_types[k]);
 			std::vector<CForceTemplate *> potential_force_templates;
 			int priority = 0;
 			for (size_t i = 0; i < faction_force_templates.size(); ++i) {
@@ -1911,7 +1911,7 @@ void AiForceManager::CheckForceRecruitment()
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->get_units().size(); ++j) {
 					const stratagus::unit_class *unit_class = faction_force_templates[i]->get_units()[j].first;
-					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
 					if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
 						break;
@@ -1943,7 +1943,7 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Role = AiForceRole::Default;
 				for (size_t i = 0; i < force_template->get_units().size(); ++i) {
 					const stratagus::unit_class *unit_class = force_template->get_units()[i].first;
-					CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
 					const int count = force_template->get_units()[i].second;
 					
 					AiUnitType newaiut;

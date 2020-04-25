@@ -584,9 +584,9 @@ static int **Str2ResourceRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CFaction **Str2FactionRef(lua_State *l, const char *s)
+static stratagus::faction **Str2FactionRef(lua_State *l, const char *s)
 {
-	CFaction **res = nullptr; // Result.
+	stratagus::faction **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Faction")) {
@@ -689,9 +689,9 @@ int **CclParseResourceDesc(lua_State *l)
 **
 **  @return   faction reference definition.
 */
-CFaction **CclParseFactionDesc(lua_State *l)
+stratagus::faction **CclParseFactionDesc(lua_State *l)
 {
-	CFaction **res = nullptr;
+	stratagus::faction **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2FactionRef(l, LuaToString(l, -1));
@@ -1346,7 +1346,7 @@ std::string EvalString(const StringDesc *s)
 	const CUnitType **type;	// Temporary unit type
 	CUpgrade **upgrade;	// Temporary upgrade
 	int **resource;		// Temporary resource
-	CFaction **faction;	// Temporary faction
+	stratagus::faction **faction;	// Temporary faction
 	//Wyrmgus end
 
 	Assert(s);
@@ -1432,7 +1432,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->settlement != nullptr && unit->settlement->get_site_unit() != nullptr) {
 				int civilization = unit->settlement->get_site_unit()->Type->civilization;
-				if (civilization != -1 && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization || unit->settlement->get_site_unit()->Type == PlayerRaces.Factions[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
+				if (civilization != -1 && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization || unit->settlement->get_site_unit()->Type == stratagus::faction::get_all()[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
 					civilization = unit->settlement->get_site_unit()->Player->Race;
 				}
 				return unit->settlement->GetCulturalName(civilization != -1 ? stratagus::civilization::get_all()[civilization] : nullptr);
@@ -3528,12 +3528,7 @@ void SavePreferences()
 //Wyrmgus start
 void DeleteModFaction(const std::string &faction_name)
 {
-	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	if (faction != -1 && !PlayerRaces.Factions[faction]->Mod.empty()) {
-		FactionStringToIndex.erase(PlayerRaces.Factions[faction]->Ident);
-		delete PlayerRaces.Factions[faction];
-		PlayerRaces.Factions.erase(std::remove(PlayerRaces.Factions.begin(), PlayerRaces.Factions.end(), PlayerRaces.Factions[faction]), PlayerRaces.Factions.end());
-	}
+	stratagus::faction::remove(faction_name);
 }
 
 void DeleteModUnitType(const std::string &unit_type_ident)
@@ -3560,7 +3555,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 	for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
 		civilization->remove_class_unit_type(unit_type);
 	}
-	for (CFaction *faction : PlayerRaces.Factions) {
+	for (stratagus::faction *faction : stratagus::faction::get_all()) {
 		faction->remove_class_unit_type(unit_type);
 	}
 	for (CUnitType *other_unit_type : CUnitType::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
@@ -3617,13 +3612,15 @@ void DisableMod(const std::string &mod_file)
 		}
 	}
 	
-	const int factions_size = PlayerRaces.Factions.size();
-	for (int i = (factions_size - 1); i >= 0; --i) {
-		if (PlayerRaces.Factions[i]->Mod == mod_file) {
-			FactionStringToIndex.erase(PlayerRaces.Factions[i]->Ident);
-			PlayerRaces.Factions.erase(std::remove(PlayerRaces.Factions.begin(), PlayerRaces.Factions.end(), PlayerRaces.Factions[i]), PlayerRaces.Factions.end());
-			delete PlayerRaces.Factions[i];
+	std::vector<stratagus::faction *> factions_to_remove;
+	for (stratagus::faction *faction : stratagus::faction::get_all()) {
+		if (faction->Mod == mod_file) {
+			factions_to_remove.push_back(faction);
 		}
+	}
+
+	for (stratagus::faction *faction : factions_to_remove) {
+		stratagus::faction::remove(faction);
 	}
 }
 

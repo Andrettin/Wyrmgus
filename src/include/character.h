@@ -43,7 +43,6 @@
 class CDeity;
 class CDeityDomain;
 class CDependency;
-class CFaction;
 class CFile;
 class CLanguage;
 class CPersistentItem;
@@ -58,6 +57,7 @@ class LuaCallback;
 namespace stratagus {
 	class calendar;
 	class civilization;
+	class faction;
 	class historical_location;
 	class site;
 }
@@ -146,7 +146,7 @@ public:
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 	stratagus::civilization *civilization = nullptr;	/// Culture to which the character belongs
-	CFaction *Faction = nullptr;	/// Faction to which the character belongs
+	stratagus::faction *Faction = nullptr;	/// Faction to which the character belongs
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
@@ -173,7 +173,7 @@ public:
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
-	std::vector<CFaction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
+	std::vector<stratagus::faction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<CDeity *> GeneratedDeities;		/// Deities picked during history generation for this character to worship
 	std::vector<CDeityDomain *> PreferredDeityDomains;	/// Preferred deity domains for the character, used to generate deities for it if any are lacking
@@ -187,9 +187,9 @@ public:
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
-	std::vector<std::pair<CDate, CFaction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
+	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::unique_ptr<stratagus::historical_location>> HistoricalLocations;	/// historical locations of the character
-	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::tuple<CDate, CDate, stratagus::faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 };
 

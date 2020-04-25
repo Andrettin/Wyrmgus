@@ -2152,7 +2152,7 @@ static void AiCheckPathwayConstruction()
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					CUnitType *worker_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
+					CUnitType *worker_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
 					if (worker_type != nullptr) {						
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
@@ -2295,7 +2295,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	CUnitType *town_hall_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
+	CUnitType *town_hall_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
 	if (town_hall_type == nullptr) {
 		return;
 	}
@@ -2386,7 +2386,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	CUnitType *dock_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("dock"));
+	CUnitType *dock_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("dock"));
 	if (dock_type == nullptr) {
 		return;
 	}
@@ -2510,7 +2510,7 @@ void AiCheckBuildings()
 		return;
 	}
 
-	std::vector<CAiBuildingTemplate *> building_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetAiBuildingTemplates();
+	std::vector<CAiBuildingTemplate *> building_templates = stratagus::faction::get_all()[AiPlayer->Player->Faction]->GetAiBuildingTemplates();
 	std::vector<const CAiBuildingTemplate *> potential_building_templates;
 	
 	int priority = 0;
@@ -2527,7 +2527,7 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
+		CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
 		if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type, false, true)) {
 			continue;
 		}
@@ -2563,7 +2563,7 @@ void AiCheckBuildings()
 	
 	const CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	CUnitType *unit_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
+	CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
 	
 	if (unit_type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[unit_type->Slot].empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);
@@ -2576,7 +2576,7 @@ void AiCheckBuildings()
 
 static void AiCheckMinecartConstruction()
 {
-	CUnitType *minecart_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
+	CUnitType *minecart_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
@@ -2647,7 +2647,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	CUnitType *minecart_type = PlayerRaces.Factions[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
+	CUnitType *minecart_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
