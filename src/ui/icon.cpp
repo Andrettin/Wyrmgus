@@ -258,9 +258,8 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			if (!Preference.CommandButtonFrameG || !(flags & IconCommandButton)) {
 				Preference.PressedIconFrameG->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
 			} else {
-				Preference.CommandButtonFrameG->DrawClip(pos.x - 5, pos.y - 4);
+				Preference.CommandButtonFrameG->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);
 			}
-//			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 		} else {
 			if (show_percent < 100) {
 				DrawUIButton(&s, flags, pos.x, pos.y, text, player, true);
