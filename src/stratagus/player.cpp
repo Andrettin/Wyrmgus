@@ -90,6 +90,7 @@
 //Wyrmgus end
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 #include "video.h"
 #include "world.h"
 
@@ -3730,7 +3731,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 
 	this->ChangeUnitTypeCount(type, -1);
 	
-	this->UnitsByType[type].erase(std::remove(this->UnitsByType[type].begin(), this->UnitsByType[type].end(), unit), this->UnitsByType[type].end());
+	stratagus::vector::remove(this->UnitsByType[type], unit);
 			
 	if (this->UnitsByType[type].empty()) {
 		this->UnitsByType.erase(type);
@@ -3739,7 +3740,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 	if (unit->Active) {
 		this->ChangeUnitTypeAiActiveCount(type, -1);
 		
-		this->AiActiveUnitsByType[type].erase(std::remove(this->AiActiveUnitsByType[type].begin(), this->AiActiveUnitsByType[type].end(), unit), this->AiActiveUnitsByType[type].end());
+		stratagus::vector::remove(this->AiActiveUnitsByType[type], unit);
 		
 		if (this->AiActiveUnitsByType[type].empty()) {
 			this->AiActiveUnitsByType.erase(type);

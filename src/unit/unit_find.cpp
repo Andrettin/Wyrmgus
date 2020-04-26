@@ -47,6 +47,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/vector_util.h"
 
 /*----------------------------------------------------------------------------
   -- Finding units
@@ -406,13 +407,20 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 {
 	BestDepotFinder<true> finder(pos, resource, range, z);
 	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = p.UnitBegin(); it != p.UnitEnd(); ++it) {
-		table.push_back(*it);
+	for (const auto &kv_pair : p.UnitsByType) {
+		const CUnitType *unit_type = kv_pair.first;
+		if (unit_type->CanStore[resource]) {
+			stratagus::vector::merge(table, kv_pair.second);
+		}
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->IsAllied(p) && p.IsAllied(*CPlayer::Players[i])) {
-			for (std::vector<CUnit *>::iterator it = CPlayer::Players[i]->UnitBegin(); it != CPlayer::Players[i]->UnitEnd(); ++it) {
-				table.push_back(*it);
+		const CPlayer *other_player = CPlayer::Players[i];
+		if (other_player->IsAllied(p) && p.IsAllied(*other_player)) {
+			for (const auto &kv_pair : other_player->UnitsByType) {
+				const CUnitType *unit_type = kv_pair.first;
+				if (unit_type->CanStore[resource]) {
+					stratagus::vector::merge(table, kv_pair.second);
+				}
 			}
 		}
 	}
@@ -699,13 +707,20 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
 	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
-		table.push_back(*it);
+	for (const auto &kv_pair : unit.Player->UnitsByType) {
+		const CUnitType *unit_type = kv_pair.first;
+		if (unit_type->CanStore[resource]) {
+			stratagus::vector::merge(table, kv_pair.second);
+		}
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->IsAllied(*unit.Player) && unit.Player->IsAllied(*CPlayer::Players[i])) {
-			for (std::vector<CUnit *>::iterator it = CPlayer::Players[i]->UnitBegin(); it != CPlayer::Players[i]->UnitEnd(); ++it) {
-				table.push_back(*it);
+		const CPlayer *other_player = CPlayer::Players[i];
+		if (other_player->IsAllied(*unit.Player) && unit.Player->IsAllied(*other_player)) {
+			for (const auto &kv_pair : other_player->UnitsByType) {
+				const CUnitType *unit_type = kv_pair.first;
+				if (unit_type->CanStore[resource]) {
+					stratagus::vector::merge(table, kv_pair.second);
+				}
 			}
 		}
 	}
