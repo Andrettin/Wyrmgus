@@ -31,13 +31,17 @@
 
 #include "achievement.h"
 #include "character.h"
+#include "civilization.h"
+#include "faction.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"
+#include "map/site.h"
 #include "parameters.h"
 #include "player.h"
 #include "script.h"
+#include "unit/unit_class.h"
 
 stratagus::quest *CurrentQuest = nullptr;
 
@@ -78,15 +82,15 @@ void SaveQuestCompletion()
 std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type)
 {
 	if (objective_type == ObjectiveType::GatherResource) {
-		return "gather-resource";
+		return "gather_resource";
 	} else if (objective_type == ObjectiveType::HaveResource) {
-		return "have-resource";
+		return "have_resource";
 	} else if (objective_type == ObjectiveType::BuildUnits) {
 		return "build-units";
 	} else if (objective_type == ObjectiveType::BuildUnitsOfClass) {
 		return "build-units-of-class";
 	} else if (objective_type == ObjectiveType::DestroyUnits) {
-		return "destroy-units";
+		return "destroy_units";
 	} else if (objective_type == ObjectiveType::ResearchUpgrade) {
 		return "research-upgrade";
 	} else if (objective_type == ObjectiveType::RecruitHero) {
@@ -106,15 +110,15 @@ std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type)
 
 ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 {
-	if (objective_type == "gather-resource") {
+	if (objective_type == "gather_resource") {
 		return ObjectiveType::GatherResource;
-	} else if (objective_type == "have-resource") {
+	} else if (objective_type == "have_resource") {
 		return ObjectiveType::HaveResource;
 	} else if (objective_type == "build-units") {
 		return ObjectiveType::BuildUnits;
 	} else if (objective_type == "build-units-of-class") {
 		return ObjectiveType::BuildUnitsOfClass;
-	} else if (objective_type == "destroy-units") {
+	} else if (objective_type == "destroy_units") {
 		return ObjectiveType::DestroyUnits;
 	} else if (objective_type == "research-upgrade") {
 		return ObjectiveType::ResearchUpgrade;
@@ -133,7 +137,42 @@ ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 	return ObjectiveType::None;
 }
 
+
+void CQuestObjective::process_sml_property(const stratagus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "objective_string") {
+		this->objective_string = value;
+	} else if (key == "settlement") {
+		this->settlement = stratagus::site::get(value);
+	} else if (key == "faction") {
+		this->faction = stratagus::faction::get(value);
+	} else {
+		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
+	}
+}
+
+void CQuestObjective::process_sml_scope(const stratagus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "unit_classes") {
+		for (const std::string &value : values) {
+			this->unit_classes.push_back(stratagus::unit_class::get(value));
+		}
+	} else {
+		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
 namespace stratagus {
+
+quest::quest(const std::string &identifier) : detailed_data_entry(identifier)
+{
+}
 
 quest::~quest()
 {
@@ -151,6 +190,55 @@ quest::~quest()
 	}
 	for (size_t i = 0; i < this->Objectives.size(); ++i) {
 		delete this->Objectives[i];
+	}
+}
+
+void quest::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "player_color") {
+		const int color = GetPlayerColorIndexByName(value);
+		if (color != -1) {
+			this->PlayerColor = color;
+		} else {
+			throw std::runtime_error("Player color \"" + value + "\" doesn't exist.");
+		}
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void quest::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "objectives") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			CQuestObjective *objective = new CQuestObjective(this->Objectives.size());
+			objective->Quest = this;
+			this->Objectives.push_back(objective);
+
+			objective->ObjectiveType = GetQuestObjectiveTypeIdByName(child_scope.get_tag());
+			if (objective->ObjectiveType == ObjectiveType::None) {
+				throw std::runtime_error("Objective type doesn't exist.");
+			}
+			if (objective->ObjectiveType == ObjectiveType::HeroMustSurvive) {
+				objective->Quantity = 0;
+			}
+
+			database::process_sml_data(objective, child_scope);
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void quest::initialize()
+{
+	if (!this->Hidden && this->civilization != nullptr && std::find(this->civilization->Quests.begin(), this->civilization->Quests.end(), this) == this->civilization->Quests.end()) {
+		this->civilization->Quests.push_back(this);
 	}
 }
 

@@ -1386,12 +1386,13 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.ChangeExperience(xp_gained);
 	
 	//update quests
-	for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
-		if (player.QuestObjectives[i]->ObjectiveType == ObjectiveType::GatherResource) {
-			if (player.QuestObjectives[i]->Resource == rindex) {
-				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + processed_resource_change, player.QuestObjectives[i]->Quantity);
-			} else if (player.QuestObjectives[i]->Resource == this->CurrentResource) {
-				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + unit.ResourcesHeld, player.QuestObjectives[i]->Quantity);
+	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
+		const CQuestObjective *quest_objective = objective->get_quest_objective();
+		if (quest_objective->ObjectiveType == ObjectiveType::GatherResource) {
+			if (quest_objective->Resource == rindex) {
+				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->Quantity);
+			} else if (quest_objective->Resource == this->CurrentResource) {
+				objective->Counter = std::min(objective->Counter + unit.ResourcesHeld, quest_objective->Quantity);
 			}
 		}
 	}

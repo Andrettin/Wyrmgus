@@ -1486,14 +1486,14 @@ void MessagesDisplay::DrawMessages()
 				
 				++z;
 				
-				for (size_t j = 0; j < CPlayer::GetThisPlayer()->QuestObjectives.size(); ++j) {
-					const CPlayerQuestObjective *objective = CPlayer::GetThisPlayer()->QuestObjectives[j];
-					if (objective->Quest != quest) {
+				for (const CPlayerQuestObjective *objective : CPlayer::GetThisPlayer()->QuestObjectives) {
+					const CQuestObjective *quest_objective = objective->get_quest_objective();
+					if (quest_objective->Quest != quest) {
 						continue;
 					}
-					std::string objective_string = "- " + std::string(_(objective->ObjectiveString.c_str()));
-					if (objective->Quantity) {
-						objective_string += " (" + std::to_string((long long) objective->Counter) + "/" + std::to_string((long long) objective->Quantity) + ")";
+					std::string objective_string = "- " + std::string(_(quest_objective->get_objective_string().c_str()));
+					if (quest_objective->Quantity) {
+						objective_string += " (" + std::to_string((long long) objective->Counter) + "/" + std::to_string((long long) quest_objective->Quantity) + ")";
 					}
 					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);
 					++z;

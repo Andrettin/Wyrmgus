@@ -59,6 +59,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 
 /// How many resources the player gets back if canceling upgrade
 static constexpr int CancelUpgradeCostsFactor = 100;
@@ -379,12 +380,13 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		
 		if (!unit.UnderConstruction) {
 			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
+				const CQuestObjective *quest_objective = objective->get_quest_objective();
 				if (
-					(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
-					|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->get_unit_class() == newtype.get_unit_class())
+					(quest_objective->ObjectiveType == ObjectiveType::BuildUnits && stratagus::vector::contains(quest_objective->UnitTypes, &newtype))
+					|| (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && stratagus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class()))
 				) {
-					if (!objective->settlement || objective->settlement == unit.settlement) {
-						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
+					if (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == unit.settlement) {
+						objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
 					}
 				}
 			}

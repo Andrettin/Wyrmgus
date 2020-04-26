@@ -430,8 +430,8 @@ void CPlayer::Load(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				CPlayerQuestObjective *objective = new CPlayerQuestObjective;
-				this->QuestObjectives.push_back(objective);
+				const stratagus::quest *quest = nullptr;
+				CPlayerQuestObjective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
@@ -440,48 +440,13 @@ void CPlayer::Load(lua_State *l)
 					value = LuaToString(l, -1, n + 1);
 					++n;
 					if (!strcmp(value, "quest")) {
-						objective->Quest = stratagus::quest::get(LuaToString(l, -1, n + 1));
-					} else if (!strcmp(value, "objective-type")) {
-						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, n + 1));
-						if (objective->ObjectiveType == ObjectiveType::None) {
-							LuaError(l, "Objective type doesn't exist.");
-						}
-					} else if (!strcmp(value, "objective-string")) {
-						objective->ObjectiveString = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "quantity")) {
-						objective->Quantity = LuaToNumber(l, -1, n + 1);
+						quest = stratagus::quest::get(LuaToString(l, -1, n + 1));
+					} else if (!strcmp(value, "objective-index")) {
+						const int objective_index = LuaToNumber(l, -1, n + 1);
+						objective = new CPlayerQuestObjective(quest->Objectives[objective_index]);
+						this->QuestObjectives.push_back(objective);
 					} else if (!strcmp(value, "counter")) {
 						objective->Counter = LuaToNumber(l, -1, n + 1);
-					} else if (!strcmp(value, "resource")) {
-						int resource = GetResourceIdByName(LuaToString(l, -1, n + 1));
-						if (resource == -1) {
-							LuaError(l, "Resource doesn't exist.");
-						}
-						objective->Resource = resource;
-					} else if (!strcmp(value, "unit-class")) {
-						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, n + 1));
-						objective->set_unit_class(unit_class);
-					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, n + 1));
-						objective->UnitTypes.push_back(unit_type);
-					} else if (!strcmp(value, "upgrade")) {
-						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, n + 1));
-						objective->Upgrade = upgrade;
-					} else if (!strcmp(value, "character")) {
-						CCharacter *character = CCharacter::get(LuaToString(l, -1, n + 1));
-						objective->Character = character;
-					} else if (!strcmp(value, "unique")) {
-						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, n + 1));
-						if (!unique) {
-							LuaError(l, "Unique doesn't exist.");
-						}
-						objective->Unique = unique;
-					} else if (!strcmp(value, "settlement")) {
-						stratagus::site *site = stratagus::site::get(LuaToString(l, -1, n + 1));
-						objective->settlement = site;
-					} else if (!strcmp(value, "faction")) {
-						stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, n + 1));
-						objective->Faction = faction;
 					} else {
 						LuaError(l, "Invalid quest objective property.");
 					}

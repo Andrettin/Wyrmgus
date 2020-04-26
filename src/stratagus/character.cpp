@@ -983,56 +983,9 @@ void SaveHero(CCharacter *hero)
 		fprintf(fd, "\n\t},\n");
 	}
 	
-	if (hero->Custom) {
-		if (hero->QuestsInProgress.size() > 0) {
-			fprintf(fd, "\tQuestsInProgress = {");
-			for (size_t j = 0; j < hero->QuestsInProgress.size(); ++j) {
-				fprintf(fd, "\"%s\"", hero->QuestsInProgress[j]->get_name().c_str());
-				if (j < (hero->QuestsInProgress.size() - 1)) {
-					fprintf(fd, ", ");
-				}
-			}
-			fprintf(fd, "},\n");
-		}
-		if (hero->QuestsCompleted.size() > 0) {
-			fprintf(fd, "\tQuestsCompleted = {");
-			for (size_t j = 0; j < hero->QuestsCompleted.size(); ++j) {
-				fprintf(fd, "\"%s\"", hero->QuestsCompleted[j]->get_name().c_str());
-				if (j < (hero->QuestsCompleted.size() - 1)) {
-					fprintf(fd, ", ");
-				}
-			}
-			fprintf(fd, "},\n");
-		}
-	}
 	fprintf(fd, "})\n\n");
 		
 	fclose(fd);
-}
-
-void HeroAddQuest(const std::string &hero_full_name, const std::string &quest_name)
-{
-	CCharacter *hero = GetCustomHero(hero_full_name);
-	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
-	}
-	
-	stratagus::quest *quest = stratagus::quest::get(quest_name);
-	
-	hero->QuestsInProgress.push_back(quest);
-}
-
-void HeroCompleteQuest(const std::string &hero_full_name, const std::string &quest_name)
-{
-	CCharacter *hero = GetCustomHero(hero_full_name);
-	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
-	}
-	
-	stratagus::quest *quest = stratagus::quest::get(quest_name);
-	
-	hero->QuestsInProgress.erase(std::remove(hero->QuestsInProgress.begin(), hero->QuestsInProgress.end(), quest), hero->QuestsInProgress.end());
-	hero->QuestsCompleted.push_back(quest);
 }
 
 void SaveCustomHero(const std::string &hero_full_name)

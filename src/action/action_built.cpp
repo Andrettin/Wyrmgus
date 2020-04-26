@@ -52,6 +52,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/vector_util.h"
 
 /// How many resources the player gets back if canceling building
 static constexpr int CancelBuildingCostsFactor = 75;
@@ -185,12 +186,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	player.IncreaseCountsForUnit(&unit);
 	
 	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
+		const CQuestObjective *quest_objective = objective->get_quest_objective();
 		if (
-			(objective->ObjectiveType == ObjectiveType::BuildUnits && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
-			|| (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && objective->get_unit_class() == type.get_unit_class())
+			(quest_objective->ObjectiveType == ObjectiveType::BuildUnits && stratagus::vector::contains(quest_objective->UnitTypes, &type))
+			|| (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class()))
 		) {
-			if (!objective->settlement || objective->settlement == unit.settlement) {
-				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
+			if (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == unit.settlement) {
+				objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
 			}
 		}
 	}

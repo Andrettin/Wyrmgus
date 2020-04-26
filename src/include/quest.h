@@ -37,8 +37,12 @@ class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
+struct lua_State;
+
+int CclDefineQuest(lua_State *l);
 
 namespace stratagus {
+	class civilization;
 	class faction;
 	class quest;
 	class site;
@@ -63,42 +67,89 @@ enum class ObjectiveType {
 class CQuestObjective
 {
 public:
-	const stratagus::unit_class *get_unit_class() const
+	CQuestObjective(const int index) : index(index)
 	{
-		return this->unit_class;
 	}
 
-	void set_unit_class(const stratagus::unit_class *unit_class)
+	void process_sml_property(const stratagus::sml_property &property);
+	void process_sml_scope(const stratagus::sml_data &scope);
+
+	int get_index() const
 	{
-		this->unit_class = unit_class;
+		return this->index;
 	}
 
+	const std::string &get_objective_string() const
+	{
+		return this->objective_string;
+	}
+
+	const std::vector<const stratagus::unit_class *> &get_unit_classes() const
+	{
+		return this->unit_classes;
+	}
+
+	const stratagus::site *get_settlement() const
+	{
+		return this->settlement;
+	}
+
+	const stratagus::faction *get_faction() const
+	{
+		return this->faction;
+	}
+
+private:
+	int index = -1;
+public:
 	ObjectiveType ObjectiveType = ObjectiveType::None;
 	int Quantity = 1;
 	int Resource = -1;
 private:
-	const stratagus::unit_class *unit_class = nullptr;
+	std::string objective_string;
 public:
-	std::string ObjectiveString;
 	stratagus::quest *Quest = nullptr;
+private:
+	std::vector<const stratagus::unit_class *> unit_classes;
+public:
 	std::vector<const CUnitType *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 	const CCharacter *Character = nullptr;
 	const CUniqueItem *Unique = nullptr;
+private:
 	const stratagus::site *settlement = nullptr;
-	const stratagus::faction *Faction = nullptr;
+	const stratagus::faction *faction = nullptr;
+
+	friend int CclDefineQuest(lua_State *l);
 };
 
-class CPlayerQuestObjective : public CQuestObjective
+class CPlayerQuestObjective
 {
+public:
+	CPlayerQuestObjective(const CQuestObjective *quest_objective) : quest_objective(quest_objective)
+	{
+	}
+
+	const CQuestObjective *get_quest_objective() const
+	{
+		return this->quest_objective;
+	}
+
+private:
+	const CQuestObjective *quest_objective = nullptr;
 public:
 	int Counter = 0;
 };
 
 namespace stratagus {
 
-class quest : public detailed_data_entry, public data_type<quest>
+class quest final : public detailed_data_entry, public data_type<quest>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
+
 public:
 	static constexpr const char *class_identifier = "quest";
 	static constexpr const char *database_folder = "quests";
@@ -110,13 +161,23 @@ public:
 		return quest;
 	}
 
-
-	quest(const std::string &identifier) : detailed_data_entry(identifier)
-	{
-	}
-
+	quest(const std::string &identifier);
 	~quest();
 	
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
+
+	CIcon *get_icon() const
+	{
+		return this->icon;
+	}
+
+	bool is_unobtainable() const
+	{
+		return this->unobtainable;
+	}
+
 	bool IsCompleted() const
 	{
 		return this->Completed;
@@ -139,17 +200,21 @@ public:
 	std::string Rewards;			/// Description of the quest's rewards
 	std::string Hint;				/// Quest hint
 	int ID = -1;
-	int civilization = -1;				/// Which civilization the quest belongs to
+	civilization *civilization = nullptr; //civilization to which civilization the quest belongs to
+private:
+	CIcon *icon = nullptr;
+public:
 	int PlayerColor = 0;				/// Player color used for the quest's icon
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden
-	bool Completed = false;				/// Whether the quest has been completed
-	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others
-	bool Unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
+private:
+	bool unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
+public:
 	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool Unfailable = false;			/// Whether the quest can fail normally
-	IconConfig Icon;					/// Quest's icon
+	bool Completed = false;				/// Whether the quest has been completed
+	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	CDialogue *IntroductionDialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *AcceptEffects = nullptr;
@@ -159,6 +224,8 @@ public:
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
+
+	friend int ::CclDefineQuest(lua_State *l);
 };
 
 }

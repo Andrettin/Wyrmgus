@@ -110,7 +110,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1));
-			quest->civilization = civilization->ID;
+			quest->civilization = civilization;
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
 			int color = GetPlayerColorIndexByName(color_name);
@@ -124,15 +124,13 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Competitive")) {
 			quest->Competitive = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
-			quest->Unobtainable = LuaToBoolean(l, -1);
+			quest->unobtainable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Uncompleteable")) {
 			quest->Uncompleteable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unfailable")) {
 			quest->Unfailable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			quest->Icon.Name = LuaToString(l, -1);
-			quest->Icon.Icon = nullptr;
-			quest->Icon.Load();
+			quest->icon = CIcon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
 			CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
@@ -166,7 +164,7 @@ static int CclDefineQuest(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CQuestObjective *objective = new CQuestObjective;
+				CQuestObjective *objective = new CQuestObjective(quest->Objectives.size());
 				objective->Quest = quest;
 				quest->Objectives.push_back(objective);
 				if (!lua_istable(l, -1)) {
@@ -185,7 +183,7 @@ static int CclDefineQuest(lua_State *l)
 							objective->Quantity = 0;
 						}
 					} else if (!strcmp(value, "objective-string")) {
-						objective->ObjectiveString = LuaToString(l, -1, k + 1);
+						objective->objective_string = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "quantity")) {
 						objective->Quantity = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource")) {
@@ -196,7 +194,7 @@ static int CclDefineQuest(lua_State *l)
 						objective->Resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
 						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
-						objective->set_unit_class(unit_class);
+						objective->unit_classes.push_back(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
 						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
 						objective->UnitTypes.push_back(unit_type);
@@ -217,7 +215,7 @@ static int CclDefineQuest(lua_State *l)
 						objective->settlement = site;
 					} else if (!strcmp(value, "faction")) {
 						stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
-						objective->Faction = faction;
+						objective->faction = faction;
 					} else {
 						printf("\n%s\n", quest->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -235,10 +233,6 @@ static int CclDefineQuest(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-	}
-	
-	if (!quest->Hidden && quest->civilization != -1 && std::find(stratagus::civilization::get_all()[quest->civilization]->Quests.begin(), stratagus::civilization::get_all()[quest->civilization]->Quests.end(), quest) == stratagus::civilization::get_all()[quest->civilization]->Quests.end()) {
-		stratagus::civilization::get_all()[quest->civilization]->Quests.push_back(quest);
 	}
 	
 	return 0;
@@ -318,8 +312,8 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushstring(l, quest->CompletionSpeech.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (quest->civilization != -1) {
-			lua_pushstring(l, stratagus::civilization::get_all()[quest->civilization]->get_identifier().c_str());
+		if (quest->civilization != nullptr) {
+			lua_pushstring(l, quest->civilization->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -340,7 +334,11 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushnumber(l, quest->HighestCompletedDifficulty);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, quest->Icon.Name.c_str());
+		if (quest->get_icon() != nullptr) {
+			lua_pushstring(l, quest->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Objectives")) {
 		lua_createtable(l, quest->ObjectiveStrings.size(), 0);

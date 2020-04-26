@@ -179,8 +179,6 @@ public:
 	std::vector<CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
-	std::vector<stratagus::quest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
-	std::vector<stratagus::quest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
@@ -206,8 +204,6 @@ extern int GetAttributeVariableIndex(int attribute);
 extern CCharacter *GetCustomHero(const std::string &hero_ident);
 extern void SaveHero(CCharacter *hero);
 extern void SaveHeroes();
-extern void HeroAddQuest(const std::string &hero_ident, const std::string &quest_ident);
-extern void HeroCompleteQuest(const std::string &hero_ident, const std::string &quest_ident);
 extern void SaveCustomHero(const std::string &hero_ident);
 extern void DeleteCustomHero(const std::string &hero_ident);
 extern void SetCurrentCustomHero(const std::string &hero_ident);

@@ -760,20 +760,6 @@ static int CclDefineCustomHero(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "QuestsInProgress")) {
-			hero->QuestsInProgress.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				std::string quest_name = LuaToString(l, -1, j + 1);
-				hero->QuestsInProgress.push_back(stratagus::quest::get(quest_name));
-			}
-		} else if (!strcmp(value, "QuestsCompleted")) {
-			hero->QuestsCompleted.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				std::string quest_name = LuaToString(l, -1, j + 1);
-				hero->QuestsCompleted.push_back(stratagus::quest::get(quest_name));
-			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
 			hero->ForbiddenUpgrades.clear();
 			const int args = lua_rawlen(l, -1);

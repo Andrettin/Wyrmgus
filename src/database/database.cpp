@@ -45,6 +45,7 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "plane.h"
+#include "quest.h"
 #include "sound/sound.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
@@ -169,6 +170,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
 		} else if (property_class_name == "stratagus::plane*") {
 			new_property_value = QVariant::fromValue(plane::get(property.get_value()));
+		} else if (property_class_name == "stratagus::quest*") {
+			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
 		} else if (property_class_name == "stratagus::site*") {
 			new_property_value = QVariant::fromValue(site::get(property.get_value()));
 		} else if (property_class_name == "stratagus::sound*") {
