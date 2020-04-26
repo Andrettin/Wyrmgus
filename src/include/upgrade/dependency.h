@@ -248,6 +248,7 @@ public:
 	CUnitTypeDependency() {}
 	CUnitTypeDependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
 	
+	virtual void process_sml_property(const stratagus::sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual std::string GetString(const std::string &prefix = "") const override;
@@ -263,8 +264,8 @@ public:
 	CUpgradeDependency() {}
 	CUpgradeDependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
 	
+	virtual void process_sml_property(const stratagus::sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual void process_sml_property(const stratagus::sml_property &property);
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
 	virtual std::string GetString(const std::string &prefix = "") const override;

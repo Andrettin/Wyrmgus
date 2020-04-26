@@ -304,6 +304,20 @@ bool CNotDependency::Check(const CUnit *unit, bool ignore_units) const
 	return true;
 }
 
+void CUnitTypeDependency::process_sml_property(const stratagus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "unit_type") {
+		this->UnitType = CUnitType::get(value);
+	} else if (key == "count") {
+		this->Count = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid unit type dependency property: \"" + property.get_key() + "\".");
+	}
+}
+
 void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
@@ -339,6 +353,18 @@ std::string CUnitTypeDependency::GetString(const std::string &prefix) const
 	return str;
 }
 
+void CUpgradeDependency::process_sml_property(const stratagus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "upgrade") {
+		this->Upgrade = CUpgrade::get(value);
+	} else {
+		throw std::runtime_error("Invalid upgrade dependency property: \"" + property.get_key() + "\".");
+	}
+}
+
 void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
@@ -348,18 +374,6 @@ void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, 
 		this->Upgrade = CUpgrade::get(value);
 	} else {
 		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-void CUpgradeDependency::process_sml_property(const stratagus::sml_property &property)
-{
-	const std::string &key = property.get_key();
-	std::string value = property.get_value();
-	if (key == "upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::get(value);
-	} else {
-		throw std::runtime_error("Invalid upgrade dependency property: \"" + property.get_key() + "\".");
 	}
 }
 
