@@ -141,12 +141,8 @@ static int CclDefineQuest(lua_State *l)
 			quest->Icon.Load();
 		} else if (!strcmp(value, "QuestGiver")) {
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *quest_giver = CCharacter::GetCharacter(quest_giver_name);
-			if (quest_giver) {
-				quest->QuestGiver = quest_giver;
-			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ quest_giver_name.c_str());
-			}
+			CCharacter *quest_giver = CCharacter::get(quest_giver_name);
+			quest->QuestGiver = quest_giver;
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
 			CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
@@ -218,10 +214,7 @@ static int CclDefineQuest(lua_State *l)
 						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
-						CCharacter *character = CCharacter::GetCharacter(LuaToString(l, -1, k + 1));
-						if (!character) {
-							LuaError(l, "Character doesn't exist.");
-						}
+						CCharacter *character = CCharacter::get(LuaToString(l, -1, k + 1));
 						objective->Character = character;
 					} else if (!strcmp(value, "unique")) {
 						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, k + 1));
@@ -246,10 +239,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->HeroesMustSurvive.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CCharacter *hero = CCharacter::GetCharacter(LuaToString(l, -1, j + 1));
-				if (!hero) {
-					LuaError(l, "Hero doesn't exist.");
-				}
+				CCharacter *hero = CCharacter::get(LuaToString(l, -1, j + 1));
 				quest->HeroesMustSurvive.push_back(hero);
 			}
 		} else {
@@ -626,12 +616,8 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Load();
 		} else if (!strcmp(value, "Character")) {
 			std::string character_name = LuaToString(l, -1);
-			CCharacter *character = CCharacter::GetCharacter(character_name);
-			if (character) {
-				achievement->Character = character;
-			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ character_name.c_str());
-			}
+			CCharacter *character = CCharacter::get(character_name);
+			achievement->Character = character;
 		} else if (!strcmp(value, "CharacterType")) {
 			const std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::get(unit_type_ident);

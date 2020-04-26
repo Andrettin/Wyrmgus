@@ -1644,7 +1644,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		}
 	}
 	
-	for (CCharacter *character : CCharacter::Characters) {
+	for (CCharacter *character : CCharacter::get_all()) {
 		if (!character->CanAppear()) {
 			continue;
 		}

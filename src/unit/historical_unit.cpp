@@ -52,6 +52,7 @@ void historical_unit::process_sml_dated_scope(const sml_data &scope, const QDate
 	if (tag == "location") {
 		auto location = std::make_unique<historical_location>();
 		database::get()->process_sml_data(location, scope);
+		location->initialize();
 		location->check();
 		this->location = std::move(location);
 	} else {

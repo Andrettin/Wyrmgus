@@ -118,7 +118,6 @@ void CleanModules()
 	FreeAi();
 	PlayerRaces.Clean();
 	CAchievement::ClearAchievements();
-	CCharacter::ClearCharacters();
 	CleanConstructions();
 	CCurrency::ClearCurrencies();
 	CleanDecorations();

@@ -31,6 +31,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
 #include "item.h"
 #include "time/date.h"
@@ -103,22 +105,22 @@ enum CharacterTitles {
 	MaxCharacterTitles
 };
 
-class CCharacter : public CDataType
+class CCharacter : public stratagus::detailed_data_entry, public stratagus::data_type<CCharacter>, public CDataType
 {
 public:
-	static CCharacter *GetCharacter(const std::string &ident, const bool should_find = true);
-	static CCharacter *GetOrAddCharacter(const std::string &ident);
-	static void ClearCharacters();
+	static constexpr const char *class_identifier = "character";
+	static constexpr const char *database_folder = "characters";
+
+	static void clear();
 	static void GenerateCharacterHistory();		/// Generates history for characters
 	static void ResetCharacterHistory();		/// Removes generated history data from characters
 	
-	static std::vector<CCharacter *> Characters;
-	static std::map<std::string, CCharacter *> CharactersByIdent;
-	
-	CCharacter();
+	CCharacter(const std::string &identifier);
 	~CCharacter();
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void initialize() override;
+
 	void GenerateHistory();
 	void ResetHistory();
 	void SaveHistory();
@@ -140,7 +142,6 @@ public:
 	IconConfig GetIcon() const;
 	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
-	void SaveHistory(CFile &file);		/// Save generated history data for the character
 
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
@@ -153,12 +154,8 @@ public:
 	bool ViolentDeath = false;	/// If historical death was violent
 	bool Custom = false;		/// Whether this character is a custom hero
 	bool Initialized = false;	/// Whether the character has already been initialized
-	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family
-	std::string Description;	/// Description of the character from an in-game universe perspective
-	std::string Background;		/// Description of the character from a perspective outside of the game's universe
-	std::string Quote;			/// A quote relating to the character
 	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)

@@ -267,9 +267,9 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CCharacter *character = nullptr;
 			if (LoadingHistory) {
 				//only load the history for characters that are already in the character database
-				character = CCharacter::GetCharacter(ident);
+				character = CCharacter::get(ident);
 			} else {
-				character = CCharacter::GetOrAddCharacter(ident);
+				character = CCharacter::get_or_add(ident, nullptr);
 			}
 			if (!character) {
 				continue;

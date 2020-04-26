@@ -853,10 +853,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 	std::string map_template_ident = LuaToString(l, 1);
 	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
-	CCharacter *hero = CCharacter::GetCharacter(LuaToString(l, 2));
-	if (hero == nullptr) {
-		LuaError(l, "Hero doesn't exist");
-	}
+	CCharacter *hero = CCharacter::get(LuaToString(l, 2));
 
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 4);

@@ -198,7 +198,7 @@ public:
 class CGrandStrategyHero : public CCharacter
 {
 public:
-	CGrandStrategyHero() : CCharacter(),
+	CGrandStrategyHero() : CCharacter(""),
 		State(0), Existed(false),
 		Province(nullptr), ProvinceOfOrigin(nullptr),
 		Father(nullptr), Mother(nullptr)

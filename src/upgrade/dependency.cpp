@@ -407,8 +407,7 @@ void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "character") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Character = CCharacter::GetCharacter(value);
+		this->Character = CCharacter::get(value);
 	} else {
 		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
 	}

@@ -623,7 +623,7 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	}
 	
 	if (potential_heroes.size() > 0 && SyncRand(10) != 0) { // 9 chances out of 10 that a literary work will use a hero's name as a basis
-		work_name += potential_heroes[SyncRand(potential_heroes.size())]->Name;
+		work_name += potential_heroes[SyncRand(potential_heroes.size())]->get_name();
 		if (work_name.substr(work_name.size() - 1, 1) != "s") {
 			work_name += "s";
 		}
@@ -964,7 +964,7 @@ bool CGrandStrategyHero::IsVisible()
 
 bool CGrandStrategyHero::IsGenerated()
 {
-	return !this->Custom && CCharacter::GetCharacter(this->GetFullName()) == nullptr;
+	return !this->Custom && CCharacter::get(this->GetFullName()) == nullptr;
 }
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)

@@ -55,7 +55,8 @@ public:
 	void process_sml_scope(const sml_data &scope);
 
 	void ProcessConfigData(const CConfigData *config_data);
-	void check();
+	void initialize();
+	void check() const;
 	
 public:
 	CDate Date; //the historical location's date

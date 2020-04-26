@@ -914,7 +914,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	CCharacter *character = nullptr;
 	if (!custom_hero) {
-		character = CCharacter::GetCharacter(character_ident);
+		character = CCharacter::get(character_ident);
 	} else {
 		character = GetCustomHero(character_ident);
 	}
@@ -931,7 +931,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 		old_mana_percent = this->Variable[MANA_INDEX].Value * 100 / this->Variable[MANA_INDEX].Max;
 	}
 	
-	this->Name = this->Character->Name;
+	this->Name = this->Character->get_name();
 	this->ExtraName = this->Character->ExtraName;
 	this->FamilyName = this->Character->FamilyName;
 	
@@ -2485,7 +2485,7 @@ void CUnit::UpdateSoldUnits()
 		}
 		
 		if (CurrentQuest == nullptr) {
-			for (CCharacter *character : CCharacter::Characters) {
+			for (CCharacter *character : CCharacter::get_all()) {
 				if (this->Player->CanRecruitHero(character)) {
 					potential_heroes.push_back(character);
 				}
