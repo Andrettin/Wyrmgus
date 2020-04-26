@@ -64,7 +64,6 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/icon.h"
-#include "unit/historical_unit.h"
 #include "unit/unit_type.h"
 #include "util/util.h"
 #include "world.h"
@@ -292,11 +291,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(ident);
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "historical_unit") {
-			stratagus::historical_unit *historical_unit = stratagus::historical_unit::get_or_add(ident, nullptr);
-			if (!define_only) {
-				historical_unit->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "icon") {
 			CIcon *icon = CIcon::get_or_add(ident, nullptr);

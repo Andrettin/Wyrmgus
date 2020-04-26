@@ -47,7 +47,7 @@ void data_entry::load_history()
 
 	for (const sml_data &data : this->history_data) {
 		data.for_each_property([&](const sml_property &property) {
-			this->process_sml_property(property); //properties outside of a date scope, to be applied regardless of start date
+			this->process_sml_dated_property(property, QDateTime()); //properties outside of a date scope, to be applied regardless of start date
 		});
 
 		const campaign *current_campaign = game::get()->get_current_campaign();
@@ -62,6 +62,12 @@ void data_entry::load_history()
 
 				if (timeline == nullptr) {
 					calendar = calendar::try_get(history_entry.get_tag());
+				}
+
+				if (calendar == nullptr) {
+					//treat the scope as a property to be applied immediately
+					this->process_sml_dated_scope(history_entry, QDateTime());
+					return;
 				}
 			}
 

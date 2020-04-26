@@ -1499,10 +1499,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 	}
 	
 	for (const historical_unit *historical_unit : historical_unit::get_all()) {
-		if (
-			(historical_unit->StartDate.Year != 0 && !start_date.ContainsDate(historical_unit->StartDate))
-			|| (historical_unit->EndDate.Year != 0 && start_date.ContainsDate(historical_unit->EndDate))
-		) {
+		if (!historical_unit->is_active()) {
 			continue;
 		}
 		
@@ -1517,23 +1514,23 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		bool in_another_map_template = false;
-		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
-		
+		const bool in_another_map_template = historical_unit->get_location()->map_template != this;
 		if (in_another_map_template) {
 			continue;
 		}
+
+		QPoint unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, false);
 		
-		if (unit_pos.x == -1 || unit_pos.y == -1) {
+		if (unit_pos.x() == -1 || unit_pos.y() == -1) {
 			if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
 				continue;
 			}
 			
-			unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
+			unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, true);
 			
-			if (unit_pos.x == -1 || unit_pos.y == -1) {
+			if (unit_pos.x() == -1 || unit_pos.y() == -1) {
 				unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
-				unit_pos += Vec2i(unit_type->get_tile_center_pos_offset());
+				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
 		} else {
 			if (random) {
@@ -1541,7 +1538,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			}
 		}
 		
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x() < map_start_pos.x() || unit_pos.y() < map_start_pos.y()) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
 			continue;
 		}
 		
@@ -1599,7 +1596,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : nullptr;
 		
 		bool in_another_map_template = false;
-		Vec2i hero_pos = this->GetBestLocationMapPosition(character->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
+		Vec2i hero_pos = this->get_best_location_map_position(character->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
 		
 		if (in_another_map_template) {
 			continue;
@@ -1610,7 +1607,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				continue;
 			}
 			
-			hero_pos = this->GetBestLocationMapPosition(character->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
+			hero_pos = this->get_best_location_map_position(character->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
 			
 			if ((hero_pos.x == -1 || hero_pos.y == -1) && hero_player && hero_player->StartMapLayer == z) {
 				hero_pos = hero_player->StartPos;
@@ -1913,14 +1910,14 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 }
 
 /**
-**	@brief	Gets the best map position from a list of historical locations
+**	@brief	Get the best map position from a list of historical locations
 **
 **	@param	historical_location_list	The list of historical locations
-**	@param	in_another_map_template		This is set to true if there is a valid position, but it is in another map templa
+**	@param	in_another_map_template		This is set to true if there is a valid position, but it is in another map template
 **
 **	@return	The best position if found, or an invalid one otherwise
 */
-Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const
+Vec2i map_template::get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const
 {
 	Vec2i pos(-1, -1);
 	in_another_map_template = false;
@@ -1949,6 +1946,24 @@ Vec2i map_template::GetBestLocationMapPosition(const std::vector<std::unique_ptr
 	}
 	
 	return pos;
+}
+
+QPoint map_template::get_location_map_position(const std::unique_ptr<historical_location> &historical_location, const QPoint &template_start_pos, const QPoint &map_start_pos, const bool random) const
+{
+	//get a map position for a historical location
+	QPoint pos(-1, -1);
+	
+	if (historical_location->map_template == this) {
+		if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
+			return map_start_pos + historical_location->Position - template_start_pos;
+		} else if (random) {
+			if (historical_location->site != nullptr && historical_location->site->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+				return historical_location->site->get_site_unit()->get_center_tile_pos();
+			}
+		}
+	}
+
+	return QPoint(-1, -1);
 }
 
 }

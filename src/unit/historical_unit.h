@@ -40,7 +40,7 @@ class faction;
 class historical_location;
 class unit_class;
 
-class historical_unit : public named_data_entry, public data_type<historical_unit>, public CDataType
+class historical_unit : public named_data_entry, public data_type<historical_unit>
 {
 	Q_OBJECT
 
@@ -49,6 +49,7 @@ class historical_unit : public named_data_entry, public data_type<historical_uni
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
+	Q_PROPERTY(bool active MEMBER active READ is_active)
 
 public:
 	static constexpr const char *class_identifier = "historical_unit";
@@ -58,9 +59,9 @@ public:
 	~historical_unit();
 	
 	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void check() const override;
+	virtual void reset_history() override;
 
 	unit_class *get_unit_class() const
 	{
@@ -86,6 +87,16 @@ public:
 	{
 		return this->ai_active;
 	}
+
+	bool is_active() const
+	{
+		return this->active;
+	}
+
+	const std::unique_ptr<historical_location> &get_location() const
+	{
+		return this->location;
+	}
 	
 private:
 	unit_class *unit_class = nullptr; //the unit's unit class
@@ -94,14 +105,10 @@ public:
 	faction *Faction = nullptr; //the unit's faction
 private:
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
-public:
-	CDate StartDate; //when the unit starts being active
-	CDate EndDate; //when the unit ends being active (e.g. when it is disbanded)
-private:
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 	bool ai_active = true; //whether the unit's AI is active
-public:
-	std::vector<std::unique_ptr<historical_location>> HistoricalLocations; //historical locations for the unit
+	bool active = false; //whether the unit is active, i.e. should be applied to the map; used for history
+	std::unique_ptr<historical_location> location; //the unit's location, used for history
 };
 
 }
