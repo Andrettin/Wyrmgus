@@ -1585,7 +1585,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		}
 		
 		const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
-		const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->GetTileSize()) - QPoint(-1, -1);
+		const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->GetTileSize()) - QPoint(1, 1);
 		if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
 			continue;
 		}
