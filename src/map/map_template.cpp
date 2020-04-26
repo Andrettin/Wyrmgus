@@ -1561,7 +1561,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 
-		if (!this->contains_pos(historical_unit->get_location()->Position)) {
+		if (historical_unit->get_location()->Position.x != -1 && historical_unit->get_location()->Position.y != -1 && !this->contains_pos(historical_unit->get_location()->Position)) {
 			continue;
 		}
 
