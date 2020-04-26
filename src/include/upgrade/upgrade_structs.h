@@ -102,6 +102,7 @@ class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::
 	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
+	Q_PROPERTY(QString effects_string READ get_effects_string_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
 	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
@@ -152,6 +153,16 @@ public:
 		return this->effects_string;
 	}
 
+	QString get_effects_string_qstring() const
+	{
+		return QString::fromStdString(this->get_effects_string());
+	}
+
+	Q_INVOKABLE void set_effects_string(const std::string &effects_string)
+	{
+		this->effects_string = effects_string;
+	}
+
 	const std::string &get_requirements_string() const
 	{
 		return this->requirements_string;
@@ -198,7 +209,6 @@ private:
 	int faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade
-private:
 	CIcon *icon = nullptr;			/// icon to display to the user
 	bool ability = false;
 	bool weapon = false;
