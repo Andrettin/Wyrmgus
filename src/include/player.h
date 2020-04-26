@@ -73,7 +73,6 @@ class CGraphic;
 class CLanguage;
 class CProvince;
 class CPlayerQuestObjective;
-class CQuest;
 class CReligion;
 class CUnit;
 class CUnitType;
@@ -89,6 +88,7 @@ namespace stratagus {
 	class age;
 	class calendar;
 	class civilization;
+	class quest;
 	class site;
 	class unit_class;
 }
@@ -177,9 +177,9 @@ public:
 	std::map<const CUnitType *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;											/// hero units owned by this player
 	std::vector<CDeity *> Deities;											/// deities chosen by this player
-	std::vector<CQuest *> AvailableQuests;									/// quests available to this player
-	std::vector<CQuest *> CurrentQuests;									/// quests being pursued by this player
-	std::vector<CQuest *> CompletedQuests;									/// quests completed by this player
+	std::vector<stratagus::quest *> AvailableQuests;									/// quests available to this player
+	std::vector<stratagus::quest *> CurrentQuests;									/// quests being pursued by this player
+	std::vector<stratagus::quest *> CompletedQuests;									/// quests completed by this player
 	std::vector<CPlayerQuestObjective *> QuestObjectives;					/// Objectives of the player's current quests
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
 	std::vector<int> AutosellResources;
@@ -287,13 +287,13 @@ public:
 	void UpdateQuestPool();
 	void AvailableQuestsChanged();
 	void UpdateCurrentQuests();
-	void AcceptQuest(CQuest *quest);
-	void CompleteQuest(CQuest *quest);
-	void FailQuest(CQuest *quest, std::string fail_reason = "");
-	void RemoveCurrentQuest(CQuest *quest);
-	bool CanAcceptQuest(CQuest *quest);
-	bool HasCompletedQuest(CQuest *quest);
-	std::string HasFailedQuest(CQuest *quest);
+	void AcceptQuest(stratagus::quest *quest);
+	void CompleteQuest(stratagus::quest *quest);
+	void FailQuest(stratagus::quest *quest, std::string fail_reason = "");
+	void RemoveCurrentQuest(stratagus::quest *quest);
+	bool CanAcceptQuest(stratagus::quest *quest);
+	bool HasCompletedQuest(stratagus::quest *quest);
+	std::string HasFailedQuest(stratagus::quest *quest);
 	void AddModifier(CUpgrade *modifier, int cycles);
 	void RemoveModifier(CUpgrade *modifier);
 	bool AtPeace() const;

@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "quest.h"
@@ -43,24 +39,7 @@
 #include "player.h"
 #include "script.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CQuest *> Quests;
-CQuest *CurrentQuest = nullptr;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-void CleanQuests()
-{
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		delete Quests[i];
-	}
-	Quests.clear();
-}
+stratagus::quest *CurrentQuest = nullptr;
 
 void SaveQuestCompletion()
 {
@@ -87,9 +66,9 @@ void SaveQuestCompletion()
 	
 	fprintf(fd, "\n");
 	
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (Quests[i]->Completed) {
-			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", Quests[i]->Ident.c_str(), Quests[i]->HighestCompletedDifficulty);
+	for (const stratagus::quest *quest : stratagus::quest::get_all()) {
+		if (quest->Completed) {
+			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", quest->get_identifier().c_str(), quest->HighestCompletedDifficulty);
 		}
 	}
 	
@@ -154,24 +133,9 @@ ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 	return ObjectiveType::None;
 }
 
-CQuest *GetQuest(const std::string &quest_ident)
-{
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (quest_ident == Quests[i]->Ident) {
-			return Quests[i];
-		}
-	}
-	
-	for (size_t i = 0; i < Quests.size(); ++i) { // for backwards compatibility
-		if (NameToIdent(quest_ident) == Quests[i]->Ident) {
-			return Quests[i];
-		}
-	}
-	
-	return nullptr;
-}
+namespace stratagus {
 
-CQuest::~CQuest()
+quest::~quest()
 {
 	if (this->Conditions) {
 		delete Conditions;
@@ -190,12 +154,14 @@ CQuest::~CQuest()
 	}
 }
 
+}
+
 void SetCurrentQuest(const std::string &quest_ident)
 {
 	if (quest_ident.empty()) {
 		CurrentQuest = nullptr;
 	} else {
-		CurrentQuest = GetQuest(quest_ident);
+		CurrentQuest = stratagus::quest::get(quest_ident);
 	}
 }
 
@@ -204,13 +170,13 @@ std::string GetCurrentQuest()
 	if (!CurrentQuest) {
 		return "";
 	} else {
-		return CurrentQuest->Ident;
+		return CurrentQuest->get_identifier();
 	}
 }
 
 void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save)
 {
-	CQuest *quest = GetQuest(quest_ident);
+	stratagus::quest *quest = stratagus::quest::try_get(quest_ident);
 	if (!quest) {
 		return;
 	}

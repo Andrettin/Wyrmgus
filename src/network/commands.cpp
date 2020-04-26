@@ -166,10 +166,10 @@ void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 ** @param unit    pointer to unit.
 ** @param pos     map tile position to move to.
 */
-void SendCommandQuest(CUnit &unit, CQuest *quest)
+void SendCommandQuest(CUnit &unit, stratagus::quest *quest)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->Ident.c_str(), -1);
+		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->get_identifier().c_str(), -1);
 		CommandQuest(unit, quest);
 	} else {
 		NetworkSendCommand(MessageCommandQuest, unit, quest->ID, 0, NoUnitP, nullptr, 0);
@@ -1092,8 +1092,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandLearnAbility(unit, *CUpgrade::get_all()[arg1]);
 			break;
 		case MessageCommandQuest: {
-			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, Quests[arg1]->Ident.c_str(), -1);
-			CommandQuest(unit, Quests[arg1]);
+			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, stratagus::quest::get_all()[arg1]->get_identifier().c_str(), -1);
+			CommandQuest(unit, stratagus::quest::get_all()[arg1]);
 			break;
 		}
 		case MessageCommandBuy: {

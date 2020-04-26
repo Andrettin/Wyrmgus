@@ -408,10 +408,8 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				if (quest) {
-					this->CurrentQuests.push_back(quest);
-				}
+				stratagus::quest *quest = stratagus::quest::get(LuaToString(l, j + 1, k + 1));
+				this->CurrentQuests.push_back(quest);
 			}
 		} else if (!strcmp(value, "completed-quests")) {
 			if (!lua_istable(l, j + 1)) {
@@ -419,12 +417,10 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				if (quest) {
-					this->CompletedQuests.push_back(quest);
-					if (quest->Competitive) {
-						quest->CurrentCompleted = true;
-					}
+				stratagus::quest *quest = stratagus::quest::get(LuaToString(l, j + 1, k + 1));
+				this->CompletedQuests.push_back(quest);
+				if (quest->Competitive) {
+					quest->CurrentCompleted = true;
 				}
 			}
 		} else if (!strcmp(value, "quest-objectives")) {
@@ -444,10 +440,7 @@ void CPlayer::Load(lua_State *l)
 					value = LuaToString(l, -1, n + 1);
 					++n;
 					if (!strcmp(value, "quest")) {
-						objective->Quest = GetQuest(LuaToString(l, -1, n + 1));
-						if (!objective->Quest) {
-							LuaError(l, "Quest doesn't exist.");
-						}
+						objective->Quest = stratagus::quest::get(LuaToString(l, -1, n + 1));
 					} else if (!strcmp(value, "objective-type")) {
 						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, n + 1));
 						if (objective->ObjectiveType == ObjectiveType::None) {
@@ -1502,7 +1495,7 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_createtable(l, civilization->Quests.size(), 0);
 		for (size_t i = 1; i <= civilization->Quests.size(); ++i)
 		{
-			lua_pushstring(l, civilization->Quests[i-1]->Ident.c_str());
+			lua_pushstring(l, civilization->Quests[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3003,7 +2996,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HasQuest")) {
 		LuaCheckArgs(l, 3);
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
 		if (std::find(p->CurrentQuests.begin(), p->CurrentQuests.end(), quest) != p->CurrentQuests.end()) {
 			lua_pushboolean(l, true);
 		} else {
@@ -3012,7 +3005,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "CompletedQuest")) {
 		LuaCheckArgs(l, 3);
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
 		if (std::find(p->CompletedQuests.begin(), p->CompletedQuests.end(), quest) != p->CompletedQuests.end()) {
 			lua_pushboolean(l, true);
 		} else {
@@ -3196,17 +3189,17 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Team")) {
 		p->Team = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "AcceptQuest")) {
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
 		if (quest) {
 			p->AcceptQuest(quest);
 		}
 	} else if (!strcmp(data, "CompleteQuest")) {
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
 		if (quest) {
 			p->CompleteQuest(quest);
 		}
 	} else if (!strcmp(data, "FailQuest")) {
-		CQuest *quest = GetQuest(LuaToString(l, 3));
+		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
 		if (quest) {
 			p->FailQuest(quest);
 		}

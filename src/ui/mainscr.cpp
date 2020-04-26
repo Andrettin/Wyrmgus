@@ -1473,13 +1473,13 @@ void MessagesDisplay::DrawMessages()
 			}
 			
 			for (size_t i = 0; i < CPlayer::GetThisPlayer()->CurrentQuests.size(); ++i) {
-				const CQuest *quest = CPlayer::GetThisPlayer()->CurrentQuests[i];
+				const stratagus::quest *quest = CPlayer::GetThisPlayer()->CurrentQuests[i];
 
 				if (z == 0) {
 					PushClipping();
 					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
 				}
-				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->Name.c_str())));
+				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->get_name().c_str())));
 				if (z == 0) {
 					PopClipping();
 				}

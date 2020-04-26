@@ -131,7 +131,6 @@ void CleanModules()
 	CPantheon::ClearPantheons();
 	//Wyrmgus start
 	CleanProvinces();
-	CleanQuests();
 	CReligion::ClearReligions();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CleanTexts();

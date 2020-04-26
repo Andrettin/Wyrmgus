@@ -436,7 +436,7 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 **  @param unit   pointer to unit.
 **  @param quest  quest.
 */
-void CommandQuest(CUnit &unit, CQuest *quest)
+void CommandQuest(CUnit &unit, stratagus::quest *quest)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;

@@ -27,19 +27,12 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "ui/icon.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CCharacter;
 class CDialogue;
-class CQuest;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
@@ -47,6 +40,7 @@ class LuaCallback;
 
 namespace stratagus {
 	class faction;
+	class quest;
 	class site;
 	class unit_class;
 }
@@ -86,7 +80,7 @@ private:
 	const stratagus::unit_class *unit_class = nullptr;
 public:
 	std::string ObjectiveString;
-	CQuest *Quest = nullptr;
+	stratagus::quest *Quest = nullptr;
 	std::vector<const CUnitType *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 	const CCharacter *Character = nullptr;
@@ -101,19 +95,33 @@ public:
 	int Counter = 0;
 };
 
-class CQuest
+namespace stratagus {
+
+class quest : public detailed_data_entry, public data_type<quest>
 {
 public:
-	~CQuest();
+	static constexpr const char *class_identifier = "quest";
+	static constexpr const char *database_folder = "quests";
+
+	static quest *add(const std::string &identifier, const stratagus::module *module)
+	{
+		quest *quest = data_type::add(identifier, module);
+		quest->ID = quest::get_all().size() - 1;
+		return quest;
+	}
+
+
+	quest(const std::string &identifier) : detailed_data_entry(identifier)
+	{
+	}
+
+	~quest();
 	
 	bool IsCompleted() const
 	{
 		return this->Completed;
 	}
 
-	std::string Ident;				/// Ident of the quest
-	std::string Name;				/// Name of the quest
-	std::string Description;		/// Description of the quest
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -142,7 +150,6 @@ public:
 	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool Unfailable = false;			/// Whether the quest can fail normally
 	IconConfig Icon;					/// Quest's icon
-	CCharacter *QuestGiver = nullptr;	/// Quest giver
 	CDialogue *IntroductionDialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *AcceptEffects = nullptr;
@@ -154,22 +161,13 @@ public:
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
+}
 
-extern std::vector<CQuest *> Quests;
-extern CQuest *CurrentQuest;
+extern stratagus::quest *CurrentQuest;
 
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
-extern void CleanQuests();
 extern void SaveQuestCompletion();
 std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type);
 extern ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type);
-extern CQuest *GetQuest(const std::string &quest_ident);
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();

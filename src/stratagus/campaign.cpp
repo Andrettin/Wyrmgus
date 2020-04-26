@@ -84,13 +84,8 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "start_date") {
 			this->start_date = string::to_date(value);
 		} else if (key == "required_quest") {
-			value = FindAndReplaceString(value, "_", "-");
-			CQuest *quest = GetQuest(value);
-			if (quest) {
-				this->RequiredQuests.push_back(quest);
-			} else {
-				fprintf(stderr, "Invalid quest: \"%s\".\n", value.c_str());
-			}
+			quest *quest = quest::get(value);
+			this->RequiredQuests.push_back(quest);
 		} else {
 			fprintf(stderr, "Invalid campaign property: \"%s\".\n", key.c_str());
 		}
@@ -170,7 +165,7 @@ bool campaign::IsAvailable() const
 		return false;
 	}
 
-	for (CQuest *quest : this->RequiredQuests) {
+	for (quest *quest : this->RequiredQuests) {
 		if (!quest->IsCompleted()) {
 			return false;
 		}

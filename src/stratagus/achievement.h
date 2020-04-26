@@ -31,9 +31,12 @@
 #include "ui/icon.h"
 
 class CCharacter;
-class CQuest;
 class CUnitType;
 struct lua_State;
+
+namespace stratagus {
+	class quest;
+}
 
 class CAchievement : public CDataType
 {
@@ -92,7 +95,7 @@ public:
 	IconConfig Icon;				/// Achievement's icon
 	const CCharacter *Character = nullptr;	/// Character related to the achievement's requirements
 	const CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
-	std::vector<const CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
+	std::vector<const stratagus::quest *> RequiredQuests;	/// Quests required for obtaining this achievement
 
 	friend int CclDefineAchievement(lua_State *l);
 };

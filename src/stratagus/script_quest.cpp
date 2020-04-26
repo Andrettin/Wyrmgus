@@ -66,22 +66,16 @@ static int CclDefineQuest(lua_State *l)
 	}
 
 	std::string quest_ident = LuaToString(l, 1);
-	CQuest *quest = GetQuest(quest_ident);
-	if (!quest) {
-		quest = new CQuest;
-		quest->ID = Quests.size();
-		Quests.push_back(quest);
-		quest->Ident = quest_ident;
-	}
+	stratagus::quest *quest = stratagus::quest::get_or_add(quest_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			quest->Name = LuaToString(l, -1);
+			quest->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
-			quest->Description = LuaToString(l, -1);
+			quest->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "World")) {
 			quest->World = LuaToString(l, -1);
 		} else if (!strcmp(value, "Map")) {
@@ -139,10 +133,6 @@ static int CclDefineQuest(lua_State *l)
 			quest->Icon.Name = LuaToString(l, -1);
 			quest->Icon.Icon = nullptr;
 			quest->Icon.Load();
-		} else if (!strcmp(value, "QuestGiver")) {
-			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *quest_giver = CCharacter::get(quest_giver_name);
-			quest->QuestGiver = quest_giver;
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
 			CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
@@ -229,7 +219,7 @@ static int CclDefineQuest(lua_State *l)
 						stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
 						objective->Faction = faction;
 					} else {
-						printf("\n%s\n", quest->Ident.c_str());
+						printf("\n%s\n", quest->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -256,10 +246,10 @@ static int CclDefineQuest(lua_State *l)
 
 static int CclGetQuests(lua_State *l)
 {
-	lua_createtable(l, Quests.size(), 0);
-	for (size_t i = 1; i <= Quests.size(); ++i)
+	lua_createtable(l, stratagus::quest::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::quest::get_all().size(); ++i)
 	{
-		lua_pushstring(l, Quests[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::quest::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -276,19 +266,14 @@ static int CclGetQuestData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string quest_ident = LuaToString(l, 1);
-	const CQuest *quest = GetQuest(quest_ident);
-	if (!quest) {
-		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_ident.c_str());
-		lua_pushnil(l);
-		return 0;
-	}
+	const stratagus::quest *quest = stratagus::quest::get(quest_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, quest->Name.c_str());
+		lua_pushstring(l, quest->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, quest->Description.c_str());
+		lua_pushstring(l, quest->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		lua_pushstring(l, quest->World.c_str());
@@ -357,9 +342,6 @@ static int CclGetQuestData(lua_State *l)
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, quest->Icon.Name.c_str());
 		return 1;
-	} else if (!strcmp(data, "QuestGiver")) {
-		lua_pushstring(l, quest->QuestGiver->Ident.c_str());
-		return 1;
 	} else if (!strcmp(data, "Objectives")) {
 		lua_createtable(l, quest->ObjectiveStrings.size(), 0);
 		for (size_t i = 1; i <= quest->ObjectiveStrings.size(); ++i)
@@ -423,12 +405,8 @@ static int CclDefineCampaign(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
-				CQuest *required_quest = GetQuest(quest_ident);
-				if (required_quest) {
-					campaign->RequiredQuests.push_back(required_quest);
-				} else {
-					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_ident.c_str());
-				}
+				stratagus::quest *required_quest = stratagus::quest::get(quest_ident);
+				campaign->RequiredQuests.push_back(required_quest);
 			}
 		} else if (!strcmp(value, "MapTemplates")) {
 			campaign->map_templates.clear();
@@ -525,7 +503,7 @@ static int CclGetCampaignData(lua_State *l)
 		lua_createtable(l, campaign->RequiredQuests.size(), 0);
 		for (size_t i = 1; i <= campaign->RequiredQuests.size(); ++i)
 		{
-			lua_pushstring(l, campaign->RequiredQuests[i-1]->Ident.c_str());
+			lua_pushstring(l, campaign->RequiredQuests[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -627,12 +605,8 @@ static int CclDefineAchievement(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
-				CQuest *required_quest = GetQuest(quest_ident);
-				if (required_quest) {
-					achievement->RequiredQuests.push_back(required_quest);
-				} else {
-					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_ident.c_str());
-				}
+				stratagus::quest *required_quest = stratagus::quest::get(quest_ident);
+				achievement->RequiredQuests.push_back(required_quest);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -49,7 +49,6 @@ class CFile;
 class CLanguage;
 class CPersistentItem;
 class CProvince;
-class CQuest;
 class CReligion;
 class CUnitType;
 class CUnit;
@@ -61,6 +60,7 @@ namespace stratagus {
 	class civilization;
 	class faction;
 	class historical_location;
+	class quest;
 	class site;
 }
 
@@ -179,8 +179,8 @@ public:
 	std::vector<CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
-	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
-	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
+	std::vector<stratagus::quest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
+	std::vector<stratagus::quest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to

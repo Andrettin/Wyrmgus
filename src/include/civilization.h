@@ -45,7 +45,6 @@ class CCurrency;
 class CDeity;
 class CForceTemplate;
 class CLanguage;
-class CQuest;
 class CUpgrade;
 struct lua_State;
 
@@ -54,6 +53,7 @@ int CclDefineCivilization(lua_State *l);
 namespace stratagus {
 
 class calendar;
+class quest;
 class unit_class;
 
 class civilization final : public detailed_data_entry, public data_type<civilization>
@@ -186,7 +186,7 @@ private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
 public:
-	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
+	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
 	std::map<int, int> ForceTypeWeights;	/// Weights for each force type

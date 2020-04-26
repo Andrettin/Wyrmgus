@@ -755,8 +755,8 @@ void CTrigger::ClearActiveTriggers()
 	CTrigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		Quests[i]->CurrentCompleted = false;
+	for (stratagus::quest *quest : stratagus::quest::get_all()) {
+		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
 	
@@ -879,7 +879,7 @@ void SaveTriggers(CFile &file)
 	
 	//Wyrmgus start
 	if (CurrentQuest != nullptr) {
-		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->Ident.c_str());
+		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->get_identifier().c_str());
 	}
 	//Wyrmgus end
 }

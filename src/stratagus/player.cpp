@@ -927,7 +927,7 @@ void CPlayer::Save(CFile &file) const
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", p.CurrentQuests[j]->Ident.c_str());
+		file.printf("\"%s\",", p.CurrentQuests[j]->get_identifier().c_str());
 	}
 	file.printf("},");
 	
@@ -936,7 +936,7 @@ void CPlayer::Save(CFile &file) const
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", p.CompletedQuests[j]->Ident.c_str());
+		file.printf("\"%s\",", p.CompletedQuests[j]->get_identifier().c_str());
 	}
 	file.printf("},");
 	
@@ -947,7 +947,7 @@ void CPlayer::Save(CFile &file) const
 			file.printf(" ");
 		}
 		file.printf("{");
-		file.printf("\"quest\", \"%s\",", objective->Quest->Ident.c_str());
+		file.printf("\"quest\", \"%s\",", objective->Quest->get_identifier().c_str());
 		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(objective->ObjectiveType).c_str());
 		file.printf("\"objective-string\", \"%s\",", objective->ObjectiveString.c_str());
 		file.printf("\"quantity\", %d,", objective->Quantity);
@@ -2505,10 +2505,10 @@ void CPlayer::UpdateQuestPool()
 	
 	this->AvailableQuests.clear();
 	
-	std::vector<CQuest *> potential_quests;
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (this->CanAcceptQuest(Quests[i])) {
-			potential_quests.push_back(Quests[i]);
+	std::vector<stratagus::quest *> potential_quests;
+	for (stratagus::quest *quest : stratagus::quest::get_all()) {
+		if (this->CanAcceptQuest(quest)) {
+			potential_quests.push_back(quest);
 		}
 	}
 	
@@ -2547,9 +2547,9 @@ void CPlayer::AvailableQuestsChanged()
 				continue;
 			}
 			
-			const CQuest *quest = this->AvailableQuests[UnitButtonTable[i]->Value];
-			UnitButtonTable[i]->Hint = "Quest: " + quest->Name;
-			UnitButtonTable[i]->Description = quest->Description + "\n \nObjectives:";
+			const stratagus::quest *quest = this->AvailableQuests[UnitButtonTable[i]->Value];
+			UnitButtonTable[i]->Hint = "Quest: " + quest->get_name();
+			UnitButtonTable[i]->Description = quest->get_description() + "\n \nObjectives:";
 			for (size_t j = 0; j < quest->Objectives.size(); ++j) {
 				UnitButtonTable[i]->Description += "\n- " + quest->Objectives[j]->ObjectiveString;
 			}
@@ -2607,7 +2607,7 @@ void CPlayer::UpdateCurrentQuests()
 	}
 }
 
-void CPlayer::AcceptQuest(CQuest *quest)
+void CPlayer::AcceptQuest(stratagus::quest *quest)
 {
 	if (!quest) {
 		return;
@@ -2645,7 +2645,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	this->UpdateCurrentQuests();
 }
 
-void CPlayer::CompleteQuest(CQuest *quest)
+void CPlayer::CompleteQuest(stratagus::quest *quest)
 {
 	if (std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end()) {
 		return;
@@ -2666,17 +2666,17 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
+		SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
 		SaveQuestCompletion();
 		std::string rewards_string;
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) (quest->Icon.Icon ? quest->Icon.Icon->get_frame() : 0)) + ") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) (quest->Icon.Icon ? quest->Icon.Icon->get_frame() : 0)) + ") end;");
 	}
 }
 
-void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
+void CPlayer::FailQuest(stratagus::quest *quest, std::string fail_reason)
 {
 	this->RemoveCurrentQuest(quest);
 	
@@ -2688,11 +2688,11 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
 
-void CPlayer::RemoveCurrentQuest(CQuest *quest)
+void CPlayer::RemoveCurrentQuest(stratagus::quest *quest)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 	
@@ -2703,7 +2703,7 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 	}
 }
 
-bool CPlayer::CanAcceptQuest(CQuest *quest)
+bool CPlayer::CanAcceptQuest(stratagus::quest *quest)
 {
 	if (quest->Hidden || quest->CurrentCompleted || quest->Unobtainable) {
 		return false;
@@ -2836,7 +2836,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	}
 }
 
-bool CPlayer::HasCompletedQuest(CQuest *quest)
+bool CPlayer::HasCompletedQuest(stratagus::quest *quest)
 {
 	if (quest->Uncompleteable) {
 		return false;
@@ -2854,7 +2854,7 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	return true;
 }
 
-std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for failure (empty if none)
+std::string CPlayer::HasFailedQuest(stratagus::quest *quest) // returns the reason for failure (empty if none)
 {
 	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
 		if (!this->HasHero(quest->HeroesMustSurvive[i])) {

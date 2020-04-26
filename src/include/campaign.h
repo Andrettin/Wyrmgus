@@ -33,7 +33,6 @@
 #include "time/date.h"
 #include "vec2i.h"
 
-class CQuest;
 class LuaCallback;
 struct lua_State;
 
@@ -45,6 +44,7 @@ namespace stratagus {
 class calendar;
 class faction;
 class map_template;
+class quest;
 class timeline;
 
 class campaign : public detailed_data_entry, public data_type<campaign>, public CDataType
@@ -117,7 +117,7 @@ private:
 	timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
-	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
+	std::vector<quest *> RequiredQuests;		/// Quests required by the campaign
 	faction *faction = nullptr;	/// Which faction the player plays as in the campaign
 	std::vector<map_template *> map_templates; //map templates used by the campaign
 public:

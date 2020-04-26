@@ -148,13 +148,8 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			const CUnitType *unit_type = CUnitType::get(value);
 			this->CharacterType = unit_type;
 		} else if (key == "required_quest") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CQuest *required_quest = GetQuest(value);
-			if (required_quest) {
-				this->RequiredQuests.push_back(required_quest);
-			} else {
-				fprintf(stderr, "Quest \"%s\" does not exist.\n", value.c_str());
-			}
+			const stratagus::quest *required_quest = stratagus::quest::get(value);
+			this->RequiredQuests.push_back(required_quest);
 		} else {
 			fprintf(stderr, "Invalid achievement property: \"%s\".\n", key.c_str());
 		}
@@ -167,7 +162,7 @@ bool CAchievement::CanObtain() const
 		return false;
 	}
 
-	for (const CQuest *required_quest : this->RequiredQuests) {
+	for (const stratagus::quest *required_quest : this->RequiredQuests) {
 		if (!required_quest->Completed || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
 			return false;
 		}
@@ -225,7 +220,7 @@ int CAchievement::GetProgress() const
 
 	int progress = 0;
 
-	for (const CQuest *required_quest : this->RequiredQuests) {
+	for (const stratagus::quest *required_quest : this->RequiredQuests) {
 		if (required_quest->Completed && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
 			progress++;
 		}
