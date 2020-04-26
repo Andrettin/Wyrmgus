@@ -1503,7 +1503,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		faction *unit_faction = historical_unit->Faction;
+		faction *unit_faction = historical_unit->get_faction();
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 		CUnitType *unit_type = historical_unit->get_unit_type();
 		if (unit_type == nullptr && historical_unit->get_unit_class() != nullptr) {

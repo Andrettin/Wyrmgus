@@ -45,18 +45,6 @@ historical_unit::~historical_unit()
 {
 }
 
-void historical_unit::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "faction") {
-		this->Faction = faction::get(value);
-	} else {
-		data_entry::process_sml_property(property);
-	}
-}
-
 void historical_unit::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
 {
 	const std::string &tag = scope.get_tag();
@@ -82,6 +70,7 @@ void historical_unit::reset_history()
 {
 	this->location.reset();
 	this->active = false;
+	this->faction = nullptr;
 }
 
 }
