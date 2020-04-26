@@ -164,7 +164,7 @@ int SaveGame(const std::string &filename)
 	file.printf("SetCurrentTotalHours(%llu)\n", CDate::CurrentTotalHours);
 	const QDateTime &current_date = stratagus::game::get()->get_current_date();
 	if (current_date.isValid()) {
-		file.printf("SetCurrentDate(\"%s\")\n", date::to_string(current_date));
+		file.printf("SetCurrentDate(\"%s\")\n", date::to_string(current_date).c_str());
 	}
 	if (stratagus::age::current_age) {
 		file.printf("SetCurrentAge(\"%s\")\n", stratagus::age::current_age->get_identifier().c_str());
