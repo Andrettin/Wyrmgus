@@ -121,7 +121,8 @@ public:
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
-	void ApplySubtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
@@ -152,6 +153,11 @@ public:
 	const QPoint &get_end_pos() const
 	{
 		return this->end_pos;
+	}
+
+	bool contains_pos(const QPoint &pos) const
+	{
+		return pos.x() >= this->get_start_pos().x() && pos.y() >= this->get_start_pos().y() && pos.x() <= this->get_end_pos().x() && pos.y() <= this->get_end_pos().y();
 	}
 
 	QSize get_applied_size() const;
@@ -254,7 +260,7 @@ public:
 		return this->optional;
 	}
 
-	bool contains_pos(const QPoint &pos) const
+	bool contains_map_pos(const QPoint &pos) const
 	{
 		const QPoint &start_pos = this->get_current_map_start_pos();
 		const QPoint end_pos = this->get_current_map_end_pos();
@@ -275,7 +281,7 @@ public:
 	//whether a position relative to the entire map is a usable part of the map template
 	bool is_map_pos_usable(const QPoint &pos) const
 	{
-		if (!this->contains_pos(pos)) {
+		if (!this->contains_map_pos(pos)) {
 			return false;
 		}
 
@@ -410,6 +416,7 @@ public:
 	}
 
 	bool is_dependent_on(const map_template *other_template) const;
+	void add_dependency_template(const map_template *other_template);
 
 	size_t get_total_adjacent_template_count() const
 	{
@@ -491,11 +498,15 @@ public:
 	map_template *UpperTemplate = nullptr; //map template corresponding to this one in the upper layer
 	map_template *LowerTemplate = nullptr; //map template corresponding to this one in the lower layer
 	std::vector<const map_template *> AdjacentTemplates; //map templates adjacent to this one
+private:
+	std::vector<map_template *> dependent_adjacent_templates;
+public:
 	std::vector<const map_template *> NorthOfTemplates; //map templates to which this one is to the north of
 	std::vector<const map_template *> SouthOfTemplates; //map templates to which this one is to the north of
 	std::vector<const map_template *> WestOfTemplates; //map templates to which this one is to the west of
 	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
 private:
+	std::vector<const map_template *> dependency_templates; //the other templates on which this one depends on to be applied as a subtemplate, e.g. its adjacent templates, north of templates, etc.
 	plane *plane = nullptr;
 	world *world = nullptr;
 	terrain_type *base_terrain_type = nullptr;

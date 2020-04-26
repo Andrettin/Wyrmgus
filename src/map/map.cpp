@@ -825,6 +825,12 @@ bool CMap::is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const s
 	return false;
 }
 
+bool CMap::is_subtemplate_on_map(const stratagus::map_template *subtemplate) const
+{
+	const QPoint subtemplate_pos = this->get_subtemplate_pos(subtemplate);
+	return subtemplate_pos.x() != -1 && subtemplate_pos.y() != -1;
+}
+
 std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const stratagus::map_template *subtemplate) const
 {
 	if (!subtemplate) {

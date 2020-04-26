@@ -81,18 +81,24 @@ void map_template::process_sml_property(const sml_property &property)
 	if (key == "adjacent_template") {
 		map_template *adjacent_template = map_template::get(value);
 		this->AdjacentTemplates.push_back(adjacent_template);
+		this->add_dependency_template(adjacent_template);
+		adjacent_template->dependent_adjacent_templates.push_back(this);
 	} else if (key == "north_of") {
 		const map_template *north_of_template = map_template::get(value);
 		this->NorthOfTemplates.push_back(north_of_template);
+		this->add_dependency_template(north_of_template);
 	} else if (key == "south_of") {
 		const map_template *south_of_template = map_template::get(value);
 		this->SouthOfTemplates.push_back(south_of_template);
+		this->add_dependency_template(south_of_template);
 	} else if (key == "west_of") {
 		const map_template *west_of_template = map_template::get(value);
 		this->WestOfTemplates.push_back(west_of_template);
+		this->add_dependency_template(west_of_template);
 	} else if (key == "east_of") {
 		const map_template *east_of_template = map_template::get(value);
 		this->EastOfTemplates.push_back(east_of_template);
+		this->add_dependency_template(east_of_template);
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -183,18 +189,24 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "adjacent_template") {
 			map_template *adjacent_template = map_template::get(value);
 			this->AdjacentTemplates.push_back(adjacent_template);
+			this->add_dependency_template(adjacent_template);
+			adjacent_template->dependent_adjacent_templates.push_back(this);
 		} else if (key == "north_of") {
 			const map_template *north_of_template = map_template::get(value);
 			this->NorthOfTemplates.push_back(north_of_template);
+			this->add_dependency_template(north_of_template);
 		} else if (key == "south_of") {
 			const map_template *south_of_template = map_template::get(value);
 			this->SouthOfTemplates.push_back(south_of_template);
+			this->add_dependency_template(south_of_template);
 		} else if (key == "west_of") {
 			const map_template *west_of_template = map_template::get(value);
 			this->WestOfTemplates.push_back(west_of_template);
+			this->add_dependency_template(west_of_template);
 		} else if (key == "east_of") {
 			const map_template *east_of_template = map_template::get(value);
 			this->EastOfTemplates.push_back(east_of_template);
+			this->add_dependency_template(east_of_template);
 		} else if (key == "base_terrain_type") {
 			terrain_type *terrain_type = terrain_type::get(value);
 			this->base_terrain_type = terrain_type;
@@ -668,8 +680,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	if (!this->get_subtemplates().empty()) {
 		ShowLoadProgress(_("Applying \"%s\" Subtemplates"), this->get_name().c_str());
-		this->ApplySubtemplates(template_start_pos, map_start_pos, map_end, z, false);
-		this->ApplySubtemplates(template_start_pos, map_start_pos, map_end, z, true);
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false);
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true);
 	}
 
 	CMap::Map.GenerateMissingTerrain(map_start_pos, map_end - Vec2i(1, 1), z, this);
@@ -838,73 +850,103 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 **	@param	z					The map layer
 **	@param	random				Whether it is subtemplates with a random position that should be applied, or ones with a fixed one
 */
-void map_template::ApplySubtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
+void map_template::apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
 	for (map_template *subtemplate : this->get_subtemplates()) {
-		QPoint subtemplate_pos(subtemplate->get_subtemplate_pos() - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
-		bool found_location = false;
-		
-		if (subtemplate->UpperTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead
-			subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->UpperTemplate);
-			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
-				found_location = true;
-			}
+		if (CMap::Map.is_subtemplate_on_map(subtemplate)) {
+			continue;
 		}
-		
-		if (subtemplate->LowerTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has a lower template, use its coordinates instead
-			subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->LowerTemplate);
-			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
-				found_location = true;
-			}
+
+		this->apply_subtemplate(subtemplate, template_start_pos, map_start_pos, map_end, z, random);
+	}
+}
+
+void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
+{
+	QPoint subtemplate_pos(subtemplate->get_subtemplate_pos() - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
+	bool found_location = false;
+
+	if (subtemplate->UpperTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead
+		subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->UpperTemplate);
+		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
+			found_location = true;
 		}
-		
-		if (!found_location) {
-			if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
-				if (!random) {
-					continue;
-				}
+	}
 
-				QPoint max_adjacent_template_distance = map_template::max_adjacent_template_distance;
-				while (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
-					bool adjacency_restriction_occurred = false;
-					subtemplate_pos = this->generate_subtemplate_position(subtemplate, template_start_pos, map_start_pos, map_end, z, max_adjacent_template_distance, adjacency_restriction_occurred);
+	if (subtemplate->LowerTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has a lower template, use its coordinates instead
+		subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->LowerTemplate);
+		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
+			found_location = true;
+		}
+	}
 
-					if (adjacency_restriction_occurred) {
-						//double the maximum adjacent template distance for the next try
-						max_adjacent_template_distance.setX(max_adjacent_template_distance.x() * 2);
-						max_adjacent_template_distance.setY(max_adjacent_template_distance.y() * 2);
-					} else {
-						break;
-					}
-				}
+	if (!found_location) {
+		if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
+			if (!random) {
+				return;
+			}
 
-				if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
-					if (!subtemplate->is_optional()) {
-						fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
-					}
+			QPoint max_adjacent_template_distance = map_template::max_adjacent_template_distance;
+			while (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
+				bool adjacency_restriction_occurred = false;
+				subtemplate_pos = this->generate_subtemplate_position(subtemplate, template_start_pos, map_start_pos, map_end, z, max_adjacent_template_distance, adjacency_restriction_occurred);
+
+				if (adjacency_restriction_occurred) {
+					//double the maximum adjacent template distance for the next try
+					max_adjacent_template_distance.setX(max_adjacent_template_distance.x() * 2);
+					max_adjacent_template_distance.setY(max_adjacent_template_distance.y() * 2);
 				} else {
-					found_location = true;
+					break;
+				}
+			}
+
+			if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
+				if (!subtemplate->is_optional()) {
+					fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
 				}
 			} else {
-				if (random) {
-					continue;
-				}
-				subtemplate_pos = map_start_pos + subtemplate_pos - template_start_pos;
 				found_location = true;
 			}
 		} else {
 			if (random) {
-				continue;
+				return;
+			}
+			subtemplate_pos = map_start_pos + subtemplate_pos - template_start_pos;
+			found_location = true;
+		}
+	} else {
+		if (random) {
+			return;
+		}
+	}
+
+	if (found_location) {
+		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
+			subtemplate->Apply(subtemplate->get_start_pos(), subtemplate_pos, z);
+
+			//also apply all dependent adjacent templates, if the other templates they depend on have also been applied, so that they are more likely to be close to this subtemplate
+			for (map_template *dependent_subtemplate : subtemplate->dependent_adjacent_templates) {
+				if (CMap::Map.is_subtemplate_on_map(dependent_subtemplate)) {
+					continue;
+				}
+
+				bool other_dependencies_fulfilled = true;
+				for (const map_template *dependency_template : dependent_subtemplate->dependency_templates) {
+					if (!CMap::Map.is_subtemplate_on_map(dependency_template)) {
+						other_dependencies_fulfilled = false;
+						break;
+					}
+				}
+
+				if (!other_dependencies_fulfilled) {
+					continue;
+				}
+
+				this->apply_subtemplate(dependent_subtemplate, template_start_pos, map_start_pos, map_end, z, random);
 			}
 		}
-		
-		if (found_location) {
-			if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
-				subtemplate->Apply(subtemplate->get_start_pos(), subtemplate_pos, z);
-			}
-		} else if (!subtemplate->is_optional()) {
-			throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
-		}
+	} else if (!subtemplate->is_optional()) {
+		throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
 	}
 }
 
@@ -1519,16 +1561,20 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 
+		if (!this->contains_pos(historical_unit->get_location()->Position)) {
+			continue;
+		}
+
 		QPoint unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, false);
 		
-		if (unit_pos.x() == -1 || unit_pos.y() == -1) {
+		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 			if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
 				continue;
 			}
 			
 			unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, true);
 			
-			if (unit_pos.x() == -1 || unit_pos.y() == -1) {
+			if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 				unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
@@ -1538,7 +1584,9 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			}
 		}
 		
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x() < map_start_pos.x() || unit_pos.y() < map_start_pos.y()) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+		const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
+		const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->GetTileSize()) - QPoint(-1, -1);
+		if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
 			continue;
 		}
 		
@@ -1555,7 +1603,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		}
 		for (int i = 0; i < historical_unit->get_quantity(); ++i) {
 			//item units only use factions to generate special properties for them
-			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+			CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
 			if (unit_type->BoolFlag[ITEM_INDEX].value) {
 				unit->GenerateSpecialProperties(nullptr, unit_player, false);
 			}
@@ -1733,37 +1781,20 @@ bool map_template::is_dependent_on(const map_template *other_template) const
 {
 	//get whether this map template is dependent on another (i.e. needs it to establish its position)
 
-	for (const map_template *map_template : this->AdjacentTemplates) {
-		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
-			return true;
-		}
-	}
-
-	for (const map_template *map_template : this->NorthOfTemplates) {
-		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
-			return true;
-		}
-	}
-
-	for (const map_template *map_template : this->SouthOfTemplates) {
-		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
-			return true;
-		}
-	}
-
-	for (const map_template *map_template : this->WestOfTemplates) {
-		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
-			return true;
-		}
-	}
-
-	for (const map_template *map_template : this->EastOfTemplates) {
+	for (const map_template *map_template : this->dependency_templates) {
 		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
 			return true;
 		}
 	}
 
 	return false;
+}
+
+void map_template::add_dependency_template(const map_template *other_template)
+{
+	if (!vector::contains(this->dependency_templates, other_template)) {
+		this->dependency_templates.push_back(other_template);
+	}
 }
 
 QPoint map_template::generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const
@@ -1864,8 +1895,8 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 		const int south_offset = subtemplate->GetDependentTemplatesSouthOffset();
 		const int west_offset = subtemplate->GetDependentTemplatesWestOffset();
 		const int east_offset = subtemplate->GetDependentTemplatesEastOffset();
-		const bool top_left_on_map = this->contains_pos(subtemplate_pos - QPoint(west_offset, north_offset));
-		const bool bottom_right_on_map = this->contains_pos(QPoint(subtemplate_pos.x() + subtemplate->get_applied_width() + east_offset - 1, subtemplate_pos.y() + subtemplate->get_applied_height() + south_offset - 1));
+		const bool top_left_on_map = this->contains_map_pos(subtemplate_pos - QPoint(west_offset, north_offset));
+		const bool bottom_right_on_map = this->contains_map_pos(QPoint(subtemplate_pos.x() + subtemplate->get_applied_width() + east_offset - 1, subtemplate_pos.y() + subtemplate->get_applied_height() + south_offset - 1));
 		const bool on_map = top_left_on_map && bottom_right_on_map;
 
 		if (!on_map) {

@@ -284,6 +284,7 @@ public:
 	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type, const int z) const;
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain, const int z);
 	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate = nullptr) const;
+	bool is_subtemplate_on_map(const stratagus::map_template *subtemplate) const;
 	std::pair<Vec2i, Vec2i> get_subtemplate_rect(const stratagus::map_template *subtemplate) const;
 	Vec2i get_subtemplate_pos(const stratagus::map_template *subtemplate) const;
 	Vec2i get_subtemplate_center_pos(const stratagus::map_template *subtemplate) const;
