@@ -45,7 +45,7 @@
 
 namespace stratagus {
 
-std::map<std::string, terrain_type *> terrain_type::TerrainTypesByCharacter;
+std::map<char, terrain_type *> terrain_type::TerrainTypesByCharacter;
 std::map<std::tuple<int, int, int>, terrain_type *> terrain_type::TerrainTypesByColor;
 
 /**
@@ -165,20 +165,21 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "character") {
-			this->Character = value;
+			this->Character = value.front();
 			
 			if (terrain_type::TerrainTypesByCharacter.find(this->Character) != terrain_type::TerrainTypesByCharacter.end()) {
-				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", this->Character.c_str());
+				fprintf(stderr, "Character \"%c\" is already used by another terrain type.\n", this->Character);
 				continue;
 			} else {
 				terrain_type::TerrainTypesByCharacter[this->Character] = this;
 			}
 		} else if (key == "character_alias") {
-			if (terrain_type::TerrainTypesByCharacter.find(value) != terrain_type::TerrainTypesByCharacter.end()) {
+			const char c = value.front();
+			if (terrain_type::TerrainTypesByCharacter.find(c) != terrain_type::TerrainTypesByCharacter.end()) {
 				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", value.c_str());
 				continue;
 			} else {
-				terrain_type::TerrainTypesByCharacter[value] = this;
+				terrain_type::TerrainTypesByCharacter[c] = this;
 			}
 		} else if (key == "color") {
 			this->Color = CColor::FromString(value);

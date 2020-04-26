@@ -75,13 +75,13 @@ public:
 	static void LoadTerrainTypeGraphics();
 	static unsigned long GetTerrainFlagByName(const std::string &flag_name);
 	
-	static std::map<std::string, terrain_type *> TerrainTypesByCharacter;
+	static std::map<char, terrain_type *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, terrain_type *> TerrainTypesByColor;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
 
-	std::string Character;
+	char Character = 0;
 	CColor Color;
 	int ID = -1;
 	int SolidAnimationFrames = 0;

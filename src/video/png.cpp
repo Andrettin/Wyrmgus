@@ -546,7 +546,7 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 			int x = 0;
 			
 			for (unsigned int i = 0; i < line_str.length(); ++i) {
-				std::string terrain_character = line_str.substr(i, 1);
+				const char terrain_character = line_str.at(i);
 				stratagus::terrain_type *terrain = nullptr;
 				if (stratagus::terrain_type::TerrainTypesByCharacter.find(terrain_character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
 					terrain = stratagus::terrain_type::TerrainTypesByCharacter.find(terrain_character)->second;

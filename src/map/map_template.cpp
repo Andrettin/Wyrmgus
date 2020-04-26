@@ -348,25 +348,45 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 		int x = 0;
 		
 		for (unsigned int i = 0; i < line_str.length(); ++i) {
-			if (x < template_start_pos.x || x >= (template_start_pos.x + CMap::Map.Info.MapWidths[z])) {
-				x++;
-				continue;
-			}
+			try {
+				if (x < template_start_pos.x || x >= (template_start_pos.x + CMap::Map.Info.MapWidths[z])) {
+					x++;
+					continue;
+				}
 
-			if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
-				break;
-			}
+				if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
+					break;
+				}
 
-			std::string terrain_character = line_str.substr(i, 1);
-			terrain_type *terrain = nullptr;
-			if (terrain_type::TerrainTypesByCharacter.find(terrain_character) != terrain_type::TerrainTypesByCharacter.end()) {
-				terrain = terrain_type::TerrainTypesByCharacter.find(terrain_character)->second;
+				const char terrain_character = line_str.at(i);
+				terrain_type *terrain = nullptr;
+
+				const QPoint real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
+				CMapField *tile = CMap::Map.Field(real_pos, z);
+
+				if (terrain_character != '0') {
+					auto find_iterator = terrain_type::TerrainTypesByCharacter.find(terrain_character);
+					if (find_iterator != terrain_type::TerrainTypesByCharacter.end()) {
+						terrain = find_iterator->second;
+					} else {
+						throw std::runtime_error("Invalid terrain type character: \"" + std::string(1, terrain_character) + "\".");
+					}
+
+					tile->SetTerrain(terrain);
+				} else {
+					if (overlay) { //"0" in an overlay terrain file means no overlay
+						if (tile->OverlayTerrain) {
+							tile->RemoveOverlayTerrain();
+						}
+					} else {
+						throw std::runtime_error("\"0\" cannot be used for non-overlay terrain files.");
+					}
+				}
+
+				x += 1;
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i) + " of line for terrain file \"" + terrain_filename + "\": \"" + line_str + "\"."));
 			}
-			if (terrain) {
-				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
-				CMap::Map.Field(real_pos, z)->SetTerrain(terrain);
-			}
-			x += 1;
 		}
 		
 		y += 1;
@@ -600,8 +620,12 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	}
 	
-	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
-	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
+	try {
+		this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
+		this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to apply terrain file for map template \"" + this->get_identifier() + "\"."));
+	}
 	
 	if (this->outputs_terrain_image()) {
 		std::string filename = this->Ident;

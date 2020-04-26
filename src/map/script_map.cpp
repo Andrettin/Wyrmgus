@@ -1317,9 +1317,10 @@ static int CclDefineTerrainType(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			terrain->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Character")) {
-			terrain->Character = LuaToString(l, -1);
+			const std::string character_str = LuaToString(l, -1);
+			terrain->Character = character_str.front();
 			if (stratagus::terrain_type::TerrainTypesByCharacter.find(terrain->Character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
-				LuaError(l, "Character \"%s\" is already used by another terrain type." _C_ terrain->Character.c_str());
+				LuaError(l, "Character \"%c\" is already used by another terrain type." _C_ terrain->Character);
 			} else {
 				stratagus::terrain_type::TerrainTypesByCharacter[terrain->Character] = terrain;
 			}
@@ -1329,11 +1330,12 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const std::string character = LuaToString(l, -1, j + 1);
-				if (stratagus::terrain_type::TerrainTypesByCharacter.find(character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
-					LuaError(l, "Character \"%s\" is already used by another terrain type." _C_ character.c_str());
+				const std::string character_str = LuaToString(l, -1, j + 1);
+				const char c = character_str.front();
+				if (stratagus::terrain_type::TerrainTypesByCharacter.find(c) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
+					LuaError(l, "Character \"%c\" is already used by another terrain type." _C_ c);
 				} else {
-					stratagus::terrain_type::TerrainTypesByCharacter[character] = terrain;
+					stratagus::terrain_type::TerrainTypesByCharacter[c] = terrain;
 				}
 			}
 		} else if (!strcmp(value, "Color")) {
