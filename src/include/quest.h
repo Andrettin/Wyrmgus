@@ -32,7 +32,6 @@
 #include "ui/icon.h"
 
 class CCharacter;
-class CDialogue;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
@@ -43,6 +42,7 @@ int CclDefineQuest(lua_State *l);
 
 namespace stratagus {
 	class civilization;
+	class dialogue;
 	class faction;
 	class quest;
 	class site;
@@ -215,7 +215,7 @@ public:
 	bool Unfailable = false;			/// Whether the quest can fail normally
 	bool Completed = false;				/// Whether the quest has been completed
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
-	CDialogue *IntroductionDialogue = nullptr;
+	stratagus::dialogue *IntroductionDialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *AcceptEffects = nullptr;
 	LuaCallback *CompletionEffects = nullptr;

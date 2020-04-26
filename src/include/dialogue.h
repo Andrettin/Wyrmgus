@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name dialogue.h - The dialogue header file. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,30 +27,32 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "database/data_entry.h"
+#include "database/data_type.h"
 
 class CDialogueNode;
 class LuaCallback;
 
-class CDialogue
+namespace stratagus {
+
+class dialogue final : public data_entry, public data_type<dialogue>
 {
 public:
-	static CDialogue *GetDialogue(const std::string &ident, const bool should_find = true);
-	static CDialogue *GetOrAddDialogue(const std::string &ident);
-	static void ClearDialogues();
-	
-	static std::vector<CDialogue *> Dialogues;
-	static std::map<std::string, CDialogue *> DialoguesByIdent;
-	
-	~CDialogue();
+	static constexpr const char *class_identifier = "dialogue";
+	static constexpr const char *database_folder = "dialogues";
+
+	dialogue(const std::string &identifier) : data_entry(identifier)
+	{
+	}
+
+	~dialogue();
 	
 	void Call(const int player) const;
 	
-	std::string Ident;				/// Ident of the dialogue
 	std::vector<CDialogueNode *> Nodes;	/// The nodes of the dialogue
 };
+
+}
 
 class CDialogueNode
 {
@@ -67,17 +67,13 @@ public:
 	std::string SpeakerPlayer;			/// name of the player to whom the speaker belongs
 	std::string Speaker;
 	std::string Text;
-	CDialogue *Dialogue = nullptr;
+	stratagus::dialogue *Dialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *ImmediateEffects = nullptr;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionEffects;
 	std::vector<std::string> OptionTooltips;
 };
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
 
 extern void CallDialogue(const std::string &dialogue_ident, int player);
 extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);

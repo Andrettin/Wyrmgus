@@ -133,12 +133,8 @@ static int CclDefineQuest(lua_State *l)
 			quest->icon = CIcon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
-			CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
-			if (dialogue) {
-				quest->IntroductionDialogue = dialogue;
-			} else {
-				LuaError(l, "Dialogue \"%s\" doesn't exist." _C_ dialogue_ident.c_str());
-			}
+			stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
+			quest->IntroductionDialogue = dialogue;
 		} else if (!strcmp(value, "Conditions")) {
 			quest->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "AcceptEffects")) {
@@ -709,7 +705,7 @@ static int CclDefineDialogue(lua_State *l)
 	}
 
 	std::string dialogue_ident = LuaToString(l, 1);
-	CDialogue *dialogue = CDialogue::GetOrAddDialogue(dialogue_ident);
+	stratagus::dialogue *dialogue = stratagus::dialogue::get_or_add(dialogue_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -770,7 +766,7 @@ static int CclDefineDialogue(lua_State *l)
 						}
 						lua_pop(l, 1);
 					} else {
-						printf("\n%s\n", dialogue->Ident.c_str());
+						printf("\n%s\n", dialogue->get_identifier().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}

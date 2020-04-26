@@ -123,7 +123,6 @@ void CleanModules()
 	CleanDecorations();
 	CDeity::ClearDeities();
 	//Wyrmgus start
-	CDialogue::ClearDialogues();
 	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end

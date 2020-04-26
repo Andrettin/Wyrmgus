@@ -32,9 +32,12 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CDialogue;
 class CPlayer;
 class CUnitType;
+
+namespace stratagus {
+	class dialogue;
+}
 
 /// The effect which occurs after triggering a trigger
 class CTriggerEffect
@@ -51,7 +54,7 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
-	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
+	stratagus::dialogue *Dialogue = nullptr;	/// Dialogue to be called
 };
 
 /// The create unit trigger effect

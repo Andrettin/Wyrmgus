@@ -56,11 +56,8 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "dialogue") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDialogue *dialogue = CDialogue::GetDialogue(value);
-			if (dialogue) {
-				this->Dialogue = dialogue;
-			}
+			stratagus::dialogue *dialogue = stratagus::dialogue::get(value);
+			this->Dialogue = dialogue;
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
 		}
