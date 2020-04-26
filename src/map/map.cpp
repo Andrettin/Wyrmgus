@@ -369,15 +369,15 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::fa
 	}
 
 	std::vector<Vec2i> potential_positions;
-	for (int x = min_pos.x; x <= max_pos.x; ++x) {
-		for (int y = min_pos.y; y <= max_pos.y; ++y) {
+	for (int x = min_pos.x; x <= (max_pos.x - (unit_type->GetTileSize().x - 1)); ++x) {
+		for (int y = min_pos.y; y <= (max_pos.y - (unit_type->GetTileSize().y - 1)); ++y) {
 			potential_positions.push_back(Vec2i(x, y));
 		}
 	}
 	
 	while (!potential_positions.empty()) {
 		random_pos = potential_positions[SyncRand(potential_positions.size())];
-		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
+		stratagus::vector::remove(potential_positions, random_pos);
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || (this->is_point_in_a_subtemplate_area(random_pos, z) && GameCycle == 0)) {
 			continue;
@@ -400,18 +400,28 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::fa
 			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		}
 		
-		if (table.size() == 0) {
-			bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
-			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
-				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
-					if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
-						passable_surroundings = false;
-					}
+		if (!table.empty()) {
+			continue;
+		}
+
+		bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
+		for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
+			for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
+				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
+					passable_surroundings = false;
+					break;
 				}
 			}
-			if (passable_surroundings && UnitTypeCanBeAt(*unit_type, random_pos, z) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(nullptr, *unit_type, random_pos, 0, true, z))) {
-				return random_pos;
+			if (!passable_surroundings) {
+				break;
 			}
+		}
+		if (!passable_surroundings) {
+			continue;
+		}
+
+		if (UnitTypeCanBeAt(*unit_type, random_pos, z) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(nullptr, *unit_type, random_pos, 0, true, z))) {
+			return random_pos;
 		}
 	}
 	

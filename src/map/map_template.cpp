@@ -1600,7 +1600,9 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			
 			if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 				unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
-				unit_pos += unit_type->get_tile_center_pos_offset();
+				if (unit_pos.x() != -1 && unit_pos.y() != -1) {
+					unit_pos += unit_type->get_tile_center_pos_offset();
+				}
 			}
 		} else {
 			if (random) {
