@@ -1342,7 +1342,7 @@ void MessagesDisplay::UpdateMessages()
 	const unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
-		if (MessagesScrollY == UI.MessageFont->Height() + 1) {
+		if (MessagesScrollY == UI.MessageFont->Height() + 1 * stratagus::defines::get()->get_scale_factor()) {
 			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
@@ -1396,9 +1396,10 @@ void MessagesDisplay::DrawMessages()
 			}
 		} else {
 #endif
+			const int scale_factor = stratagus::defines::get()->get_scale_factor();
 			// background so the text is easier to read
 			if (MessagesCount) {
-				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
+				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
 				Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
 				//Wyrmgus start
 				/*
@@ -1410,13 +1411,13 @@ void MessagesDisplay::DrawMessages()
 									UI.MapArea.EndX - UI.MapArea.X - 15,
 									textHeight - MessagesScrollY + 2);
 				*/
-				Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.EndY - 16 - 1 - textHeight + MessagesScrollY,
-											 UI.MapArea.EndX - UI.MapArea.X - 16,
-											 textHeight + 1, 0x80);
+				Video.FillTransRectangleClip(color, UI.MapArea.X + 7 * scale_factor, UI.MapArea.EndY + (-16 - 1) * scale_factor - textHeight + MessagesScrollY,
+											 UI.MapArea.EndX - UI.MapArea.X - 16 * scale_factor,
+											 textHeight + 1 * scale_factor, 0x80);
 
-				Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.EndY - 16 - 2 - textHeight + MessagesScrollY,
-									UI.MapArea.EndX - UI.MapArea.X - 15,
-									textHeight + 2);
+				Video.DrawRectangle(color, UI.MapArea.X + 6 * scale_factor, UI.MapArea.EndY + (-16 - 2) * scale_factor - textHeight + MessagesScrollY,
+									UI.MapArea.EndX - UI.MapArea.X - 15 * scale_factor,
+									textHeight + 2 * scale_factor);
 				//Wyrmgus end
 			}
 
@@ -1427,8 +1428,7 @@ void MessagesDisplay::DrawMessages()
 					//Wyrmgus start
 //					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 //								Video.Height - 1);
-					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
-								UI.MapArea.EndY - 16);
+					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, UI.MapArea.EndY - 16 * scale_factor);
 					//Wyrmgus end
 				}
 				/*
@@ -1436,12 +1436,12 @@ void MessagesDisplay::DrawMessages()
 				 * std::string(Messages[z]) creation because
 				 * char * pointer may change during text drawing.
 				 */
-				label.DrawClip(UI.MapArea.X + 8,
+				label.DrawClip(UI.MapArea.X + 8 * scale_factor,
 								//Wyrmgus start
 //							   UI.MapArea.Y + 8 +
 //							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-							   UI.MapArea.EndY - 16 - (UI.MessageFont->Height() + 1) +
-							   (z * -1) * (UI.MessageFont->Height() + 1) + MessagesScrollY,
+							   UI.MapArea.EndY - 16 * scale_factor - (UI.MessageFont->Height() + 1 * scale_factor) +
+							   (z * -1) * (UI.MessageFont->Height() + 1 * scale_factor) + MessagesScrollY,
 								//Wyrmgus end
 							   std::string(Messages[z]));
 				if (z == 0) {
@@ -1459,15 +1459,14 @@ void MessagesDisplay::DrawMessages()
 			for (int i = 0; i < ObjectivesCount; ++i, ++z) {
 				if (z == 0) {
 					PushClipping();
-					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
-								Video.Height - 1);
+					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
 				}
 				/*
 				 * Due parallel drawing we have to force message copy due temp
 				 * std::string(Objectives[i]) creation because
 				 * char * pointer may change during text drawing.
 				 */
-				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(Objectives[i])));
+				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(Objectives[i])));
 				if (z == 0) {
 					PopClipping();
 				}
@@ -1478,10 +1477,9 @@ void MessagesDisplay::DrawMessages()
 
 				if (z == 0) {
 					PushClipping();
-					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
-								Video.Height - 1);
+					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
 				}
-				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->Name.c_str())));
+				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->Name.c_str())));
 				if (z == 0) {
 					PopClipping();
 				}
@@ -1497,11 +1495,11 @@ void MessagesDisplay::DrawMessages()
 					if (objective->Quantity) {
 						objective_string += " (" + std::to_string((long long) objective->Counter) + "/" + std::to_string((long long) objective->Quantity) + ")";
 					}
-					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), objective_string);
+					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);
 					++z;
 				}
 				for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j, ++z) {
-					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->ObjectiveStrings[j].c_str())));
+					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->ObjectiveStrings[j].c_str())));
 				}
 			}
 			//Wyrmgus end
