@@ -41,7 +41,6 @@
 
 class CDependency;
 class CFile;
-class CTriggerEffect;
 class CUnit;
 class CUnitType;
 class CUpgrade;
@@ -49,6 +48,7 @@ class LuaCallback;
 struct lua_State;
 
 namespace stratagus {
+	class effect;
 	class faction;
 }
 
@@ -107,7 +107,7 @@ public:
 	LuaCallback *Effects = nullptr;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
-	std::vector<CTriggerEffect *> TriggerEffects;
+	std::vector<stratagus::effect *> TriggerEffects;
 };
 
 #define ANY_UNIT ((const CUnitType *)0)

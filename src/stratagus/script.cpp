@@ -60,13 +60,11 @@
 #include "map/map.h"
 #include "map/site.h"
 #include "parameters.h"
-//Wyrmgus start
 #include "player.h"
+#include "script/trigger.h"
 #include "spells.h"
-//Wyrmgus end
 #include "time/timeline.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

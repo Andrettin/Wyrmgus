@@ -78,6 +78,7 @@
 //Wyrmgus start
 #include "script.h"
 //Wyrmgus end
+#include "script/trigger.h"
 #include "settings.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
@@ -85,7 +86,6 @@
 #include "text.h"
 #include "time/calendar.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

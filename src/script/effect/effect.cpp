@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger_effect.cpp - The trigger effect source file. */
-//
 //      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -33,23 +31,21 @@
 
 #include "stratagus.h"
 
-#include "trigger_effect.h"
+#include "script/effect/effect.h"
 
 #include "config.h"
 #include "dialogue.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
 /**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data
 */
-void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+void call_dialogue_effect::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -68,7 +64,7 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 	}
 }
 
-void CCallDialogueTriggerEffect::Do(CPlayer *player) const
+void call_dialogue_effect::do_effect(CPlayer *player) const
 {
 	this->Dialogue->Call(player->Index);
 }
@@ -78,7 +74,7 @@ void CCallDialogueTriggerEffect::Do(CPlayer *player) const
 **
 **	@param	config_data	The configuration data
 */
-void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+void create_unit_effect::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -99,7 +95,9 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void CCreateUnitTriggerEffect::Do(CPlayer *player) const
+void create_unit_effect::do_effect(CPlayer *player) const
 {
 	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
+}
+
 }

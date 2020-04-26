@@ -154,8 +154,6 @@ set(game_SRCS
 	src/game/loadgame.cpp
 	src/game/replay.cpp
 	src/game/savegame.cpp
-	src/game/trigger.cpp
-	src/game/trigger_effect.cpp
 )
 source_group(game FILES ${game_SRCS})
 
@@ -278,6 +276,12 @@ set(religion_SRCS
 	src/religion/religion.cpp
 )
 source_group(religion FILES ${religion_SRCS})
+
+set(script_SRCS
+	src/script/trigger.cpp
+	src/script/effect/effect.cpp
+)
+source_group(script FILES ${script_SRCS})
 
 set(sound_SRCS
 	src/sound/music.cpp
@@ -486,6 +490,7 @@ set(stratagus_SRCS
 	${particle_SRCS}
 	${pathfinder_SRCS}
 	${religion_SRCS}
+	${script_SRCS}
 	${sound_SRCS}
 	${spell_SRCS}
 	${stratagusmain_SRCS}
@@ -631,6 +636,11 @@ set(stratagus_religion_HDRS
 	src/include/religion/deity_domain.h
 	src/include/religion/pantheon.h
 	src/include/religion/religion.h
+)
+
+set(stratagus_script_HDRS
+	src/script/trigger.h
+	src/script/effect/effect.h
 )
 
 set(stratagus_sound_HDRS
@@ -780,8 +790,6 @@ set(stratagus_generic_HDRS
 	src/include/text.h
 	src/include/title.h
 	src/include/translate.h
-	src/include/trigger.h
-	src/include/trigger_effect.h
 	src/include/vec2i.h
 	src/include/version.h
 	src/include/video.h
@@ -800,6 +808,7 @@ source_group(database FILES ${stratagus_database_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
+source_group(script FILES ${stratagus_script_HDRS})
 source_group(sound FILES ${stratagus_sound_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
@@ -818,6 +827,7 @@ set(stratagus_HDRS
 	${stratagus_guichan_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_religion_HDRS}
+	${stratagus_script_HDRS}
 	${stratagus_sound_HDRS}
 	${stratagus_spell_HDRS}
 	${stratagus_time_HDRS}

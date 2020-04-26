@@ -56,6 +56,7 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
+#include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "spells.h"
@@ -63,7 +64,6 @@
 #include "time/season.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"

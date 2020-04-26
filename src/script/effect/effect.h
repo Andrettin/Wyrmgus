@@ -27,43 +27,39 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CConfigData;
 class CPlayer;
 class CUnitType;
 
 namespace stratagus {
-	class dialogue;
-}
+
+class dialogue;
 
 /// The effect which occurs after triggering a trigger
-class CTriggerEffect
+class effect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
-	virtual void Do(CPlayer *player) const = 0;			/// Performs the trigger effect
+	virtual void do_effect(CPlayer *player) const = 0;
 };
 
-/// The call dialogue trigger effect
-class CCallDialogueTriggerEffect : public CTriggerEffect
+class call_dialogue_effect final : public effect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
+	virtual void do_effect(CPlayer *player) const override;
 	
 	stratagus::dialogue *Dialogue = nullptr;	/// Dialogue to be called
 };
 
-/// The create unit trigger effect
-class CCreateUnitTriggerEffect : public CTriggerEffect
+class create_unit_effect final : public effect
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
+	virtual void do_effect(CPlayer *player) const override;
 	
 	int Quantity = 1;				/// Quantity of units created
 	CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
+
+}

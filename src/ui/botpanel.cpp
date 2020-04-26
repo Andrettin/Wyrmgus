@@ -68,10 +68,10 @@
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
+#include "script/trigger.h"
 #include "sound/sound.h"
 #include "spells.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"

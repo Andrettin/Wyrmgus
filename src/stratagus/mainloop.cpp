@@ -63,6 +63,7 @@
 //Wyrmgus end
 #include "replay.h"
 #include "results.h"
+#include "script/trigger.h"
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
@@ -71,7 +72,6 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

@@ -37,11 +37,11 @@
 
 #include "font.h"
 #include "player.h"
+#include "script/trigger.h"
 #include "spells.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
 //Wyrmgus start

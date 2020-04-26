@@ -51,6 +51,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "script/trigger.h"
 //Wyrmgus start
 #include "sound/sound.h"
 //Wyrmgus end
@@ -58,7 +59,6 @@
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
-#include "trigger.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_find.h"

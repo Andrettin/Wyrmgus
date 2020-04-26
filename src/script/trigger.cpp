@@ -25,13 +25,9 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
-#include "trigger.h"
+#include "script/trigger.h"
 
 #include "campaign.h"
 #include "config.h"
@@ -47,17 +43,13 @@
 //Wyrmgus end
 #include "results.h"
 #include "script.h"
-#include "trigger_effect.h"
+#include "script/effect/effect.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "util/string_util.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
 
@@ -69,10 +61,6 @@ std::vector<CTrigger *> CTrigger::ActiveTriggers;
 std::map<std::string, CTrigger *> CTrigger::TriggersByIdent;
 std::vector<std::string> CTrigger::DeactivatedTriggers;
 unsigned int CTrigger::CurrentTriggerId = 0;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Get player number.
@@ -624,8 +612,8 @@ void TriggersEachCycle()
 			if (current_trigger->Type == CTrigger::TriggerType::GlobalTrigger) {
 				if (CheckDependencies(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
-					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
-						trigger_effect->Do(CPlayer::Players[PlayerNumNeutral]);
+					for (stratagus::effect *effect : current_trigger->TriggerEffects) {
+						effect->do_effect(CPlayer::Players[PlayerNumNeutral]);
 					}
 				}
 			} else if (current_trigger->Type == CTrigger::TriggerType::PlayerTrigger) {
@@ -638,8 +626,8 @@ void TriggersEachCycle()
 						continue;
 					}
 					triggered = true;
-					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
-						trigger_effect->Do(player);
+					for (stratagus::effect *effect : current_trigger->TriggerEffects) {
+						effect->do_effect(player);
 					}
 					if (current_trigger->OnlyOnce) {
 						break;
@@ -805,18 +793,18 @@ void CTrigger::ProcessConfigData(const CConfigData *config_data)
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "effects") {
 			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
-				CTriggerEffect *trigger_effect = nullptr;
+				stratagus::effect *effect = nullptr;
 				
 				if (grandchild_config_data->Tag == "call_dialogue") {
-					trigger_effect = new CCallDialogueTriggerEffect;
+					effect = new stratagus::call_dialogue_effect;
 				} else if (grandchild_config_data->Tag == "create_unit") {
-					trigger_effect = new CCreateUnitTriggerEffect;
+					effect = new stratagus::create_unit_effect;
 				} else {
 					fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", grandchild_config_data->Tag.c_str());
 				}
 				
-				trigger_effect->ProcessConfigData(grandchild_config_data);
-				this->TriggerEffects.push_back(trigger_effect);
+				effect->ProcessConfigData(grandchild_config_data);
+				this->TriggerEffects.push_back(effect);
 			}
 		}
 		else if (child_config_data->Tag == "dependencies") {

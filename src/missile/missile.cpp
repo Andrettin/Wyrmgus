@@ -47,13 +47,13 @@
 #include "map/tileset.h"
 #include "mod.h"
 #include "player.h"
+#include "script/trigger.h"
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "spells.h"
-#include "trigger.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
