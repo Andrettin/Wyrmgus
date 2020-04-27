@@ -107,6 +107,7 @@ void map_template::process_sml_property(const sml_property &property)
 void map_template::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+
 	if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
 		scope.for_each_property([&](const sml_property &property) {
 			CUnitType *unit_type = CUnitType::get(property.get_key());

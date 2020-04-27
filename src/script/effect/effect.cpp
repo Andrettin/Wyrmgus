@@ -83,7 +83,7 @@ call_dialogue_effect::call_dialogue_effect(const std::string &dialogue_identifie
 
 void call_dialogue_effect::do_effect(CPlayer *player) const
 {
-	this->dialogue->Call(player->Index);
+	this->dialogue->call(player->Index);
 }
 
 std::string call_dialogue_effect::get_string(const CPlayer *player) const

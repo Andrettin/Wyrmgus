@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name dialogue.cpp - The dialogue source file. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -36,25 +34,59 @@
 
 namespace stratagus {
 
+dialogue::dialogue(const std::string &identifier) : data_entry(identifier)
+{
+}
+
 dialogue::~dialogue()
 {
-	for (CDialogueNode *node : this->Nodes) {
-		delete node;
+}
+
+
+void dialogue::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag.empty()) {
+		auto node = std::make_unique<dialogue_node>();
+		node->ID = this->nodes.size();
+		node->Dialogue = this;
+		database::process_sml_data(node, scope);
+		this->nodes.push_back(std::move(node));
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
-void dialogue::Call(const int player) const
+void dialogue::call(const int player) const
 {
-	if (this->Nodes.empty()) {
+	if (this->nodes.empty()) {
 		return;
 	}
 	
-	this->Nodes[0]->Call(player);
+	this->nodes.front()->call(player);
 }
 
+void dialogue::call_node(const int node_index, const int player) const
+{
+	if (node_index >= static_cast<int>(this->nodes.size())) {
+		return;
+	}
+
+	this->nodes[node_index]->call(player);
 }
 
-CDialogueNode::~CDialogueNode()
+void dialogue::call_node_option_effect(const int node_index, const int option_index, const int player) const
+{
+	if (node_index >= static_cast<int>(this->nodes.size())) {
+		return;
+	}
+
+	CclCommand("trigger_player = " + std::to_string(player) + ";");
+	this->nodes[node_index]->option_effect(option_index, player);
+}
+
+dialogue_node::~dialogue_node()
 {
 	if (this->Conditions) {
 		delete Conditions;
@@ -69,15 +101,45 @@ CDialogueNode::~CDialogueNode()
 	}
 }
 
-void CDialogueNode::Call(const int player) const
+void dialogue_node::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "text") {
+		this->Text = value;
+	} else {
+		throw std::runtime_error("Invalid dialogue node property: \"" + key + "\".");
+	}
+}
+
+void dialogue_node::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "option") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			if (key == "name") {
+				this->Options.push_back(value);
+			} else {
+				throw std::runtime_error("Invalid dialogue option property: \"" + key + "\".");
+			}
+		});
+	} else {
+		throw std::runtime_error("Invalid dialogue node scope: \"" + tag + "\".");
+	}
+}
+
+void dialogue_node::call(const int player) const
 {
 	if (this->Conditions) {
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
 		if (this->Conditions->popBoolean() == false) {
-			if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-				this->Dialogue->Nodes[this->ID + 1]->Call(player);
-			}
+			this->Dialogue->call_node(this->ID + 1, player);
 			return;
 		}
 	}
@@ -167,40 +229,32 @@ void CDialogueNode::Call(const int player) const
 	CclCommand(lua_command);
 }
 
-void CDialogueNode::OptionEffect(const int option, const int player) const
+void dialogue_node::option_effect(const int option, const int player) const
 {
 	if ((int) this->OptionEffects.size() > option && this->OptionEffects[option]) {
 		this->OptionEffects[option]->pushPreamble();
 		this->OptionEffects[option]->run();
 	}
-	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-		this->Dialogue->Nodes[this->ID + 1]->Call(player);
-	}
+
+	this->Dialogue->call_node(this->ID + 1, player);
+}
+
 }
 
 void CallDialogue(const std::string &dialogue_ident, int player)
 {
 	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
-	dialogue->Call(player);
+	dialogue->call(player);
 }
 
 void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 {
 	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
-	if (node >= (int) dialogue->Nodes.size()) {
-		return;
-	}
-	
-	dialogue->Nodes[node]->Call(player);
+	dialogue->call_node(node, player);
 }
 
 void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
 {
 	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
-	if (node >= (int) dialogue->Nodes.size()) {
-		return;
-	}
-	
-	CclCommand("trigger_player = " + std::to_string((long long) player) + ";");
-	dialogue->Nodes[node]->OptionEffect(option, player);
+	dialogue->call_node_option_effect(node, option, player);
 }

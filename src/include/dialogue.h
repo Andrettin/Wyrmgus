@@ -30,10 +30,14 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-class CDialogueNode;
 class LuaCallback;
+struct lua_State;
+
+int CclDefineDialogue(lua_State *l);
 
 namespace stratagus {
+
+class dialogue_node;
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
@@ -43,26 +47,31 @@ public:
 	static constexpr const char *class_identifier = "dialogue";
 	static constexpr const char *database_folder = "dialogues";
 
-	dialogue(const std::string &identifier) : data_entry(identifier)
-	{
-	}
-
+	dialogue(const std::string &identifier);
 	~dialogue();
 	
-	void Call(const int player) const;
+	virtual void process_sml_scope(const sml_data &scope) override;
+
+	void call(const int player) const;
+	void call_node(const int node_index, const int player) const;
+	void call_node_option_effect(const int node_index, const int option_index, const int player) const;
 	
-	std::vector<CDialogueNode *> Nodes;	/// The nodes of the dialogue
+private:
+	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue
+
+	friend int ::CclDefineDialogue(lua_State *l);
 };
 
-}
-
-class CDialogueNode
+class dialogue_node
 {
 public:
-	~CDialogueNode();
+	~dialogue_node();
 	
-	void Call(const int player) const;
-	void OptionEffect(const int option, const int player) const;
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	void call(const int player) const;
+	void option_effect(const int option, const int player) const;
 	
 	int ID = -1;
 	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
@@ -76,6 +85,8 @@ public:
 	std::vector<LuaCallback *> OptionEffects;
 	std::vector<std::string> OptionTooltips;
 };
+
+}
 
 extern void CallDialogue(const std::string &dialogue_ident, int player);
 extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);

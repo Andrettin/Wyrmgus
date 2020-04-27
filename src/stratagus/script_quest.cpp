@@ -715,9 +715,8 @@ static int CclDefineDialogue(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CDialogueNode *node = new CDialogueNode;
-				node->ID = dialogue->Nodes.size();
-				dialogue->Nodes.push_back(node);
+				auto node = std::make_unique<stratagus::dialogue_node>();
+				node->ID = dialogue->nodes.size();
 				node->Dialogue = dialogue;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for dialogue nodes)");
@@ -771,6 +770,7 @@ static int CclDefineDialogue(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
+				dialogue->nodes.push_back(std::move(node));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
