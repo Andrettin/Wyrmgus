@@ -280,6 +280,7 @@ source_group(religion FILES ${religion_SRCS})
 set(script_SRCS
 	src/script/trigger.cpp
 	src/script/effect/effect.cpp
+	src/script/effect/effect_list.cpp
 )
 source_group(script FILES ${script_SRCS})
 
@@ -641,6 +642,7 @@ set(stratagus_religion_HDRS
 set(stratagus_script_HDRS
 	src/script/trigger.h
 	src/script/effect/effect.h
+	src/script/effect/effect_list.h
 )
 
 set(stratagus_sound_HDRS

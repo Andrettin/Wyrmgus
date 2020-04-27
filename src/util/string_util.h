@@ -171,4 +171,9 @@ inline std::string snake_case_to_pascal_case(const std::string &str)
 	return result;
 }
 
+inline std::string highlight(const std::string &str)
+{
+	return "~<" + str + "~>";
+}
+
 }

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019 by Andrettin
+//      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,20 +25,61 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "script/effect/effect.h"
 
 #include "config.h"
+#include "database/database.h"
 #include "dialogue.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/string_util.h"
 
 namespace stratagus {
+
+std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
+{
+	const std::string &effect_identifier = property.get_key();
+
+	if (effect_identifier == "call_dialogue") {
+		return std::make_unique<call_dialogue_effect>(property.get_value());
+	} else if (effect_identifier == "create_unit") {
+		return std::make_unique<create_unit_effect>(property.get_value());
+	}
+
+	throw std::runtime_error("Invalid property effect: \"" + effect_identifier + "\".");
+}
+
+std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
+{
+	const std::string &effect_identifier = scope.get_tag();
+	std::unique_ptr<effect> effect;
+
+	if (effect == nullptr) {
+		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
+	}
+
+	database::process_sml_data(effect, scope);
+
+	return effect;
+}
+
+
+void effect::process_sml_property(const sml_property &property)
+{
+	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
+}
+
+void effect::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
+}
+
+call_dialogue_effect::call_dialogue_effect(const std::string &dialogue_identifier)
+{
+	this->dialogue = dialogue::get(dialogue_identifier);
+}
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -52,28 +93,32 @@ void call_dialogue_effect::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "dialogue") {
-			stratagus::dialogue *dialogue = stratagus::dialogue::get(value);
-			this->Dialogue = dialogue;
+			this->dialogue = dialogue::get(value);
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
 		}
 	}
 	
-	if (!this->Dialogue) {
+	if (this->get_dialogue() == nullptr) {
 		fprintf(stderr, "Call dialogue trigger effect has no dialogue.\n");
 	}
 }
 
 void call_dialogue_effect::do_effect(CPlayer *player) const
 {
-	this->Dialogue->Call(player->Index);
+	this->get_dialogue()->Call(player->Index);
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
+std::string call_dialogue_effect::get_string(const CPlayer *player) const
+{
+	return "Trigger the " + string::highlight(this->get_dialogue()->get_identifier()) + " dialogue";
+}
+
+create_unit_effect::create_unit_effect(const std::string &unit_type_identifier)
+{
+	this->UnitType = CUnitType::get(unit_type_identifier);
+}
+
 void create_unit_effect::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -98,6 +143,11 @@ void create_unit_effect::ProcessConfigData(const CConfigData *config_data)
 void create_unit_effect::do_effect(CPlayer *player) const
 {
 	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
+}
+
+std::string create_unit_effect::get_string(const CPlayer *player) const
+{
+	return "Receive a " + string::highlight(this->UnitType->get_name()) + " unit";
 }
 
 }

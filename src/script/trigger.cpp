@@ -44,6 +44,7 @@
 #include "results.h"
 #include "script.h"
 #include "script/effect/effect.h"
+#include "script/effect/effect_list.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -606,15 +607,13 @@ void TriggersEachCycle()
 			}
 		}
 		
-		if (!current_trigger->TriggerEffects.empty()) {
+		if (current_trigger->TriggerEffects != nullptr) {
 			bool triggered = false;
 			
 			if (current_trigger->Type == CTrigger::TriggerType::GlobalTrigger) {
 				if (CheckDependencies(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
-					for (stratagus::effect *effect : current_trigger->TriggerEffects) {
-						effect->do_effect(CPlayer::Players[PlayerNumNeutral]);
-					}
+					current_trigger->TriggerEffects->do_effects(CPlayer::Players[PlayerNumNeutral]);
 				}
 			} else if (current_trigger->Type == CTrigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
@@ -626,9 +625,7 @@ void TriggersEachCycle()
 						continue;
 					}
 					triggered = true;
-					for (stratagus::effect *effect : current_trigger->TriggerEffects) {
-						effect->do_effect(player);
-					}
+					current_trigger->TriggerEffects->do_effects(player);
 					if (current_trigger->OnlyOnce) {
 						break;
 					}
@@ -718,6 +715,7 @@ void CTrigger::InitActiveTriggers()
 			continue;
 		}
 		if (trigger->CampaignOnly && stratagus::game::get()->get_current_campaign() == nullptr) {
+			continue;
 		}
 		CTrigger::ActiveTriggers.push_back(trigger);
 	}
@@ -749,6 +747,10 @@ void CTrigger::ClearActiveTriggers()
 	//Wyrmgus end
 	
 	GameTimer.Reset();
+}
+
+CTrigger::CTrigger()
+{
 }
 
 CTrigger::~CTrigger()
@@ -792,19 +794,20 @@ void CTrigger::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "effects") {
+			this->TriggerEffects = std::make_unique<stratagus::effect_list>();
 			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
-				stratagus::effect *effect = nullptr;
+				std::unique_ptr<stratagus::effect> effect;
 				
 				if (grandchild_config_data->Tag == "call_dialogue") {
-					effect = new stratagus::call_dialogue_effect;
+					effect = std::make_unique<stratagus::call_dialogue_effect>();
 				} else if (grandchild_config_data->Tag == "create_unit") {
-					effect = new stratagus::create_unit_effect;
+					effect = std::make_unique<stratagus::create_unit_effect>();
 				} else {
 					fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", grandchild_config_data->Tag.c_str());
 				}
 				
 				effect->ProcessConfigData(grandchild_config_data);
-				this->TriggerEffects.push_back(effect);
+				this->TriggerEffects->add_effect(std::move(effect));
 			}
 		}
 		else if (child_config_data->Tag == "dependencies") {

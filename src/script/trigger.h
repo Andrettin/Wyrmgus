@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger.h - The trigger header file. */
-//
 //      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -49,6 +47,7 @@ struct lua_State;
 
 namespace stratagus {
 	class effect;
+	class effect_list;
 	class faction;
 }
 
@@ -95,6 +94,7 @@ public:
 	static std::vector<std::string> DeactivatedTriggers;
 	static unsigned int CurrentTriggerId;
 
+	CTrigger();
 	~CTrigger();
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
@@ -107,7 +107,7 @@ public:
 	LuaCallback *Effects = nullptr;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
-	std::vector<stratagus::effect *> TriggerEffects;
+	std::unique_ptr<stratagus::effect_list> TriggerEffects;
 };
 
 #define ANY_UNIT ((const CUnitType *)0)

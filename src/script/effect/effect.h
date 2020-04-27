@@ -34,30 +34,76 @@ class CUnitType;
 namespace stratagus {
 
 class dialogue;
+class sml_data;
+class sml_property;
 
-/// The effect which occurs after triggering a trigger
+//a scripted effect
 class effect
 {
 public:
+	static std::unique_ptr<effect> from_sml_property(const sml_property &property);
+	static std::unique_ptr<effect> from_sml_scope(const sml_data &scope);
+
+	virtual const std::string &get_class_identifier() const = 0;
+
+	virtual void process_sml_property(const sml_property &property);
+	virtual void process_sml_scope(const sml_data &scope);
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	virtual void do_effect(CPlayer *player) const = 0;
+	virtual std::string get_string(const CPlayer *player) const = 0;
+
+	virtual bool is_hidden() const
+	{
+		return false;
+	}
 };
 
 class call_dialogue_effect final : public effect
 {
 public:
+	call_dialogue_effect() {}
+	explicit call_dialogue_effect(const std::string &dialogue_identifier);
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static std::string class_identifier = "call_dialogue";
+		return class_identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void do_effect(CPlayer *player) const override;
-	
-	stratagus::dialogue *Dialogue = nullptr;	/// Dialogue to be called
+	virtual std::string get_string(const CPlayer *player) const override;
+
+	virtual bool is_hidden() const override
+	{
+		return true;
+	}
+
+	const dialogue *get_dialogue() const
+	{
+		return this->dialogue;
+	}
+
+private:
+	const dialogue *dialogue = nullptr;
 };
 
 class create_unit_effect final : public effect
 {
 public:
+	create_unit_effect() {}
+	explicit create_unit_effect(const std::string &unit_type_identifier);
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static std::string class_identifier = "create_unit";
+		return class_identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void do_effect(CPlayer *player) const override;
-	
+	virtual std::string get_string(const CPlayer *player) const override;
+
 	int Quantity = 1;				/// Quantity of units created
 	CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
