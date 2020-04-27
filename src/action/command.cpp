@@ -441,7 +441,7 @@ void CommandQuest(CUnit &unit, stratagus::quest *quest)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	unit.Player->AcceptQuest(quest);
+	unit.Player->accept_quest(quest);
 }
 
 /**

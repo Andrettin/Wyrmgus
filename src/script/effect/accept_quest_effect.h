@@ -27,44 +27,39 @@
 
 #pragma once
 
-#include "dialogue.h"
 #include "player.h"
+#include "quest.h"
 #include "script/effect/effect.h"
 #include "util/string_util.h"
 
 namespace stratagus {
 
-class call_dialogue_effect final : public effect
+class accept_quest_effect final : public effect
 {
 public:
-	explicit call_dialogue_effect(const std::string &dialogue_identifier)
+	explicit accept_quest_effect(const std::string &quest_identifier)
 	{
-		this->dialogue = dialogue::get(dialogue_identifier);
+		this->quest = quest::get(quest_identifier);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static std::string class_identifier = "call_dialogue";
+		static std::string class_identifier = "accept_quest";
 		return class_identifier;
 	}
 
 	virtual void do_effect(CPlayer *player) const override
 	{
-		this->dialogue->call(player->Index);
+		player->accept_quest(this->quest);
 	}
 
 	virtual std::string get_string(const CPlayer *player) const override
 	{
-		return "Trigger the " + string::highlight(this->dialogue->get_identifier()) + " dialogue";
-	}
-
-	virtual bool is_hidden() const override
-	{
-		return true;
+		return "Receive the " + string::highlight(this->quest->get_name()) + " quest";
 	}
 
 private:
-	const dialogue *dialogue = nullptr;
+	quest *quest = nullptr;
 };
 
 }

@@ -3155,19 +3155,13 @@ static int CclSetPlayerData(lua_State *l)
 		p->Team = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "AcceptQuest")) {
 		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
-		if (quest) {
-			p->AcceptQuest(quest);
-		}
+		p->accept_quest(quest);
 	} else if (!strcmp(data, "CompleteQuest")) {
 		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
-		if (quest) {
-			p->CompleteQuest(quest);
-		}
+		p->complete_quest(quest);
 	} else if (!strcmp(data, "FailQuest")) {
 		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
-		if (quest) {
-			p->FailQuest(quest);
-		}
+		p->fail_quest(quest);
 	} else if (!strcmp(data, "AddModifier")) {
 		LuaCheckArgs(l, 4);
 		CUpgrade *modifier_upgrade = CUpgrade::get(LuaToString(l, 3));

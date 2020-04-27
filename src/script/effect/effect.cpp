@@ -31,6 +31,7 @@
 
 #include "config.h"
 #include "database/database.h"
+#include "script/effect/accept_quest_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/create_unit_effect.h"
 
@@ -40,7 +41,9 @@ std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
 {
 	const std::string &effect_identifier = property.get_key();
 
-	if (effect_identifier == "call_dialogue") {
+	if (effect_identifier == "accept_quest") {
+		return std::make_unique<accept_quest_effect>(property.get_value());
+	} else if (effect_identifier == "call_dialogue") {
 		return std::make_unique<call_dialogue_effect>(property.get_value());
 	} else if (effect_identifier == "create_unit") {
 		return std::make_unique<create_unit_effect>(property.get_value());
