@@ -38,6 +38,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "dialogue.h"
+#include "dialogue_option.h"
 #include "faction.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -745,7 +746,11 @@ static int CclDefineDialogue(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
-							node->Options.push_back(LuaToString(l, -1, n + 1));
+							if (n >= static_cast<int>(node->options.size())) {
+								auto option = std::make_unique<stratagus::dialogue_option>();
+								node->options.push_back(std::move(option));
+							}
+							node->options.at(n)->name = LuaToString(l, -1, n + 1);
 						}
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "option-effects")) {
@@ -753,7 +758,11 @@ static int CclDefineDialogue(lua_State *l)
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							lua_rawgeti(l, -1, n + 1);
-							node->OptionEffects.push_back(new LuaCallback(l, -1));
+							if (n >= static_cast<int>(node->options.size())) {
+								auto option = std::make_unique<stratagus::dialogue_option>();
+								node->options.push_back(std::move(option));
+							}
+							node->options.at(n)->lua_effects = std::make_unique<LuaCallback>(l, -1);
 							lua_pop(l, 1);
 						}
 						lua_pop(l, 1);
@@ -761,7 +770,11 @@ static int CclDefineDialogue(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
-							node->OptionTooltips.push_back(LuaToString(l, -1, n + 1));
+							if (n >= static_cast<int>(node->options.size())) {
+								auto option = std::make_unique<stratagus::dialogue_option>();
+								node->options.push_back(std::move(option));
+							}
+							node->options.at(n)->tooltip = LuaToString(l, -1, n + 1);
 						}
 						lua_pop(l, 1);
 					} else {

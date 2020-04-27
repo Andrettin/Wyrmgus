@@ -29,7 +29,9 @@
 
 #include "dialogue.h"
 
+#include "dialogue_option.h"
 #include "luacallback.h"
+#include "player.h"
 #include "script.h"
 
 namespace stratagus {
@@ -86,6 +88,10 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 	this->nodes[node_index]->option_effect(option_index, player);
 }
 
+dialogue_node::dialogue_node()
+{
+}
+
 dialogue_node::~dialogue_node()
 {
 	if (this->Conditions) {
@@ -94,10 +100,6 @@ dialogue_node::~dialogue_node()
 	
 	if (this->ImmediateEffects) {
 		delete ImmediateEffects;
-	}
-	
-	for (LuaCallback *option_effect : this->OptionEffects) {
-		delete option_effect;
 	}
 }
 
@@ -118,16 +120,9 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "option") {
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-
-			if (key == "name") {
-				this->Options.push_back(value);
-			} else {
-				throw std::runtime_error("Invalid dialogue option property: \"" + key + "\".");
-			}
-		});
+		auto option = std::make_unique<dialogue_option>();
+		database::process_sml_data(option, scope);
+		this->options.push_back(std::move(option));
 	} else {
 		throw std::runtime_error("Invalid dialogue node scope: \"" + tag + "\".");
 	}
@@ -171,15 +166,15 @@ void dialogue_node::call(const int player) const
 	lua_command += std::to_string((long long) player) + ", ";
 	
 	lua_command += "{";
-	if (this->Options.size() > 0) {
+	if (!this->options.empty() && !this->options.front()->get_name().empty()) {
 		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
+		for (const auto &option : this->options) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
 				first = false;
 			}
-			lua_command += "\"" + this->Options[i] + "\"";
+			lua_command += "\"" + option->get_name() +"\"";
 		}
 	} else {
 		lua_command += "\"~!Continue\"";
@@ -187,9 +182,9 @@ void dialogue_node::call(const int player) const
 	lua_command += "}, ";
 	
 	lua_command += "{";
-	if (this->Options.size() > 0) {
+	if (!this->options.empty()) {
 		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
+		for (size_t i = 0; i < this->options.size(); ++i) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
@@ -209,16 +204,16 @@ void dialogue_node::call(const int player) const
 	lua_command += "nil, nil, nil, ";
 	
 	lua_command += "{";
-	if (this->OptionTooltips.size() > 0) {
+	if (!this->options.empty() && !this->options.front()->tooltip.empty()) {
 		lua_command += "OptionTooltips = {";
 		bool first = true;
-		for (size_t i = 0; i < this->OptionTooltips.size(); ++i) {
+		for (const auto &option : this->options) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
 				first = false;
 			}
-			lua_command += "\"" + this->OptionTooltips[i] + "\"";
+			lua_command += "\"" + option->tooltip + "\"";
 		}
 		lua_command += "}";
 	}
@@ -229,11 +224,11 @@ void dialogue_node::call(const int player) const
 	CclCommand(lua_command);
 }
 
-void dialogue_node::option_effect(const int option, const int player) const
+void dialogue_node::option_effect(const int option_index, const int player) const
 {
-	if ((int) this->OptionEffects.size() > option && this->OptionEffects[option]) {
-		this->OptionEffects[option]->pushPreamble();
-		this->OptionEffects[option]->run();
+	if (option_index < static_cast<int>(this->options.size())) {
+		const auto &option = this->options[option_index];
+		option->do_effects(CPlayer::Players.at(player));
 	}
 
 	this->Dialogue->call_node(this->ID + 1, player);

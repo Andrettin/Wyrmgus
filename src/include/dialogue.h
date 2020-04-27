@@ -38,6 +38,7 @@ int CclDefineDialogue(lua_State *l);
 namespace stratagus {
 
 class dialogue_node;
+class dialogue_option;
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
@@ -65,13 +66,14 @@ private:
 class dialogue_node
 {
 public:
+	dialogue_node();
 	~dialogue_node();
 	
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
 	void call(const int player) const;
-	void option_effect(const int option, const int player) const;
+	void option_effect(const int option_index, const int player) const;
 	
 	int ID = -1;
 	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
@@ -81,9 +83,7 @@ public:
 	stratagus::dialogue *Dialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *ImmediateEffects = nullptr;
-	std::vector<std::string> Options;
-	std::vector<LuaCallback *> OptionEffects;
-	std::vector<std::string> OptionTooltips;
+	std::vector<std::unique_ptr<dialogue_option>> options;
 };
 
 }
