@@ -44,7 +44,6 @@
 
 class CDeity;
 class CDeityDomain;
-class CDependency;
 class CFile;
 class CLanguage;
 class CPersistentItem;
@@ -58,6 +57,7 @@ class LuaCallback;
 namespace stratagus {
 	class calendar;
 	class civilization;
+	class dependency;
 	class faction;
 	class historical_location;
 	class quest;
@@ -165,8 +165,8 @@ public:
 	CCharacter *Father = nullptr;		/// Character's father
 	CCharacter *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	stratagus::dependency *Predependency = nullptr;
+	stratagus::dependency *Dependency = nullptr;
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character

@@ -286,10 +286,10 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "predependencies") {
-			this->Predependency = new CAndDependency;
+			this->Predependency = new stratagus::and_dependency;
 			this->Predependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
+			this->Dependency = new stratagus::and_dependency;
 			this->Dependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "modifier") {
 			CUpgradeModifier *modifier = new CUpgradeModifier;
@@ -360,10 +360,10 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 
 		CUpgradeModifier::UpgradeModifiers.push_back(modifier);
 	} else if (tag == "predependencies") {
-		this->Predependency = new CAndDependency;
+		this->Predependency = new stratagus::and_dependency;
 		stratagus::database::process_sml_data(this->Predependency, scope);
 	} else if (tag == "dependencies") {
-		this->Dependency = new CAndDependency;
+		this->Dependency = new stratagus::and_dependency;
 		stratagus::database::process_sml_data(this->Dependency, scope);
 	}
 }

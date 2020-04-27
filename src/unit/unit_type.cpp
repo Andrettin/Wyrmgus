@@ -1055,10 +1055,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "predependencies") {
-			this->Predependency = new CAndDependency;
+			this->Predependency = new stratagus::and_dependency;
 			this->Predependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
+			this->Dependency = new stratagus::and_dependency;
 			this->Dependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "variation") {
 			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;

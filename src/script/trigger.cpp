@@ -757,7 +757,7 @@ void trigger::process_sml_scope(const sml_data &scope)
 		this->effects = std::make_unique<stratagus::effect_list>();
 		database::process_sml_data(this->effects, scope);
 	} else if (tag == "dependencies") {
-		this->Dependency = new CAndDependency;
+		this->Dependency = new and_dependency;
 		database::process_sml_data(this->Dependency, scope);
 	} else {
 		data_entry::process_sml_scope(scope);

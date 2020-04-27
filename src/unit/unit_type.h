@@ -52,7 +52,6 @@
 
 class CAnimations;
 class CConstruction;
-class CDependency;
 class CFile;
 class CPlayerColorGraphic;
 class CUnitTypeVariation;
@@ -69,6 +68,7 @@ class LuaCallback;
 enum class UnitTypeType;
 
 namespace stratagus {
+	class dependency;
 	class faction;
 	class plane;
 	class terrain_type;
@@ -1061,8 +1061,8 @@ public:
 	CGraphic *LightSprite;						/// Light sprite image
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
 	
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	stratagus::dependency *Predependency = nullptr;
+	stratagus::dependency *Dependency = nullptr;
 	
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end

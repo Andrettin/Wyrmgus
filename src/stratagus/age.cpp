@@ -126,10 +126,10 @@ void age::process_sml_scope(const sml_data &scope)
 
 		this->graphics = CGraphic::New(filepath.string(), size.x, size.y);
 	} else if (tag == "predependencies") {
-		this->predependency = new CAndDependency;
+		this->predependency = new and_dependency;
 		database::process_sml_data(this->predependency, scope);
 	} else if (tag == "dependencies") {
-		this->dependency = new CAndDependency;
+		this->dependency = new and_dependency;
 		database::process_sml_data(this->dependency, scope);
 	} else {
 		data_entry::process_sml_scope(scope);

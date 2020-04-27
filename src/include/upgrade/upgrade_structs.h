@@ -50,7 +50,6 @@
 
 class CCharacter;
 class CDeityDomain;
-class CDependency;
 class CIcon;
 class CSchoolOfMagic;
 class CUniqueItem;
@@ -60,6 +59,7 @@ struct lua_State;
 
 namespace stratagus {
 	class civilization;
+	class dependency;
 }
 
 /**
@@ -246,8 +246,8 @@ public:
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	stratagus::dependency *Predependency = nullptr;
+	stratagus::dependency *Dependency = nullptr;
 
 	friend int CclDefineUpgrade(lua_State *l);
 };

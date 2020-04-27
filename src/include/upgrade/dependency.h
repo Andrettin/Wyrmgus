@@ -99,43 +99,51 @@ class CUpgrade;
 class ButtonAction;
 
 namespace stratagus {
-	class age;
-	class sml_data;
-	class sml_property;
-	class trigger;
-}
+
+class age;
+class faction;
+class site;
+class sml_data;
+class sml_property;
+class trigger;
 
 /// Dependency rule
-class CDependency
+class dependency
 {
 public:
+	static std::unique_ptr<const dependency> from_sml_scope(const sml_data &scope);
+
+	virtual ~dependency() {}
+
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
-	virtual void process_sml_property(const stratagus::sml_property &property);
-	virtual void process_sml_scope(const stratagus::sml_data &scope);
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const = 0;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const;
-	virtual std::string GetString(const std::string &prefix = "") const = 0; //get the dependency as a string
+	virtual void process_sml_property(const sml_property &property);
+	virtual void process_sml_scope(const sml_data &scope);
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const = 0;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const;
+
+	//get the dependency as a string
+	virtual std::string get_string(const std::string &prefix = "") const = 0;
 };
 
-class CAndDependency : public CDependency
+class and_dependency : public dependency
 {
 public:
-	CAndDependency() {}
-	CAndDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
+	and_dependency() {}
+	and_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies) : dependencies(std::move(dependencies)) {}
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
 	
-	virtual std::string GetString(const std::string &prefix = "") const override
+	virtual std::string get_string(const std::string &prefix = "") const override
 	{
 		int element_count = 0;
 		
-		for (const CDependency *dependency : this->Dependencies) {
-			if (!dependency->GetString(prefix + '\t').empty()) {
+		for (const auto &dependency : this->dependencies) {
+			if (!dependency->get_string(prefix + '\t').empty()) {
 				element_count++;
 			}
 		}
@@ -146,8 +154,8 @@ public:
 				str += prefix + "AND:\n";
 			}
 		
-			for (const CDependency *dependency : this->Dependencies) {
-				str += dependency->GetString((element_count > 1) ? prefix + '\t' : prefix);
+			for (const auto &dependency : this->dependencies) {
+				str += dependency->get_string((element_count > 1) ? prefix + '\t' : prefix);
 			}
 
 			return str;
@@ -157,26 +165,28 @@ public:
 	}
 
 private:
-	std::vector<const CDependency *> Dependencies;	/// The dependencies of which all should be true
+	std::vector<std::unique_ptr<const dependency>> dependencies; //the dependencies of which all should be true
 };
 
-class COrDependency : public CDependency
+class or_dependency : public dependency
 {
 public:
-	COrDependency() {}
-	COrDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
+	or_dependency() {}
+	or_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies) : dependencies(std::move(dependencies))
+	{
+	}
 	
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
 	
-	virtual std::string GetString(const std::string &prefix = "") const override
+	virtual std::string get_string(const std::string &prefix = "") const override
 	{
 		int element_count = 0;
 		
-		for (const CDependency *dependency : this->Dependencies) {
-			if (!dependency->GetString(prefix + '\t').empty()) {
+		for (const auto &dependency : this->dependencies) {
+			if (!dependency->get_string(prefix + '\t').empty()) {
 				element_count++;
 			}
 		}
@@ -187,8 +197,8 @@ public:
 				str += prefix + "OR:\n";
 			}
 		
-			for (const CDependency *dependency : this->Dependencies) {
-				str += dependency->GetString((element_count > 1) ? prefix + '\t' : prefix);
+			for (const auto &dependency : this->dependencies) {
+				str += dependency->get_string((element_count > 1) ? prefix + '\t' : prefix);
 			}
 
 			return str;
@@ -198,29 +208,34 @@ public:
 	}
 
 private:
-	std::vector<const CDependency *> Dependencies;	/// The dependencies of which one should be true
+	std::vector<std::unique_ptr<const dependency>> dependencies;	/// The dependencies of which one should be true
 };
 
-class CNotDependency : public CDependency
+class not_dependency : public dependency
 {
 public:
-	CNotDependency() {}
-	CNotDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
-	CNotDependency(const CDependency *dependency)
+	not_dependency() {}
+	not_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies)
+		: dependencies(std::move(dependencies))
 	{
-		this->Dependencies.push_back(dependency);
+	}
+
+	not_dependency(std::unique_ptr<const dependency> &&dependency)
+	{
+		this->dependencies.push_back(std::move(dependency));
 	}
 	
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
 	
-	virtual std::string GetString(const std::string &prefix = "") const override
+	virtual std::string get_string(const std::string &prefix = "") const override
 	{
 		int element_count = 0;
 		
-		for (const CDependency *dependency : this->Dependencies) {
-			if (!dependency->GetString(prefix + '\t').empty()) {
+		for (const auto &dependency : this->dependencies) {
+			if (!dependency->get_string(prefix + '\t').empty()) {
 				element_count++;
 			}
 		}
@@ -228,8 +243,8 @@ public:
 		if (element_count >= 1) {
 			std::string str = prefix + "NOT:\n";
 		
-			for (const CDependency *dependency : this->Dependencies) {
-				str += dependency->GetString(prefix + '\t');
+			for (const auto &dependency : this->dependencies) {
+				str += dependency->get_string(prefix + '\t');
 			}
 
 			return str;
@@ -239,88 +254,101 @@ public:
 	}
 
 private:
-	std::vector<const CDependency *> Dependencies;	/// The dependencies of which none should be true
+	std::vector<std::unique_ptr<const dependency>> dependencies;	/// The dependencies of which none should be true
 };
 
-class CUnitTypeDependency : public CDependency
+class unit_type_dependency : public dependency
 {
 public:
-	CUnitTypeDependency() {}
-	CUnitTypeDependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
+	unit_type_dependency() {}
+	unit_type_dependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
 	
-	virtual void process_sml_property(const stratagus::sml_property &property) override;
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual std::string GetString(const std::string &prefix = "") const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
 	const CUnitType *UnitType = nullptr;
 	int Count = 1;		/// How many of the unit type are required
 };
 
-class CUpgradeDependency : public CDependency
+class upgrade_dependency : public dependency
 {
 public:
-	CUpgradeDependency() {}
-	CUpgradeDependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
+	upgrade_dependency() {}
+	upgrade_dependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
 	
-	virtual void process_sml_property(const stratagus::sml_property &property) override;
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
-	virtual std::string GetString(const std::string &prefix = "") const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
 	const CUpgrade *Upgrade = nullptr;
 };
 
-class CAgeDependency : public CDependency
+class age_dependency : public dependency
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual std::string GetString(const std::string &prefix = "") const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
-	const stratagus::age *age = nullptr;
+	const age *age = nullptr;
 };
 
-class CCharacterDependency : public CDependency
+class character_dependency : public dependency
 {
 public:
-	virtual void process_sml_property(const stratagus::sml_property &property) override;
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
-	virtual std::string GetString(const std::string &prefix = "") const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
 	const CCharacter *Character = nullptr;
 };
 
-class CSeasonDependency : public CDependency
+class season_dependency : public dependency
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
-	virtual std::string GetString(const std::string &prefix = "") const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
 	const CSeason *Season = nullptr;
 };
 
-class CTriggerDependency : public CDependency
+class settlement_dependency : public dependency
+{
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
+
+private:
+	const site *settlement = nullptr;
+	const faction *faction = nullptr;
+	bool enemy = false;
+};
+
+class trigger_dependency : public dependency
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual std::string GetString(const std::string &prefix = "") const override;
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
-	const stratagus::trigger *trigger = nullptr;
+	const trigger *trigger = nullptr;
 };
 
+}
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -345,15 +373,15 @@ extern bool CheckDependencies(const T *target, const CPlayer *player, bool ignor
 	
 	if constexpr (std::is_same_v<stratagus::age, T>) {
 		if (is_predependency) {
-			return !target->get_predependency() || target->get_predependency()->Check(player, ignore_units);
+			return !target->get_predependency() || target->get_predependency()->check(player, ignore_units);
 		} else {
-			return !target->get_dependency() || target->get_dependency()->Check(player, ignore_units);
+			return !target->get_dependency() || target->get_dependency()->check(player, ignore_units);
 		}
 	} else {
 		if (is_predependency) {
-			return !target->Predependency || target->Predependency->Check(player, ignore_units);
+			return !target->Predependency || target->Predependency->check(player, ignore_units);
 		} else {
-			return !target->Dependency || target->Dependency->Check(player, ignore_units);
+			return !target->Dependency || target->Dependency->check(player, ignore_units);
 		}
 	}
 }

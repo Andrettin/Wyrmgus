@@ -30,7 +30,6 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-class CDependency;
 class CFile;
 class CUnit;
 class CUnitType;
@@ -39,6 +38,7 @@ class LuaCallback;
 struct lua_State;
 
 namespace stratagus {
+	class dependency;
 	class effect;
 	class effect_list;
 	class faction;
@@ -117,8 +117,8 @@ private:
 public:
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	dependency *Predependency = nullptr;
+	dependency *Dependency = nullptr;
 	std::unique_ptr<effect_list> effects;
 };
 

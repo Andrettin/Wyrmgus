@@ -30,11 +30,12 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-class CDependency;
 class CGraphic;
 class CUpgrade;
 
 namespace stratagus {
+
+class dependency;
 
 class age final : public named_data_entry, public data_type<age>
 {
@@ -74,12 +75,12 @@ public:
 		return this->graphics;
 	}
 
-	CDependency *get_predependency() const
+	dependency *get_predependency() const
 	{
 		return this->predependency;
 	}
 
-	CDependency *get_dependency() const
+	dependency *get_dependency() const
 	{
 		return this->dependency;
 	}
@@ -87,8 +88,8 @@ public:
 private:
 	CGraphic *graphics = nullptr;
 	int priority = 0;
-	CDependency *predependency = nullptr;
-	CDependency *dependency = nullptr;
+	dependency *predependency = nullptr;
+	dependency *dependency = nullptr;
 };
 
 }
