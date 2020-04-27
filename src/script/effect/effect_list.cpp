@@ -89,9 +89,4 @@ std::string effect_list::get_effects_string(const CPlayer *player, const size_t 
 	return effects_string;
 }
 
-void effect_list::add_effect(std::unique_ptr<effect> &&effect)
-{
-	this->effects.push_back(std::move(effect));
-}
-
 }

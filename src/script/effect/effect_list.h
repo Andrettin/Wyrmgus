@@ -46,8 +46,6 @@ public:
 	void do_effects(CPlayer *player) const;
 	std::string get_effects_string(const CPlayer *player, const size_t indent = 0) const;
 
-	void add_effect(std::unique_ptr<effect> &&effect);
-
 private:
 	std::vector<std::unique_ptr<effect>> effects;
 };

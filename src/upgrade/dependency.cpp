@@ -51,6 +51,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/vector_util.h"
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -416,6 +417,18 @@ std::string CAgeDependency::GetString(const std::string &prefix) const
 	return str;
 }
 
+void CCharacterDependency::process_sml_property(const stratagus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "character") {
+		this->Character = CCharacter::get(value);
+	} else {
+		throw std::runtime_error("Invalid character dependency property: \"" + property.get_key() + "\".");
+	}
+}
+
 void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
@@ -476,8 +489,7 @@ void CTriggerDependency::ProcessConfigDataProperty(const std::pair<std::string, 
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "trigger") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Trigger = CTrigger::GetTrigger(value);
+		this->trigger = stratagus::trigger::get(value);
 	} else {
 		fprintf(stderr, "Invalid trigger dependency property: \"%s\".\n", key.c_str());
 	}
@@ -487,7 +499,7 @@ bool CTriggerDependency::Check(const CPlayer *player, bool ignore_units) const
 {
 	//checks whether a trigger has already fired
 	
-	return std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), this->Trigger->Ident) != CTrigger::DeactivatedTriggers.end(); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
+	return stratagus::vector::contains(stratagus::trigger::DeactivatedTriggers, this->trigger->get_identifier()); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
 }
 
 std::string CTriggerDependency::GetString(const std::string &prefix) const

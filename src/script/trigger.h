@@ -27,15 +27,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "database/data_entry.h"
+#include "database/data_type.h"
 
 class CDependency;
 class CFile;
@@ -73,8 +66,15 @@ public:
 	unsigned long LastUpdate = 0;	/// GameCycle of last update
 };
 
-class CTrigger : public CDataType
+namespace stratagus {
+
+class trigger final : public data_entry, public data_type<trigger>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
+	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
+
 public:
 	enum class TriggerType
 	{
@@ -82,33 +82,47 @@ public:
 		PlayerTrigger //checked for each player
 	};
 
-	static CTrigger *GetTrigger(const std::string &ident, const bool should_find = true);
-	static CTrigger *GetOrAddTrigger(const std::string &ident);
-	static void ClearTriggers();		/// Cleanup the trigger module
+	static constexpr const char *class_identifier = "trigger";
+	static constexpr const char *database_folder = "triggers";
+
+	static void clear();
 	static void InitActiveTriggers();	/// Setup triggers
 	static void ClearActiveTriggers();
 
-	static std::vector<CTrigger *> Triggers;
-	static std::vector<CTrigger *> ActiveTriggers; //triggers that are active for the current game
-	static std::map<std::string, CTrigger *> TriggersByIdent;
+	static std::vector<trigger *> ActiveTriggers; //triggers that are active for the current game
 	static std::vector<std::string> DeactivatedTriggers;
 	static unsigned int CurrentTriggerId;
 
-	CTrigger();
-	~CTrigger();
+	trigger(const std::string &identifier);
+	~trigger();
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+
+	bool fires_only_once() const
+	{
+		return this->only_once;
+	}
+
+	bool is_campaign_only() const
+	{
+		return this->campaign_only;
+	}
+
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
-	bool OnlyOnce = false;				/// Whether the trigger should occur only once in a game
-	bool CampaignOnly = false;			/// Whether the trigger should only occur in the campaign mode
+private:
+	bool only_once = false;				/// Whether the trigger should occur only once in a game
+	bool campaign_only = false;			/// Whether the trigger should only occur in the campaign mode
+public:
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
-	std::unique_ptr<stratagus::effect_list> TriggerEffects;
+	std::unique_ptr<effect_list> effects;
 };
+
+}
 
 #define ANY_UNIT ((const CUnitType *)0)
 #define ALL_FOODUNITS ((const CUnitType *)-1)

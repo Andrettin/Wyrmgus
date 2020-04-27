@@ -37,6 +37,8 @@ namespace stratagus {
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "dialogue";
 	static constexpr const char *database_folder = "dialogues";

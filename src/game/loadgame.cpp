@@ -114,7 +114,6 @@ void CleanModules()
 	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();
-	CTrigger::ClearTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
 	CAchievement::ClearAchievements();
@@ -188,7 +187,7 @@ void InitModules()
 	InitUpgrades();
 
 	InitButtons();
-	CTrigger::InitActiveTriggers();
+	stratagus::trigger::InitActiveTriggers();
 
 	InitAiModule();
 

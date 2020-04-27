@@ -93,7 +93,6 @@ class CCharacter;
 class CConfigData;
 class CPlayer;
 class CSeason;
-class CTrigger;
 class CUnitType;
 class CUnit;
 class CUpgrade;
@@ -103,6 +102,7 @@ namespace stratagus {
 	class age;
 	class sml_data;
 	class sml_property;
+	class trigger;
 }
 
 /// Dependency rule
@@ -288,6 +288,7 @@ private:
 class CCharacterDependency : public CDependency
 {
 public:
+	virtual void process_sml_property(const stratagus::sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
@@ -317,7 +318,7 @@ public:
 	virtual std::string GetString(const std::string &prefix = "") const override;
 
 private:
-	const CTrigger *Trigger = nullptr;
+	const stratagus::trigger *trigger = nullptr;
 };
 
 /*----------------------------------------------------------------------------

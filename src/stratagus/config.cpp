@@ -360,11 +360,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				time_of_day_schedule->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "trigger") {
-			CTrigger *trigger = CTrigger::GetOrAddTrigger(ident);
-			if (!define_only) {
-				trigger->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "unit_type") {
 			CUnitType *unit_type = CUnitType::get_or_add(ident, nullptr);
 			if (!define_only) {

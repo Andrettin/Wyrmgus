@@ -1861,7 +1861,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// Triggers
 	//
-	CTrigger::InitActiveTriggers();
+	stratagus::trigger::InitActiveTriggers();
 	
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
@@ -1952,7 +1952,7 @@ void CleanGame()
 
 	RestoreColorCyclingSurface();
 	CleanGame_Lua();
-	CTrigger::ClearActiveTriggers();
+	stratagus::trigger::ClearActiveTriggers();
 	CleanAi();
 	CleanGroups();
 	CleanMissiles();

@@ -48,7 +48,6 @@ public:
 
 	virtual void process_sml_property(const sml_property &property);
 	virtual void process_sml_scope(const sml_data &scope);
-	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	virtual void do_effect(CPlayer *player) const = 0;
 	virtual std::string get_string(const CPlayer *player) const = 0;
 
@@ -70,18 +69,12 @@ public:
 		return class_identifier;
 	}
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void do_effect(CPlayer *player) const override;
 	virtual std::string get_string(const CPlayer *player) const override;
 
 	virtual bool is_hidden() const override
 	{
 		return true;
-	}
-
-	const dialogue *get_dialogue() const
-	{
-		return this->dialogue;
 	}
 
 private:
@@ -91,7 +84,6 @@ private:
 class create_unit_effect final : public effect
 {
 public:
-	create_unit_effect() {}
 	explicit create_unit_effect(const std::string &unit_type_identifier);
 
 	virtual const std::string &get_class_identifier() const override
@@ -100,12 +92,11 @@ public:
 		return class_identifier;
 	}
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void do_effect(CPlayer *player) const override;
 	virtual std::string get_string(const CPlayer *player) const override;
 
-	int Quantity = 1;				/// Quantity of units created
-	CUnitType *UnitType = nullptr;	/// Unit type to be created
+private:
+	const CUnitType *unit_type = nullptr;	/// Unit type to be created
 };
 
 }

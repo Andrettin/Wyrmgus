@@ -81,73 +81,29 @@ call_dialogue_effect::call_dialogue_effect(const std::string &dialogue_identifie
 	this->dialogue = dialogue::get(dialogue_identifier);
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void call_dialogue_effect::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "dialogue") {
-			this->dialogue = dialogue::get(value);
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	if (this->get_dialogue() == nullptr) {
-		fprintf(stderr, "Call dialogue trigger effect has no dialogue.\n");
-	}
-}
-
 void call_dialogue_effect::do_effect(CPlayer *player) const
 {
-	this->get_dialogue()->Call(player->Index);
+	this->dialogue->Call(player->Index);
 }
 
 std::string call_dialogue_effect::get_string(const CPlayer *player) const
 {
-	return "Trigger the " + string::highlight(this->get_dialogue()->get_identifier()) + " dialogue";
+	return "Trigger the " + string::highlight(this->dialogue->get_identifier()) + " dialogue";
 }
 
 create_unit_effect::create_unit_effect(const std::string &unit_type_identifier)
 {
-	this->UnitType = CUnitType::get(unit_type_identifier);
-}
-
-void create_unit_effect::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "quantity") {
-			this->Quantity = std::stoi(value);
-		} else if (key == "unit_type") {
-			CUnitType *unit_type = CUnitType::get(value);
-			this->UnitType = unit_type;
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	if (!this->UnitType) {
-		fprintf(stderr, "Create unit trigger effect has no unit type.\n");
-	}
+	this->unit_type = CUnitType::get(unit_type_identifier);
 }
 
 void create_unit_effect::do_effect(CPlayer *player) const
 {
-	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
+	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->unit_type, player, player->StartMapLayer);
 }
 
 std::string create_unit_effect::get_string(const CPlayer *player) const
 {
-	return "Receive a " + string::highlight(this->UnitType->get_name()) + " unit";
+	return "Receive a " + string::highlight(this->unit_type->get_name()) + " unit";
 }
 
 }

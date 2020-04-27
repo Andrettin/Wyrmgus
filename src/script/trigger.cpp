@@ -51,17 +51,21 @@
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 
 CTimer GameTimer;               /// The game timer
 
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
 
-std::vector<CTrigger *> CTrigger::Triggers;
-std::vector<CTrigger *> CTrigger::ActiveTriggers;
-std::map<std::string, CTrigger *> CTrigger::TriggersByIdent;
-std::vector<std::string> CTrigger::DeactivatedTriggers;
-unsigned int CTrigger::CurrentTriggerId = 0;
+namespace stratagus {
+
+std::vector<trigger *> trigger::ActiveTriggers;
+std::vector<std::string> trigger::DeactivatedTriggers;
+unsigned int trigger::CurrentTriggerId = 0;
+
+}
+
 
 /**
 **  Get player number.
@@ -485,22 +489,21 @@ static int CclAddTrigger(lua_State *l)
 
 	std::string trigger_ident = LuaToString(l, 1);
 	
-	if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger_ident) != CTrigger::DeactivatedTriggers.end()) {
+	if (stratagus::vector::contains(stratagus::trigger::DeactivatedTriggers, trigger_ident)) {
 		return 0;
 	}
 	
 	//this function only adds temporary triggers, that is, ones that will only last for the current game
 	
-	CTrigger *trigger = new CTrigger;
-	trigger->Ident = trigger_ident;
+	stratagus::trigger *trigger = new stratagus::trigger(trigger_ident);
 	trigger->Local = true;
-	CTrigger::ActiveTriggers.push_back(trigger);
+	stratagus::trigger::ActiveTriggers.push_back(trigger);
 	
 	trigger->Conditions = new LuaCallback(l, 2);
 	trigger->Effects = new LuaCallback(l, 3);
 	
 	if (trigger->Conditions == nullptr || trigger->Effects == nullptr) {
-		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->Ident.c_str());
+		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->get_identifier().c_str());
 	}
 
 	return 0;
@@ -511,7 +514,7 @@ static int CclAddTrigger(lua_State *l)
 */
 void SetCurrentTriggerId(unsigned int trigger_id)
 {
-	CTrigger::CurrentTriggerId = trigger_id;
+	stratagus::trigger::CurrentTriggerId = trigger_id;
 }
 
 /**
@@ -522,7 +525,7 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 	const int args = lua_gettop(l);
 
 	for (int j = 0; j < args; ++j) {
-		CTrigger::DeactivatedTriggers.push_back(LuaToString(l, j + 1));
+		stratagus::trigger::DeactivatedTriggers.push_back(LuaToString(l, j + 1));
 	}
 	return 0;
 }
@@ -575,8 +578,8 @@ static void TriggerRemoveTrigger(int trig)
 */
 void TriggersEachCycle()
 {
-	if (CTrigger::CurrentTriggerId >= CTrigger::ActiveTriggers.size()) {
-		CTrigger::CurrentTriggerId = 0;
+	if (stratagus::trigger::CurrentTriggerId >= stratagus::trigger::ActiveTriggers.size()) {
+		stratagus::trigger::CurrentTriggerId = 0;
 	}
 
 	if (GamePaused) {
@@ -584,8 +587,8 @@ void TriggersEachCycle()
 	}
 
 	// go to the next trigger
-	if (CTrigger::CurrentTriggerId < CTrigger::ActiveTriggers.size()) {
-		CTrigger *current_trigger = CTrigger::ActiveTriggers[CTrigger::CurrentTriggerId];
+	if (stratagus::trigger::CurrentTriggerId < stratagus::trigger::ActiveTriggers.size()) {
+		stratagus::trigger *current_trigger = stratagus::trigger::ActiveTriggers[stratagus::trigger::CurrentTriggerId];
 
 		bool removed_trigger = false;
 		
@@ -597,8 +600,8 @@ void TriggersEachCycle()
 				current_trigger->Effects->pushPreamble();
 				current_trigger->Effects->run(1);
 				if (current_trigger->Effects->popBoolean() == false) {
-					CTrigger::DeactivatedTriggers.push_back(current_trigger->Ident);
-					CTrigger::ActiveTriggers.erase(CTrigger::ActiveTriggers.begin() + CTrigger::CurrentTriggerId);
+					stratagus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+					stratagus::trigger::ActiveTriggers.erase(stratagus::trigger::ActiveTriggers.begin() + stratagus::trigger::CurrentTriggerId);
 					removed_trigger = true;
 					if (current_trigger->Local) {
 						delete current_trigger;
@@ -607,15 +610,15 @@ void TriggersEachCycle()
 			}
 		}
 		
-		if (current_trigger->TriggerEffects != nullptr) {
+		if (current_trigger->effects != nullptr) {
 			bool triggered = false;
 			
-			if (current_trigger->Type == CTrigger::TriggerType::GlobalTrigger) {
+			if (current_trigger->Type == stratagus::trigger::TriggerType::GlobalTrigger) {
 				if (CheckDependencies(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
-					current_trigger->TriggerEffects->do_effects(CPlayer::Players[PlayerNumNeutral]);
+					current_trigger->effects->do_effects(CPlayer::Players[PlayerNumNeutral]);
 				}
-			} else if (current_trigger->Type == CTrigger::TriggerType::PlayerTrigger) {
+			} else if (current_trigger->Type == stratagus::trigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
 					CPlayer *player = CPlayer::Players[i];
 					if (player->Type == PlayerNobody) {
@@ -625,16 +628,16 @@ void TriggersEachCycle()
 						continue;
 					}
 					triggered = true;
-					current_trigger->TriggerEffects->do_effects(player);
-					if (current_trigger->OnlyOnce) {
+					current_trigger->effects->do_effects(player);
+					if (current_trigger->fires_only_once()) {
 						break;
 					}
 				}
 			}
 			
-			if (triggered && current_trigger->OnlyOnce) {
-				CTrigger::DeactivatedTriggers.push_back(current_trigger->Ident);
-				CTrigger::ActiveTriggers.erase(CTrigger::ActiveTriggers.begin() + CTrigger::CurrentTriggerId);
+			if (triggered && current_trigger->fires_only_once()) {
+				stratagus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+				stratagus::trigger::ActiveTriggers.erase(stratagus::trigger::ActiveTriggers.begin() + stratagus::trigger::CurrentTriggerId);
 				removed_trigger = true;
 				if (current_trigger->Local) {
 					delete current_trigger;
@@ -643,61 +646,25 @@ void TriggersEachCycle()
 		}
 		
 		if (!removed_trigger) {
-			CTrigger::CurrentTriggerId++;
+			stratagus::trigger::CurrentTriggerId++;
 		}
 	} else {
-		CTrigger::CurrentTriggerId = 0;
+		stratagus::trigger::CurrentTriggerId = 0;
 	}
 }
 
-CTrigger *CTrigger::GetTrigger(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CTrigger *>::const_iterator find_iterator = TriggersByIdent.find(ident);
-	
-	if (find_iterator != TriggersByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid trigger: \"%s\".\n", ident.c_str());
-	}
+namespace stratagus {
 
-	return nullptr;
-}
-
-CTrigger *CTrigger::GetOrAddTrigger(const std::string &ident)
-{
-	CTrigger *trigger = GetTrigger(ident, false);
-	
-	if (!trigger) {
-		trigger = new CTrigger;
-		trigger->Ident = ident;
-		Triggers.push_back(trigger);
-		TriggersByIdent[ident] = trigger;
-	}
-	
-	return trigger;
-}
-
-/**
-**	Cleanup the trigger module.
-*/
-void CTrigger::ClearTriggers()
+void trigger::clear()
 {
 	ClearActiveTriggers();
-
-	for (CTrigger *trigger : CTrigger::Triggers) {
-		delete trigger;
-	}
-	
-	CTrigger::Triggers.clear();
-	CTrigger::TriggersByIdent.clear();
+	data_type::clear();
 }
 
 /**
 **	Initialize the trigger module.
 */
-void CTrigger::InitActiveTriggers()
+void trigger::InitActiveTriggers()
 {
 	// Setup default triggers
 
@@ -710,18 +677,18 @@ void CTrigger::InitActiveTriggers()
 	}
 	lua_pop(Lua, 1);
 	
-	for (CTrigger *trigger : CTrigger::Triggers) {
-		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
+	for (trigger *trigger : trigger::get_all()) {
+		if (vector::contains(trigger::DeactivatedTriggers, trigger->get_identifier())) {
 			continue;
 		}
-		if (trigger->CampaignOnly && stratagus::game::get()->get_current_campaign() == nullptr) {
+		if (trigger->is_campaign_only() && stratagus::game::get()->get_current_campaign() == nullptr) {
 			continue;
 		}
-		CTrigger::ActiveTriggers.push_back(trigger);
+		trigger::ActiveTriggers.push_back(trigger);
 	}
 }
 
-void CTrigger::ClearActiveTriggers()
+void trigger::ClearActiveTriggers()
 {
 	lua_pushnil(Lua);
 	lua_setglobal(Lua, "_triggers_");
@@ -729,16 +696,16 @@ void CTrigger::ClearActiveTriggers()
 	lua_pushnil(Lua);
 	lua_setglobal(Lua, "Triggers");
 
-	CTrigger::CurrentTriggerId = 0;
+	trigger::CurrentTriggerId = 0;
 
-	for (CTrigger *trigger : CTrigger::ActiveTriggers) {
+	for (trigger *trigger : trigger::ActiveTriggers) {
 		if (trigger->Local) {
 			delete trigger;
 		}
 	}
 	
-	CTrigger::ActiveTriggers.clear();
-	CTrigger::DeactivatedTriggers.clear();
+	trigger::ActiveTriggers.clear();
+	trigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
 	for (stratagus::quest *quest : stratagus::quest::get_all()) {
@@ -749,11 +716,11 @@ void CTrigger::ClearActiveTriggers()
 	GameTimer.Reset();
 }
 
-CTrigger::CTrigger()
+trigger::trigger(const std::string &identifier) : data_entry(identifier)
 {
 }
 
-CTrigger::~CTrigger()
+trigger::~trigger()
 {
 	if (this->Conditions) {
 		delete this->Conditions;
@@ -764,59 +731,39 @@ CTrigger::~CTrigger()
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CTrigger::ProcessConfigData(const CConfigData *config_data)
+void trigger::process_sml_property(const sml_property &property)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "type") {
-			if (value == "global_trigger") {
-				this->Type = TriggerType::GlobalTrigger;
-			} else if (value == "player_trigger") {
-				this->Type = TriggerType::PlayerTrigger;
-			} else {
-				fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "only_once") {
-			this->OnlyOnce = string::to_bool(value);
-		} else if (key == "campaign_only") {
-			this->CampaignOnly = string::to_bool(value);
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "type") {
+		if (value == "global_trigger") {
+			this->Type = TriggerType::GlobalTrigger;
+		} else if (value == "player_trigger") {
+			this->Type = TriggerType::PlayerTrigger;
 		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+			throw std::runtime_error("Invalid trigger type: \"" + value + "\".");
 		}
+	} else {
+		data_entry::process_sml_property(property);
 	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "effects") {
-			this->TriggerEffects = std::make_unique<stratagus::effect_list>();
-			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
-				std::unique_ptr<stratagus::effect> effect;
-				
-				if (grandchild_config_data->Tag == "call_dialogue") {
-					effect = std::make_unique<stratagus::call_dialogue_effect>();
-				} else if (grandchild_config_data->Tag == "create_unit") {
-					effect = std::make_unique<stratagus::create_unit_effect>();
-				} else {
-					fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", grandchild_config_data->Tag.c_str());
-				}
-				
-				effect->ProcessConfigData(grandchild_config_data);
-				this->TriggerEffects->add_effect(std::move(effect));
-			}
-		}
-		else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
-			this->Dependency->ProcessConfigData(child_config_data);
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
+}
+
+void trigger::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "effects") {
+		this->effects = std::make_unique<stratagus::effect_list>();
+		database::process_sml_data(this->effects, scope);
+	} else if (tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		database::process_sml_data(this->Dependency, scope);
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
+}
+
 }
 
 /**
@@ -846,15 +793,15 @@ void SaveTriggers(CFile &file)
 	file.printf("\n");
 
 	file.printf("SetDeactivatedTriggers(");
-	for (size_t i = 0; i < CTrigger::DeactivatedTriggers.size(); ++i) {
+	for (size_t i = 0; i < stratagus::trigger::DeactivatedTriggers.size(); ++i) {
 		if (i) {
 			file.printf(", ");
 		}
-		file.printf("\"%s\"", CTrigger::DeactivatedTriggers[i].c_str());
+		file.printf("\"%s\"", stratagus::trigger::DeactivatedTriggers[i].c_str());
 	}
 	file.printf(")\n");
 
-	file.printf("SetCurrentTriggerId(%d)\n", CTrigger::CurrentTriggerId);
+	file.printf("SetCurrentTriggerId(%d)\n", stratagus::trigger::CurrentTriggerId);
 
 	if (GameTimer.Init) {
 		file.printf("ActionSetTimer(%ld, %s)\n",
