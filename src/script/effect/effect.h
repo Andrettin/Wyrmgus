@@ -57,46 +57,4 @@ public:
 	}
 };
 
-class call_dialogue_effect final : public effect
-{
-public:
-	call_dialogue_effect() {}
-	explicit call_dialogue_effect(const std::string &dialogue_identifier);
-
-	virtual const std::string &get_class_identifier() const override
-	{
-		static std::string class_identifier = "call_dialogue";
-		return class_identifier;
-	}
-
-	virtual void do_effect(CPlayer *player) const override;
-	virtual std::string get_string(const CPlayer *player) const override;
-
-	virtual bool is_hidden() const override
-	{
-		return true;
-	}
-
-private:
-	const dialogue *dialogue = nullptr;
-};
-
-class create_unit_effect final : public effect
-{
-public:
-	explicit create_unit_effect(const std::string &unit_type_identifier);
-
-	virtual const std::string &get_class_identifier() const override
-	{
-		static std::string class_identifier = "create_unit";
-		return class_identifier;
-	}
-
-	virtual void do_effect(CPlayer *player) const override;
-	virtual std::string get_string(const CPlayer *player) const override;
-
-private:
-	const CUnitType *unit_type = nullptr;	/// Unit type to be created
-};
-
 }

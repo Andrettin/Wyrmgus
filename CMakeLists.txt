@@ -279,10 +279,14 @@ source_group(religion FILES ${religion_SRCS})
 
 set(script_SRCS
 	src/script/trigger.cpp
+)
+source_group(script FILES ${script_SRCS})
+
+set(script_effect_SRCS
 	src/script/effect/effect.cpp
 	src/script/effect/effect_list.cpp
 )
-source_group(script FILES ${script_SRCS})
+source_group(script\\effect FILES ${script_effect_SRCS})
 
 set(sound_SRCS
 	src/sound/music.cpp
@@ -492,6 +496,7 @@ set(stratagus_SRCS
 	${pathfinder_SRCS}
 	${religion_SRCS}
 	${script_SRCS}
+	${script_effect_SRCS}
 	${sound_SRCS}
 	${spell_SRCS}
 	${stratagusmain_SRCS}
@@ -641,6 +646,11 @@ set(stratagus_religion_HDRS
 
 set(stratagus_script_HDRS
 	src/script/trigger.h
+)
+
+set(stratagus_script_effect_HDRS
+	src/script/effect/call_dialogue_effect.h
+	src/script/effect/create_unit_effect.h
 	src/script/effect/effect.h
 	src/script/effect/effect_list.h
 )
@@ -811,6 +821,7 @@ source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(script FILES ${stratagus_script_HDRS})
+source_group(script\\effect FILES ${stratagus_script_effect_HDRS})
 source_group(sound FILES ${stratagus_sound_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
@@ -830,6 +841,7 @@ set(stratagus_HDRS
 	${stratagus_map_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_script_HDRS}
+	${stratagus_script_effect_HDRS}
 	${stratagus_sound_HDRS}
 	${stratagus_spell_HDRS}
 	${stratagus_time_HDRS}

@@ -25,53 +25,42 @@
 //      02111-1307, USA.
 //
 
-#include "stratagus.h"
+#pragma once
 
+#include "player.h"
 #include "script/effect/effect.h"
-
-#include "config.h"
-#include "database/database.h"
-#include "script/effect/call_dialogue_effect.h"
-#include "script/effect/create_unit_effect.h"
+#include "unit/unit.h"
+#include "unit/unit_type.h"
+#include "util/string_util.h"
 
 namespace stratagus {
 
-std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
+class create_unit_effect final : public effect
 {
-	const std::string &effect_identifier = property.get_key();
-
-	if (effect_identifier == "call_dialogue") {
-		return std::make_unique<call_dialogue_effect>(property.get_value());
-	} else if (effect_identifier == "create_unit") {
-		return std::make_unique<create_unit_effect>(property.get_value());
+public:
+	explicit create_unit_effect(const std::string &unit_type_identifier)
+	{
+		this->unit_type = CUnitType::get(unit_type_identifier);
 	}
 
-	throw std::runtime_error("Invalid property effect: \"" + effect_identifier + "\".");
-}
-
-std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
-{
-	const std::string &effect_identifier = scope.get_tag();
-	std::unique_ptr<effect> effect;
-
-	if (effect == nullptr) {
-		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
+	virtual const std::string &get_class_identifier() const override
+	{
+		static std::string class_identifier = "create_unit";
+		return class_identifier;
 	}
 
-	database::process_sml_data(effect, scope);
+	virtual void do_effect(CPlayer *player) const override
+	{
+		MakeUnitAndPlace(player->StartPos, *this->unit_type, player, player->StartMapLayer);
+	}
 
-	return effect;
-}
+	virtual std::string get_string(const CPlayer *player) const override
+	{
+		return "Receive a " + string::highlight(this->unit_type->get_name()) + " unit";
+	}
 
-
-void effect::process_sml_property(const sml_property &property)
-{
-	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
-}
-
-void effect::process_sml_scope(const sml_data &scope)
-{
-	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
-}
+private:
+	const CUnitType *unit_type = nullptr;	/// Unit type to be created
+};
 
 }

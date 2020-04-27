@@ -25,53 +25,47 @@
 //      02111-1307, USA.
 //
 
-#include "stratagus.h"
+#pragma once
 
+#include "dialogue.h"
+#include "player.h"
 #include "script/effect/effect.h"
-
-#include "config.h"
-#include "database/database.h"
-#include "script/effect/call_dialogue_effect.h"
-#include "script/effect/create_unit_effect.h"
+#include "util/string_util.h"
 
 namespace stratagus {
 
-std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
+class call_dialogue_effect final : public effect
 {
-	const std::string &effect_identifier = property.get_key();
-
-	if (effect_identifier == "call_dialogue") {
-		return std::make_unique<call_dialogue_effect>(property.get_value());
-	} else if (effect_identifier == "create_unit") {
-		return std::make_unique<create_unit_effect>(property.get_value());
+public:
+	call_dialogue_effect() {}
+	explicit call_dialogue_effect(const std::string &dialogue_identifier)
+	{
+		this->dialogue = dialogue::get(dialogue_identifier);
 	}
 
-	throw std::runtime_error("Invalid property effect: \"" + effect_identifier + "\".");
-}
-
-std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
-{
-	const std::string &effect_identifier = scope.get_tag();
-	std::unique_ptr<effect> effect;
-
-	if (effect == nullptr) {
-		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
+	virtual const std::string &get_class_identifier() const override
+	{
+		static std::string class_identifier = "call_dialogue";
+		return class_identifier;
 	}
 
-	database::process_sml_data(effect, scope);
+	virtual void do_effect(CPlayer *player) const override
+	{
+		this->dialogue->call(player->Index);
+	}
 
-	return effect;
-}
+	virtual std::string get_string(const CPlayer *player) const override
+	{
+		return "Trigger the " + string::highlight(this->dialogue->get_identifier()) + " dialogue";
+	}
 
+	virtual bool is_hidden() const override
+	{
+		return true;
+	}
 
-void effect::process_sml_property(const sml_property &property)
-{
-	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
-}
-
-void effect::process_sml_scope(const sml_data &scope)
-{
-	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
-}
+private:
+	const dialogue *dialogue = nullptr;
+};
 
 }
