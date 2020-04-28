@@ -370,7 +370,7 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 				const QPoint real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
 				CMapField *tile = CMap::Map.Field(real_pos, z);
 
-				if (terrain_character != '0') {
+				if (terrain_character != '0' && terrain_character != '=') {
 					auto find_iterator = terrain_type::TerrainTypesByCharacter.find(terrain_character);
 					if (find_iterator != terrain_type::TerrainTypesByCharacter.end()) {
 						terrain = find_iterator->second;
@@ -379,8 +379,8 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 					}
 
 					tile->SetTerrain(terrain);
-				} else {
-					if (overlay) { //"0" in an overlay terrain file means no overlay
+				} else if (terrain_character == '0') {
+					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
 						if (tile->OverlayTerrain) {
 							tile->RemoveOverlayTerrain();
 						}
