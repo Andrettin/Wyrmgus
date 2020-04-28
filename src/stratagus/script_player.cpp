@@ -646,18 +646,18 @@ static int CclSetDiplomacy(lua_State *l)
 	const char *state = LuaToString(l, 2);
 
 	if (!strcmp(state, "allied")) {
-		SendCommandDiplomacy(base, Diplomacy::Allied, plynr);
+		SendCommandDiplomacy(base, diplomacy_state::allied, plynr);
 	} else if (!strcmp(state, "neutral")) {
-		SendCommandDiplomacy(base, Diplomacy::Neutral, plynr);
+		SendCommandDiplomacy(base, diplomacy_state::neutral, plynr);
 	} else if (!strcmp(state, "crazy")) {
-		SendCommandDiplomacy(base, Diplomacy::Crazy, plynr);
+		SendCommandDiplomacy(base, diplomacy_state::crazy, plynr);
 	} else if (!strcmp(state, "enemy")) {
-		SendCommandDiplomacy(base, Diplomacy::Enemy, plynr);
+		SendCommandDiplomacy(base, diplomacy_state::enemy, plynr);
 	//Wyrmgus start
 	} else if (!strcmp(state, "overlord")) {
-		SendCommandDiplomacy(base, Diplomacy::Overlord, plynr);
+		SendCommandDiplomacy(base, diplomacy_state::overlord, plynr);
 	} else if (!strcmp(state, "vassal")) {
-		SendCommandDiplomacy(base, Diplomacy::Vassal, plynr);
+		SendCommandDiplomacy(base, diplomacy_state::vassal, plynr);
 	//Wyrmgus end
 	}
 	return 0;
@@ -1898,7 +1898,7 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 
 				std::string diplomacy_state_name = LuaToString(l, -1, j + 1);
-				const Diplomacy diplomacy_state = GetDiplomacyStateIdByName(diplomacy_state_name);
+				const diplomacy_state diplomacy_state = GetDiplomacyStateIdByName(diplomacy_state_name);
 				faction->HistoricalDiplomacyStates[std::pair<CDate, stratagus::faction *>(date, diplomacy_state_faction)] = diplomacy_state;
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {

@@ -186,7 +186,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 			CUnitType &type = **i;
 			unsigned int cost = 0;
 
-			for (size_t j = 0; j < CResource::Resources.size(); ++j) {
+			for (size_t j = 0; j < stratagus::resource::get_all().size(); ++j) {
 				cost += type.DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
 			}
 			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
@@ -233,7 +233,7 @@ static std::vector<CUnitType *> getMineUnits()
 			float score;
 			unsigned int cost = 0;
 
-			for (size_t j = 0; j < CResource::Resources.size(); ++j) {
+			for (size_t j = 0; j < stratagus::resource::get_all().size(); ++j) {
 				cost += type->_Costs[j];
 			}
 			score = ((float) type->MaxOnBoard) / cost;
@@ -1289,11 +1289,11 @@ static int CclAiSetReserve(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	lua_newtable(l);
-	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
 		lua_pushnumber(l, AiPlayer->Reserve[i]);
 		lua_rawseti(l, -2, i + 1);
 	}
-	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
 		AiPlayer->Reserve[i] = LuaToNumber(l, 1, i + 1);
 	}
 	return 1;
@@ -1363,7 +1363,7 @@ static int CclAiDump(lua_State *l)
 			//
 
 			printf("------\n");
-			for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+			for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
 				printf("%s(%4d, %4d/%4d) ", DefaultResourceNames[i].c_str(),
 					   aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
 			}

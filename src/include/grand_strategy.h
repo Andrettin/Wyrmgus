@@ -52,7 +52,7 @@ class CGrandStrategyProvince;
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
 class LuaCallback;
-enum class Diplomacy;
+enum class diplomacy_state;
 
 namespace stratagus {
 	class unit_class;
@@ -310,7 +310,7 @@ extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPo
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern Diplomacy GetDiplomacyStateIdByName(std::string diplomacy_state);
+extern diplomacy_state GetDiplomacyStateIdByName(const std::string &diplomacy_state);
 extern std::string GetFactionTierNameById(const faction_tier tier);
 extern faction_tier GetFactionTierIdByName(const std::string &tier);
 extern int GetProvinceId(std::string province_name);

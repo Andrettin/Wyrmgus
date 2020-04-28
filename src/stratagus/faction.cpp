@@ -105,6 +105,59 @@ void faction::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void faction::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "resources") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const sml_operator sml_operator = property.get_operator();
+			const std::string &value = property.get_value();
+
+			const resource *resource = resource::get(key);
+			const int quantity = std::stoi(value);
+
+			if (sml_operator == sml_operator::assignment) {
+				this->resources[resource] = quantity;
+			} else if (sml_operator == sml_operator::addition) {
+				this->resources[resource] += quantity;
+			} else if (sml_operator == sml_operator::subtraction) {
+				this->resources[resource] -= quantity;
+			} else {
+				throw std::runtime_error("Invalid faction resource operator: \"" + std::to_string(static_cast<int>(sml_operator)) + "\".");
+			}
+		});
+	} else if (tag == "diplomacy_state") {
+		const faction *other_faction = nullptr;
+		std::optional<diplomacy_state> state;
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			if (key == "faction") {
+				other_faction = faction::get(value);
+			} else if (key == "state") {
+				state = GetDiplomacyStateIdByName(value);
+			} else {
+				throw std::runtime_error("Invalid diplomacy state property: \"" + key + "\".");
+			}
+		});
+
+		if (other_faction == nullptr) {
+			throw std::runtime_error("Diplomacy state has no faction.");
+		}
+
+		if (!state.has_value()) {
+			throw std::runtime_error("Diplomacy state has no state.");
+		}
+
+		this->diplomacy_states[other_faction] = state.value();
+	} else {
+		data_entry::process_sml_dated_scope(scope, date);
+	}
+}
+
 void faction::initialize()
 {
 	if (this->Type == FactionTypeTribe) {

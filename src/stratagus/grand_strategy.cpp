@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name grand_strategy.cpp - The grand strategy mode. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -1582,18 +1580,18 @@ CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name)
 	return nullptr;
 }
 
-Diplomacy GetDiplomacyStateIdByName(std::string diplomacy_state)
+diplomacy_state GetDiplomacyStateIdByName(const std::string &diplomacy_state)
 {
 	if (diplomacy_state == "peace") {
-		return Diplomacy::Neutral;
+		return diplomacy_state::neutral;
 	} else if (diplomacy_state == "war") {
-		return Diplomacy::Enemy;
+		return diplomacy_state::enemy;
 	} else if (diplomacy_state == "alliance") {
-		return Diplomacy::Allied;
+		return diplomacy_state::allied;
 	} else if (diplomacy_state == "vassal") {
-		return Diplomacy::Vassal;
+		return diplomacy_state::vassal;
 	} else if (diplomacy_state == "overlord") {
-		return Diplomacy::Overlord;
+		return diplomacy_state::overlord;
 	} else {
 		throw std::runtime_error("Invalid diplomacy state: " + diplomacy_state);
 	}

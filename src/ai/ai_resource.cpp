@@ -1442,17 +1442,17 @@ static void AiProduceResources()
 		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->Slot].size(); ++j) {
 			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
 			
-			if (!CResource::Resources[resource]->LuxuryResource && AiCanSellResource(resource)) {
+			if (!stratagus::resource::get_all()[resource]->LuxuryResource && AiCanSellResource(resource)) {
 				continue;
 			}
 			
-			if (CResource::Resources[resource]->LuxuryResource && !market_unit) {
+			if (stratagus::resource::get_all()[resource]->LuxuryResource && !market_unit) {
 				continue;
 			}
 			
-			int input_resource = CResource::Resources[resource]->InputResource;
+			int input_resource = stratagus::resource::get_all()[resource]->InputResource;
 
-			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && CResource::Resources[resource]->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
+			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && stratagus::resource::get_all()[resource]->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
@@ -1520,8 +1520,8 @@ static void AiCollectResources()
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
-			int c = CResource::Resources[order.GetCurrentResource()]->FinalResource;
-			if (CResource::Resources[c]->LuxuryResource) {
+			int c = stratagus::resource::get_all()[order.GetCurrentResource()]->FinalResource;
+			if (stratagus::resource::get_all()[c]->LuxuryResource) {
 				num_units_assigned[c]++;
 				c = CopperCost;
 			}
@@ -1591,7 +1591,7 @@ static void AiCollectResources()
 	}
 
 	// Initialise priority & mapping
-	for (size_t c = 0; c < CResource::Resources.size(); ++c) {
+	for (size_t c = 0; c < stratagus::resource::get_all().size(); ++c) {
 		priority_resource[c] = c;
 		priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
 
@@ -1602,8 +1602,8 @@ static void AiCollectResources()
 	}
 	CUnit *unit;
 	// sort resources by priority
-	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
-		for (size_t j = i + 1; j < CResource::Resources.size(); ++j) {
+	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
+		for (size_t j = i + 1; j < stratagus::resource::get_all().size(); ++j) {
 			if (priority_needed[j] > priority_needed[i]) {
 				std::swap(priority_needed[i], priority_needed[j]);
 				std::swap(priority_resource[i], priority_resource[j]);
@@ -1613,7 +1613,7 @@ static void AiCollectResources()
 	unit = nullptr;
 
 	// Try to complete each resource in the priority order
-	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
 		int c = priority_resource[i];
 			
 		//Wyrmgus start
@@ -1631,7 +1631,7 @@ static void AiCollectResources()
 				unit = unassigned_unit;
 					
 				// remove it from other ressources
-				for (size_t j = 0; j < CResource::Resources.size(); ++j) {
+				for (size_t j = 0; j < stratagus::resource::get_all().size(); ++j) {
 					if (j == c || !unit->Type->ResInfo[j]) {
 						continue;
 					}
@@ -1649,7 +1649,7 @@ static void AiCollectResources()
 		// Else : Take from already assigned worker with lower priority.
 		if (!unit) {
 			// Take from lower priority only (i+1).
-			for (size_t j = i + 1; j < CResource::Resources.size() && !unit; ++j) {
+			for (size_t j = i + 1; j < stratagus::resource::get_all().size() && !unit; ++j) {
 				// Try to move worker from src_c to c
 				const int src_c = priority_resource[j];
 
@@ -1780,7 +1780,7 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (CResource::Resources[i]->LuxuryResource && CResource::Resources[i]->InputResource == c && num_units_assigned[i] > 0) {
+				if (stratagus::resource::get_all()[i]->LuxuryResource && stratagus::resource::get_all()[i]->InputResource == c && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}
@@ -2230,7 +2230,7 @@ static void AiCheckPathwayConstruction()
 				bool built_pathway = false;
 					
 				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !CResource::Resources[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
+					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !stratagus::resource::get_all()[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
 						continue;
 					}
 						
@@ -2595,7 +2595,7 @@ static void AiCheckMinecartConstruction()
 	
 	std::vector<stratagus::site *> potential_settlements;
 		
-	for (size_t res = 0; res < CResource::Resources.size(); ++res) {
+	for (size_t res = 0; res < stratagus::resource::get_all().size(); ++res) {
 		if (res >= (int) AiHelpers.Mines.size()) {
 			break;
 		}
@@ -2669,7 +2669,7 @@ static void AiCheckMinecartSalvaging()
 		
 		bool has_accessible_mine = false;
 		
-		for (size_t res = 0; res < CResource::Resources.size(); ++res) {
+		for (size_t res = 0; res < stratagus::resource::get_all().size(); ++res) {
 			if (!minecart_type->ResInfo[res]) {
 				continue;
 			}

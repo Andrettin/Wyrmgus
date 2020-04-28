@@ -1343,27 +1343,27 @@ void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
 **  @param state     New diplomacy state.
 **  @param opponent  Opponent.
 */
-void CommandDiplomacy(const int player, const Diplomacy state, const int opponent)
+void CommandDiplomacy(const int player, const diplomacy_state state, const int opponent)
 {
 	switch (state) {
-		case Diplomacy::Neutral:
+		case diplomacy_state::neutral:
 			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[opponent]);
 			break;
-		case Diplomacy::Allied:
+		case diplomacy_state::allied:
 			CPlayer::Players[player]->SetDiplomacyAlliedWith(*CPlayer::Players[opponent]);
 			break;
-		case Diplomacy::Enemy:
+		case diplomacy_state::enemy:
 			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[opponent]);
 			break;
 		//Wyrmgus start
-		case Diplomacy::Overlord:
+		case diplomacy_state::overlord:
 			CPlayer::Players[opponent]->SetOverlord(CPlayer::Players[player]);
 			break;
-		case Diplomacy::Vassal:
+		case diplomacy_state::vassal:
 			CPlayer::Players[player]->SetOverlord(CPlayer::Players[opponent]);
 			break;
 		//Wyrmgus end
-		case Diplomacy::Crazy:
+		case diplomacy_state::crazy:
 			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[opponent]);
 			break;
 	}

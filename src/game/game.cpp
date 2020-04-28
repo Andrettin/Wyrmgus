@@ -1287,13 +1287,13 @@ static void GameTypeMelee()
 			}
 
 			if (CPlayer::Players[i]->Type == PlayerComputer && CPlayer::Players[j]->Type == PlayerComputer) {
-				CommandDiplomacy(i, Diplomacy::Allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, Diplomacy::Allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, Diplomacy::Enemy, j);
-				CommandDiplomacy(j, Diplomacy::Enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1315,8 +1315,8 @@ static void GameTypeFreeForAll()
 				continue;
 			}
 			
-			CommandDiplomacy(i, Diplomacy::Enemy, j);
-			CommandDiplomacy(j, Diplomacy::Enemy, i);
+			CommandDiplomacy(i, diplomacy_state::enemy, j);
+			CommandDiplomacy(j, diplomacy_state::enemy, i);
 		}
 	}
 }
@@ -1343,13 +1343,13 @@ static void GameTypeTopVsBottom()
 			const bool top_j = CPlayer::Players[j]->StartPos.y <= middle;
 
 			if (top_i == top_j) {
-				CommandDiplomacy(i, Diplomacy::Allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, Diplomacy::Allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, Diplomacy::Enemy, j);
-				CommandDiplomacy(j, Diplomacy::Enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1377,13 +1377,13 @@ static void GameTypeLeftVsRight()
 			const bool left_j = CPlayer::Players[j]->StartPos.x <= middle;
 
 			if (left_i == left_j) {
-				CommandDiplomacy(i, Diplomacy::Allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, Diplomacy::Allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, Diplomacy::Enemy, j);
-				CommandDiplomacy(j, Diplomacy::Enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1411,13 +1411,13 @@ static void GameTypeManVsMachine()
 			}
 
 			if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
-				CommandDiplomacy(i, Diplomacy::Allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, Diplomacy::Allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, Diplomacy::Enemy, j);
-				CommandDiplomacy(j, Diplomacy::Enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1443,10 +1443,10 @@ static void GameTypeManTeamVsMachine()
 
 			if (i != j) {
 				if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
-					CommandDiplomacy(i, Diplomacy::Allied, j);
+					CommandDiplomacy(i, diplomacy_state::allied, j);
 					CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				} else {
-					CommandDiplomacy(i, Diplomacy::Enemy, j);
+					CommandDiplomacy(i, diplomacy_state::enemy, j);
 				}
 			}
 		}
@@ -2195,7 +2195,7 @@ static int CclDefineResource(lua_State *l)
 	if (resource_id == -1) {
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
-	CResource *resource = CResource::Resources[resource_id];
+	stratagus::resource *resource = stratagus::resource::get_all()[resource_id];
 	resource->FinalResource = resource_id;
 	
 	//  Parse the list:
@@ -2203,7 +2203,7 @@ static int CclDefineResource(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			resource->Name = LuaToString(l, -1);
+			resource->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultIncome")) {
 			resource->DefaultIncome = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DefaultAmount")) {
@@ -2219,7 +2219,7 @@ static int CclDefineResource(lua_State *l)
 				LuaError(l, "Resource \"%s\" doesn't exist." _C_ final_resource_ident.c_str());
 			}
 			resource->FinalResource = final_resource_id;
-			CResource::Resources[final_resource_id]->ChildResources.push_back(resource);
+			stratagus::resource::get_all()[final_resource_id]->ChildResources.push_back(resource);
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
 			resource->FinalResourceConversionRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
@@ -2256,14 +2256,15 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		DefaultResourceNames[i].clear();
 	}
-	
-	CResource::ClearResources();
+
+	stratagus::resource::clear();
 	
 	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 		
-		CResource::GetOrAddResource(DefaultResourceNames[i]);
+		stratagus::resource *resource = stratagus::resource::add(DefaultResourceNames[i], nullptr);
+		resource->ID = i;
 	}
 	
 	return 0;

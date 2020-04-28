@@ -439,7 +439,7 @@ public:
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && CResource::Resources[unit->GivesResource]->FinalResource == resource) || (include_luxury && CResource::Resources[unit->GivesResource]->LuxuryResource))
+		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && stratagus::resource::get_all()[unit->GivesResource]->FinalResource == resource) || (include_luxury && stratagus::resource::get_all()[unit->GivesResource]->LuxuryResource))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -567,7 +567,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, const CUnit &worker, bool check_usage)
 //Wyrmgus end
 {
-	const CResource *resource = CResource::Resources[mine.GivesResource];
+	const stratagus::resource *resource = stratagus::resource::get_all()[mine.GivesResource];
 
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start

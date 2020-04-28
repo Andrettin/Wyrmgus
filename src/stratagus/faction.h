@@ -46,6 +46,7 @@ int CclDefineFaction(lua_State *l);
 namespace stratagus {
 
 class civilization;
+class resource;
 class unit_class;
 
 class faction : public detailed_data_entry, public data_type<faction>
@@ -72,10 +73,17 @@ public:
 
 	~faction();
 
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+
+	virtual void reset_history() override
+	{
+		this->resources.clear();
+		this->diplomacy_states.clear();
+	}
 
 	civilization *get_civilization() const
 	{
@@ -121,6 +129,16 @@ public:
 		}
 	}
 
+	const std::map<const resource *, int> &get_resources() const
+	{
+		return this->resources;
+	}
+
+	const std::map<const faction *, diplomacy_state> &get_diplomacy_states() const
+	{
+		return this->diplomacy_states;
+	}
+
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
@@ -163,7 +181,11 @@ public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
-	std::map<std::pair<CDate, faction *>, Diplomacy> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
+private:
+	std::map<const resource *, int> resources;
+	std::map<const faction *, diplomacy_state> diplomacy_states;
+public:
+	std::map<std::pair<CDate, faction *>, diplomacy_state> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
 	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
 	std::vector<CFiller> UIFillers;

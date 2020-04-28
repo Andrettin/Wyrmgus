@@ -81,7 +81,7 @@ class PlayerAi;
 class CFiller;
 class LuaCallback;
 //Wyrmgus end
-enum class Diplomacy;
+enum class DiplomacyState;
 struct lua_State;
 
 namespace stratagus {
@@ -97,15 +97,15 @@ namespace stratagus {
 --  Player type
 ----------------------------------------------------------------------------*/
 
-enum class Diplomacy {
-	Allied,   /// Ally with opponent
-	Neutral,  /// Don't attack be neutral
-	Enemy,    /// Attack opponent
+enum class diplomacy_state {
+	allied,   /// Ally with opponent
+	neutral,  /// Don't attack be neutral
+	enemy,    /// Attack opponent
 	//Wyrmgus start
-	Overlord,	/// Become overlord to other player
-	Vassal,	/// Become vassal to other player
+	overlord,	/// Become overlord to other player
+	vassal,	/// Become vassal to other player
 	//Wyrmgus end
-	Crazy     /// Ally and attack opponent
+	crazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
 
 ///  Player structure

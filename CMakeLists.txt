@@ -361,7 +361,7 @@ set(stratagusmain_SRCS
 	src/stratagus/translate.cpp
 	src/stratagus/world.cpp
 )
-source_group(stratagusmain FILES ${stratagus_SRCS})
+source_group(stratagus FILES ${stratagusmain_SRCS})
 
 set(time_SRCS
 	src/time/calendar.cpp
@@ -816,23 +816,23 @@ set(stratagus_generic_HDRS
 	src/stratagus/faction.h
 )
 
-source_group(include FILES ${stratagus_generic_HDRS})
-source_group(include\\action FILES ${stratagus_action_HDRS})
-source_group(include\\animation FILES ${stratagus_animation_HDRS})
+source_group(stratagus FILES ${stratagus_generic_HDRS})
+source_group(action FILES ${stratagus_action_HDRS})
+source_group(animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
-source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
+source_group(guichan FILES ${stratagus_guichan_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
-source_group(include\\religion FILES ${stratagus_religion_HDRS})
+source_group(religion FILES ${stratagus_religion_HDRS})
 source_group(script FILES ${stratagus_script_HDRS})
 source_group(script\\effect FILES ${stratagus_script_effect_HDRS})
 source_group(sound FILES ${stratagus_sound_HDRS})
-source_group(include\\spell FILES ${stratagus_spell_HDRS})
-source_group(include\\time FILES ${stratagus_time_HDRS})
-source_group(include\\ui FILES ${stratagus_ui_HDRS})
+source_group(spell FILES ${stratagus_spell_HDRS})
+source_group(time FILES ${stratagus_time_HDRS})
+source_group(ui FILES ${stratagus_ui_HDRS})
 source_group(unit FILES ${stratagus_unit_HDRS})
-source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
+source_group(upgrade FILES ${stratagus_upgrade_HDRS})
 source_group(util FILES ${stratagus_util_HDRS})
-source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
+source_group(xbrz FILES ${stratagus_xbrz_HDRS})
 
 
 set(stratagus_HDRS
@@ -1428,6 +1428,7 @@ target_precompile_headers(stratagus PRIVATE
 	<map>
 	<memory>
 	<mutex>
+	<optional>
 	<queue>
 	<set>
 	<shared_mutex>

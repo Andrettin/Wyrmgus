@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name resource.h - The resource header file. */
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
 //
@@ -30,15 +28,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 
 struct lua_State;
 
@@ -79,20 +70,20 @@ static constexpr int ScoreCost = MaxCosts + 1;
 static constexpr int ManaResCost = MaxCosts + 2;
 static constexpr int FreeWorkersCount = MaxCosts + 3;
 
-class CResource : public CDataType
+namespace stratagus {
+
+class resource : public named_data_entry, public data_type<resource>
 {
 public:
-	static CResource *GetResource(const std::string &ident, const bool should_find = true);
-	static CResource *GetOrAddResource(const std::string &ident);
-	static void ClearResources();
-	
-	static std::vector<CResource *> Resources;
-	static std::map<std::string, CResource *> ResourcesByIdent;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	static constexpr const char *class_identifier = "resource";
+	static constexpr const char *database_folder = "resources";
+
+	resource(const std::string &identifier) : named_data_entry(identifier)
+	{
+	}
+
 	bool IsMineResource() const;
 
-	std::string Name;
 	std::string ActionName;
 	int ID = -1;
 	int DefaultIncome = 100;
@@ -105,8 +96,10 @@ public:
 	int InputResource = 0;
 	bool LuxuryResource = false;
 	bool Hidden = false;
-	std::vector<CResource *> ChildResources; //resources (other than this one) that have this resource as their final resource
+	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource
 };
+
+}
 
 /**
 **  Default resources for a new player.

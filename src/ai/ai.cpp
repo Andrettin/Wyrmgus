@@ -464,31 +464,31 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 
 	file.printf("  \"reserve\", {");
-	for (const CResource *resource : CResource::Resources) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Reserve[resource->ID]);
+	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Reserve[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
-	for (const CResource *resource : CResource::Resources) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Used[resource->ID]);
+	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Used[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
-	for (const CResource *resource : CResource::Resources) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Needed[resource->ID]);
+	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Needed[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
-	for (const CResource *resource : CResource::Resources) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Collect[resource->ID]);
+	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Collect[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"need-mask\", {");
-	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
 		if (ai.NeededMask & ((long long int) 1 << i)) {
 			file.printf("\"%s\", ", DefaultResourceNames[i].c_str());
 		}

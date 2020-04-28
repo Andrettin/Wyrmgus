@@ -456,13 +456,13 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncome != -1) {
-		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= CResource::Resources[condition->ImproveIncome]->DefaultIncome) {
+		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= stratagus::resource::get_all()[condition->ImproveIncome]->DefaultIncome) {
 			return false;
 		}
 	}
 
 	if (condition->ChildResources != CONDITION_TRUE) {
-		if ((condition->ChildResources == CONDITION_ONLY) ^ (CResource::Resources[button.Value]->ChildResources.size() > 0)) {
+		if ((condition->ChildResources == CONDITION_ONLY) ^ (stratagus::resource::get_all()[button.Value]->ChildResources.size() > 0)) {
 			return false;
 		}
 	}
@@ -470,10 +470,10 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
 		if (button.Action == ButtonCmd::ProduceResource) {
-			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > CResource::Resources[button.Value]->DefaultIncome) {
+			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > stratagus::resource::get_all()[button.Value]->DefaultIncome) {
 				improve_incomes = true;
 			}
-			for (const CResource *child_resource : CResource::Resources[button.Value]->ChildResources) {
+			for (const stratagus::resource *child_resource : stratagus::resource::get_all()[button.Value]->ChildResources) {
 				if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
 					improve_incomes = true;
 					break;
@@ -484,7 +484,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				return false;
 			}
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > CResource::Resources[i]->DefaultIncome) {
+				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > stratagus::resource::get_all()[i]->DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}
@@ -559,7 +559,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && CResource::Resources[button.Value]->LuxuryResource)) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && stratagus::resource::get_all()[button.Value]->LuxuryResource)) {
 			return false;
 		}
 	}

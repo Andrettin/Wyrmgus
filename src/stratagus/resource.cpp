@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name resource.cpp - The resource source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,97 +25,27 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "resource.h"
 
-#include "config.h"
+namespace stratagus {
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CResource *> CResource::Resources;
-std::map<std::string, CResource *> CResource::ResourcesByIdent;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a resource
-**
-**	@param	ident		The resource's string identifier
-**	@param	should_find	Whether it is an error if the resource couldn't be found
-**
-**	@return	The resource if found, or null otherwise
-*/
-CResource *CResource::GetResource(const std::string &ident, const bool should_find)
+bool resource::IsMineResource() const
 {
-	std::map<std::string, CResource *>::const_iterator find_iterator = ResourcesByIdent.find(ident);
-	
-	if (find_iterator != ResourcesByIdent.end()) {
-		return find_iterator->second;
+	switch (this->ID) {
+		case CopperCost:
+		case SilverCost:
+		case GoldCost:
+		case IronCost:
+		case MithrilCost:
+		case CoalCost:
+		case DiamondsCost:
+		case EmeraldsCost:
+			return true;
+		default:
+			return false;
 	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid resource: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
 }
 
-/**
-**	@brief	Get or add a resource
-**
-**	@param	ident	The resource's string identifier
-**
-**	@return	The resource if found, otherwise a new resource is created and returned
-*/
-CResource *CResource::GetOrAddResource(const std::string &ident)
-{
-	CResource *resource = GetResource(ident, false);
-	
-	if (!resource) {
-		resource = new CResource;
-		resource->Ident = ident;
-		Resources.push_back(resource);
-		ResourcesByIdent[ident] = resource;
-	}
-	
-	return resource;
-}
-
-/**
-**	@brief	Remove the existing resources
-*/
-void CResource::ClearResources()
-{
-	for (size_t i = 0; i < Resources.size(); ++i) {
-		delete Resources[i];
-	}
-	Resources.clear();
-}
-
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CResource::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else {
-			fprintf(stderr, "Invalid resource property: \"%s\".\n", key.c_str());
-		}
-	}
 }

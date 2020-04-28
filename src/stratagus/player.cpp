@@ -1190,14 +1190,14 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//  Initial default incomes.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->Incomes[i] = CResource::Resources[i]->DefaultIncome;
+		this->Incomes[i] = stratagus::resource::get_all()[i]->DefaultIncome;
 	}
 	
 	this->TradeCost = DefaultTradeCost;
 
 	//  Initial max resource amounts.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->MaxResources[i] = CResource::Resources[i]->DefaultMaxAmount;
+		this->MaxResources[i] = stratagus::resource::get_all()[i]->DefaultMaxAmount;
 	}
 
 	//Wyrmgus start
@@ -2280,7 +2280,7 @@ void CPlayer::Clear()
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
 		this->SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
 		//Wyrmgus start
-		this->Prices[i] = CResource::Resources[i]->BasePrice;
+		this->Prices[i] = stratagus::resource::get_all()[i]->BasePrice;
 		//Wyrmgus end
 	}
 	this->SpeedBuild = SPEEDUP_FACTOR;
@@ -3149,7 +3149,7 @@ bool CPlayer::CheckResource(const int resource, const int value)
 */
 void CPlayer::IncreaseResourcePrice(const int resource)
 {
-	int price_change = CResource::Resources[resource]->BasePrice / std::max(this->Prices[resource], 100);
+	int price_change = stratagus::resource::get_all()[resource]->BasePrice / std::max(this->Prices[resource], 100);
 	price_change = std::max(1, price_change);
 	this->Prices[resource] += price_change;
 }
@@ -3161,7 +3161,7 @@ void CPlayer::IncreaseResourcePrice(const int resource)
 */
 void CPlayer::DecreaseResourcePrice(const int resource)
 {
-	int price_change = this->Prices[resource] / CResource::Resources[resource]->BasePrice;
+	int price_change = this->Prices[resource] / stratagus::resource::get_all()[resource]->BasePrice;
 	price_change = std::max(1, price_change);
 	this->Prices[resource] -= price_change;
 	this->Prices[resource] = std::max(1, this->Prices[resource]);
@@ -3179,7 +3179,7 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 		converged = false;
 
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (!CResource::Resources[i]->BasePrice) {
+			if (!stratagus::resource::get_all()[i]->BasePrice) {
 				continue;
 			}
 			
@@ -3236,12 +3236,12 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	int resource_demand = this->ResourceDemand[resource];
 	
 	if (this->Prices[resource]) {
-		resource_demand *= CResource::Resources[resource]->BasePrice;
+		resource_demand *= stratagus::resource::get_all()[resource]->BasePrice;
 		resource_demand /= this->Prices[resource];
 	}
 	
-	if (CResource::Resources[resource]->DemandElasticity != 100) {
-		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * CResource::Resources[resource]->DemandElasticity / 100);
+	if (stratagus::resource::get_all()[resource]->DemandElasticity != 100) {
+		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * stratagus::resource::get_all()[resource]->DemandElasticity / 100);
 	}
 	
 	resource_demand = std::max(resource_demand, 0);
@@ -3280,7 +3280,7 @@ int CPlayer::GetTotalPriceDifferenceWith(const CPlayer &player) const
 {
 	int difference = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!CResource::Resources[i]->BasePrice) {
+		if (!stratagus::resource::get_all()[i]->BasePrice) {
 			continue;
 		}
 		difference += abs(this->Prices[i] - player.Prices[i]);
@@ -3296,7 +3296,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 {
 	int trade_potential = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!CResource::Resources[i]->BasePrice) {
+		if (!stratagus::resource::get_all()[i]->BasePrice) {
 			continue;
 		}
 		int price_difference = abs(this->Prices[i] - player.Prices[i]);
@@ -3393,7 +3393,7 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 		}
 		if (notify) {
 			const char *name = DefaultResourceNames[i].c_str();
-			const char *actionName = CResource::Resources[i]->ActionName.c_str();
+			const char *actionName = stratagus::resource::get_all()[i]->ActionName.c_str();
 
 			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name));
 
@@ -4176,8 +4176,8 @@ void CPlayer::SetOverlord(CPlayer *player)
 		if (!SaveGameLoading) {
 			this->SetDiplomacyAlliedWith(*this->Overlord);
 			this->Overlord->SetDiplomacyAlliedWith(*this);
-			CommandDiplomacy(this->Index, Diplomacy::Allied, this->Overlord->Index);
-			CommandDiplomacy(this->Overlord->Index, Diplomacy::Allied, this->Index);
+			CommandDiplomacy(this->Index, diplomacy_state::allied, this->Overlord->Index);
+			CommandDiplomacy(this->Overlord->Index, diplomacy_state::allied, this->Index);
 			CommandSharedVision(this->Index, true, this->Overlord->Index);
 			CommandSharedVision(this->Overlord->Index, true, this->Index);
 		}

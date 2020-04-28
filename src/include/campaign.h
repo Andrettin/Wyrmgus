@@ -54,7 +54,7 @@ class campaign : public detailed_data_entry, public data_type<campaign>, public 
 	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date)
 	Q_PROPERTY(stratagus::calendar* start_date_calendar MEMBER start_date_calendar)
 	Q_PROPERTY(stratagus::timeline* timeline MEMBER timeline READ get_timeline)
-	Q_PROPERTY(stratagus::faction*faction MEMBER faction READ get_faction)
+	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 
 public:
