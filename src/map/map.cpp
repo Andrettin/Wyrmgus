@@ -848,8 +848,8 @@ std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const stratagus::map_template
 	}
 
 	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->get_plane() && main_template->get_world()) {
-		const int z = GetMapLayer(main_template->get_plane()->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
+	if (main_template && subtemplate != main_template) {
+		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "", main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
@@ -912,8 +912,8 @@ CMapLayer *CMap::get_subtemplate_map_layer(const stratagus::map_template *subtem
 	}
 	
 	const stratagus::map_template *main_template = subtemplate->GetTopMapTemplate();
-	if (main_template && subtemplate != main_template && main_template->get_plane() && main_template->get_world()) {
-		const int z = GetMapLayer(main_template->get_plane()->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
+	if (main_template && subtemplate != main_template) {
+		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "", main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
@@ -942,9 +942,9 @@ std::vector<CUnit *> CMap::get_map_template_layer_connectors(const stratagus::ma
 	}
 	
 	const stratagus::map_template *main_template = map_template->GetTopMapTemplate();
-	if (main_template && main_template->get_plane() && main_template->get_world()) {
+	if (main_template) {
 		const bool is_main_template = main_template == map_template;
-		const int z = GetMapLayer(main_template->get_plane()->Ident, main_template->get_world()->get_identifier(), main_template->SurfaceLayer);
+		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "", main_template->SurfaceLayer);
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
