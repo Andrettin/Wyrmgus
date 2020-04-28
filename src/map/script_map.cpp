@@ -218,7 +218,6 @@ static int CclStratagusMap(lua_State *l)
 						lua_rawgeti(l, -1, z + 1);
 						CMap::Map.MapLayers[z]->plane = stratagus::plane::try_get(LuaToString(l, -1, 1));
 						CMap::Map.MapLayers[z]->world = stratagus::world::try_get(LuaToString(l, -1, 2));
-						CMap::Map.MapLayers[z]->SurfaceLayer = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -903,10 +902,7 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		}
 	}
 	
-	if (lua_isnumber(l, 4)) {
-		int layer = LuaToNumber(l, 4);
-		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
-	} else if (lua_isstring(l, 4)) {
+	if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
 		if (stratagus::world::try_get(realm)) {
 			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>(ipos, unittype, stratagus::world::get(realm), unique));
@@ -1599,11 +1595,6 @@ static int CclDefineMapTemplate(lua_State *l)
 			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
 			map_template->world = world;
 			map_template->plane = world->get_plane();
-		} else if (!strcmp(value, "SurfaceLayer")) {
-			map_template->SurfaceLayer = LuaToNumber(l, -1);
-			if (map_template->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
-				UI.SurfaceLayerButtons.resize(map_template->SurfaceLayer + 1);
-			}
 		} else if (!strcmp(value, "TerrainFile")) {
 			map_template->terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {

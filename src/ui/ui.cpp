@@ -477,28 +477,6 @@ void CleanUserInterfaceFillers()
 	}
 	UI.Fillers.clear();
 }
-
-void UpdateSurfaceLayerButtons()
-{
-	unsigned int last_surface_layer = 0;
-	if (UI.CurrentMapLayer) {
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			if (UI.CurrentMapLayer->plane == CMap::Map.MapLayers[z]->plane && UI.CurrentMapLayer->world == CMap::Map.MapLayers[z]->world && CMap::Map.MapLayers[z]->SurfaceLayer > (int) last_surface_layer) {
-				last_surface_layer = CMap::Map.MapLayers[z]->SurfaceLayer;
-			}
-		}
-	}
-	
-	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
-		if (i <= last_surface_layer && last_surface_layer > 0) {
-			UI.SurfaceLayerButtons[i].X = -2 * stratagus::defines::get()->get_scale_factor();
-			UI.SurfaceLayerButtons[i].Y = Video.Height + (-157 + (19  * i)) * stratagus::defines::get()->get_scale_factor();;
-		} else {
-			UI.SurfaceLayerButtons[i].X = -1;
-			UI.SurfaceLayerButtons[i].Y = -1;
-		}
-	}
-}
 //Wyrmgus end
 
 void FreeButtonStyles()

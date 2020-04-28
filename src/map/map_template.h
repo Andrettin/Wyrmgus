@@ -481,7 +481,6 @@ private:
 	std::filesystem::path overlay_terrain_image;
 	QSize size = QSize(0, 0);
 public:
-	int SurfaceLayer = 0; //surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates
 private:
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
@@ -532,7 +531,6 @@ public:
 	std::vector<std::tuple<Vec2i, CCharacter *, faction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::plane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<site *> sites;
 	point_map<site *> sites_by_position;

@@ -207,7 +207,6 @@ class CUserInterface
 	
 	//Wyrmgus start
 	vector<CUIButton> WorldButtons;
-	vector<CUIButton> SurfaceLayerButtons;
 	//Wyrmgus end
 
 	vector<CUIUserButton> UserButtons;
@@ -727,5 +726,4 @@ void SetDefaultTextColors(const std::string &normal, const std::string &reverse)
 //Wyrmgus start
 extern bool IsMouseLeftButtonPressed();
 extern std::string GetCurrentButtonValueStr();
-extern void UpdateSurfaceLayerButtons();
 //Wyrmgus end

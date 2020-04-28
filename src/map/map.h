@@ -295,10 +295,8 @@ public:
 	
 	void SetCurrentPlane(stratagus::plane *plane);
 	void SetCurrentWorld(stratagus::world *world);
-	void SetCurrentSurfaceLayer(int surface_layer);
 	stratagus::plane *GetCurrentPlane() const;
 	stratagus::world *GetCurrentWorld() const;
-	int GetCurrentSurfaceLayer() const;
 	//Wyrmgus end
 
 	//UnitCache
@@ -507,7 +505,7 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 extern void PreprocessMap();
 
 //Wyrmgus start
-extern int GetMapLayer(const std::string &plane_ident = "", const std::string &world_ident = "", const int surface_layer = 0);
+extern int GetMapLayer(const std::string &plane_ident = "", const std::string &world_ident = "");
 extern void ChangeToPreviousMapLayer();
 extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(const std::string &time_of_day_ident, int z = 0);

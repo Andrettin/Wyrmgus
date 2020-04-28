@@ -151,11 +151,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "world") {
 			stratagus::world *world = world::get(value);
 			this->set_world(world);
-		} else if (key == "surface_layer") {
-			this->SurfaceLayer = std::stoi(value);
-			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
-				UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
-			}
 		} else if (key == "terrain_file") {
 			this->terrain_file = value;
 		} else if (key == "overlay_terrain_file") {
@@ -290,7 +285,6 @@ void map_template::initialize()
 		if (this->get_main_template()->get_world() != nullptr) {
 			this->world = this->get_main_template()->get_world();
 		}
-		this->SurfaceLayer = this->get_main_template()->SurfaceLayer;
 	}
 
 	if (!this->subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
@@ -526,13 +520,11 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
 		map_layer->plane = this->get_plane();
 		map_layer->world = this->get_world();
-		map_layer->SurfaceLayer = this->SurfaceLayer;
 		CMap::Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			CMap::Map.MapLayers[z]->plane = this->get_plane();
 			CMap::Map.MapLayers[z]->world = this->get_world();
-			CMap::Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
 		}
 	}
 
@@ -551,11 +543,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 			CMap::Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
 			CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
 			
-			if (
-				this->SurfaceLayer == 0
-				&& !GameSettings.Inside
-				&& !GameSettings.NoTimeOfDay
-			) {
+			if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
 				if (this->get_world() && this->get_world()->TimeOfDaySchedule) {
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = this->get_world()->TimeOfDaySchedule;
 				} else if (!this->get_world() && this->get_plane() && this->get_plane()->TimeOfDaySchedule) {
@@ -1375,97 +1363,6 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (found_other_connector) {
 				break;
 			}
-		}
-	}
-	
-	for (size_t i = 0; i < this->SurfaceLayerConnectors.size(); ++i) {
-		const CUnitType *type = std::get<1>(this->SurfaceLayerConnectors[i]);
-		const int surface_layer = std::get<2>(this->SurfaceLayerConnectors[i]);
-		CUniqueItem *unique = std::get<3>(this->SurfaceLayerConnectors[i]);
-		Vec2i unit_raw_pos(std::get<0>(this->SurfaceLayerConnectors[i]));
-		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
-		Vec2i unit_offset((type->TileSize - 1) / 2);
-
-		//add the connecting destination
-		const map_template *other_template = nullptr;
-		if (surface_layer == (this->SurfaceLayer + 1)) {
-			other_template = this->LowerTemplate;
-		}
-		else if (surface_layer == (this->SurfaceLayer - 1)) {
-			other_template = this->UpperTemplate;
-		}
-		if (!other_template) {
-			continue; //surface layer connectors must lead to an adjacent surface layer
-		}
-
-		if (random) {
-			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
-				continue;
-			}
-			
-			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
-			std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
-			for (const CUnit *connector : other_layer_connectors) {
-				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->plane == this->get_plane() && connector->ConnectingDestination->MapLayer->world == this->get_world() && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
-					already_implemented = true;
-					break;
-				}
-			}
-
-			if (already_implemented) {
-				continue;
-			}
-			
-			unit_pos = CMap::Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
-			unit_pos += unit_offset;
-		} else {
-			if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) {
-				//if the upper/lower layer has a surface layer connector to this layer that has no connecting destination, and this connector leads to that surface layer, place this connection in the same position as the other one
-				std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
-				for (const CUnit *potential_connector : other_layer_connectors) {
-					if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-						unit_pos = potential_connector->get_center_tile_pos();
-						break;
-					}
-				}
-			}
-		}
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
-			continue;
-		}
-		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z) && unit_raw_pos.x != -1 && unit_raw_pos.y != -1) {
-			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
-		}
-
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
-		if (unique) {
-			unit->SetUnique(unique);
-		}
-		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
-		
-		//get the nearest compatible connector in the target map layer / template
-		std::vector<CUnit *> other_layer_connectors = CMap::Map.get_map_template_layer_connectors(other_template);
-		CUnit *best_layer_connector = nullptr;
-		int best_distance = -1;
-		for (size_t j = 0; j < other_layer_connectors.size(); ++j) {
-			CUnit *potential_connector = other_layer_connectors[j];
-			
-			if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-				int distance = potential_connector->MapDistanceTo(unit->get_center_tile_pos(), potential_connector->MapLayer->ID);
-				if (best_distance == -1 || distance < best_distance) {
-					best_layer_connector = potential_connector;
-					best_distance = distance;
-					if (distance == 0) {
-						break;
-					}
-				}
-			}
-		}
-		
-		if (best_layer_connector) {
-			best_layer_connector->ConnectingDestination = unit;
-			unit->ConnectingDestination = best_layer_connector;
 		}
 	}
 }

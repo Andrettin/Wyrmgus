@@ -473,7 +473,6 @@ public:
 	
 	//Wyrmgus start
 	std::vector<CUIButton> WorldButtons;	/// Button info for world map layer buttons
-	std::vector<CUIButton> SurfaceLayerButtons;	/// Button info for surface layer map layer buttons
 	//Wyrmgus end
 
 	// Used defined buttons
@@ -559,7 +558,6 @@ extern void SaveUserInterface(CFile &file);
 extern void CleanUserInterface();
 //Wyrmgus start
 void CleanUserInterfaceFillers();
-extern void UpdateSurfaceLayerButtons();
 //Wyrmgus end
 
 extern void FreeButtonStyles();

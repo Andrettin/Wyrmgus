@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_layer.h - The map layer header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -156,7 +154,6 @@ public:
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
 	stratagus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
 	stratagus::world *world = nullptr;			/// the world pointer (if any) for the map layer
-	int SurfaceLayer = 0;						/// the surface layer for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
 	std::vector<std::tuple<Vec2i, Vec2i, stratagus::map_template *>> subtemplate_areas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration

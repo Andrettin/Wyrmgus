@@ -1103,18 +1103,6 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 	}
 
-	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
-		const CUIButton &button = UI.SurfaceLayerButtons[i];
-
-		if (button.X != -1) {
-			if (button.Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaMapLayerSurfaceLayer;
-				ButtonUnderCursor = i;
-				CursorOn = cursor_on::button;
-				return;
-			}
-		}
-	}
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 		const CUIUserButton &button = UI.UserButtons[i];
 
@@ -1414,13 +1402,6 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	} else {
 		for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 			const CUIButton &button = UI.WorldButtons[i];
-
-			if (button.Clicked) {
-				return;
-			}
-		}
-		for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
-			const CUIButton &button = UI.SurfaceLayerButtons[i];
 
 			if (button.Clicked) {
 				return;
@@ -2499,15 +2480,6 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 					button.Clicked = true;
 				}
 			}
-		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
-			for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
-				CUIButton &button = UI.SurfaceLayerButtons[i];
-
-				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					button.Clicked = true;
-				}
-			}
 		//  clicked on user buttons
 		} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
 			for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
@@ -2984,24 +2956,6 @@ void UIHandleButtonUp(unsigned button)
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 					CMap::Map.SetCurrentWorld(stratagus::world::get_all()[i]);
-					if (button.Callback) {
-						button.Callback->action("");
-					}
-					return;
-				}
-			}
-		}
-
-		//
-		//  Surface layer buttons
-		//
-		for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
-			CUIButton &button = UI.SurfaceLayerButtons[i];
-
-			if (button.Clicked) {
-				button.Clicked = false;
-				if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
-					CMap::Map.SetCurrentSurfaceLayer(i);
 					if (button.Callback) {
 						button.Callback->action("");
 					}

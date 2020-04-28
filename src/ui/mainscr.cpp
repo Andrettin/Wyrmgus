@@ -981,17 +981,6 @@ void DrawMapLayerButtons()
 			);
 		}
 	}
-
-	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
-		if (UI.SurfaceLayerButtons[i].X != -1) {
-			DrawUIButton(UI.SurfaceLayerButtons[i].Style,
-				(ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.SurfaceLayerButtons[i].Clicked || CMap::Map.GetCurrentSurfaceLayer() == i) ? MI_FLAGS_CLICKED : 0),
-				UI.SurfaceLayerButtons[i].X, UI.SurfaceLayerButtons[i].Y,
-				UI.SurfaceLayerButtons[i].Text
-			);
-		}
-	}
 }
 
 //Wyrmgus start
@@ -1238,14 +1227,6 @@ void DrawPopups()
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 		DrawGenericPopup(stratagus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
-	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
-		std::string surface_layer_string;
-		if (ButtonUnderCursor == 0) {
-			surface_layer_string = "Surface";
-		} else {
-			surface_layer_string = "Underground Layer " + std::to_string((long long) ButtonUnderCursor);
-		}
-		DrawGenericPopup(surface_layer_string, UI.SurfaceLayerButtons[ButtonUnderCursor].X, UI.SurfaceLayerButtons[ButtonUnderCursor].Y);
 	}
 }
 //Wyrmgus end
