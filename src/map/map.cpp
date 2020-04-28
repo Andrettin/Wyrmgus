@@ -2553,7 +2553,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 **	@param	preserve_coastline	Whether to avoid changing the coastline during terrain generation
 **	@param	z					The map layer to generate the terrain on
 */
-void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z)
+void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z)
 {
 	if (SaveGameLoading) {
 		return;

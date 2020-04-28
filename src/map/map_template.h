@@ -41,19 +41,29 @@ class CUniqueItem;
 class CUnitType;
 struct lua_State;
 
-namespace stratagus {
-	class faction;
-	class historical_location;
-	class site;
-	class terrain_type;
-	class unit_class;
-}
-
 int CclDefineMapTemplate(lua_State *l);
 
-class CGeneratedTerrain
+namespace stratagus {
+
+class faction;
+class historical_location;
+class plane;
+class site;
+class terrain_type;
+class unit_class;
+class world;
+
+class generated_terrain
 {
 public:
+	generated_terrain() {}
+
+	generated_terrain(terrain_type *terrain_type) : TerrainType(terrain_type)
+	{
+	}
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	
 	bool CanUseTileAsSeed(const CMapField *tile) const;
@@ -61,20 +71,14 @@ public:
 	bool CanTileBePartOfExpansion(const CMapField *tile) const;
 	bool CanRemoveTileOverlayTerrain(const CMapField *tile) const;
 
-	stratagus::terrain_type *TerrainType = nullptr;
+	terrain_type *TerrainType = nullptr;
 	int SeedCount = 0;
 	int ExpansionChance = 50; //50% chance to expand to a tile by default
 	int MaxPercent = 0; //the maximum percentage of tiles in the map subtemplate that should have the generated terrain type as their top tile
 	bool UseExistingAsSeeds = false; //whether to use existing tiles of the given terrain in the map layer as seeds for this terrain generation
 	bool UseSubtemplateBordersAsSeeds = false; //whether to use the border tiles of subtemplates that have the given terrain as seeds for this terrain generation
-	std::vector<const stratagus::terrain_type *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
+	std::vector<const terrain_type *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
-
-namespace stratagus {
-
-class plane;
-class site;
-class world;
 
 class map_template final : public named_data_entry, public data_type<map_template>, public CDataType
 {
@@ -519,8 +523,8 @@ private:
 	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
 	terrain_type *unusable_area_overlay_terrain_type = nullptr;
 	std::vector<map_template *> subtemplates;
+	std::vector<std::unique_ptr<generated_terrain>> generated_terrains; //terrains generated in the map template
 public:
-	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position

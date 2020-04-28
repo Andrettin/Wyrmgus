@@ -68,9 +68,6 @@ namespace stratagus {
 
 map_template::~map_template()
 {
-	for (CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
-		delete generated_terrain;
-	}
 }
 
 void map_template::process_sml_property(const sml_property &property)
@@ -108,7 +105,16 @@ void map_template::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
+	if (tag == "generated_terrains") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			terrain_type *terrain_type = terrain_type::get(child_scope.get_tag());
+
+			auto generated_terrain = std::make_unique<stratagus::generated_terrain>(terrain_type);
+			database::process_sml_data(generated_terrain, child_scope);
+
+			this->generated_terrains.push_back(std::move(generated_terrain));
+		});
+	} else if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
 		scope.for_each_property([&](const sml_property &property) {
 			CUnitType *unit_type = CUnitType::get(property.get_key());
 			const int quantity = std::stoi(property.get_value());
@@ -256,16 +262,15 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else if (child_config_data->Tag == "generated_terrain") {
-			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
+			auto generated_terrain = std::make_unique<stratagus::generated_terrain>();
 			
 			generated_terrain->ProcessConfigData(child_config_data);
 				
 			if (!generated_terrain->TerrainType) {
-				delete generated_terrain;
 				continue;
 			}
 			
-			this->GeneratedTerrains.push_back(generated_terrain);
+			this->generated_terrains.push_back(std::move(generated_terrain));
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -714,7 +719,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (!has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 		
-		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
+		for (const auto &generated_terrain : this->generated_terrains) {
 			int map_width = (map_end.x() - map_start_pos.x());
 			int map_height = (map_end.y() - map_start_pos.y());
 			
@@ -772,7 +777,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 		
-		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
+		for (const auto &generated_terrain : this->generated_terrains) {
 			int map_width = (map_end.x() - map_start_pos.x());
 			int map_height = (map_end.y() - map_start_pos.y());
 			
@@ -2024,21 +2029,42 @@ QPoint map_template::get_location_map_position(const std::unique_ptr<historical_
 	return QPoint(-1, -1);
 }
 
+void generated_terrain::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "seed_count") {
+		this->SeedCount = std::stoi(value);
+	} else if (key == "expansion_chance") {
+		this->ExpansionChance = std::stoi(value);
+	} else if (key == "max_percent") {
+		this->MaxPercent = std::stoi(value);
+	} else if (key == "use_existing_as_seeds") {
+		this->UseExistingAsSeeds = string::to_bool(value);
+	} else if (key == "use_subtemplate_borders_as_seeds") {
+		this->UseSubtemplateBordersAsSeeds = string::to_bool(value);
+	} else if (key == "target_terrain_type") {
+		const terrain_type *target_terrain_type = terrain_type::get(value);
+		this->TargetTerrainTypes.push_back(target_terrain_type);
+	} else {
+		throw std::runtime_error("Invalid generated terrain property: \"" + key + "\".");
+	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
+void generated_terrain::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid generated terrain scope: \"" + scope.get_tag() + "\".");
+}
+
+void generated_terrain::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "terrain_type") {
-			this->TerrainType = stratagus::terrain_type::get(value);
+			this->TerrainType = terrain_type::get(value);
 		} else if (key == "seed_count") {
 			this->SeedCount = std::stoi(value);
 		} else if (key == "expansion_chance") {
@@ -2050,7 +2076,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "use_subtemplate_borders_as_seeds") {
 			this->UseSubtemplateBordersAsSeeds = string::to_bool(value);
 		} else if (key == "target_terrain_type") {
-			const stratagus::terrain_type *target_terrain_type = stratagus::terrain_type::get(value);
+			const terrain_type *target_terrain_type = terrain_type::get(value);
 			this->TargetTerrainTypes.push_back(target_terrain_type);
 		} else {
 			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
@@ -2069,9 +2095,9 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	True if the tile can be used as a seed, or false otherwise
 */
-bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
+bool generated_terrain::CanUseTileAsSeed(const CMapField *tile) const
 {
-	const stratagus::terrain_type *top_terrain = tile->GetTopTerrain();
+	const terrain_type *top_terrain = tile->GetTopTerrain();
 	
 	if (top_terrain == this->TerrainType) { //top terrain is the same as the one for the generation, so the tile can be used as a seed
 		return true;
@@ -2091,7 +2117,7 @@ bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
 **
 **	@return	True if the terrain can be generated on the tile, or false otherwise
 */
-bool CGeneratedTerrain::CanGenerateOnTile(const CMapField *tile) const
+bool generated_terrain::CanGenerateOnTile(const CMapField *tile) const
 {
 	if (this->TerrainType->Overlay) {
 		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
@@ -2128,7 +2154,7 @@ bool CGeneratedTerrain::CanGenerateOnTile(const CMapField *tile) const
 **
 **	@return	True if the tile can be part of an expansion, or false otherwise
 */
-bool CGeneratedTerrain::CanTileBePartOfExpansion(const CMapField *tile) const
+bool generated_terrain::CanTileBePartOfExpansion(const CMapField *tile) const
 {
 	if (this->CanGenerateOnTile(tile)) {
 		return true;
@@ -2154,11 +2180,13 @@ bool CGeneratedTerrain::CanTileBePartOfExpansion(const CMapField *tile) const
 **
 **	@return	True if the terrain generation can remove the tile's overlay terrain, or false otherwise
 */
-bool CGeneratedTerrain::CanRemoveTileOverlayTerrain(const CMapField *tile) const
+bool generated_terrain::CanRemoveTileOverlayTerrain(const CMapField *tile) const
 {
 	if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->OverlayTerrain) == this->TargetTerrainTypes.end()) {
 		return false;
 	}
 	
 	return true;
+}
+
 }

@@ -87,7 +87,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CGeneratedTerrain;
 class CGraphic;
 class CPlayer;
 class CFile;
@@ -100,6 +99,7 @@ class CUnitType;
 
 namespace stratagus {
 	class faction;
+	class generated_terrain;
 	class map_template;
 	class plane;
 	class site;
@@ -218,7 +218,7 @@ public:
 	void AdjustMap();
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
-	void GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
+	void GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
 	void GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template);
 	void generate_settlement_territories(const int z);
