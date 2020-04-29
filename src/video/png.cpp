@@ -103,6 +103,10 @@ int LoadGraphicPNG(CGraphic *g)
 		throw std::runtime_error("Failed to load the \"" + name + "\" image file.");
 	}
 
+	if (g->image.format() != QImage::Format_RGBA8888) {
+		g->image = g->image.convertToFormat(QImage::Format_RGBA8888);
+	}
+
 	CFile fp;
 
 	if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {

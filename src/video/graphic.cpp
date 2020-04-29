@@ -1879,38 +1879,20 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 						  const int ow, const int oh, const stratagus::time_of_day *time_of_day)
 						//Wyrmgus end
 {
-	int useckey = g->Surface->flags & SDL_SRCCOLORKEY;
-	SDL_PixelFormat *f = g->Surface->format;
-	int bpp = f->BytesPerPixel;
-	Uint32 ckey = f->colorkey;
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	int maxw = std::min<int>(g->GraphicWidth - ow, GLMaxTextureSize);
-	int maxh = std::min<int>(g->GraphicHeight - oh, GLMaxTextureSize);
+	int maxw = std::min<int>(g->get_image().width() - ow, GLMaxTextureSize);
+	int maxh = std::min<int>(g->get_image().height() - oh, GLMaxTextureSize);
 	int w = PowerOf2(maxw);
 	int h = PowerOf2(maxh);
 	unsigned char *tex = new unsigned char[w * h * 4];
 	memset(tex, 0, w * h * 4);
-	unsigned char alpha;
-	if (g->Surface->flags & SDL_SRCALPHA) {
-		alpha = f->alpha;
-	} else {
-		alpha = 0xff;
-	}
 
-	SDL_LockSurface(g->Surface);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	unsigned char *tp;
-	const unsigned char *sp;
-	Uint32 b;
-	Uint32 c;
-	Uint32 pc;
-	
 	//Wyrmgus start
 	int found_player_color = -1;
 	//Wyrmgus end
@@ -1929,111 +1911,77 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	}
 	//Wyrmgus end
 
-	for (int i = 0; i < maxh; ++i) {
-		sp = (const unsigned char *)g->Surface->pixels + ow * bpp +
-			 (oh + i) * g->Surface->pitch;
-		tp = tex + i * w * 4;
-		for (int j = 0; j < maxw; ++j) {
-			if (bpp == 1) {
-				if (useckey && *sp == ckey) {
-					tp[3] = 0;
-				} else {
-					SDL_Color p = f->palette->colors[*sp];
-					//Wyrmgus start
-					/*
-					tp[0] = p.r;
-					tp[1] = p.g;
-					tp[2] = p.b;
-					*/
-					
-					int red = p.r;
-					int green = p.g;
-					int blue = p.b;
-					
-					if (colors && !g->Grayscale) {
-						for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
-							if (PlayerColorNames[ConversiblePlayerColors[k]].empty()) {
-								break;
-							}
-							
-							for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
-								if (p.r == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && p.g == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && p.b == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
-									red = colors->Colors[z].R;
-									green = colors->Colors[z].G;
-									blue = colors->Colors[z].B;
-									
-									if (found_player_color == -1) {
-										found_player_color = ConversiblePlayerColors[k];
-									} else if (found_player_color != ConversiblePlayerColors[k]) {
-										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", g->File.c_str(), PlayerColorNames[ConversiblePlayerColors[k]].c_str(), PlayerColorNames[found_player_color].c_str());
-									}
-								}
-							}
-						}
-					}
-				
-					tp[0] = std::max<int>(0,std::min<int>(255,int(red) + time_of_day_red));
-					tp[1] = std::max<int>(0,std::min<int>(255,int(green) + time_of_day_green));
-					tp[2] = std::max<int>(0,std::min<int>(255,int(blue) + time_of_day_blue));;
-					//Wyrmgus end
-					tp[3] = alpha;
-				}
-				//Wyrmgus start
-				/*
-				if (colors) {
-					for (int z = 0; z < PlayerColorIndexCount; ++z) {
-						if (*sp == PlayerColorIndexStart + z) {
-							SDL_Color p = colors->Colors[z];
-							tp[0] = p.r;
-							tp[1] = p.g;
-							tp[2] = p.b;
-							tp[3] = 0xff;
-							break;
-						}
-					}
-				}
-				*/
-				//Wyrmgus end
-				++sp;
-			} else {
-				if (bpp == 4) {
-					c = *(Uint32 *)sp;
-				} else {
-					c = (sp[f->Rshift >> 3] << f->Rshift) |
-						(sp[f->Gshift >> 3] << f->Gshift) |
-						(sp[f->Bshift >> 3] << f->Bshift);
-					c |= ((alpha | (alpha << 8) | (alpha << 16) | (alpha << 24)) ^
-						  (f->Rmask | f->Gmask | f->Bmask));
-				}
-				*(Uint32 *)tp = c;
-				//Wyrmgus start
-//				if (colors) {
-				if (!g->Grayscale) {
-				//Wyrmgus end
-					b = (c & f->Bmask) >> f->Bshift;
-//					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
-//						((c & f->Gmask) >> f->Gshift) == b) {
-						//Wyrmgus start
-						/*
-						pc = ((colors->Colors[0].R * b / 255) << f->Rshift) |
-							 ((colors->Colors[0].G * b / 255) << f->Gshift) |
-							 ((colors->Colors[0].B * b / 255) << f->Bshift);
-						*/
-						pc = ((std::max<int>(0,std::min<int>(255, (*tp) + time_of_day_red))) << f->Rshift) |
-							 ((std::max<int>(0,std::min<int>(255, *(tp + 1) + time_of_day_green))) << f->Gshift) |
-							 ((std::max<int>(0,std::min<int>(255, *(tp + 2) + time_of_day_blue))) << f->Bshift);
-						//Wyrmgus end
-						if (bpp == 4) {
-							pc |= (c & f->Amask);
-						} else {
-							pc |= (0xFFFFFFFF ^ (f->Rmask | f->Gmask | f->Bmask));
-						}
-						*(Uint32 *)tp = pc;
-//					}
-				}
-				sp += bpp;
+	const QImage &image = g->get_image();
+
+	if (image.isNull()) {
+		throw std::runtime_error("Cannot generate a texture for a null image.");
+	}
+
+	if (image.format() != QImage::Format_RGBA8888) {
+		throw std::runtime_error("The image format is \"" + std::to_string(image.format()) + "\", but it must be RGBA8888 for generating textures.");
+	}
+	const int depth = image.depth();
+	const int bpp = depth / 8;
+
+	if (bpp != 4) {
+		throw std::runtime_error("The image BPP must be 4 for generating textures.");
+	}
+
+	const unsigned char *image_data = image.constBits();
+	for (int x = 0; x < maxw; ++x) {
+		for (int y = 0; y < maxh; ++y) {
+			const int src_index = ((oh + y) * image.width() + ow + x) * bpp;
+			const unsigned char &src_red = image_data[src_index];
+			const unsigned char &src_green = image_data[src_index + 1];
+			const unsigned char &src_blue = image_data[src_index + 2];
+			const unsigned char &src_alpha = image_data[src_index + 3];
+
+			const int dst_index = (y * w + x) * 4;
+			unsigned char &dst_red = tex[dst_index];
+			unsigned char &dst_green = tex[dst_index + 1];
+			unsigned char &dst_blue = tex[dst_index + 2];
+			unsigned char &dst_alpha = tex[dst_index + 3];
+
+			dst_red = src_red;
+			dst_green = src_green;
+			dst_blue = src_blue;
+			dst_alpha = src_alpha;
+
+			if (g->Grayscale) {
+				continue;
 			}
-			tp += 4;
+
+			if (colors != nullptr) {
+				for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
+					if (PlayerColorNames[ConversiblePlayerColors[k]].empty()) {
+						break;
+					}
+
+					for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
+						if (dst_red == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && dst_green == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && dst_blue == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
+							dst_red = colors->Colors[z].R;
+							dst_green = colors->Colors[z].G;
+							dst_blue = colors->Colors[z].B;
+
+							if (found_player_color == -1) {
+								found_player_color = ConversiblePlayerColors[k];
+							} else if (found_player_color != ConversiblePlayerColors[k]) {
+								fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", g->File.c_str(), PlayerColorNames[ConversiblePlayerColors[k]].c_str(), PlayerColorNames[found_player_color].c_str());
+							}
+						}
+					}
+				}
+			}
+
+			if (time_of_day_red != 0) {
+				dst_red = std::max<int>(0, std::min<int>(255, dst_red + time_of_day_red));
+			}
+			if (time_of_day_green != 0) {
+				dst_green = std::max<int>(0, std::min<int>(255, dst_green + time_of_day_green));
+			}
+			if (time_of_day_blue != 0) {
+				dst_blue = std::max<int>(0, std::min<int>(255, dst_blue + time_of_day_blue));
+			}
 		}
 	}
 
@@ -2052,7 +2000,6 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 		DebugPrint("glTexImage2D(%x)\n" _C_ x);
 	}
 #endif
-	SDL_UnlockSurface(g->Surface);
 	delete[] tex;
 }
 
@@ -2068,16 +2015,16 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const stratagus::time_of_day *time_of_day)
 //Wyrmgus end
 {
-	int tw = (g->GraphicWidth - 1) / GLMaxTextureSize + 1;
-	const int th = (g->GraphicHeight - 1) / GLMaxTextureSize + 1;
+	int tw = (g->get_image().width() - 1) / GLMaxTextureSize + 1;
+	const int th = (g->get_image().height() - 1) / GLMaxTextureSize + 1;
 
-	int w = g->GraphicWidth % GLMaxTextureSize;
+	int w = g->get_image().width() % GLMaxTextureSize;
 	if (w == 0) {
 		w = GLMaxTextureSize;
 	}
 	g->TextureWidth = (GLfloat)w / PowerOf2(w);
 
-	int h = g->GraphicHeight % GLMaxTextureSize;
+	int h = g->get_image().height() % GLMaxTextureSize;
 	if (h == 0) {
 		h = GLMaxTextureSize;
 	}
@@ -2215,6 +2162,8 @@ void CGraphic::Resize(int w, int h)
 
 	int bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
+		this->image = this->image.scaled(w, h);
+
 		SDL_Color pal[256];
 
 		SDL_LockSurface(Surface);
@@ -2270,6 +2219,9 @@ void CGraphic::Resize(int w, int h)
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
 			Rmask, Gmask, Bmask, Amask);
 	} else {
+		this->image = this->image.scaled(w, h, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		this->image = this->image.convertToFormat(QImage::Format_RGBA8888);
+
 		SDL_LockSurface(Surface);
 
 		unsigned char *pixels = (unsigned char *)Surface->pixels;

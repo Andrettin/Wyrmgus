@@ -37,6 +37,7 @@
 
 #include "database/defines.h"
 #include "intern_video.h"
+#include "util/image_util.h"
 #include "util/util.h"
 #include "video.h"
 
@@ -813,12 +814,22 @@ void CFont::MakeFontColorTextures() const
 		newg->GraphicWidth = g.GraphicWidth;
 		newg->GraphicHeight = g.GraphicHeight;
 		newg->Surface = g.Surface;
+		newg->image = QImage(g.File.c_str());
 
 		SDL_LockSurface(s);
 		for (int j = 0; j < MaxFontColors; ++j) {
 			s->format->palette->colors[j] = fc->Colors[j];
+			newg->image.setColor(j, qRgba(fc->Colors[j].R, fc->Colors[j].G, fc->Colors[j].B, j == 0 ? 0 : 255));
 		}
 		SDL_UnlockSurface(s);
+
+		newg->image = newg->image.convertToFormat(QImage::Format_RGBA8888);
+
+		const int scale_factor = stratagus::defines::get()->get_scale_factor();
+		if (scale_factor != 1) {
+			newg->image = stratagus::image::scale(newg->image, scale_factor, g.get_original_frame_size());
+		}
+
 		MakeTexture(newg);
 	}
 }

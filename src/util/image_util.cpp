@@ -36,7 +36,7 @@ QImage scale(const QImage &src_image, const int scale_factor)
 		return image::scale(reformatted_src_image, scale_factor);
 	}
 
-	QImage result_image(src_image.size() * scale_factor, QImage::Format_ARGB32);
+	QImage result_image(src_image.size() * scale_factor, QImage::Format_RGBA8888);
 
 	const unsigned char *src_data = src_image.constBits();
 	unsigned char *dst_data = result_image.bits();
@@ -60,7 +60,7 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	const QSize new_frame_size = old_frame_size * scale_factor;
 
 	const int bpp = src_image.depth() / 8;
-	QImage result_image(src_image.size() * scale_factor, QImage::Format_ARGB32);
+	QImage result_image(src_image.size() * scale_factor, QImage::Format_RGBA8888);
 	unsigned char *dst_data = result_image.bits();
 
 	//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling

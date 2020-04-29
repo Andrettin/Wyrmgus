@@ -167,6 +167,11 @@ public:
 		return this->original_frame_size;
 	}
 
+	const QImage &get_image() const
+	{
+		return this->image;
+	}
+
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface = nullptr;      /// Surface
