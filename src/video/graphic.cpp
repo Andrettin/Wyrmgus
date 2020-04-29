@@ -2296,6 +2296,25 @@ void CGraphic::Resize(int w, int h)
 			VideoPaletteListAdd(Surface);
 		}
 		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
+	} else if (w > old_size.width() && (w % old_size.width()) == 0 && (h % old_size.height()) == 0 && h > old_size.height() && (w / old_size.width()) == (h / old_size.height()) && bpp == 4) {
+		//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
+		const size_t scale_factor = w / old_size.width();
+		SDL_LockSurface(Surface);
+		unsigned char *pixels = static_cast<unsigned char *>(Surface->pixels);
+		unsigned char *data = new unsigned char[w * h * bpp];
+		xbrz::scale(scale_factor, reinterpret_cast<uint32_t *>(pixels), reinterpret_cast<uint32_t *>(data), old_size.width(), old_size.height());
+
+		int Rmask = Surface->format->Rmask;
+		int Gmask = Surface->format->Gmask;
+		int Bmask = Surface->format->Bmask;
+		int Amask = Surface->format->Amask;
+
+		SDL_UnlockSurface(Surface);
+		VideoPaletteListRemove(Surface);
+		SDL_FreeSurface(Surface);
+
+		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
+			Rmask, Gmask, Bmask, Amask);
 	} else {
 		SDL_LockSurface(Surface);
 
