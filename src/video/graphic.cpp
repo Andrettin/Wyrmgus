@@ -1241,9 +1241,7 @@ void CGraphic::GenFramesMap()
 	Assert(Width != 0);
 	Assert(Height != 0);
 
-	delete[] frame_map;
-
-	frame_map = new frame_pos_t[NumFrames];
+	frame_map.resize(NumFrames);
 
 	for (int frame = 0; frame < NumFrames; ++frame) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1553,16 +1551,14 @@ void CGraphic::Free(CGraphic *g)
 #endif
 
 		FreeSurface(&g->Surface);
-		delete[] g->frame_map;
-		g->frame_map = nullptr;
+		g->frame_map.clear();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (!UseOpenGL)
 #endif
 		{
 			FreeSurface(&g->SurfaceFlip);
-			delete[] g->frameFlip_map;
-			g->frameFlip_map = nullptr;
+			g->frameFlip_map.clear();
 			
 			//Wyrmgus start
 			if (g->DawnSurface) {
@@ -1815,9 +1811,7 @@ void CGraphic::Flip()
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
 
-	delete[] frameFlip_map;
-
-	frameFlip_map = new frame_pos_t[NumFrames];
+	frameFlip_map.resize(NumFrames);
 
 	for (int frame = 0; frame < NumFrames; ++frame) {
 		frameFlip_map[frame].x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
@@ -2408,8 +2402,7 @@ void CGraphic::SetOriginalSize()
 		FreeSurface(&Surface);
 		Surface = nullptr;
 	}
-	delete[] frame_map;
-	frame_map = nullptr;
+	this->frame_map.clear();
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
 #endif
@@ -2418,8 +2411,7 @@ void CGraphic::SetOriginalSize()
 			FreeSurface(&SurfaceFlip);
 			SurfaceFlip = nullptr;
 		}
-		delete[] frameFlip_map;
-		frameFlip_map = nullptr;
+		this->frameFlip_map.clear();
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

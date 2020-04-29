@@ -179,8 +179,8 @@ public:
 	SDL_Surface *NightSurface = nullptr;      /// Surface
 	SDL_Surface *NightSurfaceFlip = nullptr;  /// Flipped surface
 	//Wyrmgus end
-	frame_pos_t *frame_map = nullptr;
-	frame_pos_t *frameFlip_map = nullptr;
+	std::vector<frame_pos_t> frame_map;
+	std::vector<frame_pos_t> frameFlip_map;
 	void GenFramesMap();
 	int Width = 0;					/// Width of a frame
 	int Height = 0;					/// Height of a frame
