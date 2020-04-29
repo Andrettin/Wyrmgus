@@ -97,6 +97,12 @@ int LoadGraphicPNG(CGraphic *g)
 	if (name.empty()) {
 		return -1;
 	}
+
+	g->image = QImage(name.c_str());
+	if (g->image.isNull()) {
+		throw std::runtime_error("Failed to load the \"" + name + "\" image file.");
+	}
+
 	CFile fp;
 
 	if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {

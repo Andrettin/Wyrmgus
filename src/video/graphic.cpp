@@ -51,6 +51,7 @@
 //Wyrmgus start
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
+#include "util/image_util.h"
 #include "video.h"
 #include "xbrz.h"
 
@@ -2246,50 +2247,15 @@ void CGraphic::Resize(int w, int h)
 		}
 
 		//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
-		const size_t scale_factor = w / old_size.width();
+		const int scale_factor = w / old_size.width();
 		SDL_LockSurface(Surface);
-		unsigned char *pixels = static_cast<unsigned char *>(Surface->pixels);
-		unsigned char *data = new unsigned char[w * h * bpp];
-		const int horizontal_frame_count = old_size.width() / old_frame_size.width();
-		const int vertical_frame_count = old_size.height() / old_frame_size.height();
+		this->image = stratagus::image::scale(this->image, scale_factor, old_frame_size);
+		const unsigned char *image_data = this->image.constBits();
+		const int byte_count = this->image.sizeInBytes();
 
-		//scale each frame individually
-		for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
-			for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
-				unsigned char *frame_pixels = new unsigned char[old_frame_size.width() * old_frame_size.height() * bpp];
-				for (int x = 0; x < old_frame_size.width(); ++x) {
-					for (int y = 0; y < old_frame_size.height(); ++y) {
-						const int frame_pixel_index = y * old_frame_size.width() + x;
-						const int pixel_x = frame_x * old_frame_size.width() + x;
-						const int pixel_y = frame_y * old_frame_size.height() + y;
-						const int pixel_index = pixel_y * old_size.width() + pixel_x;
-						frame_pixels[frame_pixel_index * bpp + 0] = pixels[pixel_index * bpp + 0];
-						frame_pixels[frame_pixel_index * bpp + 1] = pixels[pixel_index * bpp + 1];
-						frame_pixels[frame_pixel_index * bpp + 2] = pixels[pixel_index * bpp + 2];
-						frame_pixels[frame_pixel_index * bpp + 3] = pixels[pixel_index * bpp + 3];
-					}
-				}
-
-				unsigned char *frame_data = new unsigned char[frame_size.width() * frame_size.height() * bpp];
-
-				xbrz::scale(scale_factor, reinterpret_cast<uint32_t *>(frame_pixels), reinterpret_cast<uint32_t *>(frame_data), old_frame_size.width(), old_frame_size.height());
-
-				for (int x = 0; x < frame_size.width(); ++x) {
-					for (int y = 0; y < frame_size.height(); ++y) {
-						const int frame_pixel_index = y * frame_size.width() + x;
-						const int pixel_x = frame_x * frame_size.width() + x;
-						const int pixel_y = frame_y * frame_size.height() + y;
-						const int pixel_index = pixel_y * w + pixel_x;
-						data[pixel_index * bpp + 0] = frame_data[frame_pixel_index * bpp + 0];
-						data[pixel_index * bpp + 1] = frame_data[frame_pixel_index * bpp + 1];
-						data[pixel_index * bpp + 2] = frame_data[frame_pixel_index * bpp + 2];
-						data[pixel_index * bpp + 3] = frame_data[frame_pixel_index * bpp + 3];
-					}
-				}
-
-				delete[] frame_pixels;
-				delete[] frame_data;
-			}
+		unsigned char *data = new unsigned char[byte_count];
+		for (int i = 0; i < byte_count; ++i) {
+			data[i] = image_data[i];
 		}
 
 		int Rmask = Surface->format->Rmask;
@@ -2426,7 +2392,7 @@ void CGraphic::SetOriginalSize()
 	this->Surface = nullptr;
 	this->Load();
 
-	Resized = false;
+	this->Resized = false;
 }
 
 //Wyrmgus start

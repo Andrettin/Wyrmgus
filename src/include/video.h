@@ -179,6 +179,10 @@ public:
 	SDL_Surface *NightSurface = nullptr;      /// Surface
 	SDL_Surface *NightSurfaceFlip = nullptr;  /// Flipped surface
 	//Wyrmgus end
+private:
+	QImage image;
+	QImage flipped_image;
+public:
 	std::vector<frame_pos_t> frame_map;
 	std::vector<frame_pos_t> frameFlip_map;
 	void GenFramesMap();
@@ -204,6 +208,7 @@ public:
 #endif
 
 	friend class CFont;
+	friend int LoadGraphicPNG(CGraphic *g);
 };
 
 class CPlayerColorGraphic : public CGraphic
