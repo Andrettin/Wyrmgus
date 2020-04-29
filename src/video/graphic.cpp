@@ -109,56 +109,6 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 //		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 		SDL_BlitSurface(surface ? surface : Surface, &srect, TheScreen, &drect);
 		//Wyrmgus end
-		//Wyrmgus start
-		//code for drawing a scaled image under xBRZ - use later for implementing zoom mode
-		/*
-		SDL_Rect srect = {Sint16(gx * 2), Sint16(gy * 2), Uint16(w * 2), Uint16(h * 2)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		SDL_LockSurface(Surface);
-		
-		SDL_Surface *neutral_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,1,1,32,0xFF0000,0xFF00,0xFF,0xFF000000);
-		SDL_PixelFormat format = *neutral_surface->format;
-		
-		int Rmask = format.Rmask;
-		int Gmask = format.Gmask;
-		int Bmask = format.Bmask;
-		int Amask = format.Amask;
-		int bpp = format.BitsPerPixel;
-		
-		SDL_Surface *src = SDL_ConvertSurface(Surface,&format,SDL_SWSURFACE);
-							 
-		SDL_Surface *dst = SDL_CreateRGBSurface(SDL_SWSURFACE, Width * 2, Height * 2,
-							 bpp, Rmask, Gmask, Bmask, Amask);
-		SDL_LockSurface(src);
-		SDL_LockSurface(dst);
-		const Uint32* old_pixels = reinterpret_cast<const Uint32*>(src->pixels);
-		Uint32* new_pixels = reinterpret_cast<Uint32*>(dst->pixels);
-		xbrz::scale(2, old_pixels, new_pixels, Width, Height);
-		SDL_SetAlpha(SDL_DisplayFormatAlpha(dst),SDL_SRCALPHA|SDL_RLEACCEL,SDL_ALPHA_OPAQUE);
-		SDL_UnlockSurface(Surface);
-		SDL_UnlockSurface(src);
-		SDL_UnlockSurface(dst);
-		SDL_BlitSurface(dst, &srect, TheScreen, &drect);
-
-		unsigned char *src_pixels = nullptr;
-
-		if (src->flags & SDL_PREALLOC) {
-			src_pixels = (unsigned char *)src->pixels;
-		}
-		SDL_FreeSurface(src);
-		delete[] src_pixels;
-		src = nullptr;
-
-		unsigned char *dst_pixels = nullptr;
-
-		if (dst->flags & SDL_PREALLOC) {
-			dst_pixels = (unsigned char *)dst->pixels;
-		}
-		SDL_FreeSurface(dst);
-		delete[] dst_pixels;
-		dst = nullptr;
-		*/
-		//Wyrmgus end
 	}
 }
 
@@ -2251,9 +2201,9 @@ void CGraphic::Resize(int w, int h)
 		return;
 	}
 
-	const QSize old_size = QSize(this->GraphicWidth, this->GraphicHeight);
-	const int frame_width = this->Width * w / old_size.width();
-	const int frame_height = this->Height * h / old_size.height();
+	const QSize old_size(this->GraphicWidth, this->GraphicHeight);
+	const QSize old_frame_size(this->Width, this->Height);
+	const QSize frame_size(this->Width * w / old_size.width(), this->Height * h / old_size.height());
 
 	// Resizing the same image multiple times looks horrible
 	// If the image has already been resized then get a clean copy first
@@ -2302,7 +2252,47 @@ void CGraphic::Resize(int w, int h)
 		SDL_LockSurface(Surface);
 		unsigned char *pixels = static_cast<unsigned char *>(Surface->pixels);
 		unsigned char *data = new unsigned char[w * h * bpp];
-		xbrz::scale(scale_factor, reinterpret_cast<uint32_t *>(pixels), reinterpret_cast<uint32_t *>(data), old_size.width(), old_size.height());
+		const int horizontal_frame_count = old_size.width() / old_frame_size.width();
+		const int vertical_frame_count = old_size.height() / old_frame_size.height();
+
+		//scale each frame individually
+		for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
+			for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
+				unsigned char *frame_pixels = new unsigned char[old_frame_size.width() * old_frame_size.height() * bpp];
+				for (int x = 0; x < old_frame_size.width(); ++x) {
+					for (int y = 0; y < old_frame_size.height(); ++y) {
+						const int frame_pixel_index = y * old_frame_size.width() + x;
+						const int pixel_x = frame_x * old_frame_size.width() + x;
+						const int pixel_y = frame_y * old_frame_size.height() + y;
+						const int pixel_index = pixel_y * old_size.width() + pixel_x;
+						frame_pixels[frame_pixel_index * bpp + 0] = pixels[pixel_index * bpp + 0];
+						frame_pixels[frame_pixel_index * bpp + 1] = pixels[pixel_index * bpp + 1];
+						frame_pixels[frame_pixel_index * bpp + 2] = pixels[pixel_index * bpp + 2];
+						frame_pixels[frame_pixel_index * bpp + 3] = pixels[pixel_index * bpp + 3];
+					}
+				}
+
+				unsigned char *frame_data = new unsigned char[frame_size.width() * frame_size.height() * bpp];
+
+				xbrz::scale(scale_factor, reinterpret_cast<uint32_t *>(frame_pixels), reinterpret_cast<uint32_t *>(frame_data), old_frame_size.width(), old_frame_size.height());
+
+				for (int x = 0; x < frame_size.width(); ++x) {
+					for (int y = 0; y < frame_size.height(); ++y) {
+						const int frame_pixel_index = y * frame_size.width() + x;
+						const int pixel_x = frame_x * frame_size.width() + x;
+						const int pixel_y = frame_y * frame_size.height() + y;
+						const int pixel_index = pixel_y * w + pixel_x;
+						data[pixel_index * bpp + 0] = frame_data[frame_pixel_index * bpp + 0];
+						data[pixel_index * bpp + 1] = frame_data[frame_pixel_index * bpp + 1];
+						data[pixel_index * bpp + 2] = frame_data[frame_pixel_index * bpp + 2];
+						data[pixel_index * bpp + 3] = frame_data[frame_pixel_index * bpp + 3];
+					}
+				}
+
+				delete[] frame_pixels;
+				delete[] frame_data;
+			}
+		}
 
 		int Rmask = Surface->format->Rmask;
 		int Gmask = Surface->format->Gmask;
@@ -2328,7 +2318,7 @@ void CGraphic::Resize(int w, int h)
 			fy -= iy;
 			for (int j = 0; j < w; ++j) {
 				if (this->is_tile()) {
-					if ((i % frame_height) == 0 || (i % frame_height) == (frame_height - 1) || (j % frame_width) == 0 || (j % frame_width) == (frame_width - 1)) {
+					if ((i % frame_size.height()) == 0 || (i % frame_size.height()) == (frame_size.height() - 1) || (j % frame_size.width()) == 0 || (j % frame_size.width()) == (frame_size.width() - 1)) {
 						//don't apply rescaling algorithm to frame border pixels for tiles, to prevent artifacts when tiling them
 						for (int k = 0; k < bpp; ++k) {
 							data[x * bpp + k] = pixels[(i * GraphicHeight / h) * Surface->pitch + (j * GraphicWidth / w) * bpp + k];
@@ -2393,8 +2383,8 @@ void CGraphic::Resize(int w, int h)
 	GraphicWidth = w;
 	GraphicHeight = h;
 
-	this->Width = frame_width;
-	this->Height = frame_height;
+	this->Width = frame_size.width();
+	this->Height = frame_size.height();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL && Textures) {
