@@ -72,10 +72,7 @@ class CGraphic : public gcn::Image
 	};
 
 protected:
-	CGraphic(const bool tile = false) : tile(tile)
-	{
-	}
-
+	CGraphic() {}
 	~CGraphic() {}
 
 public:
@@ -129,11 +126,11 @@ public:
 	//Wyrmgus end
 
 
-	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0, const bool tile = false);
+	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0);
 
-	static CGraphic *New(const std::string &file, const QSize &size, const bool tile = false)
+	static CGraphic *New(const std::string &file, const QSize &size)
 	{
-		return CGraphic::New(file, size.width(), size.height(), tile);
+		return CGraphic::New(file, size.width(), size.height());
 	}
 
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
@@ -170,11 +167,6 @@ public:
 		return this->original_frame_size;
 	}
 
-	bool is_tile() const
-	{
-		return this->tile;
-	}
-
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface = nullptr;      /// Surface
@@ -202,9 +194,6 @@ public:
 	//Wyrmgus start
 	bool Grayscale = false;
 	//Wyrmgus end
-private:
-	bool tile = false; //whether this is a tile graphic, i.e. whether its boundaries should be preserved for tiling when being rescaled
-
 public:
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat TextureWidth = 0.f;      /// Width of the texture
@@ -220,7 +209,7 @@ public:
 class CPlayerColorGraphic : public CGraphic
 {
 protected:
-	CPlayerColorGraphic(const bool tile = false) : CGraphic(tile)
+	CPlayerColorGraphic()
 	{
 		//Wyrmgus start
 		for (int i = 0; i < PlayerColorMax; ++i) {
@@ -260,11 +249,11 @@ public:
 	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 	//Wyrmgus end
 
-	static CPlayerColorGraphic *New(const std::string &file, const int w = 0, const int h = 0, const bool tile = false);
+	static CPlayerColorGraphic *New(const std::string &file, const int w = 0, const int h = 0);
 
-	static CPlayerColorGraphic *New(const std::string &file, const QSize &size, const bool tile = false)
+	static CPlayerColorGraphic *New(const std::string &file, const QSize &size)
 	{
-		return CPlayerColorGraphic::New(file, size.width(), size.height(), tile);
+		return CPlayerColorGraphic::New(file, size.width(), size.height());
 	}
 
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);

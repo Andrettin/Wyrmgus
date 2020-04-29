@@ -1043,16 +1043,16 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filename, const int w, const int h, const bool tile)
+CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 {
 	if (filename.empty()) {
-		return new CGraphic(tile);
+		return new CGraphic();
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
 	if (g == nullptr) {
-		g = new CGraphic(tile);
+		g = new CGraphic();
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -1080,16 +1080,16 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h, c
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, const int w, const int h, const bool tile)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, const int w, const int h)
 {
 	if (filename.empty()) {
-		return new CPlayerColorGraphic(tile);
+		return new CPlayerColorGraphic();
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == nullptr) {
-		g = new CPlayerColorGraphic(tile);
+		g = new CPlayerColorGraphic();
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -2321,16 +2321,6 @@ void CGraphic::Resize(int w, int h)
 			int iy = (int)fy;
 			fy -= iy;
 			for (int j = 0; j < w; ++j) {
-				if (this->is_tile()) {
-					if ((i % frame_size.height()) == 0 || (i % frame_size.height()) == (frame_size.height() - 1) || (j % frame_size.width()) == 0 || (j % frame_size.width()) == (frame_size.width() - 1)) {
-						//don't apply rescaling algorithm to frame border pixels for tiles, to prevent artifacts when tiling them
-						for (int k = 0; k < bpp; ++k) {
-							data[x * bpp + k] = pixels[(i * GraphicHeight / h) * Surface->pitch + (j * GraphicWidth / w) * bpp + k];
-						}
-						++x;
-						continue;
-					}
-				}
 				float fx = (float)j * GraphicWidth / w;
 				int ix = (int)fx;
 				fx -= ix;
