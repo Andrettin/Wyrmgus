@@ -139,21 +139,12 @@ public:
 	static void Free(CGraphic *g);
 
 	void Load(const bool grayscale = false, const int scale_factor = 1);
-	void Flip();
-	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
-	SDL_Surface *SetTimeOfDay(const stratagus::time_of_day *time_of_day, bool flipped = false);
-	bool TransparentPixel(int x, int y);
-	void MakeShadow();
 
-	inline bool IsLoaded() const { return Surface != nullptr; }
+	inline bool IsLoaded() const { return !this->get_image().isNull(); }
 
 	//guichan
-	//Wyrmgus start
-//	virtual void *_getData() const { return Surface; }
-	virtual void *_getData(int player_color = -1) { return Surface; }
-	//Wyrmgus end
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }
 	//Wyrmgus start
@@ -174,7 +165,6 @@ public:
 
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
-	SDL_Surface *Surface = nullptr;      /// Surface
 	SDL_Surface *SurfaceFlip = nullptr;  /// Flipped surface
 	//Wyrmgus start
 	SDL_Surface *DawnSurface = nullptr;      /// Surface
@@ -246,9 +236,6 @@ protected:
 
 public:
 	//Wyrmgus start
-	void MakePlayerColorSurface(int player_color, bool flipped = false, const stratagus::time_of_day *time_of_day = nullptr);
-	//Wyrmgus end
-	//Wyrmgus start
 	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y);
 //	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
@@ -271,19 +258,6 @@ public:
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
 	
-	//Wyrmgus start
-	virtual void *_getData(int player_color = -1) {
-		if (player_color == -1) {
-			return Surface;
-		}
-		
-		if (!PlayerColorSurfaces[player_color]) {
-			MakePlayerColorSurface(player_color, false, nullptr);
-		}
-		return PlayerColorSurfaces[player_color];
-	}
-	//Wyrmgus end
-
 	//Wyrmgus start
 	SDL_Surface *PlayerColorSurfaces[PlayerColorMax];			/// Surface
 	SDL_Surface *PlayerColorSurfacesFlip[PlayerColorMax];		/// Flipped surface
@@ -611,9 +585,6 @@ extern void RealizeVideoMemory();
 /// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);
 
-/// Save a screenshot to a PNG file
-extern void SaveMapPNG(const char *name);
-
 //Wyrmgus start
 /// Save a map template's terrain to a PNG file
 extern void save_map_template_png(const char *name, const stratagus::map_template *map_template, const bool overlay);
@@ -694,10 +665,6 @@ extern void VideoPaletteListRemove(SDL_Surface *surface);
 extern void ClearAllColorCyclingRange();
 extern void AddColorCyclingRange(unsigned int begin, unsigned int end);
 extern void SetColorCycleAll(bool value);
-extern void RestoreColorCyclingSurface();
-
-/// Does ColorCycling..
-extern void ColorCycle();
 
 //called by tolua++
 extern int get_scale_factor();

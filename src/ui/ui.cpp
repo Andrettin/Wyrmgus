@@ -282,47 +282,37 @@ void CUserInterface::Load()
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load(false, stratagus::defines::get()->get_scale_factor());
-			Resources[i].G->UseDisplayFormat();
 		}
 	}
 
 	if (InfoPanel.G) {
 		InfoPanel.G->Load(false, stratagus::defines::get()->get_scale_factor());
-		InfoPanel.G->UseDisplayFormat();
 	}
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load(false, stratagus::defines::get()->get_scale_factor());
-		ButtonPanel.G->UseDisplayFormat();
 	}
 	if (PieMenu.G) {
 		PieMenu.G->Load(false, stratagus::defines::get()->get_scale_factor());
-		PieMenu.G->UseDisplayFormat();
 	}
 
 	//Wyrmgus start
 	if (Preference.IconFrameG) {
 		Preference.IconFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
-		Preference.IconFrameG->UseDisplayFormat();
 	}
 	if (Preference.PressedIconFrameG) {
 		Preference.PressedIconFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
-		Preference.PressedIconFrameG->UseDisplayFormat();
 	}
 	if (Preference.CommandButtonFrameG) {
 		Preference.CommandButtonFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
-		Preference.CommandButtonFrameG->UseDisplayFormat();
 	}
 	if (Preference.BarFrameG) {
 		Preference.BarFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
-		Preference.BarFrameG->UseDisplayFormat();
 	}
 	if (Preference.InfoPanelFrameG) {
 		Preference.InfoPanelFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
-		Preference.InfoPanelFrameG->UseDisplayFormat();
 	}
 	if (Preference.ProgressBarG) {
 		Preference.ProgressBarG->Load(false, stratagus::defines::get()->get_scale_factor());
-		Preference.ProgressBarG->UseDisplayFormat();
 	}
 	//Wyrmgus end
 	

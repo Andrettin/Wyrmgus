@@ -177,8 +177,6 @@ set(guichan_SRCS
 #	src/guichan/opengl/openglimageloader.cpp
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
-	src/guichan/sdl/sdlgraphics.cpp
-	src/guichan/sdl/sdlimageloader.cpp
 	src/guichan/sdl/sdlinput.cpp
 	src/guichan/widget.cpp
 	src/guichan/widgets/button.cpp
@@ -538,8 +536,6 @@ set(stratagus_guichan_HDRS
 	src/guichan/include/guichan/mouselistener.h
 	src/guichan/include/guichan/platform.h
 	src/guichan/include/guichan/rectangle.h
-	src/guichan/include/guichan/sdl/sdlgraphics.h
-	src/guichan/include/guichan/sdl/sdlimageloader.h
 	src/guichan/include/guichan/sdl/sdlinput.h
 	src/guichan/include/guichan/sdl/sdlpixel.h
 	src/guichan/include/guichan/widget.h

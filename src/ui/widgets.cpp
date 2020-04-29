@@ -122,21 +122,7 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 */
 void initGuichan()
 {
-	gcn::Graphics *graphics;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		graphics = new MyOpenGLGraphics();
-	} else
-#endif
-	{
-		graphics = new gcn::SDLGraphics();
-
-		// Set the target for the graphics object to be the screen.
-		// In other words, we will draw to the screen.
-		// Note, any surface will do, it doesn't have to be the screen.
-		((gcn::SDLGraphics *)graphics)->setTarget(TheScreen);
-	}
+	gcn::Graphics *graphics = new MyOpenGLGraphics();
 
 	Input = new gcn::SDLInput();
 
@@ -449,18 +435,6 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	}
 	
 	//Wyrmgus start
-	if (img) {
-		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-			} else
-		#endif
-			{
-				WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CGraphic *)img));
-			}
-		}
-	}
-
 //	graphics->drawImage(img, 0, 0, 0, 0,
 //						img->getWidth(), img->getHeight());
 
@@ -600,17 +574,6 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		}
 		//Wyrmgus end
 	}
-	
-	//Wyrmgus start
-	//restore old alpha
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-	} else
-#endif
-	{
-		WidgetGraphicTransparency(255, *((CGraphic *)img));
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -841,22 +804,6 @@ void PlayerColorImageButton::setPosition(int x, int y)
 		mDimension.x = x;
 		mDimension.y = y;
 	}
-}
-
-/**
-**  Set transparency.
-**
-**  FIXME: use function pointer here.
-**
-**  @param player  Pointer to player.
-**  @param sprite  The sprite in which the colors should be changed.
-*/
-void WidgetGraphicTransparency(int alpha, const CGraphic &sprite)
-{
-	SDL_LockSurface(sprite.Surface);
-//	int oldalpha = Surface->format->alpha;
-	SDL_SetAlpha(sprite.Surface, SDL_SRCALPHA, alpha);
-	SDL_UnlockSurface(sprite.Surface);
 }
 //Wyrmgus end
 

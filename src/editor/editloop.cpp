@@ -1468,8 +1468,6 @@ static void ShowUnitInfo(const CUnit &unit)
 */
 void EditorUpdateDisplay()
 {
-	ColorCycle();
-
 	DrawMapArea(); // draw the map area
 
 	DrawStartLocations();

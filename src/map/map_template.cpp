@@ -420,15 +420,11 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
 	}
 	
-	CGraphic *terrain_image = CGraphic::New(terrain_filename);
-	terrain_image->Load();
+	const QImage terrain_image(terrain_filename.c_str());
 	
-	SDL_LockSurface(terrain_image->Surface);
-	const SDL_PixelFormat *f = terrain_image->Surface->format;
-	const int bpp = terrain_image->Surface->format->BytesPerPixel;
-	Uint8 r, g, b;
+	const int bpp = terrain_image.depth() / 8;
 
-	for (int y = 0; y < terrain_image->Height; ++y) {
+	for (int y = 0; y < terrain_image.height(); ++y) {
 		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
 			continue;
 		}
@@ -437,7 +433,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			break;
 		}
 
-		for (int x = 0; x < terrain_image->Width; ++x) {
+		for (int x = 0; x < terrain_image.width(); ++x) {
 			if (x < template_start_pos.x || x >= (template_start_pos.x + CMap::Map.Info.MapWidths[z])) {
 				continue;
 			}
@@ -446,22 +442,19 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 				break;
 			}
 
-			Uint32 c = *reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(terrain_image->Surface->pixels)[x * 4 + y * terrain_image->Surface->pitch]);
-			Uint8 a;
-
-			Video.GetRGBA(c, terrain_image->Surface->format, &r, &g, &b, &a);
+			const QColor color = terrain_image.pixelColor(x, y);
 			
-			if (a == 0) { //transparent pixels means leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
+			if (color.alpha() == 0) { //transparent pixels means leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
 				continue;
 			}
 
 			terrain_type *terrain = nullptr;
 			short terrain_feature_id = -1;
-			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainFeatureColorToIndex.end()) {
-				terrain_feature_id = TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
+			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue())) != TerrainFeatureColorToIndex.end()) {
+				terrain_feature_id = TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))->second;
 				terrain = TerrainFeatures[terrain_feature_id]->TerrainType;
-			} else if (terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(r, g, b)) != terrain_type::TerrainTypesByColor.end()) {
-				terrain = terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(r, g, b))->second;
+			} else if (terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue())) != terrain_type::TerrainTypesByColor.end()) {
+				terrain = terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))->second;
 			}
 			Vec2i real_pos(map_start_pos.x + (x - template_start_pos.x), map_start_pos.y + (y - template_start_pos.y));
 
@@ -476,17 +469,14 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 					CMap::Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
 				}
 			} else {
-				if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
-					fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, r, g, b);
+				if (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+					fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, color.red(), color.green(), color.blue());
 				} else if (overlay && CMap::Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
 					CMap::Map.Field(real_pos, z)->RemoveOverlayTerrain();
 				}
 			}
 		}
 	}
-	SDL_UnlockSurface(terrain_image->Surface);
-	
-	CGraphic::Free(terrain_image);
 }
 
 void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)

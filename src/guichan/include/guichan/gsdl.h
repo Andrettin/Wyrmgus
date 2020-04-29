@@ -54,10 +54,6 @@
 
 #pragma once
 
-#include <guichan/sdl/sdlgraphics.h>
-#ifdef USE_SDL_IMAGE
-#include <guichan/sdl/sdlimageloader.h>
-#endif
 #include <guichan/sdl/sdlinput.h>
 
 #include "platform.h"

@@ -60,7 +60,13 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	const QSize new_frame_size = old_frame_size * scale_factor;
 
 	const int bpp = src_image.depth() / 8;
-	QImage result_image(src_image.size() * scale_factor, QImage::Format_RGBA8888);
+	const QSize result_size = src_image.size() * scale_factor;
+	QImage result_image(result_size, QImage::Format_RGBA8888);
+
+	if (result_image.isNull()) {
+		throw std::runtime_error("Failed to allocate image to be scaled.");
+	}
+
 	unsigned char *dst_data = result_image.bits();
 
 	//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling

@@ -95,7 +95,6 @@ void CConstruction::Load()
 		UpdateLoadProgress();
 		this->Sprite = CPlayerColorGraphic::New(file, this->Width, this->Height);
 		this->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
-		this->Sprite->Flip();
 		IncItemsLoaded();
 	}
 	file = this->ShadowFile.File;
@@ -105,8 +104,6 @@ void CConstruction::Load()
 		UpdateLoadProgress();
 		this->ShadowSprite = CGraphic::ForceNew(file, this->ShadowWidth, this->ShadowHeight);
 		this->ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
-		this->ShadowSprite->Flip();
-		this->ShadowSprite->MakeShadow();
 		IncItemsLoaded();
 	}
 }

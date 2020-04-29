@@ -140,17 +140,8 @@ static void VideoDrawChar(const CGraphic &g,
 						  int gx, int gy, int w, int h, int x, int y, const CFontColor &fc)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		g.DrawSub(gx, gy, w, h, x, y);
-	} else
+	g.DrawSub(gx, gy, w, h, x, y);
 #endif
-	{
-		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
-		SDL_SetColors(g.Surface, &sdlColors[0], 0, MaxFontColors);
-		SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
-	}
 }
 
 /**
@@ -757,38 +748,39 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 */
 void CFont::MeasureWidths()
 {
-	const int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
+	const QImage image(G->File.c_str());
+	const QSize &frame_size = G->get_original_frame_size();
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
+	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
 	delete[] CharWidth;
 	CharWidth = new char[maxy];
 	memset(CharWidth, 0, maxy);
-	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
-	const Uint32 ckey = G->Surface->format->colorkey;
-	const int ipr = G->Surface->w / G->Width; // images per row
+	CharWidth[0] = frame_size.width() / 2 * scale_factor;  // a reasonable value for SPACE
+	const int ipr = image.width() / frame_size.width(); // images per row
 
-	SDL_LockSurface(G->Surface);
 	for (int y = 1; y < maxy; ++y) {
-		const unsigned char *sp = (const unsigned char *)G->Surface->pixels +
-								  (y / ipr) * G->Surface->pitch * G->Height +
-								  (y % ipr) * G->Width - 1;
-		const unsigned char *gp = sp + G->Surface->pitch * G->Height;
+		const unsigned char *sp = (const unsigned char *)image.constBits() +
+								  (y / ipr) * image.bytesPerLine() * frame_size.height() +
+								  (y % ipr) * frame_size.width() - 1;
+		const unsigned char *gp = sp + image.bytesPerLine() * frame_size.height();
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char *)G->Surface->pixels +
-				   G->Surface->pitch * G->GraphicHeight)) {
+		if (gp >= ((const unsigned char *) image.constBits() +
+			image.bytesPerLine() * image.height())) {
 			break;
 		}
 		while (sp < gp) {
-			const unsigned char *lp = sp + G->Width;
+			const unsigned char *lp = sp + frame_size.width();
 
 			for (; sp < lp; --lp) {
-				if (*lp != ckey && *lp != 7) {
-					CharWidth[y] = std::max<char>(CharWidth[y], lp - sp);
+				if (*lp != 0 && *lp != 7) {
+					CharWidth[y] = std::max<char>(CharWidth[y], (lp - sp) * scale_factor);
 				}
 			}
-			sp += G->Surface->pitch;
+			sp += image.bytesPerLine();
 		}
 	}
-	SDL_UnlockSurface(G->Surface);
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -802,7 +794,6 @@ void CFont::MakeFontColorTextures() const
 		return;
 	}
 	const CGraphic &g = *this->G;
-	SDL_Surface *s = g.Surface;
 
 	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
 		CFontColor *fc = it->second;
@@ -813,15 +804,11 @@ void CFont::MakeFontColorTextures() const
 		newg->NumFrames = g.NumFrames;
 		newg->GraphicWidth = g.GraphicWidth;
 		newg->GraphicHeight = g.GraphicHeight;
-		newg->Surface = g.Surface;
 		newg->image = QImage(g.File.c_str());
 
-		SDL_LockSurface(s);
-		for (int j = 0; j < MaxFontColors; ++j) {
-			s->format->palette->colors[j] = fc->Colors[j];
+		for (int j = 0; j < newg->image.colorCount(); ++j) {
 			newg->image.setColor(j, qRgba(fc->Colors[j].R, fc->Colors[j].G, fc->Colors[j].B, j == 0 ? 0 : 255));
 		}
-		SDL_UnlockSurface(s);
 
 		newg->image = newg->image.convertToFormat(QImage::Format_RGBA8888);
 

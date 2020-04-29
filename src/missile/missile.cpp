@@ -255,9 +255,6 @@ void MissileType::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
 		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
-		if (this->Flip) {
-			this->G->Flip();
-		}
 
 		// Correct the number of frames in graphic
 		Assert(this->G->NumFrames >= this->SpriteFrames);

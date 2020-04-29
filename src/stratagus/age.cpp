@@ -140,7 +140,6 @@ void age::initialize()
 {
 	if (this->graphics != nullptr) {
 		this->graphics->Load(false, defines::get()->get_scale_factor());
-		this->graphics->UseDisplayFormat();
 	}
 
 	data_entry::initialize();

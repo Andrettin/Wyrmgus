@@ -457,46 +457,6 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 	}
 }
 
-/**
-**  Color cycle.
-*/
-// FIXME: cpu intensive to go through the whole PaletteList
-void ColorCycle()
-{
-	/// MACRO defines speed of colorcycling FIXME: should be made configurable
-#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND / 4)
-	if ((FrameCounter % COLOR_CYCLE_SPEED) != 0) {
-		return;
-	}
-	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	if (colorCycling.ColorCycleAll) {
-		++colorCycling.cycleCount;
-		for (std::vector<SDL_Surface *>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
-			SDL_Surface *surface = (*it);
-
-			ColorCycleSurface(*surface);
-		}
-	} else if (CMap::Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-		++colorCycling.cycleCount;
-		ColorCycleSurface(*CMap::Map.TileGraphic->Surface);
-	}
-}
-
-void RestoreColorCyclingSurface()
-{
-	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	if (colorCycling.ColorCycleAll) {
-		for (std::vector<SDL_Surface *>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
-			SDL_Surface *surface = (*it);
-
-			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
-		}
-	} else if (CMap::Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-		ColorCycleSurface_Reverse(*CMap::Map.TileGraphic->Surface, colorCycling.cycleCount);
-	}
-	colorCycling.cycleCount = 0;
-}
-
 #endif
 
 int get_scale_factor()

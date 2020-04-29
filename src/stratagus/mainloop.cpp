@@ -478,8 +478,6 @@ static void DisplayLoop()
 	//
 	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
 
-	ColorCycle();
-
 #ifdef REALVIDEO
 	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {
 		RealVideoSyncSpeed = VideoSyncSpeed;

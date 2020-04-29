@@ -66,9 +66,6 @@ namespace gcn
      * The function is static. If this is not done, the constructor taking a
      * filename will throw an exception. The ImageLoader you use must be
      * compatible with the Graphics object you use.
-     *
-     * EXAMPLE: If you use SDLGraphics you should use SDLImageLoader.
-     *          Otherwise your program will crash in a most bizarre way.
      */
     class GCN_CORE_DECLSPEC Image
     {
@@ -112,23 +109,10 @@ namespace gcn
         virtual int getHeight() const;
 
         /**
-         * Gets the data of the Image. Image data can be different things
-         * depending on what ImageLoader you use. If you for instance use the
-         * SDLImageLoader then an SDL_Surface will be returned.
-         *
-         * @return a void pointer to the Image data.
-         * @see SDLImageLoader, AllegroImageLoader
-         */
-		//Wyrmgus start
-//        virtual void* _getData() const;
-        virtual void* _getData(int player_color = -1);
-		//Wyrmgus end
-
-        /**
          * Gets the ImageLoader used for loading Images.
          *
          * @return the ImageLoader used for loading Images.
-         * @see SDLImageLoader, AllegroImageLoader
+         * @see AllegroImageLoader
          */
         static ImageLoader* _getImageLoader();
 
@@ -139,7 +123,7 @@ namespace gcn
          *            images!
          *
          * @param imageLoader the ImageLoader to be used for loading images.
-         * @see SDLImageLoader, AllegroImageLoader
+         * @see AllegroImageLoader
          */
         static void setImageLoader(ImageLoader* imageLoader);
 

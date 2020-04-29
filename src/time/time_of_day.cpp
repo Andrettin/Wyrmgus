@@ -85,7 +85,6 @@ void time_of_day::initialize()
 {
 	if (this->G != nullptr) {
 		this->G->Load(false, defines::get()->get_scale_factor());
-		this->G->UseDisplayFormat();
 	}
 
 	data_entry::initialize();

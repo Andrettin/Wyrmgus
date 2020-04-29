@@ -1949,7 +1949,6 @@ void CleanGame()
 	EndReplayLog();
 	CleanMessages();
 
-	RestoreColorCyclingSurface();
 	CleanGame_Lua();
 	stratagus::trigger::ClearActiveTriggers();
 	CleanAi();

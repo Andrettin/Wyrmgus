@@ -545,11 +545,3 @@ private:
 	bool drawUnder;
 	bool running;
 };
-
-//Wyrmgus start
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern void WidgetGraphicTransparency(int alpha, const CGraphic &sprite);
-//Wyrmgus end

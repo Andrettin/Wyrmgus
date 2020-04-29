@@ -109,7 +109,7 @@ namespace gcn
          * Sets the Graphics object to use for drawing.
          *
          * @param graphics the Graphics object to use for drawing.
-         * @see SDLGraphics, OpenGLGraphics, AllegroGraphics
+         * @see OpenGLGraphics, AllegroGraphics
          */
         virtual void setGraphics(Graphics* graphics);
 

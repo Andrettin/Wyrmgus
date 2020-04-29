@@ -88,7 +88,7 @@ namespace gcn
      * If you implement a Graphics class not present in Guichan we would be very
      * happy to add it to Guichan.
      *
-     * @see AllegroGraphics, OpenGLGraphics, SDLGraphics, Image
+     * @see AllegroGraphics, OpenGLGraphics, Image
      */
     class GCN_CORE_DECLSPEC Graphics
     {

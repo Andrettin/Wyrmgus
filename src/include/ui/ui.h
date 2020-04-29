@@ -218,41 +218,10 @@ public:
 
 class CFiller
 {
-	struct bits_map {
-		~bits_map();
-
-		void Init(CGraphic *g);
-
-		bool TransparentPixel(int x, int y)
-		{
-			if (bstore) {
-				const unsigned int x_index = x / 32;
-				y *= Width;
-				y /= 32;
-				x -= (x_index * 32);
-				return ((bstore[y + x_index] & (1 << x)) == 0);
-			}
-			return false;
-		};
-
-		int Width = 0;
-		int Height = 0;
-		unsigned int *bstore = nullptr;
-	};
-
-	bits_map map;
 public:
 	void Load();
+	bool OnGraphic(int x, int y) const;
 
-	bool OnGraphic(int x, int y)
-	{
-		x -= X;
-		y -= Y;
-		if (x >= 0 && y >= 0 && x < map.Width && y < map.Height) {
-			return !map.TransparentPixel(x, y);
-		}
-		return false;
-	}
 	CGraphic *G = nullptr;         /// Graphic
 	int X = 0;               /// X coordinate
 	int Y = 0;               /// Y coordinate

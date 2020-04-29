@@ -109,14 +109,6 @@ namespace gcn
         return mHeight;
     }
 
-	//Wyrmgus start
-//    void* Image::_getData() const
-    void* Image::_getData(int player_color)
-	//Wyrmgus end
-    {
-        return mData;
-    }
-
     void Image::setImageLoader(ImageLoader* imageLoader)
     {
         mImageLoader = imageLoader;

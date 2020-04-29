@@ -134,7 +134,6 @@ void LoadCursors(const std::string civilization_name)
 		if (cursor.G && !cursor.G->IsLoaded()) {
 			UpdateLoadProgress();
 			cursor.G->Load(false, stratagus::defines::get()->get_scale_factor());
-			cursor.G->UseDisplayFormat();
 
 			IncItemsLoaded();
 		}
