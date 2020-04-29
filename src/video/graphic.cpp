@@ -1298,7 +1298,7 @@ static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 }
 
 //Wyrmgus start
-static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
+static void ApplySepiaScale(SDL_Surface *Surface)
 {
 	SDL_LockSurface(Surface);
 	const SDL_PixelFormat *f = Surface->format;
@@ -1322,9 +1322,9 @@ static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
 		}
 		case 4: {
 			Uint32 *p;
-			for (int i = 0; i < Height; ++i) {
-				for (int j = 0; j < Width; ++j) {
-					p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
+			for (int i = 0; i < Surface->h; ++i) {
+				for (int j = 0; j < Surface->w; ++j) {
+					p = (Uint32 *)(Surface->pixels) + (i * Surface->w + j) * bpp;
 					
 					int input_red = (*p);
 					int input_green = *(p + 1);
@@ -1452,7 +1452,7 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 		this->Grayscale = true;
 //		ApplyGrayScale(Surface, Width, Height);
 		if (Preference.SepiaForGrayscale) {
-			ApplySepiaScale(Surface, Width, Height);
+			ApplySepiaScale(Surface);
 		} else {
 			ApplyGrayScale(Surface, Width, Height);
 		}
@@ -2246,7 +2246,11 @@ void CGraphic::Resize(int w, int h)
 			VideoPaletteListAdd(Surface);
 		}
 		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
-	} else if (w > old_size.width() && (w % old_size.width()) == 0 && (h % old_size.height()) == 0 && h > old_size.height() && (w / old_size.width()) == (h / old_size.height()) && bpp == 4) {
+	} else if (w > old_size.width() && (w % old_size.width()) == 0 && (h % old_size.height()) == 0 && h > old_size.height() && (w / old_size.width()) == (h / old_size.height())) {
+		if (bpp != 4) {
+			throw std::runtime_error("Image \"" + this->getFile() + "\" cannot be scaled with xBRZ, as its bytes-per-pixel are not 4.");
+		}
+
 		//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
 		const size_t scale_factor = w / old_size.width();
 		SDL_LockSurface(Surface);
