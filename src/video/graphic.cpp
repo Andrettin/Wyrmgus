@@ -837,7 +837,8 @@ static void ApplyGrayScale(QImage &image, int Width, int Height)
 			}
 			break;
 		}
-		case 4: {
+		case 3:
+		case 4:
 			unsigned char *image_data = image.bits();
 			for (int x = 0; x < image.width(); ++x) {
 				for (int y = 0; y < image.height(); ++y) {
@@ -853,7 +854,6 @@ static void ApplyGrayScale(QImage &image, int Width, int Height)
 				}
 			}
 			break;
-		}
 	}
 }
 
@@ -880,7 +880,8 @@ static void ApplySepiaScale(QImage &image)
 			}
 			break;
 		}
-		case 4: {
+		case 3:
+		case 4:
 			unsigned char *image_data = image.bits();
 			for (int x = 0; x < image.width(); ++x) {
 				for (int y = 0; y < image.height(); ++y) {
@@ -899,7 +900,6 @@ static void ApplySepiaScale(QImage &image)
 				}
 			}
 			break;
-		}
 	}
 }
 
