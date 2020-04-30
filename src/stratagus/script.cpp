@@ -1489,14 +1489,14 @@ std::string EvalString(const StringDesc *s)
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
 					str = GetItemClassNameById((**type).ItemClass).c_str();
+					str[0] = toupper(str[0]);
+					size_t loc;
+					while ((loc = str.find("-")) != std::string::npos) {
+						str.replace(loc, 1, " ");
+						str[loc + 1] = toupper(str[loc + 1]);
+					}
 				} else if ((**type).get_unit_class() != nullptr) {
-					str = (**type).get_unit_class()->get_identifier().c_str();
-				}
-				str[0] = toupper(str[0]);
-				size_t loc;
-				while ((loc = str.find("-")) != std::string::npos) {
-					str.replace(loc, 1, " ");
-					str[loc + 1] = toupper(str[loc + 1]);
+					str = (**type).get_unit_class()->get_name().c_str();
 				}
 				return _(str.c_str());
 			} else { // ERROR.
