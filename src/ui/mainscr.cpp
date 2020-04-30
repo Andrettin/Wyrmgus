@@ -91,10 +91,7 @@ static void DrawMenuButtonArea_noNetwork()
 		DrawUIButton(UI.MenuButton.Style,
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
-					 //Wyrmgus start
-//					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 					 (UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
-					 //Wyrmgus end
 					 UI.MenuButton.X, UI.MenuButton.Y,
 					 UI.MenuButton.Text);
 	}
@@ -102,17 +99,6 @@ static void DrawMenuButtonArea_noNetwork()
 
 static void DrawMenuButtonArea_Network()
 {
-	//Wyrmgus start
-	/*
-	if (UI.NetworkMenuButton.X != -1) {
-		DrawUIButton(UI.NetworkMenuButton.Style,
-					 (ButtonAreaUnderCursor == ButtonAreaMenu
-					  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
-					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-					 UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
-					 UI.NetworkMenuButton.Text);
-	}
-	*/
 	if (UI.MenuButton.X != -1) {
 		DrawUIButton(UI.MenuButton.Style,
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
@@ -121,15 +107,11 @@ static void DrawMenuButtonArea_Network()
 					 UI.MenuButton.X, UI.MenuButton.Y,
 					 UI.MenuButton.Text);
 	}
-	//Wyrmgus end
 	if (UI.NetworkDiplomacyButton.X != -1) {
 		DrawUIButton(UI.NetworkDiplomacyButton.Style,
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
-					//Wyrmgus start
-//					 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
 					 (UI.NetworkDiplomacyButton.Clicked ? MI_FLAGS_CLICKED : 0),
-					//Wyrmgus end
 					 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
 					 UI.NetworkDiplomacyButton.Text);
 	}
@@ -529,10 +511,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			flags |= IconCommandButton;
 			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
-			//Wyrmgus start
-//			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer());
-			//Wyrmgus end
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.get_player_color());
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
@@ -566,9 +545,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
-//					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer());
-					//Wyrmgus end
+					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.get_player_color());
 					train_counter.push_back(1);
 					++j;
 				}
@@ -624,10 +601,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		}
 		 //Wyrmgus end
 
-		//Wyrmgus start
-//		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer());
-		//Wyrmgus end
+		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.get_player_color());
 	}
 }
 
@@ -659,11 +633,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
-				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
-				//Wyrmgus end
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.get_player_color());
 			}
 			return true;
 		}
@@ -682,11 +653,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
-				//Wyrmgus start
 				flag |= IconCommandButton;
-//				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
-				//Wyrmgus end
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.get_player_color());
 			}
 			return true;
 		}
@@ -718,10 +686,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		//Wyrmgus start
-//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer());
-		//Wyrmgus end
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->get_player_color());
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
@@ -767,7 +732,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index);
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.get_player_color());
 		++j;
 	}
 }
@@ -1078,7 +1043,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index);
+				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->get_player_color());
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					if (!Preference.NoStatusLineTooltips) {
@@ -1909,14 +1874,9 @@ static void InfoPanel_draw_no_selection()
 				//Wyrmgus end
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
-				Video.FillRectangleClip(CPlayer::Players[i]->Color, x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
+				Video.FillRectangleClip(Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
 
-				//Wyrmgus start
-//				label.Draw(x + 27, y, CPlayer::Players[i]->Name);
 				label.Draw(x + 15 * scale_factor, y, _(CPlayer::Players[i]->Name.c_str()));
-				//the score was appearing on top of the faction name
-//				label.Draw(x + 117, y, CPlayer::Players[i]->Score);
-				//Wyrmgus end
 				y += 14 * scale_factor;
 				
 				//Wyrmgus start
@@ -2010,10 +1970,7 @@ static void InfoPanel_draw_multiple_selection()
 		//Wyrmgus end
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
-						  //Wyrmgus start
-//						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
-						  pos, "", Selected[i]->GetDisplayPlayer());
-						  //Wyrmgus end
+						  pos, "", Selected[i]->get_player_color());
 
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 

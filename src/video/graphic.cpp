@@ -43,6 +43,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "player.h"
+#include "player_color.h"
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
@@ -103,72 +104,29 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 #endif
 }
 
-//Wyrmgus start
-/**
-**  Video draw part of a player color graphic.
-**
-**  @param player  player number
-**  @param gx  X offset into object
-**  @param gy  Y offset into object
-**  @param w   width to display
-**  @param h   height to display
-**  @param x   X screen position
-**  @param y   Y screen position
-*/
-void CPlayerColorGraphic::DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y)
+void CPlayerColorGraphic::DrawPlayerColorSub(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!PlayerColorTextures[player]) {
-		MakePlayerColorTexture(this, player, nullptr);
+	if (this->get_textures(player_color) == nullptr) {
+		MakePlayerColorTexture(this, player_color, nullptr);
 	}
-	DrawTexture(this, PlayerColorTextures[player], gx, gy, gx + w, gy + h, x, y, 0);
-#endif
+	DrawTexture(this, this->get_textures(player_color), gx, gy, gx + w, gy + h, x, y, 0);
 }
-//Wyrmgus end
 
-/**
-**  Video draw part of graphic clipped.
-**
-**  @param gx  X offset into object
-**  @param gy  Y offset into object
-**  @param w   width to display
-**  @param h   height to display
-**  @param x   X screen position
-**  @param y   Y screen position
-*/
-//Wyrmgus start
-//void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface) const
-//Wyrmgus end
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	//Wyrmgus start
-//	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y, surface);
-	//Wyrmgus end
 }
 
-//Wyrmgus start
-/**
-**  Video draw part of graphic clipped.
-**
-**  @param gx  X offset into object
-**  @param gy  Y offset into object
-**  @param w   width to display
-**  @param h   height to display
-**  @param x   X screen position
-**  @param y   Y screen position
-*/
-void CPlayerColorGraphic::DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y)
+void CPlayerColorGraphic::DrawPlayerColorSubClip(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawPlayerColorSub(player, gx + x - oldx, gy + y - oldy, w, h, x, y);
+	DrawPlayerColorSub(player_color, gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
-//Wyrmgus end
 
 /**
 **  Video draw part of graphic with alpha.
@@ -320,129 +278,69 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const
 #endif
 }
 
-/**
-**  Draw graphic object clipped and with player colors.
-**
-**  @param player  player number
-**  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
-*/
-void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
-//Wyrmgus start
-//												   int x, int y)
-												   int x, int y, const stratagus::time_of_day *time_of_day, int show_percent)
-//Wyrmgus end
+void CPlayerColorGraphic::DrawPlayerColorFrameClip(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, int show_percent)
 {
-	//Wyrmgus start
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
-			player = i;
-			break;
-		}
-	}
-	
-	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	//Wyrmgus start
-	/*
-	if (!PlayerColorTextures[player]) {
-		MakePlayerColorTexture(this, player);
-	}
-	DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-	*/
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player, nullptr);
+		if (this->get_textures(player_color) == nullptr) {
+			MakePlayerColorTexture(this, player_color, nullptr);
 		}
-		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
+		DoDrawFrameClip(this->get_textures(player_color), frame, x, y, show_percent);
 	} else {
-		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
-			MakePlayerColorTexture(this, player, time_of_day);
+		if (PlayerColorTextureColorModifications.find(player_color) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player_color].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player_color].end()) {
+			MakePlayerColorTexture(this, player_color, time_of_day);
 		}
-		DoDrawFrameClip(PlayerColorTextureColorModifications[player][time_of_day->ColorModification], frame, x, y, show_percent);
+		DoDrawFrameClip(PlayerColorTextureColorModifications[player_color][time_of_day->ColorModification], frame, x, y, show_percent);
 	}
 	//Wyrmgus end
 #endif
 }
 
 //Wyrmgus start
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day, int show_percent)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day, int show_percent)
 {
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
-			player = i;
-			break;
-		}		
-	}
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player, nullptr);
+		if (this->get_textures(player_color) == nullptr) {
+			MakePlayerColorTexture(this, player_color, nullptr);
 		}
 	} else {
-		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
-			MakePlayerColorTexture(this, player, time_of_day);
+		if (PlayerColorTextureColorModifications.find(player_color) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player_color].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player_color].end()) {
+			MakePlayerColorTexture(this, player_color, time_of_day);
 		}
 	}
 	
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
-	//Wyrmgus start
-//	DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
+		DoDrawFrameClip(this->get_textures(player_color), frame, x, y, show_percent);
 	} else {
-		DoDrawFrameClip(PlayerColorTextureColorModifications[player][time_of_day->ColorModification], frame, x, y, show_percent);
+		DoDrawFrameClip(PlayerColorTextureColorModifications[player_color][time_of_day->ColorModification], frame, x, y, show_percent);
 	}
-	//Wyrmgus end
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 #endif
 }
 
-//Wyrmgus start
-//void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha)
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day)
-//Wyrmgus end
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day)
 {
-	//Wyrmgus start
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
-			player = i;
-			break;
-		}		
-	}
-	//Wyrmgus end
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	//Wyrmgus start
-	/*
-	if (!PlayerColorTextures[player]) {
-		MakePlayerColorTexture(this, player);
-	}
-	*/
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player, nullptr);
+		if (this->get_textures(player_color) == nullptr) {
+			MakePlayerColorTexture(this, player_color, nullptr);
 		}
 	} else {
-		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
-			MakePlayerColorTexture(this, player, time_of_day);
+		if (PlayerColorTextureColorModifications.find(player_color) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player_color].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player_color].end()) {
+			MakePlayerColorTexture(this, player_color, time_of_day);
 		}
 	}
-	//Wyrmgus end
 	
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
-	//Wyrmgus start
-//	DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+		DoDrawFrameClipX(this->get_textures(player_color), frame, x, y);
 	} else {
-		DoDrawFrameClipX(PlayerColorTextureColorModifications[player][time_of_day->ColorModification], frame, x, y);
+		DoDrawFrameClipX(PlayerColorTextureColorModifications[player_color][time_of_day->ColorModification], frame, x, y);
 	}
-	//Wyrmgus end
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-#endif
 }
 //Wyrmgus end
 
@@ -547,40 +445,20 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, cons
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
-//Wyrmgus start
-//												   int x, int y)
-												   int x, int y, const stratagus::time_of_day *time_of_day)
-//Wyrmgus end
+void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day)
 {
-	//Wyrmgus start
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
-			player = i;
-			break;
-		}		
-	}
-	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	//Wyrmgus start
-	/*
-	if (!PlayerColorTextures[player]) {
-		MakePlayerColorTexture(this, player);
-	}
-	DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-	*/
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		if (!PlayerColorTextures[player]) {
-			MakePlayerColorTexture(this, player, nullptr);
+		if (this->get_textures(player_color) == nullptr) {
+			MakePlayerColorTexture(this, player_color, nullptr);
 		}
-		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+		DoDrawFrameClipX(this->get_textures(player_color), frame, x, y);
 	} else {
-		if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
-			MakePlayerColorTexture(this, player, time_of_day);
+		if (PlayerColorTextureColorModifications.find(player_color) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player_color].find(time_of_day->ColorModification) == PlayerColorTextureColorModifications[player_color].end()) {
+			MakePlayerColorTexture(this, player_color, time_of_day);
 		}
-		DoDrawFrameClipX(PlayerColorTextureColorModifications[player][time_of_day->ColorModification], frame, x, y);
+		DoDrawFrameClipX(PlayerColorTextureColorModifications[player_color][time_of_day->ColorModification], frame, x, y);
 	}
-	//Wyrmgus end
 #endif
 }
 
@@ -710,6 +588,20 @@ CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 	}
 
 	return g;
+}
+
+const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *player_color) const
+{
+	if (!this->has_player_color() || player_color == stratagus::defines::get()->get_conversible_player_color()) {
+		return CGraphic::get_textures();
+	}
+
+	auto find_iterator = this->player_color_textures.find(player_color);
+	if (find_iterator != this->player_color_textures.end()) {
+		return find_iterator->second;
+	}
+
+	return nullptr;
 }
 
 /**
@@ -1077,17 +969,15 @@ void CGraphic::Free(CGraphic *g)
 
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
-				for (int i = 0; i < PlayerColorMax; ++i) {
-					if (cg->PlayerColorTextures[i]) {
-						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
-						delete[] cg->PlayerColorTextures[i];
-					}
+				for (const auto &kv_pair : cg->player_color_textures) {
+					glDeleteTextures(cg->NumTextures, kv_pair.second);
+					delete[] kv_pair.second;
 				}
 					
-				for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
-					for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
-						glDeleteTextures(cg->NumTextures, sub_iterator->second);
-						delete[] sub_iterator->second;
+				for (const auto &kv_pair : cg->PlayerColorTextureColorModifications) {
+					for (const auto &sub_kv_pair : kv_pair.second) {
+						glDeleteTextures(cg->NumTextures, sub_kv_pair.second);
+						delete[] sub_kv_pair.second;
 					}
 				}
 			}
@@ -1124,18 +1014,15 @@ void FreeOpenGLGraphics()
 		
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
-			for (int j = 0; j < PlayerColorMax; ++j) {
-				if (cg->PlayerColorTextures[j]) {
-					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[j]);
-				}
-				
+			for (const auto &kv_pair : cg->player_color_textures) {
+				glDeleteTextures(cg->NumTextures, kv_pair.second);
 			}
+			cg->player_color_textures.clear();
 			
-			for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
-				for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
-					glDeleteTextures(cg->NumTextures, sub_iterator->second);
+			for (const auto &kv_pair : cg->PlayerColorTextureColorModifications) {
+				for (const auto &sub_kv_pair : kv_pair.second) {
+					glDeleteTextures(cg->NumTextures, sub_kv_pair.second);
 				}
-				iterator->second.clear();
 			}
 			cg->PlayerColorTextureColorModifications.clear();
 		}
@@ -1164,20 +1051,20 @@ void ReloadGraphics()
 				
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
-			for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
-				for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
-					delete[] sub_iterator->second;
+			for (const auto &kv_pair : cg->PlayerColorTextureColorModifications) {
+				for (const auto &sub_kv_pair : kv_pair.second) {
+					delete[] sub_kv_pair.second;
 				}
-				iterator->second.clear();
 			}
 			cg->PlayerColorTextureColorModifications.clear();				
 			
-			for (int j = 0; j < PlayerColorMax; ++j) {
-				if (cg->PlayerColorTextures[j]) {
-					delete[] cg->PlayerColorTextures[j];
-					cg->PlayerColorTextures[j] = nullptr;
-					MakePlayerColorTexture(cg, j, nullptr);
-				}
+			for (const auto &kv_pair : cg->player_color_textures) {
+				delete[] kv_pair.second;
+			}
+			cg->player_color_textures.clear();
+
+			for (const stratagus::player_color *player_color : stratagus::player_color::get_all()) {
+				MakePlayerColorTexture(cg, player_color, nullptr);
 			}
 		}
 	}
@@ -1301,17 +1188,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	delete[] tex;
 }
 
-/**
-**  Make an OpenGL texture or textures out of a graphic object.
-**
-**  @param g       The graphic object.
-**  @param player  Player number.
-**  @param colors  Unit colors.
-*/
-//Wyrmgus start
-//static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
-static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const stratagus::time_of_day *time_of_day)
-//Wyrmgus end
+static void MakeTextures(CGraphic *g, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
 {
 	int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
 	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
@@ -1332,7 +1209,7 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 
 	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 	GLuint *textures;
-	if (!colors || !cg) {
+	if (!player_color || !cg) {
 		if (time_of_day && time_of_day->HasColorModification()) {
 			textures = g->TextureColorModifications[time_of_day->ColorModification] = new GLuint[g->NumTextures];
 			glGenTextures(g->NumTextures, g->TextureColorModifications[time_of_day->ColorModification]);
@@ -1341,11 +1218,11 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 			glGenTextures(g->NumTextures, g->textures);
 		}
 	} else if (time_of_day && time_of_day->HasColorModification()) {
-		textures = cg->PlayerColorTextureColorModifications[player][time_of_day->ColorModification] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->PlayerColorTextureColorModifications[player][time_of_day->ColorModification]);
+		textures = cg->PlayerColorTextureColorModifications[player_color][time_of_day->ColorModification] = new GLuint[cg->NumTextures];
+		glGenTextures(cg->NumTextures, cg->PlayerColorTextureColorModifications[player_color][time_of_day->ColorModification]);
 	} else {
-		textures = cg->PlayerColorTextures[player] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->PlayerColorTextures[player]);
+		textures = cg->player_color_textures[player_color] = new GLuint[cg->NumTextures];
+		glGenTextures(cg->NumTextures, cg->player_color_textures[player_color]);
 	}
 
 	QImage image = g->get_image();
@@ -1353,22 +1230,24 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 		image = image.convertToFormat(QImage::Format_RGBA8888);
 	}
 
-	if (!g->Grayscale && colors != nullptr && g->has_player_color()) {
+	if (!g->Grayscale && player_color != nullptr && g->has_player_color()) {
 		const int bpp = image.depth() / 8;
 		unsigned char *image_data = image.bits();
+		const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
+		const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
+		const std::vector<QColor> &colors = player_color->get_colors();
+
 		for (int i = 0; i < image.sizeInBytes(); i += bpp) {
 			unsigned char &red = image_data[i];
 			unsigned char &green = image_data[i + 1];
 			unsigned char &blue = image_data[i + 2];
 
-			const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
-			const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
 			for (size_t z = 0; z < conversible_colors.size(); ++z) {
 				const QColor &color = conversible_colors[z];
 				if (red == color.red() && green == color.green() && blue == color.blue()) {
-					red = colors->Colors[z].R;
-					green = colors->Colors[z].G;
-					blue = colors->Colors[z].B;
+					red = colors[z].red();
+					green = colors[z].green();
+					blue = colors[z].blue();
 				}
 			}
 		}
@@ -1421,46 +1300,22 @@ void MakeTexture(CGraphic *g, const stratagus::time_of_day *time_of_day)
 	}
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	MakeTextures(g, 0, nullptr);
-	MakeTextures(g, 0, nullptr, time_of_day);
-	//Wyrmgus end
+	MakeTextures(g, nullptr, time_of_day);
 }
 
-/**
-**  Make an OpenGL texture with the player colors.
-**
-**  @param g       The graphic to texture with player colors.
-**  @param player  Player number to make textures for.
-*/
-//Wyrmgus start
-//void MakePlayerColorTexture(CPlayerColorGraphic *g, int player)
-void MakePlayerColorTexture(CPlayerColorGraphic *g, int player, const stratagus::time_of_day *time_of_day)
-//Wyrmgus end
+void MakePlayerColorTexture(CPlayerColorGraphic *g, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
 {
-	//Wyrmgus start
-	/*
-	if (g->PlayerColorTextures[player]) {
-		return;
-	}
-	*/
 	if (time_of_day && time_of_day->HasColorModification()) {
-		if (g->PlayerColorTextureColorModifications.find(player) != g->PlayerColorTextureColorModifications.end() && g->PlayerColorTextureColorModifications[player].find(time_of_day->ColorModification) != g->PlayerColorTextureColorModifications[player].end()) {
+		if (g->PlayerColorTextureColorModifications.find(player_color) != g->PlayerColorTextureColorModifications.end() && g->PlayerColorTextureColorModifications[player_color].find(time_of_day->ColorModification) != g->PlayerColorTextureColorModifications[player_color].end()) {
 			return;
 		}
 	} else {
-		if (g->PlayerColorTextures[player]) {
+		if (g->get_textures(player_color) != nullptr) {
 			return;
 		}
 	}
-	//Wyrmgus end
 
-	//Wyrmgus start
-//	MakeTextures(g, player, &CPlayer::Players[player]->UnitColors);
-	CUnitColors texture_unit_colors;
-	texture_unit_colors.Colors = PlayerColorsRGB[player];
-	MakeTextures(g, player, &texture_unit_colors, time_of_day);
-	//Wyrmgus end
+	MakeTextures(g, player_color, time_of_day);
 }
 
 #endif

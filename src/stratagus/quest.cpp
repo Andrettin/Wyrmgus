@@ -40,6 +40,7 @@
 #include "map/site.h"
 #include "parameters.h"
 #include "player.h"
+#include "player_color.h"
 #include "script.h"
 #include "unit/unit_class.h"
 
@@ -199,12 +200,7 @@ void quest::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "player_color") {
-		const int color = GetPlayerColorIndexByName(value);
-		if (color != -1) {
-			this->PlayerColor = color;
-		} else {
-			throw std::runtime_error("Player color \"" + value + "\" doesn't exist.");
-		}
+		this->PlayerColor = player_color::get(value);
 	} else {
 		data_entry::process_sml_property(property);
 	}

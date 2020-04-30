@@ -407,7 +407,6 @@ void Exit(int err)
 	CleanModules();
 	FreeBurningBuildingFrames();
 	FreeGraphics();
-	FreePlayerColors();
 	FreeButtonStyles();
 	FreeAllContainers();
 	freeGuichan();

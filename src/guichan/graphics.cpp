@@ -118,15 +118,9 @@ namespace gcn
         return mClipStack.top();
     }
 
-	//Wyrmgus start
-//    void Graphics::drawImage(const Image* image, int dstX, int dstY)
-    void Graphics::drawImage(Image* image, int dstX, int dstY, int player, unsigned int transparency)
-	//Wyrmgus end
+    void Graphics::drawImage(Image* image, int dstX, int dstY, const stratagus::player_color *player_color, unsigned int transparency)
     {
-		//Wyrmgus start
-//        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight());
-        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player, transparency);
-		//Wyrmgus end
+        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player_color, transparency);
     }
 
     void Graphics::setFont(Font* font)

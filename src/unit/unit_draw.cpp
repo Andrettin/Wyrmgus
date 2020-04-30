@@ -154,7 +154,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	
 	// show player color circle below unit if that is activated
 	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(unit.Player->Color, x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor - 1);
+		DrawSelectionCircleWithTrans(Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor - 1);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
@@ -172,11 +172,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
-			color = unit.Player->Color;
+			color = Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color());
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					color = CPlayer::Players[i]->Color;
+					color = Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color());
 				}
 			}
 		}
@@ -734,6 +734,9 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	if (!sprite) {
 		return;
 	}
+
+	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
@@ -744,15 +747,15 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
+				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 	} else {
@@ -764,9 +767,9 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 		}
 	}
 }
@@ -1034,6 +1037,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 {
 	PixelPos pos = screenPos;
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
 	if (cframe->File == ConstructionFileConstruction) {
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->Construction) {
@@ -1041,18 +1045,18 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			pos.x -= construction.Width * scale_factor / 2;
 			pos.y -= construction.Height * scale_factor / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
+				construction.Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+				construction.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			const CConstruction &construction = *type.Construction;
 			pos.x -= construction.Width * scale_factor / 2;
 			pos.y -= construction.Height * scale_factor / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
+				construction.Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+				construction.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 		//Wyrmgus end
@@ -1078,9 +1082,9 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		if (variation && variation->Sprite) {
-			variation->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+			variation->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 		} else {
-			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+			type.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 		}
 		//Wyrmgus end
 	}

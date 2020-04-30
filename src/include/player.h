@@ -88,6 +88,7 @@ namespace stratagus {
 	class age;
 	class calendar;
 	class civilization;
+	class player_color;
 	class quest;
 	class site;
 	class unit_class;
@@ -122,6 +123,16 @@ private:
 	static CPlayer *ThisPlayer; //player on local computer
 
 public:
+	const stratagus::player_color *get_player_color() const
+	{
+		return this->player_color;
+	}
+
+	const QColor &get_minimap_color() const
+	{
+		return this->minimap_color;
+	}
+
 	int Index = 0;          /// player as number
 	std::string Name;   /// name of non computer
 
@@ -218,10 +229,11 @@ public:
 	int HeroCooldownTimer = 0;	/// The cooldown timer for recruiting heroes
 	//Wyrmgus end
 	
-	IntColor Color = 0;           /// color of units on minimap
+private:
+	const stratagus::player_color *player_color = nullptr; /// player color for units and portraits
+	QColor minimap_color;           /// color of units on minimap
 
-	CUnitColors UnitColors; /// Unit colors for new units
-
+public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
 	//Wyrmgus start
 	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
@@ -246,7 +258,7 @@ public:
 	void set_age(stratagus::age *age);
 	CCurrency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
-	bool IsPlayerColorUsed(int color);
+	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
 	bool HasUpgradeClass(const int upgrade_class) const;
 	bool HasSettlement(const stratagus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
@@ -446,6 +458,8 @@ private:
 	unsigned int Enemy = 0;     /// enemy bit field for this player
 	unsigned int Allied = 0;    /// allied bit field for this player
 	unsigned int SharedVision = 0; /// shared vision bit field
+
+	friend void SetPlayersPalette();
 };
 
 //Wyrmgus start
@@ -857,25 +871,12 @@ enum NotifyType {
 extern int NumPlayers; //how many player slots used
 extern bool NoRescueCheck; //disable rescue check
 //Wyrmgus start
-//extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
-//extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors
-//extern std::string PlayerColorNames[PlayerMax];  /// Player color names
-extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
-extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
-extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
-
 extern std::map<std::string, int> DynastyStringToIndex;
 
 extern bool LanguageCacheOutdated;
 //Wyrmgus end
 
 extern PlayerRace PlayerRaces;  /// Player races
-
-/**
-**  Which indexes to replace with player color
-*/
-extern int PlayerColorIndexStart;
-extern int PlayerColorIndexCount;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -909,11 +910,6 @@ extern void PlayersEachHalfMinute(int player);
 extern void PlayersEachMinute(int player);
 //Wyrmgus end
 
-/// Output debug information for players
-extern void DebugPlayers();
-
-void FreePlayerColors();
-
 /// register ccl features
 extern void PlayerCclRegister();
 
@@ -925,7 +921,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 
 //Wyrmgus start
 extern void NetworkSetFaction(int player, const std::string &faction_name);
-extern int GetPlayerColorIndexByName(const std::string &player_color_name);
 extern std::string GetFactionTypeNameById(int faction_type);
 extern int GetFactionTypeIdByName(const std::string &faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);

@@ -58,13 +58,8 @@ public:
 	virtual void _beginDraw();
 	virtual void _endDraw();
 
-	//Wyrmgus start
 	virtual void drawImage(gcn::Image *image, int srcX, int srcY,
-	//Wyrmgus end
-						   //Wyrmgus start
-//						   int dstX, int dstY, int width, int height);
-						   int dstX, int dstY, int width, int height, int player = -1, unsigned int transparency = 0);
-						   //Wyrmgus end
+						   int dstX, int dstY, int width, int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0);
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);

@@ -32,6 +32,7 @@
 #include "character.h"
 #include "config.h"
 #include "player.h"
+#include "player_color.h"
 #include "quest.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
@@ -121,13 +122,7 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "description") {
 			this->description = value;
 		} else if (key == "player_color") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int color = GetPlayerColorIndexByName(value);
-			if (color != -1) {
-				this->PlayerColor = color;
-			} else {
-				fprintf(stderr, "Invalid player color: \"%s\".\n", value.c_str());
-			}
+			this->PlayerColor = stratagus::player_color::get(value);
 		} else if (key == "character_level") {
 			this->CharacterLevel = std::stoi(value);
 		} else if (key == "difficulty") {
@@ -208,7 +203,7 @@ void CAchievement::Obtain(const bool save, const bool display)
 	}
 
 	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + PlayerColorNames[this->PlayerColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + (this->PlayerColor ? this->PlayerColor->get_identifier() : "") + "\") end;");
 	}
 }
 

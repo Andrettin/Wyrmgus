@@ -103,6 +103,10 @@ class CPlayer;
 class ButtonStyle;
 struct lua_State;
 
+namespace stratagus {
+	class player_color;
+}
+
 /// Icon: rectangle image used in menus
 class CIcon final : public stratagus::data_entry, public stratagus::data_type<CIcon>
 {
@@ -158,17 +162,14 @@ public:
 	}
 
 	/// Draw icon
-	void DrawIcon(const PixelPos &pos, const int player = -1) const;
+	void DrawIcon(const PixelPos &pos, const stratagus::player_color *player_color = nullptr) const;
 	/// Draw grayscale icon
-	void DrawGrayscaleIcon(const PixelPos &pos, const int player = -1) const;
+	void DrawGrayscaleIcon(const PixelPos &pos, const stratagus::player_color *player_color = nullptr) const;
 	/// Draw cooldown spell
 	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const;
 	/// Draw icon of a unit
 	void DrawUnitIcon(const ButtonStyle &style,
-					  //Wyrmgus start
-//					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1) const;
-					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
-					  //Wyrmgus end
+					  unsigned flags, const PixelPos &pos, const std::string &text, const stratagus::player_color *player = nullptr, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 
 private:
 	void load();

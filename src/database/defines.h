@@ -48,6 +48,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(int scale_factor MEMBER scale_factor READ get_scale_factor)
 	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
+	Q_PROPERTY(stratagus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
 	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
 
@@ -101,6 +102,11 @@ public:
 		return this->conversible_player_color;
 	}
 
+	player_color *get_neutral_player_color() const
+	{
+		return this->neutral_player_color;
+	}
+
 	time_of_day *get_underground_time_of_day() const
 	{
 		return this->underground_time_of_day;
@@ -116,6 +122,7 @@ private:
 	QSize icon_size;
 	int scale_factor = 1;
 	player_color *conversible_player_color = nullptr;
+	player_color *neutral_player_color = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
 	bool documents_modules_loading_enabled = true;
 };

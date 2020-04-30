@@ -44,6 +44,7 @@ namespace stratagus {
 	class civilization;
 	class dialogue;
 	class faction;
+	class player_color;
 	class quest;
 	class site;
 	class unit_class;
@@ -204,7 +205,7 @@ public:
 private:
 	CIcon *icon = nullptr;
 public:
-	int PlayerColor = 0;				/// Player color used for the quest's icon
+	const player_color *PlayerColor = nullptr;		/// Player color used for the quest's icon
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden
 	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others

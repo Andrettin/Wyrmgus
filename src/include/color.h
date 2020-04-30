@@ -134,15 +134,4 @@ public:
 	short A;			/// Alpha
 };
 
-
-class CUnitColors
-{
-public:
-	CUnitColors() {}
-
-public:
-	std::vector<CColor> Colors;
-};
-
-
 typedef uint32_t IntColor; // Uint32 in SDL

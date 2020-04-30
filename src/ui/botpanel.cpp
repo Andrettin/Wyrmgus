@@ -1204,15 +1204,14 @@ void CButtonPanel::Draw()
 //			button_icon->DrawGrayscaleIcon(pos); //better to not show it
 			//Wyrmgus end
 		} else {
-			int player = -1;
+			const stratagus::player_color *player_color = nullptr;
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
-				//Wyrmgus start
-//				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
-				player = Selected[0]->GetDisplayPlayer();
+				player_color = Selected[0]->get_player_color();
 
+				//Wyrmgus start
 				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
-				if (CPlayer::GetThisPlayer()->HasBuildingAccess(*CPlayer::Players[player], buttons[i].Action)) {
-					player = CPlayer::GetThisPlayer()->Index;
+				if (CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, buttons[i].Action)) {
+					player_color = CPlayer::GetThisPlayer()->get_player_color();
 				}
 				//Wyrmgus end
 			}
@@ -1220,7 +1219,7 @@ void CButtonPanel::Draw()
 			if (IsButtonUsable(*Selected[0], buttons[i])) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
+												   pos, buf, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 												   
 				if (
 					(buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::get_all()[buttons[i].Value]) != 0)
@@ -1247,11 +1246,11 @@ void CButtonPanel::Draw()
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, false, true);
+												   pos, buf, player_color, false, true);
 			} else {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, true);
+												   pos, buf, player_color, true);
 			}
 		}
 	}

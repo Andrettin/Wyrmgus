@@ -44,9 +44,7 @@
 #include "netconnect.h"
 #include "editor.h"
 #include "sound/sound.h"
-//Wyrmgus start
-#include "player.h"
-//Wyrmgus end
+#include "player_color.h"
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
@@ -251,12 +249,8 @@ void MyOpenGLGraphics::_endDraw()
 	popClipArea();
 }
 
-//Wyrmgus start
-//void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
-//								 int dstX, int dstY, int width, int height)
 void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height, int player, unsigned int transparency)
-//Wyrmgus end
+								 int dstX, int dstY, int width, int height, const stratagus::player_color *player_color, unsigned int transparency)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -271,8 +265,8 @@ void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
 	//Wyrmgus start
 //	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
 //									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
-	if (player != -1) {
-		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player, srcX, srcY, width, height,
+	if (player_color != nullptr) {
+		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player_color, srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	} else {
 		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
@@ -358,13 +352,12 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 {
-	int WidgetPlayerColorIndexFromName = GetPlayerColorIndexByName(WidgetPlayerColor);
-	if (WidgetPlayerColorIndexFromName == -1) {
-		fprintf(stderr, "Color %s not defined\n", WidgetPlayerColor.c_str());
-		ExitFatal(1);
+	const stratagus::player_color *player_color = nullptr;
+	if (!this->WidgetPlayerColor.empty()) {
+		player_color = stratagus::player_color::get(WidgetPlayerColor);
 	}
 	
-	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), WidgetPlayerColorIndexFromName);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color);
 }
 //Wyrmgus end
 
@@ -664,10 +657,9 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		img = normalImage;
 	}
 
-	int WidgetPlayerColorIndexFromName = GetPlayerColorIndexByName(ButtonPlayerColor);
-	if (WidgetPlayerColorIndexFromName == -1) {
-		fprintf(stderr, "Color %s not defined\n", ButtonPlayerColor.c_str());
-		ExitFatal(1);
+	const stratagus::player_color *player_color = nullptr;
+	if (!this->ButtonPlayerColor.empty()) {
+		player_color = stratagus::player_color::get(ButtonPlayerColor);
 	}
 		
 	if (frameImage) {
@@ -685,7 +677,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName, Transparency);
+								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -707,7 +699,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, Transparency);
+								img->getWidth(), img->getHeight(), player_color, Transparency);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -726,7 +718,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		#endif
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, Transparency);
+							img->getWidth(), img->getHeight(), player_color, Transparency);
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {

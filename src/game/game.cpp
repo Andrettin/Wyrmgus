@@ -68,6 +68,7 @@
 #include "parameters.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "player_color.h"
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
@@ -332,163 +333,6 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	CMap::Map.Info.Filename = mapname;
 }
 
-// Write a small image of map preview
-static void WriteMapPreview(const char *mapname, CMap &map)
-{
-	FILE *fp = fopen(mapname, "wb");
-	if (fp == nullptr) {
-		return;
-	}
-
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-	if (png_ptr == nullptr) {
-		fclose(fp);
-		return;
-	}
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == nullptr) {
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, nullptr);
-		return;
-	}
-
-	if (setjmp(png_jmpbuf(png_ptr))) {
-		/* If we get here, we had a problem reading the file */
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return;
-	}
-
-	/* set up the output control if you are using standard C streams */
-	png_init_io(png_ptr, fp);
-
-	png_set_IHDR(png_ptr, info_ptr, UI.Minimap.W, UI.Minimap.H, 8,
-				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-				 PNG_FILTER_TYPE_DEFAULT);
-
-	png_write_info(png_ptr, info_ptr);
-
-	const int rectSize = 5; // size of rectange used for player start spots
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
-		if (!pixels) {
-			fprintf(stderr, "Out of memory\n");
-			exit(1);
-		}
-		// Copy GL map surface to pixel array
-		for (int i = 0; i < UI.Minimap.H; ++i) {
-			for (int j = 0; j < UI.Minimap.W; ++j) {
-				Uint32 c = ((Uint32 *)MinimapSurfaceGL[UI.CurrentMapLayer->ID])[j + i * UI.Minimap.W];
-
-				const int offset = (i * UI.Minimap.W + j) * 3;
-				pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
-				pixels[offset + 1] = ((c & GMASK) >> GSHIFT);
-				pixels[offset + 2] = ((c & BMASK) >> BSHIFT);
-			}
-		}
-		// Add player start spots
-		for (int i = 0; i < PlayerMax - 1; ++i) {
-			//Wyrmgus start
-//			if (CPlayer::Players[i]->Type != PlayerNobody) {
-			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
-			//Wyrmgus end
-				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
-					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
-						const int miniMapX = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->get_width();
-						const int miniMapY = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->get_height();
-						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
-							continue;
-						}
-						if (miniMapY + k < 0 || miniMapY + k >= UI.Minimap.H) {
-							continue;
-						}
-						const int offset = ((miniMapY + k) * UI.Minimap.H + miniMapX + j) * 3;
-						pixels[offset + 0] = ((CPlayer::Players[i]->Color & RMASK) >> RSHIFT);
-						pixels[offset + 1] = ((CPlayer::Players[i]->Color & GMASK) >> GSHIFT);
-						pixels[offset + 2] = ((CPlayer::Players[i]->Color & BMASK) >> BSHIFT);
-					}
-				}
-			}
-		}
-		// Write everything in PNG
-		for (int i = 0; i < UI.Minimap.H; ++i) {
-			unsigned char *row = new unsigned char[UI.Minimap.W * 3];
-			memcpy(row, pixels + i * UI.Minimap.W * 3, UI.Minimap.W * 3);
-			png_write_row(png_ptr, row);
-			delete[] row;
-		}
-		delete[] pixels;
-	} else
-#endif
-	{
-		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
-		//Wyrmgus start
-//		const SDL_PixelFormat *fmt = MinimapSurface->format;
-		const SDL_PixelFormat *fmt = MinimapSurface[UI.CurrentMapLayer->ID]->format;
-		//Wyrmgus end
-		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
-													UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
-		//Wyrmgus start
-//		SDL_BlitSurface(MinimapSurface, nullptr, preview, nullptr);
-		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], nullptr, preview, nullptr);
-		//Wyrmgus end
-
-		SDL_LockSurface(preview);
-
-		SDL_Rect rect;
-		for (int i = 0; i < PlayerMax - 1; ++i) {
-			//Wyrmgus start
-//			if (CPlayer::Players[i]->Type != PlayerNobody) {
-			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
-			//Wyrmgus end
-				rect.x = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->get_width() - rectSize / 2;
-				rect.y = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->get_height() - rectSize / 2;
-				rect.w = rect.h = rectSize;
-				SDL_FillRect(preview, &rect, CPlayer::Players[i]->Color);
-			}
-		}
-
-		for (int i = 0; i < UI.Minimap.H; ++i) {
-			switch (preview->format->BytesPerPixel) {
-				case 1:
-					for (int j = 0; j < UI.Minimap.W; ++j) {
-						Uint8 c = ((Uint8 *)preview->pixels)[j + i * UI.Minimap.W];
-						row[j * 3 + 0] = fmt->palette->colors[c].r;
-						row[j * 3 + 1] = fmt->palette->colors[c].g;
-						row[j * 3 + 2] = fmt->palette->colors[c].b;
-					}
-					break;
-				case 3:
-					memcpy(row, (char *)preview->pixels + i * UI.Minimap.W, UI.Minimap.W * 3);
-					break;
-				case 4:
-					for (int j = 0; j < UI.Minimap.W; ++j) {
-						Uint32 c = ((Uint32 *)preview->pixels)[j + i * UI.Minimap.W];
-						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
-						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
-						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
-					}
-					break;
-			}
-			png_write_row(png_ptr, row);
-		}
-		delete[] row;
-
-		SDL_UnlockSurface(preview);
-		SDL_FreeSurface(preview);
-	}
-
-	png_write_end(png_ptr, info_ptr);
-
-	/* clean up after the write, and free any memory allocated */
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-
-	fclose(fp);
-}
-
-
 // Write the map presentation file
 //Wyrmgus start
 //static int WriteMapPresentation(const std::string &mapname, CMap &map)
@@ -607,10 +451,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (faction->ParentFaction != -1) {
 				f->printf("\tParentFaction = \"%s\",\n", stratagus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
 			}
-			if (faction->Colors.size() > 0) {
+			if (!faction->get_player_colors().empty()) {
 				f->printf("\tColors = {");
-				for (size_t k = 0; k < faction->Colors.size(); ++k) {
-					f->printf("\"%s\", ", PlayerColorNames[faction->Colors[k]].c_str());
+				for (const stratagus::player_color *player_color : faction->get_player_colors()) {
+					f->printf("\"%s\", ", player_color->get_identifier().c_str());
 				}
 				f->printf("},\n");
 			}
@@ -1134,17 +978,6 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bo
 	if (!setupExtension) {
 		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.c_str());
 	}
-
-	//Wyrmgus start
-	//don't write map previews
-	/*
-	char previewName[PATH_MAX];
-	strcpy_s(previewName, sizeof(previewName), mapName.c_str());
-	char *previewExtension = strstr(previewName, ".smp");
-	memcpy(previewExtension, ".png\0", 5 * sizeof(char));
-	WriteMapPreview(previewName, map);
-	*/
-	//Wyrmgus end
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
 	//Wyrmgus start
@@ -1845,7 +1678,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// Init players?
 	//
-	DebugPlayers();
 	PlayersInitAi();
 
 	//
@@ -1880,19 +1712,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// FIXME: must be done after map is loaded
 	InitPathfinder();
-	//
-	// FIXME: The palette is loaded after the units are created.
-	// FIXME: This loops fixes the colors of the units.
-	//
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		// I don't really think that there can be any rescued units at this point.
-		if (unit.RescuedFrom) {
-			unit.Colors = &unit.RescuedFrom->UnitColors;
-		} else {
-			unit.Colors = &unit.Player->UnitColors;
-		}
-	}
 
 	GameResult = GameNoResult;
 

@@ -32,6 +32,7 @@
 #include "civilization.h"
 #include "grand_strategy.h" //for the faction tier string to enum conversion
 #include "luacallback.h"
+#include "player_color.h"
 
 namespace stratagus {
 
@@ -84,15 +85,10 @@ void faction::process_sml_scope(const sml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "colors") {
-		this->Colors.clear(); //remove previously defined colors
+		this->player_colors.clear(); //remove previously defined colors
 
 		for (const std::string &value : values) {
-			const int color = GetPlayerColorIndexByName(value);
-			if (color != -1) {
-				this->Colors.push_back(color);
-			} else {
-				throw std::runtime_error("Player color \"" + value + "\" doesn't exist.");
-			}
+			this->player_colors.push_back(player_color::get(value));
 		}
 	} else if (tag == "develops_from") {
 		for (const std::string &value : values) {

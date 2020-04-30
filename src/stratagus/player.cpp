@@ -26,10 +26,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "player.h"
@@ -44,6 +40,7 @@
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
+#include "database/defines.h"
 #include "editor.h"
 //Wyrmgus end
 #include "faction.h"
@@ -64,6 +61,9 @@
 #include "netconnect.h"
 //Wyrmgus start
 #include "parameters.h"
+//Wyrmgus end
+#include "player_color.h"
+//Wyrmgus start
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -314,15 +314,6 @@
 **    Color of units of this player on the minimap. Index number
 **    into the global palette.
 **
-**  CPlayer::UnitColors
-**
-**    Unit colors of this player. Contains the hardware dependent
-**    pixel values for the player colors (palette index #208-#211).
-**    Setup from the global palette.
-**    @note Index #208-#211 are various SHADES of the team color
-**    (#208 is brightest shade, #211 is darkest shade) .... these
-**    numbers are NOT red=#208, blue=#209, etc
-**
 **  CPlayer::Allow
 **
 **    Contains which unit-types and upgrades are allowed for the
@@ -355,25 +346,6 @@ std::vector<CPlayer *> CPlayer::Players; //all players in play
 PlayerRace PlayerRaces; //player races
 
 bool NoRescueCheck; //disable rescue check
-
-/**
-**  Colors used for minimap.
-*/
-//Wyrmgus start
-//std::vector<CColor> PlayerColorsRGB[PlayerMax];
-//std::vector<IntColor> PlayerColors[PlayerMax];
-
-//std::string PlayerColorNames[PlayerMax];
-std::vector<CColor> PlayerColorsRGB[PlayerColorMax];
-std::vector<IntColor> PlayerColors[PlayerColorMax];
-std::string PlayerColorNames[PlayerColorMax];
-//Wyrmgus end
-
-/**
-**  Which indexes to replace with player color
-*/
-int PlayerColorIndexStart;
-int PlayerColorIndexCount;
 
 //Wyrmgus start
 std::map<std::string, int> DynastyStringToIndex;
@@ -612,19 +584,7 @@ void InitPlayers()
 		if (!CPlayer::Players[p]->Type) {
 			CPlayer::Players[p]->Type = PlayerNobody;
 		}
-		//Wyrmgus start
-//		for (int x = 0; x < PlayerColorIndexCount; ++x) {
-//			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
-//		}
-		//Wyrmgus end
 	}
-	//Wyrmgus start
-	for (int p = 0; p < PlayerColorMax; ++p) {
-		for (int x = 0; x < PlayerColorIndexCount; ++x) {
-			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
-		}
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -638,23 +598,6 @@ void CleanPlayers()
 	}
 	NumPlayers = 0;
 	NoRescueCheck = false;
-}
-
-void FreePlayerColors()
-{
-	for (int i = 0; i < PlayerMax; ++i) {
-		CPlayer::Players[i]->UnitColors.Colors.clear();
-		//Wyrmgus start
-//		PlayerColorsRGB[i].clear();
-//		PlayerColors[i].clear();
-		//Wyrmgus end
-	}
-	//Wyrmgus start
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		PlayerColorsRGB[i].clear();
-		PlayerColors[i].clear();
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -721,11 +664,8 @@ void CPlayer::Save(CFile &file) const
 	if (p.age) {
 		file.printf(" \"age\", \"%s\",", p.age->get_identifier().c_str());
 	}
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == this->Color) {
-			file.printf(" \"color\", %d,", i);
-			break;
-		}
+	if (p.get_player_color() != nullptr) {
+		file.printf(" \"player-color\", \"%s\",", p.get_player_color()->get_identifier().c_str());
 	}
 	//Wyrmgus end
 	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
@@ -972,7 +912,6 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
-	// UnitColors done by init code.
 	// Allow saved by allow.
 
 	file.printf("\n  \"timers\", {");
@@ -1222,8 +1161,6 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
 
-	this->Color = PlayerColors[NumPlayers][0];
-
 	if (CPlayer::Players[NumPlayers]->Type == PlayerComputer || CPlayer::Players[NumPlayers]->Type == PlayerRescueActive) {
 		this->AiEnabled = true;
 	} else {
@@ -1360,27 +1297,41 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 		this->SetName(stratagus::faction::get_all()[this->Faction]->get_name());
 	}
 	if (this->Faction != -1) {
-		int color = -1;
-		for (size_t i = 0; i < stratagus::faction::get_all()[faction_id]->Colors.size(); ++i) {
-			if (!IsPlayerColorUsed(stratagus::faction::get_all()[faction_id]->Colors[i])) {
-				color = stratagus::faction::get_all()[faction_id]->Colors[i];
+		const stratagus::player_color *player_color = nullptr;
+		const stratagus::faction *faction = stratagus::faction::get_all()[faction_id];
+		for (const stratagus::player_color *faction_color : faction->get_player_colors()) {
+			if (this->get_player_color_usage_count(faction_color) == 0) {
+				player_color = faction_color;
 				break;
 			}
 		}
-		if (color == -1) { //if all of the faction's colors are used, get a unused player color
-			for (int i = 0; i < PlayerColorMax; ++i) {
-				if (!IsPlayerColorUsed(i)) {
-					color = i;
-					break;
+
+		if (player_color == nullptr) { //if all of the faction's colors are used, get one of the least used player colors
+			int best_usage_count = -1;
+			std::vector<const stratagus::player_color *> available_colors;
+			for (const stratagus::player_color *pc : stratagus::player_color::get_all()) {
+				if (pc == stratagus::defines::get()->get_neutral_player_color()) {
+					continue;
 				}
+
+				const int usage_count = this->get_player_color_usage_count(pc);
+				if (best_usage_count == -1 || usage_count <= best_usage_count) {
+					if (usage_count < best_usage_count) {
+						available_colors.clear();
+					}
+					available_colors.push_back(pc);
+					best_usage_count = usage_count;
+				}
+			}
+
+			if (!available_colors.empty()) {
+				player_color = available_colors[SyncRand(available_colors.size())];
 			}
 		}
 		
-		if (color != -1) {
-			if (this->Color != PlayerColors[color][0]) {
-				this->Color = PlayerColors[color][0];
-				this->UnitColors.Colors = PlayerColorsRGB[color];
-			}
+		if (player_color != nullptr) {
+			this->player_color = player_color;
+			this->minimap_color = player_color->get_colors()[0];
 		}
 	
 		if (!stratagus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {
@@ -1631,15 +1582,17 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	}
 }
 
-bool CPlayer::IsPlayerColorUsed(int color)
+int CPlayer::get_player_color_usage_count(const stratagus::player_color *player_color) const
 {
-	bool color_used = false;
+	int count = 0;
+
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Color == PlayerColors[color][0]) {
-			color_used = true;
+		if (this->Index != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->get_player_color() == player_color) {
+			count++;
 		}		
 	}
-	return color_used;
+
+	return count;
 }
 
 bool CPlayer::HasUpgradeClass(const int upgrade_class) const
@@ -2273,7 +2226,7 @@ void CPlayer::Clear()
 	this->LostTownHallTimer = 0;
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
-	this->Color = 0;
+	this->minimap_color = QColor();
 	this->UpgradeTimers.Clear();
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
@@ -2633,7 +2586,7 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) (quest->get_icon() ? quest->get_icon()->get_frame() : 0)) + ") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->PlayerColor ? quest->PlayerColor->get_identifier() : "") + "\", " + std::to_string((long long) (quest->get_icon() ? quest->get_icon()->get_frame() : 0)) + ") end;");
 	}
 }
 
@@ -2649,7 +2602,7 @@ void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->PlayerColor ? quest->PlayerColor->get_identifier() : "") + "\") end;");
 	}
 }
 
@@ -3885,49 +3838,15 @@ void PlayersEachMinute(int playerIdx)
 */
 void SetPlayersPalette()
 {
-	for (int i = 0; i < PlayerMax; ++i) {
-		//Wyrmgus start
-//		CPlayer::Players[i]->UnitColors.Colors = PlayerColorsRGB[i];
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->Faction == -1) {
-			CPlayer::Players[i]->UnitColors.Colors = PlayerColorsRGB[i];
+			CPlayer::Players[i]->player_color = stratagus::player_color::get_all()[SyncRand(stratagus::player_color::get_all().size())];
+			CPlayer::Players[i]->minimap_color = CPlayer::Players[i]->player_color->get_colors()[0];
 		}
-		//Wyrmgus end
 	}
-}
 
-/**
-**  Output debug information for players.
-*/
-void DebugPlayers()
-{
-#ifdef DEBUG
-	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
-	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (CPlayer::Players[i]->Type == PlayerNobody) {
-			continue;
-		}
-		const char *playertype;
-
-		switch (CPlayer::Players[i]->Type) {
-			case 0: playertype = "Don't know 0"; break;
-			case 1: playertype = "Don't know 1"; break;
-			case 2: playertype = "neutral     "; break;
-			case 3: playertype = "nobody      "; break;
-			case 4: playertype = "computer    "; break;
-			case 5: playertype = "person      "; break;
-			case 6: playertype = "rescue pas. "; break;
-			case 7: playertype = "rescue akt. "; break;
-			default : playertype = "?unknown?   "; break;
-		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
-		           CPlayer::GetThisPlayer() == CPlayer::Players[i] ? '*' :
-				   CPlayer::Players[i]->AiEnabled ? '+' : ' ' _C_
-				   CPlayer::Players[i]->Name.c_str() _C_ playertype _C_
-				   PlayerRaces.Name[CPlayer::Players[i]->Race].c_str() _C_
-				   CPlayer::Players[i]->AiName.c_str());
-	}
-#endif
+	CPlayer::Players[PlayerNumNeutral]->player_color = stratagus::defines::get()->get_neutral_player_color();
+	CPlayer::Players[PlayerNumNeutral]->minimap_color = CPlayer::Players[PlayerNumNeutral]->player_color->get_colors()[0];
 }
 
 /**
@@ -4349,16 +4268,6 @@ void NetworkSetFaction(int player, const std::string &faction_name)
 	const stratagus::faction *faction = stratagus::faction::try_get(faction_name);
 	int faction_id = faction ? faction->ID : -1;
 	SendCommandSetFaction(player, faction_id);
-}
-
-int GetPlayerColorIndexByName(const std::string &player_color_name)
-{
-	for (int c = 0; c < PlayerColorMax; ++c) {
-		if (PlayerColorNames[c] == player_color_name) {
-			return c;
-		}
-	}
-	return -1;
 }
 
 std::string GetFactionTypeNameById(int faction_type)

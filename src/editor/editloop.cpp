@@ -72,21 +72,6 @@ extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
 extern void CleanGame();
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-#define UNIT_ICON_X (IconWidth + 7)       /// Unit mode icon
-#define UNIT_ICON_Y (0)                   /// Unit mode icon
-#define TILE_ICON_X (IconWidth * 2 + 16)  /// Tile mode icon
-#define TILE_ICON_Y (2)                   /// Tile mode icon
-#define START_ICON_X (IconWidth * 3 + 16)  /// Start mode icon
-#define START_ICON_Y (2)                   /// Start mode icon
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 static int IconWidth;                       /// Icon width in panels
 static int IconHeight;                      /// Icon height in panels
 
@@ -126,6 +111,39 @@ struct EditorAction {
 
 static std::deque<EditorAction> EditorUndoActions;
 static std::deque<EditorAction> EditorRedoActions;
+
+/// Unit mode icon
+static int get_unit_icon_x()
+{
+	return IconWidth + 7 * stratagus::defines::get()->get_scale_factor();
+}
+
+static int get_unit_icon_y()
+{
+	return 0;
+}
+
+/// Tile mode icon
+static int get_tile_icon_x()
+{
+	return IconWidth * (2 + 16) * stratagus::defines::get()->get_scale_factor();
+}
+
+static int get_tile_icon_y()
+{
+	return 2 * stratagus::defines::get()->get_scale_factor();
+}
+
+/// Start mode icon
+static int get_start_icon_x()
+{
+	return IconWidth * (3 + 16) * stratagus::defines::get()->get_scale_factor();
+}
+
+static int get_start_icon_y()
+{
+	return 2 * stratagus::defines::get()->get_scale_factor();
+}
 
 static void EditorUndoAction();
 static void EditorRedoAction();
@@ -756,7 +774,7 @@ static void DrawPlayers()
 			i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
 		if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(CPlayer::Players[i]->Color, x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.FillRectangle(Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
@@ -862,7 +880,7 @@ static void DrawUnitIcons()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->Index);
+		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -1128,15 +1146,14 @@ static void DrawEditorPanel_SelectIcon()
 	//Wyrmgus end
 		
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
 }
 
 static void DrawEditorPanel_UnitsIcon()
 {
-	//Wyrmgus start
-//	const PixelPos pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
-	const PixelPos pos(UI.InfoPanel.X + 11 + UNIT_ICON_X, UI.InfoPanel.Y + 7 + UNIT_ICON_Y);
-	//Wyrmgus end
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
+	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x(), UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y());
 	CIcon *icon = Editor.Units.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
@@ -1153,24 +1170,20 @@ static void DrawEditorPanel_UnitsIcon()
 	//Wyrmgus end
 		
 	// FIXME: wrong button style
-	//Wyrmgus start
-//	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
-	//Wyrmgus end
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
 }
 
 static void DrawEditorPanel_StartIcon()
 {
-	//Wyrmgus start
-//	int x = UI.InfoPanel.X + 4;
-	int x = UI.InfoPanel.X + 11;
-	//Wyrmgus end
-	int y = UI.InfoPanel.Y + 5;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
+	int x = UI.InfoPanel.X + 11 * scale_factor;
+	int y = UI.InfoPanel.Y + 5 * scale_factor;
 
 	if (Editor.StartUnit) {
 		CIcon *icon = Editor.StartUnit->Icon.Icon;
 		Assert(icon);
-		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
+		const PixelPos pos(x + get_start_icon_x(), y + get_start_icon_y());
 		unsigned int flag = 0;
 		if (ButtonUnderCursor == StartButton) {
 			flag = IconActive;
@@ -1184,31 +1197,23 @@ static void DrawEditorPanel_StartIcon()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
 	} else {
 		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
 		PushClipping();
-		x += START_ICON_X + 1;
-		y += START_ICON_Y + 1;
+		x += get_start_icon_x() + 1 * scale_factor;
+		y += get_start_icon_y() + 1 * scale_factor;
 		if (ButtonUnderCursor == StartButton) {
-			Video.DrawRectangleClip(ColorGray, x - 1, y - 1, IconHeight, IconHeight);
+			Video.DrawRectangleClip(ColorGray, x - 1 * scale_factor, y - 1 * scale_factor, IconHeight, IconHeight);
 		}
-		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
+		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2 * scale_factor, IconHeight - 2 * scale_factor);
 
 		const PixelPos lt(x, y);
-		//Wyrmgus start
-//		const PixelPos lb(x, y + IconHeight - 2);
-//		const PixelPos rt(x + IconHeight - 2, y);
-		const PixelPos lb(x, y + IconHeight - 3);
-		const PixelPos rt(x + IconHeight - 3, y);
-		//Wyrmgus end
-		const PixelPos rb(x + IconHeight - 2, y + IconHeight - 2);
-		//Wyrmgus start
-//		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
-		const Uint32 color = CPlayer::Players[Editor.SelectedPlayer]->Color;
-
-		//Wyrmgus end
+		const PixelPos lb(x, y + IconHeight - 3 * scale_factor);
+		const PixelPos rt(x + IconHeight - 3 * scale_factor, y);
+		const PixelPos rb(x + IconHeight - 2 * scale_factor, y + IconHeight - 2 * scale_factor);
+		const Uint32 color = Video.MapRGB(TheScreen->format, CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
 
 		Video.DrawLineClip(color, lt, rb);
 		Video.DrawLineClip(color, rt, lb);
@@ -1221,15 +1226,14 @@ static void DrawEditorPanel_StartIcon()
 */
 static void DrawEditorPanel()
 {
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	DrawEditorPanel_SelectIcon();
 	DrawEditorPanel_UnitsIcon();
 
 	if (Editor.TerrainEditable) {
-		//Wyrmgus start
-//		const int x = UI.InfoPanel.X + TILE_ICON_X + 4;
-		const int x = UI.InfoPanel.X + TILE_ICON_X + 11;
-		//Wyrmgus end
-		const int y = UI.InfoPanel.Y + TILE_ICON_Y + 4;
+		const int x = UI.InfoPanel.X + get_tile_icon_x() + 11 * scale_factor;
+		const int y = UI.InfoPanel.Y + get_tile_icon_y() + 4 * scale_factor;
 
 		DrawTileIcon(0x10 + 4 * 16, x, y,
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
@@ -1356,7 +1360,7 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, nullptr);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, stratagus::defines::get()->get_scaled_tile_size(), CPlayer::Players[i]->Color);
+					DrawCross(startScreenPos, stratagus::defines::get()->get_scaled_tile_size(), Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()));
 				}
 			}
 		}
@@ -2168,6 +2172,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	static int LastMapX;
 	static int LastMapY;
 
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	PixelPos restrictPos = pos;
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
 	const PixelPos screenPos = pos;
@@ -2290,18 +2296,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Handle buttons
-	//Wyrmgus start
-//	if (UI.InfoPanel.X + 4 < CursorScreenPos.x
-	if (UI.InfoPanel.X + 11 < CursorScreenPos.x
-	//Wyrmgus end
-		//Wyrmgus start
-//		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width
-//		&& UI.InfoPanel.Y + 4 < CursorScreenPos.y
-//		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + Editor.Select.Icon->G->Width) {
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 + Editor.Select.Icon->G->Width
-		&& UI.InfoPanel.Y + 7 < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 + Editor.Select.Icon->G->Width) {
-		//Wyrmgus end
+	if (UI.InfoPanel.X + 11 * scale_factor < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + Editor.Select.Icon->G->Width
+		&& UI.InfoPanel.Y + 7 * scale_factor < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + Editor.Select.Icon->G->Width) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -2309,16 +2307,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		UI.StatusLine.Set(_("Select Mode"));
 		return;
 	}
-	//Wyrmgus start
-//	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorScreenPos.x
-//		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + UNIT_ICON_X + Editor.Units.Icon->G->Width
-//		&& UI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorScreenPos.y
-//		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
-	if (UI.InfoPanel.X + 11 + UNIT_ICON_X < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 + UNIT_ICON_X + Editor.Units.Icon->G->Width
-		&& UI.InfoPanel.Y + 7 + UNIT_ICON_Y < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
-	//Wyrmgus end
+	if (UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() + Editor.Units.Icon->G->Width
+		&& UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() + Editor.Units.Icon->G->Height) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = cursor_on::button;
@@ -2326,14 +2318,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		return;
 	}
 	if (Editor.TerrainEditable) {
-		//Wyrmgus start
-//		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
-//			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + stratagus::defines::get()->get_scaled_tile_width() + 7
-		if (UI.InfoPanel.X + 11 + TILE_ICON_X < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + stratagus::defines::get()->get_scaled_tile_width() + 7
-		//Wyrmgus end
-			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorScreenPos.y
-			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + stratagus::defines::get()->get_scaled_tile_height() + 7) {
+		if (UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() < CursorScreenPos.x
+			&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() + stratagus::defines::get()->get_scaled_tile_width() + 7 * scale_factor
+			&& UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() < CursorScreenPos.y
+			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() + stratagus::defines::get()->get_scaled_tile_height() + 7 * scale_factor) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = cursor_on::button;
@@ -2342,18 +2330,12 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		}
 	}
 
-	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Width : stratagus::defines::get()->get_scaled_tile_width() + 7;
-	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Height : stratagus::defines::get()->get_scaled_tile_height() + 7;
-	//Wyrmgus start
-//	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
-//		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
-//		&& UI.InfoPanel.Y + 4 + START_ICON_Y < CursorScreenPos.y
-//		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + START_ICON_Y + StartUnitHeight) {
-	if (UI.InfoPanel.X + 11 + START_ICON_X < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 + START_ICON_X + StartUnitWidth
-		&& UI.InfoPanel.Y + 5 + START_ICON_Y < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 5 + START_ICON_Y + StartUnitHeight) {
-	//Wyrmgus end
+	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Width : stratagus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
+	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Height : stratagus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
+	if (UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() + StartUnitWidth
+		&& UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() + StartUnitHeight) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = cursor_on::button;

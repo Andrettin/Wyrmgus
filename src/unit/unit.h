@@ -56,7 +56,6 @@ class CSpell;
 class CUniqueItem;
 //Wyrmgus end
 class CUnit;
-class CUnitColors;
 class CUnitPtr;
 class CUnitStats;
 class CUnitType;
@@ -70,6 +69,7 @@ struct lua_State;
 typedef COrder *COrderPtr;
 
 namespace stratagus {
+	class player_color;
 	class time_of_day;
 }
 
@@ -145,6 +145,8 @@ public:
 	void Init(const CUnitType &type);
 	/// Assign unit to player
 	void AssignToPlayer(CPlayer &player);
+
+	const stratagus::player_color *get_player_color() const;
 
 	/// Draw a single unit
 	void Draw(const CViewport &vp) const;
@@ -531,7 +533,6 @@ public:
 
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
-	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
 	std::string Name;		/// Unit's personal/proper name (if any)
 	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)

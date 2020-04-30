@@ -102,6 +102,20 @@ public:
 		return this->default_tier;
 	}
 
+	const player_color *get_player_color() const
+	{
+		if (!this->player_colors.empty()) {
+			return this->player_colors.front();
+		}
+
+		return nullptr;
+	}
+
+	const std::vector<const player_color *> &get_player_colors() const
+	{
+		return this->player_colors;
+	}
+
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
@@ -158,7 +172,9 @@ public:
 	CCurrency *Currency = nullptr;										/// The faction's currency
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
-	std::vector<int> Colors;											/// faction colors
+private:
+	std::vector<const player_color *> player_colors;					/// faction colors
+public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction

@@ -760,11 +760,6 @@ static int CclUnit(lua_State *l)
 		MapMarkUnitSight(*unit);
 	}
 
-	// Fix Colors for rescued units.
-	if (unit->RescuedFrom) {
-		unit->Colors = &unit->RescuedFrom->UnitColors;
-	}
-
 	return 0;
 }
 

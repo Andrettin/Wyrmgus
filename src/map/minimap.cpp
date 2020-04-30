@@ -408,7 +408,7 @@ void CMinimap::UpdateTerrain(int z)
 			Uint32 c;
 
 			if (mf.get_owner() != nullptr && CMap::Map.tile_borders_other_player_territory(QPoint(Minimap2MapX[z][mx], Minimap2MapY[z][my] / CMap::Map.Info.MapWidths[z]), z, this->get_territory_tile_range(z))) {
-				c = mf.get_owner()->Color;
+				c = Video.MapRGB(TheScreen->format, mf.get_owner()->get_minimap_color());
 			} else {
 				QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
 
@@ -542,7 +542,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			Uint32 c;
 
 			if (mf.get_owner() != nullptr && CMap::Map.tile_borders_other_player_territory(QPoint(x, y / CMap::Map.Info.MapWidths[z]), z, this->get_territory_tile_range(z))) {
-				c = mf.get_owner()->Color;
+				c = Video.MapRGB(TheScreen->format, mf.get_owner()->get_minimap_color());
 			} else {
 				QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
 
@@ -602,7 +602,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			color = ColorGreen;
 		}
 	} else {
-		color = unit.Player->Color;
+		color = Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color());
 	}
 
 	//Wyrmgus start

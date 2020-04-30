@@ -481,7 +481,6 @@ void CUnit::Init()
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
-	Colors = nullptr;
 	//Wyrmgus start
 	Name.clear();
 	ExtraName.clear();
@@ -2907,7 +2906,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 	Player = &player;
 	Stats = &type.Stats[Player->Index];
-	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(!Stats->Variables.empty());
@@ -2941,6 +2939,17 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		}
 	}
 	//Wyrmgus end
+}
+
+const stratagus::player_color *CUnit::get_player_color() const
+{
+	if (this->RescuedFrom != nullptr) {
+		return this->RescuedFrom->get_player_color();
+	} else if (this->Player != nullptr) {
+		return this->Player->get_player_color();
+	}
+
+	return nullptr;
 }
 
 /**

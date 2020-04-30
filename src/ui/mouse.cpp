@@ -3225,7 +3225,7 @@ void DrawPieMenu()
 			if (gray) {
 				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 			} else {
-				buttons[i].Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->Index);
+				buttons[i].Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color());
 			}
 
 			// Tutorial show command key in icons

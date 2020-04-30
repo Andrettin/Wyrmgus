@@ -2360,6 +2360,8 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	}
 	//Wyrmgus end
 	
+	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
@@ -2393,15 +2395,15 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, time_of_day);
+				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 	} else {
@@ -2413,9 +2415,9 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, time_of_day);
+			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 		}
 	}
 	//Wyrmgus end

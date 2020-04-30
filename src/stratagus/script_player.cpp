@@ -53,6 +53,7 @@
 #include "map/map.h"
 #include "map/site.h"
 #include "plane.h"
+#include "player_color.h"
 #include "province.h"
 #include "quest.h"
 #include "religion/deity.h"
@@ -156,10 +157,9 @@ void CPlayer::Load(lua_State *l)
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
 			this->age = stratagus::age::get(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "color")) {
-			int color_id = LuaToNumber(l, j + 1);
-			this->Color = PlayerColors[color_id][0];
-			this->UnitColors.Colors = PlayerColorsRGB[color_id];
+		} else if (!strcmp(value, "player-color")) {
+			this->player_color = stratagus::player_color::get(LuaToString(l, j + 1));
+			this->minimap_color = player_color->get_colors()[0];
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
@@ -1608,16 +1608,11 @@ static int CclDefineFaction(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			faction->Colors.clear(); //remove previously defined colors
+			faction->player_colors.clear(); //remove previously defined colors
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				std::string color_name = LuaToString(l, -1, k + 1);
-				int color = GetPlayerColorIndexByName(color_name);
-				if (color != -1) {
-					faction->Colors.push_back(color);
-				} else {
-					LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
-				}
+				const std::string color_name = LuaToString(l, -1, k + 1);
+				faction->player_colors.push_back(stratagus::player_color::get(color_name));
 			}
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
@@ -2423,18 +2418,10 @@ static int CclGetFactions(lua_State *l)
 */
 static int CclGetPlayerColors(lua_State *l)
 {
-	std::vector<std::string> player_colors;
-	for (int i = 0; i < PlayerColorMax; ++i)
+	lua_createtable(l, stratagus::player_color::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::player_color::get_all().size(); ++i)
 	{
-		if (!PlayerColorNames[i].empty()) {
-			player_colors.push_back(PlayerColorNames[i]);
-		}
-	}
-		
-	lua_createtable(l, player_colors.size(), 0);
-	for (size_t i = 1; i <= player_colors.size(); ++i)
-	{
-		lua_pushstring(l, player_colors[i-1].c_str());
+		lua_pushstring(l, stratagus::player_color::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	
@@ -2484,8 +2471,8 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Color")) {
-		if (faction->Colors.size() > 0) {
-			lua_pushstring(l, PlayerColorNames[faction->Colors[0]].c_str());
+		if (faction->get_player_color() != nullptr) {
+			lua_pushstring(l, faction->get_player_color()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2571,76 +2558,6 @@ static int CclGetDynastyData(lua_State *l)
 }
 //Wyrmgus end
 
-/**
-**  Define player colors
-**
-**  @param l  Lua state.
-*/
-static int CclDefinePlayerColors(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-
-	const int args = lua_rawlen(l, 1);
-	for (int i = 0; i < args; ++i) {
-		PlayerColorNames[i / 2] = LuaToString(l, 1, i + 1);
-		++i;
-		lua_rawgeti(l, 1, i + 1);
-		if (!lua_istable(l, -1)) {
-			LuaError(l, "incorrect argument");
-		}
-		const int numcolors = lua_rawlen(l, -1);
-		if (numcolors != PlayerColorIndexCount) {
-			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
-		}
-		for (int j = 0; j < numcolors; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			PlayerColorsRGB[i / 2][j].Parse(l);
-			lua_pop(l, 1);
-		}
-	}
-
-	return 0;
-}
-
-/**
-**  Make new player colors
-**
-**  @param l  Lua state.
-*/
-static int CclNewPlayerColors(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	SetPlayersPalette();
-
-	return 0;
-}
-
-/**
-**  Define player color indexes
-**
-**  @param l  Lua state.
-*/
-static int CclDefinePlayerColorIndex(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	PlayerColorIndexStart = LuaToNumber(l, 1);
-	PlayerColorIndexCount = LuaToNumber(l, 2);
-
-	//Wyrmgus start
-//	for (int i = 0; i < PlayerMax; ++i) {
-	for (int i = 0; i < PlayerColorMax; ++i) {
-	//Wyrmgus end
-		PlayerColorsRGB[i].clear();
-		PlayerColorsRGB[i].resize(PlayerColorIndexCount);
-		PlayerColors[i].clear();
-		PlayerColors[i].resize(PlayerColorIndexCount, 0);
-	}
-	return 0;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -2682,17 +2599,10 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Color")) {
-		bool found_color = false;
-		for (int i = 0; i < PlayerColorMax; ++i) {
-			if (PlayerColors[i][0] == p->Color) {
-				lua_pushstring(l, PlayerColorNames[i].c_str());
-				found_color = true;
-				break;
-			}		
-		}
-		if (!found_color) {
+		if (p->get_player_color() == nullptr) {
 			LuaError(l, "Player %d has no color." _C_ p->Index);
 		}
+		lua_pushstring(l, p->get_player_color()->get_identifier().c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
@@ -3557,10 +3467,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
 	lua_register(Lua, "GetDynastyData", CclGetDynastyData);
 	//Wyrmgus end
-	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
-	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
-
-	lua_register(Lua, "NewColors", CclNewPlayerColors);
 
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);

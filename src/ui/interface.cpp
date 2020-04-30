@@ -48,6 +48,7 @@
 #include "map/map_layer.h"
 #include "network.h"
 #include "player.h"
+#include "player_color.h"
 #include "replay.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
@@ -1117,21 +1118,8 @@ static int InputKey(int key)
 				// Replace ~ with ~~
 				ReplaceTildeBy2Tilde(Input);
 				char chatMessage[sizeof(Input) + 40];
-				//Wyrmgus start
-				/*
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
-						 PlayerColorNames[CPlayer::GetThisPlayer()->Index].c_str(),
-				*/
-				int player_color; // make the player color be correct for the faction
-				for (int j = 0; j < PlayerColorMax; ++j) {
-					if (PlayerColors[j][0] == CPlayer::GetThisPlayer()->Color) {
-						player_color = j;
-						break;
-					}
-				}
-				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
-					PlayerColorNames[player_color].c_str(),
-				//Wyrmgus end
+					CPlayer::GetThisPlayer()->get_player_color()->get_identifier().c_str(),
 					CPlayer::GetThisPlayer()->Name.c_str(), Input);
 				// FIXME: only to selected players ...
 				NetworkSendChatMessage(chatMessage);

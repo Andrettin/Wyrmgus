@@ -45,6 +45,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "player.h"
+#include "player_color.h"
 #include "script.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -113,13 +114,8 @@ static int CclDefineQuest(lua_State *l)
 			stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1));
 			quest->civilization = civilization;
 		} else if (!strcmp(value, "PlayerColor")) {
-			std::string color_name = LuaToString(l, -1);
-			int color = GetPlayerColorIndexByName(color_name);
-			if (color != -1) {
-				quest->PlayerColor = color;
-			} else {
-				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
-			}
+			const std::string color_name = LuaToString(l, -1);
+			quest->PlayerColor = stratagus::player_color::get(color_name);
 		} else if (!strcmp(value, "Hidden")) {
 			quest->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Competitive")) {
@@ -316,7 +312,11 @@ static int CclGetQuestData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		lua_pushstring(l, PlayerColorNames[quest->PlayerColor].c_str());
+		if (quest->PlayerColor != nullptr) {
+			lua_pushstring(l, quest->PlayerColor->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, quest->Hidden);
@@ -568,13 +568,8 @@ static int CclDefineAchievement(lua_State *l)
 		} else if (!strcmp(value, "Description")) {
 			achievement->description = LuaToString(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
-			std::string color_name = LuaToString(l, -1);
-			int color = GetPlayerColorIndexByName(color_name);
-			if (color != -1) {
-				achievement->PlayerColor = color;
-			} else {
-				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
-			}
+			const std::string color_name = LuaToString(l, -1);
+			achievement->PlayerColor = stratagus::player_color::get(color_name);
 		} else if (!strcmp(value, "CharacterLevel")) {
 			achievement->CharacterLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
@@ -646,7 +641,11 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushstring(l, achievement->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		lua_pushstring(l, PlayerColorNames[achievement->PlayerColor].c_str());
+		if (achievement->PlayerColor != nullptr) {
+			lua_pushstring(l, achievement->PlayerColor->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Character")) {
 		if (achievement->Character) {

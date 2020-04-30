@@ -59,10 +59,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  //Wyrmgus start
-//				  const std::string &text, int player)
-				  const std::string &text, int player, bool transparent, int show_percent)
-				  //Wyrmgus end
+				  const std::string &text, const stratagus::player_color *player_color, bool transparent, int show_percent)
 {
 	ButtonStyleProperties *p;
 
@@ -92,15 +89,12 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	if (pimage->Sprite) {
 		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
 
-		if (colorGraphic && player != -1) {
-			//Wyrmgus start
-//			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);
+		if (colorGraphic && player_color != nullptr) {
 			if (transparent) {
-				colorGraphic->DrawPlayerColorFrameClipTrans(player, pimage->Frame, x, y, 64, nullptr, show_percent);
+				colorGraphic->DrawPlayerColorFrameClipTrans(player_color, pimage->Frame, x, y, 64, nullptr, show_percent);
 			} else {
-				colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y, nullptr, show_percent);
+				colorGraphic->DrawPlayerColorFrameClip(player_color, pimage->Frame, x, y, nullptr, show_percent);
 			}
-			//Wyrmgus end
 		} else {
 			pimage->Sprite->DrawFrame(pimage->Frame, x, y);
 		}

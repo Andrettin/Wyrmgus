@@ -35,6 +35,7 @@ class CUnitType;
 struct lua_State;
 
 namespace stratagus {
+	class player_color;
 	class quest;
 }
 
@@ -84,7 +85,7 @@ private:
 	std::string name;				/// Name of the achievement
 	std::string description;		/// Description of the achievement
 public:
-	int PlayerColor = 0;			/// Player color used for the achievement's icon
+	const stratagus::player_color *PlayerColor = nullptr; //player color used for the achievement's icon
 	int CharacterLevel = 0;			/// Character level required for the achievement
 	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
 private:
