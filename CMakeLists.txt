@@ -418,6 +418,7 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
+	src/util/color_container.cpp
 	src/util/image_util.cpp
 	src/util/point_container.cpp
 	src/util/util.cpp
@@ -723,6 +724,7 @@ set(stratagus_upgrade_HDRS
 )
 
 set(stratagus_util_HDRS
+	src/util/color_container.h
 	src/util/container_util.h
 	src/util/date_util.h
 	src/util/exception_util.h
