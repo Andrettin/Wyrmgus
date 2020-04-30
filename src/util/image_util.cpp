@@ -25,6 +25,9 @@
 //      02111-1307, USA.
 //
 
+#include "util/image_util.h"
+
+#include "util/container_util.h"
 #include "xbrz.h"
 
 namespace stratagus::image {
@@ -96,6 +99,71 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	}
 
 	return result_image;
+}
+
+std::set<QRgb> get_rgbs(const QImage &image)
+{
+	if (!image.colorTable().empty()) {
+		return container::to_set(image.colorTable());
+	}
+
+	std::set<QRgb> rgb_set;
+
+	const unsigned char *image_data = image.constBits();
+	const int pixel_count = image.width() * image.height();
+	const int bpp = image.depth() / 8;
+	int red_index = 0;
+	int green_index = 0;
+	int blue_index = 0;
+	int alpha_index = 0;
+	if (image.format() == QImage::Format_RGBA8888 || image.format() == QImage::Format_RGB888) {
+		red_index = 0;
+		green_index = 1;
+		blue_index = 2;
+		alpha_index = 3;
+	} else if (image.format() == QImage::Format_ARGB32 || image.format() == QImage::Format_RGB32) {
+		red_index = 1;
+		green_index = 2;
+		blue_index = 3;
+		alpha_index = 0;
+	} else {
+		throw std::runtime_error("Invalid image format for image::get_rgbs: \"" + std::to_string(image.format()) + "\".");
+	}
+
+	if (bpp == 4) {
+		for (int i = 0; i < pixel_count; ++i) {
+			const int pixel_index = i * bpp;
+			const unsigned char &red = image_data[pixel_index + red_index];
+			const unsigned char &green = image_data[pixel_index + green_index];
+			const unsigned char &blue = image_data[pixel_index + blue_index];
+			const unsigned char &alpha = image_data[pixel_index + alpha_index];
+			rgb_set.insert(qRgba(red, green, blue, alpha));
+		}
+	} else if (bpp == 3) {
+		for (int i = 0; i < pixel_count; ++i) {
+			const int pixel_index = i * bpp;
+			const unsigned char &red = image_data[pixel_index + red_index];
+			const unsigned char &green = image_data[pixel_index + green_index];
+			const unsigned char &blue = image_data[pixel_index + blue_index];
+			rgb_set.insert(qRgba(red, green, blue, 255));
+		}
+	}
+
+	return rgb_set;
+}
+
+color_set get_colors(const QImage &image)
+{
+	color_set color_set;
+
+	const std::set<QRgb> rgb_set = image::get_rgbs(image);
+	for (const QRgb rgb : rgb_set) {
+		QColor color;
+		color.setRgba(rgb);
+		color_set.insert(std::move(color));
+	}
+
+	return color_set;
 }
 
 }

@@ -64,6 +64,18 @@ QStringList to_qstring_list(const T &string_container)
 }
 
 template <typename T>
+inline std::set<typename T::value_type> to_set(const T &container)
+{
+	std::set<typename T::value_type> set;
+
+	for (const typename T::value_type &element : container) {
+		set.insert(element);
+	}
+
+	return set;
+}
+
+template <typename T>
 inline std::vector<typename T::value_type> to_vector(const T &container)
 {
 	std::vector<typename T::value_type> vector;

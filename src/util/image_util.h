@@ -27,9 +27,13 @@
 
 #pragma once
 
+#include "util/color_container.h"
+
 namespace stratagus::image {
 
 extern QImage scale(const QImage &src_image, const int scale_factor);
 extern QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_frame_size);
+extern std::set<QRgb> get_rgbs(const QImage &image);
+extern color_set get_colors(const QImage &image);
 
 }
