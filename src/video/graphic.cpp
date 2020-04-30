@@ -999,19 +999,10 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 	const stratagus::color_set color_set = stratagus::image::get_colors(this->get_image());
 	for (const QColor &color : color_set) {
 		if (!this->player_color) {
-			for (const int conversible_color : ConversiblePlayerColors) {
-				if (PlayerColorNames[conversible_color].empty()) {
-					break;
-				}
-
-				for (const CColor &player_color : PlayerColorsRGB[conversible_color]) {
-					if (color.red() == player_color.R && color.green() == player_color.G && color.blue() == player_color.B) {
-						this->player_color = true;
-						break;
-					}
-				}
-
-				if (this->player_color) {
+			const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
+			for (const QColor &player_color : conversible_player_color->get_colors()) {
+				if (color.red() == player_color.red() && color.green() == player_color.green() && color.blue() == player_color.blue()) {
+					this->player_color = true;
 					break;
 				}
 			}
@@ -1370,17 +1361,14 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 			unsigned char &green = image_data[i + 1];
 			unsigned char &blue = image_data[i + 2];
 
-			for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
-				if (PlayerColorNames[ConversiblePlayerColors[k]].empty()) {
-					break;
-				}
-
-				for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
-					if (red == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && green == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && blue == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
-						red = colors->Colors[z].R;
-						green = colors->Colors[z].G;
-						blue = colors->Colors[z].B;
-					}
+			const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
+			const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
+			for (size_t z = 0; z < conversible_colors.size(); ++z) {
+				const QColor &color = conversible_colors[z];
+				if (red == color.red() && green == color.green() && blue == color.blue()) {
+					red = colors->Colors[z].R;
+					green = colors->Colors[z].G;
+					blue = colors->Colors[z].B;
 				}
 			}
 		}

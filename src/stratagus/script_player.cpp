@@ -2641,29 +2641,6 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	return 0;
 }
 
-/**
-**  Define conversible player colors.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineConversiblePlayerColors(lua_State *l)
-{
-	ConversiblePlayerColors.clear();
-	
-	const unsigned int args = lua_gettop(l);
-	for (unsigned int i = 0; i < args; ++i) {
-		std::string player_color_name = LuaToString(l, i + 1);
-		int player_color = GetPlayerColorIndexByName(player_color_name);
-		if (player_color != -1) {
-			ConversiblePlayerColors.push_back(player_color);
-		} else {
-			LuaError(l, "Player color \"%s\" doesn't exist." _C_ player_color_name.c_str());
-		}
-	}
-	
-	return 0;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -3585,8 +3562,6 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
 
-	lua_register(Lua, "DefineConversiblePlayerColors", CclDefineConversiblePlayerColors);
-	
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);

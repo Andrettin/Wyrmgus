@@ -863,7 +863,6 @@ extern bool NoRescueCheck; //disable rescue check
 extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
 extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
-extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player colors
 
 extern std::map<std::string, int> DynastyStringToIndex;
 

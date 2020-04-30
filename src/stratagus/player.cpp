@@ -367,7 +367,6 @@ bool NoRescueCheck; //disable rescue check
 std::vector<CColor> PlayerColorsRGB[PlayerColorMax];
 std::vector<IntColor> PlayerColors[PlayerColorMax];
 std::string PlayerColorNames[PlayerColorMax];
-std::vector<int> ConversiblePlayerColors;
 //Wyrmgus end
 
 /**
