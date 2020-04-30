@@ -284,7 +284,6 @@ public:
 	
 	GLuint *PlayerColorTextures[PlayerColorMax];				/// Textures with player colors
 	std::map<int, std::map<CColor, GLuint *>> PlayerColorTextureColorModifications;	/// Player color textures with a color modification applied to them
-#endif
 };
 
 #ifdef USE_MNG
