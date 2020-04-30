@@ -35,6 +35,7 @@
 
 namespace stratagus {
 
+class player_color;
 class sml_data;
 class sml_property;
 class time_of_day;
@@ -46,6 +47,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(int scale_factor MEMBER scale_factor READ get_scale_factor)
+	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
 	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
 
@@ -94,6 +96,11 @@ public:
 		return this->get_tile_height() * this->get_scale_factor();
 	}
 
+	player_color *get_conversible_player_color() const
+	{
+		return this->conversible_player_color;
+	}
+
 	time_of_day *get_underground_time_of_day() const
 	{
 		return this->underground_time_of_day;
@@ -108,6 +115,7 @@ private:
 	QSize tile_size;
 	QSize icon_size;
 	int scale_factor = 1;
+	player_color *conversible_player_color = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
 	bool documents_modules_loading_enabled = true;
 };
