@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.h - The player color header file. */
-//
 //      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,29 +27,39 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 
-#include "color.h"
-#include "data_type.h"
+namespace stratagus {
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CPlayerColor : public CDataType
+class player_color final : public named_data_entry, public data_type<player_color>
 {
-public:
-	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
-	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
-	static void ClearPlayerColors();
-	
-	static std::vector<CPlayerColor *> PlayerColors;	/// Player colors
-	static std::map<std::string, CPlayerColor *> PlayerColorsByIdent;
+	Q_OBJECT
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	std::string Name;				/// Name of the player color
-	std::vector<CColor> Colors;		/// The colors of the player color
+	Q_PROPERTY(QVariantList colors READ get_colors_qvariant_list)
+
+public:
+	static constexpr const char *class_identifier = "player_color";
+	static constexpr const char *database_folder = "player_colors";
+
+	player_color(const std::string &identifier) : named_data_entry(identifier)
+	{
+	}
+
+	const std::vector<QColor> &get_colors() const
+	{
+		return this->colors;
+	}
+
+	QVariantList get_colors_qvariant_list() const;
+
+	Q_INVOKABLE void add_color(const QColor &color)
+	{
+		this->colors.push_back(color);
+	}
+
+private:
+	std::vector<QColor> colors; //the color shades of the player color
 };
+
+}

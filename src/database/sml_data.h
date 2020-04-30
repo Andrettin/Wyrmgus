@@ -84,6 +84,17 @@ public:
 		return this->parent;
 	}
 
+	bool has_children() const
+	{
+		for (const auto &element : this->get_elements()) {
+			if (std::holds_alternative<sml_data>(element)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	const sml_data &get_child(const std::string &tag) const
 	{
 		for (const auto &element : this->get_elements()) {

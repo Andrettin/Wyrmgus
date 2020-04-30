@@ -87,6 +87,7 @@ public:
 	static void process_sml_scope_for_object(QObject *object, const sml_data &scope);
 	static QVariant process_sml_scope_value(const sml_data &scope, const QMetaProperty &meta_property);
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const std::string &value);
+	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const sml_data &scope);
 
 	static std::filesystem::path get_root_path()
 	{

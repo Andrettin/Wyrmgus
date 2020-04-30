@@ -154,8 +154,6 @@ void CleanModules()
 	FreePathfinder();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
-
-	CPlayerColor::ClearPlayerColors();
 }
 
 /**

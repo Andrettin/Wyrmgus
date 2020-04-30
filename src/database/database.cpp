@@ -10,24 +10,20 @@
 //
 //      (c) Copyright 2019-2020 by Andrettin
 //
-//      Permission is hereby granted, free of charge, to any person obtaining a
-//      copy of this software and associated documentation files (the
-//      "Software"), to deal in the Software without restriction, including
-//      without limitation the rights to use, copy, modify, merge, publish,
-//      distribute, sublicense, and/or sell copies of the Software, and to
-//      permit persons to whom the Software is furnished to do so, subject to
-//      the following conditions:
+//      This program is free software; you can redistribute it and/or modify
+//      it under the terms of the GNU General Public License as published by
+//      the Free Software Foundation; only version 2 of the License.
 //
-//      The above copyright notice and this permission notice shall be included
-//      in all copies or substantial portions of the Software.
+//      This program is distributed in the hope that it will be useful,
+//      but WITHOUT ANY WARRANTY; without even the implied warranty of
+//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//      GNU General Public License for more details.
 //
-//      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-//      OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//      MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//      IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-//      CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//      TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//      SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//      You should have received a copy of the GNU General Public License
+//      along with this program; if not, write to the Free Software
+//      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+//      02111-1307, USA.
+//
 
 #include "database/database.h"
 
@@ -45,6 +41,7 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "plane.h"
+#include "player_color.h"
 #include "quest.h"
 #include "sound/sound.h"
 #include "time/calendar.h"
@@ -170,6 +167,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
 		} else if (property_class_name == "stratagus::plane*") {
 			new_property_value = QVariant::fromValue(plane::get(property.get_value()));
+		} else if (property_class_name == "stratagus::player_color*") {
+			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
 		} else if (property_class_name == "stratagus::quest*") {
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
 		} else if (property_class_name == "stratagus::site*") {
@@ -211,11 +210,23 @@ void database::process_sml_scope_for_object(QObject *object, const sml_data &sco
 
 		const QVariant::Type property_type = meta_property.type();
 
-		if ((property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) && !scope.get_values().empty()) {
-			for (const std::string &value : scope.get_values()) {
-				database::modify_list_property_for_object(object, property_name, sml_operator::addition, value);
+		if (scope.get_operator() == sml_operator::assignment) {
+			if ((property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) && !scope.get_values().empty()) {
+				for (const std::string &value : scope.get_values()) {
+					database::modify_list_property_for_object(object, property_name, sml_operator::addition, value);
+				}
+				return;
+			} else if (property_type == QVariant::Type::List && scope.has_children()) {
+				scope.for_each_child([&](const sml_data &child_scope) {
+					database::modify_list_property_for_object(object, property_name, sml_operator::addition, child_scope);
+				});
+				return;
 			}
-			return;
+		} else {
+			if (property_type == QVariant::Type::List) {
+				database::modify_list_property_for_object(object, property_name, scope.get_operator(), scope);
+				return;
+			}
 		}
 
 		QVariant new_property_value = database::process_sml_scope_value(scope, meta_property);
@@ -308,6 +319,41 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(unit_class *, unit_class_value));
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
+	} else {
+		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
+	}
+
+	if (!success) {
+		throw std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\".");
+	}
+}
+
+void database::modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const sml_data &scope)
+{
+	const QMetaObject *meta_object = object->metaObject();
+	const std::string class_name = meta_object->className();
+	const int property_index = meta_object->indexOfProperty(property_name.c_str());
+	QMetaProperty meta_property = meta_object->property(property_index);
+	const QVariant::Type property_type = meta_property.type();
+
+	if (sml_operator == sml_operator::assignment) {
+		throw std::runtime_error("The assignment operator is not available for list properties.");
+	}
+
+	std::string method_name;
+	if (sml_operator == sml_operator::addition) {
+		method_name = "add_";
+	} else if (sml_operator == sml_operator::subtraction) {
+		method_name = "remove_";
+	}
+
+	method_name += string::get_singular_form(property_name);
+
+	bool success = false;
+
+	if (property_name == "colors") {
+		const QColor color = scope.to_color();
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(QColor, color));
 	} else {
 		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
 	}
