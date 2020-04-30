@@ -938,9 +938,9 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
 	int FogTileVariation = 0;
 	CGraphic *fog_graphic = CMap::Map.FogGraphics;
-	if (sx % 3 == 0 && fog_graphic->get_image().height() / stratagus::defines::get()->get_scaled_tile_height() >= 3) {
+	if (sx % 3 == 0 && fog_graphic->get_height() / stratagus::defines::get()->get_scaled_tile_height() >= 3) {
 		FogTileVariation = 2;
-	} else if (sx % 2 == 0 && fog_graphic->get_image().height() / stratagus::defines::get()->get_scaled_tile_height() >= 2) {
+	} else if (sx % 2 == 0 && fog_graphic->get_height() / stratagus::defines::get()->get_scaled_tile_height() >= 2) {
 		FogTileVariation = 1;
 	}
 	if (FogTable[fogTileIndex] && FogTable[fogTileIndex] != 16) {

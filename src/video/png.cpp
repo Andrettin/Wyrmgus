@@ -82,7 +82,6 @@ private:
 
 /**
 **  Load a png graphic file.
-**  Modified function from SDL_Image
 **
 **  @param g  graphic to load.
 **
@@ -99,12 +98,13 @@ int LoadGraphicPNG(CGraphic *g)
 	}
 
 	g->image = QImage(name.c_str());
-	if (g->image.isNull()) {
+	if (g->get_image().isNull()) {
 		throw std::runtime_error("Failed to load the \"" + name + "\" image file.");
 	}
 
 	g->GraphicWidth = g->get_image().width();
 	g->GraphicHeight = g->get_image().height();
+	g->original_size = g->get_image().size();
 
 	return 0;
 }

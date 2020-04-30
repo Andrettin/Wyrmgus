@@ -142,7 +142,7 @@ public:
 	void Resize(int w, int h);
 	void SetOriginalSize();
 
-	inline bool IsLoaded() const { return !this->get_image().isNull(); }
+	inline bool IsLoaded() const { return !this->image.isNull(); }
 
 	//guichan
 	virtual int getWidth() const { return Width; }
@@ -153,6 +153,41 @@ public:
 	virtual int getGraphicHeight() const { return GraphicHeight; }
 	//Wyrmgus end
 
+	QSize get_size() const
+	{
+		return QSize(this->GraphicWidth, this->GraphicHeight);
+	}
+
+	int get_width() const
+	{
+		return this->get_size().width();
+	}
+
+	int get_height() const
+	{
+		return this->get_size().height();
+	}
+
+	const QSize &get_original_size() const
+	{
+		return this->original_size;
+	}
+
+	QSize get_frame_size() const
+	{
+		return QSize(this->Width, this->Height);
+	}
+
+	int get_frame_width() const
+	{
+		return this->get_frame_size().width();
+	}
+
+	int get_frame_height() const
+	{
+		return this->get_frame_size().height();
+	}
+
 	const QSize &get_original_frame_size() const
 	{
 		return this->original_frame_size;
@@ -161,11 +196,6 @@ public:
 	const QImage &get_image() const
 	{
 		return this->image;
-	}
-
-	bool has_transparency() const
-	{
-		return this->transparency;
 	}
 
 	bool has_player_color() const
@@ -186,13 +216,13 @@ public:
 	//Wyrmgus end
 private:
 	QImage image;
-	QImage flipped_image;
 public:
 	std::vector<frame_pos_t> frame_map;
 	std::vector<frame_pos_t> frameFlip_map;
 	void GenFramesMap();
 	int Width = 0;					/// Width of a frame
 	int Height = 0;					/// Height of a frame
+	QSize original_size = QSize(0, 0); //the unscaled size
 	QSize original_frame_size = QSize(0, 0); //the unscaled frame size
 	int NumFrames = 1;				/// Number of frames
 	int GraphicWidth = 0;			/// Original graphic width
@@ -211,7 +241,6 @@ public:
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 #endif
-	bool transparency = false;
 	bool player_color = false;
 
 	friend class CFont;
@@ -554,7 +583,7 @@ extern int LoadGraphicPNG(CGraphic *g);
 extern void MakeTexture(CGraphic *graphic, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 //Wyrmgus start
-extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
+extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start

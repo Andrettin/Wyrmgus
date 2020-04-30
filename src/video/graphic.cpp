@@ -817,7 +817,7 @@ void CGraphic::GenFramesMap()
 	}
 }
 
-static void ApplyGrayScale(QImage &image, int Width, int Height)
+static void ApplyGrayScale(QImage &image)
 {
 	const int bpp = image.depth() / 8;
 	const double redGray = 0.21;
@@ -1004,26 +1004,17 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
 	if (grayscale) {
-		//Wyrmgus start
 		this->Grayscale = true;
-//		ApplyGrayScale(Surface, Width, Height);
 		if (Preference.SepiaForGrayscale) {
 			ApplySepiaScale(this->image);
 		} else {
-			ApplyGrayScale(this->image, Width, Height);
+			ApplyGrayScale(this->image);
 		}
-		//Wyrmgus end
 	}
 
-	this->transparency = false;
 	this->player_color = false;
 	const stratagus::color_set color_set = stratagus::image::get_colors(this->get_image());
 	for (const QColor &color : color_set) {
-		const int alpha = color.alpha();
-		if (!this->transparency && alpha != 255) {
-			this->transparency = true;
-		}
-
 		if (!this->player_color) {
 			for (const int conversible_color : ConversiblePlayerColors) {
 				if (PlayerColorNames[conversible_color].empty()) {
@@ -1043,16 +1034,10 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 			}
 		}
 
-		if (this->transparency && this->player_color) {
+		if (this->player_color) {
 			break; //nothing left to check
 		}
 	}
-
-	/*
-	if (Width == 1792) {
-		ConvertImageToMap(Surface, Width, Height);
-	}
-	*/
 	
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -1311,7 +1296,7 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day)
+void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const stratagus::time_of_day *time_of_day)
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	int maxw = std::min<int>(image.width() - ow, GLMaxTextureSize);
@@ -1376,22 +1361,6 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, CUnit
 				continue;
 			}
 
-			if (colors != nullptr) {
-				for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
-					if (PlayerColorNames[ConversiblePlayerColors[k]].empty()) {
-						break;
-					}
-
-					for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
-						if (dst_red == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && dst_green == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && dst_blue == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
-							dst_red = colors->Colors[z].R;
-							dst_green = colors->Colors[z].G;
-							dst_blue = colors->Colors[z].B;
-						}
-					}
-				}
-			}
-
 			if (time_of_day_red != 0) {
 				dst_red = std::max<int>(0, std::min<int>(255, dst_red + time_of_day_red));
 			}
@@ -1434,16 +1403,16 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, CUnit
 static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const stratagus::time_of_day *time_of_day)
 //Wyrmgus end
 {
-	int tw = (g->get_image().width() - 1) / GLMaxTextureSize + 1;
-	const int th = (g->get_image().height() - 1) / GLMaxTextureSize + 1;
+	int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
+	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
 
-	int w = g->get_image().width() % GLMaxTextureSize;
+	int w = g->get_width() % GLMaxTextureSize;
 	if (w == 0) {
 		w = GLMaxTextureSize;
 	}
 	g->TextureWidth = (GLfloat)w / PowerOf2(w);
 
-	int h = g->get_image().height() % GLMaxTextureSize;
+	int h = g->get_height() % GLMaxTextureSize;
 	if (h == 0) {
 		h = GLMaxTextureSize;
 	}
@@ -1469,18 +1438,53 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 		glGenTextures(cg->NumTextures, cg->PlayerColorTextures[player]);
 	}
 
-	const QImage *src_image = nullptr;
-	QImage reformatted_image;
-	if (g->get_image().format() == QImage::Format_RGBA8888) {
-		src_image = &g->get_image();
-	} else {
-		reformatted_image = g->get_image().convertToFormat(QImage::Format_RGBA8888);
-		src_image = &reformatted_image;
+	QImage image = g->get_image();
+	if (image.format() != QImage::Format_RGBA8888) {
+		image = image.convertToFormat(QImage::Format_RGBA8888);
+	}
+
+	if (!g->Grayscale && colors != nullptr && g->has_player_color()) {
+		const int bpp = image.depth() / 8;
+		unsigned char *image_data = image.bits();
+		for (int i = 0; i < image.sizeInBytes(); i += bpp) {
+			unsigned char &red = image_data[i];
+			unsigned char &green = image_data[i + 1];
+			unsigned char &blue = image_data[i + 2];
+
+			for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
+				if (PlayerColorNames[ConversiblePlayerColors[k]].empty()) {
+					break;
+				}
+
+				for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
+					if (red == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && green == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && blue == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
+						red = colors->Colors[z].R;
+						green = colors->Colors[z].G;
+						blue = colors->Colors[z].B;
+					}
+				}
+			}
+		}
+	}
+
+	if (image.size() != g->get_size()) {
+		//the texture needs to be rescaled compared to the source image
+		if (g->get_width() > image.width() && g->get_height() > image.height() && (g->get_width() % image.width()) == 0 && (g->get_height() % image.height()) == 0 && (g->get_width() / image.width()) == (g->get_height() / image.height())) {
+			//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
+			const int scale_factor = g->get_width() / image.width();
+			image = stratagus::image::scale(image, scale_factor, g->get_original_frame_size());
+		} else {
+			image = image.scaled(g->get_size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+			if (image.format() != QImage::Format_RGBA8888) {
+				//the image's format could have changed due to the rescaling
+				image = image.convertToFormat(QImage::Format_RGBA8888);
+			}
+		}
 	}
 
 	for (int j = 0; j < th; ++j) {
 		for (int i = 0; i < tw; ++i) {
-			MakeTextures2(g, *src_image, textures[j * tw + i], colors, GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
+			MakeTextures2(g, image, textures[j * tw + i], GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
 		}
 	}
 }
@@ -1583,25 +1587,6 @@ void CGraphic::Resize(int w, int h)
 
 	this->Resized = true;
 
-	const int bpp = this->get_image().depth() / 8;
-	if (w > old_size.width() && (w % old_size.width()) == 0 && (h % old_size.height()) == 0 && h > old_size.height() && (w / old_size.width()) == (h / old_size.height())) {
-		//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
-		const int scale_factor = w / old_size.width();
-		this->image = stratagus::image::scale(this->image, scale_factor, old_frame_size);
-	} else {
-		this->image = this->image.scaled(w, h, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	}
-
-	if (!this->has_transparency() && this->get_image().depth() >= 32) {
-		//convert 32-bit color images to 24-bit if they don't have transparency, to save on memory (the scaling processes could have changed their format)
-		this->image = this->get_image().convertToFormat(QImage::Format_RGB888);
-	}
-
-	if (bpp == 1) {
-		//restore indexed format for images after rescaling, to save memory
-		this->image = this->get_image().convertToFormat(QImage::Format_Indexed8);
-	}
-
 	GraphicWidth = w;
 	GraphicHeight = h;
 
@@ -1684,8 +1669,9 @@ bool CFiller::OnGraphic(int x, int y) const
 {
 	x -= X;
 	y -= Y;
-	if (x >= 0 && y >= 0 && x < this->G->get_image().width() && y < this->G->get_image().height()) {
-		return this->G->get_image().pixelColor(x, y).alpha() != 0;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	if (x >= 0 && y >= 0 && x < this->G->get_width() && y < this->G->get_height()) {
+		return this->G->get_image().pixelColor(x / scale_factor, y / scale_factor).alpha() != 0;
 	}
 	return false;
 }

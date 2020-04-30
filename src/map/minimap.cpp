@@ -327,11 +327,12 @@ void CMinimap::Reload()
 /**
 **  Calculate the tile graphic pixel
 */
-static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, stratagus::terrain_type *terrain, const CSeason *season)
+static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int z, stratagus::terrain_type *terrain, const CSeason *season)
 {
-	int x = (xofs + 7 + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
-	int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
-	return terrain->GetGraphics(season)->get_image().pixelColor(x, y);
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	int x = (xofs + (7 * scale_factor) + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
+	int y = (yofs + (6 * scale_factor) + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
+	return terrain->GetGraphics(season)->get_image().pixelColor(x / scale_factor, y / scale_factor);
 	//Wyrmgus end
 }
 
@@ -357,9 +358,6 @@ void CMinimap::UpdateTerrain(int z)
 	if (!scaley) {
 		scaley = 1;
 	}
-	//Wyrmgus start
-//	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
-	//Wyrmgus end
 	
 	const CSeason *season = CMap::Map.MapLayers[z]->GetSeason();
 
@@ -393,11 +391,9 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->get_image().width() / stratagus::defines::get()->get_scaled_tile_width();
-			const int bpp = terrain->GetGraphics(season)->get_image().depth() / 8;
+			int tilepitch = terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->get_image().width() / stratagus::defines::get()->get_scaled_tile_width();
-			//assumes the BPP for the base terrain is the same as for the top terrain (which may be an overlay)
+			int base_tilepitch = base_terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			//Wyrmgus end
 	
 			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
@@ -414,10 +410,10 @@ void CMinimap::UpdateTerrain(int z)
 			if (mf.get_owner() != nullptr && CMap::Map.tile_borders_other_player_territory(QPoint(Minimap2MapX[z][mx], Minimap2MapY[z][my] / CMap::Map.Info.MapWidths[z]), z, this->get_territory_tile_range(z))) {
 				c = mf.get_owner()->Color;
 			} else {
-				QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
+				QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
 
 				if (color.alpha() == 0) { //transparent pixel, use base instead
-					color = GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+					color = GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, z, base_terrain, season);
 				}
 
 				c = Video.MapRGB(0, color.red(), color.green(), color.blue());
@@ -462,11 +458,6 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	if (scaley == 0) {
 		scaley = 1;
 	}
-
-	//Wyrmgus start
-//	const int tilepitch = Map.TileGraphic->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
-//	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
-	//Wyrmgus end
 
 	const CSeason *season = CMap::Map.MapLayers[z]->GetSeason();
 
@@ -534,10 +525,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->get_image().width() / stratagus::defines::get()->get_scaled_tile_width();
-			const int bpp = terrain->GetGraphics(season)->get_image().depth() / 8;
+			int tilepitch = terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->get_image().width() / stratagus::defines::get()->get_scaled_tile_width();
+			int base_tilepitch = base_terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			//Wyrmgus end
 	
 			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
@@ -554,10 +544,10 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			if (mf.get_owner() != nullptr && CMap::Map.tile_borders_other_player_territory(QPoint(x, y / CMap::Map.Info.MapWidths[z]), z, this->get_territory_tile_range(z))) {
 				c = mf.get_owner()->Color;
 			} else {
-				QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, season);
+				QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
 
 				if (color.alpha() == 0) { //transparent pixel, use base instead
-					color = GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, season);
+					color = GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, z, base_terrain, season);
 				}
 
 				c = Video.MapRGB(0, color.red(), color.green(), color.blue());

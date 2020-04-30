@@ -804,17 +804,19 @@ void CFont::MakeFontColorTextures() const
 		newg->NumFrames = g.NumFrames;
 		newg->GraphicWidth = g.GraphicWidth;
 		newg->GraphicHeight = g.GraphicHeight;
-		newg->image = QImage(g.File.c_str());
+		newg->image = g.get_image();
+		newg->original_size = g.get_original_size();
+		newg->original_frame_size = g.get_original_frame_size();
 
 		for (int j = 0; j < newg->image.colorCount(); ++j) {
 			newg->image.setColor(j, qRgba(fc->Colors[j].R, fc->Colors[j].G, fc->Colors[j].B, j == 0 ? 0 : 255));
 		}
 
-		newg->image = newg->image.convertToFormat(QImage::Format_RGBA8888);
+		QImage image = newg->get_image().convertToFormat(QImage::Format_RGBA8888);
 
 		const int scale_factor = stratagus::defines::get()->get_scale_factor();
 		if (scale_factor != 1) {
-			newg->image = stratagus::image::scale(newg->image, scale_factor, g.get_original_frame_size());
+			image = stratagus::image::scale(image, scale_factor, g.get_original_frame_size());
 		}
 
 		MakeTexture(newg);
