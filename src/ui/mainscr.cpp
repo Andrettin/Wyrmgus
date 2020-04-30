@@ -1305,43 +1305,6 @@ void MessagesDisplay::DrawMessages()
 {
 	if (show && Preference.ShowMessages) {
 		CLabel label(*UI.MessageFont);
-#ifdef DEBUG
-		if (showBuilList && ThisPlayer->Ai) {
-			char buffer[256];
-			int count = ThisPlayer->Ai->UnitTypeBuilt.size();
-			// Draw message line(s)
-			for (int z = 0; z < count; ++z) {
-				if (z == 0) {
-					PushClipping();
-					//Wyrmgus start
-//					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8,
-//								Video.Width - 1, Video.Height - 1);
-					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8,
-								UI.MapArea.X + 8, UI.MapArea.EndY - 16);
-					//Wyrmgus end
-				}
-
-				snprintf(buffer, 256, "%s (%d/%d) Wait %lu [%d,%d]",
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Type->Name.c_str(),
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Made,
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Want,
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Wait,
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Pos.x,
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Pos.y);
-
-				label.DrawClip(UI.MapArea.X + 8,
-				//Wyrmgus start
-//							   UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1),
-							   UI.MapArea.EndY - 16 - (UI.MessageFont->Height() + 1) + (z * -1) * (UI.MessageFont->Height() + 1),
-				//Wyrmgus end
-							   buffer);
-
-				if (z == 0) {
-					PopClipping();
-				}
-			}
-		} else {
-#endif
 			const int scale_factor = stratagus::defines::get()->get_scale_factor();
 			// background so the text is easier to read
 			if (MessagesCount) {
@@ -1357,7 +1320,7 @@ void MessagesDisplay::DrawMessages()
 									UI.MapArea.EndX - UI.MapArea.X - 15,
 									textHeight - MessagesScrollY + 2);
 				*/
-				Video.FillTransRectangleClip(color, UI.MapArea.X + 7 * scale_factor, UI.MapArea.EndY + (-16 - 1) * scale_factor - textHeight + MessagesScrollY,
+				Video.FillTransRectangleClip(color, UI.MapArea.X + 6 * scale_factor + 1, UI.MapArea.EndY + (-16 - 2) * scale_factor + 1 - textHeight + MessagesScrollY,
 											 UI.MapArea.EndX - UI.MapArea.X - 16 * scale_factor,
 											 textHeight + 1 * scale_factor, 0x80);
 
