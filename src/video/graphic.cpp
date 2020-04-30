@@ -1597,6 +1597,11 @@ void CGraphic::Resize(int w, int h)
 	} else {
 		this->image = this->image.scaled(w, h, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	}
+
+	if (!this->has_transparency() && this->get_image().depth() >= 32) {
+		//convert 32-bit color images to 24-bit if they don't have transparency, to save on memory (the scaling processes could have changed their format)
+		this->image = this->get_image().convertToFormat(QImage::Format_RGB888);
+	}
 	GraphicWidth = w;
 	GraphicHeight = h;
 
