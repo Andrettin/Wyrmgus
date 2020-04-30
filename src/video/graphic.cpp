@@ -1014,7 +1014,40 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 		}
 		//Wyrmgus end
 	}
-	
+
+	this->transparency = false;
+	this->player_color = false;
+	const stratagus::color_set color_set = stratagus::image::get_colors(this->get_image());
+	for (const QColor &color : color_set) {
+		const int alpha = color.alpha();
+		if (!this->transparency && alpha != 255) {
+			this->transparency = true;
+		}
+
+		if (!this->player_color) {
+			for (const int conversible_color : ConversiblePlayerColors) {
+				if (PlayerColorNames[conversible_color].empty()) {
+					break;
+				}
+
+				for (const CColor &player_color : PlayerColorsRGB[conversible_color]) {
+					if (color.red() == player_color.R && color.green() == player_color.G && color.blue() == player_color.B) {
+						this->player_color = true;
+						break;
+					}
+				}
+
+				if (this->player_color) {
+					break;
+				}
+			}
+		}
+
+		if (this->transparency && this->player_color) {
+			break; //nothing left to check
+		}
+	}
+
 	/*
 	if (Width == 1792) {
 		ConvertImageToMap(Surface, Width, Height);
@@ -1548,7 +1581,7 @@ void CGraphic::Resize(int w, int h)
 		}
 	}
 
-	Resized = true;
+	this->Resized = true;
 
 	const int bpp = this->get_image().depth() / 8;
 	if (bpp < 4) {

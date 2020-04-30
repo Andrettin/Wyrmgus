@@ -163,6 +163,16 @@ public:
 		return this->image;
 	}
 
+	bool has_transparency() const
+	{
+		return this->transparency;
+	}
+
+	bool has_player_color() const
+	{
+		return this->player_color;
+	}
+
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *SurfaceFlip = nullptr;  /// Flipped surface
@@ -201,6 +211,8 @@ public:
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 #endif
+	bool transparency = false;
+	bool player_color = false;
 
 	friend class CFont;
 	friend int LoadGraphicPNG(CGraphic *g);
