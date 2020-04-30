@@ -238,10 +238,12 @@ public:
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 #endif
+private:
+	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool player_color = false;
 
 	friend class CFont;
-	friend int LoadGraphicPNG(CGraphic *g);
+	friend int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 };
 
 class CPlayerColorGraphic : public CGraphic
@@ -547,7 +549,7 @@ void DeInitVideo();
 extern int VideoValidResolution(int w, int h);
 
 /// Load graphic from PNG file
-extern int LoadGraphicPNG(CGraphic *g);
+extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 

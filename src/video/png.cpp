@@ -87,19 +87,33 @@ private:
 **
 **  @return   0 for success, -1 for error.
 */
-int LoadGraphicPNG(CGraphic *g)
+int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 {
 	if (g->File.empty()) {
 		return -1;
 	}
-	const std::string name = LibraryFileName(g->File.c_str());
-	if (name.empty()) {
+	std::filesystem::path filepath = LibraryFileName(g->File.c_str());
+	if (filepath.empty()) {
 		return -1;
 	}
 
-	g->image = QImage(name.c_str());
+	//if the scale factor is greater than 1, see if there is a file in the same folder with e.g. the "_2x" suffix for the 2x scale factor, and if so, use that
+	int suffix_scale_factor = scale_factor;
+	while (suffix_scale_factor > 1) {
+		std::filesystem::path scale_suffix_filepath = filepath;
+		scale_suffix_filepath.replace_filename(filepath.stem().string() + "_" + std::to_string(suffix_scale_factor) + "x" + filepath.extension().string());
+		if (std::filesystem::exists(scale_suffix_filepath)) {
+			filepath = scale_suffix_filepath;
+			g->custom_scale_factor = suffix_scale_factor;
+			break;
+		}
+		suffix_scale_factor /= 2;
+	}
+
+	g->File = filepath.string();
+	g->image = QImage(filepath.string().c_str());
 	if (g->get_image().isNull()) {
-		throw std::runtime_error("Failed to load the \"" + name + "\" image file.");
+		throw std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file.");
 	}
 
 	g->GraphicWidth = g->get_image().width();

@@ -714,10 +714,16 @@ static void ApplyGrayScale(QImage &image)
 		}
 		case 3:
 		case 4:
+			if (bpp == 3 && image.format() != QImage::Format_RGB888) {
+				image = image.convertToFormat(QImage::Format_RGB888);
+			} else if (bpp == 4 && image.format() != QImage::Format_RGBA8888) {
+				image = image.convertToFormat(QImage::Format_RGBA8888);
+			}
+
 			unsigned char *image_data = image.bits();
 			for (int x = 0; x < image.width(); ++x) {
 				for (int y = 0; y < image.height(); ++y) {
-					const int pixel_index = (y * image.height() + x) * bpp;
+					const int pixel_index = (y * image.width() + x) * bpp;
 					unsigned char &red = image_data[pixel_index];
 					unsigned char &green = image_data[pixel_index + 1];
 					unsigned char &blue = image_data[pixel_index + 2];
@@ -757,10 +763,16 @@ static void ApplySepiaScale(QImage &image)
 		}
 		case 3:
 		case 4:
+			if (bpp == 3 && image.format() != QImage::Format_RGB888) {
+				image = image.convertToFormat(QImage::Format_RGB888);
+			} else if (bpp == 4 && image.format() != QImage::Format_RGBA8888) {
+				image = image.convertToFormat(QImage::Format_RGBA8888);
+			}
+
 			unsigned char *image_data = image.bits();
 			for (int x = 0; x < image.width(); ++x) {
 				for (int y = 0; y < image.height(); ++y) {
-					const int pixel_index = (y * image.height() + x) * bpp;
+					const int pixel_index = (y * image.width() + x) * bpp;
 					unsigned char &red = image_data[pixel_index];
 					unsigned char &green = image_data[pixel_index + 1];
 					unsigned char &blue = image_data[pixel_index + 2];
@@ -852,9 +864,16 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 	}
 
 	// TODO: More formats?
-	if (LoadGraphicPNG(this) == -1) {
+	if (LoadGraphicPNG(this, scale_factor) == -1) {
 		fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
 		ExitFatal(-1);
+	}
+
+	if (this->custom_scale_factor != 1) {
+		//update the frame size for the custom scale factor of the loaded image
+		this->Width *= this->custom_scale_factor;
+		this->Height *= this->custom_scale_factor;
+		this->original_frame_size = QSize(this->Width, this->Height);
 	}
 
 	if (!Width) {
@@ -910,8 +929,8 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 
 	GenFramesMap();
 
-	if (scale_factor != 1) {
-		this->Resize(this->GraphicWidth * scale_factor, this->GraphicHeight * scale_factor);
+	if (scale_factor != this->custom_scale_factor) {
+		this->Resize(this->GraphicWidth * scale_factor / this->custom_scale_factor, this->GraphicHeight * scale_factor / this->custom_scale_factor);
 	}
 }
 
