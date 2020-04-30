@@ -1584,13 +1584,7 @@ void CGraphic::Resize(int w, int h)
 	this->Resized = true;
 
 	const int bpp = this->get_image().depth() / 8;
-	if (bpp < 4) {
-		this->image = this->image.scaled(w, h);
-	} else if (w > old_size.width() && (w % old_size.width()) == 0 && (h % old_size.height()) == 0 && h > old_size.height() && (w / old_size.width()) == (h / old_size.height())) {
-		if (bpp != 4) {
-			throw std::runtime_error("Image \"" + this->getFile() + "\" cannot be scaled with xBRZ, as its bytes-per-pixel are not 4.");
-		}
-
+	if (w > old_size.width() && (w % old_size.width()) == 0 && (h % old_size.height()) == 0 && h > old_size.height() && (w / old_size.width()) == (h / old_size.height())) {
 		//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
 		const int scale_factor = w / old_size.width();
 		this->image = stratagus::image::scale(this->image, scale_factor, old_frame_size);
@@ -1602,6 +1596,12 @@ void CGraphic::Resize(int w, int h)
 		//convert 32-bit color images to 24-bit if they don't have transparency, to save on memory (the scaling processes could have changed their format)
 		this->image = this->get_image().convertToFormat(QImage::Format_RGB888);
 	}
+
+	if (bpp == 1) {
+		//restore indexed format for images after rescaling, to save memory
+		this->image = this->get_image().convertToFormat(QImage::Format_Indexed8);
+	}
+
 	GraphicWidth = w;
 	GraphicHeight = h;
 
