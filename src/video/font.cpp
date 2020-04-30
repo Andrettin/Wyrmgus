@@ -874,7 +874,7 @@ void CFont::FreeOpenGL()
 		for (FontColorGraphicMap::iterator it = FontColorGraphics[this].begin();
 			 it != FontColorGraphics[this].end(); ++it) {
 			CGraphic &g = *it->second;
-			glDeleteTextures(g.NumTextures, g.Textures);
+			glDeleteTextures(g.NumTextures, g.textures);
 		}
 	}
 }
@@ -900,7 +900,7 @@ void CFont::Reload() const
 			 it != fontColorGraphicMap.end(); ++it) {
 			CGraphic *g = it->second;
 #if defined(USE_OPENGL) || defined(USE_GLES)
-			delete[] g->Textures;
+			delete[] g->textures;
 #endif
 			delete g;
 		}
@@ -1023,8 +1023,8 @@ void CFont::Clean()
 			for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
 				 it != fontColorGraphicMap.end(); ++it) {
 				CGraphic *g = it->second;
-				glDeleteTextures(g->NumTextures, g->Textures);
-				delete[] g->Textures;
+				glDeleteTextures(g->NumTextures, g->textures);
+				delete[] g->textures;
 				delete g;
 			}
 			fontColorGraphicMap.clear();

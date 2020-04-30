@@ -99,7 +99,7 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	DrawTexture(this, Textures, gx, gy, gx + w, gy + h, x, y, 0);
+	DrawTexture(this, this->textures, gx, gy, gx + w, gy + h, x, y, 0);
 #endif
 }
 
@@ -232,7 +232,7 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
+		DrawTexture(this, this->textures, frame_map[frame].x, frame_map[frame].y,
 					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
 	} else
 #endif
@@ -277,7 +277,7 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const stratagus::time
 	//Wyrmgus start
 //	DoDrawFrameClip(Textures, frame, x, y);
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClip(Textures, frame, x, y, show_percent);
+		DoDrawFrameClip(this->textures, frame, x, y, show_percent);
 	} else {
 		if (TextureColorModifications.find(time_of_day->ColorModification) == TextureColorModifications.end()) {
 			MakeTexture(this, time_of_day);
@@ -376,12 +376,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 		}		
 	}
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	//Wyrmgus start
-	/*
-	if (!PlayerColorTextures[player]) {
-		MakePlayerColorTexture(this, player);
-	}
-	*/
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		if (!PlayerColorTextures[player]) {
 			MakePlayerColorTexture(this, player, nullptr);
@@ -391,7 +385,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 			MakePlayerColorTexture(this, player, time_of_day);
 		}
 	}
-	//Wyrmgus end
 	
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
@@ -462,18 +455,8 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 */
 void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
-					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
-	} else
-#endif
-	{
-		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-
-		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	}
+	DrawTexture(this, this->textures, frame_map[frame].x, frame_map[frame].y,
+				frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -519,7 +502,7 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const stratagus::tim
 	//Wyrmgus start
 	//DoDrawFrameClipX(Textures, frame, x, y);
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClipX(Textures, frame, x, y);
+		DoDrawFrameClipX(this->textures, frame, x, y);
 	} else {
 		if (TextureColorModifications.find(time_of_day->ColorModification) == TextureColorModifications.end()) {
 			MakeTexture(this, time_of_day);
@@ -1090,9 +1073,9 @@ void CGraphic::Free(CGraphic *g)
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		// No more uses of this graphic
 		if (UseOpenGL) {
-			if (g->Textures) {
-				glDeleteTextures(g->NumTextures, g->Textures);
-				delete[] g->Textures;
+			if (g->textures) {
+				glDeleteTextures(g->NumTextures, g->textures);
+				delete[] g->textures;
 			}
 			
 			for (std::map<CColor, GLuint *>::iterator iterator = g->TextureColorModifications.begin(); iterator != g->TextureColorModifications.end(); ++iterator) {
@@ -1115,9 +1098,7 @@ void CGraphic::Free(CGraphic *g)
 						glDeleteTextures(cg->NumTextures, sub_iterator->second);
 						delete[] sub_iterator->second;
 					}
-					iterator->second.clear();
 				}
-				cg->PlayerColorTextureColorModifications.clear();
 			}
 			Graphics.remove(g);
 		}
@@ -1141,8 +1122,8 @@ void FreeOpenGLGraphics()
 {
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
-		if ((*i)->Textures) {
-			glDeleteTextures((*i)->NumTextures, (*i)->Textures);
+		if ((*i)->textures) {
+			glDeleteTextures((*i)->NumTextures, (*i)->textures);
 		}
 		
 		for (std::map<CColor, GLuint *>::iterator iterator = (*i)->TextureColorModifications.begin(); iterator != (*i)->TextureColorModifications.end(); ++iterator) {
@@ -1177,9 +1158,9 @@ void ReloadGraphics()
 {
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
-		if ((*i)->Textures) {
-			delete[](*i)->Textures;
-			(*i)->Textures = nullptr;
+		if ((*i)->textures) {
+			delete[](*i)->textures;
+			(*i)->textures = nullptr;
 			MakeTexture(*i);
 		}
 		
@@ -1365,8 +1346,8 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 			textures = g->TextureColorModifications[time_of_day->ColorModification] = new GLuint[g->NumTextures];
 			glGenTextures(g->NumTextures, g->TextureColorModifications[time_of_day->ColorModification]);
 		} else {
-			textures = g->Textures = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->Textures);
+			textures = g->textures = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->textures);
 		}
 	} else if (time_of_day && time_of_day->HasColorModification()) {
 		textures = cg->PlayerColorTextureColorModifications[player][time_of_day->ColorModification] = new GLuint[cg->NumTextures];
@@ -1446,7 +1427,7 @@ void MakeTexture(CGraphic *g, const stratagus::time_of_day *time_of_day)
 			return;
 		}
 	} else {
-		if (g->Textures) {
+		if (g->textures) {
 			return;
 		}
 	}
@@ -1532,10 +1513,10 @@ void CGraphic::Resize(int w, int h)
 	this->Height = frame_size.height();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && Textures) {
-		glDeleteTextures(NumTextures, Textures);
-		delete[] Textures;
-		Textures = nullptr;
+	if (UseOpenGL && this->textures) {
+		glDeleteTextures(NumTextures, this->textures);
+		delete[] this->textures;
+		this->textures = nullptr;
 		MakeTexture(this);
 	}
 #endif
@@ -1560,10 +1541,10 @@ void CGraphic::SetOriginalSize()
 	this->frame_map.clear();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && Textures) {
-		glDeleteTextures(NumTextures, Textures);
-		delete[] Textures;
-		Textures = nullptr;
+	if (UseOpenGL && this->textures) {
+		glDeleteTextures(NumTextures, this->textures);
+		delete[] this->textures;
+		this->textures = nullptr;
 	}
 #endif
 

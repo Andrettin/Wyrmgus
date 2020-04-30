@@ -203,6 +203,11 @@ public:
 		return this->player_color;
 	}
 
+	const GLuint *get_textures() const
+	{
+		return this->textures;
+	}
+
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 private:
@@ -228,7 +233,7 @@ public:
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat TextureWidth = 0.f;      /// Width of the texture
 	GLfloat TextureHeight = 0.f;     /// Height of the texture
-	GLuint *Textures = nullptr;          /// Texture names
+	GLuint *textures = nullptr;          /// Texture names
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 #endif
@@ -277,7 +282,6 @@ public:
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
 	
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	GLuint *PlayerColorTextures[PlayerColorMax];				/// Textures with player colors
 	std::map<int, std::map<CColor, GLuint *>> PlayerColorTextureColorModifications;	/// Player color textures with a color modification applied to them
 #endif
