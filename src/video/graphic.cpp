@@ -1278,15 +1278,11 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
-						//Wyrmgus start
-//						  int ow, int oh)
-						  const int ow, const int oh, const stratagus::time_of_day *time_of_day)
-						//Wyrmgus end
+void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day)
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	int maxw = std::min<int>(g->get_image().width() - ow, GLMaxTextureSize);
-	int maxh = std::min<int>(g->get_image().height() - oh, GLMaxTextureSize);
+	int maxw = std::min<int>(image.width() - ow, GLMaxTextureSize);
+	int maxh = std::min<int>(image.height() - oh, GLMaxTextureSize);
 	int w = PowerOf2(maxw);
 	int h = PowerOf2(maxh);
 	unsigned char *tex = new unsigned char[w * h * 4];
@@ -1298,10 +1294,6 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	//Wyrmgus start
-	int found_player_color = -1;
-	//Wyrmgus end
-	
 	//Wyrmgus start
 	int time_of_day_red = 0;
 	int time_of_day_green = 0;
@@ -1316,32 +1308,21 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	}
 	//Wyrmgus end
 
-	const QImage &image = g->get_image();
-
 	if (image.isNull()) {
 		throw std::runtime_error("Cannot generate a texture for a null image.");
 	}
 
-	const QImage *src_image = nullptr;
-	QImage reformatted_image;
-
-	if (image.format() == QImage::Format_RGBA8888) {
-		src_image = &image;
-	} else {
-		reformatted_image = image.convertToFormat(QImage::Format_RGBA8888);
-		src_image = &reformatted_image;
-	}
-	const int depth = src_image->depth();
+	const int depth = image.depth();
 	const int bpp = depth / 8;
 
 	if (bpp != 4) {
 		throw std::runtime_error("The image BPP must be 4 for generating textures.");
 	}
 
-	const unsigned char *image_data = src_image->constBits();
+	const unsigned char *image_data = image.constBits();
 	for (int x = 0; x < maxw; ++x) {
 		for (int y = 0; y < maxh; ++y) {
-			const int src_index = ((oh + y) * src_image->width() + ow + x) * bpp;
+			const int src_index = ((oh + y) * image.width() + ow + x) * bpp;
 			const unsigned char &src_red = image_data[src_index];
 			const unsigned char &src_green = image_data[src_index + 1];
 			const unsigned char &src_blue = image_data[src_index + 2];
@@ -1373,12 +1354,6 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 							dst_red = colors->Colors[z].R;
 							dst_green = colors->Colors[z].G;
 							dst_blue = colors->Colors[z].B;
-
-							if (found_player_color == -1) {
-								found_player_color = ConversiblePlayerColors[k];
-							} else if (found_player_color != ConversiblePlayerColors[k]) {
-								fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", g->File.c_str(), PlayerColorNames[ConversiblePlayerColors[k]].c_str(), PlayerColorNames[found_player_color].c_str());
-							}
 						}
 					}
 				}
@@ -1461,12 +1436,18 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, const str
 		glGenTextures(cg->NumTextures, cg->PlayerColorTextures[player]);
 	}
 
+	const QImage *src_image = nullptr;
+	QImage reformatted_image;
+	if (g->get_image().format() == QImage::Format_RGBA8888) {
+		src_image = &g->get_image();
+	} else {
+		reformatted_image = g->get_image().convertToFormat(QImage::Format_RGBA8888);
+		src_image = &reformatted_image;
+	}
+
 	for (int j = 0; j < th; ++j) {
 		for (int i = 0; i < tw; ++i) {
-			//Wyrmgus start
-//			MakeTextures2(g, textures[j * tw + i], colors, GLMaxTextureSize * i, GLMaxTextureSize * j);
-			MakeTextures2(g, textures[j * tw + i], colors, GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
-			//Wyrmgus end
+			MakeTextures2(g, *src_image, textures[j * tw + i], colors, GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
 		}
 	}
 }

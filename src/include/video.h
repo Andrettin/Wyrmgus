@@ -542,7 +542,7 @@ extern int LoadGraphicPNG(CGraphic *g);
 extern void MakeTexture(CGraphic *graphic, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 //Wyrmgus start
-extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
+extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, CUnitColors *colors, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
