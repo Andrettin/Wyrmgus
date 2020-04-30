@@ -136,7 +136,7 @@ public:
 		this->border_tiles.clear();
 	}
 
-	void update_border_tile_graphics();
+	void update_border_tiles(const bool minimap_only);
 
 	const std::vector<faction *> &get_cores() const
 	{

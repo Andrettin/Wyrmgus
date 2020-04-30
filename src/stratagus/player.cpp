@@ -1332,6 +1332,18 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 		if (player_color != nullptr) {
 			this->player_color = player_color;
 			this->minimap_color = player_color->get_colors()[0];
+
+			//update the borders on the minimap for the new color
+			for (const auto &kv_pair : this->UnitsByType) {
+				const CUnitType *unit_type = kv_pair.first;
+				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+					continue;
+				}
+
+				for (const CUnit *town_hall : kv_pair.second) {
+					town_hall->settlement->update_border_tiles(true);
+				}
+			}
 		}
 	
 		if (!stratagus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {

@@ -221,7 +221,7 @@ void site::set_owner(CPlayer *player)
 	}
 
 	this->owner = player;
-	this->update_border_tile_graphics();
+	this->update_border_tiles(false);
 	this->owner_faction = player ? player->get_faction() : nullptr;
 }
 
@@ -235,13 +235,15 @@ void site::remove_building_class(unit_class *building_class)
 	vector::remove_one(this->building_classes, building_class);
 }
 
-void site::update_border_tile_graphics()
+void site::update_border_tiles(const bool minimap_only)
 {
 	if (this->get_site_unit() != nullptr) {
 		const int z = this->get_site_unit()->MapLayer->ID;
 		const int minimap_territory_tile_range = UI.Minimap.get_territory_tile_range(z);
 		for (const QPoint &tile_pos : this->border_tiles) {
-			CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+			if (!minimap_only) {
+				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+			}
 
 			for (int minimap_offset_x = -minimap_territory_tile_range; minimap_offset_x <= minimap_territory_tile_range; ++minimap_offset_x) {
 				for (int minimap_offset_y = -minimap_territory_tile_range; minimap_offset_y <= minimap_territory_tile_range; ++minimap_offset_y) {
@@ -269,7 +271,9 @@ void site::update_border_tile_graphics()
 
 					CMapField *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
 					if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
-						CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
+						if (!minimap_only) {
+							CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
+						}
 
 						for (int minimap_offset_x = -minimap_territory_tile_range; minimap_offset_x <= minimap_territory_tile_range; ++minimap_offset_x) {
 							for (int minimap_offset_y = -minimap_territory_tile_range; minimap_offset_y <= minimap_territory_tile_range; ++minimap_offset_y) {
