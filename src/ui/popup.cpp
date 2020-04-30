@@ -35,6 +35,7 @@
 
 #include "ui/popup.h"
 
+#include "database/defines.h"
 #include "font.h"
 #include "player.h"
 #include "script/trigger.h"
@@ -101,6 +102,7 @@
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -120,7 +122,7 @@
 	if (draw.length()) {
 		int i = 1;
 		while ((GetLineFont(i++, draw, this->MaxWidth, &font)).length()) {
-			height += font.Height() + 2;
+			height += font.Height() + 2 * scale_factor;
 		}
 	}
 	return height;
@@ -131,6 +133,8 @@
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
 			//Wyrmgus start
@@ -154,7 +158,7 @@
 							 : 0;
 		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
 			label.Draw(x, y_off, sub);
-			y_off += font.Height() + 2;
+			y_off += font.Height() + 2 * scale_factor;
 		}
 		return;
 	}
@@ -228,6 +232,8 @@
 /* virtual */ int CPopupContentTypeText::GetHeight(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
@@ -243,7 +249,7 @@
 //	while ((GetLineFont(i++, this->Text, this->MaxWidth, &font)).length()) {
 	while ((GetLineFont(i++, text, this->MaxWidth, &font)).length()) {
 	//Wyrmgus end
-		height += font.Height() + 2;
+		height += font.Height() + 2 * scale_factor;
 	}
 	return height;
 }
@@ -251,6 +257,8 @@
 /* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
@@ -272,7 +280,7 @@
 	while ((sub = GetLineFont(++i, text, width, &font)).length()) {
 	//Wyrmgus end
 		label.Draw(x, y_off, sub);
-		y_off += font.Height() + 2;
+		y_off += font.Height() + 2 * scale_factor;
 	}
 }
 
@@ -302,18 +310,19 @@
 {
 	int popupWidth = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (UI.Resources[i].IconWidth != -1)	{
-				popupWidth += (UI.Resources[i].IconWidth + 5);
+				popupWidth += (UI.Resources[i].IconWidth + 5 * scale_factor);
 			} else {
 				const CGraphic *G = UI.Resources[i].G;
 				if (G) {
-					popupWidth += (G->Width + 5);
+					popupWidth += (G->Width + 5 * scale_factor);
 				}
 			}
-			popupWidth += (font.Width(Costs[i]) + 5);
+			popupWidth += (font.Width(Costs[i]) + 5 * scale_factor);
 		}
 	}
 	if (Costs[ManaResCost]) {
@@ -323,21 +332,18 @@
 		if (spell->ManaCost) {
 			popupWidth = 10;
 			if (UI.Resources[ManaResCost].IconWidth != -1) {
-				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5);
+				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5 * scale_factor);
 			} else {
 				if (G) {
-					popupWidth += (G->Width + 5);
+					popupWidth += (G->Width + 5 * scale_factor);
 				}
 			}
 			popupWidth += font.Width(spell->ManaCost);
-			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10);
+			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10 * scale_factor);
 		} else {
-			//Wyrmgus start
-//			popupWidth = font.Width(button.Hint) + 10;
-			popupWidth = font.Width(button.GetHint()) + 10;
-			//Wyrmgus end
+			popupWidth = font.Width(button.GetHint()) + 10 * scale_factor;
 		}
-		popupWidth = std::max<int>(popupWidth, 100);
+		popupWidth = std::max<int>(popupWidth, 100 * scale_factor);
 	}
 	return popupWidth;
 }
@@ -359,6 +365,7 @@
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -370,13 +377,13 @@
 			if (G) {
 				int x_offset = UI.Resources[i].IconWidth;
 				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
-				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
+				x += ((x_offset != -1 ? x_offset : G->Width) + 5 * scale_factor);
 				y_offset = G->Height;
 				y_offset -= label.Height();
 				y_offset /= 2;
 			}
 			x += label.Draw(x, y + y_offset, Costs[i]);
-			x += 5;
+			x += 5 * scale_factor;
 		}
 	}
 	if (Costs[ManaResCost]) {
@@ -389,9 +396,9 @@
 			int y_offset = 0;
 			if (G) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
-				x += 5;
+				x += 5 * scale_factor;
 				G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, y);
-				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
+				x += ((x_offset != -1 ? x_offset : G->Width) + 5 * scale_factor);
 				y_offset = G->Height;
 				y_offset -= font.Height();
 				y_offset /= 2;
@@ -421,7 +428,6 @@
 
 CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1)
 {
-
 }
 
 /* virtual */ int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const
