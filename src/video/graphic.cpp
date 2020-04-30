@@ -243,7 +243,7 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-void CGraphic::DoDrawFrameClip(GLuint *textures,
+void CGraphic::DoDrawFrameClip(const GLuint *textures,
 							   unsigned frame, int x, int y, int show_percent) const
 {
 	int ox;
@@ -477,7 +477,7 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
+void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
 								int x, int y) const
 {
 	int ox;
@@ -1039,12 +1039,9 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 		}
 	}
 	
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		MakeTexture(this);
-		Graphics.push_back(this);
-	}
-#endif
+	MakeTexture(this);
+	Graphics.push_back(this);
+
 	GenFramesMap();
 
 	if (scale_factor != 1) {
@@ -1127,65 +1124,6 @@ void CGraphic::Free(CGraphic *g)
 #endif
 
 		g->frame_map.clear();
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (!UseOpenGL)
-#endif
-		{
-			FreeSurface(&g->SurfaceFlip);
-			g->frameFlip_map.clear();
-			
-			//Wyrmgus start
-			if (g->DawnSurface) {
-				FreeSurface(&g->DawnSurface);
-			}
-			if (g->DawnSurfaceFlip) {
-				FreeSurface(&g->DawnSurfaceFlip);
-			}
-			if (g->DuskSurface) {
-				FreeSurface(&g->DuskSurface);
-			}
-			if (g->DuskSurfaceFlip) {
-				FreeSurface(&g->DuskSurfaceFlip);
-			}
-			if (g->NightSurface) {
-				FreeSurface(&g->NightSurface);
-			}
-			if (g->NightSurfaceFlip) {
-				FreeSurface(&g->NightSurfaceFlip);
-			}
-
-			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-			if (cg) {
-				for (int i = 0; i < PlayerColorMax; ++i) {
-					if (cg->PlayerColorSurfaces[i]) {
-						FreeSurface(&cg->PlayerColorSurfaces[i]);
-					}
-					if (cg->PlayerColorSurfacesFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesFlip[i]);
-					}
-					if (cg->PlayerColorSurfacesDawn[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDawn[i]);
-					}
-					if (cg->PlayerColorSurfacesDawnFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDawnFlip[i]);
-					}
-					if (cg->PlayerColorSurfacesDusk[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDusk[i]);
-					}
-					if (cg->PlayerColorSurfacesDuskFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesDuskFlip[i]);
-					}
-					if (cg->PlayerColorSurfacesNight[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesNight[i]);
-					}
-					if (cg->PlayerColorSurfacesNightFlip[i]) {
-						FreeSurface(&cg->PlayerColorSurfacesNightFlip[i]);
-					}
-				}
-			}
-			//Wyrmgus end
-		}
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);

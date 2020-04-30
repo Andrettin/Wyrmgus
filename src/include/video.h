@@ -98,7 +98,7 @@ public:
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
+	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
 #endif
 	//Wyrmgus start
 //	void DrawFrameClip(unsigned frame, int x, int y) const;
@@ -113,7 +113,7 @@ public:
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	void DoDrawFrameClipX(GLuint *textures, unsigned frame, int x, int y) const;
+	void DoDrawFrameClipX(const GLuint *textures, unsigned frame, int x, int y) const;
 #endif
 	//Wyrmgus start
 //	void DrawFrameClipX(unsigned frame, int x, int y) const;
@@ -205,15 +205,6 @@ public:
 
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
-	SDL_Surface *SurfaceFlip = nullptr;  /// Flipped surface
-	//Wyrmgus start
-	SDL_Surface *DawnSurface = nullptr;      /// Surface
-	SDL_Surface *DawnSurfaceFlip = nullptr;  /// Flipped surface
-	SDL_Surface *DuskSurface = nullptr;      /// Surface
-	SDL_Surface *DuskSurfaceFlip = nullptr;  /// Flipped surface
-	SDL_Surface *NightSurface = nullptr;      /// Surface
-	SDL_Surface *NightSurfaceFlip = nullptr;  /// Flipped surface
-	//Wyrmgus end
 private:
 	QImage image;
 public:
@@ -252,19 +243,6 @@ class CPlayerColorGraphic : public CGraphic
 protected:
 	CPlayerColorGraphic()
 	{
-		//Wyrmgus start
-		for (int i = 0; i < PlayerColorMax; ++i) {
-			PlayerColorSurfaces[i] = nullptr;
-			PlayerColorSurfacesFlip[i] = nullptr;
-			PlayerColorSurfacesDawn[i] = nullptr;
-			PlayerColorSurfacesDawnFlip[i] = nullptr;
-			PlayerColorSurfacesDusk[i] = nullptr;
-			PlayerColorSurfacesDuskFlip[i] = nullptr;
-			PlayerColorSurfacesNight[i] = nullptr;
-			PlayerColorSurfacesNightFlip[i] = nullptr;
-		}
-		//Wyrmgus end
-		
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
 //		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
@@ -298,17 +276,6 @@ public:
 	static CPlayerColorGraphic *Get(const std::string &file);
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
-	
-	//Wyrmgus start
-	SDL_Surface *PlayerColorSurfaces[PlayerColorMax];			/// Surface
-	SDL_Surface *PlayerColorSurfacesFlip[PlayerColorMax];		/// Flipped surface
-	SDL_Surface *PlayerColorSurfacesDawn[PlayerColorMax];		/// Surface
-	SDL_Surface *PlayerColorSurfacesDawnFlip[PlayerColorMax];	/// Flipped surface
-	SDL_Surface *PlayerColorSurfacesDusk[PlayerColorMax];		/// Surface
-	SDL_Surface *PlayerColorSurfacesDuskFlip[PlayerColorMax];	/// Flipped surface
-	SDL_Surface *PlayerColorSurfacesNight[PlayerColorMax];		/// Surface
-	SDL_Surface *PlayerColorSurfacesNightFlip[PlayerColorMax];	/// Flipped surface
-	//Wyrmgus end
 	
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLuint *PlayerColorTextures[PlayerColorMax];				/// Textures with player colors
@@ -679,7 +646,7 @@ extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
+void DrawTexture(const CGraphic *g, const GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
 #endif
 

@@ -75,7 +75,7 @@
 **    Flipping controls which of those values corresponds
 **    to @a gx_beg and which one to @a gx_end.
 */
-void DrawTexture(const CGraphic *g, GLuint *textures,
+void DrawTexture(const CGraphic *g, const GLuint *textures,
 				 int gx_beg, int gy_beg, int gx_end, int gy_end,
 				 int sx_beg, int sy_beg, int flip)
 {
