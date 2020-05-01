@@ -293,7 +293,7 @@ bool IconConfig::Load()
 	if (res == true) {
 		UpdateLoadProgress();
 	} else {
-		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
+		throw std::runtime_error("Can't find icon \"" + this->Name + "\".");
 	}
 	return res;
 }
