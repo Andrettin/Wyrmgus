@@ -499,8 +499,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
 			const CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-//			CIcon &icon = *order.GetUnitType().Icon.Icon;
-			CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+//			stratagus::icon &icon = *order.GetUnitType().Icon.Icon;
+			stratagus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 			//Wyrmgus end
 			//Wyrmgus start
 //			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
@@ -535,7 +535,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 						break;
 					}
 					const CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-					CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+					stratagus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -628,7 +628,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 
-				CIcon &icon = *order.GetUnitType().Icon.Icon;
+				stratagus::icon &icon = *order.GetUnitType().Icon.Icon;
 				unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
@@ -648,7 +648,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 				
-				CIcon &icon = *order.GetUpgrade().get_icon();
+				stratagus::icon &icon = *order.GetUpgrade().get_icon();
 				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
@@ -676,8 +676,8 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			continue;
 		}
 		//Wyrmgus start
-//		CIcon &icon = *uins->Type->Icon.Icon;
-		CIcon &icon = *uins->GetIcon().Icon;
+//		stratagus::icon &icon = *uins->Type->Icon.Icon;
+		stratagus::icon &icon = *uins->GetIcon().Icon;
 		//Wyrmgus end
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
@@ -720,7 +720,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
-		CIcon &icon = *uins->GetIcon().Icon;
+		stratagus::icon &icon = *uins->GetIcon().Icon;
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   IconActive : 0;
@@ -1031,7 +1031,7 @@ void DrawPopups()
 				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 					continue;
 				}
-				CIcon &icon = *uins->GetIcon().Icon;
+				stratagus::icon &icon = *uins->GetIcon().Icon;
 				
 				int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 						   IconActive : 0;
@@ -1924,7 +1924,7 @@ static void InfoPanel_draw_multiple_selection()
 	DrawInfoPanelBackground(0);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		//Wyrmgus start
-//		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
+//		const stratagus::icon &icon = *Selected[i]->Type->Icon.Icon;
 		//Wyrmgus end
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start

@@ -36,7 +36,6 @@ class CCurrency;
 class CDeity;
 class CDynasty;
 class CForceTemplate;
-class CIcon;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
@@ -46,6 +45,7 @@ int CclDefineFaction(lua_State *l);
 namespace stratagus {
 
 class civilization;
+class icon;
 class resource;
 class unit_class;
 
@@ -53,8 +53,8 @@ class faction : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::civilization *civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(CIcon *icon MEMBER icon READ get_icon)
+	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 
 public:
 	static constexpr const char *class_identifier = "faction";
@@ -90,7 +90,7 @@ public:
 		return this->civilization;
 	}
 
-	CIcon *get_icon() const
+	icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -168,7 +168,7 @@ public:
 	int ParentFaction = -1;												/// parent faction of this faction
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
-	CIcon *icon = nullptr;												/// Faction's icon
+	icon *icon = nullptr;												/// Faction's icon
 	CCurrency *Currency = nullptr;										/// The faction's currency
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;

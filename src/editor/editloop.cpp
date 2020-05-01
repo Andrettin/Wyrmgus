@@ -709,7 +709,7 @@ static void CalculateMaxIconSize()
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
 		const CUnitType *type = CUnitType::get(Editor.UnitTypes[i].c_str());
 		Assert(type->Icon.Icon);
-		const CIcon &icon = *type->Icon.Icon;
+		const stratagus::icon &icon = *type->Icon.Icon;
 
 		IconWidth = std::max(IconWidth, icon.G->Width);
 		IconHeight = std::max(IconHeight, icon.G->Height);
@@ -862,8 +862,8 @@ static void DrawUnitIcons()
 			//Wyrmgus emd
 		}
 		//Wyrmgus start
-//		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::get("icon-level-up");
+//		stratagus::icon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
+		stratagus::icon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *stratagus::icon::get("icon-level-up");
 		//Wyrmgus end
 		const PixelPos pos(x, y);
 
@@ -1130,7 +1130,7 @@ static void DrawEditorPanel_SelectIcon()
 //	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
 	const PixelPos pos(UI.InfoPanel.X + 11, UI.InfoPanel.Y + 7);
 	//Wyrmgus end
-	CIcon *icon = Editor.Select.Icon;
+	stratagus::icon *icon = Editor.Select.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == SelectButton) {
@@ -1154,7 +1154,7 @@ static void DrawEditorPanel_UnitsIcon()
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x(), UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y());
-	CIcon *icon = Editor.Units.Icon;
+	stratagus::icon *icon = Editor.Units.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == UnitButton) {
@@ -1181,7 +1181,7 @@ static void DrawEditorPanel_StartIcon()
 	int y = UI.InfoPanel.Y + 5 * scale_factor;
 
 	if (Editor.StartUnit) {
-		CIcon *icon = Editor.StartUnit->Icon.Icon;
+		stratagus::icon *icon = Editor.StartUnit->Icon.Icon;
 		Assert(icon);
 		const PixelPos pos(x + get_start_icon_x(), y + get_start_icon_y());
 		unsigned int flag = 0;

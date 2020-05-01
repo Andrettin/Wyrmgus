@@ -6485,7 +6485,7 @@ IconConfig CUnit::GetIcon() const
 	}
 }
 
-CIcon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
+stratagus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;

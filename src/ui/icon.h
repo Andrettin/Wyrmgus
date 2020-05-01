@@ -31,35 +31,6 @@
 #include "database/data_type.h"
 #include "vec2i.h"
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**  @class CIcon icon.h
-**
-**  \#include "icon.h"
-**
-**  This structure contains all information about an icon.
-**
-**  The icon structure members:
-**
-**  CIcon::Ident
-**
-**    Unique identifier of the icon, used to reference it in config
-**    files and during startup.  Don't use this in game, use instead
-**    the pointer to this structure.
-**
-**  CIcon::G
-**
-**    Graphic image containing the loaded graphics. All icons
-**    belonging to the same icon file shares this structure.
-**
-**  CIcon::Frame
-**
-**    Frame number in the graphic to display.
-*/
-
 /**
 **  @class IconConfig icon.h
 **
@@ -72,16 +43,11 @@
 **    Unique identifier of the icon, used to reference icons in config
 **    files and during startup.  The name is resolved during game
 **    start and the pointer placed in the next field.
-**    @see CIcon::Ident
 **
 **  IconConfig::Icon
 **
 **    Pointer to an icon. This pointer is resolved during game start.
 */
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
 
 static constexpr int IconActive = 1; //cursor on icon
 static constexpr int IconClicked = 2; //mouse button down on icon
@@ -92,10 +58,6 @@ static constexpr int IconAutoCast = 16; //auto cast icon
 static constexpr int IconCommandButton = 32; //if the icon is a command button
 //Wyrmgus end
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CConfigData;
 class CGraphic;
 class CPlayerColorGraphic;
@@ -103,12 +65,14 @@ class CPlayer;
 class ButtonStyle;
 struct lua_State;
 
+int CclDefineIcon(lua_State *l);;
+
 namespace stratagus {
-	class player_color;
-}
+
+class player_color;
 
 /// Icon: rectangle image used in menus
-class CIcon final : public stratagus::data_entry, public stratagus::data_type<CIcon>
+class icon final : public data_entry, public data_type<icon>
 {
 	Q_OBJECT
 
@@ -120,13 +84,13 @@ public:
 	static constexpr const char *database_folder = "icons";
 
 	//needed by scripts via tolua++ for now
-	static CIcon *Get(const std::string &ident)
+	static icon *Get(const std::string &ident)
 	{
-		return CIcon::get(ident);
+		return icon::get(ident);
 	}
 
-	CIcon(const std::string &identifier);
-	~CIcon();
+	icon(const std::string &identifier);
+	~icon();
 
 	virtual void initialize() override;
 
@@ -137,8 +101,6 @@ public:
 		}
 	}
 
-	void ProcessConfigData(const CConfigData *config_data);
-	
 	const std::filesystem::path &get_file() const
 	{
 		return this->file;
@@ -162,14 +124,14 @@ public:
 	}
 
 	/// Draw icon
-	void DrawIcon(const PixelPos &pos, const stratagus::player_color *player_color = nullptr) const;
+	void DrawIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
 	/// Draw grayscale icon
-	void DrawGrayscaleIcon(const PixelPos &pos, const stratagus::player_color *player_color = nullptr) const;
+	void DrawGrayscaleIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
 	/// Draw cooldown spell
 	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const;
 	/// Draw icon of a unit
 	void DrawUnitIcon(const ButtonStyle &style,
-					  unsigned flags, const PixelPos &pos, const std::string &text, const stratagus::player_color *player = nullptr, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
+					  unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player = nullptr, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 
 private:
 	void load();
@@ -181,8 +143,10 @@ private:
 	std::filesystem::path file;
 	int frame = 0; //frame number in the icon's image
 
-	friend int CclDefineIcon(lua_State *l);
+	friend int ::CclDefineIcon(lua_State *l);
 };
+
+}
 
 /// Icon reference (used in config tables)
 class IconConfig
@@ -194,5 +158,5 @@ public:
 	bool Load();
 public:
 	std::string Name; //config icon name
-	CIcon *Icon = nullptr; //icon pointer to use to run time
+	stratagus::icon *Icon = nullptr; //icon pointer to use to run time
 };

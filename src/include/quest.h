@@ -148,7 +148,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 
 public:
@@ -169,7 +169,7 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
-	CIcon *get_icon() const
+	icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -203,7 +203,7 @@ public:
 	int ID = -1;
 	civilization *civilization = nullptr; //civilization to which civilization the quest belongs to
 private:
-	CIcon *icon = nullptr;
+	icon *icon = nullptr;
 public:
 	const player_color *PlayerColor = nullptr;		/// Player color used for the quest's icon
 	int HighestCompletedDifficulty = -1;

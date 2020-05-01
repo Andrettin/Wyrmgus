@@ -25,15 +25,10 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/icon.h"
 
-#include "config.h"
 #include "database/defines.h"
 #include "menus.h"
 #include "mod.h"
@@ -43,24 +38,22 @@
 #include "unit/unit.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-CIcon::CIcon(const std::string &identifier) : data_entry(identifier)
+icon::icon(const std::string &identifier) : data_entry(identifier)
 {
 }
 
-CIcon::~CIcon()
+icon::~icon()
 {
 	CPlayerColorGraphic::Free(this->G);
 	CPlayerColorGraphic::Free(this->GScale);
 }
 
-void CIcon::initialize()
+void icon::initialize()
 {
 	if (!this->get_file().empty() && this->G == nullptr) {
-		const QSize &icon_size = stratagus::defines::get()->get_icon_size();
+		const QSize &icon_size = defines::get()->get_icon_size();
 		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size.width(), icon_size.height());
 	}
 
@@ -69,71 +62,22 @@ void CIcon::initialize()
 	data_entry::initialize();
 }
 
-void CIcon::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "frame") {
-			this->frame = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid icon property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "image") {
-			Vec2i size(0, 0);
-				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "file") {
-					this->file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					size.x = std::stoi(value);
-				} else if (key == "height") {
-					size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CPlayerColorGraphic::New(this->get_file().string(), size.x, size.y);
-		} else {
-			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-}
-
-void CIcon::set_file(const std::filesystem::path &filepath)
+void icon::set_file(const std::filesystem::path &filepath)
 {
 	if (filepath == this->get_file()) {
 		return;
 	}
 
-	this->file = stratagus::database::get_graphics_path(this->get_module()) / filepath;
+	this->file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
-void CIcon::load()
+void icon::load()
 {
 	if (this->G == nullptr) {
 		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
 	}
 
-	this->G->Load(false, stratagus::defines::get()->get_scale_factor());
+	this->G->Load(false, defines::get()->get_scale_factor());
 	if (Preference.GrayscaleIcons) {
 		this->GScale = this->G->Clone(true);
 	}
@@ -149,7 +93,7 @@ void CIcon::load()
 **  @param player  Player pointer used for icon colors
 **  @param pos     display pixel position
 */
-void CIcon::DrawIcon(const PixelPos &pos, const stratagus::player_color *player_color) const
+void icon::DrawIcon(const PixelPos &pos, const player_color *player_color) const
 {
 	if (player_color != nullptr) {
 		this->G->DrawPlayerColorFrameClip(player_color, this->get_frame(), pos.x, pos.y, nullptr);
@@ -163,7 +107,7 @@ void CIcon::DrawIcon(const PixelPos &pos, const stratagus::player_color *player_
 **
 **  @param pos     display pixel position
 */
-void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const stratagus::player_color *player_color) const
+void icon::DrawGrayscaleIcon(const PixelPos &pos, const player_color *player_color) const
 {
 	if (this->GScale) {
 		if (player_color != nullptr) {
@@ -180,7 +124,7 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const stratagus::player_color
 **  @param pos       display pixel position
 **  @param percent   cooldown percent
 */
-void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
+void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 {
 	// TO-DO: implement more effect types (clock-like)
 	if (this->GScale) {
@@ -202,8 +146,8 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 **  @param pos     display pixel position
 **  @param text    Optional text to display
 */
-void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
-						 const PixelPos &pos, const std::string &text, const stratagus::player_color *player_color, bool transparent, bool grayscale, int show_percent) const
+void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
+						 const PixelPos &pos, const std::string &text, const player_color *player_color, bool transparent, bool grayscale, int show_percent) const
 {
 	ButtonStyle s(style);
 
@@ -229,7 +173,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	}
 	//Wyrmgus end
 
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
@@ -327,6 +271,8 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	}
 }
 
+}
+
 /**
 **  Load the Icon
 */
@@ -334,7 +280,7 @@ bool IconConfig::LoadNoLog()
 {
 	Assert(!this->Name.empty());
 
-	Icon = CIcon::try_get(this->Name);
+	Icon = stratagus::icon::try_get(this->Name);
 	return Icon != nullptr;
 }
 

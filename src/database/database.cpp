@@ -159,8 +159,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
-		} else if (property_class_name == "CIcon*") {
-			new_property_value = QVariant::fromValue(CIcon::get(property.get_value()));
+		} else if (property_class_name == "stratagus::icon*") {
+			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
 		} else if (property_class_name == "stratagus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "stratagus::module*") {

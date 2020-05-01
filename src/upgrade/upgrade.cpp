@@ -222,7 +222,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "icon") {
-			CIcon *icon = CIcon::get(value);
+			stratagus::icon *icon = stratagus::icon::get(value);
 			this->icon = icon;
 		} else if (key == "class") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -514,7 +514,7 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Name")) {
 			upgrade->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
-			CIcon *icon = CIcon::get(LuaToString(l, -1));
+			stratagus::icon *icon = stratagus::icon::get(LuaToString(l, -1));
 			upgrade->icon = icon;
 		} else if (!strcmp(value, "Class")) {
 			std::string class_name = LuaToString(l, -1);

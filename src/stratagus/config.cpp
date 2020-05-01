@@ -290,11 +290,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "icon") {
-			CIcon *icon = CIcon::get_or_add(ident, nullptr);
-			if (!define_only) {
-				icon->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "map_template") {
 			stratagus::map_template *map_template = stratagus::map_template::get_or_add(ident, nullptr);
 			if (!define_only) {

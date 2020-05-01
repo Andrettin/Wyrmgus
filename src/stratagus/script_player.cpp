@@ -1639,7 +1639,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefiniteArticle")) {
 			faction->DefiniteArticle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			faction->icon = CIcon::get(LuaToString(l, -1));
+			faction->icon = stratagus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			faction->Currency = currency;

@@ -50,7 +50,6 @@
 
 class CCharacter;
 class CDeityDomain;
-class CIcon;
 class CSchoolOfMagic;
 class CUniqueItem;
 class CUnitType;
@@ -60,6 +59,7 @@ struct lua_State;
 namespace stratagus {
 	class civilization;
 	class dependency;
+	class icon;
 }
 
 /**
@@ -100,7 +100,7 @@ class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(CIcon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
 	Q_PROPERTY(QString effects_string READ get_effects_string_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
@@ -128,7 +128,7 @@ public:
 	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
 	virtual void initialize() override;
 
-	CIcon *get_icon() const
+	stratagus::icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -209,7 +209,7 @@ private:
 	int faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade
-	CIcon *icon = nullptr;			/// icon to display to the user
+	stratagus::icon *icon = nullptr; //icon to display to the user
 	bool ability = false;
 	bool weapon = false;
 	bool shield = false;

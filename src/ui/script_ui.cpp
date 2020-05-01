@@ -1281,7 +1281,7 @@ static int CclDefineIcon(lua_State *l)
 		}
 	}
 
-	CIcon *icon = CIcon::add(ident, nullptr);
+	stratagus::icon *icon = stratagus::icon::add(ident, nullptr);
 	icon->file = file;
 	icon->frame = frame;
 	icon->G = CPlayerColorGraphic::New(icon->get_file().string(), size.x, size.y);
@@ -1295,7 +1295,7 @@ static int CclGetIconData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string icon_ident = LuaToString(l, 1);
-	const CIcon *icon = CIcon::get(icon_ident);
+	const stratagus::icon *icon = stratagus::icon::get(icon_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "File")) {
@@ -1314,7 +1314,7 @@ static int CclGetIconData(lua_State *l)
 static int CclGetIcons(lua_State *l)
 {
 	std::vector<std::string> icons;
-	for (const CIcon *icon : CIcon::get_all()) {
+	for (const stratagus::icon *icon : stratagus::icon::get_all()) {
 		icons.push_back(icon->get_identifier());
 	}
 		
