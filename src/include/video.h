@@ -57,12 +57,8 @@ namespace stratagus {
 	class time_of_day;
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-extern char ForceUseOpenGL;
-extern bool UseOpenGL;
 extern bool ZoomNoResize;
 extern bool GLShaderPipelineSupported;
-#endif
 
 class CGraphic : public gcn::Image
 {
@@ -404,14 +400,7 @@ public:
 
 	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			return MapRGBA(f, r, g, b, 0xFF);
-		} else
-#endif
-		{
-			return SDL_MapRGB(f, r, g, b);
-		}
+		return MapRGBA(f, r, g, b, 0xFF);
 	}
 
 	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
@@ -425,14 +414,7 @@ public:
 	}
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
-		} else
-#endif
-		{
-			return SDL_MapRGBA(f, r, g, b, a);
-		}
+		return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 	}
 
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
@@ -447,30 +429,16 @@ public:
 
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			*r = (c >> RSHIFT) & 0xff;
-			*g = (c >> GSHIFT) & 0xff;
-			*b = (c >> BSHIFT) & 0xff;
-		} else
-#endif
-		{
-			SDL_GetRGB(c, f, r, g, b);
-		}
+		*r = (c >> RSHIFT) & 0xff;
+		*g = (c >> GSHIFT) & 0xff;
+		*b = (c >> BSHIFT) & 0xff;
 	}
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			*r = (c >> RSHIFT) & 0xff;
-			*g = (c >> GSHIFT) & 0xff;
-			*b = (c >> BSHIFT) & 0xff;
-			*a = (c >> ASHIFT) & 0xff;
-		} else
-#endif
-		{
-			SDL_GetRGBA(c, f, r, g, b, a);
-		}
+		*r = (c >> RSHIFT) & 0xff;
+		*g = (c >> GSHIFT) & 0xff;
+		*b = (c >> BSHIFT) & 0xff;
+		*a = (c >> ASHIFT) & 0xff;
 	}
 
 	int Width;

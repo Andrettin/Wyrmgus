@@ -498,12 +498,6 @@ void InitVideoSdl()
 
 #if ! defined(USE_WIN32)
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
-		bool UseOpenGL_orig = UseOpenGL;
-		UseOpenGL = false;
-#endif
-
 #ifndef __MORPHOS__	
 		SDL_Surface *icon = nullptr;
 		CGraphic *g = nullptr;
@@ -553,10 +547,6 @@ void InitVideoSdl()
 		}
 #endif
 		
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		UseOpenGL = UseOpenGL_orig;
-#endif
-
 #endif
 #ifdef USE_WIN32
 		HWND hwnd = nullptr;
@@ -595,15 +585,11 @@ void InitVideoSdl()
 		flags |= SDL_FULLSCREEN;
 	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
 #ifdef USE_GLES_NATIVE
-		flags |= SDL_OPENGLES;
+	flags |= SDL_OPENGLES;
 #endif
 #ifdef USE_OPENGL
-		flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
-#endif
-	}
+	flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
 #endif
 
 	if (!Video.Width || !Video.Height) {
@@ -665,60 +651,56 @@ void InitVideoSdl()
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
 #ifdef USE_GLES_EGL
-		// Get the SDL window handle
-		SDL_SysWMinfo sysInfo; //Will hold our Window information
-		SDL_VERSION(&sysInfo.version); //Set SDL version
-		if (SDL_GetWMInfo(&sysInfo) <= 0) {
-			fprintf(stderr, "Unable to get window handle\n");
-			exit(1);
-		}
+	// Get the SDL window handle
+	SDL_SysWMinfo sysInfo; //Will hold our Window information
+	SDL_VERSION(&sysInfo.version); //Set SDL version
+	if (SDL_GetWMInfo(&sysInfo) <= 0) {
+		fprintf(stderr, "Unable to get window handle\n");
+		exit(1);
+	}
 
-		eglDisplay = eglGetDisplay((EGLNativeDisplayType)sysInfo.info.x11.display);
-		if (!eglDisplay) {
-			fprintf(stderr, "Couldn't open EGL Display\n");
-			exit(1);
-		}
+	eglDisplay = eglGetDisplay((EGLNativeDisplayType)sysInfo.info.x11.display);
+	if (!eglDisplay) {
+		fprintf(stderr, "Couldn't open EGL Display\n");
+		exit(1);
+	}
 
-		if (!eglInitialize(eglDisplay, nullptr, nullptr)) {
-			fprintf(stderr, "Couldn't initialize EGL Display\n");
-			exit(1);
-		}
+	if (!eglInitialize(eglDisplay, nullptr, nullptr)) {
+		fprintf(stderr, "Couldn't initialize EGL Display\n");
+		exit(1);
+	}
 
-		// Find a matching config
-		EGLint configAttribs[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_NONE};
-		EGLint numConfigsOut = 0;
-		EGLConfig eglConfig;
-		if (eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0) {
-			fprintf(stderr, "Unable to find appropriate EGL config\n");
-			exit(1);
-		}
+	// Find a matching config
+	EGLint configAttribs[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_NONE};
+	EGLint numConfigsOut = 0;
+	EGLConfig eglConfig;
+	if (eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0) {
+		fprintf(stderr, "Unable to find appropriate EGL config\n");
+		exit(1);
+	}
 
-		eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
-		if (eglSurface == EGL_NO_SURFACE) {
-			fprintf(stderr, "Unable to create EGL surface\n");
-			exit(1);
-		}
+	eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
+	if (eglSurface == EGL_NO_SURFACE) {
+		fprintf(stderr, "Unable to create EGL surface\n");
+		exit(1);
+	}
 
-		// Bind GLES and create the context
-		eglBindAPI(EGL_OPENGL_ES_API);
-		EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
-		EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, nullptr, nullptr);
-		if (eglContext == EGL_NO_CONTEXT) {
-			fprintf(stderr, "Unable to create GLES context\n");
-			exit(1);
-		}
+	// Bind GLES and create the context
+	eglBindAPI(EGL_OPENGL_ES_API);
+	EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
+	EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, nullptr, nullptr);
+	if (eglContext == EGL_NO_CONTEXT) {
+		fprintf(stderr, "Unable to create GLES context\n");
+		exit(1);
+	}
 
-		if (eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext) == EGL_FALSE) {
-			fprintf(stderr, "Unable to make GLES context current\n");
-			exit(1);
-		}
-#endif
-		InitOpenGL();
+	if (eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext) == EGL_FALSE) {
+		fprintf(stderr, "Unable to make GLES context current\n");
+		exit(1);
 	}
 #endif
+	InitOpenGL();
 
 	InitKey2Str();
 
@@ -955,27 +937,17 @@ void WaitEventsOneFrame()
 */
 void RealizeVideoMemory()
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
 #ifdef USE_GLES_EGL
-		eglSwapBuffers(eglDisplay, eglSurface);
+	eglSwapBuffers(eglDisplay, eglSurface);
 #endif
 #if defined(USE_OPENGL) || defined(USE_GLES_NATIVE)
-		if (GLShaderPipelineSupported) {
-			RenderFramebufferToScreen();
-		} else {
-			SDL_GL_SwapBuffers();
-		}
-#endif
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	} else
-#endif
-	{
-		if (NumRects) {
-			SDL_UpdateRects(TheScreen, NumRects, Rects);
-			NumRects = 0;
-		}
+	if (GLShaderPipelineSupported) {
+		RenderFramebufferToScreen();
+	} else {
+		SDL_GL_SwapBuffers();
 	}
+#endif
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /**
@@ -1088,23 +1060,7 @@ void ToggleFullScreen()
 	//Wyrmgus end
 #endif
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		ReloadOpenGL();
-	} else
-#endif
-	{
-		SDL_LockSurface(TheScreen);
-		memcpy(TheScreen->pixels, pixels, framesize);
-		delete[] pixels;
-
-		if (TheScreen->format->palette) {
-			// !!! FIXME : No idea if that flags param is right.
-			SDL_SetPalette(TheScreen, SDL_LOGPAL, palette, 0, ncolors);
-			delete[] palette;
-		}
-		SDL_UnlockSurface(TheScreen);
-	}
+	ReloadOpenGL();
 
 	SDL_SetClipRect(TheScreen, &clip);
 

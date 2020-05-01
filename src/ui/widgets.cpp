@@ -430,21 +430,13 @@ void ImageButton::draw(gcn::Graphics *graphics)
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1);
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
@@ -452,40 +444,24 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			}
 		} else {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight());
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 		}
 	} else {
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight());
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
 	}
 	//Wyrmgus end
@@ -661,21 +637,13 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency);
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
@@ -683,40 +651,24 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			}
 		} else {
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight(), player_color, Transparency);
 			if (Transparency) {
-			#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (UseOpenGL) {
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				}
-			#endif
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 		}
 	} else {
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight(), player_color, Transparency);
 		if (Transparency) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-			}
-		#endif
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
 	}
 

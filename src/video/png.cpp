@@ -159,77 +159,32 @@ void SaveScreenshotPNG(const char *name)
 	png_init_io(png_ptr, fp);
 
 	int pngw, pngh;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		pngw = Video.ViewportWidth;
-		pngh = Video.ViewportHeight;
-	}
-	else
-#endif
-	{
-		pngw = Video.Width;
-		pngh = Video.Height;
-	}
+
+	pngw = Video.ViewportWidth;
+	pngh = Video.ViewportHeight;
+
 	png_set_IHDR(png_ptr, info_ptr, pngw, pngh, 8,
 				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 				 PNG_FILTER_TYPE_DEFAULT);
 
 	png_write_info(png_ptr, info_ptr);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glPixelStorei(GL_PACK_ALIGNMENT, 1); //allows screenshots of resolution widths that aren't multiples of 4
-		unsigned char* pixels = new unsigned char[Video.ViewportWidth * Video.ViewportHeight * 3];
-		if (GLShaderPipelineSupported) {
-			// switch to real display
-			glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-		}
+	glPixelStorei(GL_PACK_ALIGNMENT, 1); //allows screenshots of resolution widths that aren't multiples of 4
+	unsigned char* pixels = new unsigned char[Video.ViewportWidth * Video.ViewportHeight * 3];
+	if (GLShaderPipelineSupported) {
+		// switch to real display
+		glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+	}
 #ifdef USE_OPENGL
-		glReadBuffer(GL_FRONT);
+	glReadBuffer(GL_FRONT);
 #endif
-		glReadPixels(0, 0, Video.ViewportWidth, Video.ViewportHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-		if (GLShaderPipelineSupported) {
-			// switch back to framebuffer
-			glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
-		}
-		for (int i = 0; i < Video.ViewportHeight; ++i) {
-			png_write_row(png_ptr, &pixels[(Video.ViewportHeight - 1 - i) * Video.ViewportWidth * 3]);
-		}
-	} else
-#endif
-	{
-		std::vector<unsigned char> row;
-		SDL_PixelFormat *fmt = TheScreen->format;
-
-		row.resize(Video.Width * 3);
-		for (int i = 0; i < Video.Height; ++i) {
-			switch (Video.Depth) {
-				case 15:
-				case 16: {
-					for (int j = 0; j < Video.Width; ++j) {
-						Uint16 c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
-						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift) << fmt->Rloss;
-						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift) << fmt->Gloss;
-						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift) << fmt->Bloss;
-					}
-					break;
-				}
-				case 24: {
-					memcpy(&row[0], (char *)TheScreen->pixels + i * Video.Width, Video.Width * 3);
-					break;
-				}
-				case 32: {
-					for (int j = 0; j < Video.Width; ++j) {
-						Uint32 c = ((Uint32 *)TheScreen->pixels)[j + i * Video.Width];
-						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
-						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
-						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
-					}
-					break;
-				}
-			}
-			png_write_row(png_ptr, &row[0]);
-		}
+	glReadPixels(0, 0, Video.ViewportWidth, Video.ViewportHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	if (GLShaderPipelineSupported) {
+		// switch back to framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
+	}
+	for (int i = 0; i < Video.ViewportHeight; ++i) {
+		png_write_row(png_ptr, &pixels[(Video.ViewportHeight - 1 - i) * Video.ViewportWidth * 3]);
 	}
 
 	png_write_end(png_ptr, info_ptr);

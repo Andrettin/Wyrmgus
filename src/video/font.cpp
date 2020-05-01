@@ -428,21 +428,14 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 
 CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		CGraphic* fontColorG = FontColorGraphics[this][&fontColor];
-		if (!fontColorG) {
+	CGraphic* fontColorG = FontColorGraphics[this][&fontColor];
+	if (!fontColorG) {
 #ifdef DEBUG
-			fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
+		fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
 #endif
-			return this->G;
-		}
-		return fontColorG;
-	} else
-#endif
-	{
 		return this->G;
 	}
+	return fontColorG;
 }
 
 /**
@@ -835,11 +828,7 @@ void CFont::Load()
 		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
 		this->MeasureWidths();
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			this->MakeFontColorTextures();
-		}
-#endif
+		this->MakeFontColorTextures();
 	}
 }
 
@@ -899,17 +888,12 @@ void CFont::Reload() const
 		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
 			 it != fontColorGraphicMap.end(); ++it) {
 			CGraphic *g = it->second;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 			delete[] g->textures;
-#endif
 			delete g;
 		}
 		fontColorGraphicMap.clear();
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			this->MakeFontColorTextures();
-		}
-#endif
+
+		this->MakeFontColorTextures();
 	}
 }
 
@@ -1014,23 +998,19 @@ CFontColor::~CFontColor()
 
 void CFont::Clean()
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	CFont *font = this;
 
-	if (UseOpenGL) {
-		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
-		if (!fontColorGraphicMap.empty()) {
-			for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
-				 it != fontColorGraphicMap.end(); ++it) {
-				CGraphic *g = it->second;
-				glDeleteTextures(g->NumTextures, g->textures);
-				delete[] g->textures;
-				delete g;
-			}
-			fontColorGraphicMap.clear();
+	FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
+	if (!fontColorGraphicMap.empty()) {
+		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
+			 it != fontColorGraphicMap.end(); ++it) {
+			CGraphic *g = it->second;
+			glDeleteTextures(g->NumTextures, g->textures);
+			delete[] g->textures;
+			delete g;
 		}
+		fontColorGraphicMap.clear();
 	}
-#endif
 }
 
 /**
@@ -1044,11 +1024,7 @@ void CleanFonts()
 		font->Clean();
 		delete font;
 	}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		FontColorGraphics.clear();
-	}
-#endif
+	FontColorGraphics.clear();
 	Fonts.clear();
 
 	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {

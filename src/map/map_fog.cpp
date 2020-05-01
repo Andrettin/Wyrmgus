@@ -714,36 +714,7 @@ void UpdateFogOfWarChange()
 */
 void VideoDrawOnlyFog(int x, int y)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-								x, y, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height());
-	} else
-#endif
-	{
-		SDL_Surface *only_fog_surface = OnlyFogSurface;
-		
-		int oldx;
-		int oldy;
-		SDL_Rect srect;
-		SDL_Rect drect;
-
-		srect.x = 0;
-		srect.y = 0;
-		srect.w = only_fog_surface->w;
-		srect.h = only_fog_surface->h;
-
-		oldx = x;
-		oldy = y;
-		CLIP_RECTANGLE(x, y, srect.w, srect.h);
-		srect.x += x - oldx;
-		srect.y += y - oldy;
-
-		drect.x = x;
-		drect.y = y;
-
-		SDL_BlitSurface(only_fog_surface, &srect, TheScreen, &drect);
-	}
+	Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity), x, y, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height());
 }
 
 /*----------------------------------------------------------------------------
@@ -982,14 +953,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->ID) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
-			} else
-#endif
-			{
-				alpha_fog_graphic->DrawFrameClip(fogTile, dx, dy);
-			}
+			fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);

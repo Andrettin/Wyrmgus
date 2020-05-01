@@ -188,16 +188,8 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 */
 void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		DrawTexture(this, this->textures, frame_map[frame].x, frame_map[frame].y,
+	DrawTexture(this, this->textures, frame_map[frame].x, frame_map[frame].y,
 					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
-	} else
-#endif
-	{
-		DrawSub(frame_map[frame].x, frame_map[frame].y,
-				Width, Height, x, y);
-	}
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -248,18 +240,10 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const stratagus::time
 
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor4ub(255, 255, 255, alpha);
-		DrawFrame(frame, x, y);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	} else
-#endif
-	{
-		DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
-					 Width, Height, x, y, alpha);
-	}
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrame(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 //Wyrmgus start
@@ -972,37 +956,33 @@ void CGraphic::Free(CGraphic *g)
 
 	--g->Refs;
 	if (!g->Refs) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		// No more uses of this graphic
-		if (UseOpenGL) {
-			if (g->textures) {
-				glDeleteTextures(g->NumTextures, g->textures);
-				delete[] g->textures;
+		if (g->textures) {
+			glDeleteTextures(g->NumTextures, g->textures);
+			delete[] g->textures;
+		}
+		
+		for (std::map<CColor, GLuint *>::iterator iterator = g->TextureColorModifications.begin(); iterator != g->TextureColorModifications.end(); ++iterator) {
+			glDeleteTextures(g->NumTextures, iterator->second);
+			delete[] iterator->second;
+		}
+		g->TextureColorModifications.clear();
+
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+		if (cg) {
+			for (const auto &kv_pair : cg->player_color_textures) {
+				glDeleteTextures(cg->NumTextures, kv_pair.second);
+				delete[] kv_pair.second;
 			}
 			
-			for (std::map<CColor, GLuint *>::iterator iterator = g->TextureColorModifications.begin(); iterator != g->TextureColorModifications.end(); ++iterator) {
-				glDeleteTextures(g->NumTextures, iterator->second);
-				delete[] iterator->second;
-			}
-			g->TextureColorModifications.clear();
-
-			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-			if (cg) {
-				for (const auto &kv_pair : cg->player_color_textures) {
-					glDeleteTextures(cg->NumTextures, kv_pair.second);
-					delete[] kv_pair.second;
-				}
-					
-				for (const auto &kv_pair : cg->PlayerColorTextureColorModifications) {
-					for (const auto &sub_kv_pair : kv_pair.second) {
-						glDeleteTextures(cg->NumTextures, sub_kv_pair.second);
-						delete[] sub_kv_pair.second;
-					}
+			for (const auto &kv_pair : cg->PlayerColorTextureColorModifications) {
+				for (const auto &sub_kv_pair : kv_pair.second) {
+					glDeleteTextures(cg->NumTextures, sub_kv_pair.second);
+					delete[] sub_kv_pair.second;
 				}
 			}
-			Graphics.remove(g);
 		}
-#endif
+		Graphics.remove(g);
 
 		g->frame_map.clear();
 
@@ -1374,14 +1354,13 @@ void CGraphic::Resize(int w, int h)
 	this->Width = frame_size.width();
 	this->Height = frame_size.height();
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && this->textures) {
+	if (this->textures) {
 		glDeleteTextures(NumTextures, this->textures);
 		delete[] this->textures;
 		this->textures = nullptr;
 		MakeTexture(this);
 	}
-#endif
+
 	GenFramesMap();
 }
 
@@ -1402,13 +1381,11 @@ void CGraphic::SetOriginalSize()
 	}
 	this->frame_map.clear();
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && this->textures) {
+	if (this->textures) {
 		glDeleteTextures(NumTextures, this->textures);
 		delete[] this->textures;
 		this->textures = nullptr;
 	}
-#endif
 
 	this->Width = this->Height = 0;
 	this->image = QImage();

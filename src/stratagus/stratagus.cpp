@@ -571,21 +571,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'N':
 				parameters.LocalPlayerName = optarg;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'o':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 0;
-				if (ZoomNoResize) {
-					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
-					Usage();
-					ExitFatal(-1);
-				}
-				continue;
-			case 'O':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				continue;
-#endif
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
 				continue;
@@ -642,8 +627,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				}
 				continue;
 			case 'Z':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
 				ZoomNoResize = 1;
 				Video.ViewportHeight = Video.Height;
 				Video.ViewportWidth = Video.Width;
