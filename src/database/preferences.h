@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,43 +25,40 @@
 //      02111-1307, USA.
 //
 
-#include "database/defines.h"
+#pragma once
 
-#include "database/database.h"
-#include "database/preferences.h"
-#include "database/sml_data.h"
-#include "database/sml_parser.h"
+#include "util/singleton.h"
 
 namespace stratagus {
 
-void defines::load(const std::filesystem::path &data_path)
-{
-	std::filesystem::path defines_path(data_path / "defines.txt");
+class sml_data;
+class sml_property;
 
-	if (!std::filesystem::exists(defines_path)) {
-		return;
+class preferences final : public QObject, public singleton<preferences>
+{
+	Q_OBJECT
+
+	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
+
+public:
+	std::filesystem::path get_path() const;
+	void load();
+	void save() const;
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	int get_scale_factor() const
+	{
+		return this->scale_factor;
 	}
 
-	sml_parser parser(defines_path);
-	const sml_data data = parser.parse();
+	void set_scale_factor(const int factor)
+	{
+		this->scale_factor = factor;
+	}
 
-	data.for_each_element([&](const sml_property &property) {
-		this->process_sml_property(property);
-	}, [&](const sml_data &scope) {
-		this->process_sml_scope(scope);
-	});
-
-	this->scale_factor = preferences::get()->get_scale_factor();
-}
-
-void defines::process_sml_property(const sml_property &property)
-{
-	database::process_sml_property_for_object(this, property);
-}
-
-void defines::process_sml_scope(const sml_data &scope)
-{
-	database::process_sml_scope_for_object(this, scope);
-}
+private:
+	int scale_factor = 1;
+};
 
 }

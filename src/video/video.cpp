@@ -85,11 +85,11 @@
 
 #include "cursor.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "font.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "ui/ui.h"
-
 
 #include "SDL.h"
 
@@ -462,4 +462,14 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 int get_scale_factor()
 {
 	return stratagus::defines::get()->get_scale_factor();
+}
+
+int get_scale_factor_preference()
+{
+	return stratagus::preferences::get()->get_scale_factor();
+}
+
+void set_scale_factor(const int factor)
+{
+	stratagus::preferences::get()->set_scale_factor(factor);
 }

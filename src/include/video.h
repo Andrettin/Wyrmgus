@@ -681,3 +681,5 @@ extern void SetColorCycleAll(bool value);
 
 //called by tolua++
 extern int get_scale_factor();
+extern int get_scale_factor_preference();
+extern void set_scale_factor(const int factor);

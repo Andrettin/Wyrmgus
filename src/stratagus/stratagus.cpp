@@ -178,6 +178,7 @@ extern void beos_init(int argc, char **argv);
 #include "character.h"
 //Wyrmgus end
 #include "database/database.h"
+#include "database/preferences.h"
 #include "editor.h"
 #include "game.h"
 #include "guichan.h"
@@ -940,6 +941,8 @@ void load_database(const bool initial_definition)
 void load_defines()
 {
 	try {
+		//load the preferences before the defines, as the latter depend on the preferences
+		stratagus::preferences::get()->load();
 		stratagus::database::get()->load_defines();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading defines."));
@@ -953,4 +956,9 @@ void initialize_database()
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error initializing database."));
 	}
+}
+
+void save_preferences()
+{
+	stratagus::preferences::get()->save();
 }

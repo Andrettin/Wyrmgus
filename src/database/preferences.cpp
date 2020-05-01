@@ -25,24 +25,28 @@
 //      02111-1307, USA.
 //
 
-#include "database/defines.h"
+#include "database/preferences.h"
 
 #include "database/database.h"
-#include "database/preferences.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
 
 namespace stratagus {
 
-void defines::load(const std::filesystem::path &data_path)
+std::filesystem::path preferences::get_path() const
 {
-	std::filesystem::path defines_path(data_path / "defines.txt");
+	return database::get_documents_path() / "preferences.txt";
+}
 
-	if (!std::filesystem::exists(defines_path)) {
+void preferences::load()
+{
+	const std::filesystem::path preferences_path = this->get_path();
+
+	if (!std::filesystem::exists(preferences_path)) {
 		return;
 	}
 
-	sml_parser parser(defines_path);
+	sml_parser parser(preferences_path);
 	const sml_data data = parser.parse();
 
 	data.for_each_element([&](const sml_property &property) {
@@ -50,16 +54,30 @@ void defines::load(const std::filesystem::path &data_path)
 	}, [&](const sml_data &scope) {
 		this->process_sml_scope(scope);
 	});
-
-	this->scale_factor = preferences::get()->get_scale_factor();
 }
 
-void defines::process_sml_property(const sml_property &property)
+void preferences::save() const
+{
+	//create the documents path if necessary
+	if (!std::filesystem::exists(database::get_documents_path())) {
+		std::filesystem::create_directories(database::get_documents_path());
+	}
+
+	const std::filesystem::path preferences_path = this->get_path();
+
+	sml_data data(preferences_path.filename().stem().string());
+
+	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
+
+	data.print_to_dir(preferences_path.parent_path());
+}
+
+void preferences::process_sml_property(const sml_property &property)
 {
 	database::process_sml_property_for_object(this, property);
 }
 
-void defines::process_sml_scope(const sml_data &scope)
+void preferences::process_sml_scope(const sml_data &scope)
 {
 	database::process_sml_scope_for_object(this, scope);
 }
