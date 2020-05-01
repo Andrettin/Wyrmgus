@@ -1088,17 +1088,4 @@ void CMap::CleanFogOfWar()
 
 	CGraphic::Free(this->FogGraphics);
 	this->FogGraphics = nullptr;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (OnlyFogSurface != nullptr) {
-			VideoPaletteListRemove(OnlyFogSurface);
-			SDL_FreeSurface(OnlyFogSurface);
-			OnlyFogSurface = nullptr;
-		}
-		CGraphic::Free(AlphaFogGraphics);
-		AlphaFogGraphics = nullptr;
-	}
 }

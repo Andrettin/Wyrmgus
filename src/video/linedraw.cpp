@@ -73,9 +73,7 @@ static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 */
 void VideoDrawPixel16(Uint32 color, int x, int y)
 {
-	Video.LockScreen();
 	VideoDoDrawPixel16(color, x, y);
-	Video.UnlockScreen();
 }
 
 /**
@@ -91,9 +89,7 @@ static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 */
 void VideoDrawPixel32(Uint32 color, int x, int y)
 {
-	Video.LockScreen();
 	VideoDoDrawPixel32(color, x, y);
-	Video.UnlockScreen();
 }
 
 /**
@@ -117,9 +113,7 @@ static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char al
 */
 void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
-	Video.LockScreen();
 	VideoDoDrawTransPixel16(color, x, y, alpha);
-	Video.UnlockScreen();
 }
 
 /**
@@ -148,9 +142,7 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 */
 void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
-	Video.LockScreen();
 	VideoDoDrawTransPixel32(color, x, y, alpha);
-	Video.UnlockScreen();
 }
 
 /**
@@ -168,9 +160,7 @@ static void VideoDoDrawPixelClip(Uint32 color, int x, int y)
 */
 void DrawPixelClip(Uint32 color, int x, int y)
 {
-	Video.LockScreen();
 	VideoDoDrawPixelClip(color, x, y);
-	Video.UnlockScreen();
 }
 
 /**
@@ -188,9 +178,7 @@ static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char 
 */
 void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
-	Video.LockScreen();
 	VideoDoDrawTransPixelClip(color, x, y, alpha);
-	Video.UnlockScreen();
 }
 
 /**
@@ -198,11 +186,9 @@ void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 */
 void DrawVLine(Uint32 color, int x, int y, int height)
 {
-	Video.LockScreen();
 	for (int i = 0; i < height; ++i) {
 		VideoDoDrawPixel(color, x, y + i);
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -211,11 +197,9 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 void DrawTransVLine(Uint32 color, int x, int y,
 					int height, unsigned char alpha)
 {
-	Video.LockScreen();
 	for (int i = 0; i < height; ++i) {
 		VideoDoDrawTransPixel(color, x, y + i, alpha);
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -234,11 +218,9 @@ void DrawVLineClip(Uint32 color, int x, int y, int height)
 void DrawTransVLineClip(Uint32 color, int x, int y,
 						int height, unsigned char alpha)
 {
-	Video.LockScreen();
 	for (int i = 0; i < height; ++i) {
 		VideoDoDrawTransPixelClip(color, x, y + i, alpha);
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -246,11 +228,9 @@ void DrawTransVLineClip(Uint32 color, int x, int y,
 */
 void DrawHLine(Uint32 color, int x, int y, int width)
 {
-	Video.LockScreen();
 	for (int i = 0; i < width; ++i) {
 		VideoDoDrawPixel(color, x + i, y);
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -269,11 +249,9 @@ void DrawHLineClip(Uint32 color, int x, int y, int width)
 void DrawTransHLine(Uint32 color, int x, int y,
 					int width, unsigned char alpha)
 {
-	Video.LockScreen();
 	for (int i = 0; i < width; ++i) {
 		VideoDoDrawTransPixel(color, x + i, y, alpha);
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -282,11 +260,9 @@ void DrawTransHLine(Uint32 color, int x, int y,
 void DrawTransHLineClip(Uint32 color, int x, int y,
 						int width, unsigned char alpha)
 {
-	Video.LockScreen();
 	for (int i = 0; i < width; ++i) {
 		VideoDoDrawTransPixelClip(color, x + i, y, alpha);
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -343,7 +319,6 @@ void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 
 		p = (ylen << 1) - xlen;
 
-		Video.LockScreen();
 		for (x = sx; x < dx; ++x) {
 			VideoDoDrawPixel(color, x, y);
 			if (p >= 0) {
@@ -353,14 +328,12 @@ void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (ylen << 1);
 			}
 		}
-		Video.UnlockScreen();
 		return;
 	}
 
 	if (ylen > xlen) {
 		int p = (xlen << 1) - ylen;
 
-		Video.LockScreen();
 		for (y = sy; y < dy; ++y) {
 			VideoDoDrawPixel(color, x, y);
 			if (p >= 0) {
@@ -370,19 +343,16 @@ void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (xlen << 1);
 			}
 		}
-		Video.UnlockScreen();
 		return;
 	}
 
 	// Draw a diagonal line
 	if (ylen == xlen) {
-		Video.LockScreen();
 		while (y != dy) {
 			VideoDoDrawPixel(color, x, y);
 			x += incr;
 			++y;
 		}
-		Video.UnlockScreen();
 	}
 }
 
@@ -437,7 +407,6 @@ void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 
 		int p = (ylen << 1) - xlen;
 
-		Video.LockScreen();
 		for (x = sx; x < dx; ++x) {
 			VideoDoDrawPixelClip(color, x, y);
 			if (p >= 0) {
@@ -447,14 +416,12 @@ void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (ylen << 1);
 			}
 		}
-		Video.UnlockScreen();
 		return;
 	}
 
 	if (ylen > xlen) {
 		int p = (xlen << 1) - ylen;
 
-		Video.LockScreen();
 		for (y = sy; y < dy; ++y) {
 			VideoDoDrawPixelClip(color, x, y);
 			if (p >= 0) {
@@ -464,19 +431,16 @@ void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (xlen << 1);
 			}
 		}
-		Video.UnlockScreen();
 		return;
 	}
 
 	// Draw a diagonal line
 	if (ylen == xlen) {
-		Video.LockScreen();
 		while (y != dy) {
 			VideoDoDrawPixelClip(color, x, y);
 			x += incr;
 			++y;
 		}
-		Video.UnlockScreen();
 	}
 }
 
@@ -596,13 +560,11 @@ void FillTransRectangle(Uint32 color, int x, int y,
 	int ey = y + h;
 	int sx = x;
 
-	Video.LockScreen();
 	for (; y < ey; ++y) {
 		for (x = sx; x < ex; ++x) {
 			VideoDoDrawTransPixel(color, x, y, alpha);
 		}
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -623,7 +585,6 @@ void DrawCircle(Uint32 color, int x, int y, int r)
 	int p = 1 - r;
 	int py = r;
 
-	Video.LockScreen();
 	for (int px = 0; px <= py + 1; ++px) {
 		VideoDoDrawPixel(color, x + px, y + py);
 		VideoDoDrawPixel(color, x + px, y - py);
@@ -642,7 +603,6 @@ void DrawCircle(Uint32 color, int x, int y, int r)
 			py -= 1;
 		}
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -654,7 +614,6 @@ void DrawTransCircle(Uint32 color, int x, int y,
 	int p = 1 - r;
 	int py = r;
 
-	Video.LockScreen();
 	for (int px = 0; px <= py + 1; ++px) {
 		VideoDoDrawTransPixel(color, x + px, y + py, alpha);
 		VideoDoDrawTransPixel(color, x + px, y - py, alpha);
@@ -673,7 +632,6 @@ void DrawTransCircle(Uint32 color, int x, int y,
 			py -= 1;
 		}
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -684,7 +642,6 @@ void DrawCircleClip(Uint32 color, int x, int y, int r)
 	int p = 1 - r;
 	int py = r;
 
-	Video.LockScreen();
 	for (int px = 0; px <= py + 1; ++px) {
 		VideoDoDrawPixelClip(color, x + px, y + py);
 		VideoDoDrawPixelClip(color, x + px, y - py);
@@ -703,7 +660,6 @@ void DrawCircleClip(Uint32 color, int x, int y, int r)
 			py -= 1;
 		}
 	}
-	Video.UnlockScreen();
 }
 
 /**
@@ -715,7 +671,6 @@ void DrawTransCircleClip(Uint32 color, int x, int y,
 	int p = 1 - r;
 	int py = r;
 
-	Video.LockScreen();
 	for (int px = 0; px <= py + 1; ++px) {
 		VideoDoDrawTransPixelClip(color, x + px, y + py, alpha);
 		VideoDoDrawTransPixelClip(color, x + px, y - py, alpha);
@@ -734,7 +689,6 @@ void DrawTransCircleClip(Uint32 color, int x, int y,
 			py -= 1;
 		}
 	}
-	Video.UnlockScreen();
 }
 
 /**

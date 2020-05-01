@@ -361,9 +361,6 @@ class CVideo
 public:
 	CVideo() : Width(0), Height(0), Depth(0), FullScreen(false) {}
 
-	void LockScreen();
-	void UnlockScreen();
-
 	void ClearScreen();
 	bool ResizeScreen(int width, int height);
 
@@ -580,13 +577,6 @@ extern void SetVideoSync();
 
 /// Init line draw
 extern void InitLineDraw();
-
-/// Simply invalidates whole window or screen.
-extern void Invalidate();
-
-/// Invalidates selected area on window or screen. Use for accurate
-/// redrawing. in so
-extern void InvalidateArea(int x, int y, int w, int h);
 
 /// Set clipping for nearly all vector primitives. Functions which support
 /// clipping will be marked Clip. Set the system-wide clipping rectangle.

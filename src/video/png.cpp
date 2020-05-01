@@ -174,8 +174,6 @@ void SaveScreenshotPNG(const char *name)
 				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 				 PNG_FILTER_TYPE_DEFAULT);
 
-	Video.LockScreen();
-
 	png_write_info(png_ptr, info_ptr);
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -235,8 +233,6 @@ void SaveScreenshotPNG(const char *name)
 	}
 
 	png_write_end(png_ptr, info_ptr);
-
-	Video.UnlockScreen();
 
 	/* clean up after the write, and free any memory allocated */
 	png_destroy_write_struct(&png_ptr, &info_ptr);

@@ -539,7 +539,6 @@ set(stratagus_guichan_HDRS
 	src/guichan/include/guichan/platform.h
 	src/guichan/include/guichan/rectangle.h
 	src/guichan/include/guichan/sdl/sdlinput.h
-	src/guichan/include/guichan/sdl/sdlpixel.h
 	src/guichan/include/guichan/widget.h
 	src/guichan/include/guichan/widgets/button.h
 	src/guichan/include/guichan/widgets/container.h

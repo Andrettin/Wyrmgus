@@ -299,11 +299,6 @@ void UpdateDisplay()
 	if (CurrentCursorState != CursorState::Rectangle) {
 		DrawCursor();
 	}
-
-	//
-	// Update changes to display.
-	//
-	Invalidate();
 }
 
 static void InitGameCallbacks()

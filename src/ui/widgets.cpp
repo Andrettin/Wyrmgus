@@ -129,11 +129,7 @@ void initGuichan()
 	Gui->setInput(Input);
 	Gui->setTop(nullptr);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	Gui->setUseDirtyDrawing(!UseOpenGL);
-#else
-	Gui->setUseDirtyDrawing(1);
-#endif
+	Gui->setUseDirtyDrawing(false);
 
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
@@ -185,11 +181,7 @@ void handleInput(const SDL_Event *event)
 void DrawGuichanWidgets()
 {
 	if (Gui) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
-#else
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-#endif
+		Gui->setUseDirtyDrawing(false);
 		Gui->draw();
 	}
 }

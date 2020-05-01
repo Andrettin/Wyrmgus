@@ -195,8 +195,6 @@ extern void DrawCursor();
 /// Draw building cursor
 extern void DrawBuildingCursor();
 //Wyrmgus end
-/// Hide the cursor
-extern void HideCursor();
 /// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
 

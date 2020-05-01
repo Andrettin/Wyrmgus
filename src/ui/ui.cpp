@@ -112,13 +112,6 @@ void ShowLoadProgress(const char *fmt, ...)
 		}
 		//Wyrmgus end
 		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16 * stratagus::defines::get()->get_scale_factor(), temp);
-		//Wyrmgus start
-//		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
-		if (loadingBackground == nullptr) {
-			InvalidateArea(0, Video.Height - 18 * stratagus::defines::get()->get_scale_factor(), Video.Width, 18 * stratagus::defines::get()->get_scale_factor());
-		} else {
-			InvalidateArea(0, 0, Video.Width, Video.Height);
-		}
 		//Wyrmgus end
 
 		RealizeVideoMemory();

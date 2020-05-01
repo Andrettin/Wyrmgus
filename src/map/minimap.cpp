@@ -624,17 +624,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		h0 = UI.Minimap.H - my;
 	}
 	int bpp = 0;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		SDL_Color c;
-		//Wyrmgus start
-//		bpp = MinimapSurface->format->BytesPerPixel;
-		bpp = MinimapSurface[UI.CurrentMapLayer->ID]->format->BytesPerPixel;
-		//Wyrmgus end
-		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
-	}
+
 	while (w-- >= 0) {
 		int h = h0;
 		while (h-- >= 0) {
@@ -730,18 +720,6 @@ void CMinimap::Update()
 		}
 	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		//Wyrmgus start
-//		SDL_LockSurface(MinimapSurface);
-//		SDL_LockSurface(MinimapTerrainSurface);
-		SDL_LockSurface(MinimapSurface[UI.CurrentMapLayer->ID]);
-		SDL_LockSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID]);
-		//Wyrmgus end
-	}
-
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
 			//Wyrmgus start
@@ -815,16 +793,6 @@ void CMinimap::Update()
 		}
 	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		//Wyrmgus start
-//		SDL_UnlockSurface(MinimapTerrainSurface);
-		SDL_UnlockSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID]);
-		//Wyrmgus end
-	}
-
 	//
 	// Draw units on map
 	//
@@ -833,15 +801,6 @@ void CMinimap::Update()
 		if (unit.IsVisibleOnMinimap()) {
 			DrawUnitOn(unit, red_phase);
 		}
-	}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		//Wyrmgus start
-//		SDL_UnlockSurface(MinimapSurface);
-		SDL_UnlockSurface(MinimapSurface[UI.CurrentMapLayer->ID]);
-		//Wyrmgus end
 	}
 }
 

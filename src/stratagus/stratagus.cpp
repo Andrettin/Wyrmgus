@@ -291,7 +291,6 @@ static int MenuLoop()
 	current_interface_state = interface_state::menu;
 	//  Clear screen
 	Video.ClearScreen();
-	Invalidate();
 
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;

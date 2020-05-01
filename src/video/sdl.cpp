@@ -750,47 +750,6 @@ int VideoValidResolution(int w, int h)
 }
 
 /**
-**  Invalidate some area
-**
-**  @param x  screen pixel X position.
-**  @param y  screen pixel Y position.
-**  @param w  width of rectangle in pixels.
-**  @param h  height of rectangle in pixels.
-*/
-void InvalidateArea(int x, int y, int w, int h)
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
-		Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
-		Rects[NumRects].x = x;
-		Rects[NumRects].y = y;
-		Rects[NumRects].w = w;
-		Rects[NumRects].h = h;
-		++NumRects;
-	}
-}
-
-/**
-**  Invalidate whole window
-*/
-void Invalidate()
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		Rects[0].x = 0;
-		Rects[0].y = 0;
-		Rects[0].w = Video.Width;
-		Rects[0].h = Video.Height;
-		NumRects = 1;
-	}
-}
-
-/**
 **  Handle interactive input event.
 **
 **  @param callbacks  Callback structure for events.
@@ -1017,37 +976,6 @@ void RealizeVideoMemory()
 			NumRects = 0;
 		}
 	}
-	HideCursor();
-}
-
-/**
-**  Lock the screen for write access.
-*/
-void SdlLockScreen()
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (SDL_MUSTLOCK(TheScreen)) {
-			SDL_LockSurface(TheScreen);
-		}
-	}
-}
-
-/**
-**  Unlock the screen for write access.
-*/
-void SdlUnlockScreen()
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (SDL_MUSTLOCK(TheScreen)) {
-			SDL_UnlockSurface(TheScreen);
-		}
-	}
 }
 
 /**
@@ -1138,39 +1066,10 @@ void ToggleFullScreen()
 	// save the contents of the screen.
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (!(pixels = new unsigned char[framesize])) { // out of memory
-			return;
-		}
-		SDL_LockSurface(TheScreen);
-		memcpy(pixels, TheScreen->pixels, framesize);
-
-		if (TheScreen->format->palette) {
-			ncolors = TheScreen->format->palette->ncolors;
-			if (!(palette = new SDL_Color[ncolors])) {
-				delete[] pixels;
-				return;
-			}
-			memcpy(palette, TheScreen->format->palette->colors,
-				   ncolors * sizeof(SDL_Color));
-		}
-		SDL_UnlockSurface(TheScreen);
-	}
-
 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (!UseOpenGL)
-#endif
-			{
-				delete[] pixels;
-				delete[] palette;
-			}
 			fprintf(stderr, "Toggle to fullscreen, crashed all\n");
 			Exit(-1);
 		}
@@ -1209,7 +1108,6 @@ void ToggleFullScreen()
 
 	SDL_SetClipRect(TheScreen, &clip);
 
-	Invalidate(); // Update display
 #else // !USE_WIN32
 	SDL_WM_ToggleFullScreen(TheScreen);
 #endif

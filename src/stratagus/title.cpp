@@ -153,7 +153,6 @@ void TitleScreen::ShowTitleImage()
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
 		this->ShowLabels();
 
-		Invalidate();
 		RealizeVideoMemory();
 		WaitEventsOneFrame();
 	}
@@ -190,7 +189,6 @@ void ShowTitleScreens()
 
 		Video.ClearScreen();
 	}
-	Invalidate();
 }
 
 

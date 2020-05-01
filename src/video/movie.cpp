@@ -254,7 +254,6 @@ int PlayMovie(const std::string &name)
 	const EventCallback *old_callbacks = GetCallbacks();
 	SetCallbacks(&callbacks);
 
-	Invalidate();
 	RealizeVideoMemory();
 
 	MovieStop = false;

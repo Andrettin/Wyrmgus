@@ -153,9 +153,6 @@ private:
 
 extern void InitVideoSdl();         /// Init SDL video hardware driver
 
-extern void SdlLockScreen();        /// Do SDL hardware lock
-extern void SdlUnlockScreen();      /// Do SDL hardware unlock
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -253,22 +250,6 @@ void PopClipping()
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Lock the screen for write access.
-*/
-void CVideo::LockScreen()
-{
-	SdlLockScreen();
-}
-
-/**
-**  Unlock the screen for write access.
-*/
-void CVideo::UnlockScreen()
-{
-	SdlUnlockScreen();
-}
 
 /**
 **  Clear the video screen.
