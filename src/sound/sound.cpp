@@ -731,8 +731,8 @@ void InitSoundClient()
 		GameSounds.ChatMessage.MapSound();
 	}
 
-	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + stratagus::defines::get()->get_tile_width()) / stratagus::defines::get()->get_tile_width();
-	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + stratagus::defines::get()->get_tile_height()) / stratagus::defines::get()->get_tile_height();
+	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + stratagus::defines::get()->get_scaled_tile_width()) / stratagus::defines::get()->get_scaled_tile_width();
+	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + stratagus::defines::get()->get_scaled_tile_height()) / stratagus::defines::get()->get_scaled_tile_height();
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }
