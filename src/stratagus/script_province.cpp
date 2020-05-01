@@ -38,6 +38,7 @@
 #include "civilization.h"
 #include "faction.h"
 #include "iolib.h"
+#include "map/region.h"
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
@@ -93,52 +94,6 @@ static int CclDefineWorldMapTerrainType(lua_State *l)
 			terrain_type->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, -1));
 		} else if (!strcmp(value, "Variations")) {
 			terrain_type->Variations = LuaToNumber(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
-/**
-**  Define a region.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineRegion(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string region_ident = LuaToString(l, 1);
-	CRegion *region = GetRegion(region_ident);
-	if (!region) {
-		region = new CRegion;
-		region->Ident = region_ident;
-		region->ID = Regions.size();
-		Regions.push_back(region);
-	}
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			region->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "HistoricalPopulation")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int year = LuaToNumber(l, -1, j + 1);
-				++j;
-				int historical_population = LuaToNumber(l, -1, j + 1);
-				region->HistoricalPopulation[year] = historical_population;
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -227,12 +182,8 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CRegion *region = GetRegion(LuaToString(l, -1, j + 1));
-				if (region == nullptr) {
-					LuaError(l, "Region doesn't exist.");
-				}
+				stratagus::region *region = stratagus::region::get(LuaToString(l, -1, j + 1));
 				province->Regions.push_back(region);
-				region->Provinces.push_back(province);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
@@ -723,7 +674,6 @@ static int CclGetProvinces(lua_State *l)
 void ProvinceCclRegister()
 {
 	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
-	lua_register(Lua, "DefineRegion", CclDefineRegion);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);
 	lua_register(Lua, "GetPlaneData", CclGetPlaneData);

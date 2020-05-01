@@ -38,6 +38,7 @@
 #include "database/sml_property.h"
 #include "faction.h"
 #include "map/map_template.h"
+#include "map/region.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "plane.h"
@@ -171,6 +172,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
 		} else if (property_class_name == "stratagus::quest*") {
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
+		} else if (property_class_name == "stratagus::region*") {
+			new_property_value = QVariant::fromValue(region::get(property.get_value()));
 		} else if (property_class_name == "stratagus::site*") {
 			new_property_value = QVariant::fromValue(site::get(property.get_value()));
 		} else if (property_class_name == "stratagus::sound*") {
@@ -314,6 +317,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "map_templates") {
 		map_template *map_template_value = map_template::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(map_template *, map_template_value));
+	} else if (property_name == "regions" || property_name == "superregions") {
+		region *region_value = region::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(region *, region_value));
 	} else if (property_name == "unit_classes" || property_name == "building_classes") {
 		unit_class *unit_class_value = unit_class::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(unit_class *, unit_class_value));

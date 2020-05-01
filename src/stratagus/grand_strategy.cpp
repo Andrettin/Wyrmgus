@@ -1285,15 +1285,6 @@ void FinalizeGrandStrategyInitialization()
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
 		CProvince *base_province = GetProvince(province->Name);
 		
-		// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
-		for (size_t j = 0; j < base_province->Regions.size(); ++j) {
-			for (std::map<int, int>::iterator iterator = base_province->Regions[j]->HistoricalPopulation.begin(); iterator != base_province->Regions[j]->HistoricalPopulation.end(); ++iterator) {
-				if (base_province->HistoricalPopulation.find(iterator->first) == base_province->HistoricalPopulation.end()) { // if the province doesn't have historical population information for a given year but the region does, then use the region's population quantity divided by the number of provinces the region has
-					base_province->HistoricalPopulation[iterator->first] = iterator->second / base_province->Regions[j]->Provinces.size();
-				}
-			}
-		}
-		
 		for (std::map<int, int>::reverse_iterator iterator = base_province->HistoricalPopulation.rbegin(); iterator != base_province->HistoricalPopulation.rend(); ++iterator) {
 			if (GrandStrategyYear >= iterator->first) {
 				province->SetPopulation(iterator->second);

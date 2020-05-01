@@ -91,7 +91,6 @@ class CGraphic;
 class CPlayer;
 class CFile;
 class CMapLayer;
-class CRegion;
 class CTileset;
 class CUniqueItem;
 class CUnit;

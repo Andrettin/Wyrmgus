@@ -49,6 +49,7 @@ class WorldMapTile;
 
 namespace stratagus {
 	class faction;
+	class region;
 	class site;
 	class world;
 }
@@ -91,22 +92,6 @@ public:
 	int Variations;					/// quantity of variations
 };
 
-class CRegion
-{
-public:
-	CRegion() :
-		ID(-1)
-	{
-	}
-	
-	std::string Ident;
-	std::string Name;
-	int ID;											/// ID of this province
-	std::vector<CProvince *> Provinces;				/// Provinces which belong to this region
-	std::vector<stratagus::site *> sites;			/// Sites which belong to this region
-	std::map<int, int> HistoricalPopulation;		/// Historical population, mapped to the year
-};
-
 class CProvince
 {
 public:
@@ -124,7 +109,7 @@ public:
 	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
 	std::map<stratagus::faction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
 	std::vector<stratagus::faction *> FactionClaims;								/// Factions which have a claim to this province
-	std::vector<CRegion *> Regions;										/// Regions to which this province belongs
+	std::vector<stratagus::region *> Regions;										/// Regions to which this province belongs
 	std::map<int, stratagus::faction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
 	std::map<int, stratagus::faction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
 	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
@@ -164,7 +149,6 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
 extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
@@ -174,7 +158,6 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 ----------------------------------------------------------------------------*/
 
 extern void CleanProvinces();
-extern CRegion *GetRegion(const std::string &region_name);
 extern CProvince *GetProvince(const std::string &province_name);
 extern int GetWorldMapTerrainTypeId(const std::string &terrain_type_name);
 extern std::string GetEraNameById(int era);

@@ -33,14 +33,13 @@
 
 #include "province.h"
 
-#include "map/map.h" // for the sites, which are cleaned here
+#include "map/map.h" // for the terrain features, which are cleaned here
 #include "map/tileset.h" // for the terrain types, which are cleaned here
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
@@ -60,20 +59,6 @@ void CleanProvinces()
 		delete WorldMapTerrainTypes[i];
 	}
 	WorldMapTerrainTypes.clear();
-	
-	for (size_t j = 0; j < Regions.size(); ++j) {
-		delete Regions[j];
-	}
-}
-
-CRegion *GetRegion(const std::string &region_ident)
-{
-	for (size_t i = 0; i < Regions.size(); ++i) {
-		if (region_ident == Regions[i]->Ident) {
-			return Regions[i];
-		}
-	}
-	return nullptr;
 }
 
 CProvince *GetProvince(const std::string &province_name)

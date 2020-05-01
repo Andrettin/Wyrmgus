@@ -33,7 +33,6 @@
 #include "time/date.h"
 
 class CPlayer;
-class CRegion;
 class CUnit;
 class CUnitType;
 class CUniqueItem;
@@ -46,6 +45,7 @@ namespace stratagus {
 class civilization;
 class faction;
 class map_template;
+class region;
 class unit_class;
 
 class site : public named_data_entry, public data_type<site>, public CDataType
@@ -58,6 +58,7 @@ class site : public named_data_entry, public data_type<site>, public CDataType
 	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
+	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "site";
@@ -148,6 +149,16 @@ public:
 	Q_INVOKABLE void add_core(faction *faction);
 	Q_INVOKABLE void remove_core(faction *faction);
 
+	const std::vector<region *> &get_regions() const
+	{
+		return this->regions;
+	}
+
+	QVariantList get_regions_qvariant_list() const;
+
+	Q_INVOKABLE void add_region(region *region);
+	Q_INVOKABLE void remove_region(region *region);
+
 private:
 	bool major = false; /// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
@@ -155,9 +166,7 @@ private:
 	CPlayer *owner = nullptr;
 	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is set to its player owner's faction
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
-public:
-	std::vector<CRegion *> Regions;								/// Regions where this site is located
-private:
+	std::vector<region *> regions;								/// Regions where this site is located
 	std::vector<faction *> cores;						/// Factions which have this site as a core
 public:
 	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization

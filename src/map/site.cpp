@@ -35,6 +35,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/region.h"
 #include "player.h" //for factions
 #include "province.h" //for regions
 #include "unit/unit.h"
@@ -66,15 +67,9 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			faction *faction = faction::get(value);
 			this->add_core(faction);
 		} else if (key == "region") {
-			value = FindAndReplaceString(value, "_", "-");
-			
-			CRegion *region = GetRegion(value);
-			if (region != nullptr) {
-				this->Regions.push_back(region);
-				region->sites.push_back(this);
-			} else {
-				fprintf(stderr, "Invalid region: \"%s\".\n", value.c_str());
-			}
+			region *region = region::get(value);
+			this->regions.push_back(region);
+			region->add_site(this);
 		} else {
 			fprintf(stderr, "Invalid site property: \"%s\".\n", key.c_str());
 		}
@@ -309,6 +304,24 @@ void site::remove_core(faction *faction)
 {
 	vector::remove(this->cores, faction);
 	vector::remove(faction->sites, this);
+}
+
+QVariantList site::get_regions_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_regions());
+}
+
+void site::add_region(region *region)
+{
+	this->regions.push_back(region);
+	region->add_site(this);
+}
+
+
+void site::remove_region(region *region)
+{
+	vector::remove(this->regions, region);
+	region->remove_site(this);
 }
 
 }

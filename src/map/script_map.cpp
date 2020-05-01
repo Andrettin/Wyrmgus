@@ -44,6 +44,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/region.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
@@ -1864,12 +1865,9 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CRegion *region = GetRegion(LuaToString(l, -1, j + 1));
-				if (region == nullptr) {
-					LuaError(l, "Region doesn't exist.");
-				}
-				site->Regions.push_back(region);
-				region->sites.push_back(site);
+				stratagus::region *region = stratagus::region::get(LuaToString(l, -1, j + 1));
+				site->regions.push_back(region);
+				region->add_site(site);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
