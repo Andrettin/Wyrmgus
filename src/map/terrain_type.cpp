@@ -59,8 +59,8 @@ void terrain_type::LoadTerrainTypeGraphics()
 		for (const auto &kv_pair : terrain_type->season_graphics) {
 			kv_pair.second->Load(false, defines::get()->get_scale_factor());
 		}
-		if (terrain_type->ElevationGraphics) {
-			terrain_type->ElevationGraphics->Load(false, defines::get()->get_scale_factor());
+		if (terrain_type->elevation_graphics) {
+			terrain_type->elevation_graphics->Load(false, defines::get()->get_scale_factor());
 		}
 	}
 }
@@ -128,17 +128,17 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 */
 terrain_type::~terrain_type()
 {
-	if (this->graphics) {
+	if (this->graphics != nullptr) {
 		CGraphic::Free(this->graphics);
 	}
-	if (this->transition_graphics) {
+	if (this->transition_graphics != nullptr) {
 		CGraphic::Free(this->transition_graphics);
 	}
 	for (const auto &kv_pair : this->season_graphics) {
 		CGraphic::Free(kv_pair.second);
 	}
-	if (this->ElevationGraphics) {
-		CGraphic::Free(this->ElevationGraphics);
+	if (this->elevation_graphics != nullptr) {
+		CGraphic::Free(this->elevation_graphics);
 	}
 }
 
@@ -360,7 +360,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		this->graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size());
 	}
 	if (!elevation_graphics_file.empty()) {
-		this->ElevationGraphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
+		this->elevation_graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
 	}
 }
 
@@ -372,6 +372,10 @@ void terrain_type::initialize()
 
 	if (!this->get_transition_image_file().empty() && this->transition_graphics == nullptr) {
 		this->transition_graphics = CPlayerColorGraphic::New(this->get_transition_image_file().string(), defines::get()->get_tile_size());
+	}
+
+	if (!this->get_elevation_image_file().empty() && this->elevation_graphics == nullptr) {
+		this->elevation_graphics = CGraphic::New(this->get_elevation_image_file().string(), defines::get()->get_tile_size());
 	}
 
 	for (const auto &kv_pair : this->season_image_files) {
@@ -428,6 +432,17 @@ void terrain_type::set_image_file(const std::filesystem::path &filepath)
 	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
+CPlayerColorGraphic *terrain_type::get_graphics(const season *season) const
+{
+	auto find_iterator = this->season_graphics.find(season);
+
+	if (find_iterator != this->season_graphics.end()) {
+		return find_iterator->second;
+	} else {
+		return this->graphics;
+	}
+}
+
 void terrain_type::set_transition_image_file(const std::filesystem::path &filepath)
 {
 	if (filepath == this->get_transition_image_file()) {
@@ -437,15 +452,13 @@ void terrain_type::set_transition_image_file(const std::filesystem::path &filepa
 	this->transition_image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
-CPlayerColorGraphic *terrain_type::get_graphics(const season *season) const
+void terrain_type::set_elevation_image_file(const std::filesystem::path &filepath)
 {
-	auto find_iterator = this->season_graphics.find(season);
-	
-	if (find_iterator != this->season_graphics.end()) {
-		return find_iterator->second;
-	} else {
-		return this->graphics;
+	if (filepath == this->get_elevation_image_file()) {
+		return;
 	}
+
+	this->elevation_image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
 QVariantList terrain_type::get_base_terrain_types_qvariant_list() const

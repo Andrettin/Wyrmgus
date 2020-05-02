@@ -53,6 +53,7 @@ class terrain_type : public named_data_entry, public data_type<terrain_type>, pu
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QString transition_image_file READ get_transition_image_file_qstring)
+	Q_PROPERTY(QString elevation_image_file READ get_elevation_image_file_qstring)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
 	Q_PROPERTY(bool tiled_background MEMBER tiled_background READ has_tiled_background)
 	Q_PROPERTY(stratagus::resource* resource MEMBER resource READ get_resource)
@@ -198,6 +199,28 @@ public:
 		return this->get_graphics(season);
 	}
 
+	const std::filesystem::path &get_elevation_image_file() const
+	{
+		return this->elevation_image_file;
+	}
+
+	void set_elevation_image_file(const std::filesystem::path &filepath);
+
+	QString get_elevation_image_file_qstring() const
+	{
+		return QString::fromStdString(this->get_elevation_image_file().string());
+	}
+
+	Q_INVOKABLE void set_elevation_image_file(const std::string &filepath)
+	{
+		this->set_elevation_image_file(std::filesystem::path(filepath));
+	}
+
+	CGraphic *get_elevation_graphics() const
+	{
+		return this->elevation_graphics;
+	}
+
 	bool is_overlay() const
 	{
 		return this->overlay;
@@ -299,8 +322,8 @@ private:
 	CPlayerColorGraphic *transition_graphics = nullptr;
 	std::map<const season *, std::filesystem::path> season_image_files;
 	std::map<const season *, CPlayerColorGraphic *> season_graphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
-public:
-	CGraphic *ElevationGraphics = nullptr;						/// Semi-transparent elevation graphics, separated so that borders look better
+	std::filesystem::path elevation_image_file;
+	CGraphic *elevation_graphics = nullptr; //semi-transparent elevation graphics, displayed on borders so that they look better
 private:
 	std::vector<terrain_type *> base_terrain_types; //possible base terrain types for this terrain type (if it is an overlay terrain)
 public:

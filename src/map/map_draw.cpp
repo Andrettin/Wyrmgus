@@ -345,8 +345,8 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				if (overlay_transition_tiles[i].first->ElevationGraphics) {
-					overlay_transition_tiles[i].first->ElevationGraphics->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
+				if (overlay_transition_tiles[i].first->get_elevation_graphics()) {
+					overlay_transition_tiles[i].first->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
 				}
 			}
 

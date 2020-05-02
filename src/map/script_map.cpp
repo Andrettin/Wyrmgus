@@ -1516,7 +1516,7 @@ static int CclDefineTerrainType(lua_State *l)
 		terrain->graphics = CPlayerColorGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size());
 	}
 	if (!elevation_graphics_file.empty()) {
-		terrain->ElevationGraphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size());
+		terrain->elevation_graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size());
 	}
 	
 	return 0;
