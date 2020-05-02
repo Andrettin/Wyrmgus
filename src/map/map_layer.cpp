@@ -441,8 +441,8 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap
 			if (
-				(mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(old_season) != mf.playerInfo.SeenTerrain->GetGraphics(new_season))
-				|| (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->GetGraphics(old_season) != mf.playerInfo.SeenOverlayTerrain->GetGraphics(new_season))
+				(mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->get_graphics(old_season) != mf.playerInfo.SeenTerrain->get_graphics(new_season))
+				|| (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->get_graphics(old_season) != mf.playerInfo.SeenOverlayTerrain->get_graphics(new_season))
 			) {
 				UI.Minimap.UpdateXY(Vec2i(x, y), this->ID);
 			}

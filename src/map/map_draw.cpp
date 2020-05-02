@@ -282,103 +282,74 @@ void CViewport::DrawMapBackgroundInViewport() const
 				continue;
 			}
 			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
-			//Wyrmgus start
-			/*
-			unsigned short int tile;
+
+			const stratagus::terrain_type *terrain = nullptr;
+			const stratagus::terrain_type *overlay_terrain = nullptr;
+			int solid_tile = 0;
+			int overlay_solid_tile = 0;
+
 			if (ReplayRevealMap) {
-				tile = mf.getGraphicTile();
+				terrain = mf.Terrain;
+				overlay_terrain = mf.OverlayTerrain;
+				solid_tile = mf.SolidTile;
+				overlay_solid_tile = mf.OverlaySolidTile;
 			} else {
-				tile = mf.playerInfo.SeenTile;
+				terrain = mf.playerInfo.SeenTerrain;
+				overlay_terrain = mf.playerInfo.SeenOverlayTerrain;
+				solid_tile = mf.playerInfo.SeenSolidTile;
+				overlay_solid_tile = mf.playerInfo.SeenOverlaySolidTile;
 			}
-			*/
-			//Wyrmgus end
-			//Wyrmgus start
-//			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 
-			if (ReplayRevealMap) {
-				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(mf.OverlayTerrain->get_destroyed_tiles(), mf.OverlaySolidTile);
-				const bool is_underground = mf.Terrain && mf.Terrain->Flags & MapFieldUnderground;
-				const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-				const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
+			const std::vector<std::pair<stratagus::terrain_type *, short>> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.playerInfo.SeenTransitionTiles;
+			const std::vector<std::pair<stratagus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.playerInfo.SeenOverlayTransitionTiles;
 
-				if (mf.Terrain && mf.Terrain->GetGraphics(season)) {
-					mf.Terrain->GetGraphics(season)->DrawFrameClip(mf.SolidTile + (mf.Terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
-				}
-				for (size_t i = 0; i != mf.TransitionTiles.size(); ++i) {
-					if (mf.TransitionTiles[i].first->GetGraphics(season)) {
-						const bool is_transition_underground = mf.TransitionTiles[i].first->Flags & MapFieldUnderground;
-						const stratagus::time_of_day *transition_time_of_day = is_transition_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-						mf.TransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, transition_time_of_day);
-					}
-				}
-				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
-						CMap::Map.BorderTerrain->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
-					}
-				}
-				if (mf.OverlayTerrain && mf.OverlayTransitionTiles.size() == 0) {
-					if (mf.OverlayTerrain->GetGraphics(season)) {
-						mf.OverlayTerrain->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, time_of_day);
-					}
-				}
-				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
-					if (mf.OverlayTransitionTiles[i].first->GetGraphics(season)) {
-						mf.OverlayTransitionTiles[i].first->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.OverlayTransitionTiles[i].second, dx, dy, time_of_day);
-					}
-				}
-				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
-						CMap::Map.BorderTerrain->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
-					}
-				}
-				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
-					if (mf.OverlayTransitionTiles[i].first->ElevationGraphics) {
-						mf.OverlayTransitionTiles[i].first->ElevationGraphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, time_of_day);
-					}
-				}
-			} else {
-				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(mf.playerInfo.SeenOverlayTerrain->get_destroyed_tiles(), mf.playerInfo.SeenOverlaySolidTile);
-				const bool is_underground = mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->Flags & MapFieldUnderground;
-				const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-				const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
+			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
+			const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
+			const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+			const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
 
-				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(season)) {
-					mf.playerInfo.SeenTerrain->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
-				}
-				for (size_t i = 0; i != mf.playerInfo.SeenTransitionTiles.size(); ++i) {
-					const bool is_transition_underground = mf.playerInfo.SeenTransitionTiles[i].first->Flags & MapFieldUnderground;
+			if (terrain && terrain->get_graphics(season)) {
+				terrain->get_graphics(season)->DrawFrameClip(solid_tile + (terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
+			}
+
+			for (size_t i = 0; i != transition_tiles.size(); ++i) {
+				if (transition_tiles[i].first->get_graphics(season)) {
+					const bool is_transition_underground = transition_tiles[i].first->Flags & MapFieldUnderground;
 					const stratagus::time_of_day *transition_time_of_day = is_transition_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-					if (mf.playerInfo.SeenTransitionTiles[i].first->GetGraphics(season)) {
-						mf.playerInfo.SeenTransitionTiles[i].first->GetGraphics(season)->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, transition_time_of_day);
-					}
-				}
-				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable_seen) {
-					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
-						CMap::Map.BorderTerrain->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
-					}
-				}
-				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
-					if (mf.playerInfo.SeenOverlayTerrain->GetGraphics(season)) {
-						mf.playerInfo.SeenOverlayTerrain->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, time_of_day);
-					}
-				}
-				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
-					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->GetGraphics(season)) {
-						mf.playerInfo.SeenOverlayTransitionTiles[i].first->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, time_of_day);
-					}
-				}
-				if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable_seen) {
-					if (CMap::Map.BorderTerrain->GetGraphics(season)) {
-						CMap::Map.BorderTerrain->GetGraphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
-					}
-				}
-				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
-					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->ElevationGraphics) {
-						mf.playerInfo.SeenOverlayTransitionTiles[i].first->ElevationGraphics->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, time_of_day);
-					}
+					transition_tiles[i].first->get_graphics(season)->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
 				}
 			}
-			//Wyrmgus end
+
+			if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (CMap::Map.BorderTerrain->get_graphics(season)) {
+					CMap::Map.BorderTerrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
+				}
+			}
+
+			if (overlay_terrain && overlay_transition_tiles.size() == 0) {
+				if (overlay_terrain->get_graphics(season)) {
+					overlay_terrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, time_of_day);
+				}
+			}
+
+			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
+				if (overlay_transition_tiles[i].first->get_transition_graphics(season)) {
+					overlay_transition_tiles[i].first->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].second, dx, dy, time_of_day);
+				}
+			}
+
+			if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (CMap::Map.BorderTerrain->get_graphics(season)) {
+					CMap::Map.BorderTerrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
+				}
+			}
+
+			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
+				if (overlay_transition_tiles[i].first->ElevationGraphics) {
+					overlay_transition_tiles[i].first->ElevationGraphics->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
+				}
+			}
+
 			++sx;
 			dx += stratagus::defines::get()->get_scaled_tile_width();
 		}

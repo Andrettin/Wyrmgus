@@ -50,10 +50,13 @@ namespace stratagus {
 void terrain_type::LoadTerrainTypeGraphics()
 {
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
-		if (terrain_type->Graphics) {
-			terrain_type->Graphics->Load(false, defines::get()->get_scale_factor());
+		if (terrain_type->graphics) {
+			terrain_type->graphics->Load(false, defines::get()->get_scale_factor());
 		}
-		for (const auto &kv_pair : terrain_type->SeasonGraphics) {
+		if (terrain_type->transition_graphics) {
+			terrain_type->transition_graphics->Load(false, defines::get()->get_scale_factor());
+		}
+		for (const auto &kv_pair : terrain_type->season_graphics) {
 			kv_pair.second->Load(false, defines::get()->get_scale_factor());
 		}
 		if (terrain_type->ElevationGraphics) {
@@ -125,10 +128,13 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 */
 terrain_type::~terrain_type()
 {
-	if (this->Graphics) {
-		CGraphic::Free(this->Graphics);
+	if (this->graphics) {
+		CGraphic::Free(this->graphics);
 	}
-	for (const auto &kv_pair : this->SeasonGraphics) {
+	if (this->transition_graphics) {
+		CGraphic::Free(this->transition_graphics);
+	}
+	for (const auto &kv_pair : this->season_graphics) {
 		CGraphic::Free(kv_pair.second);
 	}
 	if (this->ElevationGraphics) {
@@ -311,7 +317,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->SeasonGraphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size());
+			this->season_graphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size());
 		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
 			const terrain_type *transition_terrain = nullptr; //any terrain, by default
 			tile_transition_type transition_type = tile_transition_type::none;
@@ -351,7 +357,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	if (!graphics_file.empty()) {
-		this->Graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size());
+		this->graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size());
 	}
 	if (!elevation_graphics_file.empty()) {
 		this->ElevationGraphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
@@ -360,16 +366,20 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 
 void terrain_type::initialize()
 {
-	if (!this->get_image_file().empty() && this->Graphics == nullptr) {
-		this->Graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size());
+	if (!this->get_image_file().empty() && this->graphics == nullptr) {
+		this->graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size());
+	}
+
+	if (!this->get_transition_image_file().empty() && this->transition_graphics == nullptr) {
+		this->transition_graphics = CPlayerColorGraphic::New(this->get_transition_image_file().string(), defines::get()->get_tile_size());
 	}
 
 	for (const auto &kv_pair : this->season_image_files) {
 		const season *season = kv_pair.first;
 		const std::filesystem::path &filepath = kv_pair.second;
 
-		if (!this->SeasonGraphics.contains(season)) {
-			this->SeasonGraphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size());
+		if (!this->season_graphics.contains(season)) {
+			this->season_graphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size());
 		}
 	}
 }
@@ -418,14 +428,23 @@ void terrain_type::set_image_file(const std::filesystem::path &filepath)
 	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
-CPlayerColorGraphic *terrain_type::GetGraphics(const season *season) const
+void terrain_type::set_transition_image_file(const std::filesystem::path &filepath)
 {
-	auto find_iterator = this->SeasonGraphics.find(season);
+	if (filepath == this->get_transition_image_file()) {
+		return;
+	}
+
+	this->transition_image_file = database::get_graphics_path(this->get_module()) / filepath;
+}
+
+CPlayerColorGraphic *terrain_type::get_graphics(const season *season) const
+{
+	auto find_iterator = this->season_graphics.find(season);
 	
-	if (find_iterator != this->SeasonGraphics.end()) {
+	if (find_iterator != this->season_graphics.end()) {
 		return find_iterator->second;
 	} else {
-		return this->Graphics;
+		return this->graphics;
 	}
 }
 

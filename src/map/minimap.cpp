@@ -262,7 +262,7 @@ static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	int x = (xofs + (7 * scale_factor) + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
 	int y = (yofs + (6 * scale_factor) + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
-	return terrain->GetGraphics(season)->get_image().pixelColor(x / scale_factor, y / scale_factor);
+	return terrain->get_graphics(season)->get_image().pixelColor(x / scale_factor, y / scale_factor);
 	//Wyrmgus end
 }
 
@@ -321,9 +321,9 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
+			int tilepitch = terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
+			int base_tilepitch = base_terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			//Wyrmgus end
 	
 			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
@@ -455,9 +455,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
+			int tilepitch = terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			
-			int base_tilepitch = base_terrain->GetGraphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
+			int base_tilepitch = base_terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			//Wyrmgus end
 	
 			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);

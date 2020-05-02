@@ -981,7 +981,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
 	const stratagus::terrain_type *terrain = Editor.ShownTileTypes[0];
-	terrain->GetGraphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y);
+	terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y);
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
@@ -1094,8 +1094,8 @@ static void DrawTileIcons()
 
 			const stratagus::terrain_type *terrain = Editor.ShownTileTypes[i];
 
-			if (terrain->GetGraphics() && terrain->get_solid_tiles().size() > 0) {
-				terrain->GetGraphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y);
+			if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
+				terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y);
 			}
 			//Wyrmgus end
 			Video.DrawRectangleClip(ColorGray, x, y, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height());
@@ -1311,8 +1311,8 @@ static void DrawMapCursor()
 					//Wyrmgus start
 //					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
 
-					if (terrain->GetGraphics() && terrain->get_solid_tiles().size() > 0) {
-						terrain->GetGraphics()->DrawFrameClip(terrain->get_solid_tiles()[0], screenPosIt.x, screenPosIt.y);
+					if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
+						terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], screenPosIt.x, screenPosIt.y);
 					}
 					//Wyrmgus end
 				}
