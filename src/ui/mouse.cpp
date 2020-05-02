@@ -390,11 +390,11 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	}
 	const CUnitType &type = *unit.Type;
 	// FIXME: support harvesting more types of terrain.
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (type.ResInfo[res]
+	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+		if (type.ResInfo[resource->ID]
 			//Wyrmgus start
 //			&& type.ResInfo[res]->TerrainHarvester
-			&& UI.CurrentMapLayer->Field(pos)->IsTerrainResourceOnMap(res)
+			&& UI.CurrentMapLayer->Field(pos)->get_resource() == resource
 			//Wyrmgus end
 			//Wyrmgus start
 //			&& ((unit.CurrentResource != res)
@@ -409,7 +409,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				acknowledged = 1;
 			}
 			*/
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != resource->ID || unit.ResourcesHeld < type.ResInfo[resource->ID]->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
 				if (!acknowledged) {
 					PlayUnitSound(unit, UnitVoiceGroup::Harvesting);
@@ -821,7 +821,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	}
 	// FIXME: support harvesting more types of terrain.
 	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
-	if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
+	if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, UnitVoiceGroup::Acknowledging);
 			acknowledged = 1;
@@ -1500,12 +1500,12 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			bool has_terrain_resource = false;
 			const CViewport &vp = *UI.MouseViewport;
 			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
-			for (int res = 0; res < MaxCosts; ++res) {
-				if (Selected[0]->Type->ResInfo[res]
+			for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+				if (Selected[0]->Type->ResInfo[resource->ID]
 					//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end
-					&& UI.CurrentMapLayer->Field(tilePos)->IsTerrainResourceOnMap(res)
+					&& UI.CurrentMapLayer->Field(tilePos)->get_resource() == resource
 				) {
 					has_terrain_resource = true;
 				}
@@ -1907,7 +1907,7 @@ static int SendResource(const Vec2i &pos, int flush)
 //						&& mf.playerInfo.IsExplored(*unit.Player)
 						&& mf.playerInfo.IsTeamExplored(*unit.Player)
 						//Wyrmgus end
-						&& mf.IsTerrainResourceOnMap(res)
+						&& mf.get_resource() == stratagus::resource::get_all()[res]
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						//Wyrmgus start
@@ -1934,8 +1934,8 @@ static int SendResource(const Vec2i &pos, int flush)
 				continue;
 			}
 			//Wyrmgus start
-//			if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
-			if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
+//			if (mf.playerInfo.IsExplored(*unit.Player) && mf.get_resource() != nullptr) {
+			if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				SendCommandResourceLoc(unit, pos, flush);

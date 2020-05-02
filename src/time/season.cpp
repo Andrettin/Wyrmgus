@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name season.cpp - The season source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "time/season.h"
@@ -40,86 +34,16 @@
 #include "mod.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CSeason *> CSeason::Seasons;
-std::map<std::string, CSeason *> CSeason::SeasonsByIdent;
-	
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a season
-**
-**	@param	ident			The season's string identifier
-**	@param	should_find		Whether it is an error if the season could not be found; this is true by default
-**
-**	@return	The season if found, or null otherwise
-*/
-CSeason *CSeason::GetSeason(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CSeason *>::const_iterator find_iterator = SeasonsByIdent.find(ident);
-	
-	if (find_iterator != SeasonsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid season: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a season
-**
-**	@param	ident	The season's string identifier
-**
-**	@return	The season if found, or a newly-created one otherwise
-*/
-CSeason *CSeason::GetOrAddSeason(const std::string &ident)
-{
-	CSeason *season = GetSeason(ident, false);
-	
-	if (!season) {
-		season = new CSeason;
-		season->Ident = ident;
-		Seasons.push_back(season);
-		SeasonsByIdent[ident] = season;
-	}
-	
-	return season;
-}
-
-/**
-**	@brief	Remove the existing seasons
-*/
-void CSeason::ClearSeasons()
-{
-	for (size_t i = 0; i < Seasons.size(); ++i) {
-		delete Seasons[i];
-	}
-	Seasons.clear();
-	SeasonsByIdent.clear();
-}
-
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CSeason::ProcessConfigData(const CConfigData *config_data)
+void season::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else {
 			fprintf(stderr, "Invalid season property: \"%s\".\n", key.c_str());
 		}
@@ -166,4 +90,6 @@ void CSeason::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid season property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+}
+
 }

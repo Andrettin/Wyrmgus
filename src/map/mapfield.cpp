@@ -47,6 +47,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/vector_util.h"
 
 CMapField::CMapField() :
 	Flags(0),
@@ -106,33 +107,18 @@ stratagus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ig
 	}
 }
 
-bool CMapField::IsTerrainResourceOnMap(int resource) const
-{
-	return this->GetResource() == resource;
-}
-
-bool CMapField::IsTerrainResourceOnMap() const
-{
-	for (int i = 0; i != MaxCosts; ++i) {
-		if (IsTerrainResourceOnMap(i)) {
-			return true;
-		}
-	}
-	return false;
-}
-
 bool CMapField::IsSeenTileCorrect() const
 {
 	return this->Terrain == this->playerInfo.SeenTerrain && this->OverlayTerrain == this->playerInfo.SeenOverlayTerrain && this->SolidTile == this->playerInfo.SeenSolidTile && this->OverlaySolidTile == this->playerInfo.SeenOverlaySolidTile && this->TransitionTiles == this->playerInfo.SeenTransitionTiles && this->OverlayTransitionTiles == this->playerInfo.SeenOverlayTransitionTiles;
 }
 
-int CMapField::GetResource() const
+const stratagus::resource *CMapField::get_resource() const
 {
 	if (this->OverlayTerrain && !this->OverlayTerrainDestroyed) {
-		return this->OverlayTerrain->Resource;
+		return this->OverlayTerrain->get_resource();
 	}
 	
-	return -1;
+	return nullptr;
 }
 
 bool CMapField::IsDestroyedForestTile() const
@@ -153,7 +139,7 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 	}
 	
 	//remove the flags of the old terrain type
-	if (terrain_type->Overlay) {
+	if (terrain_type->is_overlay()) {
 		if (this->OverlayTerrain == terrain_type) {
 			return;
 		}
@@ -180,26 +166,26 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		}
 	}
 	
-	if (terrain_type->Overlay) {
-		if (!this->Terrain || std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), this->Terrain) == terrain_type->BaseTerrainTypes.end()) {
-			this->SetTerrain(terrain_type->BaseTerrainTypes[0]);
+	if (terrain_type->is_overlay()) {
+		if (!this->Terrain || !stratagus::vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
+			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
 		if (terrain_type->Flags & MapFieldWaterAllowed) {
 			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water, remove all flags from the base terrain
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 		this->OverlayTerrain = terrain_type;
-		if (terrain_type->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
+		if (terrain_type->get_solid_tiles().size() > 0) {
+			this->OverlaySolidTile = terrain_type->get_solid_tiles()[SyncRand(terrain_type->get_solid_tiles().size())];
 		}
 		this->OverlayTerrainDestroyed = false;
 		this->OverlayTerrainDamaged = false;
 	} else {
 		this->Terrain = terrain_type;
-		if (terrain_type->SolidTiles.size() > 0) {
-			this->SolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
+		if (terrain_type->get_solid_tiles().size() > 0) {
+			this->SolidTile = terrain_type->get_solid_tiles()[SyncRand(terrain_type->get_solid_tiles().size())];
 		}
-		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrainTypes.begin(), this->OverlayTerrain->BaseTerrainTypes.end(), terrain_type) == this->OverlayTerrain->BaseTerrainTypes.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
+		if (this->OverlayTerrain && !stratagus::vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = nullptr;
@@ -208,13 +194,13 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 	}
 	
 	if (Editor.Running == EditorNotRunning && terrain_type->SolidAnimationFrames > 0) {
-		if (terrain_type->Overlay) {
+		if (terrain_type->is_overlay()) {
 			this->OverlayAnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		} else {
 			this->AnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		}
 	} else {
-		if (terrain_type->Overlay) {
+		if (terrain_type->is_overlay()) {
 			this->OverlayAnimationFrame = 0;
 		} else {
 			this->AnimationFrame = 0;
@@ -252,14 +238,14 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		this->Flags |= MapFieldNoRail;
 	}
 
-	if (terrain_type->Overlay && (this->Flags & MapFieldUnderground) && (this->Flags & MapFieldWall)) {
+	if (terrain_type->is_overlay() && (this->Flags & MapFieldUnderground) && (this->Flags & MapFieldWall)) {
 		//underground walls are not passable by air units
 		this->Flags |= MapFieldAirUnpassable;
 	}
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (terrain_type->Overlay && terrain_type->Resource != -1) {
-		this->Value = stratagus::resource::get_all()[terrain_type->Resource]->DefaultAmount;
+	if (terrain_type->is_overlay() && terrain_type->get_resource() != nullptr) {
+		this->Value = terrain_type->get_resource()->DefaultAmount;
 	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
@@ -321,12 +307,12 @@ void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
 	this->OverlayTerrainDestroyed = destroyed;
 	
 	if (destroyed) {
-		if (this->OverlayTerrain->DestroyedTiles.size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->DestroyedTiles[SyncRand(this->OverlayTerrain->DestroyedTiles.size())];
+		if (this->OverlayTerrain->get_destroyed_tiles().size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->get_destroyed_tiles()[SyncRand(this->OverlayTerrain->get_destroyed_tiles().size())];
 		}
 	} else {
-		if (this->OverlayTerrain->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->SolidTiles[SyncRand(this->OverlayTerrain->SolidTiles.size())];
+		if (this->OverlayTerrain->get_solid_tiles().size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->get_solid_tiles()[SyncRand(this->OverlayTerrain->get_solid_tiles().size())];
 		}
 	}
 }
@@ -340,12 +326,12 @@ void CMapField::SetOverlayTerrainDamaged(bool damaged)
 	this->OverlayTerrainDamaged = damaged;
 	
 	if (damaged) {
-		if (this->OverlayTerrain->DamagedTiles.size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->DamagedTiles[SyncRand(this->OverlayTerrain->DamagedTiles.size())];
+		if (this->OverlayTerrain->get_damaged_tiles().size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->get_damaged_tiles()[SyncRand(this->OverlayTerrain->get_damaged_tiles().size())];
 		}
 	} else {
-		if (this->OverlayTerrain->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->SolidTiles[SyncRand(this->OverlayTerrain->SolidTiles.size())];
+		if (this->OverlayTerrain->get_solid_tiles().size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->get_solid_tiles()[SyncRand(this->OverlayTerrain->get_solid_tiles().size())];
 		}
 	}
 }
@@ -382,7 +368,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	
 	//Wyrmgus start
 	stratagus::terrain_type *terrain = stratagus::terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
-	if (terrain->Overlay) {
+	if (terrain->is_overlay()) {
 		if (terrain->Flags & MapFieldForest) {
 			this->SetTerrain(stratagus::terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
 		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
@@ -414,7 +400,7 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (TerrainFeature && !TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (TerrainFeature && !TerrainFeature->TerrainType->is_overlay()) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->is_overlay()) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);

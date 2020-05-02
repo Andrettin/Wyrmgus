@@ -1676,7 +1676,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 		}
 		
 		Vec2i pos(0, 0);
-		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer->ID, water_zone)) {
+		if (FindTerrainType(0, nullptr, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer->ID, water_zone)) {
 			return true;
 		}
 	}

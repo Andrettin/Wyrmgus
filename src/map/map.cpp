@@ -494,7 +494,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 
 bool CMap::TileBordersTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const
 {
-	bool overlay = terrain_type != nullptr ? terrain_type->Overlay : false;
+	bool overlay = terrain_type != nullptr ? terrain_type->is_overlay() : false;
 
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -534,7 +534,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain
 			}
 			stratagus::terrain_type *top_terrain = GetTileTopTerrain(pos, false, z);
 			stratagus::terrain_type *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos, false, z);
-			if (!new_terrain_type->Overlay) {
+			if (!new_terrain_type->is_overlay()) {
 				if (
 					adjacent_top_terrain
 					&& adjacent_top_terrain != top_terrain
@@ -547,7 +547,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain
 				if (
 					adjacent_top_terrain
 					&& adjacent_top_terrain != top_terrain
-					&& std::find(top_terrain->BaseTerrainTypes.begin(), top_terrain->BaseTerrainTypes.end(), adjacent_top_terrain) == top_terrain->BaseTerrainTypes.end() && std::find(adjacent_top_terrain->BaseTerrainTypes.begin(), adjacent_top_terrain->BaseTerrainTypes.end(), top_terrain) == adjacent_top_terrain->BaseTerrainTypes.end()
+					&& !stratagus::vector::contains(top_terrain->get_base_terrain_types(), adjacent_top_terrain) && !stratagus::vector::contains(adjacent_top_terrain->get_base_terrain_types(), top_terrain)
 					&& adjacent_top_terrain != new_terrain_type
 				) {
 					return false;
@@ -699,7 +699,7 @@ bool CMap::TileBordersUnit(const Vec2i &pos, int z)
 */
 bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const
 {
-	if (!terrain_type || !terrain_type->Overlay) {
+	if (!terrain_type || !terrain_type->is_overlay()) {
 		return false;
 	}
 	
@@ -723,10 +723,10 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const str
 				continue;
 			}
 			
-			if (terrain_type->Overlay) {
+			if (terrain_type->is_overlay()) {
 				if ( //if the terrain type is an overlay one, the adjacent tile terrain is incompatible with it if it both cannot be a base terrain for the overlay terrain type, and it "expands into" the tile (that is, the tile has the adjacent terrain as an inner border terrain)
 					std::find(tile_terrain->InnerBorderTerrains.begin(), tile_terrain->InnerBorderTerrains.end(), adjacent_terrain) != tile_terrain->InnerBorderTerrains.end()
-					&& std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), adjacent_terrain) == terrain_type->BaseTerrainTypes.end()
+					&& !stratagus::vector::contains(terrain_type->get_base_terrain_types(), adjacent_terrain)
 				) {
 					return true;
 				}
@@ -774,7 +774,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 			if (overlay_terrain_type != nullptr) {
 				if ( //if the terrain type is an overlay one, the adjacent tile terrain is incompatible with it if it both cannot be a base terrain for the overlay terrain type, and it "expands into" the tile (that is, the tile has the adjacent terrain as an inner border terrain)
 					std::find(terrain_type->InnerBorderTerrains.begin(), terrain_type->InnerBorderTerrains.end(), adjacent_terrain) != terrain_type->InnerBorderTerrains.end()
-					&& std::find(overlay_terrain_type->BaseTerrainTypes.begin(), overlay_terrain_type->BaseTerrainTypes.end(), adjacent_terrain) == overlay_terrain_type->BaseTerrainTypes.end()
+					&& !stratagus::vector::contains(overlay_terrain_type->get_base_terrain_types(), adjacent_terrain)
 					) {
 					return true;
 				}
@@ -1766,9 +1766,9 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	stratagus::terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->Overlay, z);
+	stratagus::terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
 	
-	if (terrain->Overlay) {
+	if (terrain->is_overlay()) {
 		if (mf.OverlayTerrain == terrain) {
 			return;
 		}
@@ -1780,7 +1780,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 	
 	mf.SetTerrain(terrain);
 	
-	if (terrain->Overlay) {
+	if (terrain->is_overlay()) {
 		//remove decorations if the overlay terrain has changed
 		std::vector<CUnit *> table;
 		Select(pos, pos, table, z);
@@ -1811,7 +1811,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
-					if (terrain->Overlay && adjacent_mf.OverlayTerrain != terrain && Editor.Running == EditorNotRunning) {
+					if (terrain->is_overlay() && adjacent_mf.OverlayTerrain != terrain && Editor.Running == EditorNotRunning) {
 						continue;
 					}
 					
@@ -2478,10 +2478,10 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					stratagus::terrain_type *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					if (
 						mf.Terrain != tile_terrain
-						&& tile_top_terrain->Overlay
+						&& tile_top_terrain->is_overlay()
 						&& tile_top_terrain != mf.OverlayTerrain
 						&& std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), mf.Terrain) == tile_terrain->OuterBorderTerrains.end()
-						&& std::find(tile_top_terrain->BaseTerrainTypes.begin(), tile_top_terrain->BaseTerrainTypes.end(), mf.Terrain) == tile_top_terrain->BaseTerrainTypes.end()
+						&& !stratagus::vector::contains(tile_top_terrain->get_base_terrain_types(), mf.Terrain)
 					) {
 						mf.SetTerrain(tile_terrain);
 					}
@@ -2615,13 +2615,13 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 		if (
 			(
 				(
-					!terrain_type->Overlay
-					&& ((tile_terrain == terrain_type && GetTileTopTerrain(random_pos, false, z)->Overlay) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(random_pos, terrain_type, z)))
+					!terrain_type->is_overlay()
+					&& ((tile_terrain == terrain_type && GetTileTopTerrain(random_pos, false, z)->is_overlay()) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(random_pos, terrain_type, z)))
 				)
 				|| (
-					terrain_type->Overlay
-					&& std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(random_pos, terrain_type, z)
-					&& (!GetTileTopTerrain(random_pos, false, z)->Overlay || GetTileTopTerrain(random_pos, false, z) == terrain_type)
+					terrain_type->is_overlay()
+					&& stratagus::vector::contains(terrain_type->get_base_terrain_types(), tile_terrain) && this->TileBordersOnlySameTerrain(random_pos, terrain_type, z)
+					&& (!GetTileTopTerrain(random_pos, false, z)->is_overlay() || GetTileTopTerrain(random_pos, false, z) == terrain_type)
 				)
 			)
 			&& (!preserve_coastline || (terrain_type->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed))
@@ -2653,17 +2653,17 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 					if (
 						(
 							(
-								!terrain_type->Overlay
-								&& ((diagonal_tile_terrain == terrain_type && GetTileTopTerrain(diagonal_pos, false, z)->Overlay) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), diagonal_tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain_type, z)))
-								&& ((vertical_tile_terrain == terrain_type && GetTileTopTerrain(vertical_pos, false, z)->Overlay) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), vertical_tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain_type, z)))
-								&& ((horizontal_tile_terrain == terrain_type && GetTileTopTerrain(horizontal_pos, false, z)->Overlay) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), horizontal_tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain_type, z)))
+								!terrain_type->is_overlay()
+								&& ((diagonal_tile_terrain == terrain_type && GetTileTopTerrain(diagonal_pos, false, z)->is_overlay()) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), diagonal_tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain_type, z)))
+								&& ((vertical_tile_terrain == terrain_type && GetTileTopTerrain(vertical_pos, false, z)->is_overlay()) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), vertical_tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain_type, z)))
+								&& ((horizontal_tile_terrain == terrain_type && GetTileTopTerrain(horizontal_pos, false, z)->is_overlay()) || (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), horizontal_tile_terrain) != terrain_type->BorderTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain_type, z)))
 							)
 							|| (
-								terrain_type->Overlay
-								&& std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), diagonal_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain_type, z)
-								&& std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), vertical_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain_type, z)
-								&& std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), horizontal_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain_type, z)
-								&& (!GetTileTopTerrain(diagonal_pos, false, z)->Overlay || GetTileTopTerrain(diagonal_pos, false, z) == terrain_type) && (!GetTileTopTerrain(vertical_pos, false, z)->Overlay || GetTileTopTerrain(vertical_pos, false, z) == terrain_type) && (!GetTileTopTerrain(horizontal_pos, false, z)->Overlay || GetTileTopTerrain(horizontal_pos, false, z) == terrain_type)
+								terrain_type->is_overlay()
+								&& stratagus::vector::contains(terrain_type->get_base_terrain_types(), diagonal_tile_terrain) && this->TileBordersOnlySameTerrain(diagonal_pos, terrain_type, z)
+								&& stratagus::vector::contains(terrain_type->get_base_terrain_types(), vertical_tile_terrain) && this->TileBordersOnlySameTerrain(vertical_pos, terrain_type, z)
+								&& stratagus::vector::contains(terrain_type->get_base_terrain_types(), horizontal_tile_terrain) && this->TileBordersOnlySameTerrain(horizontal_pos, terrain_type, z)
+								&& (!GetTileTopTerrain(diagonal_pos, false, z)->is_overlay() || GetTileTopTerrain(diagonal_pos, false, z) == terrain_type) && (!GetTileTopTerrain(vertical_pos, false, z)->is_overlay() || GetTileTopTerrain(vertical_pos, false, z) == terrain_type) && (!GetTileTopTerrain(horizontal_pos, false, z)->is_overlay() || GetTileTopTerrain(horizontal_pos, false, z) == terrain_type)
 							)
 						)
 						&& (!preserve_coastline || ((terrain_type->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
@@ -2678,7 +2678,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 			
 			if (adjacent_positions.size() > 0) {
 				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-				if (!terrain_type->Overlay) {
+				if (!terrain_type->is_overlay()) {
 					this->Field(random_pos, z)->RemoveOverlayTerrain();
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
 					this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
@@ -2737,7 +2737,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 				stratagus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
 				stratagus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
 				
-				if (!terrain_type->Overlay) {
+				if (!terrain_type->is_overlay()) {
 					if (diagonal_tile_terrain != terrain_type && (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), diagonal_tile_terrain) == terrain_type->BorderTerrains.end() || this->TileBordersTerrainIncompatibleWithTerrain(diagonal_pos, terrain_type, z))) {
 						continue;
 					}
@@ -2748,13 +2748,13 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 						continue;
 					}
 				} else {
-					if ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), diagonal_tile_terrain) == terrain_type->BaseTerrainTypes.end() || this->TileBordersTerrainIncompatibleWithTerrain(diagonal_pos, terrain_type, z)) && GetTileTerrain(diagonal_pos, terrain_type->Overlay, z) != terrain_type) {
+					if ((!stratagus::vector::contains(terrain_type->get_base_terrain_types(), diagonal_tile_terrain) || this->TileBordersTerrainIncompatibleWithTerrain(diagonal_pos, terrain_type, z)) && GetTileTerrain(diagonal_pos, terrain_type->is_overlay(), z) != terrain_type) {
 						continue;
 					}
-					if ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), vertical_tile_terrain) == terrain_type->BaseTerrainTypes.end() || this->TileBordersTerrainIncompatibleWithTerrain(vertical_pos, terrain_type, z)) && GetTileTerrain(vertical_pos, terrain_type->Overlay, z) != terrain_type) {
+					if ((!stratagus::vector::contains(terrain_type->get_base_terrain_types(), vertical_tile_terrain) || this->TileBordersTerrainIncompatibleWithTerrain(vertical_pos, terrain_type, z)) && GetTileTerrain(vertical_pos, terrain_type->is_overlay(), z) != terrain_type) {
 						continue;
 					}
-					if ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), horizontal_tile_terrain) == terrain_type->BaseTerrainTypes.end() || this->TileBordersTerrainIncompatibleWithTerrain(horizontal_pos, terrain_type, z)) && GetTileTerrain(horizontal_pos, terrain_type->Overlay, z) != terrain_type) {
+					if ((!stratagus::vector::contains(terrain_type->get_base_terrain_types(), horizontal_tile_terrain) || this->TileBordersTerrainIncompatibleWithTerrain(horizontal_pos, terrain_type, z)) && GetTileTerrain(horizontal_pos, terrain_type->is_overlay(), z) != terrain_type) {
 						continue;
 					}
 				}
@@ -2807,12 +2807,12 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
 			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
 			
-			if (!this->is_point_in_a_subtemplate_area(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
-				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
+				if (!terrain_type->is_overlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
 				}
 
-				if (this->GetTileTerrain(adjacent_pos, terrain_type->Overlay, z) != terrain_type) {
+				if (this->GetTileTerrain(adjacent_pos, terrain_type->is_overlay(), z) != terrain_type) {
 					this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
 				}
 				
@@ -2823,12 +2823,12 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 				}
 			}
 			
-			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
-				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
+				if (!terrain_type->is_overlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z))) {
 					this->Field(adjacent_pos_horizontal, z)->RemoveOverlayTerrain();
 				}
 				
-				if (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type) {
+				if (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->is_overlay(), z) != terrain_type) {
 					this->Field(adjacent_pos_horizontal, z)->SetTerrain(terrain_type);
 				}
 				
@@ -2839,12 +2839,12 @@ void CMap::GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &
 				}
 			}
 			
-			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
-				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
+				if (!terrain_type->is_overlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z))) {
 					this->Field(adjacent_pos_vertical, z)->RemoveOverlayTerrain();
 				}
 				
-				if (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type) {
+				if (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->is_overlay(), z) != terrain_type) {
 					this->Field(adjacent_pos_vertical, z)->SetTerrain(terrain_type);
 				}
 				

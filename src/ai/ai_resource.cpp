@@ -1241,7 +1241,7 @@ static void AiCheckingWork()
 */
 //Wyrmgus start
 //static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
-static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_range)
+static int AiAssignHarvesterFromTerrain(CUnit &unit, const stratagus::resource *resource, int resource_range)
 //Wyrmgus end
 {
 	// TODO : hardcoded forest
@@ -1274,16 +1274,16 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 */
 //Wyrmgus start
 //static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
-static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_range)
+static int AiAssignHarvesterFromUnit(CUnit &unit, const stratagus::resource *resource, int resource_range)
 //Wyrmgus end
 {
 	// Try to find the nearest depot first.
-	CUnit *depot = FindDeposit(unit, 1000, resource);
+	CUnit *depot = FindDeposit(unit, 1000, resource->ID);
 	
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, nullptr, false, false, false, resource == CopperCost && AiPlayer->Player->HasMarketUnit());
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource->ID, true, nullptr, false, false, false, resource->ID == CopperCost && AiPlayer->Player->HasMarketUnit());
 	//Wyrmgus end
 
 	if (mine) {
@@ -1355,7 +1355,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvester(CUnit &unit, int resource)
+static int AiAssignHarvester(CUnit &unit, const stratagus::resource *resource)
 {
 	// It can't.
 	//Wyrmgus start
@@ -1369,7 +1369,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit), AiPlayer->Scouts.end());
 	}
 
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
+	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource->ID];
 	Assert(&resinfo);
 
 	//Wyrmgus start
@@ -1626,7 +1626,7 @@ static void AiCollectResources()
 		if (num_units_unassigned[c]) {
 			CUnit *unassigned_unit = units_unassigned[c][SyncRand(units_unassigned[c].size())]; //only try to assign one unit (randomly, so it isn't always the first unit) per time, to lessen the strain on performance
 			// Take the unit.
-			if (AiAssignHarvester(*unassigned_unit, c)) {
+			if (AiAssignHarvester(*unassigned_unit, stratagus::resource::get_all()[c])) {
 				// unit is assigned
 				unit = unassigned_unit;
 					
@@ -1717,7 +1717,7 @@ static void AiCollectResources()
 					//Wyrmgus end
 					
 					// unit can't harvest : next one
-					if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
+					if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, stratagus::resource::get_all()[c])) {
 						unit = nullptr;
 						continue;
 					}

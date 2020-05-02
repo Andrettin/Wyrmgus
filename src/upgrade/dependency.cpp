@@ -449,10 +449,10 @@ std::string character_dependency::get_string(const std::string &prefix) const
 void season_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
-	std::string value = property.second;
+	const std::string &value = property.second;
+
 	if (key == "season") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Season = CSeason::GetSeason(value);
+		this->Season = season::get(value);
 	} else {
 		fprintf(stderr, "Invalid season dependency property: \"%s\".\n", key.c_str());
 	}
@@ -470,7 +470,7 @@ bool season_dependency::check(const CUnit *unit, bool ignore_units) const
 
 std::string season_dependency::get_string(const std::string &prefix) const
 {
-	std::string str = prefix + this->Season->Name + '\n';
+	std::string str = prefix + this->Season->get_name() + '\n';
 	return str;
 }
 

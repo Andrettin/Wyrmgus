@@ -45,10 +45,10 @@ class CAnimations;
 class CConstruction;
 class CGraphic;
 class CPlayerColorGraphic;
-class CSeason;
 class CUnitType;
 
 namespace stratagus {
+	class season;
 	class terrain_type;
 }
 
@@ -93,8 +93,8 @@ public:
 	std::vector<const CUnitType *> ItemsNotEquipped;
 	std::vector<const stratagus::terrain_type *> Terrains;
 	std::vector<const stratagus::terrain_type *> TerrainsForbidden;
-	std::vector<const CSeason *> Seasons;
-	std::vector<const CSeason *> ForbiddenSeasons;
+	std::vector<const stratagus::season *> Seasons;
+	std::vector<const stratagus::season *> ForbiddenSeasons;
 
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.

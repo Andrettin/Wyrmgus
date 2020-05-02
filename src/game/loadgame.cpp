@@ -146,7 +146,6 @@ void CleanModules()
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
-	CSeason::ClearSeasons();
 	CSeasonSchedule::ClearSeasonSchedules();
 	CParticleManager::exit();
 	CleanReplayLog();

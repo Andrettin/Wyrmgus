@@ -44,6 +44,7 @@
 #include "plane.h"
 #include "player_color.h"
 #include "quest.h"
+#include "resource.h"
 #include "sound/sound.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
@@ -174,6 +175,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
 		} else if (property_class_name == "stratagus::region*") {
 			new_property_value = QVariant::fromValue(region::get(property.get_value()));
+		} else if (property_class_name == "stratagus::resource*") {
+			new_property_value = QVariant::fromValue(resource::get(property.get_value()));
 		} else if (property_class_name == "stratagus::site*") {
 			new_property_value = QVariant::fromValue(site::get(property.get_value()));
 		} else if (property_class_name == "stratagus::sound*") {
@@ -320,6 +323,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "regions" || property_name == "superregions") {
 		region *region_value = region::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(region *, region_value));
+	} else if (property_name == "terrain_types" || property_name == "base_terrain_types") {
+		terrain_type *terrain_type_value = terrain_type::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(terrain_type *, terrain_type_value));
 	} else if (property_name == "unit_classes" || property_name == "building_classes") {
 		unit_class *unit_class_value = unit_class::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(unit_class *, unit_class_value));

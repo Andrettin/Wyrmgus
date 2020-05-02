@@ -127,7 +127,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 	//Wyrmgus start
 //	if (CMap::Map.Field(pos)->CheckMask(resmask)) { // reachable
-	if (CMap::Map.Field(pos, z)->GetResource() == resource) { // reachable
+	if (CMap::Map.Field(pos, z)->get_resource() == stratagus::resource::get_all()[resource]) { // reachable
 	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult::Ok;
@@ -158,7 +158,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 
 	//Wyrmgus start
 //	Assert(CMap::Map.Field(startPos)->CheckMask(resmask));
-	Assert(CMap::Map.Field(startPos, z)->GetResource() == resource);
+	Assert(CMap::Map.Field(startPos, z)->get_resource() == stratagus::resource::get_all()[resource]);
 	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
@@ -190,10 +190,10 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	order->goalPos = ressourceLoc;
 	order->CurrentResource = WoodCost; // Hard-coded resource.
 	*/
-	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->GetResource() != -1) {
-		order->CurrentResource = CMap::Map.Field(pos, z)->GetResource();
+	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->get_resource() != nullptr) {
+		order->CurrentResource = CMap::Map.Field(pos, z)->get_resource()->ID;
 		//  Find the closest resource tile next to a tile where the unit can move
-		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, CMap::Map.Field(pos, z)->GetResource(), 20, *harvester.Player, pos, &ressourceLoc, z)) {
+		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, CMap::Map.Field(pos, z)->get_resource()->ID, 20, *harvester.Player, pos, &ressourceLoc, z)) {
 			DebugPrint("FIXME: Give up???\n");
 			ressourceLoc = pos;
 		}
@@ -485,11 +485,11 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	//Wyrmgus end
 
 	// Wood gone, look somewhere else.
-	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->IsTerrainResourceOnMap(CurrentResource) == false)
+	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->get_resource() != stratagus::resource::get_all()[this->CurrentResource])
 		&& (!unit.get_pixel_offset().x()) && (!unit.get_pixel_offset().y())) {
 		//Wyrmgus start
 //		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
-		if (!FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
+		if (!FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
 		//Wyrmgus end
 			// no wood in range
 			return -1;
@@ -525,7 +525,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			}
 			//Wyrmgus start
 //			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
-			if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 9999, *unit.Player, unit.tilePos, &pos, z)) {
+			if (FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 9999, *unit.Player, unit.tilePos, &pos, z)) {
 			//Wyrmgus end
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
@@ -927,7 +927,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	// Target gone?
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester && !CMap::Map.Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
-	if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !CMap::Map.Field(this->goalPos, this->MapLayer)->IsTerrainResourceOnMap(this->CurrentResource)) {
+	if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && CMap::Map.Field(this->goalPos, this->MapLayer)->get_resource() != stratagus::resource::get_all()[this->CurrentResource]) {
 	//Wyrmgus end
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
@@ -1439,7 +1439,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		//Wyrmgus start
 //		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
-		if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 10, *unit.Player, pos, &pos, z)) {
+		if (FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 10, *unit.Player, pos, &pos, z)) {
 		//Wyrmgus end
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
@@ -1603,7 +1603,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				Vec2i resPos;
 				//Wyrmgus start
 //				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
-				if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
+				if (FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
 				//Wyrmgus end
 					this->goalPos = resPos;
 					this->MapLayer = unit.MapLayer->ID;

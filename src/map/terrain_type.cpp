@@ -40,17 +40,13 @@
 #include "map/tileset.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/container_util.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 #include "video.h"
 
 namespace stratagus {
 
-std::map<char, terrain_type *> terrain_type::TerrainTypesByCharacter;
-std::map<std::tuple<int, int, int>, terrain_type *> terrain_type::TerrainTypesByColor;
-
-/**
-**	@brief	Load the graphics of the terrain types
-*/
 void terrain_type::LoadTerrainTypeGraphics()
 {
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
@@ -120,8 +116,7 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 	} else if (flag_name == "underground") {
 		return MapFieldUnderground;
 	} else {
-		fprintf(stderr, "Flag \"%s\" doesn't exist.\n", flag_name.c_str());
-		return 0;
+		throw std::runtime_error("Flag \"" + flag_name + "\" doesn't exist.");
 	}
 }
 
@@ -141,11 +136,87 @@ terrain_type::~terrain_type()
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
+void terrain_type::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "character") {
+		this->set_character(value.front());
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void terrain_type::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "character_aliases") {
+		for (const std::string &value : values) {
+			this->map_to_character(value.front());
+		}
+	} else if (tag == "flags") {
+		for (const std::string &value : values) {
+			const unsigned long flag = terrain_type::GetTerrainFlagByName(value);
+			this->Flags |= flag;
+		}
+	} else if (tag == "solid_tiles") {
+		for (const std::string &value : values) {
+			this->solid_tiles.push_back(std::stoi(value));
+		}
+	} else if (tag == "damaged_tiles") {
+		for (const std::string &value : values) {
+			this->damaged_tiles.push_back(std::stoi(value));
+		}
+	} else if (tag == "destroyed_tiles") {
+		for (const std::string &value : values) {
+			this->destroyed_tiles.push_back(std::stoi(value));
+		}
+	} else if (tag == "season_image_files") {
+		scope.for_each_property([&](const sml_property &property) {
+			const season *season = season::get(property.get_key());
+			const std::filesystem::path filepath = property.get_value();
+
+			this->season_image_files[season] = filepath;
+		});
+	} else if (tag == "transition_tiles" || tag == "adjacent_transition_tiles") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &child_tag = child_scope.get_tag();
+			const terrain_type *transition_terrain = nullptr;
+			int transition_terrain_id = -1;
+
+			if (child_tag != "any") {
+				transition_terrain = terrain_type::get(child_tag);
+				transition_terrain_id = transition_terrain->ID;
+			}
+
+			child_scope.for_each_child([&](const sml_data &grandchild_scope) {
+				const std::string &grandchild_tag = grandchild_scope.get_tag();
+				const int transition_type = GetTransitionTypeIdByName(FindAndReplaceString(grandchild_tag, "_", "-"));
+				std::vector<int> tiles;
+
+				if (transition_type == -1) {
+					throw std::runtime_error("Invalid tile transition type: \"" + grandchild_tag + "\".");
+				}
+
+				for (const std::string &value : grandchild_scope.get_values()) {
+					const int tile = std::stoi(value);
+
+					if (tag == "transition_tiles") {
+						this->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tile);
+					} else if (tag == "adjacent_transition_tiles") {
+						this->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tile);
+					}
+				}
+			});
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void terrain_type::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string graphics_file;
@@ -158,36 +229,15 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "character") {
-			this->Character = value.front();
-			
-			if (terrain_type::TerrainTypesByCharacter.find(this->Character) != terrain_type::TerrainTypesByCharacter.end()) {
-				fprintf(stderr, "Character \"%c\" is already used by another terrain type.\n", this->Character);
-				continue;
-			} else {
-				terrain_type::TerrainTypesByCharacter[this->Character] = this;
-			}
+			this->set_character(value.front());
 		} else if (key == "character_alias") {
 			const char c = value.front();
-			if (terrain_type::TerrainTypesByCharacter.find(c) != terrain_type::TerrainTypesByCharacter.end()) {
-				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", value.c_str());
-				continue;
-			} else {
-				terrain_type::TerrainTypesByCharacter[c] = this;
-			}
+			this->map_to_character(c);
 		} else if (key == "color") {
-			this->Color = CColor::FromString(value);
-			
-			if (terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != terrain_type::TerrainTypesByColor.end()) {
-				fprintf(stderr, "Color is already used by another terrain type.\n");
-				continue;
-			}
-			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != TerrainFeatureColorToIndex.end()) {
-				fprintf(stderr, "Color is already used by a terrain feature.\n");
-				continue;
-			}
-			terrain_type::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
+			const CColor color = CColor::FromString(value);
+			this->set_color(QColor(color.R, color.G, color.B));
 		} else if (key == "overlay") {
-			this->Overlay = string::to_bool(value);
+			this->overlay = string::to_bool(value);
 		} else if (key == "buildable") {
 			this->Buildable = string::to_bool(value);
 		} else if (key == "allow_single") {
@@ -195,14 +245,11 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "hidden") {
 			this->Hidden = string::to_bool(value);
 		} else if (key == "resource") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Resource = GetResourceIdByName(value.c_str());
+			this->resource = resource::get(value);
 		} else if (key == "flag") {
 			value = FindAndReplaceString(value, "_", "-");
-			unsigned long flag = terrain_type::GetTerrainFlagByName(value);
-			if (flag) {
-				this->Flags |= flag;
-			}
+			const unsigned long flag = terrain_type::GetTerrainFlagByName(value);
+			this->Flags |= flag;
 		} else if (key == "graphics") {
 			graphics_file = value;
 			if (!CanAccessFile(graphics_file.c_str())) {
@@ -215,7 +262,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "base_terrain_type") {
 			terrain_type *base_terrain_type = terrain_type::get(value);
-			this->BaseTerrainTypes.push_back(base_terrain_type);
+			this->add_base_terrain_type(base_terrain_type);
 		} else if (key == "inner_border_terrain_type") {
 			terrain_type *border_terrain_type = terrain_type::get(value);
 			this->InnerBorderTerrains.push_back(border_terrain_type);
@@ -229,11 +276,11 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			border_terrain_type->InnerBorderTerrains.push_back(this);
 			border_terrain_type->BorderTerrains.push_back(this);
 		} else if (key == "solid_tile") {
-			this->SolidTiles.push_back(std::stoi(value));
+			this->solid_tiles.push_back(std::stoi(value));
 		} else if (key == "damaged_tile") {
-			this->DamagedTiles.push_back(std::stoi(value));
+			this->damaged_tiles.push_back(std::stoi(value));
 		} else if (key == "destroyed_tile") {
-			this->DestroyedTiles.push_back(std::stoi(value));
+			this->destroyed_tiles.push_back(std::stoi(value));
 		} else {
 			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", key.c_str());
 		}
@@ -242,15 +289,14 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "season_graphics") {
 			std::string season_graphics_file;
-			CSeason *season = nullptr;
+			season *season = nullptr;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "season") {
-					value = FindAndReplaceString(value, "_", "-");
-					season = CSeason::GetSeason(value);
+					season = season::get(value);
 				} else if (key == "graphics") {
 					season_graphics_file = value;
 					if (!CanAccessFile(season_graphics_file.c_str())) {
@@ -271,10 +317,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			if (CPlayerColorGraphic::Get(season_graphics_file) == nullptr) {
-				CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size());
-			}
-			this->SeasonGraphics[season] = CPlayerColorGraphic::Get(season_graphics_file);
+			this->SeasonGraphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size());
 		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
 			int transition_terrain_id = -1; //any terrain, by default
 			int transition_type = -1;
@@ -315,27 +358,74 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	if (!graphics_file.empty()) {
-		if (CPlayerColorGraphic::Get(graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size());
-		}
-		this->Graphics = CPlayerColorGraphic::Get(graphics_file);
+		this->Graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size());
 	}
 	if (!elevation_graphics_file.empty()) {
-		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
-		}
-		this->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
+		this->ElevationGraphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
 	}
 }
 
-/**
-**	@brief	Get the graphics for the terrain type
-**
-**	@param	season	The season for the graphics, if any
-**
-**	@return	The graphics
-*/
-CPlayerColorGraphic *terrain_type::GetGraphics(const CSeason *season) const
+void terrain_type::initialize()
+{
+	if (!this->get_image_file().empty() && this->Graphics == nullptr) {
+		this->Graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size());
+	}
+
+	for (const auto &kv_pair : this->season_image_files) {
+		const season *season = kv_pair.first;
+		const std::filesystem::path &filepath = kv_pair.second;
+
+		if (!this->SeasonGraphics.contains(season)) {
+			this->SeasonGraphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size());
+		}
+	}
+}
+
+void terrain_type::set_character(const char character)
+{
+	if (character == this->get_character()) {
+		return;
+	}
+
+	this->character = character;
+	this->map_to_character(character);
+}
+
+void terrain_type::map_to_character(const char character)
+{
+	if (terrain_type::try_get_by_character(character) != nullptr) {
+		throw std::runtime_error("Character \"" + std::string(character, 1) + "\" is already used by another terrain type.");
+	}
+
+	terrain_type::terrain_types_by_character[character] = this;
+}
+
+void terrain_type::set_color(const QColor &color)
+{
+	if (color == this->get_color()) {
+		return;
+	}
+
+	if (terrain_type::try_get_by_color(color) != nullptr) {
+		throw std::runtime_error("Color is already used by another terrain type.");
+	} else if (TerrainFeatureColorToIndex.contains(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))) {
+		throw std::runtime_error("Color is already used by a terrain feature.");
+	}
+
+	this->color = color;
+	terrain_type::terrain_types_by_color[color] = this;
+}
+
+void terrain_type::set_image_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_image_file()) {
+		return;
+	}
+
+	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
+}
+
+CPlayerColorGraphic *terrain_type::GetGraphics(const season *season) const
 {
 	auto find_iterator = this->SeasonGraphics.find(season);
 	
@@ -344,6 +434,16 @@ CPlayerColorGraphic *terrain_type::GetGraphics(const CSeason *season) const
 	} else {
 		return this->Graphics;
 	}
+}
+
+QVariantList terrain_type::get_base_terrain_types_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_base_terrain_types());
+}
+
+void terrain_type::remove_base_terrain_type(terrain_type *terrain_type)
+{
+	vector::remove(this->base_terrain_types, terrain_type);
 }
 
 }

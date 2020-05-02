@@ -74,6 +74,8 @@ namespace stratagus {
 
 class resource : public named_data_entry, public data_type<resource>
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "resource";
 	static constexpr const char *database_folder = "resources";

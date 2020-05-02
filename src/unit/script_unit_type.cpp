@@ -852,16 +852,12 @@ static int CclDefineUnitType(lua_State *l)
 						variation->TerrainsForbidden.push_back(terrain);
 					} else if (!strcmp(value, "season")) {
 						const std::string season_ident = LuaToString(l, -1, k + 1);
-						CSeason *season = CSeason::GetSeason(season_ident);
-						if (season) {
-							variation->Seasons.push_back(season);
-						}
+						stratagus::season *season = stratagus::season::get(season_ident);
+						variation->Seasons.push_back(season);
 					} else if (!strcmp(value, "forbidden-season")) {
 						const std::string season_ident = LuaToString(l, -1, k + 1);
-						CSeason *season = CSeason::GetSeason(season_ident);
-						if (season) {
-							variation->ForbiddenSeasons.push_back(season);
-						}
+						stratagus::season *season = stratagus::season::get(season_ident);
+						variation->ForbiddenSeasons.push_back(season);
 					} else if (!strcmp(value, "resource-min")) {
 						variation->ResourceMin = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource-max")) {

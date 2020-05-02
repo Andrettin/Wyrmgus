@@ -103,7 +103,7 @@ public:
 	//Wyrmgus start
 //	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vec2i *resPos, int z, int landmass) :
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, const stratagus::resource *resource, Vec2i *resPos, int z, int landmass) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass) {}
 	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -113,7 +113,7 @@ private:
 	int movemask;
 	//Wyrmgus start
 //	int resmask;
-	int resource;
+	const stratagus::resource *resource = nullptr;
 	int z;
 	int landmass;
 	//Wyrmgus end
@@ -135,7 +135,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) {
-	if ((!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass) && (!resource || CMap::Map.Field(pos, z)->GetResource() == resource)) {
+	if ((!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass) && (this->resource == nullptr || CMap::Map.Field(pos, z)->get_resource() == resource)) {
 	//Wyrmgus end
 		if (resPos) {
 			*resPos = pos;
@@ -171,7 +171,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **
 **  @return            True if wood was found.
 */
-bool FindTerrainType(int movemask, int resource, int range,
+bool FindTerrainType(int movemask, const stratagus::resource *resource, int range,
 					 //Wyrmgus start
 //					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, int landmass)

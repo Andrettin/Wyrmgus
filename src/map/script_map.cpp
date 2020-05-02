@@ -1311,12 +1311,7 @@ static int CclDefineTerrainType(lua_State *l)
 			terrain->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Character")) {
 			const std::string character_str = LuaToString(l, -1);
-			terrain->Character = character_str.front();
-			if (stratagus::terrain_type::TerrainTypesByCharacter.find(terrain->Character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
-				LuaError(l, "Character \"%c\" is already used by another terrain type." _C_ terrain->Character);
-			} else {
-				stratagus::terrain_type::TerrainTypesByCharacter[terrain->Character] = terrain;
-			}
+			terrain->set_character(character_str.front());
 		} else if (!strcmp(value, "CharacterAliases")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1325,28 +1320,15 @@ static int CclDefineTerrainType(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				const std::string character_str = LuaToString(l, -1, j + 1);
 				const char c = character_str.front();
-				if (stratagus::terrain_type::TerrainTypesByCharacter.find(c) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
-					LuaError(l, "Character \"%c\" is already used by another terrain type." _C_ c);
-				} else {
-					stratagus::terrain_type::TerrainTypesByCharacter[c] = terrain;
-				}
+				terrain->map_to_character(c);
 			}
 		} else if (!strcmp(value, "Color")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			terrain->Color.R = LuaToNumber(l, -1, 1);
-			terrain->Color.G = LuaToNumber(l, -1, 2);
-			terrain->Color.B = LuaToNumber(l, -1, 3);
-			if (stratagus::terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)) != stratagus::terrain_type::TerrainTypesByColor.end()) {
-				LuaError(l, "Color is already used by another terrain type.");
-			}
-			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)) != TerrainFeatureColorToIndex.end()) {
-				LuaError(l, "Color is already used by a terrain feature.");
-			}
-			stratagus::terrain_type::TerrainTypesByColor[std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)] = terrain;
+			terrain->set_color(QColor(LuaToNumber(l, -1, 1), LuaToNumber(l, -1, 2), LuaToNumber(l, -1, 3)));
 		} else if (!strcmp(value, "Overlay")) {
-			terrain->Overlay = LuaToBoolean(l, -1);
+			terrain->overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {
 			terrain->Buildable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AllowSingle")) {
@@ -1356,7 +1338,7 @@ static int CclDefineTerrainType(lua_State *l)
 		} else if (!strcmp(value, "SolidAnimationFrames")) {
 			terrain->SolidAnimationFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Resource")) {
-			terrain->Resource = GetResourceIdByName(LuaToString(l, -1));
+			terrain->resource = stratagus::resource::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "BaseTerrainTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1364,7 +1346,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::terrain_type *base_terrain = stratagus::terrain_type::get_or_add(LuaToString(l, -1, j + 1), nullptr);
-				terrain->BaseTerrainTypes.push_back(base_terrain);
+				terrain->add_base_terrain_type(base_terrain);
 			}
 		} else if (!strcmp(value, "InnerBorderTerrains")) {
 			if (!lua_istable(l, -1)) {
@@ -1397,7 +1379,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::terrain_type *overlay_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
-				overlay_terrain->BaseTerrainTypes.push_back(terrain);
+				overlay_terrain->add_base_terrain_type(terrain);
 			}
 		} else if (!strcmp(value, "Flags")) {
 			if (!lua_istable(l, -1)) {
@@ -1471,7 +1453,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				terrain->SolidTiles.push_back(LuaToNumber(l, -1, j + 1));
+				terrain->solid_tiles.push_back(LuaToNumber(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "DamagedTiles")) {
 			if (!lua_istable(l, -1)) {
@@ -1479,7 +1461,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				terrain->DamagedTiles.push_back(LuaToNumber(l, -1, j + 1));
+				terrain->damaged_tiles.push_back(LuaToNumber(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "DestroyedTiles")) {
 			if (!lua_istable(l, -1)) {
@@ -1487,7 +1469,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				terrain->DestroyedTiles.push_back(LuaToNumber(l, -1, j + 1));
+				terrain->destroyed_tiles.push_back(LuaToNumber(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "TransitionTiles")) {
 			if (!lua_istable(l, -1)) {
@@ -1539,16 +1521,10 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 	
 	if (!graphics_file.empty()) {
-		if (CPlayerColorGraphic::Get(graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size());
-		}
-		terrain->Graphics = CPlayerColorGraphic::Get(graphics_file);
+		terrain->Graphics = CPlayerColorGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size());
 	}
 	if (!elevation_graphics_file.empty()) {
-		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size());
-		}
-		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
+		terrain->ElevationGraphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size());
 	}
 	
 	return 0;
@@ -1900,10 +1876,9 @@ static int CclDefineTerrainFeature(lua_State *l)
 			terrain_feature->Color.R = LuaToNumber(l, -1, 1);
 			terrain_feature->Color.G = LuaToNumber(l, -1, 2);
 			terrain_feature->Color.B = LuaToNumber(l, -1, 3);
-			if (stratagus::terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != stratagus::terrain_type::TerrainTypesByColor.end()) {
+			if (stratagus::terrain_type::try_get_by_color(QColor(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != nullptr) {
 				LuaError(l, "Color is already used by a terrain type.");
-			}
-			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != TerrainFeatureColorToIndex.end()) {
+			} else if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != TerrainFeatureColorToIndex.end()) {
 				LuaError(l, "Color is already used by another terrain feature.");
 			}
 			TerrainFeatureColorToIndex[std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)] = terrain_feature->ID;

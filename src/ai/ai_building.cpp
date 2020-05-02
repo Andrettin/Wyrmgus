@@ -530,8 +530,8 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		return VisitResult::DeadEnd;
 	}
 	
-//	if (CMap::Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
-	if (CMap::Map.Field(pos, z)->IsTerrainResourceOnMap(resource)) {
+//	if (CMap::Map.Field(pos)->get_resource() == stratagus::resource::get_all()[resource]) {
+	if (CMap::Map.Field(pos, z)->get_resource() == stratagus::resource::get_all()[resource]) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {

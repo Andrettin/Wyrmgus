@@ -882,7 +882,7 @@ void DrawTime()
 			UI.TimeOfDayPanel.G = nullptr;
 		}
 
-		const CSeason *season = UI.CurrentMapLayer->GetSeason();
+		const stratagus::season *season = UI.CurrentMapLayer->GetSeason();
 		if (season) {
 			UI.SeasonPanel.G = season->G;
 		} else {
@@ -1173,7 +1173,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->Name.c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text

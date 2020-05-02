@@ -44,6 +44,10 @@ class CPlayer;
 class CUnit;
 enum class UnitTypeType;
 
+namespace stratagus {
+	class resource;
+}
+
 //
 //  Some predicates
 //
@@ -463,14 +467,8 @@ extern CUnit *FindHomeMarket(const CUnit &unit, int range);
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
-//Wyrmgus start
-//extern bool FindTerrainType(int movemask, int resmask, int range,
-extern bool FindTerrainType(int movemask, int resource, int range,
-//Wyrmgus end
-							//Wyrmgus start
-//							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
+extern bool FindTerrainType(int movemask, const stratagus::resource *resource, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, int landmass = 0);
-							//Wyrmgus end
 
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
 

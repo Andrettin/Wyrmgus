@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name season_schedule.h - The season schedule header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,24 +27,19 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "time/time_period_schedule.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CSeason;
 class CSeasonSchedule;
+
+namespace stratagus {
+	class season;
+}
 
 class CScheduledSeason
 {
 public:
 	unsigned ID = 0;						/// the scheduled season's ID within the season schedule
-	CSeason *Season = nullptr;				/// the season that is scheduled
+	stratagus::season *Season = nullptr;				/// the season that is scheduled
 	unsigned Hours = 0;						/// the amount of hours the scheduled season lasts
 	CSeasonSchedule *Schedule = nullptr;	/// the schedule to which this season belongs
 };

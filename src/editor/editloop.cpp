@@ -222,11 +222,11 @@ static void EditTile(const Vec2i &pos, stratagus::terrain_type *terrain)
 	//Wyrmgus start
 	int value = 0;
 	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
-		value = stratagus::resource::get_all()[terrain->Resource]->DefaultAmount;
+		value = terrain->get_resource()->DefaultAmount;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
-	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
+	if (!terrain->is_overlay() && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
 		mf.RemoveOverlayTerrain();
 	}
 	mf.Value = value;
@@ -307,12 +307,12 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		stratagus::terrain_type *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, UI.CurrentMapLayer->ID);
+		stratagus::terrain_type *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->is_overlay(), UI.CurrentMapLayer->ID);
 		
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
 
-		bool has_transitions = terrain->Overlay ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
+		bool has_transitions = terrain->is_overlay() ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
 		if (tile_terrain && !tile_terrain->AllowSingle) {
@@ -323,8 +323,8 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 									
-							stratagus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
-							if (tile_terrain->Overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
+							stratagus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->is_overlay(), UI.CurrentMapLayer->ID);
+							if (tile_terrain->is_overlay() && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
 							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -392,7 +392,7 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (CMap::Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
 												stratagus::terrain_type *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
-												if (adjacent_terrain->Overlay && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
+												if (adjacent_terrain->is_overlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
 												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -981,7 +981,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
 	const stratagus::terrain_type *terrain = Editor.ShownTileTypes[0];
-	terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
+	terrain->GetGraphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y);
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
@@ -1094,8 +1094,8 @@ static void DrawTileIcons()
 
 			const stratagus::terrain_type *terrain = Editor.ShownTileTypes[i];
 
-			if (terrain->GetGraphics() && terrain->SolidTiles.size() > 0) {
-				terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], x, y);
+			if (terrain->GetGraphics() && terrain->get_solid_tiles().size() > 0) {
+				terrain->GetGraphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y);
 			}
 			//Wyrmgus end
 			Video.DrawRectangleClip(ColorGray, x, y, stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height());
@@ -1311,8 +1311,8 @@ static void DrawMapCursor()
 					//Wyrmgus start
 //					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
 
-					if (terrain->GetGraphics() && terrain->SolidTiles.size() > 0) {
-						terrain->GetGraphics()->DrawFrameClip(terrain->SolidTiles[0], screenPosIt.x, screenPosIt.y);
+					if (terrain->GetGraphics() && terrain->get_solid_tiles().size() > 0) {
+						terrain->GetGraphics()->DrawFrameClip(terrain->get_solid_tiles()[0], screenPosIt.x, screenPosIt.y);
 					}
 					//Wyrmgus end
 				}

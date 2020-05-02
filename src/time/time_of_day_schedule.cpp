@@ -198,7 +198,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "season_hours") {
-			CSeason *season = nullptr;
+			stratagus::season *season = nullptr;
 			int season_hours = 0;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -207,7 +207,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
-					season = CSeason::GetSeason(value);
+					season = stratagus::season::get(value);
 				} else if (key == "hours") {
 					season_hours = std::stoi(value);
 				} else {
@@ -247,10 +247,10 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The amount of hours
 */
-int CScheduledTimeOfDay::GetHours(const CSeason *season) const
+int CScheduledTimeOfDay::GetHours(const stratagus::season *season) const
 {
 	if (season) {
-		std::map<const CSeason *, int>::const_iterator find_iterator = this->SeasonHours.find(season);
+		auto find_iterator = this->SeasonHours.find(season);
 		
 		if (find_iterator != this->SeasonHours.end()) {
 			return find_iterator->second;

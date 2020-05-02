@@ -46,6 +46,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/size_util.h"
+#include "util/vector_util.h"
 #include "video.h"
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
@@ -263,7 +264,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
-	const CSeason *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
+	const stratagus::season *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
@@ -295,7 +296,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 
 			if (ReplayRevealMap) {
-				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) == mf.OverlayTerrain->DestroyedTiles.end();
+				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(mf.OverlayTerrain->get_destroyed_tiles(), mf.OverlaySolidTile);
 				const bool is_underground = mf.Terrain && mf.Terrain->Flags & MapFieldUnderground;
 				const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 				const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
@@ -336,7 +337,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 				}
 			} else {
-				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) == mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end();
+				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(mf.playerInfo.SeenOverlayTerrain->get_destroyed_tiles(), mf.playerInfo.SeenOverlaySolidTile);
 				const bool is_underground = mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->Flags & MapFieldUnderground;
 				const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 				const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();

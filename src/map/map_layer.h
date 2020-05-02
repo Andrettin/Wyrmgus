@@ -40,7 +40,6 @@
 class CMapField;
 class CScheduledSeason;
 class CScheduledTimeOfDay;
-class CSeason;
 class CSeasonSchedule;
 class CTimeOfDaySchedule;
 class CUnit;
@@ -48,6 +47,7 @@ class CUnit;
 namespace stratagus {
 	class map_template;
 	class plane;
+	class season;
 	class time_of_day;
 	class world;
 }
@@ -139,7 +139,7 @@ private:
 public:
 	void SetSeasonByHours(const unsigned long long hours);
 	void SetSeason(CScheduledSeason *season);
-	CSeason *GetSeason() const;
+	stratagus::season *GetSeason() const;
 	
 	int ID = -1;
 private:

@@ -429,8 +429,8 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 		return;
 	}
 	
-	CSeason *old_season = this->Season ? this->Season->Season : nullptr;
-	CSeason *new_season = season ? season->Season : nullptr;
+	stratagus::season *old_season = this->Season ? this->Season->Season : nullptr;
+	stratagus::season *new_season = season ? season->Season : nullptr;
 	
 	this->Season = season;
 	
@@ -468,7 +468,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 **
 **	@return	The map layer's current season
 */
-CSeason *CMapLayer::GetSeason() const
+stratagus::season *CMapLayer::GetSeason() const
 {
 	if (!this->Season) {
 		return nullptr;

@@ -163,17 +163,11 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
 			this->TerrainsForbidden.push_back(terrain_type);
 		} else if (key == "season") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CSeason *season = CSeason::GetSeason(value);
-			if (season != nullptr) {
-				this->Seasons.push_back(season);
-			}
+			const stratagus::season *season = stratagus::season::get(value);
+			this->Seasons.push_back(season);
 		} else if (key == "forbidden_season") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CSeason *season = CSeason::GetSeason(value);
-			if (season != nullptr) {
-				this->ForbiddenSeasons.push_back(season);
-			}
+			const stratagus::season *season = stratagus::season::get(value);
+			this->ForbiddenSeasons.push_back(season);
 		} else if (key == "resource_min") {
 			this->ResourceMin = std::stoi(value);
 		} else if (key == "resource_max") {

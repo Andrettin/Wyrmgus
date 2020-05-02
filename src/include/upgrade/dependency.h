@@ -85,14 +85,9 @@
 **
 */
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CCharacter;
 class CConfigData;
 class CPlayer;
-class CSeason;
 class CUnitType;
 class CUnit;
 class CUpgrade;
@@ -102,6 +97,7 @@ namespace stratagus {
 
 class age;
 class faction;
+class season;
 class site;
 class sml_data;
 class sml_property;
@@ -322,7 +318,7 @@ public:
 	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
-	const CSeason *Season = nullptr;
+	const season *Season = nullptr;
 };
 
 class settlement_dependency : public dependency

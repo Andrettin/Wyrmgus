@@ -365,13 +365,7 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 				CMapField *tile = CMap::Map.Field(real_pos, z);
 
 				if (terrain_character != '0' && terrain_character != '=') {
-					auto find_iterator = terrain_type::TerrainTypesByCharacter.find(terrain_character);
-					if (find_iterator != terrain_type::TerrainTypesByCharacter.end()) {
-						terrain = find_iterator->second;
-					} else {
-						throw std::runtime_error("Invalid terrain type character: \"" + std::string(1, terrain_character) + "\".");
-					}
-
+					terrain = terrain_type::get_by_character(terrain_character);
 					tile->SetTerrain(terrain);
 				} else if (terrain_character == '0') {
 					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
@@ -453,8 +447,8 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue())) != TerrainFeatureColorToIndex.end()) {
 				terrain_feature_id = TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))->second;
 				terrain = TerrainFeatures[terrain_feature_id]->TerrainType;
-			} else if (terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue())) != terrain_type::TerrainTypesByColor.end()) {
-				terrain = terrain_type::TerrainTypesByColor.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))->second;
+			} else {
+				terrain = terrain_type::try_get_by_color(color);
 			}
 			Vec2i real_pos(map_start_pos.x + (x - template_start_pos.x), map_start_pos.y + (y - template_start_pos.y));
 
@@ -641,7 +635,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 
 				if (historical_terrain) {
-					if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+					if (historical_terrain->is_overlay() && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
 						continue;
 					}
 					CMap::Map.Field(real_pos, z)->SetTerrain(historical_terrain);
@@ -2006,7 +2000,7 @@ bool generated_terrain::CanUseTileAsSeed(const CMapField *tile) const
 */
 bool generated_terrain::CanGenerateOnTile(const CMapField *tile) const
 {
-	if (this->TerrainType->Overlay) {
+	if (this->TerrainType->is_overlay()) {
 		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
 			return false;
 		}
@@ -2021,7 +2015,7 @@ bool generated_terrain::CanGenerateOnTile(const CMapField *tile) const
 		if ( //don't allow generating the terrain on the tile if it is a base terrain, and putting it there would destroy an overlay terrain that isn't a target of the generation
 			tile->OverlayTerrain
 			&& !this->CanRemoveTileOverlayTerrain(tile)
-			&& std::find(tile->OverlayTerrain->BaseTerrainTypes.begin(), tile->OverlayTerrain->BaseTerrainTypes.end(), this->TerrainType) == tile->OverlayTerrain->BaseTerrainTypes.end()
+			&& !vector::contains(tile->OverlayTerrain->get_base_terrain_types(), this->TerrainType)
 		) {
 			return false;
 		}
@@ -2051,7 +2045,7 @@ bool generated_terrain::CanTileBePartOfExpansion(const CMapField *tile) const
 		return true;
 	}
 	
-	if (!this->TerrainType->Overlay) {
+	if (!this->TerrainType->is_overlay()) {
 		if (this->TerrainType == tile->Terrain) {
 			return true;
 		}

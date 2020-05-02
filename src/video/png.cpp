@@ -224,9 +224,6 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 	
 	QImage image(map_template->get_size(), QImage::Format_RGBA8888);
 
-	const size_t imageWidth = map_template->get_width();
-	const size_t imageHeight = map_template->get_height();
-
 	if (use_terrain_file) {
 		const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 			
@@ -244,20 +241,13 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 			
 			for (unsigned int i = 0; i < line_str.length(); ++i) {
 				const char terrain_character = line_str.at(i);
-				stratagus::terrain_type *terrain = nullptr;
-				if (stratagus::terrain_type::TerrainTypesByCharacter.find(terrain_character) != stratagus::terrain_type::TerrainTypesByCharacter.end()) {
-					terrain = stratagus::terrain_type::TerrainTypesByCharacter.find(terrain_character)->second;
-				}
-				Uint8 red = 0;
-				Uint8 green = 0;
-				Uint8 blue = 0;
-				if (terrain) {
-					red = terrain->Color.R;
-					green = terrain->Color.G;
-					blue = terrain->Color.B;
+				const stratagus::terrain_type *terrain = stratagus::terrain_type::try_get_by_character(terrain_character);
+
+				QColor color(0, 0, 0);
+				if (terrain != nullptr) {
+					color = terrain->get_color();
 				}
 				
-				const QColor color(red, green, blue);
 				image.setPixelColor(QPoint(x, y), color);
 
 				x += 1;
@@ -271,7 +261,7 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 			if (std::get<2>(map_template->HistoricalTerrains[i]).Year == 0) {
 				Vec2i terrain_pos = std::get<0>(map_template->HistoricalTerrains[i]);
 				stratagus::terrain_type *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
-				if (terrain_type->Overlay == overlay) {
+				if (terrain_type->is_overlay() == overlay) {
 					terrain_map[terrain_pos.y][terrain_pos.x] = terrain_type;
 				}
 			}
@@ -286,16 +276,11 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 				int x = iterator->first;
 				stratagus::terrain_type *terrain_type = iterator->second;
 				
-				Uint8 red = 0;
-				Uint8 green = 0;
-				Uint8 blue = 0;
-				if (terrain_type) {
-					red = terrain_type->Color.R;
-					green = terrain_type->Color.G;
-					blue = terrain_type->Color.B;
+				QColor color(0, 0, 0);
+				if (terrain_type != nullptr) {
+					color = terrain_type->get_color();
 				}
 				
-				const QColor color(red, green, blue);
 				image.setPixelColor(QPoint(x, y), color);
 			}
 		}

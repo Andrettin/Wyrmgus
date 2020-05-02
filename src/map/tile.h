@@ -143,6 +143,7 @@ class CTerrainFeature;
 struct lua_State;
 
 namespace stratagus {
+	class resource;
 	class site;
 	class terrain_type;
 }
@@ -247,14 +248,10 @@ public:
 	bool RockOnMap() const;
 
 	bool isAWall() const;
-	bool isHuman() const;
 
-	bool IsTerrainResourceOnMap(int resource) const;
-	bool IsTerrainResourceOnMap() const;
-	
 	bool IsSeenTileCorrect() const;
 	
-	int GetResource() const;
+	const stratagus::resource *get_resource() const;
 
 	bool IsDestroyedForestTile() const;
 	

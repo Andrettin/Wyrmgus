@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name season.h - The season header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,30 +27,27 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CGraphic;
 
-class CSeason : public CDataType
+namespace stratagus {
+
+class season : public named_data_entry, public data_type<season>, public CDataType
 {
 public:
-	static CSeason *GetSeason(const std::string &ident, const bool should_find = true);
-	static CSeason *GetOrAddSeason(const std::string &ident);
-	static void ClearSeasons();
-	
-	static std::vector<CSeason *> Seasons;		/// Seasons
-	static std::map<std::string, CSeason *> SeasonsByIdent;
-	
+	static constexpr const char *class_identifier = "season";
+	static constexpr const char *database_folder = "seasons";
+
+	season(const std::string &identifier) : named_data_entry(identifier)
+	{
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	std::string Name;							/// Name of the season
 	CGraphic *G = nullptr;
 };
+
+}

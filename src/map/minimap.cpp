@@ -257,7 +257,7 @@ void CMinimap::Reload()
 /**
 **  Calculate the tile graphic pixel
 */
-static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int z, stratagus::terrain_type *terrain, const CSeason *season)
+static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int z, stratagus::terrain_type *terrain, const stratagus::season *season)
 {
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	int x = (xofs + (7 * scale_factor) + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
@@ -289,7 +289,7 @@ void CMinimap::UpdateTerrain(int z)
 		scaley = 1;
 	}
 	
-	const CSeason *season = CMap::Map.MapLayers[z]->GetSeason();
+	const stratagus::season *season = CMap::Map.MapLayers[z]->GetSeason();
 
 	//Wyrmgus start
 //	const int tilepitch = Map.TileGraphic->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
@@ -389,7 +389,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 		scaley = 1;
 	}
 
-	const CSeason *season = CMap::Map.MapLayers[z]->GetSeason();
+	const stratagus::season *season = CMap::Map.MapLayers[z]->GetSeason();
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.

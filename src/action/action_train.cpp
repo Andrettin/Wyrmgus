@@ -473,8 +473,8 @@ static void AnimateActionTrain(CUnit &unit)
 			}
 			
 			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->playerInfo.IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
-				for (size_t res = 0; res < stratagus::resource::get_all().size(); ++res) {
-					if (newUnit->Type->ResInfo[res] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->IsTerrainResourceOnMap(res)) {
+				for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+					if (newUnit->Type->ResInfo[resource->ID] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->get_resource() == resource) {
 						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
 						command_found = true;
 						break;
