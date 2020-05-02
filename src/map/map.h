@@ -210,6 +210,7 @@ public:
 	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
+	void calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
 	void CalculateTileTerrainFeature(const Vec2i &pos, int z);

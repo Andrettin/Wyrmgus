@@ -175,16 +175,10 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 		this->OverlayTerrain = terrain_type;
-		if (terrain_type->get_solid_tiles().size() > 0) {
-			this->OverlaySolidTile = terrain_type->get_solid_tiles()[SyncRand(terrain_type->get_solid_tiles().size())];
-		}
 		this->OverlayTerrainDestroyed = false;
 		this->OverlayTerrainDamaged = false;
 	} else {
 		this->Terrain = terrain_type;
-		if (terrain_type->get_solid_tiles().size() > 0) {
-			this->SolidTile = terrain_type->get_solid_tiles()[SyncRand(terrain_type->get_solid_tiles().size())];
-		}
 		if (this->OverlayTerrain && !stratagus::vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
@@ -305,16 +299,6 @@ void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
 	}
 	
 	this->OverlayTerrainDestroyed = destroyed;
-	
-	if (destroyed) {
-		if (this->OverlayTerrain->get_destroyed_tiles().size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->get_destroyed_tiles()[SyncRand(this->OverlayTerrain->get_destroyed_tiles().size())];
-		}
-	} else {
-		if (this->OverlayTerrain->get_solid_tiles().size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->get_solid_tiles()[SyncRand(this->OverlayTerrain->get_solid_tiles().size())];
-		}
-	}
 }
 
 void CMapField::SetOverlayTerrainDamaged(bool damaged)
@@ -324,16 +308,6 @@ void CMapField::SetOverlayTerrainDamaged(bool damaged)
 	}
 	
 	this->OverlayTerrainDamaged = damaged;
-	
-	if (damaged) {
-		if (this->OverlayTerrain->get_damaged_tiles().size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->get_damaged_tiles()[SyncRand(this->OverlayTerrain->get_damaged_tiles().size())];
-		}
-	} else {
-		if (this->OverlayTerrain->get_solid_tiles().size() > 0) {
-			this->OverlaySolidTile = this->OverlayTerrain->get_solid_tiles()[SyncRand(this->OverlayTerrain->get_solid_tiles().size())];
-		}
-	}
 }
 //Wyrmgus end
 

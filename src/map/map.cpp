@@ -1159,6 +1159,11 @@ void PreprocessMap()
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
+				CMapField &mf = *CMap::Map.Field(tile_pos, z);
+				CMap::Map.calculate_tile_solid_tile(tile_pos, false, z);
+				if (mf.OverlayTerrain != nullptr) {
+					CMap::Map.calculate_tile_solid_tile(tile_pos, true, z);
+				}
 				CMap::Map.CalculateTileTransitions(tile_pos, false, z);
 				CMap::Map.CalculateTileTransitions(tile_pos, true, z);
 			}
@@ -1795,7 +1800,12 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 		}
 	}
 	
-	this->CalculateTileTransitions(pos, false, z); //recalculate both, since one may have changed the other
+	//recalculate transitions and solid tiles for both non-overlay and overlay, since setting one may have changed the other
+	this->calculate_tile_solid_tile(pos, false, z);
+	if (mf.OverlayTerrain != nullptr) {
+		this->calculate_tile_solid_tile(pos, true, z);
+	}
+	this->CalculateTileTransitions(pos, false, z); 
 	this->CalculateTileTransitions(pos, true, z);
 	this->CalculateTileTerrainFeature(pos, z);
 	
@@ -1910,6 +1920,14 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		}
 	}
 	
+	if (destroyed) {
+		if (mf.OverlayTerrain->get_destroyed_tiles().size() > 0) {
+			mf.OverlaySolidTile = mf.OverlayTerrain->get_destroyed_tiles()[SyncRand(mf.OverlayTerrain->get_destroyed_tiles().size())];
+		}
+	} else {
+		this->calculate_tile_solid_tile(pos, true, z);
+	}
+
 	this->CalculateTileTransitions(pos, true, z);
 	
 	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
@@ -1950,6 +1968,14 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 	
 	mf.SetOverlayTerrainDamaged(damaged);
 	
+	if (damaged) {
+		if (mf.OverlayTerrain->get_damaged_tiles().size() > 0) {
+			mf.OverlaySolidTile = mf.OverlayTerrain->get_damaged_tiles()[SyncRand(mf.OverlayTerrain->get_damaged_tiles().size())];
+		}
+	} else {
+		this->calculate_tile_solid_tile(pos, true, z);
+	}
+
 	this->CalculateTileTransitions(pos, true, z);
 	
 	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
@@ -2061,6 +2087,37 @@ static stratagus::tile_transition_type GetTransitionType(std::vector<int> &adjac
 	}
 
 	return transition_type;
+}
+
+void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z)
+{
+	CMapField *tile = this->Field(pos, z);
+
+	const stratagus::terrain_type *terrain_type = nullptr;
+	int solid_tile = 0;
+
+	if (overlay) {
+		terrain_type = tile->OverlayTerrain;
+	} else {
+		terrain_type = tile->Terrain;
+	}
+
+	if (terrain_type->has_tiled_background()) {
+		const CPlayerColorGraphic *terrain_graphics = terrain_type->get_graphics();
+		const int solid_tile_frame_x = pos.x() % terrain_graphics->get_frames_per_row();
+		const int solid_tile_frame_y = pos.y() % terrain_graphics->get_frames_per_column();
+		solid_tile = terrain_graphics->get_frame_index(QPoint(solid_tile_frame_x, solid_tile_frame_y));
+	} else {
+		if (!terrain_type->get_solid_tiles().empty()) {
+			solid_tile = terrain_type->get_solid_tiles()[SyncRand(terrain_type->get_solid_tiles().size())];
+		}
+	}
+
+	if (overlay) {
+		tile->OverlaySolidTile = solid_tile;
+	} else {
+		tile->SolidTile = solid_tile;
+	}
 }
 
 void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)

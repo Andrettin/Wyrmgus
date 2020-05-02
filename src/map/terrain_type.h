@@ -54,6 +54,7 @@ class terrain_type : public named_data_entry, public data_type<terrain_type>, pu
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QString transition_image_file READ get_transition_image_file_qstring)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
+	Q_PROPERTY(bool tiled_background MEMBER tiled_background READ has_tiled_background)
 	Q_PROPERTY(stratagus::resource* resource MEMBER resource READ get_resource)
 	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
 
@@ -202,6 +203,11 @@ public:
 		return this->overlay;
 	}
 
+	bool has_tiled_background() const
+	{
+		return this->tiled_background;
+	}
+
 	resource *get_resource() const
 	{
 		return this->resource;
@@ -277,10 +283,13 @@ private:
 public:
 	unsigned long Flags = 0;
 private:
-	bool overlay = false;										/// Whether this terrain type belongs to the overlay layer
+	bool overlay = false;				/// Whether this terrain type belongs to the overlay layer
 public:
-	bool Buildable = false;										/// Whether structures can be built upon this terrain type
-	bool AllowSingle = false;									/// Whether this terrain type has transitions for single tiles
+	bool Buildable = false;				/// Whether structures can be built upon this terrain type
+private:
+	bool tiled_background = false;
+public:
+	bool AllowSingle = false;			/// Whether this terrain type has transitions for single tiles
 	bool Hidden = false;
 	CUnitType *UnitType = nullptr;
 private:

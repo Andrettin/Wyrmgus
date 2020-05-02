@@ -190,6 +190,21 @@ public:
 		return this->original_frame_size;
 	}
 
+	int get_frames_per_row() const
+	{
+		return this->get_width() / this->get_frame_width();
+	}
+
+	int get_frames_per_column() const
+	{
+		return this->get_height() / this->get_frame_height();
+	}
+
+	int get_frame_index(const QPoint &frame_pos) const
+	{
+		return frame_pos.y() * this->get_frames_per_row() + frame_pos.x();
+	}
+
 	const QImage &get_image() const
 	{
 		return this->image;
