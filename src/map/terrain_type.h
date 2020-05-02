@@ -44,6 +44,7 @@ namespace stratagus {
 
 class resource;
 class season;
+enum class tile_transition_type;
 
 class terrain_type : public named_data_entry, public data_type<terrain_type>, public CDataType
 {
@@ -208,6 +209,36 @@ public:
 		return this->destroyed_tiles;
 	}
 
+	const std::vector<int> &get_transition_tiles(const terrain_type *terrain_type, const tile_transition_type transition_type) const
+	{
+		static std::vector<int> empty_vector;
+
+		auto find_iterator = this->transition_tiles.find(terrain_type);
+		if (find_iterator != this->transition_tiles.end()) {
+			auto sub_find_iterator = find_iterator->second.find(transition_type);
+			if (sub_find_iterator != find_iterator->second.end()) {
+				return sub_find_iterator->second;
+			}
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<int> &get_adjacent_transition_tiles(const terrain_type *terrain_type, const tile_transition_type transition_type) const
+	{
+		static std::vector<int> empty_vector;
+
+		auto find_iterator = this->adjacent_transition_tiles.find(terrain_type);
+		if (find_iterator != this->adjacent_transition_tiles.end()) {
+			auto sub_find_iterator = find_iterator->second.find(transition_type);
+			if (sub_find_iterator != find_iterator->second.end()) {
+				return sub_find_iterator->second;
+			}
+		}
+
+		return empty_vector;
+	}
+
 private:
 	char character = 0;
 	QColor color;
@@ -241,9 +272,8 @@ private:
 	std::vector<int> solid_tiles;
 	std::vector<int> damaged_tiles;
 	std::vector<int> destroyed_tiles;
-public:
-	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
-	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	std::map<const terrain_type *, std::map<tile_transition_type, std::vector<int>>> transition_tiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	std::map<const terrain_type *, std::map<tile_transition_type, std::vector<int>>> adjacent_transition_tiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 
 	friend int ::CclDefineTerrainType(lua_State *l);
 };

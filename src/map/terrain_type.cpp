@@ -185,29 +185,23 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &child_tag = child_scope.get_tag();
 			const terrain_type *transition_terrain = nullptr;
-			int transition_terrain_id = -1;
 
 			if (child_tag != "any") {
 				transition_terrain = terrain_type::get(child_tag);
-				transition_terrain_id = transition_terrain->ID;
 			}
 
 			child_scope.for_each_child([&](const sml_data &grandchild_scope) {
 				const std::string &grandchild_tag = grandchild_scope.get_tag();
-				const int transition_type = GetTransitionTypeIdByName(FindAndReplaceString(grandchild_tag, "_", "-"));
+				const tile_transition_type transition_type = GetTransitionTypeIdByName(FindAndReplaceString(grandchild_tag, "_", "-"));
 				std::vector<int> tiles;
-
-				if (transition_type == -1) {
-					throw std::runtime_error("Invalid tile transition type: \"" + grandchild_tag + "\".");
-				}
 
 				for (const std::string &value : grandchild_scope.get_values()) {
 					const int tile = std::stoi(value);
 
 					if (tag == "transition_tiles") {
-						this->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tile);
+						this->transition_tiles[transition_terrain][transition_type].push_back(tile);
 					} else if (tag == "adjacent_transition_tiles") {
-						this->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tile);
+						this->adjacent_transition_tiles[transition_terrain][transition_type].push_back(tile);
 					}
 				}
 			});
@@ -319,8 +313,8 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			
 			this->SeasonGraphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size());
 		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
-			int transition_terrain_id = -1; //any terrain, by default
-			int transition_type = -1;
+			const terrain_type *transition_terrain = nullptr; //any terrain, by default
+			tile_transition_type transition_type = tile_transition_type::none;
 			std::vector<int> tiles;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -328,8 +322,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "terrain_type") {
-					terrain_type *transition_terrain = terrain_type::get(value);
-					transition_terrain_id = transition_terrain->ID;
+					transition_terrain = terrain_type::get(value);
 				} else if (key == "transition_type") {
 					value = FindAndReplaceString(value, "_", "-");
 					transition_type = GetTransitionTypeIdByName(value);
@@ -340,16 +333,16 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 			
-			if (transition_type == -1) {
+			if (transition_type == tile_transition_type::none) {
 				fprintf(stderr, "Transition tile has no transition type.\n");
 				continue;
 			}
-			
+
 			for (size_t j = 0; j < tiles.size(); ++j) {
 				if (child_config_data->Tag == "transition_tile") {
-					this->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
+					this->transition_tiles[transition_terrain][transition_type].push_back(tiles[j]);
 				} else if (child_config_data->Tag == "adjacent_transition_tile") {
-					this->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
+					this->adjacent_transition_tiles[transition_terrain][transition_type].push_back(tiles[j]);
 				}
 			}
 		} else {

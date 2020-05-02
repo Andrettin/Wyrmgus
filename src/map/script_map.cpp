@@ -1482,16 +1482,12 @@ static int CclDefineTerrainType(lua_State *l)
 				if (transition_terrain_name != "any") {
 					transition_terrain = stratagus::terrain_type::get(transition_terrain_name);
 				}
-				int transition_terrain_id = transition_terrain ? transition_terrain->ID : -1;
 				++j;
 				
-				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
-				if (transition_type == -1) {
-					LuaError(l, "Transition type doesn't exist.");
-				}
+				const stratagus::tile_transition_type transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				
-				terrain->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(LuaToNumber(l, -1, j + 1));
+				terrain->transition_tiles[transition_terrain][transition_type].push_back(LuaToNumber(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "AdjacentTransitionTiles")) {
 			if (!lua_istable(l, -1)) {
@@ -1504,16 +1500,12 @@ static int CclDefineTerrainType(lua_State *l)
 				if (transition_terrain_name != "any") {
 					transition_terrain = stratagus::terrain_type::get(transition_terrain_name);
 				}
-				int transition_terrain_id = transition_terrain ? transition_terrain->ID : -1;
 				++j;
 				
-				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
-				if (transition_type == -1) {
-					LuaError(l, "Transition type doesn't exist.");
-				}
+				const stratagus::tile_transition_type transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				
-				terrain->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(LuaToNumber(l, -1, j + 1));
+				terrain->adjacent_transition_tiles[transition_terrain][transition_type].push_back(LuaToNumber(l, -1, j + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

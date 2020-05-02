@@ -792,201 +792,200 @@ unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 	return tileIndex;
 }
 
-//Wyrmgus start
-std::string GetTransitionTypeNameById(int transition_type)
+std::string GetTransitionTypeNameById(const stratagus::tile_transition_type transition_type)
 {
-	if (transition_type == NorthTransitionType) {
+	if (transition_type == stratagus::tile_transition_type::north) {
 		return "north";
-	} else if (transition_type == SouthTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::south) {
 		return "south";
-	} else if (transition_type == WestTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::west) {
 		return "west";
-	} else if (transition_type == EastTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::east) {
 		return "east";
-	} else if (transition_type == NorthwestOuterTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_outer) {
 		return "northwest-outer";
-	} else if (transition_type == NortheastOuterTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northeast_outer) {
 		return "northeast-outer";
-	} else if (transition_type == SouthwestOuterTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southwest_outer) {
 		return "southwest-outer";
-	} else if (transition_type == SoutheastOuterTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southeast_outer) {
 		return "southeast-outer";
-	} else if (transition_type == NorthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_inner) {
 		return "northwest-inner";
-	} else if (transition_type == NortheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northeast_inner) {
 		return "northeast-inner";
-	} else if (transition_type == SouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southwest_inner) {
 		return "southwest-inner";
-	} else if (transition_type == SoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southeast_inner) {
 		return "southeast-inner";
-	} else if (transition_type == NorthwestSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_southeast_inner) {
 		return "northwest-southeast-inner";
-	} else if (transition_type == NortheastSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northeast_southwest_inner) {
 		return "northeast-southwest-inner";
-	} else if (transition_type == SingleTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::single) {
 		return "single";
-	} else if (transition_type == NorthSingleTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::north_single) {
 		return "north-single";
-	} else if (transition_type == SouthSingleTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::south_single) {
 		return "south-single";
-	} else if (transition_type == WestSingleTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::west_single) {
 		return "west-single";
-	} else if (transition_type == EastSingleTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::east_single) {
 		return "east-single";
-	} else if (transition_type == NorthSouthTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::north_south) {
 		return "north-south";
-	} else if (transition_type == WestEastTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::west_east) {
 		return "west-east";
-	} else if (transition_type == NorthwestNortheastSouthwestSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_southwest_southeast_inner) {
 		return "northwest-northeast-southwest-southeast-inner";
-	} else if (transition_type == NorthwestNortheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_inner) {
 		return "northwest-northeast-inner";
-	} else if (transition_type == SouthwestSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southwest_southeast_inner) {
 		return "southwest-southeast-inner";
-	} else if (transition_type == NorthwestSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_southwest_inner) {
 		return "northwest-southwest-inner";
-	} else if (transition_type == NortheastSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northeast_southeast_inner) {
 		return "northeast-southeast-inner";
-	} else if (transition_type == NorthwestNortheastSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_southwest_inner) {
 		return "northwest-northeast-southwest-inner";
-	} else if (transition_type == NorthwestNortheastSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_southeast_inner) {
 		return "northwest-northeast-southeast-inner";
-	} else if (transition_type == NorthwestSouthwestSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_southwest_southeast_inner) {
 		return "northwest-southwest-southeast-inner";
-	} else if (transition_type == NortheastSouthwestSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northeast_southwest_southeast_inner) {
 		return "northeast-southwest-southeast-inner";
-	} else if (transition_type == NorthSouthwestInnerSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::north_southwest_inner_southeast_inner) {
 		return "north-southwest-inner-southeast-inner";
-	} else if (transition_type == NorthSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::north_southwest_inner) {
 		return "north-southwest-inner";
-	} else if (transition_type == NorthSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::north_southeast_inner) {
 		return "north-southeast-inner";
-	} else if (transition_type == SouthNorthwestInnerNortheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::south_northwest_inner_northeast_inner) {
 		return "south-northwest-inner-northeast-inner";
-	} else if (transition_type == SouthNorthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::south_northwest_inner) {
 		return "south-northwest-inner";
-	} else if (transition_type == SouthNortheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::south_northeast_inner) {
 		return "south-northeast-inner";
-	} else if (transition_type == WestNortheastInnerSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::west_northeast_inner_southeast_inner) {
 		return "west-northeast-inner-southeast-inner";
-	} else if (transition_type == WestNortheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::west_northeast_inner) {
 		return "west-northeast-inner";
-	} else if (transition_type == WestSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::west_southeast_inner) {
 		return "west-southeast-inner";
-	} else if (transition_type == EastNorthwestInnerSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::east_northwest_inner_southwest_inner) {
 		return "east-northwest-inner-southwest-inner";
-	} else if (transition_type == EastNorthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::east_northwest_inner) {
 		return "east-northwest-inner";
-	} else if (transition_type == EastSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::east_southwest_inner) {
 		return "east-southwest-inner";
-	} else if (transition_type == NorthwestOuterSoutheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northwest_outer_southeast_inner) {
 		return "northwest-outer-southeast-inner";
-	} else if (transition_type == NortheastOuterSouthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::northeast_outer_southwest_inner) {
 		return "northeast-outer-southwest-inner";
-	} else if (transition_type == SouthwestOuterNortheastInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southwest_outer_northeast_inner) {
 		return "southwest-outer-northeast-inner";
-	} else if (transition_type == SoutheastOuterNorthwestInnerTransitionType) {
+	} else if (transition_type == stratagus::tile_transition_type::southeast_outer_northwest_inner) {
 		return "southeast-outer-northwest-inner";
 	}
-	return "";
+
+	throw std::runtime_error("Invalid tile transition type: \"" + std::to_string(static_cast<int>(transition_type)) + "\".");
 }
 
-int GetTransitionTypeIdByName(const std::string &transition_type)
+stratagus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type)
 {
 	if (transition_type == "north") {
-		return NorthTransitionType;
+		return stratagus::tile_transition_type::north;
 	} else if (transition_type == "south") {
-		return SouthTransitionType;
+		return stratagus::tile_transition_type::south;
 	} else if (transition_type == "west") {
-		return WestTransitionType;
+		return stratagus::tile_transition_type::west;
 	} else if (transition_type == "east") {
-		return EastTransitionType;
+		return stratagus::tile_transition_type::east;
 	} else if (transition_type == "northwest-outer") {
-		return NorthwestOuterTransitionType;
+		return stratagus::tile_transition_type::northwest_outer;
 	} else if (transition_type == "northeast-outer") {
-		return NortheastOuterTransitionType;
+		return stratagus::tile_transition_type::northeast_outer;
 	} else if (transition_type == "southwest-outer") {
-		return SouthwestOuterTransitionType;
+		return stratagus::tile_transition_type::southwest_outer;
 	} else if (transition_type == "southeast-outer") {
-		return SoutheastOuterTransitionType;
+		return stratagus::tile_transition_type::southeast_outer;
 	} else if (transition_type == "northwest-inner") {
-		return NorthwestInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_inner;
 	} else if (transition_type == "northeast-inner") {
-		return NortheastInnerTransitionType;
+		return stratagus::tile_transition_type::northeast_inner;
 	} else if (transition_type == "southwest-inner") {
-		return SouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::southwest_inner;
 	} else if (transition_type == "southeast-inner") {
-		return SoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::southeast_inner;
 	} else if (transition_type == "northwest-southeast-inner") {
-		return NorthwestSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_southeast_inner;
 	} else if (transition_type == "northeast-southwest-inner") {
-		return NortheastSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::northeast_southwest_inner;
 	} else if (transition_type == "single") {
-		return SingleTransitionType;
+		return stratagus::tile_transition_type::single;
 	} else if (transition_type == "north-single") {
-		return NorthSingleTransitionType;
+		return stratagus::tile_transition_type::north_single;
 	} else if (transition_type == "south-single") {
-		return SouthSingleTransitionType;
+		return stratagus::tile_transition_type::south_single;
 	} else if (transition_type == "west-single") {
-		return WestSingleTransitionType;
+		return stratagus::tile_transition_type::west_single;
 	} else if (transition_type == "east-single") {
-		return EastSingleTransitionType;
+		return stratagus::tile_transition_type::east_single;
 	} else if (transition_type == "north-south") {
-		return NorthSouthTransitionType;
+		return stratagus::tile_transition_type::north_south;
 	} else if (transition_type == "west-east") {
-		return WestEastTransitionType;
+		return stratagus::tile_transition_type::west_east;
 	} else if (transition_type == "northwest-northeast-southwest-southeast-inner") {
-		return NorthwestNortheastSouthwestSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_northeast_southwest_southeast_inner;
 	} else if (transition_type == "northwest-northeast-inner") {
-		return NorthwestNortheastInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_northeast_inner;
 	} else if (transition_type == "southwest-southeast-inner") {
-		return SouthwestSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::southwest_southeast_inner;
 	} else if (transition_type == "northwest-southwest-inner") {
-		return NorthwestSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_southwest_inner;
 	} else if (transition_type == "northeast-southeast-inner") {
-		return NortheastSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northeast_southeast_inner;
 	} else if (transition_type == "northwest-northeast-southwest-inner") {
-		return NorthwestNortheastSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_northeast_southwest_inner;
 	} else if (transition_type == "northwest-northeast-southeast-inner") {
-		return NorthwestNortheastSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_northeast_southeast_inner;
 	} else if (transition_type == "northwest-southwest-southeast-inner") {
-		return NorthwestSouthwestSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_southwest_southeast_inner;
 	} else if (transition_type == "northeast-southwest-southeast-inner") {
-		return NortheastSouthwestSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northeast_southwest_southeast_inner;
 	} else if (transition_type == "north-southwest-inner-southeast-inner") {
-		return NorthSouthwestInnerSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::north_southwest_inner_southeast_inner;
 	} else if (transition_type == "north-southwest-inner") {
-		return NorthSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::north_southwest_inner;
 	} else if (transition_type == "north-southeast-inner") {
-		return NorthSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::north_southeast_inner;
 	} else if (transition_type == "south-northwest-inner-northeast-inner") {
-		return SouthNorthwestInnerNortheastInnerTransitionType;
+		return stratagus::tile_transition_type::south_northwest_inner_northeast_inner;
 	} else if (transition_type == "south-northwest-inner") {
-		return SouthNorthwestInnerTransitionType;
+		return stratagus::tile_transition_type::south_northwest_inner;
 	} else if (transition_type == "south-northeast-inner") {
-		return SouthNortheastInnerTransitionType;
+		return stratagus::tile_transition_type::south_northeast_inner;
 	} else if (transition_type == "west-northeast-inner-southeast-inner") {
-		return WestNortheastInnerSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::west_northeast_inner_southeast_inner;
 	} else if (transition_type == "west-northeast-inner") {
-		return WestNortheastInnerTransitionType;
+		return stratagus::tile_transition_type::west_northeast_inner;
 	} else if (transition_type == "west-southeast-inner") {
-		return WestSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::west_southeast_inner;
 	} else if (transition_type == "east-northwest-inner-southwest-inner") {
-		return EastNorthwestInnerSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::east_northwest_inner_southwest_inner;
 	} else if (transition_type == "east-northwest-inner") {
-		return EastNorthwestInnerTransitionType;
+		return stratagus::tile_transition_type::east_northwest_inner;
 	} else if (transition_type == "east-southwest-inner") {
-		return EastSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::east_southwest_inner;
 	} else if (transition_type == "northwest-outer-southeast-inner") {
-		return NorthwestOuterSoutheastInnerTransitionType;
+		return stratagus::tile_transition_type::northwest_outer_southeast_inner;
 	} else if (transition_type == "northeast-outer-southwest-inner") {
-		return NortheastOuterSouthwestInnerTransitionType;
+		return stratagus::tile_transition_type::northeast_outer_southwest_inner;
 	} else if (transition_type == "southwest-outer-northeast-inner") {
-		return SouthwestOuterNortheastInnerTransitionType;
+		return stratagus::tile_transition_type::southwest_outer_northeast_inner;
 	} else if (transition_type == "southeast-outer-northwest-inner") {
-		return SoutheastOuterNorthwestInnerTransitionType;
-	} else {
-		return -1;
+		return stratagus::tile_transition_type::southeast_outer_northwest_inner;
 	}
+
+	throw std::runtime_error("Invalid tile transition type: \"" + transition_type + "\".");
 }
-//Wyrmgus end

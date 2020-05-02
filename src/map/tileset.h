@@ -100,60 +100,61 @@ enum TileType {
 	TileTypeWater		/// Any water tile
 };
 
-//Wyrmgus start
-enum TransitionTypes {
-	NorthTransitionType,
-	SouthTransitionType,
-	WestTransitionType,
-	EastTransitionType,
-	NorthwestOuterTransitionType,
-	NortheastOuterTransitionType,
-	SouthwestOuterTransitionType,
-	SoutheastOuterTransitionType,
-	NorthwestInnerTransitionType,
-	NortheastInnerTransitionType,
-	SouthwestInnerTransitionType,
-	SoutheastInnerTransitionType,
-	NorthwestSoutheastInnerTransitionType,
-	NortheastSouthwestInnerTransitionType,
+namespace stratagus {
+
+enum class tile_transition_type {
+	none = -1,
+	north,
+	south,
+	west,
+	east,
+	northwest_outer,
+	northeast_outer,
+	southwest_outer,
+	southeast_outer,
+	northwest_inner,
+	northeast_inner,
+	southwest_inner,
+	southeast_inner,
+	northwest_southeast_inner,
+	northeast_southwest_inner,
 	
 	//single tile transition types (enabled for terrain types with the AllowSingle field)
-	SingleTransitionType,
-	NorthSingleTransitionType,
-	SouthSingleTransitionType,
-	WestSingleTransitionType,
-	EastSingleTransitionType,
-	NorthSouthTransitionType,
-	WestEastTransitionType,
-	NorthwestNortheastSouthwestSoutheastInnerTransitionType,
-	NorthwestNortheastInnerTransitionType,
-	SouthwestSoutheastInnerTransitionType,
-	NorthwestSouthwestInnerTransitionType,
-	NortheastSoutheastInnerTransitionType,
-	NorthwestNortheastSouthwestInnerTransitionType,
-	NorthwestNortheastSoutheastInnerTransitionType,
-	NorthwestSouthwestSoutheastInnerTransitionType,
-	NortheastSouthwestSoutheastInnerTransitionType,
-	NorthSouthwestInnerSoutheastInnerTransitionType,
-	NorthSouthwestInnerTransitionType,
-	NorthSoutheastInnerTransitionType,
-	SouthNorthwestInnerNortheastInnerTransitionType,
-	SouthNorthwestInnerTransitionType,
-	SouthNortheastInnerTransitionType,
-	WestNortheastInnerSoutheastInnerTransitionType,
-	WestNortheastInnerTransitionType,
-	WestSoutheastInnerTransitionType,
-	EastNorthwestInnerSouthwestInnerTransitionType,
-	EastNorthwestInnerTransitionType,
-	EastSouthwestInnerTransitionType,
-	NorthwestOuterSoutheastInnerTransitionType,
-	NortheastOuterSouthwestInnerTransitionType,
-	SouthwestOuterNortheastInnerTransitionType,
-	SoutheastOuterNorthwestInnerTransitionType,
-	
-	MaxTransitionTypes
+	single,
+	north_single,
+	south_single,
+	west_single,
+	east_single,
+	north_south,
+	west_east,
+	northwest_northeast_southwest_southeast_inner,
+	northwest_northeast_inner,
+	southwest_southeast_inner,
+	northwest_southwest_inner,
+	northeast_southeast_inner,
+	northwest_northeast_southwest_inner,
+	northwest_northeast_southeast_inner,
+	northwest_southwest_southeast_inner,
+	northeast_southwest_southeast_inner,
+	north_southwest_inner_southeast_inner,
+	north_southwest_inner,
+	north_southeast_inner,
+	south_northwest_inner_northeast_inner,
+	south_northwest_inner,
+	south_northeast_inner,
+	west_northeast_inner_southeast_inner,
+	west_northeast_inner,
+	west_southeast_inner,
+	east_northwest_inner_southwest_inner,
+	east_northwest_inner,
+	east_southwest_inner,
+	northwest_outer_southeast_inner,
+	northeast_outer_southwest_inner,
+	southwest_outer_northeast_inner,
+	southeast_outer_northwest_inner
 };
-//Wyrmgus end
+
+}
 
 /// Single tile definition
 struct CTileInfo {
@@ -326,6 +327,6 @@ private:
 
 extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 //Wyrmgus start
-extern std::string GetTransitionTypeNameById(int transition_type);
-extern int GetTransitionTypeIdByName(const std::string &transition_type);
+extern std::string GetTransitionTypeNameById(const stratagus::tile_transition_type transition_type);
+extern stratagus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type);
 //Wyrmgus end
