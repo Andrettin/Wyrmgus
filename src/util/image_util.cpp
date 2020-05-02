@@ -112,21 +112,13 @@ std::set<QRgb> get_rgbs(const QImage &image)
 	const unsigned char *image_data = image.constBits();
 	const int pixel_count = image.width() * image.height();
 	const int bpp = image.depth() / 8;
-	int red_index = 0;
-	int green_index = 0;
-	int blue_index = 0;
-	int alpha_index = 0;
-	if (image.format() == QImage::Format_RGBA8888 || image.format() == QImage::Format_RGB888) {
-		red_index = 0;
-		green_index = 1;
-		blue_index = 2;
-		alpha_index = 3;
-	} else if (image.format() == QImage::Format_ARGB32 || image.format() == QImage::Format_RGB32) {
-		red_index = 1;
-		green_index = 2;
-		blue_index = 3;
-		alpha_index = 0;
-	} else {
+
+	static constexpr int red_index = 0;
+	static constexpr int green_index = 1;
+	static constexpr int blue_index = 2;
+	static constexpr int alpha_index = 3;
+
+	if (image.format() != QImage::Format_RGBA8888 && image.format() != QImage::Format_RGB888) {
 		throw std::runtime_error("Invalid image format for image::get_rgbs: \"" + std::to_string(image.format()) + "\".");
 	}
 

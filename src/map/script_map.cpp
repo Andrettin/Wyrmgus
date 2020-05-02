@@ -1302,7 +1302,6 @@ static int CclDefineTerrainType(lua_State *l)
 	
 	std::string graphics_file;
 	std::string elevation_graphics_file;
-	std::string player_color_graphics_file;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1466,11 +1465,6 @@ static int CclDefineTerrainType(lua_State *l)
 			if (!CanAccessFile(elevation_graphics_file.c_str())) {
 				LuaError(l, "File \"%s\" doesn't exist." _C_ elevation_graphics_file.c_str());
 			}
-		} else if (!strcmp(value, "PlayerColorGraphics")) {
-			player_color_graphics_file = LuaToString(l, -1);
-			if (!CanAccessFile(player_color_graphics_file.c_str())) {
-				LuaError(l, "File \"%s\" doesn't exist." _C_ player_color_graphics_file.c_str());
-			}
 		} else if (!strcmp(value, "SolidTiles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1545,22 +1539,16 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 	
 	if (!graphics_file.empty()) {
-		if (CGraphic::Get(graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size());
+		if (CPlayerColorGraphic::Get(graphics_file) == nullptr) {
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size());
 		}
-		terrain->Graphics = CGraphic::Get(graphics_file);
+		terrain->Graphics = CPlayerColorGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size());
 		}
 		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
-	}
-	if (!player_color_graphics_file.empty()) {
-		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, stratagus::defines::get()->get_tile_size());
-		}
-		terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}
 	
 	return 0;

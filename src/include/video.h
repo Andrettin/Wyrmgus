@@ -205,6 +205,16 @@ public:
 		return this->textures;
 	}
 
+	const GLuint *get_textures(const CColor &color_modification) const
+	{
+		auto find_iterator = this->texture_color_modifications.find(color_modification);
+		if (find_iterator != this->texture_color_modifications.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 private:
@@ -231,7 +241,7 @@ public:
 	GLfloat TextureWidth = 0.f;      /// Width of the texture
 	GLfloat TextureHeight = 0.f;     /// Height of the texture
 	GLuint *textures = nullptr;          /// Texture names
-	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
+	std::map<CColor, GLuint *> texture_color_modifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 #endif
 private:
@@ -270,9 +280,10 @@ public:
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
 	
 	const GLuint *get_textures(const stratagus::player_color *player_color) const;
+	const GLuint *get_textures(const stratagus::player_color *player_color, const CColor &color_modification) const;
 
 	std::map<const stratagus::player_color *, GLuint *> player_color_textures;
-	std::map<const stratagus::player_color *, std::map<CColor, GLuint *>> PlayerColorTextureColorModifications; //player color textures with a color modification applied to them
+	std::map<const stratagus::player_color *, std::map<CColor, GLuint *>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
 };
 
 #ifdef USE_MNG

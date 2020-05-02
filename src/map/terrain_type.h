@@ -79,7 +79,7 @@ public:
 	static std::map<std::tuple<int, int, int>, terrain_type *> TerrainTypesByColor;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
+	CPlayerColorGraphic *GetGraphics(const CSeason *season = nullptr) const;
 
 	char Character = 0;
 	CColor Color;
@@ -93,11 +93,10 @@ public:
 	bool Hidden = false;
 	CUnitType *UnitType = nullptr;
 //private:
-	CGraphic *Graphics = nullptr;
-	std::map<const CSeason *, CGraphic *> SeasonGraphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
+	CPlayerColorGraphic *Graphics = nullptr;
+	std::map<const CSeason *, CPlayerColorGraphic *> SeasonGraphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 public:
 	CGraphic *ElevationGraphics = nullptr;						/// Semi-transparent elevation graphics, separated so that borders look better
-	CPlayerColorGraphic *PlayerColorGraphics = nullptr;
 	std::vector<terrain_type *> BaseTerrainTypes;				/// Possible base terrain types for this terrain type (if it is an overlay terrain)
 	std::vector<terrain_type *> BorderTerrains;					/// Terrain types which this one can border
 	std::vector<terrain_type *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions

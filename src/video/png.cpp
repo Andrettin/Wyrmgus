@@ -116,6 +116,13 @@ int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 		throw std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file.");
 	}
 
+	const int bpp = g->image.depth() / 8;
+	if (bpp == 4 && g->image.format() != QImage::Format_RGBA8888) {
+		g->image = g->image.convertToFormat(QImage::Format_RGBA8888);
+	} else if (bpp == 3 && g->image.format() != QImage::Format_RGB888) {
+		g->image = g->image.convertToFormat(QImage::Format_RGB888);
+	}
+
 	g->GraphicWidth = g->get_image().width();
 	g->GraphicHeight = g->get_image().height();
 	g->original_size = g->get_image().size();
