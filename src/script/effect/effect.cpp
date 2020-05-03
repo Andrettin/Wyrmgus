@@ -57,6 +57,10 @@ std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
 	const std::string &effect_identifier = scope.get_tag();
 	std::unique_ptr<effect> effect;
 
+	if (effect_identifier == "create_unit") {
+		effect = std::make_unique<create_unit_effect>();
+	}
+
 	if (effect == nullptr) {
 		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
 	}
@@ -65,7 +69,6 @@ std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
 
 	return effect;
 }
-
 
 void effect::process_sml_property(const sml_property &property)
 {

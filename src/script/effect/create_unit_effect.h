@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "map/map_layer.h"
+#include "map/site.h"
 #include "player.h"
 #include "script/effect/effect.h"
 #include "unit/unit.h"
@@ -38,6 +40,10 @@ namespace stratagus {
 class create_unit_effect final : public effect
 {
 public:
+	create_unit_effect()
+	{
+	}
+
 	explicit create_unit_effect(const std::string &unit_type_identifier)
 	{
 		this->unit_type = CUnitType::get(unit_type_identifier);
@@ -49,18 +55,50 @@ public:
 		return class_identifier;
 	}
 
+	virtual void process_sml_property(const sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "unit_type") {
+			this->unit_type = CUnitType::get(value);
+		} else if (key == "site") {
+			this->site = site::get(value);
+		} else if (key == "ttl") {
+			this->ttl = std::stoi(value);
+		} else {
+			effect::process_sml_property(property);
+		}
+	}
+
 	virtual void do_effect(CPlayer *player) const override
 	{
-		MakeUnitAndPlace(player->StartPos, *this->unit_type, player, player->StartMapLayer);
+		QPoint unit_top_left_pos = this->site ? this->site->get_site_unit()->get_center_tile_pos() : player->StartPos;
+		unit_top_left_pos -= this->unit_type->get_tile_center_pos_offset();
+		const int map_layer = this->site ? this->site->get_site_unit()->MapLayer->ID : player->StartMapLayer;
+
+		CUnit *unit = MakeUnitAndPlace(unit_top_left_pos, *this->unit_type, player, map_layer);
+		if (this->ttl != 0) {
+			unit->TTL = this->ttl;
+		}
 	}
 
 	virtual std::string get_string(const CPlayer *player) const override
 	{
-		return "Receive a " + string::highlight(this->unit_type->get_name()) + " unit";
+		std::string str = "Receive a " + string::highlight(this->unit_type->get_name()) + " unit";
+		if (this->site != nullptr) {
+			str += " at " + this->site->get_name();
+		}
+		if (this->ttl != 0) {
+			str += " for " + std::to_string(this->ttl) + " cycles";
+		}
+		return str;
 	}
 
 private:
-	const CUnitType *unit_type = nullptr;	/// Unit type to be created
+	const CUnitType *unit_type = nullptr; //the unit type to be created
+	const site *site = nullptr; //the site where the unit type is to be located, if any
+	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
 };
 
 }
