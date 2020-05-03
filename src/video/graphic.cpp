@@ -252,7 +252,6 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, int show_percent)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		if (this->get_textures(player_color) == nullptr) {
 			MakePlayerColorTexture(this, player_color, nullptr);
@@ -264,8 +263,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(const stratagus::player_color
 		}
 		DoDrawFrameClip(this->get_textures(player_color, time_of_day->ColorModification), frame, x, y, show_percent);
 	}
-	//Wyrmgus end
-#endif
 }
 
 //Wyrmgus start

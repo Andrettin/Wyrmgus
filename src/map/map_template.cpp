@@ -464,7 +464,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 				}
 			} else {
 				if (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
-					fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, color.red(), color.green(), color.blue());
+					throw std::runtime_error("Invalid map terrain: (" + std::to_string(x) + ", " + std::to_string(y) + ") (RGB: " + std::to_string(color.red()) + "/" + std::to_string(color.green()) + "/" + std::to_string(color.blue()) + ").");
 				} else if (overlay && CMap::Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
 					CMap::Map.Field(real_pos, z)->RemoveOverlayTerrain();
 				}
