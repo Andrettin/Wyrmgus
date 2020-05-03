@@ -118,10 +118,6 @@ void CCharacter::ResetCharacterHistory()
 */
 void CCharacter::ProcessConfigData(const CConfigData *config_data)
 {
-	if (this->Initialized) {
-		fprintf(stderr, "Character \"%s\" is being redefined.\n", this->Ident.c_str());
-	}
-				
 	bool name_changed = false;
 	bool family_name_changed = false;
 	
@@ -186,48 +182,36 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->ViolentDeath = string::to_bool(value);
 		} else if (key == "father") {
 			CCharacter *father = CCharacter::get(value);
-			if (father) {
-				if (father->Gender == MaleGender || !father->Initialized) {
-					this->Father = father;
-					if (!father->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the father
-						father->Children.push_back(this);
+			this->Father = father;
+			if (!father->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the father
+				father->Children.push_back(this);
+			}
+			// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+			for (CCharacter *sibling : father->Children) {
+				if (sibling != this) {
+					if (!this->IsSiblingOf(sibling->Ident)) {
+						this->Siblings.push_back(sibling);
 					}
-					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-					for (CCharacter *sibling : father->Children) {
-						if (sibling != this) {
-							if (!this->IsSiblingOf(sibling->Ident)) {
-								this->Siblings.push_back(sibling);
-							}
-							if (!sibling->IsSiblingOf(this->Ident)) {
-								sibling->Siblings.push_back(this);
-							}
-						}
+					if (!sibling->IsSiblingOf(this->Ident)) {
+						sibling->Siblings.push_back(this);
 					}
-				} else {
-					fprintf(stderr, "Character \"%s\" set to be the biological father of \"%s\", but isn't male.\n", value.c_str(), this->Ident.c_str());
 				}
 			}
 		} else if (key == "mother") {
 			CCharacter *mother = CCharacter::get(value);
-			if (mother) {
-				if (mother->Gender == FemaleGender || !mother->Initialized) {
-					this->Mother = mother;
-					if (!mother->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the mother
-						mother->Children.push_back(this);
+			this->Mother = mother;
+			if (!mother->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the mother
+				mother->Children.push_back(this);
+			}
+			// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+			for (CCharacter *sibling : mother->Children) {
+				if (sibling != this) {
+					if (!this->IsSiblingOf(sibling->Ident)) {
+						this->Siblings.push_back(sibling);
 					}
-					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-					for (CCharacter *sibling : mother->Children) {
-						if (sibling != this) {
-							if (!this->IsSiblingOf(sibling->Ident)) {
-								this->Siblings.push_back(sibling);
-							}
-							if (!sibling->IsSiblingOf(this->Ident)) {
-								sibling->Siblings.push_back(this);
-							}
-						}
+					if (!sibling->IsSiblingOf(this->Ident)) {
+						sibling->Siblings.push_back(this);
 					}
-				} else {
-					fprintf(stderr, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female.\n", value.c_str(), this->Ident.c_str());
 				}
 			}
 		} else if (key == "deity") {
@@ -352,32 +336,36 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid character property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
+}
+
+void CCharacter::initialize()
+{
+
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->Type != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
-		if (name_changed) {
+		if (!this->get_name().empty()) {
 			this->Type->PersonalNames[this->Gender].push_back(this->get_name());
 		}
-	} else if (this->civilization) {
-		if (name_changed) {
+	} else if (this->civilization != nullptr) {
+		if (!this->get_name().empty()) {
 			this->civilization->PersonalNames[this->Gender].push_back(this->get_name());
 		}
-		if (family_name_changed) {
+		if (!this->FamilyName.empty()) {
 			this->civilization->FamilyNames.push_back(this->FamilyName);
 		}
 	}
-	
+
 	if (this->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
 		if (this->Type != nullptr && this->Type->Traits.size() == 1) {
 			this->Trait = this->Type->Traits[0];
 		}
 	}
-		
+
 	//check if the abilities are correct for this character's unit type
 	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), this->Abilities[i]) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
+			if (!stratagus::vector::contains(AiHelpers.LearnableAbilities[this->Type->Slot], this->Abilities[i])) {
 				stratagus::vector::remove(this->Abilities, this->Abilities[i]);
 			}
 		}
@@ -385,14 +373,20 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 
 	this->GenerateMissingDates();
 	this->UpdateAttributes();
-	
-	this->Initialized = true;
-}
 
-void CCharacter::initialize()
-{
 	for (const std::unique_ptr<stratagus::historical_location> &location : this->HistoricalLocations) {
 		location->initialize();
+	}
+}
+
+void CCharacter::check() const
+{
+	if (this->Father != nullptr && this->Father->Gender != MaleGender) {
+		throw std::runtime_error("Character \"" + this->Father->get_identifier() + "\" is set to be the biological father of \"" + this->get_identifier() + "\", but isn't male.");
+	}
+
+	if (this->Mother != nullptr && this->Mother->Gender != FemaleGender) {
+		throw std::runtime_error("Character \"" + this->Mother->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
 }
 

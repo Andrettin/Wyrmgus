@@ -142,54 +142,39 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
 			CCharacter *father = CCharacter::get(father_ident);
-			if (father) {
-				if (father->Gender == MaleGender || !father->Initialized) {
-					character->Father = father;
-					if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
-						father->Children.push_back(character);
+			character->Father = father;
+			if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
+				father->Children.push_back(character);
+			}
+			// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+			for (size_t i = 0; i < father->Children.size(); ++i) {
+				if (father->Children[i]->Ident != character_ident) {
+					if (!character->IsSiblingOf(father->Children[i]->Ident)) {
+						character->Siblings.push_back(father->Children[i]);
 					}
-					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-					for (size_t i = 0; i < father->Children.size(); ++i) {
-						if (father->Children[i]->Ident != character_ident) {
-							if (!character->IsSiblingOf(father->Children[i]->Ident)) {
-								character->Siblings.push_back(father->Children[i]);
-							}
-							if (!father->Children[i]->IsSiblingOf(character_ident)) {
-								father->Children[i]->Siblings.push_back(character);
-							}
-						}
+					if (!father->Children[i]->IsSiblingOf(character_ident)) {
+						father->Children[i]->Siblings.push_back(character);
 					}
-				} else {
-					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_ident.c_str() _C_ character_ident.c_str());
 				}
-			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ father_ident.c_str());
 			}
 		} else if (!strcmp(value, "Mother")) {
 			std::string mother_ident = LuaToString(l, -1);
 			CCharacter *mother = CCharacter::get(mother_ident);
-			if (mother) {
-				if (mother->Gender == FemaleGender || !mother->Initialized) {
-					character->Mother = mother;
-					if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
-						mother->Children.push_back(character);
+
+			character->Mother = mother;
+			if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
+				mother->Children.push_back(character);
+			}
+			// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+			for (size_t i = 0; i < mother->Children.size(); ++i) {
+				if (mother->Children[i]->Ident != character_ident) {
+					if (!character->IsSiblingOf(mother->Children[i]->Ident)) {
+						character->Siblings.push_back(mother->Children[i]);
 					}
-					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-					for (size_t i = 0; i < mother->Children.size(); ++i) {
-						if (mother->Children[i]->Ident != character_ident) {
-							if (!character->IsSiblingOf(mother->Children[i]->Ident)) {
-								character->Siblings.push_back(mother->Children[i]);
-							}
-							if (!mother->Children[i]->IsSiblingOf(character_ident)) {
-								mother->Children[i]->Siblings.push_back(character);
-							}
-						}
+					if (!mother->Children[i]->IsSiblingOf(character_ident)) {
+						mother->Children[i]->Siblings.push_back(character);
 					}
-				} else {
-					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_ident.c_str() _C_ character_ident.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
 				}
-			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_ident.c_str());
 			}
 		} else if (!strcmp(value, "Children")) {
 			const int args = lua_rawlen(l, -1);
@@ -511,21 +496,13 @@ static int CclDefineCharacter(lua_State *l)
 	
 	if (!redefinition) {
 		if (character->Type->BoolFlag[FAUNA_INDEX].value) {
-			character->Type->PersonalNames[character->Gender].push_back(character->get_name());
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
 				character->Type->PersonalNames[character->Gender].push_back(alternate_names[i]);
 			}
 		} else if (character->civilization) {
-			character->civilization->PersonalNames[character->Gender].push_back(character->get_name());
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
 				character->civilization->PersonalNames[character->Gender].push_back(alternate_names[i]);
 			}
-		}
-	}
-	
-	if (character->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (character->Type != nullptr && character->Type->Traits.size() == 1) {
-			character->Trait = character->Type->Traits[0];
 		}
 	}
 	
@@ -534,21 +511,6 @@ static int CclDefineCharacter(lua_State *l)
 			character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
 	}
-	
-	//check if the abilities are correct for this character's unit type
-	if (character->Type != nullptr && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
-		int ability_count = (int) character->Abilities.size();
-		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
-				stratagus::vector::remove(character->Abilities, character->Abilities[i]);
-			}
-		}
-	}
-
-	character->GenerateMissingDates();
-	character->UpdateAttributes();
-	
-	character->Initialized = true;
 	
 	return 0;
 }

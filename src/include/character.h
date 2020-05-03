@@ -27,20 +27,12 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
 #include "item.h"
 #include "time/date.h"
 #include "ui/icon.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CDeity;
 class CDeityDomain;
@@ -120,6 +112,7 @@ public:
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
 	void GenerateHistory();
 	void ResetHistory();
@@ -153,7 +146,6 @@ public:
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath = false;	/// If historical death was violent
 	bool Custom = false;		/// Whether this character is a custom hero
-	bool Initialized = false;	/// Whether the character has already been initialized
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family
 	std::string HairVariation;	/// Name of the character's hair variation
