@@ -424,6 +424,7 @@ set(util_SRCS
 	src/util/color_container.cpp
 	src/util/image_util.cpp
 	src/util/point_container.cpp
+	src/util/point_util.cpp
 	src/util/util.cpp
 )
 source_group(util FILES ${util_SRCS})

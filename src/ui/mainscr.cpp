@@ -73,9 +73,8 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-//Wyrmgus start
+#include "util/point_util.h"
 #include "util/util.h"
-//Wyrmgus end
 #include "upgrade/upgrade.h"
 #include "version.h"
 #include "video.h"
@@ -1820,33 +1819,38 @@ static void InfoPanel_draw_no_selection()
 		std::string rc;
 
 		GetDefaultTextColors(nc, rc);
+
+		std::vector<const CPlayer *> listed_players;
+
 		for (int i = 0; i < PlayerMax - 1; ++i) {
-			//Wyrmgus start
-//			if (CPlayer::Players[i]->Type != PlayerNobody) {
-			if (CPlayer::Players[i]->Type != PlayerNobody && !CPlayer::Players[i]->HasNeutralFactionType() && CPlayer::GetThisPlayer()->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->GetUnitCount() > 0) {
-			//Wyrmgus end
-				if (CPlayer::GetThisPlayer()->IsAllied(*CPlayer::Players[i])) {
-					label.SetNormalColor(FontGreen);
-				} else if (CPlayer::GetThisPlayer()->IsEnemy(*CPlayer::Players[i])) {
-					label.SetNormalColor(FontRed);
-				} else {
-					label.SetNormalColor(nc);
-				}
-				//Wyrmgus start
-//				label.Draw(x + 15, y, i);
-				//Wyrmgus end
+			const CPlayer *player = CPlayer::Players[i];
+			if (player->Type != PlayerNobody && !player->HasNeutralFactionType() && CPlayer::GetThisPlayer()->HasContactWith(*player) && player->GetUnitCount() > 0) {
+				listed_players.push_back(player);
+			}
+		}
 
-				Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
-				Video.FillRectangleClip(Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
+		//sort players by order of distance of their start position to the main player's
+		std::sort(listed_players.begin(), listed_players.end(), [](const CPlayer *a, const CPlayer *b) {
+			return stratagus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, a->StartPos) < stratagus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, b->StartPos);
+		});
 
-				label.Draw(x + 15 * scale_factor, y, _(CPlayer::Players[i]->Name.c_str()));
-				y += 14 * scale_factor;
-				
-				//Wyrmgus start
-				if ((y + 12 * scale_factor) > Video.Height)  { // if the square would overflow the screen, don't draw the player
-					break;
-				}
-				//Wyrmgus end
+		for (const CPlayer *player : listed_players) {
+			if (CPlayer::GetThisPlayer()->IsAllied(*player)) {
+				label.SetNormalColor(FontGreen);
+			} else if (CPlayer::GetThisPlayer()->IsEnemy(*player)) {
+				label.SetNormalColor(FontRed);
+			} else {
+				label.SetNormalColor(nc);
+			}
+
+			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
+			Video.FillRectangleClip(Video.MapRGB(TheScreen->format, player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
+
+			label.Draw(x + 15 * scale_factor, y, _(player->Name.c_str()));
+			y += 14 * scale_factor;
+
+			if ((y + 12 * scale_factor) > Video.Height) { // if the square would overflow the screen, don't draw the player
+				break;
 			}
 		}
 	}

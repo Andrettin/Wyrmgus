@@ -25,15 +25,17 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "util/point_util.h"
+
+#include "util/util.h"
 
 namespace stratagus::point {
 
-inline QSize to_size(const QPoint &point)
+int distance_to(const QPoint &point, const QPoint &other_point)
 {
-	return QSize(point.x(), point.y());
+	const int dx = point.x() - other_point.x();
+	const int dy = point.y() - other_point.y();
+	return isqrt(dx * dx + dy * dy);
 }
-
-extern int distance_to(const QPoint &point, const QPoint &other_point);
 
 }
