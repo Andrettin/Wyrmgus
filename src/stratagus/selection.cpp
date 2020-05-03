@@ -872,7 +872,7 @@ int SelectArmy()
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeType::Naval || unit.Type->UnitType == UnitTypeType::Fly) {
+		if (unit.Type->UnitType == UnitTypeType::Naval || unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::Space) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else on team has this unit
@@ -984,7 +984,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeType::Fly) {
+		if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::Space) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1107,7 +1107,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeType::Fly) {
+		if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::Space) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit

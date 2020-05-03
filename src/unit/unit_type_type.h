@@ -31,8 +31,9 @@
 
 enum class UnitTypeType {
 	None = -1,
-	Land,  /// Unit lives on land
-	Fly,   /// Unit lives in the air
-	FlyLow,   /// Unit lives in the air, but flies low, so that it can be attacked by melee land units and cannot fly over rocks
-	Naval  /// Unit lives on water
+	Land, //can only move on land
+	Fly, //can move on land and water, and over non-passable terrain like rocks or trees
+	FlyLow, //flying unit, but it flies low, so that it can be attacked by melee land units and cannot fly over rocks or trees
+	Naval, //can only move on water
+	Space  //can move in space, as well as over any other kind of terrain that flying units can
 };

@@ -744,6 +744,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->UnitTypeType = UnitTypeType::FlyLow;
 			} else if (!strcmp(unit_type_type, "naval")) {
 				condition->UnitTypeType = UnitTypeType::Naval;
+			} else if (!strcmp(unit_type_type, "space")) {
+				condition->UnitTypeType = UnitTypeType::Space;
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ unit_type_type);
 			}

@@ -174,7 +174,7 @@
 		//Wyrmgus end
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
-			if (unit.Type->UnitType != UnitTypeType::Fly && unit.IsAlive()
+			if (unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::Space && unit.IsAlive()
 				//Wyrmgus start
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!

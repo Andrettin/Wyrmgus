@@ -49,6 +49,7 @@ class CUnit;
 class CUnitType;
 class CUpgrade;
 class CPlayer;
+enum class ForceType;
 
 namespace stratagus {
 	class site;
@@ -175,7 +176,7 @@ public:
 
 	inline bool IsAttacking() const { return (!Defending && Attacking); }
 
-	int GetForceType() const;
+	ForceType GetForceType() const;
 	bool IsNaval() const;
 	bool IsAirForce() const;
 	bool IsHeroOnlyForce() const;

@@ -304,8 +304,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 			const std::vector<std::pair<stratagus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.playerInfo.SeenOverlayTransitionTiles;
 
 			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
-			const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
-			const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+			const bool is_space = terrain && terrain->Flags & MapFieldSpace;
+			const stratagus::time_of_day *time_of_day = nullptr;
+			if (!is_space) {
+				const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
+				time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+			}
 			const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
 
 			if (terrain && terrain->get_graphics(season)) {
@@ -313,10 +317,16 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != transition_tiles.size(); ++i) {
-				if (transition_tiles[i].first->get_graphics(season)) {
-					const bool is_transition_underground = transition_tiles[i].first->Flags & MapFieldUnderground;
-					const stratagus::time_of_day *transition_time_of_day = is_transition_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-					transition_tiles[i].first->get_graphics(season)->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
+				const stratagus::terrain_type *transition_terrain = transition_tiles[i].first;
+
+				if (transition_terrain->get_graphics(season)) {
+					const bool is_transition_space = transition_terrain && transition_terrain->Flags & MapFieldSpace;
+					const stratagus::time_of_day *transition_time_of_day = nullptr;
+					if (!is_transition_space) {
+						const bool is_transition_underground = transition_terrain->Flags & MapFieldUnderground;
+						transition_time_of_day = is_transition_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+					}
+					transition_terrain->get_graphics(season)->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
 				}
 			}
 
@@ -326,15 +336,22 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 
-			if (overlay_terrain && overlay_transition_tiles.size() == 0) {
+			if (overlay_terrain && (overlay_transition_tiles.size() == 0 || overlay_terrain->has_transition_mask())) {
+				const bool is_overlay_space = overlay_terrain->Flags & MapFieldSpace;
 				if (overlay_terrain->get_graphics(season)) {
-					overlay_terrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, time_of_day);
+					overlay_terrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
 				}
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				if (overlay_transition_tiles[i].first->get_transition_graphics(season)) {
-					overlay_transition_tiles[i].first->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].second, dx, dy, time_of_day);
+				const stratagus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
+				if (overlay_transition_terrain->has_transition_mask()) {
+					continue;
+				}
+
+				const bool is_overlay_transition_space = overlay_transition_terrain->Flags & MapFieldSpace;
+				if (overlay_transition_terrain->get_transition_graphics(season)) {
+					overlay_transition_terrain->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].second, dx, dy, is_overlay_transition_space ? nullptr : time_of_day);
 				}
 			}
 
@@ -345,8 +362,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				if (overlay_transition_tiles[i].first->get_elevation_graphics()) {
-					overlay_transition_tiles[i].first->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
+				const stratagus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
+				if (overlay_transition_terrain->get_elevation_graphics()) {
+					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
 				}
 			}
 

@@ -555,7 +555,8 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 {
 	CUnit *bestunit = nullptr;
 
-	bool flyeronly = (unit_type == UnitTypeType::Fly);
+	bool space_only = (unit_type == UnitTypeType::Space);
+	bool flier_only = (unit_type == UnitTypeType::Fly) || space_only;
 	
 	int best_score = 0;
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
@@ -589,8 +590,16 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 			continue;
 		}
 
-		if (type.UnitType != UnitTypeType::Fly) {
-			if (flyeronly) {
+		if (type.UnitType != UnitTypeType::Space) {
+			if (space_only) {
+				continue;
+			}
+		} else {
+			space_only = true;
+		}
+
+		if (type.UnitType != UnitTypeType::Fly && type.UnitType != UnitTypeType::Space) {
+			if (flier_only) {
 				continue;
 			}
 			if (unit_type == UnitTypeType::Land && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
@@ -600,7 +609,7 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 				continue;
 			}
 		} else {
-			flyeronly = true;
+			flier_only = true;
 		}
 		
 		if (unit.Type->CanTransport() && unit.BoardCount) { //if a transporter is carrying a unit, then it shouldn't be used for scouting, as it likely is taking part in an attack
@@ -659,12 +668,19 @@ void AiSendExplorers()
 	bool land_scout = false;
 	bool naval_scout = false;
 	bool air_scout = false;
+	bool space_scout = false;
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
 		if (AiPlayer->Scouts[i] == nullptr) {
 			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, (int) i);
 			return;
 		}
-		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Fly) {
+		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Space) {
+			land_scout = true;
+			naval_scout = true;
+			air_scout = true;
+			space_scout = true;
+			break;
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Fly) {
 			land_scout = true;
 			naval_scout = true;
 			air_scout = true;
@@ -680,6 +696,16 @@ void AiSendExplorers()
 	}
 		
 	//if no scouts are already present for a particular type, then choose a suitable unit to scout
+	if (!space_scout) { 
+		CUnit *bestunit = GetBestScout(UnitTypeType::Space);
+		if (bestunit != nullptr) {
+			AiPlayer->Scouts.push_back(bestunit);
+			CommandStopUnit(*bestunit);
+			air_scout = true;
+			land_scout = true;
+			naval_scout = true;
+		}
+	}
 	if (!air_scout) { 
 		CUnit *bestunit = GetBestScout(UnitTypeType::Fly);
 		if (bestunit != nullptr) {
@@ -748,7 +774,7 @@ void AiCheckTransporters()
 		if (!unit.Type->CanTransport()) {
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeType::Naval && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow) {
+		if (unit.Type->UnitType != UnitTypeType::Naval && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
 			continue;
 		}
 		if (unit.CanMove() == false) {
@@ -786,7 +812,7 @@ int AiGetRequestedTransportCapacity(int water_landmass)
 	
 	for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-		if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeType::Naval || queue.Type->UnitType == UnitTypeType::Fly || queue.Type->UnitType == UnitTypeType::FlyLow)) {
+		if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeType::Naval || queue.Type->UnitType == UnitTypeType::Fly || queue.Type->UnitType == UnitTypeType::FlyLow || queue.Type->UnitType == UnitTypeType::Space)) {
 			transport_capacity += queue.Want * queue.Type->MaxOnBoard;
 		}
 	}

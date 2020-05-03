@@ -4350,27 +4350,31 @@ int GetGovernmentTypeIdByName(const std::string &government_type)
 	return -1;
 }
 
-std::string GetForceTypeNameById(int force_type)
+std::string GetForceTypeNameById(const ForceType force_type)
 {
-	if (force_type == LandForceType) {
+	if (force_type == ForceType::Land) {
 		return "land-force";
-	} else if (force_type == NavalForceType) {
+	} else if (force_type == ForceType::Naval) {
 		return "naval-force";
-	} else if (force_type == AirForceType) {
+	} else if (force_type == ForceType::Air) {
 		return "air-force";
+	} else if (force_type == ForceType::Space) {
+		return "space-force";
 	}
 
 	return "";
 }
 
-int GetForceTypeIdByName(const std::string &force_type)
+ForceType GetForceTypeIdByName(const std::string &force_type)
 {
 	if (force_type == "land-force" || force_type == "land_force") {
-		return LandForceType;
+		return ForceType::Land;
 	} else if (force_type == "naval-force" || force_type == "naval_force") {
-		return NavalForceType;
+		return ForceType::Naval;
 	} else if (force_type == "air-force" || force_type == "air_force") {
-		return AirForceType;
+		return ForceType::Air;
+	} else if (force_type == "space-force" || force_type == "space_force") {
+		return ForceType::Space;
 	}
 
 	throw std::runtime_error("Invalid force type: " + force_type + ".");

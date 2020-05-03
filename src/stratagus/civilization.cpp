@@ -45,9 +45,9 @@ namespace stratagus {
 
 civilization::~civilization()
 {
-	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second.size(); ++i) {
-			delete iterator->second[i];
+	for (const auto &kv_pair : this->ForceTemplates) {
+		for (size_t i = 0; i < kv_pair.second.size(); ++i) {
+			delete kv_pair.second[i];
 		}
 	}
 	
@@ -97,7 +97,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const int force_type = GetForceTypeIdByName(key);
+			const ForceType force_type = GetForceTypeIdByName(key);
 			this->ForceTypeWeights[force_type] = std::stoi(value);
 		});
 	} else if (tag == "force_templates") {
@@ -134,8 +134,8 @@ void civilization::process_sml_scope(const sml_data &scope)
 			this->ForceTemplates[force->ForceType].push_back(force);
 		});
 
-		for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-			std::sort(iterator->second.begin(), iterator->second.end(), [](CForceTemplate *a, CForceTemplate *b) {
+		for (auto &kv_pair : this->ForceTemplates) {
+			std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](CForceTemplate *a, CForceTemplate *b) {
 				return a->Priority > b->Priority;
 			});
 		}
@@ -350,9 +350,9 @@ int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 	return 100;
 }
 
-int civilization::GetForceTypeWeight(int force_type) const
+int civilization::GetForceTypeWeight(const ForceType force_type) const
 {
-	if (force_type == -1) {
+	if (force_type == ForceType::None) {
 		fprintf(stderr, "Error in civilization::GetForceTypeWeight: the force_type is -1.\n");
 	}
 	
@@ -393,9 +393,9 @@ CCurrency *civilization::GetCurrency() const
 	return nullptr;
 }
 
-std::vector<CForceTemplate *> civilization::GetForceTemplates(int force_type) const
+std::vector<CForceTemplate *> civilization::GetForceTemplates(const ForceType force_type) const
 {
-	if (force_type == -1) {
+	if (force_type == ForceType::None) {
 		fprintf(stderr, "Error in civilization::GetForceTemplates: the force_type is -1.\n");
 	}
 	

@@ -38,9 +38,9 @@ namespace stratagus {
 
 faction::~faction()
 {
-	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second.size(); ++i) {
-			delete iterator->second[i];
+	for (const auto &kv_pair : this->ForceTemplates) {
+		for (size_t i = 0; i < kv_pair.second.size(); ++i) {
+			delete kv_pair.second[i];
 		}
 	}
 	
@@ -204,9 +204,9 @@ int faction::GetUpgradePriority(const CUpgrade *upgrade) const
 	return this->civilization->GetUpgradePriority(upgrade);
 }
 
-int faction::GetForceTypeWeight(int force_type) const
+int faction::GetForceTypeWeight(const ForceType force_type) const
 {
-	if (force_type == -1) {
+	if (force_type == ForceType::None) {
 		fprintf(stderr, "Error in faction::GetForceTypeWeight: the force_type is -1.\n");
 	}
 	
@@ -239,9 +239,9 @@ CCurrency *faction::GetCurrency() const
 	return this->civilization->GetCurrency();
 }
 
-std::vector<CForceTemplate *> faction::GetForceTemplates(int force_type) const
+std::vector<CForceTemplate *> faction::GetForceTemplates(const ForceType force_type) const
 {
-	if (force_type == -1) {
+	if (force_type == ForceType::None) {
 		fprintf(stderr, "Error in faction::GetForceTemplates: the force_type is -1.\n");
 	}
 	

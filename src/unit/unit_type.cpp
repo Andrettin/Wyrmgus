@@ -742,6 +742,9 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			} else if (value == "naval") {
 				this->UnitType = UnitTypeType::Naval;
 				this->SeaUnit = true;
+			} else if (value == "space") {
+				this->UnitType = UnitTypeType::Space;
+				this->AirUnit = true;
 			} else {
 				fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
 			}
@@ -1222,7 +1225,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		CclCommand(button_definition);
 	}
 	
-	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeType::Fly)) {
+	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeType::Fly || this->UnitType == UnitTypeType::Space)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
@@ -1987,7 +1990,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 								MapFieldCoastAllowed |
 								MapFieldWaterAllowed |
 								MapFieldNoBuilding |
-								MapFieldUnpassable;
+								MapFieldUnpassable |
+								MapFieldSpace;
 			type.FieldFlags = MapFieldNoBuilding;
 		} else {
 			type.MovementMask = 0;
@@ -2014,7 +2018,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldBuilding | // already occuppied
 					MapFieldCoastAllowed |
 					MapFieldWaterAllowed | // can't move on this
-					MapFieldUnpassable;
+					MapFieldUnpassable |
+					MapFieldSpace;
 			} else {
 				type.MovementMask =
 					MapFieldLandUnit |
@@ -2022,7 +2027,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldBuilding | // already occuppied
 					MapFieldCoastAllowed |
 					MapFieldWaterAllowed | // can't move on this
-					MapFieldUnpassable;
+					MapFieldUnpassable |
+					MapFieldSpace;
 			}
 			
 			if (type.BoolFlag[RAIL_INDEX].value) { //rail units can only move over railroads
@@ -2039,11 +2045,13 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			*/
 			if (type.BoolFlag[DIMINUTIVE_INDEX].value) {
 				type.MovementMask =
-					MapFieldAirUnpassable;
+					MapFieldAirUnpassable |
+					MapFieldSpace;
 			} else {
 				type.MovementMask =
 					MapFieldAirUnit | // already occuppied
-					MapFieldAirUnpassable;
+					MapFieldAirUnpassable |
+					MapFieldSpace;
 			}
 			//Wyrmgus end
 			break;
@@ -2053,14 +2061,16 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				type.MovementMask =
 					MapFieldBuilding |
 					MapFieldUnpassable |
-					MapFieldAirUnpassable;
+					MapFieldAirUnpassable |
+					MapFieldSpace;
 			} else {
 				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding |
 					MapFieldUnpassable |
-					MapFieldAirUnpassable;
+					MapFieldAirUnpassable |
+					MapFieldSpace;
 			}
 			break;
 		case UnitTypeType::Naval: // on water
@@ -2086,20 +2096,23 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldBridge |
 					//Wyrmgus end
 					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable;
+					MapFieldUnpassable |
+					MapFieldSpace;
 			} else if (type.BoolFlag[CANDOCK_INDEX].value && type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
 				type.MovementMask =
 					MapFieldBuilding | // already occuppied
 					MapFieldBridge |
 					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable;
+					MapFieldUnpassable |
+					MapFieldSpace;
 			} else if (type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
 				type.MovementMask =
 					MapFieldBuilding | // already occuppied
 					MapFieldBridge |
 					MapFieldCoastAllowed |
 					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable;
+					MapFieldUnpassable |
+					MapFieldSpace;
 			//Wyrmgus end
 			} else {
 				type.MovementMask =
@@ -2111,8 +2124,20 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					//Wyrmgus end
 					MapFieldCoastAllowed |
 					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable;
+					MapFieldUnpassable |
+					MapFieldSpace;
 			}
+			break;
+		case UnitTypeType::Space:
+			if (type.BoolFlag[DIMINUTIVE_INDEX].value) {
+				type.MovementMask =
+					MapFieldAirUnpassable;
+			} else {
+				type.MovementMask =
+					MapFieldAirUnit | // already occuppied
+					MapFieldAirUnpassable;
+			}
+			//Wyrmgus end
 			break;
 		default:
 			DebugPrint("Where moves this unit?\n");
@@ -2129,7 +2154,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				//Wyrmgus start
 				MapFieldBridge |
 				//Wyrmgus end
-				MapFieldLandAllowed; // can't build on this
+				MapFieldLandAllowed | // can't build on this
+				MapFieldSpace;
 		}
 		type.MovementMask |= MapFieldNoBuilding;
 		//Wyrmgus start
@@ -2164,6 +2190,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 							MapFieldCoastAllowed |
 							MapFieldWaterAllowed |
 							MapFieldUnpassable |
+							MapFieldSpace |
 							MapFieldItem;
 		type.FieldFlags = MapFieldItem;
 	} else if (type.BoolFlag[BRIDGE_INDEX].value) {
@@ -2171,6 +2198,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 							MapFieldBuilding |
 							MapFieldLandAllowed |
 							MapFieldUnpassable |
+							MapFieldSpace |
 							MapFieldBridge;
 		type.FieldFlags = MapFieldBridge;
 	//Wyrmgus end
@@ -2192,6 +2220,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				//Wyrmgus end
 				break;
 			case UnitTypeType::Fly: // in air
+			case UnitTypeType::Space:
 				type.FieldFlags = MapFieldAirUnit;
 				break;
 			//Wyrmgus start

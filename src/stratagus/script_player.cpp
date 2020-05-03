@@ -803,7 +803,7 @@ static int CclDefineCivilization(lua_State *l)
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
+				const ForceType force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				civilization->ForceTypeWeights[force_type] = LuaToNumber(l, -1, j + 1);
 			}
@@ -821,7 +821,7 @@ static int CclDefineCivilization(lua_State *l)
 					++k;
 					if (!strcmp(value, "force-type")) {
 						force->ForceType = GetForceTypeIdByName(LuaToString(l, -1, k + 1));
-						if (force->ForceType == -1) {
+						if (force->ForceType == ForceType::None) {
 							LuaError(l, "Force type doesn't exist.");
 						}
 						civilization->ForceTemplates[force->ForceType].push_back(force);
@@ -841,8 +841,8 @@ static int CclDefineCivilization(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = civilization->ForceTemplates.begin(); iterator != civilization->ForceTemplates.end(); ++iterator) {
-				std::sort(iterator->second.begin(), iterator->second.end(), [](CForceTemplate *a, CForceTemplate *b) {
+			for (auto &kv_pair : civilization->ForceTemplates) {
+				std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](CForceTemplate *a, CForceTemplate *b) {
 					return a->Priority > b->Priority;
 				});
 			}
@@ -1719,7 +1719,7 @@ static int CclDefineFaction(lua_State *l)
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
+				const ForceType force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				faction->ForceTypeWeights[force_type] = LuaToNumber(l, -1, j + 1);
 			}
@@ -1737,7 +1737,7 @@ static int CclDefineFaction(lua_State *l)
 					++k;
 					if (!strcmp(value, "force-type")) {
 						force->ForceType = GetForceTypeIdByName(LuaToString(l, -1, k + 1));
-						if (force->ForceType == -1) {
+						if (force->ForceType == ForceType::None) {
 							LuaError(l, "Force type doesn't exist.");
 						}
 						faction->ForceTemplates[force->ForceType].push_back(force);
@@ -1757,8 +1757,8 @@ static int CclDefineFaction(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = faction->ForceTemplates.begin(); iterator != faction->ForceTemplates.end(); ++iterator) {
-				std::sort(iterator->second.begin(), iterator->second.end(), [](CForceTemplate *a, CForceTemplate *b) {
+			for (auto &kv_pair : faction->ForceTemplates) {
+				std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](CForceTemplate *a, CForceTemplate *b) {
 					return a->Priority > b->Priority;
 				});
 			}

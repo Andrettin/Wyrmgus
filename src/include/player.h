@@ -82,6 +82,7 @@ class CFiller;
 class LuaCallback;
 //Wyrmgus end
 enum class DiplomacyState;
+enum class ForceType;
 struct lua_State;
 
 namespace stratagus {
@@ -495,12 +496,14 @@ enum class faction_tier {
 	count
 };
 
-enum ForceTypes {
-	LandForceType,
-	NavalForceType,
-	AirForceType,
+enum class ForceType {
+	None = -1,
+	Land,
+	Naval,
+	Air,
+	Space,
 	
-	MaxForceTypes
+	Count
 };
 
 enum WordTypes {
@@ -614,7 +617,7 @@ public:
 		this->units.push_back(std::pair<const stratagus::unit_class *, int>(unit_class, quantity));
 	}
 
-	int ForceType = -1;
+	ForceType ForceType = ForceType::None;
 	int Priority = 100;
 	int Weight = 1;
 
@@ -925,8 +928,8 @@ extern std::string GetFactionTypeNameById(int faction_type);
 extern int GetFactionTypeIdByName(const std::string &faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(const std::string &government_type);
-extern std::string GetForceTypeNameById(int force_type);
-extern int GetForceTypeIdByName(const std::string &force_type);
+extern std::string GetForceTypeNameById(const ForceType force_type);
+extern ForceType GetForceTypeIdByName(const std::string &force_type);
 extern std::string GetWordTypeNameById(int word_type);
 extern int GetWordTypeIdByName(const std::string &word_type);
 extern std::string GetArticleTypeNameById(int article_type);

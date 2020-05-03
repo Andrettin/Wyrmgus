@@ -118,6 +118,8 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldStumps;
 	} else if (flag_name == "underground") {
 		return MapFieldUnderground;
+	} else if (flag_name == "space") {
+		return MapFieldSpace;
 	} else {
 		throw std::runtime_error("Flag \"" + flag_name + "\" doesn't exist.");
 	}

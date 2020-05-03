@@ -739,22 +739,24 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 }
 //Wyrmgus end
 
-int AiForce::GetForceType() const
+ForceType AiForce::GetForceType() const
 {
 	if (this->Units.size() == 0) {
-		return LandForceType;
+		return ForceType::Land;
 	}
 	
-	int force_type = AirForceType;
+	ForceType force_type = ForceType::Space;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 		
 		if (unit->Type->UnitType == UnitTypeType::Naval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
-			return NavalForceType;
+			return ForceType::Naval;
 		}
 		
-		if (unit->Type->UnitType != UnitTypeType::Fly) { //all units must be of UnitTypeType::Fly for it to be considered an air force
-			force_type = LandForceType;
+		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::Space) { //all units must be of UnitTypeType::Fly for it to be considered an air force
+			force_type = ForceType::Land;
+		} else if (unit->Type->UnitType != UnitTypeType::Space) {
+			force_type = ForceType::Air;
 		}
 	}
 	
@@ -763,12 +765,12 @@ int AiForce::GetForceType() const
 
 bool AiForce::IsNaval() const
 {
-	return this->GetForceType() == NavalForceType;
+	return this->GetForceType() == ForceType::Naval;
 }
 
 bool AiForce::IsAirForce() const
 {
-	return this->GetForceType() == AirForceType;
+	return this->GetForceType() == ForceType::Air;
 }
 
 bool AiForce::IsHeroOnlyForce() const
@@ -909,7 +911,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit *const unit = this->Units[i];
 
-			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
+			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
 				needs_transport = true;
 				break;
 			}
@@ -1565,7 +1567,7 @@ void AiForce::Update()
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
-		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
+		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
 		}
@@ -1847,7 +1849,7 @@ void AiForceManager::CheckForceRecruitment()
 
 	bool all_forces_completed = true;
 	int completed_forces = 0;
-	int force_type_count[MaxForceTypes];
+	int force_type_count[static_cast<int>(ForceType::Count)];
 	memset(force_type_count, 0, sizeof(force_type_count));
 	
 	for (unsigned int f = 0; f < forces.size(); ++f) {
@@ -1855,7 +1857,7 @@ void AiForceManager::CheckForceRecruitment()
 		if (force.Completed && force.Units.size() > 0) {
 			if (!force.IsHeroOnlyForce()) {
 				completed_forces++;
-				force_type_count[force.GetForceType()]++;
+				force_type_count[static_cast<int>(force.GetForceType())]++;
 			}
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
@@ -1886,16 +1888,16 @@ void AiForceManager::CheckForceRecruitment()
 	}
 	
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
-		int force_type_weights[MaxForceTypes];
-		for (int i = 0; i < MaxForceTypes; ++i) {
-			force_type_weights[i] = stratagus::faction::get_all()[AiPlayer->Player->Faction]->GetForceTypeWeight(i);
+		int force_type_weights[static_cast<int>(ForceType::Count)];
+		for (int i = 0; i < static_cast<int>(ForceType::Count); ++i) {
+			force_type_weights[i] = stratagus::faction::get_all()[AiPlayer->Player->Faction]->GetForceTypeWeight(static_cast<ForceType>(i));
 		}
 		
-		std::vector<int> force_types;
-		while ((int) force_types.size() < MaxForceTypes) {
-			for (int i = 0; i < MaxForceTypes; ++i) {
+		std::vector<ForceType> force_types;
+		while ((int) force_types.size() < static_cast<int>(ForceType::Count)) {
+			for (int i = 0; i < static_cast<int>(ForceType::Count); ++i) {
 				if (force_type_count[i] <= 0) {
-					force_types.push_back(i);
+					force_types.push_back(static_cast<ForceType>(i));
 				}
 				force_type_count[i] -= force_type_weights[i];
 			}

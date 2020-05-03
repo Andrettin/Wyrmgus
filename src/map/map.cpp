@@ -391,7 +391,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::fa
 		if (player != nullptr) {
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
-			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeType::Fly)) {
+			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
 				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
 			} else {
 				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
@@ -2290,7 +2290,13 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 		return; //already calculated
 	}
 	
-	bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
+	const bool is_space = mf.Flags & MapFieldSpace;
+
+	if (is_space) {
+		return; //no landmass for space tiles
+	}
+
+	const bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
 
 	//doesn't have a landmass ID, and hasn't inherited one from another tile yet, so add a new one
 	mf.Landmass = this->Landmasses + 1;
@@ -2307,7 +2313,13 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 					Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
 					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
+						const bool adjacent_is_space = adjacent_mf.Flags & MapFieldSpace;
+
+						if (adjacent_is_space) {
+							continue;
+						}
+
+						const bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
 									
 						if (adjacent_is_water == is_water && adjacent_mf.Landmass == 0) {
 							adjacent_mf.Landmass = mf.Landmass;
@@ -3163,9 +3175,10 @@ void CMap::generate_settlement_territories(const int z)
 		}
 	}
 
-	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed), MapFieldUnderground);
-	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldCoastAllowed, MapFieldUnderground);
-	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, 0, MapFieldUnderground);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace), MapFieldUnderground);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldCoastAllowed, MapFieldUnderground | MapFieldSpace);
+	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldSpace, MapFieldUnderground);
+	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldSpace);
 	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement

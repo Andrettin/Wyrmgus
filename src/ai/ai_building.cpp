@@ -68,7 +68,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (mf.Flags & blockedFlag) {
 		return false;
 	}
-	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed);
+	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed | MapFieldSpace);
 	return ((mf.Flags & passableFlag) != 0);
 }
 

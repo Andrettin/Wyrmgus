@@ -170,9 +170,11 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		if (!this->Terrain || !stratagus::vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
 			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
-		if (terrain_type->Flags & MapFieldWaterAllowed) {
-			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water, remove all flags from the base terrain
-			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
+		if ((terrain_type->Flags & MapFieldWaterAllowed) || terrain_type->Flags & MapFieldSpace) {
+			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water or space, remove all flags from the base terrain
+			if (terrain_type->Flags & MapFieldWaterAllowed) {
+				this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
+			}
 		}
 		this->OverlayTerrain = terrain_type;
 		this->OverlayTerrainDestroyed = false;
@@ -406,6 +408,12 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldWaterAllowed) {
 		file.printf(", \"water\"");
 	}
+	if (Flags & MapFieldSpace) {
+		file.printf(", \"space\"");
+	}
+	if (Flags & MapFieldUnderground) {
+		file.printf(", \"underground\"");
+	}
 	if (Flags & MapFieldNoBuilding) {
 		//Wyrmgus start
 //		file.printf(", \"mud\"");
@@ -625,7 +633,6 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldSeaUnit;
 		} else if (!strcmp(value, "building")) {
 			this->Flags |= MapFieldBuilding;
-		//Wyrmgus start
 		} else if (!strcmp(value, "item")) {
 			this->Flags |= MapFieldItem;
 		} else if (!strcmp(value, "bridge")) {
@@ -658,7 +665,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldStumps;
 		} else if (!strcmp(value, "underground")) {
 			this->Flags |= MapFieldUnderground;
-		//Wyrmgus end
+		} else if (!strcmp(value, "space")) {
+			this->Flags |= MapFieldSpace;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

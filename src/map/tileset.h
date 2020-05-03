@@ -82,6 +82,7 @@ enum MapFieldFlag : unsigned long long {
 	MapFieldStumps = 1 << 27,		/// Used for playing stumps step sounds and identifying removed forests
 
 	MapFieldUnderground = 1 << 28,	/// The terrain is an underground one; this is used to make it always be "night" there, for graphical purposes as well as for unit sight
+	MapFieldSpace = 1 << 29,	//the terrain is a space one, only being passable by space units
 };
 
 /**

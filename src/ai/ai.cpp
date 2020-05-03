@@ -1446,7 +1446,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	what.Player->Ai->Force.Assign(what, -1);
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
-		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeType::Naval || what.Type->UnitType == UnitTypeType::Fly || what.Type->UnitType == UnitTypeType::FlyLow)) {
+		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeType::Naval || what.Type->UnitType == UnitTypeType::Fly || what.Type->UnitType == UnitTypeType::FlyLow || what.Type->UnitType == UnitTypeType::Space)) {
 			int landmass = CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID);
 			
 			what.Player->Ai->Transporters[landmass].push_back(&what);

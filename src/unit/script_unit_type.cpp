@@ -1242,26 +1242,19 @@ static int CclDefineUnitType(lua_State *l)
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {
 				type->UnitType = UnitTypeType::Land;
-				//Wyrmgus start
 				type->LandUnit = true;
-				//Wyrmgus end
 			} else if (!strcmp(value, "fly")) {
 				type->UnitType = UnitTypeType::Fly;
-				//Wyrmgus start
 				type->AirUnit = true;
-				//Wyrmgus end
-			//Wyrmgus start
 			} else if (!strcmp(value, "fly-low")) {
 				type->UnitType = UnitTypeType::FlyLow;
-				//Wyrmgus start
 				type->AirUnit = true;
-				//Wyrmgus end
-			//Wyrmgus end
 			} else if (!strcmp(value, "naval")) {
 				type->UnitType = UnitTypeType::Naval;
-				//Wyrmgus start
 				type->SeaUnit = true;
-				//Wyrmgus end
+			} else if (!strcmp(value, "space")) {
+				type->UnitType = UnitTypeType::Space;
+				type->AirUnit = true;
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
@@ -2015,7 +2008,7 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanMove() && ((!type->BoolFlag[COWARD_INDEX].value && type->CanAttack) || type->UnitType == UnitTypeType::Fly)) {
+	if (type->CanMove() && ((!type->BoolFlag[COWARD_INDEX].value && type->CanAttack) || type->UnitType == UnitTypeType::Fly || type->UnitType == UnitTypeType::Space)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
@@ -2510,6 +2503,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		//Wyrmgus end
 		} else if (type->UnitType == UnitTypeType::Naval) {
 			lua_pushstring(l, "naval");
+			return 1;
+		} else if (type->UnitType == UnitTypeType::Space) {
+			lua_pushstring(l, "space");
 			return 1;
 		}
 	} else if (!strcmp(data, "Corpse")) {

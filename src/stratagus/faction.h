@@ -117,8 +117,8 @@ public:
 	}
 
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
-	int GetForceTypeWeight(int force_type) const;
-	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
+	int GetForceTypeWeight(const ForceType force_type) const;
+	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &get_ship_names() const;
 
@@ -190,8 +190,8 @@ private:
 public:
 	std::vector<site *> Cores; /// Core sites of this faction (required to found it)
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
-	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
-	std::map<int, int> ForceTypeWeights;								/// Weights for each force type
+	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
+	std::map<ForceType, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change

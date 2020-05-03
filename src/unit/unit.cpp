@@ -3648,7 +3648,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 	
 	//Wyrmgus start
 	// if there is a trap in the new tile, trigger it
-	if ((this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
+	if ((this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
 		const CUnitCache &cache = CMap::Map.Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			if (!cache[i]) {
@@ -5476,7 +5476,7 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		}
 		value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	} else if (index == SPEED_INDEX) {
-		if (this->MapLayer && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow) {
+		if (this->MapLayer && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) {
 			value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->getCost();
 		}
 	}
@@ -7612,7 +7612,7 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 		}
 		return source.CanTarget & CanTargetLand;
 	}
-	if (dest.UnitType == UnitTypeType::Fly) {
+	if (dest.UnitType == UnitTypeType::Fly || dest.UnitType == UnitTypeType::Space) {
 		return source.CanTarget & CanTargetAir;
 	}
 	//Wyrmgus start
@@ -7899,14 +7899,12 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		return true;
 	}
 	
+	const bool is_flying = this->Type->UnitType == UnitTypeType::Fly || this->Type->UnitType == UnitTypeType::Space;
+	const bool is_goal_flying = goal->Type->UnitType == UnitTypeType::Fly || goal->Type->UnitType == UnitTypeType::Space;
 	if (
 		goal
 		&& goal->IsAliveOnMap()
-		&& (
-			this->MapDistanceTo(*goal) > 1
-			|| (this->Type->UnitType != UnitTypeType::Fly && goal->Type->UnitType == UnitTypeType::Fly)
-			|| (this->Type->UnitType == UnitTypeType::Fly && goal->Type->UnitType != UnitTypeType::Fly)
-		)
+		&& (this->MapDistanceTo(*goal) > 1 || (is_flying != is_goal_flying))
 	) {
 		return true;
 	}

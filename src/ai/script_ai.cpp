@@ -282,7 +282,7 @@ static std::vector<CUnitType *> GetNavalTransporterUnits()
 	std::vector<CUnitType *> res;
 
 	for (CUnitType *unit_type : CUnitType::get_all()) {
-		if (unit_type->CanTransport() && (unit_type->UnitType == UnitTypeType::Naval || unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::FlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
+		if (unit_type->CanTransport() && (unit_type->UnitType == UnitTypeType::Naval || unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::FlyLow || unit_type->UnitType == UnitTypeType::Space)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
 			res.push_back(unit_type);
 		}
 	}

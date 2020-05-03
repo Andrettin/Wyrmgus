@@ -46,6 +46,7 @@ class CDeity;
 class CForceTemplate;
 class CLanguage;
 class CUpgrade;
+enum class ForceType;
 struct lua_State;
 
 int CclDefineCivilization(lua_State *l);
@@ -87,7 +88,7 @@ public:
 	virtual void initialize() override;
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
-	int GetForceTypeWeight(int force_type) const;
+	int GetForceTypeWeight(const ForceType force_type) const;
 
 	const std::string &get_interface() const
 	{
@@ -132,7 +133,7 @@ public:
 		return this->playable;
 	}
 
-	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
+	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::map<int, std::vector<std::string>> &GetPersonalNames() const;
 	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
@@ -188,8 +189,8 @@ private:
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
-	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
-	std::map<int, int> ForceTypeWeights;	/// Weights for each force type
+	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
+	std::map<ForceType, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 private:
