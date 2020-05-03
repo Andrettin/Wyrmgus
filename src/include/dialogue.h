@@ -30,6 +30,7 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
+class CPlayer;
 class LuaCallback;
 struct lua_State;
 
@@ -53,9 +54,9 @@ public:
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
 
-	void call(const int player) const;
-	void call_node(const int node_index, const int player) const;
-	void call_node_option_effect(const int node_index, const int option_index, const int player) const;
+	void call(CPlayer *player) const;
+	void call_node(const int node_index, CPlayer *player) const;
+	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
 	
 private:
 	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue
@@ -72,8 +73,8 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
-	void call(const int player) const;
-	void option_effect(const int option_index, const int player) const;
+	void call(CPlayer *player) const;
+	void option_effect(const int option_index, CPlayer *player) const;
 	
 	int ID = -1;
 	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself

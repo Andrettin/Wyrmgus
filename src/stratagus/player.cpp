@@ -41,6 +41,7 @@
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "database/defines.h"
+#include "dialogue.h"
 #include "editor.h"
 //Wyrmgus end
 #include "faction.h"
@@ -2591,6 +2592,11 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 	if (this == CPlayer::GetThisPlayer()) {
 		SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
 		SaveQuestCompletion();
+
+		if (stratagus::game::get()->get_current_campaign() != nullptr && stratagus::game::get()->get_current_campaign()->get_completion_quest() == quest) {
+			stratagus::defines::get()->get_campaign_victory_dialogue()->call(this);
+		}
+
 		std::string rewards_string;
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
@@ -2611,6 +2617,10 @@ void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
+		if (stratagus::game::get()->get_current_campaign() != nullptr && stratagus::game::get()->get_current_campaign()->get_completion_quest() == quest) {
+			stratagus::defines::get()->get_campaign_defeat_dialogue()->call(this);
+		}
+
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->PlayerColor ? quest->PlayerColor->get_identifier() : "") + "\") end;");
 	}
 }

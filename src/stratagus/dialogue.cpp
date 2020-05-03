@@ -60,7 +60,7 @@ void dialogue::process_sml_scope(const sml_data &scope)
 	}
 }
 
-void dialogue::call(const int player) const
+void dialogue::call(CPlayer *player) const
 {
 	if (this->nodes.empty()) {
 		return;
@@ -69,7 +69,7 @@ void dialogue::call(const int player) const
 	this->nodes.front()->call(player);
 }
 
-void dialogue::call_node(const int node_index, const int player) const
+void dialogue::call_node(const int node_index, CPlayer *player) const
 {
 	if (node_index >= static_cast<int>(this->nodes.size())) {
 		return;
@@ -78,13 +78,13 @@ void dialogue::call_node(const int node_index, const int player) const
 	this->nodes[node_index]->call(player);
 }
 
-void dialogue::call_node_option_effect(const int node_index, const int option_index, const int player) const
+void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const
 {
 	if (node_index >= static_cast<int>(this->nodes.size())) {
 		return;
 	}
 
-	CclCommand("trigger_player = " + std::to_string(player) + ";");
+	CclCommand("trigger_player = " + std::to_string(player->Index) + ";");
 	this->nodes[node_index]->option_effect(option_index, player);
 }
 
@@ -128,7 +128,7 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 	}
 }
 
-void dialogue_node::call(const int player) const
+void dialogue_node::call(CPlayer *player) const
 {
 	if (this->Conditions) {
 		this->Conditions->pushPreamble();
@@ -163,7 +163,7 @@ void dialogue_node::call(const int player) const
 	}
 	
 	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->Text, "\"", "\\\""), "\n", "\\n") + "\", ";
-	lua_command += std::to_string((long long) player) + ", ";
+	lua_command += std::to_string(player->Index) + ", ";
 	
 	lua_command += "{";
 	if (!this->options.empty() && !this->options.front()->get_name().empty()) {
@@ -191,12 +191,12 @@ void dialogue_node::call(const int player) const
 				first = false;
 			}
 			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->get_identifier() + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) i) + ", " + std::to_string((long long) player) + ");";
+			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(i) + ", " + std::to_string(player->Index) + ");";
 			lua_command += " end";
 		}
 	} else {
 		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->get_identifier() + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
+		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(0) + ", " + std::to_string(player->Index) + ");";
 		lua_command += " end";
 	}
 	lua_command += "}, ";
@@ -224,11 +224,11 @@ void dialogue_node::call(const int player) const
 	CclCommand(lua_command);
 }
 
-void dialogue_node::option_effect(const int option_index, const int player) const
+void dialogue_node::option_effect(const int option_index, CPlayer *player) const
 {
 	if (option_index < static_cast<int>(this->options.size())) {
 		const auto &option = this->options[option_index];
-		option->do_effects(CPlayer::Players.at(player));
+		option->do_effects(player);
 	}
 
 	this->Dialogue->call_node(this->ID + 1, player);
@@ -239,17 +239,17 @@ void dialogue_node::option_effect(const int option_index, const int player) cons
 void CallDialogue(const std::string &dialogue_ident, int player)
 {
 	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
-	dialogue->call(player);
+	dialogue->call(CPlayer::Players.at(player));
 }
 
 void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 {
 	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
-	dialogue->call_node(node, player);
+	dialogue->call_node(node, CPlayer::Players.at(player));
 }
 
 void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
 {
 	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
-	dialogue->call_node_option_effect(node, option, player);
+	dialogue->call_node_option_effect(node, option, CPlayer::Players.at(player));
 }

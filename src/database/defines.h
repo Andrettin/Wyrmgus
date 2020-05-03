@@ -31,6 +31,7 @@
 
 namespace stratagus {
 
+class dialogue;
 class player_color;
 class sml_data;
 class sml_property;
@@ -46,6 +47,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(stratagus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
 	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
+	Q_PROPERTY(stratagus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
+	Q_PROPERTY(stratagus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 
 public:
 	void load(const std::filesystem::path &base_path);
@@ -112,6 +115,16 @@ public:
 		return this->documents_modules_loading_enabled;
 	}
 
+	dialogue *get_campaign_victory_dialogue() const
+	{
+		return this->campaign_victory_dialogue;
+	}
+
+	dialogue *get_campaign_defeat_dialogue() const
+	{
+		return this->campaign_defeat_dialogue;
+	}
+
 private:
 	QSize tile_size;
 	QSize icon_size;
@@ -120,6 +133,8 @@ private:
 	player_color *neutral_player_color = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
 	bool documents_modules_loading_enabled = true;
+	dialogue *campaign_victory_dialogue = nullptr;
+	dialogue *campaign_defeat_dialogue = nullptr;
 };
 
 }

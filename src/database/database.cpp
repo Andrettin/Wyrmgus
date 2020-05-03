@@ -36,6 +36,7 @@
 #include "database/sml_operator.h"
 #include "database/sml_parser.h"
 #include "database/sml_property.h"
+#include "dialogue.h"
 #include "faction.h"
 #include "map/map_template.h"
 #include "map/region.h"
@@ -160,6 +161,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
 		} else if (property_class_name == "stratagus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
+		} else if (property_class_name == "stratagus::dialogue*") {
+			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
 		} else if (property_class_name == "stratagus::icon*") {

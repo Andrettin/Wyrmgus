@@ -50,7 +50,7 @@ public:
 
 	virtual void do_effect(CPlayer *player) const override
 	{
-		this->dialogue->call(player->Index);
+		this->dialogue->call(player);
 	}
 
 	virtual std::string get_string(const CPlayer *player) const override

@@ -559,7 +559,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					CLabel label(GetGameFont(), oldnc, oldrc);
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
+					label.Draw(pos.x + 46 * stratagus::defines::get()->get_scale_factor() - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
 			}
 		}
@@ -1959,7 +1959,7 @@ static void InfoPanel_draw_multiple_selection()
 	}
 
 	if (Selected.size() > UI.SelectedButtons.size()) {
-		const std::string number_str = std::to_string(Selected.size() - UI.SelectedButtons.size());
+		const std::string number_str = "+" + std::to_string(Selected.size() - UI.SelectedButtons.size());
 		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, number_str.c_str());
 	}
 }

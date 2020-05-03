@@ -55,6 +55,7 @@ class campaign : public detailed_data_entry, public data_type<campaign>, public 
 	Q_PROPERTY(stratagus::calendar* start_date_calendar MEMBER start_date_calendar)
 	Q_PROPERTY(stratagus::timeline* timeline MEMBER timeline READ get_timeline)
 	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
+	Q_PROPERTY(stratagus::quest* completion_quest MEMBER completion_quest READ get_completion_quest)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 
 public:
@@ -84,6 +85,11 @@ public:
 	faction *get_faction() const
 	{
 		return this->faction;
+	}
+
+	quest *get_completion_quest() const
+	{
+		return this->completion_quest;
 	}
 
 	std::string GetSpecies() const;
@@ -118,7 +124,8 @@ private:
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<quest *> RequiredQuests;		/// Quests required by the campaign
-	faction *faction = nullptr;	/// Which faction the player plays as in the campaign
+	faction *faction = nullptr;	//which faction the player plays as in the campaign
+	quest *completion_quest = nullptr; //the quest which when completed means that the campaign has been completed as well
 	std::vector<map_template *> map_templates; //map templates used by the campaign
 public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
