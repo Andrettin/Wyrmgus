@@ -1714,15 +1714,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
-			if (type->get_unit_class() != nullptr)  {
-				type->get_unit_class()->remove_unit_type(type);
-			}
-			
-			type->unit_class = stratagus::unit_class::get(LuaToString(l, -1));
-			
-			if (type->get_unit_class() != nullptr && !type->get_unit_class()->has_unit_type(type)) {
-				type->get_unit_class()->add_unit_type(type);
-			}
+			type->set_unit_class(stratagus::unit_class::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);

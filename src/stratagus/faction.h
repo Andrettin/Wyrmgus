@@ -48,6 +48,7 @@ class civilization;
 class icon;
 class resource;
 class unit_class;
+class upgrade_class;
 
 class faction : public detailed_data_entry, public data_type<faction>
 {
@@ -135,6 +136,27 @@ public:
 		}
 	}
 
+	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
+
+	void set_class_upgrade(const upgrade_class *upgrade_class, CUpgrade *upgrade)
+	{
+		if (upgrade == nullptr) {
+			this->class_upgrades.erase(upgrade_class);
+			return;
+		}
+
+		this->class_upgrades[upgrade_class] = upgrade;
+	}
+
+	void remove_class_upgrade(CUpgrade *upgrade)
+	{
+		for (std::map<const upgrade_class *, CUpgrade *>::reverse_iterator iterator = this->class_upgrades.rbegin(); iterator != this->class_upgrades.rend(); ++iterator) {
+			if (iterator->second == upgrade) {
+				this->class_upgrades.erase(iterator->first);
+			}
+		}
+	}
+
 	const std::map<const resource *, int> &get_resources() const
 	{
 		return this->resources;
@@ -174,8 +196,10 @@ public:
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
-	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for a particular faction
-	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
+private:
+	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for the faction
+	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the faction
+public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:
 	std::vector<std::string> ship_names;								/// Ship names for the faction

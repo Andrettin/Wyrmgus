@@ -777,6 +777,8 @@ class CUnitType final : public stratagus::detailed_data_entry, public stratagus:
 {
 	Q_OBJECT
 
+	Q_PROPERTY(stratagus::unit_class*unit_class READ get_unit_class WRITE set_unit_class)
+
 public:
 	static constexpr const char *class_identifier = "unit_type";
 	static constexpr const char *database_folder = "unit_types";
@@ -797,6 +799,8 @@ public:
 	{
 		return this->unit_class;
 	}
+
+	void set_unit_class(stratagus::unit_class *unit_class);
 
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
@@ -1198,8 +1202,6 @@ public:
 extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
-extern std::vector<std::vector<CUnitType *>> ClassUnitTypes; //list of unit types belonging to each class
-extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 extern CUnitType *settlement_site_unit_type;
 
 extern std::vector<CSpecies *> Species;
@@ -1219,8 +1221,6 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 //Wyrmgus start
-extern int GetUpgradeClassIndexByName(const std::string &class_name);
-extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
 
 extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 

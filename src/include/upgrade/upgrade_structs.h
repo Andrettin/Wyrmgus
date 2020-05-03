@@ -60,6 +60,7 @@ namespace stratagus {
 	class civilization;
 	class dependency;
 	class icon;
+	class upgrade_class;
 }
 
 /**
@@ -99,8 +100,9 @@ class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::civilization*civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(stratagus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
 	Q_PROPERTY(QString effects_string READ get_effects_string_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
@@ -133,10 +135,12 @@ public:
 		return this->icon;
 	}
 
-	int get_class() const
+	stratagus::upgrade_class *get_upgrade_class() const
 	{
 		return this->upgrade_class;
 	}
+
+	void set_upgrade_class(stratagus::upgrade_class *upgrade_class);
 
 	stratagus::civilization *get_civilization() const
 	{
@@ -204,7 +208,7 @@ public:
 	}
 
 private:
-	int upgrade_class = -1;			/// upgrade class (e.g. siege weapon projectile I)
+	stratagus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
 	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
 	int faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string effects_string; //effects string of the upgrade

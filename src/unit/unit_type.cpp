@@ -494,8 +494,6 @@ std::vector<int> LuxuryResources;
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-std::vector<std::string> UpgradeClasses;
-std::map<std::string, int> UpgradeClassStringToIndex;
 CUnitType *settlement_site_unit_type;
 
 std::vector<CSpecies *> Species;
@@ -1257,6 +1255,23 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	this->Initialized = true;
 	
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+}
+
+void CUnitType::set_unit_class(stratagus::unit_class *unit_class)
+{
+	if (unit_class == this->get_unit_class()) {
+		return;
+	}
+
+	if (this->get_unit_class() != nullptr) {
+		this->get_unit_class()->remove_unit_type(this);
+	}
+
+	this->unit_class = unit_class;
+
+	if (this->get_unit_class() != nullptr && !this->get_unit_class()->has_unit_type(this)) {
+		this->get_unit_class()->add_unit_type(this);
+	}
 }
 
 Vec2i CUnitType::GetTileSize() const
@@ -2353,21 +2368,6 @@ void SaveUnitTypes(CFile &file)
 		}
 	}
 }
-
-//Wyrmgus start
-int GetUpgradeClassIndexByName(const std::string &class_name)
-{
-	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {
-		return UpgradeClassStringToIndex.find(class_name)->second;
-	}
-	return -1;
-}
-
-void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id)
-{
-	UpgradeClassStringToIndex[class_name] = class_id;
-}
-//Wyrmgus end
 
 /**
 **  Draw unit-type on map.

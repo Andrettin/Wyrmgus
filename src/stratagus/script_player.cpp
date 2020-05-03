@@ -69,6 +69,7 @@
 #include "unit/unit_type.h"
 #include "video.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 //Wyrmgus start
 #include "ui/ui.h"
 #include "util/util.h"
@@ -1491,11 +1492,11 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const int class_id = GetUpgradeClassIndexByName(class_name);
-		if (civilization && class_id != -1) {
-			int upgrade_id = PlayerRaces.get_civilization_class_upgrade(civilization->ID, class_id);
-			if (upgrade_id != -1) {
-				unit_type_ident = CUpgrade::get_all()[upgrade_id]->Ident;
+		const stratagus::upgrade_class *upgrade_class = stratagus::upgrade_class::try_get(class_name);
+		if (civilization && upgrade_class != nullptr) {
+			const CUpgrade *upgrade = civilization->get_class_upgrade(upgrade_class);
+			if (upgrade != nullptr) {
+				unit_type_ident = upgrade->get_identifier();
 			}
 		}
 	}
@@ -1539,11 +1540,11 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const int class_id = GetUpgradeClassIndexByName(class_name);
-		if (class_id != -1) {
-			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(faction_id, class_id);
-			if (upgrade_id != -1) {
-				unit_type_ident = CUpgrade::get_all()[upgrade_id]->Ident;
+		const stratagus::upgrade_class *upgrade_class = stratagus::upgrade_class::try_get(class_name);
+		if (upgrade_class != nullptr) {
+			const CUpgrade *upgrade = faction->get_class_upgrade(upgrade_class);
+			if (upgrade != nullptr) {
+				unit_type_ident = upgrade->get_identifier();
 			}
 		}
 	}

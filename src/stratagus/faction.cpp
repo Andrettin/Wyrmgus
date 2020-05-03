@@ -294,4 +294,22 @@ CUnitType *faction::get_class_unit_type(const unit_class *unit_class) const
 	return this->civilization->get_class_unit_type(unit_class);
 }
 
+CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const
+{
+	if (upgrade_class == nullptr) {
+		return nullptr;
+	}
+
+	auto find_iterator = this->class_upgrades.find(upgrade_class);
+	if (find_iterator != this->class_upgrades.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->ParentFaction != -1) {
+		return stratagus::faction::get_all()[ParentFaction]->get_class_upgrade(upgrade_class);
+	}
+
+	return this->get_civilization()->get_class_upgrade(upgrade_class);
+}
+
 }

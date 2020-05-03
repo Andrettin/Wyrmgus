@@ -45,6 +45,7 @@ class CPopup;
 
 namespace stratagus {
 	class unit_class;
+	class upgrade_class;
 }
 
 static constexpr int MARGIN_X = 4;
@@ -86,7 +87,7 @@ public:
 	int CanStore;				/// whether the button's unit type can store a particular resource
 	int ImproveIncome;			/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade
-	int ResearchedUpgradeClass = -1;		/// whether the button's player has researched a particular upgrade class
+	const stratagus::upgrade_class *researched_upgrade_class = nullptr; //whether the button's player has researched a particular upgrade class
 	//Wyrmgus end
 	std::string ButtonValue;    /// value used in ValueStr field of button
 

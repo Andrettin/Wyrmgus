@@ -80,6 +80,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/util.h"
@@ -225,17 +226,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			stratagus::icon *icon = stratagus::icon::get(value);
 			this->icon = icon;
 		} else if (key == "class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const std::string &class_name = value;
-			
-			int class_id = GetUpgradeClassIndexByName(class_name);
-			if (class_id == -1) {
-				SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
-				class_id = UpgradeClasses.size();
-				UpgradeClasses.push_back(class_name);
-			}
-			
-			this->upgrade_class = class_id;
+			this->set_upgrade_class(stratagus::upgrade_class::get(value));
 		} else if (key == "civilization") {
 			stratagus::civilization *civilization = stratagus::civilization::get(value);
 			this->civilization = civilization;
@@ -318,16 +309,7 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "class") {
-		int class_id = GetUpgradeClassIndexByName(value);
-		if (class_id == -1) {
-			SetUpgradeClassStringToIndex(value, UpgradeClasses.size());
-			class_id = UpgradeClasses.size();
-			UpgradeClasses.push_back(value);
-		}
-
-		this->upgrade_class = class_id;
-	} else if (key == "faction") {
+	if (key == "faction") {
 		const stratagus::faction *faction = stratagus::faction::get(value);
 		this->faction = faction->ID;
 	} else {
@@ -370,21 +352,15 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 
 void CUpgrade::initialize()
 {
-	if (this->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = this->get_class();
-		if (this->get_civilization() != nullptr) {
-			int civilization_id = this->get_civilization()->ID;
-
-			if (this->get_faction() != -1) {
-				int faction_id = this->get_faction();
-				if (faction_id != -1 && class_id != -1) {
-					stratagus::faction::get_all()[faction_id]->ClassUpgrades[class_id] = this->ID;
-				}
-			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.civilization_class_upgrades[civilization_id][class_id] = this->ID;
-				}
+	if (this->get_upgrade_class() != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		const stratagus::upgrade_class *upgrade_class = this->get_upgrade_class();
+		if (this->get_faction() != -1) {
+			const int faction_id = this->get_faction();
+			if (faction_id != -1) {
+				stratagus::faction::get_all()[faction_id]->set_class_upgrade(upgrade_class, this);
 			}
+		} else if (this->get_civilization() != nullptr) {
+			this->get_civilization()->set_class_upgrade(upgrade_class, this);
 		}
 	}
 
@@ -412,6 +388,23 @@ void CleanUpgradeModifiers()
 		delete CUpgradeModifier::UpgradeModifiers[i];
 	}
 	CUpgradeModifier::UpgradeModifiers.clear();
+}
+
+void CUpgrade::set_upgrade_class(stratagus::upgrade_class *upgrade_class)
+{
+	if (upgrade_class == this->get_upgrade_class()) {
+		return;
+	}
+
+	if (this->get_upgrade_class() != nullptr) {
+		this->get_upgrade_class()->remove_upgrade(this);
+	}
+
+	this->upgrade_class = upgrade_class;
+
+	if (this->get_upgrade_class() != nullptr && !this->get_upgrade_class()->has_upgrade(this)) {
+		this->get_upgrade_class()->add_upgrade(this);
+	}
 }
 
 /**
@@ -480,7 +473,7 @@ static int CclDefineUpgrade(lua_State *l)
 
 			upgrade->set_name(parent_upgrade->get_name());
 			upgrade->icon = parent_upgrade->get_icon();
-			upgrade->upgrade_class = parent_upgrade->get_class();
+			upgrade->upgrade_class = parent_upgrade->get_upgrade_class();
 			upgrade->set_description(parent_upgrade->get_description());
 			upgrade->set_quote(parent_upgrade->get_quote());
 			upgrade->set_background(parent_upgrade->get_background());
@@ -517,16 +510,7 @@ static int CclDefineUpgrade(lua_State *l)
 			stratagus::icon *icon = stratagus::icon::get(LuaToString(l, -1));
 			upgrade->icon = icon;
 		} else if (!strcmp(value, "Class")) {
-			std::string class_name = LuaToString(l, -1);
-			
-			int class_id = GetUpgradeClassIndexByName(class_name);
-			if (class_id == -1) {
-				SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
-				class_id = UpgradeClasses.size();
-				UpgradeClasses.push_back(class_name);
-			}
-			
-			upgrade->upgrade_class = class_id;
+			upgrade->set_upgrade_class(stratagus::upgrade_class::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
@@ -722,25 +706,6 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	//set the upgrade's civilization and class here
-	if (upgrade->get_class() != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = upgrade->get_class();
-		if (upgrade->get_civilization() != nullptr) {
-			int civilization_id = upgrade->get_civilization()->ID;
-			
-			if (upgrade->get_faction() != -1) {
-				int faction_id = upgrade->get_faction();
-				if (faction_id != -1 && class_id != -1) {
-					stratagus::faction::get_all()[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
-				}
-			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.civilization_class_upgrades[civilization_id][class_id] = upgrade->ID;
-				}
-			}
 		}
 	}
 	
@@ -1112,8 +1077,8 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		if (upgrade->get_class() != -1) {
-			lua_pushstring(l, UpgradeClasses[upgrade->get_class()].c_str());
+		if (upgrade->get_upgrade_class() != nullptr) {
+			lua_pushstring(l, upgrade->get_upgrade_class()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

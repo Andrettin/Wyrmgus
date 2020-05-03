@@ -88,6 +88,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -382,7 +383,6 @@ void PlayerRace::Clean()
 	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
 		//Wyrmgus start
 		this->civilization_upgrades[i].clear();
-		this->civilization_class_upgrades[i].clear();
 		this->Species[i].clear();
 		this->DevelopsFrom[i].clear();
 		this->DevelopsTo[i].clear();
@@ -417,40 +417,6 @@ CLanguage *PlayerRace::GetLanguage(const std::string &language_ident) const
 		return LanguageIdentToPointer[language_ident];
 	}
 	return nullptr;
-}
-
-int PlayerRace::get_civilization_class_upgrade(int civilization, int class_id)
-{
-	if (civilization == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (civilization_class_upgrades[civilization].find(class_id) != civilization_class_upgrades[civilization].end()) {
-		return civilization_class_upgrades[civilization][class_id];
-	}
-	
-	if (stratagus::civilization::get_all()[civilization]->parent_civilization) {
-		return get_civilization_class_upgrade(stratagus::civilization::get_all()[civilization]->parent_civilization->ID, class_id);
-	}
-	
-	return -1;
-}
-
-int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
-{
-	if (faction == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (stratagus::faction::get_all()[faction]->ClassUpgrades.find(class_id) != stratagus::faction::get_all()[faction]->ClassUpgrades.end()) {
-		return stratagus::faction::get_all()[faction]->ClassUpgrades[class_id];
-	}
-		
-	if (stratagus::faction::get_all()[faction]->ParentFaction != -1) {
-		return GetFactionClassUpgrade(stratagus::faction::get_all()[faction]->ParentFaction, class_id);
-	}
-	
-	return get_civilization_class_upgrade(stratagus::faction::get_all()[faction]->get_civilization()->ID, class_id);
 }
 
 CLanguage *PlayerRace::get_civilization_language(int civilization)
@@ -1263,13 +1229,15 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 	int faction_id = faction ? faction->ID : -1;
 	
 	if (old_faction_id != -1 && faction_id != -1) {
-		for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
-			if (PlayerRaces.GetFactionClassUpgrade(old_faction_id, i) != PlayerRaces.GetFactionClassUpgrade(faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-				if (PlayerRaces.GetFactionClassUpgrade(old_faction_id, i) != -1 && this->Allow.Upgrades[PlayerRaces.GetFactionClassUpgrade(old_faction_id, i)] == 'R') {
-					UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(old_faction_id, i));
+		for (const stratagus::upgrade_class *upgrade_class : stratagus::upgrade_class::get_all()) {
+			const CUpgrade *old_faction_class_upgrade = stratagus::faction::get_all()[old_faction_id]->get_class_upgrade(upgrade_class);
+			const CUpgrade *new_faction_class_upgrade = faction->get_class_upgrade(upgrade_class);
+			if (old_faction_class_upgrade != new_faction_class_upgrade) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+				if (old_faction_class_upgrade != nullptr && this->Allow.Upgrades[old_faction_class_upgrade->ID] == 'R') {
+					UpgradeLost(*this, old_faction_class_upgrade->ID);
 
-					if (PlayerRaces.GetFactionClassUpgrade(faction_id, i) != -1) {
-						UpgradeAcquire(*this, CUpgrade::get_all()[PlayerRaces.GetFactionClassUpgrade(faction_id, i)]);
+					if (new_faction_class_upgrade != nullptr) {
+						UpgradeAcquire(*this, new_faction_class_upgrade);
 					}
 				}
 			}
@@ -1433,7 +1401,7 @@ void CPlayer::SetRandomFaction()
 		}
 
 		int faction_type = faction->Type;
-		bool has_writing = this->HasUpgradeClass(GetUpgradeClassIndexByName("writing"));
+		const bool has_writing = this->has_upgrade_class(stratagus::upgrade_class::get("writing"));
 		if (
 			!(faction_type == FactionTypeTribe && !has_writing)
 			&& !(faction_type == FactionTypePolity && has_writing)
@@ -1576,16 +1544,18 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		if (upgrade_list[i]->get_class() == -1) {
+		if (upgrade_list[i]->get_upgrade_class() == nullptr) {
+			continue;
+		}
+
+		if (player.Faction == -1) {
 			continue;
 		}
 		
-		int upgrade_id = PlayerRaces.GetFactionClassUpgrade(player.Faction, upgrade_list[i]->get_class());
-		if (upgrade_id == -1) {
+		CUpgrade *upgrade = stratagus::faction::get_all()[player.Faction]->get_class_upgrade(upgrade_list[i]->get_upgrade_class());
+		if (upgrade == nullptr) {
 			continue;
 		}
-		
-		CUpgrade *upgrade = CUpgrade::get_all()[upgrade_id];
 		
 		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, &player)) {
 			continue;
@@ -1634,21 +1604,21 @@ int CPlayer::get_player_color_usage_count(const stratagus::player_color *player_
 	return count;
 }
 
-bool CPlayer::HasUpgradeClass(const int upgrade_class) const
+bool CPlayer::has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const
 {
-	if (this->Race == -1 || upgrade_class == -1) {
+	if (this->Race == -1 || upgrade_class == nullptr) {
 		return false;
 	}
 	
-	int upgrade_id = -1;
+	const CUpgrade *upgrade = nullptr;
 	
 	if (this->Faction != -1) {
-		upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, upgrade_class);
+		upgrade = stratagus::faction::get_all()[this->Faction]->get_class_upgrade(upgrade_class);
 	} else {
-		upgrade_id = PlayerRaces.get_civilization_class_upgrade(this->Race, upgrade_class);
+		upgrade = stratagus::civilization::get_all()[this->Race]->get_class_upgrade(upgrade_class);
 	}
 	
-	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
+	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->ID] == 'R') {
 		return true;
 	}
 

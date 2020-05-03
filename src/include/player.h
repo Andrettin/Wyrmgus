@@ -93,6 +93,7 @@ namespace stratagus {
 	class quest;
 	class site;
 	class unit_class;
+	class upgrade_class;
 }
 
 /*----------------------------------------------------------------------------
@@ -260,7 +261,7 @@ public:
 	CCurrency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
-	bool HasUpgradeClass(const int upgrade_class) const;
+	bool has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const;
 	bool HasSettlement(const stratagus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
@@ -781,8 +782,6 @@ public:
 	//Wyrmgus start
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
-	int get_civilization_class_upgrade(int civilization, int class_id);
-	int GetFactionClassUpgrade(int faction, int class_id);
 	CLanguage *get_civilization_language(int civilization);
 	std::vector<CFiller> get_civilization_ui_fillers(int civilization);
 	std::vector<CFiller> GetFactionUIFillers(int faction);
@@ -793,7 +792,6 @@ public:
 	//Wyrmgus start
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string civilization_upgrades[MAX_RACES];
-	std::map<int, int> civilization_class_upgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops

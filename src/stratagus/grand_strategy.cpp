@@ -50,6 +50,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/util.h"
 #include "video.h"
@@ -681,9 +682,9 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	
 	if (!secondary_setting) { //if this technology is not being set as a result of another technology of the same class being researched
 		if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
-			if (CUpgrade::get_all()[upgrade_id]->get_class() != -1) {
+			if (CUpgrade::get_all()[upgrade_id]->get_upgrade_class() != nullptr) {
 				for (size_t i = 0; i < CUpgrade::get_all().size(); ++i) {
-					if (CUpgrade::get_all()[upgrade_id]->get_class() == CUpgrade::get_all()[i]->get_class()) {
+					if (CUpgrade::get_all()[upgrade_id]->get_upgrade_class() == CUpgrade::get_all()[i]->get_upgrade_class()) {
 						this->SetTechnology(i, has_technology, true);
 					}
 				}
@@ -832,7 +833,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 		return false;
 	}
 	
-	int technology_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, GetUpgradeClassIndexByName(technology_class_name));
+	int technology_id = stratagus::faction::get_all()[this->Faction]->get_class_upgrade(stratagus::upgrade_class::get(technology_class_name))->ID;
 	
 	if (technology_id != -1 && this->Technologies[technology_id] == true) {
 		return true;

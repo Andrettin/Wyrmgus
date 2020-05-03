@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name civilization.cpp - The civilization source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -487,6 +485,24 @@ CUnitType *civilization::get_class_unit_type(const unit_class *unit_class) const
 
 	if (this->parent_civilization != nullptr) {
 		return this->parent_civilization->get_class_unit_type(unit_class);
+	}
+
+	return nullptr;
+}
+
+CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) const
+{
+	if (upgrade_class == nullptr) {
+		return nullptr;
+	}
+
+	auto find_iterator = this->class_upgrades.find(upgrade_class);
+	if (find_iterator != this->class_upgrades.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_class_upgrade(upgrade_class);
 	}
 
 	return nullptr;
