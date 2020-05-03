@@ -1604,16 +1604,8 @@ static int CclDefineFaction(lua_State *l)
 			} else {
 				LuaError(l, "Faction type \"%s\" doesn't exist." _C_ faction_type_name.c_str());
 			}
-		} else if (!strcmp(value, "Colors")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			faction->player_colors.clear(); //remove previously defined colors
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				const std::string color_name = LuaToString(l, -1, k + 1);
-				faction->player_colors.push_back(stratagus::player_color::get(color_name));
-			}
+		} else if (!strcmp(value, "Color")) {
+			faction->color = stratagus::player_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
 			const faction_tier tier = GetFactionTierIdByName(faction_tier_name);
@@ -2471,8 +2463,8 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Color")) {
-		if (faction->get_player_color() != nullptr) {
-			lua_pushstring(l, faction->get_player_color()->get_identifier().c_str());
+		if (faction->get_color() != nullptr) {
+			lua_pushstring(l, faction->get_color()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -84,13 +84,7 @@ void faction::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "colors") {
-		this->player_colors.clear(); //remove previously defined colors
-
-		for (const std::string &value : values) {
-			this->player_colors.push_back(player_color::get(value));
-		}
-	} else if (tag == "develops_from") {
+	if (tag == "develops_from") {
 		for (const std::string &value : values) {
 			faction *other_faction = faction::get(value);
 			this->DevelopsFrom.push_back(other_faction);

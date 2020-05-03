@@ -55,6 +55,7 @@ class faction : public detailed_data_entry, public data_type<faction>
 
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
 
 public:
 	static constexpr const char *class_identifier = "faction";
@@ -102,18 +103,9 @@ public:
 		return this->default_tier;
 	}
 
-	const player_color *get_player_color() const
+	player_color *get_color() const
 	{
-		if (!this->player_colors.empty()) {
-			return this->player_colors.front();
-		}
-
-		return nullptr;
-	}
-
-	const std::vector<const player_color *> &get_player_colors() const
-	{
-		return this->player_colors;
+		return this->color;
 	}
 
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
@@ -173,7 +165,7 @@ public:
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
 private:
-	std::vector<const player_color *> player_colors;					/// faction colors
+	player_color *color = nullptr; /// faction color
 public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop

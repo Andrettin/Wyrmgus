@@ -1299,15 +1299,18 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 	if (this->Faction != -1) {
 		const stratagus::player_color *player_color = nullptr;
 		const stratagus::faction *faction = stratagus::faction::get_all()[faction_id];
-		for (const stratagus::player_color *faction_color : faction->get_player_colors()) {
+		const stratagus::player_color *faction_color = faction->get_color();
+		if (faction_color != nullptr) {
 			if (this->get_player_color_usage_count(faction_color) == 0) {
 				player_color = faction_color;
-				break;
 			}
 		}
 
-		if (player_color == nullptr) { //if all of the faction's colors are used, get one of the least used player colors
+		if (player_color == nullptr) {
+			//if all of the faction's colors are used, get one of the least used player colors
+			//out of those colors, give priority to the one closest (in RGB values) to the faction's color
 			int best_usage_count = -1;
+			int best_rgb_difference = -1;
 			std::vector<const stratagus::player_color *> available_colors;
 			for (const stratagus::player_color *pc : stratagus::player_color::get_all()) {
 				if (pc == stratagus::defines::get()->get_neutral_player_color()) {
@@ -1315,13 +1318,37 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 				}
 
 				const int usage_count = this->get_player_color_usage_count(pc);
-				if (best_usage_count == -1 || usage_count <= best_usage_count) {
-					if (usage_count < best_usage_count) {
-						available_colors.clear();
-					}
-					available_colors.push_back(pc);
-					best_usage_count = usage_count;
+				if (best_usage_count != -1 && usage_count > best_usage_count) {
+					continue;
 				}
+
+				if (usage_count < best_usage_count) {
+					available_colors.clear();
+				}
+
+				int rgb_difference = -1;
+
+				if (faction_color != nullptr) {
+					for (size_t i = 0; i < faction_color->get_colors().size(); ++i) {
+						const QColor &faction_color_shade = faction_color->get_colors()[i];
+						const QColor &pc_color_shade = pc->get_colors()[i];
+						rgb_difference += std::abs(faction_color_shade.red() - pc_color_shade.red());
+						rgb_difference += std::abs(faction_color_shade.green() - pc_color_shade.green());
+						rgb_difference += std::abs(faction_color_shade.blue() - pc_color_shade.blue());
+					}
+				}
+
+				if (best_rgb_difference != -1 && rgb_difference > best_rgb_difference) {
+					continue;
+				}
+
+				if (rgb_difference < best_rgb_difference) {
+					available_colors.clear();
+				}
+
+				available_colors.push_back(pc);
+				best_usage_count = usage_count;
+				best_rgb_difference = rgb_difference;
 			}
 
 			if (!available_colors.empty()) {

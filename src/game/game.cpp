@@ -450,12 +450,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (faction->ParentFaction != -1) {
 				f->printf("\tParentFaction = \"%s\",\n", stratagus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
 			}
-			if (!faction->get_player_colors().empty()) {
-				f->printf("\tColors = {");
-				for (const stratagus::player_color *player_color : faction->get_player_colors()) {
-					f->printf("\"%s\", ", player_color->get_identifier().c_str());
-				}
-				f->printf("},\n");
+			if (faction->get_color() != nullptr) {
+				f->printf("\tColor = \"%s\",\n", faction->get_color()->get_identifier().c_str());
 			}
 			if (!faction->FactionUpgrade.empty()) {
 				f->printf("\tFactionUpgrade = \"%s\",\n", faction->FactionUpgrade.c_str());
