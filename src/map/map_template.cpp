@@ -1536,6 +1536,9 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				unit->Active = 0;
 				unit_player->ChangeUnitTypeAiActiveCount(unit_type, -1);
 			}
+			if (historical_unit->get_ttl() != 0) {
+				unit->TTL = historical_unit->get_ttl();
+			}
 		}
 	}
 	

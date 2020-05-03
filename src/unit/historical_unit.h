@@ -49,6 +49,7 @@ class historical_unit : public named_data_entry, public data_type<historical_uni
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
+	Q_PROPERTY(int ttl MEMBER ttl READ get_ttl)
 	Q_PROPERTY(bool active MEMBER active READ is_active)
 	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
 
@@ -88,6 +89,11 @@ public:
 		return this->ai_active;
 	}
 
+	int get_ttl() const
+	{
+		return this->ttl;
+	}
+
 	bool is_active() const
 	{
 		return this->active;
@@ -109,6 +115,7 @@ private:
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 	bool ai_active = true; //whether the unit's AI is active
+	int ttl = 0; //the TTL (time to live, in cycles) of the unit, useful for revealers
 	bool active = false; //whether the unit is active, i.e. should be applied to the map; used for history
 	faction *faction = nullptr; //the unit's faction, used for history
 	std::unique_ptr<historical_location> location; //the unit's location, used for history
