@@ -103,6 +103,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(stratagus::terrain_type*border_overlay_terrain_type MEMBER border_overlay_terrain_type READ get_border_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 
 public:
@@ -469,6 +471,16 @@ public:
 		return this->unusable_area_overlay_terrain_type;
 	}
 
+	terrain_type *get_surrounding_terrain_type() const
+	{
+		return this->surrounding_terrain_type;
+	}
+
+	terrain_type *get_surrounding_overlay_terrain_type() const
+	{
+		return this->surrounding_overlay_terrain_type;
+	}
+
 	bool outputs_terrain_image() const
 	{
 		return this->output_terrain_image;
@@ -516,9 +528,8 @@ private:
 	terrain_type *base_overlay_terrain_type = nullptr;
 	terrain_type *border_terrain_type = nullptr;
 	terrain_type *border_overlay_terrain_type = nullptr;
-public:
-	terrain_type *SurroundingTerrainType = nullptr;
-private:
+	terrain_type *surrounding_terrain_type = nullptr;
+	terrain_type *surrounding_overlay_terrain_type = nullptr;
 	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
 	terrain_type *unusable_area_overlay_terrain_type = nullptr;
 	std::vector<map_template *> subtemplates;

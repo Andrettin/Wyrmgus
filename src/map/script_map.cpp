@@ -1587,7 +1587,7 @@ static int CclDefineMapTemplate(lua_State *l)
 			map_template->base_overlay_terrain_type = terrain_type;
 		} else if (!strcmp(value, "SurroundingTerrainType")) {
 			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
-			map_template->SurroundingTerrainType = terrain_type;
+			map_template->surrounding_terrain_type = terrain_type;
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

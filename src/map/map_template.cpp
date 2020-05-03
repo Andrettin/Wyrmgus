@@ -646,25 +646,31 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	}
 
-	if (this->IsSubtemplateArea() && this->SurroundingTerrainType) {
-		Vec2i surrounding_start_pos(map_start_pos - Vec2i(1, 1));
-		Vec2i surrounding_end(map_end + Vec2i(1, 1));
-		for (int x = surrounding_start_pos.x; x < surrounding_end.x; ++x) {
-			for (int y = surrounding_start_pos.y; y < surrounding_end.y; y += (surrounding_end.y - surrounding_start_pos.y - 1)) {
-				Vec2i surrounding_pos(x, y);
+	if (this->IsSubtemplateArea() && this->get_surrounding_terrain_type() != nullptr) {
+		const QPoint surrounding_start_pos(map_start_pos - QPoint(1, 1));
+		const QPoint surrounding_end(map_end + QPoint(1, 1));
+		for (int x = surrounding_start_pos.x(); x < surrounding_end.x(); ++x) {
+			for (int y = surrounding_start_pos.y(); y < surrounding_end.y(); y += (surrounding_end.y() - surrounding_start_pos.y() - 1)) {
+				const QPoint surrounding_pos(x, y);
 				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.is_point_in_a_subtemplate_area(surrounding_pos, z)) {
 					continue;
 				}
-				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrainType);
+				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_terrain_type());
+				if (this->get_surrounding_overlay_terrain_type() != nullptr) {
+					CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
+				}
 			}
 		}
-		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
-			for (int y = surrounding_start_pos.y; y < surrounding_end.y; ++y) {
-				Vec2i surrounding_pos(x, y);
+		for (int x = surrounding_start_pos.x(); x < surrounding_end.x(); x += (surrounding_end.x() - surrounding_start_pos.x() - 1)) {
+			for (int y = surrounding_start_pos.y(); y < surrounding_end.y(); ++y) {
+				const QPoint surrounding_pos(x, y);
 				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.is_point_in_a_subtemplate_area(surrounding_pos, z)) {
 					continue;
 				}
-				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrainType);
+				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_terrain_type());
+				if (this->get_surrounding_overlay_terrain_type() != nullptr) {
+					CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
+				}
 			}
 		}
 	}
