@@ -93,6 +93,5 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 
 //Wyrmgus start
 extern CGraphic *loadingBackground;
-extern bool LoadingHistory;
 extern bool DefiningData;
 //Wyrmgus end

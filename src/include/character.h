@@ -104,8 +104,6 @@ public:
 	static constexpr const char *database_folder = "characters";
 
 	static void clear();
-	static void GenerateCharacterHistory();		/// Generates history for characters
-	static void ResetCharacterHistory();		/// Removes generated history data from characters
 	
 	CCharacter(const std::string &identifier);
 	~CCharacter();
@@ -114,9 +112,6 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 
-	void GenerateHistory();
-	void ResetHistory();
-	void SaveHistory();
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
@@ -144,7 +139,6 @@ public:
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
-	bool ViolentDeath = false;	/// If historical death was violent
 	bool Custom = false;		/// Whether this character is a custom hero
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family
@@ -164,8 +158,6 @@ public:
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<stratagus::faction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
-	std::vector<CDeity *> GeneratedDeities;		/// Deities picked during history generation for this character to worship
-	std::vector<CDeityDomain *> PreferredDeityDomains;	/// Preferred deity domains for the character, used to generate deities for it if any are lacking
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;

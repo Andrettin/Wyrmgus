@@ -262,13 +262,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				campaign->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "character") {
-			CCharacter *character = nullptr;
-			if (LoadingHistory) {
-				//only load the history for characters that are already in the character database
-				character = CCharacter::get(ident);
-			} else {
-				character = CCharacter::get_or_add(ident, nullptr);
-			}
+			CCharacter *character = CCharacter::get_or_add(ident, nullptr);
 			if (!character) {
 				continue;
 			}

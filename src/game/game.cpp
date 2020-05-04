@@ -126,7 +126,6 @@ unsigned long FastForwardCycle;			/// Cycle to fastforward to in a replay
 
 bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by killing.
 
-bool LoadingHistory = false;
 bool DefiningData = false;
 
 /*----------------------------------------------------------------------------
@@ -1779,12 +1778,6 @@ void CleanGame()
 	CursorBuilding = nullptr;
 	UnitUnderCursor = nullptr;
 	GameEstablishing = false;
-}
-
-void GenerateHistory()
-{
-	ShowLoadProgress("%s", _("Generating History..."));
-	CCharacter::GenerateCharacterHistory(); //generate character history, e.g. assigning worshipped deities to the character if any are missing
 }
 
 /**

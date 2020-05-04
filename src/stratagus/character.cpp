@@ -97,20 +97,6 @@ CCharacter::~CCharacter()
 	}
 }
 
-void CCharacter::GenerateCharacterHistory()
-{
-	for (CCharacter *character : CCharacter::get_all()) {
-		character->GenerateHistory();
-	}
-}
-
-void CCharacter::ResetCharacterHistory()
-{
-	for (CCharacter *character : CCharacter::get_all()) {
-		character->ResetHistory();
-	}
-}
-
 /**
 **	@brief	Process data provided by a configuration file
 **
@@ -178,8 +164,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "death_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->DeathDate = CDate::FromString(value);
-		} else if (key == "violent_death") {
-			this->ViolentDeath = string::to_bool(value);
 		} else if (key == "father") {
 			CCharacter *father = CCharacter::get(value);
 			this->Father = father;
@@ -219,9 +203,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			CDeity *deity = CDeity::GetDeity(value);
 			if (deity) {
 				this->Deities.push_back(deity);
-				if (LoadingHistory) {
-					this->GeneratedDeities.push_back(deity);
-				}
 			}
 		} else if (key == "description") {
 			this->set_description(value);
@@ -266,12 +247,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				this->ConsumedElixirs.push_back(upgrade);
 			} else {
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "preferred_deity_domain") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
-			if (deity_domain) {
-				this->PreferredDeityDomains.push_back(deity_domain);
 			}
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".\n", key.c_str());
@@ -388,134 +363,6 @@ void CCharacter::check() const
 	if (this->Mother != nullptr && this->Mother->Gender != FemaleGender) {
 		throw std::runtime_error("Character \"" + this->Mother->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
-}
-
-/**
-**	@brief	Generate missing data for the character as a part of history generation
-*/
-void CCharacter::GenerateHistory()
-{
-	//generate history (but skip already-generated data)
-	bool history_changed = false;
-	
-	if (!this->PreferredDeityDomains.empty() && this->Deities.size() < PlayerDeityMax && this->CanWorship()) { //if the character can worship deities, but worships less deities than the maximum, generate them for the character
-		int deities_missing = PlayerDeityMax - this->Deities.size();
-		CReligion *character_religion = this->GetReligion();
-		
-		for (int i = 0; i < deities_missing; ++i) {
-			std::vector<CDeity *> potential_deities;
-			int best_score = 0;
-			const bool has_major_deity = this->HasMajorDeity();
-			
-			for (size_t j = 0; j < CDeity::Deities.size(); ++j) {
-				CDeity *deity = CDeity::Deities[j];
-				
-				if (!deity->DeityUpgrade) {
-					continue; //don't use deities that have no corresponding deity upgrade for the character
-				}
-				
-				if (deity->Major == has_major_deity) {
-					continue; //try to get a major deity if the character has none, or a minor deity otherwise
-				}
-				
-				if (std::find(deity->civilizations.begin(), deity->civilizations.end(), this->civilization) == deity->civilizations.end()) {
-					continue;
-				}
-				
-				if (character_religion && std::find(deity->Religions.begin(), deity->Religions.end(), character_religion) == deity->Religions.end()) {
-					continue; //the deity should be compatible with the character's religion
-				}
-				
-				int score = 0;
-				
-				bool has_domains = true;
-				for (size_t k = 0; k < this->PreferredDeityDomains.size(); ++k) {
-					if (std::find(deity->Domains.begin(), deity->Domains.end(), this->PreferredDeityDomains[k]) != deity->Domains.end()) {
-						score++;
-					}
-				}
-				
-				if (score < best_score) {
-					continue;
-				} else if (score > best_score) {
-					potential_deities.clear();
-					best_score = score;
-				}
-				
-				potential_deities.push_back(deity);
-			}
-			
-			if (!potential_deities.empty()) {
-				CDeity *chosen_deity = potential_deities[SyncRand(potential_deities.size())];
-				this->Deities.push_back(chosen_deity);
-				this->GeneratedDeities.push_back(chosen_deity);
-				
-				if (!character_religion) {
-					character_religion = this->GetReligion();
-				}
-				
-				history_changed = true;
-			} else {
-				fprintf(stderr, "Could not generate deity for character: \"%s\".\n", this->Ident.c_str());
-			}
-		}
-	}
-	
-	if (history_changed) {
-		this->SaveHistory();
-	}
-}
-
-/**
-**	@brief	Reset generated history for the character
-*/
-void CCharacter::ResetHistory()
-{
-	for (size_t i = 0; i < this->GeneratedDeities.size(); ++i) {
-		this->Deities.erase(std::remove(this->Deities.begin(), this->Deities.end(), this->GeneratedDeities[i]), this->Deities.end());
-	}
-	
-	this->GeneratedDeities.clear();
-}
-
-/**
-**	@brief	Save generated history for the character
-*/
-void CCharacter::SaveHistory()
-{
-	struct stat tmp;
-	std::string path = Parameters::Instance.GetUserDirectory();
-
-	if (!GameName.empty()) {
-		path += "/";
-		path += GameName;
-	}
-	path += "/";
-	path += "history/";
-	if (stat(path.c_str(), &tmp) < 0) {
-		makedir(path.c_str(), 0777);
-	}
-	path += "characters/";
-	if (stat(path.c_str(), &tmp) < 0) {
-		makedir(path.c_str(), 0777);
-	}
-	path += FindAndReplaceString(this->Ident, "-", "_");
-	path += ".cfg";
-
-	FILE *fd = fopen(path.c_str(), "w");
-	if (!fd) {
-		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
-		return;
-	}
-
-	fprintf(fd, "[character]\n");
-	fprintf(fd, "\tident = %s\n", FindAndReplaceString(this->Ident, "-", "_").c_str());
-	for (size_t i = 0; i < this->GeneratedDeities.size(); ++i) {
-		fprintf(fd, "\tdeity = %s\n", FindAndReplaceString(this->GeneratedDeities[i]->Ident, "-", "_").c_str());
-	}
-	fprintf(fd, "[/character]\n");
-		
-	fclose(fd);
 }
 
 void CCharacter::GenerateMissingDates()

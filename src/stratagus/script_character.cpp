@@ -132,8 +132,6 @@ static int CclDefineCharacter(lua_State *l)
 			CclGetDate(l, &character->StartDate);
 		} else if (!strcmp(value, "DeathDate")) {
 			CclGetDate(l, &character->DeathDate);
-		} else if (!strcmp(value, "ViolentDeath")) {
-			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			character->civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
@@ -837,9 +835,6 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "DeathYear")) {
 		lua_pushnumber(l, character->DeathDate.Year);
-		return 1;
-	} else if (!strcmp(data, "ViolentDeath")) {
-		lua_pushboolean(l, character->ViolentDeath);
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
 		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
