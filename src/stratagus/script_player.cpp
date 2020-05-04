@@ -937,14 +937,14 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
-				if (gender_id == -1) {
-					gender_id = NoGender;
-				} else {
+				stratagus::gender gender = stratagus::gender::none;
+				try {
+					gender = stratagus::string_to_gender(LuaToString(l, -1, j + 1));
 					++j;
+				} catch (...) {
 				}
 				
-				civilization->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+				civilization->add_personal_name(gender, LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "UnitClassNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -961,7 +961,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "FamilyNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				civilization->FamilyNames.push_back(LuaToString(l, -1, j + 1));
+				civilization->add_surname(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "ProvinceNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -981,13 +981,13 @@ static int CclDefineCivilization(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int gender = GetGenderIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				civilization->MinisterTitles[title][gender][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
+				civilization->MinisterTitles[title][static_cast<int>(gender)][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
@@ -1676,13 +1676,13 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				int gender = GetGenderIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				faction->MinisterTitles[title][gender][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
+				faction->MinisterTitles[title][static_cast<int>(gender)][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
 			faction->FactionUpgrade = LuaToString(l, -1);
@@ -2078,7 +2078,7 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->Pantheon = CPantheon::GetPantheon(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
+			deity->gender = stratagus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
 			deity->Major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -2865,9 +2865,9 @@ static int CclGetPlayerData(lua_State *l)
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
 		int title_type_id = GetCharacterTitleIdByName(title_type_ident);
-		int gender_id = GetGenderIdByName(gender_ident);
+		const stratagus::gender gender = stratagus::string_to_gender(gender_ident);
 		
-		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender_id).c_str());
+		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).c_str());
 		return 1;
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
@@ -3410,7 +3410,7 @@ static int CclGetDeityData(lua_State *l)
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, GetGenderNameById(deity->Gender).c_str());
+		lua_pushstring(l, stratagus::gender_to_string(deity->gender).c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

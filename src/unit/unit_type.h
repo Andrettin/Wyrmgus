@@ -75,6 +75,7 @@ namespace stratagus {
 	class time_of_day;
 	class unit_class;
 	class world;
+	enum class gender;
 }
 
 static constexpr int UnitSides = 8;
@@ -842,9 +843,9 @@ public:
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(stratagus::faction *faction, int gender) const;
-	bool IsPersonalNameValid(const std::string &name, stratagus::faction *faction, int gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(stratagus::faction *faction, int gender) const;
+	std::string GeneratePersonalName(stratagus::faction *faction, const stratagus::gender gender) const;
+	bool IsPersonalNameValid(const std::string &name, stratagus::faction *faction, const stratagus::gender gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(stratagus::faction *faction, const stratagus::gender gender) const;
 	//Wyrmgus end
 
 public:
@@ -903,7 +904,7 @@ public:
 	CSpecies *Species;
 	stratagus::terrain_type *TerrainType;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::map<stratagus::gender, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

@@ -30,6 +30,7 @@
 #include "character.h" //for MaxCharacterTitles
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
+#include "gender.h"
 #include "player.h" //for certain enums
 
 class CAiBuildingTemplate;
@@ -205,7 +206,7 @@ public:
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 	std::string Titles[MaxGovernmentTypes][static_cast<int>(faction_tier::count)];			/// this faction's title for each government type and faction tier
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this faction's minister title for each minister type and government type
+	std::string MinisterTitles[MaxCharacterTitles][static_cast<int>(gender::count)][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this faction's minister title for each minister type and government type
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
 private:

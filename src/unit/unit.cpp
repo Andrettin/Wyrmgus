@@ -484,7 +484,7 @@ void CUnit::Init()
 	//Wyrmgus start
 	Name.clear();
 	ExtraName.clear();
-	FamilyName.clear();
+	this->surname.clear();
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
@@ -932,7 +932,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	this->Name = this->Character->get_name();
 	this->ExtraName = this->Character->ExtraName;
-	this->FamilyName = this->Character->get_surname();
+	this->surname = this->Character->get_surname();
 	
 	if (this->Character->get_unit_type() != nullptr) {
 		if (this->Character->get_unit_type() != this->Type) { //set type to that of the character
@@ -2132,7 +2132,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, droppedUnit->Variable[GENDER_INDEX].Value);
+				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, static_cast<stratagus::gender>(droppedUnit->Variable[GENDER_INDEX].Value));
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
@@ -2952,9 +2952,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//assign a gender to the unit
-		if (this->Variable[GENDER_INDEX].Value == NoGender && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
+		if (static_cast<stratagus::gender>(this->Variable[GENDER_INDEX].Value) == stratagus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 			this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
-			this->Variable[GENDER_INDEX].Max = MaxGenders;
+			this->Variable[GENDER_INDEX].Max = static_cast<int>(stratagus::gender::count);
 			this->Variable[GENDER_INDEX].Enable = 1;
 		}
 		
@@ -3433,6 +3433,8 @@ void CUnit::UpdateXPRequired()
 
 void CUnit::UpdatePersonalName(bool update_settlement_name)
 {
+	static constexpr bool surname_generation_enabled = false;
+
 	if (this->Character != nullptr) {
 		return;
 	} else if (this->Type->BoolFlag[ITEM_INDEX].value || this->Unique || this->Prefix || this->Suffix) {
@@ -3451,6 +3453,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
+	stratagus::civilization *civilization = civilization_id != -1 ? stratagus::civilization::get_all()[civilization_id] : nullptr;
 	CLanguage *language = PlayerRaces.get_civilization_language(civilization_id);
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
@@ -3459,13 +3462,23 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->Variable[GENDER_INDEX].Value)) {
+	if (!this->Type->IsPersonalNameValid(this->Name, faction, static_cast<stratagus::gender>(this->Variable[GENDER_INDEX].Value))) {
 		// first see if can translate the current personal name
 		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
-			this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
+			this->Name = this->Type->GeneratePersonalName(faction, static_cast<stratagus::gender>(this->Variable[GENDER_INDEX].Value));
+		}
+	}
+
+	if constexpr (surname_generation_enabled) {
+		if (civilization != nullptr) {
+			const std::vector<std::string> &surnames = civilization->get_surnames();
+
+			if (!surnames.empty() && (this->get_surname().empty() || !stratagus::vector::contains(surnames, this->get_surname()))) {
+				this->surname = surnames[SyncRand(surnames.size())];
+			}
 		}
 	}
 	
@@ -6581,13 +6594,11 @@ std::string CUnit::GetName() const
 	}
 	
 	if (!this->ExtraName.empty()) {
-		name += " ";
-		name += this->ExtraName;
+		name += " " + this->ExtraName;
 	}
 
-	if (!this->FamilyName.empty()) {
-		name += " ";
-		name += this->FamilyName;
+	if (!this->get_surname().empty()) {
+		name += " " + this->get_surname();
 	}
 	
 	return name;

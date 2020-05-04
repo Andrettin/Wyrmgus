@@ -1729,7 +1729,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
 			type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
-			type->DefaultStat.Variables[GENDER_INDEX].Value = GetGenderIdByName(LuaToString(l, -1));
+			type->DefaultStat.Variables[GENDER_INDEX].Value = static_cast<int>(stratagus::string_to_gender(LuaToString(l, -1)));
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
@@ -1824,14 +1824,14 @@ static int CclDefineUnitType(lua_State *l)
 			type->PersonalNames.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
-				if (gender_id == -1) {
-					gender_id = NoGender;
-				} else {
+				stratagus::gender gender = stratagus::gender::none;
+				try {
+					gender = stratagus::string_to_gender(LuaToString(l, -1, j + 1));
 					++j;
+				} catch (...) {
 				}
 				
-				type->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+				type->PersonalNames[gender].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "Mod")) {
 			type->Mod = LuaToString(l, -1);

@@ -34,6 +34,7 @@
 #include "config.h"
 #include "faction.h"
 #include "game.h"
+#include "gender.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "item.h"
@@ -72,7 +73,7 @@ void character::clear()
 	CustomHeroes.clear();
 }
 
-character::character(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+character::character(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
 {
 	memset(Attributes, 0, sizeof(Attributes));
 }
@@ -85,18 +86,6 @@ character::~character()
 	
 	for (CPersistentItem *item : this->Items) {
 		delete item;
-	}
-}
-
-void character::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "gender") {
-		this->Gender = GetGenderIdByName(value);
-	} else {
-		data_entry::process_sml_property(property);
 	}
 }
 
@@ -133,7 +122,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				this->unit_type = unit_type;
 			}
 		} else if (key == "gender") {
-			this->Gender = GetGenderIdByName(value);
+			this->gender = stratagus::string_to_gender(value);
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
@@ -314,23 +303,23 @@ void character::initialize()
 		this->Level = this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
 	}
 
-	if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+	if (this->get_gender() == gender::none) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
 		if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			this->Gender = this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value;
+			this->gender = static_cast<stratagus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
 		}
 	}
 
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 		if (!this->get_name().empty()) {
-			this->get_unit_type()->PersonalNames[this->Gender].push_back(this->get_name());
+			this->get_unit_type()->PersonalNames[this->get_gender()].push_back(this->get_name());
 		}
 	} else if (this->civilization != nullptr) {
 		if (!this->get_name().empty()) {
-			this->civilization->PersonalNames[this->Gender].push_back(this->get_name());
+			this->civilization->add_personal_name(this->get_gender(), this->get_name());
 		}
 		if (!this->get_surname().empty()) {
-			this->civilization->FamilyNames.push_back(this->get_surname());
+			this->civilization->add_surname(this->get_surname());
 		}
 	}
 
@@ -368,11 +357,11 @@ void character::initialize()
 
 void character::check() const
 {
-	if (this->Father != nullptr && this->Father->Gender != MaleGender) {
+	if (this->Father != nullptr && this->Father->get_gender() != gender::male) {
 		throw std::runtime_error("Character \"" + this->Father->get_identifier() + "\" is set to be the biological father of \"" + this->get_identifier() + "\", but isn't male.");
 	}
 
-	if (this->Mother != nullptr && this->Mother->Gender != FemaleGender) {
+	if (this->Mother != nullptr && this->Mother->get_gender() != gender::female) {
 		throw std::runtime_error("Character \"" + this->Mother->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
 }
@@ -507,7 +496,7 @@ bool character::IsItemEquipped(const CPersistentItem *item) const
 
 bool character::IsUsable() const
 {
-	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value) {
+	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->get_gender() != static_cast<stratagus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value)) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
 	
@@ -731,8 +720,8 @@ void SaveHero(stratagus::character *hero)
 		if (!hero->get_surname().empty()) {
 			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->get_surname().c_str());
 		}
-		if (hero->Gender != NoGender) {
-			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
+		if (hero->get_gender() != stratagus::gender::none) {
+			fprintf(fd, "\tGender = \"%s\",\n", stratagus::gender_to_string(hero->get_gender()).c_str());
 		}
 		if (hero->get_civilization()) {
 			fprintf(fd, "\tCivilization = \"%s\",\n", hero->get_civilization()->get_identifier().c_str());
@@ -994,36 +983,6 @@ bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &h
 	}
 	
 	return true;
-}
-
-std::string GetGenderNameById(int gender)
-{
-	if (gender == NoGender) {
-		return "no-gender";
-	} else if (gender == MaleGender) {
-		return "male";
-	} else if (gender == FemaleGender) {
-		return "female";
-	} else if (gender == AsexualGender) {
-		return "asexual";
-	}
-
-	return "";
-}
-
-int GetGenderIdByName(const std::string &gender)
-{
-	if (gender == "no-gender") {
-		return NoGender;
-	} else if (gender == "male") {
-		return MaleGender;
-	} else if (gender == "female") {
-		return FemaleGender;
-	} else if (gender == "asexual") {
-		return AsexualGender;
-	}
-
-	return -1;
 }
 
 std::string GetCharacterTitleNameById(int title)

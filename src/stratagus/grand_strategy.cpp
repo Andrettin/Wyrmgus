@@ -762,13 +762,13 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
-			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->get_gender() == stratagus::gender::male) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
 				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
-			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->Gender == MaleGender) {
+			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->get_gender() == stratagus::gender::male) {
 				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
 				return;
 			}
@@ -948,7 +948,7 @@ bool CGrandStrategyHero::IsAlive()
 
 bool CGrandStrategyHero::IsVisible()
 {
-	return this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->Gender == this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
+	return this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->get_gender() == static_cast<stratagus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value); // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
 }
 
 bool CGrandStrategyHero::IsGenerated()

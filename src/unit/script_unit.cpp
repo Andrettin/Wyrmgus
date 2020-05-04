@@ -337,8 +337,8 @@ static int CclUnit(lua_State *l)
 			unit->Name = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "extra-name")) {
 			unit->ExtraName = LuaToString(l, 2, j + 1);
-		} else if (!strcmp(value, "family-name")) {
-			unit->FamilyName = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "surname")) {
+			unit->surname = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = stratagus::site::get(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || settlement_site_unit_type == type) {

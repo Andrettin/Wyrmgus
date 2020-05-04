@@ -50,6 +50,7 @@ namespace stratagus {
 	class civilization;
 	class faction;
 	class plane;
+	enum class gender;
 }
 
 static constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; //major deities can only have up to three domains
@@ -66,6 +67,8 @@ public:
 	static std::vector<CDeity *> Deities;		/// Deities
 	static std::map<std::string, CDeity *> DeitiesByIdent;
 	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
+
+	CDeity();
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
@@ -76,7 +79,7 @@ public:
 		return this->home_plane;
 	}
 	
-	int Gender = 0;								//deity's gender
+	stratagus::gender gender;					//deity's gender
 	bool Major = false;							//whether the deity is a major one or not
 	std::string Name;							//name of the deity
 	std::string Description;

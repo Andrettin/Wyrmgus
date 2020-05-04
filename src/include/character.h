@@ -60,19 +60,8 @@ namespace stratagus {
 	class historical_location;
 	class quest;
 	class site;
+	enum class gender;
 }
-
-/**
-**  Indexes into gender array.
-*/
-enum Genders {
-	NoGender,
-	MaleGender,
-	FemaleGender,
-	AsexualGender, //i.e. slimes reproduce asexually
-
-	MaxGenders
-};
 
 enum Attributes {
 	StrengthAttribute,
@@ -113,6 +102,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(CUnitType* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
+	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 
@@ -125,7 +115,6 @@ public:
 	character(const std::string &identifier);
 	~character();
 	
-	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
@@ -170,6 +159,11 @@ public:
 		return this->faction;
 	}
 
+	gender get_gender() const
+	{
+		return this->gender;
+	}
+
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
@@ -211,8 +205,8 @@ public:
 private:
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *faction = nullptr;	/// Faction to which the character belongs
+	gender gender;				/// Character's gender
 public:
-	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool Custom = false;		/// Whether this character is a custom hero
@@ -275,8 +269,6 @@ extern void SetCurrentCustomHero(const std::string &hero_ident);
 extern std::string GetCurrentCustomHero();
 extern void ChangeCustomHeroCivilization(const std::string &hero_name, const std::string &civilization_ident, const std::string &new_hero_name, const std::string &new_hero_family_name);
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
-extern std::string GetGenderNameById(int gender);
-extern int GetGenderIdByName(const std::string &gender);
 extern std::string GetCharacterTitleNameById(int title);
 extern int GetCharacterTitleIdByName(const std::string &title);
 extern bool IsMinisterialTitle(int title);

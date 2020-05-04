@@ -30,6 +30,7 @@
 #include "character.h" //for MaxCharacterTitles
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
+#include "gender.h"
 #include "player.h" //for certain enums
 #include "time/date.h"
 
@@ -129,11 +130,24 @@ public:
 
 	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
-	const std::map<int, std::vector<std::string>> &GetPersonalNames() const;
+
+	const std::map<gender, std::vector<std::string>> &get_personal_names() const;
+	const std::vector<std::string> &get_personal_names(const gender gender) const;
+
+	void add_personal_name(const gender gender, const std::string &name)
+	{
+		this->personal_names[gender].push_back(name);
+	}
+
+	const std::vector<std::string> &get_surnames() const;
+
+	void add_surname(const std::string &surname)
+	{
+		this->surnames.push_back(surname);
+	}
+
 	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
-
 	const std::vector<std::string> &get_ship_names() const;
-
 	QStringList get_ship_names_qstring_list() const;
 
 	Q_INVOKABLE void add_ship_name(const std::string &ship_name)
@@ -217,11 +231,11 @@ public:
 	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
 	std::map<ForceType, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 private:
+	std::map<gender, std::vector<std::string>> personal_names; //personal names for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
+	std::vector<std::string> surnames; //surnames for the civilization
 	std::map<const unit_class *, std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 public:
-	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
@@ -231,7 +245,7 @@ private:
 public:
 	std::vector<CDeity *> Deities;
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this civilization's minister title for each minister type and government type
+	std::string MinisterTitles[MaxCharacterTitles][static_cast<int>(gender::count)][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
 	friend int ::CclDefineCivilization(lua_State *l);

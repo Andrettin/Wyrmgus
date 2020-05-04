@@ -421,17 +421,46 @@ std::vector<CAiBuildingTemplate *> civilization::GetAiBuildingTemplates() const
 	return std::vector<CAiBuildingTemplate *>();
 }
 
-const std::map<int, std::vector<std::string>> &civilization::GetPersonalNames() const
+const std::map<gender, std::vector<std::string>> &civilization::get_personal_names() const
 {
-	if (this->PersonalNames.size() > 0) {
-		return this->PersonalNames;
+	if (!this->personal_names.empty()) {
+		return this->personal_names;
+	}
+
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_personal_names();
 	}
 	
-	if (this->parent_civilization) {
-		return this->parent_civilization->GetPersonalNames();
+	return this->personal_names;
+}
+
+const std::vector<std::string> &civilization::get_personal_names(const gender gender) const
+{
+	static std::vector<std::string> empty_list;
+
+	auto find_iterator = this->personal_names.find(gender);
+	if (find_iterator != this->personal_names.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_personal_names(gender);
 	}
 	
-	return this->PersonalNames;
+	return empty_list;
+}
+
+const std::vector<std::string> &civilization::get_surnames() const
+{
+	if (!this->surnames.empty()) {
+		return this->surnames;
+	}
+
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_surnames();
+	}
+
+	return this->surnames;
 }
 
 const std::vector<std::string> &civilization::get_unit_class_names(const unit_class *unit_class) const

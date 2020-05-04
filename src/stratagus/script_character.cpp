@@ -34,6 +34,7 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "faction.h"
+#include "gender.h"
 #include "grand_strategy.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
@@ -169,7 +170,7 @@ static int CclDefineCharacter(lua_State *l)
 				std::string child_ident = LuaToString(l, -1, j + 1);
 				stratagus::character *child = stratagus::character::get(child_ident);
 				if (child) {
-					if (character->Gender == MaleGender) {
+					if (character->get_gender() == stratagus::gender::male) {
 						child->Father = character;
 					} else {
 						child->Mother = character;
@@ -193,7 +194,7 @@ static int CclDefineCharacter(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "Gender")) {
-			character->Gender = GetGenderIdByName(LuaToString(l, -1));
+			character->gender = stratagus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			character->Icon.Name = LuaToString(l, -1);
 			character->Icon.Icon = nullptr;
@@ -484,11 +485,11 @@ static int CclDefineCharacter(lua_State *l)
 	if (!redefinition) {
 		if (character->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
-				character->get_unit_type()->PersonalNames[character->Gender].push_back(alternate_names[i]);
+				character->get_unit_type()->PersonalNames[character->get_gender()].push_back(alternate_names[i]);
 			}
 		} else if (character->civilization) {
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
-				character->civilization->PersonalNames[character->Gender].push_back(alternate_names[i]);
+				character->civilization->add_personal_name(character->get_gender(), alternate_names[i]);
 			}
 		}
 	}
@@ -550,7 +551,7 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			hero->civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
+			hero->gender = stratagus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			hero->Level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -724,9 +725,9 @@ static int CclDefineCustomHero(lua_State *l)
 		}
 	}
 	
-	if (hero->Gender == NoGender) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
+	if (hero->get_gender() == stratagus::gender::none) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
 		if (hero->get_unit_type() != nullptr && hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			hero->Gender = hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value;
+			hero->gender = static_cast<stratagus::gender>(hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
 		}
 	}
 	
@@ -820,7 +821,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushnumber(l, character->DeathDate.Year);
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
+		lua_pushstring(l, stratagus::gender_to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->Level);
@@ -945,7 +946,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
+		lua_pushstring(l, stratagus::gender_to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->Level);

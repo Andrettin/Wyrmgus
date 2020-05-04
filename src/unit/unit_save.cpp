@@ -174,8 +174,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (!unit.ExtraName.empty()) {
 		file.printf("\"extra-name\", \"%s\", ", unit.ExtraName.c_str());
 	}
-	if (!unit.FamilyName.empty()) {
-		file.printf("\"family-name\", \"%s\", ", unit.FamilyName.c_str());
+	if (!unit.get_surname().empty()) {
+		file.printf("\"surname\", \"%s\", ", unit.get_surname().c_str());
 	}
 	if (unit.settlement != nullptr) {
 		file.printf("\"settlement\", \"%s\", ", unit.settlement->Ident.c_str());

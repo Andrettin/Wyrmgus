@@ -36,6 +36,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "faction.h"
+#include "gender.h"
 #include "plane.h"
 #include "player.h"
 #include "province.h"
@@ -133,6 +134,10 @@ void CDeity::ClearDeities()
 	Deities.clear();
 }
 
+CDeity::CDeity() : gender(stratagus::gender::none)
+{
+}
+
 /**
 **	@brief	Process data provided by a configuration file
 **
@@ -150,7 +155,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->Pantheon = CPantheon::GetPantheon(value);
 		} else if (key == "gender") {
-			this->Gender = GetGenderIdByName(value);
+			this->gender = stratagus::string_to_gender(value);
 		} else if (key == "major") {
 			this->Major = string::to_bool(value);
 		} else if (key == "civilization") {

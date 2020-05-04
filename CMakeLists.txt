@@ -820,6 +820,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/achievement.h
 	src/stratagus/dialogue_option.h
 	src/stratagus/faction.h
+	src/stratagus/gender.h
 )
 
 source_group(stratagus FILES ${stratagus_generic_HDRS})

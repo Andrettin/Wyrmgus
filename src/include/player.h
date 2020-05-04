@@ -86,6 +86,7 @@ namespace stratagus {
 	class site;
 	class unit_class;
 	class upgrade_class;
+	enum class gender;
 }
 
 /*----------------------------------------------------------------------------
@@ -265,7 +266,7 @@ public:
 	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
-	std::string GetCharacterTitleName(int title_type, int gender) const;
+	std::string GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
 	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
 	std::vector<CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end

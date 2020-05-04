@@ -39,6 +39,7 @@
 #include "database/sml_property.h"
 #include "dialogue.h"
 #include "faction.h"
+#include "gender.h"
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
@@ -168,6 +169,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
+		} else if (property_class_name == "stratagus::gender") {
+			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "stratagus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
 		} else if (property_class_name == "stratagus::map_template*") {

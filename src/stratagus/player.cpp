@@ -1946,9 +1946,9 @@ std::string CPlayer::GetFactionTitleName() const
 	return "";
 }
 
-std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
+std::string CPlayer::GetCharacterTitleName(const int title_type, const stratagus::gender gender) const
 {
-	if (this->Race == -1 || this->Faction == -1 || title_type == -1 || gender == -1) {
+	if (this->Race == -1 || this->Faction == -1 || title_type == -1 || gender == stratagus::gender::none) {
 		return "";
 	}
 	
@@ -1958,44 +1958,44 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 	int government_type = faction->DefaultGovernmentType;
 	
 	if (faction->Type == FactionTypePolity) {
-		if (!faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)].empty()) {
-			return faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)];
-		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)];
-		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
-			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
-		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
-		} else if (!faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)].empty()) {
-			return faction->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)];
-		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)];
-		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
-			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
-		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
-			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
-		} else if (!civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)].empty()) {
-			return civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(tier)];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(tier)];
-		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
-			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
-		} else if (!civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)].empty()) {
-			return civilization->MinisterTitles[title_type][gender][government_type][static_cast<int>(faction_tier::none)];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][government_type][static_cast<int>(faction_tier::none)];
-		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
-			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
-		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
-			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		if (!faction->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		} else if (!faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return faction->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(tier)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(gender)][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][government_type][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(gender)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
+		} else if (!civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)].empty()) {
+			return civilization->MinisterTitles[title_type][static_cast<int>(stratagus::gender::none)][GovernmentTypeNoGovernmentType][static_cast<int>(faction_tier::none)];
 		}
 	}
 
 	if (title_type == CharacterTitleHeadOfState) {
 		if (faction->Type == FactionTypeTribe) {
-			if (gender != FemaleGender) {
+			if (gender != stratagus::gender::female) {
 				return "Chieftain";
 			} else {
 				return "Chieftess";
@@ -2004,19 +2004,19 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 			std::string faction_title = this->GetFactionTitleName();
 			
 			if (faction_title == "Barony") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Baron";
 				} else {
 					return "Baroness";
 				}
 			} else if (faction_title == "Lordship") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Lord";
 				} else {
 					return "Lady";
 				}
 			} else if (faction_title == "County") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Count";
 				} else {
 					return "Countess";
@@ -2024,13 +2024,13 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 			} else if (faction_title == "City-State") {
 				return "Archon";
 			} else if (faction_title == "Duchy") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Duke";
 				} else {
 					return "Duchess";
 				}
 			} else if (faction_title == "Principality") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Prince";
 				} else {
 					return "Princess";
@@ -2040,19 +2040,19 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 			} else if (faction_title == "Landgraviate") {
 				return "Landgrave";
 			} else if (faction_title == "Grand Duchy") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Grand Duke";
 				} else {
 					return "Grand Duchess";
 				}
 			} else if (faction_title == "Archduchy") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Archduke";
 				} else {
 					return "Archduchess";
 				}
 			} else if (faction_title == "Kingdom") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "King";
 				} else {
 					return "Queen";
@@ -2060,7 +2060,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 			} else if (faction_title == "Khanate") {
 				return "Khan";
 			} else if (faction_title == "Empire") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "Emperor";
 				} else {
 					return "Empress";
@@ -2070,7 +2070,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 			} else if (faction_title == "Confederation") {
 				return "Chancellor";
 			} else if (faction_title == "Theocracy") {
-				if (gender != FemaleGender) {
+				if (gender != stratagus::gender::female) {
 					return "High Priest";
 				} else {
 					return "High Priestess";

@@ -471,6 +471,11 @@ public:
 	std::string GetMessageName() const;
 	//Wyrmgus end
 
+	const std::string &get_surname() const
+	{
+		return this->surname;
+	}
+
 	const stratagus::time_of_day *get_center_tile_time_of_day() const;
 
 public:
@@ -534,7 +539,9 @@ public:
 	//Wyrmgus start
 	std::string Name;		/// Unit's personal/proper name (if any)
 	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
-	std::string FamilyName;	/// Unit's family name
+private:
+	std::string surname;	/// Unit's surname
+public:
 	stratagus::character *Character;	/// Pointer to the character represented by this unit
 	stratagus::site *settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
 	CUpgrade *Trait;	/// Unit's trait
@@ -630,6 +637,8 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
+
+	friend int CclUnit(lua_State *l);
 };
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
