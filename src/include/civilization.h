@@ -185,6 +185,16 @@ public:
 		}
 	}
 
+	const std::vector<character *> &get_characters() const
+	{
+		return this->characters;
+	}
+
+	void add_character(character *character)
+	{
+		this->characters.push_back(character);
+	}
+
 	int ID = -1;
 	civilization *parent_civilization = nullptr;
 	std::string Adjective;			/// adjective pertaining to the civilization
@@ -217,6 +227,7 @@ private:
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
 	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
+	std::vector<character *> characters;
 public:
 	std::vector<CDeity *> Deities;
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required

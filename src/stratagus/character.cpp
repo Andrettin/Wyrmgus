@@ -137,9 +137,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
-			faction *faction = faction::get(value);
-			this->Faction = faction;
-			this->Factions.push_back(faction);
+			this->faction = faction::get(value);
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->variation = value;
@@ -259,7 +257,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			int title = -1;
 			CDate start_date;
 			CDate end_date;
-			faction *title_faction = nullptr;
+			stratagus::faction *title_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -298,7 +296,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = this;
 			}
 				
-			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, faction *, int>(start_date, end_date, title_faction, title));
+			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, stratagus::faction *, int>(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;
@@ -354,6 +352,10 @@ void character::initialize()
 
 	if (this->home_settlement != nullptr) {
 		this->home_settlement->add_character(this);
+	}
+
+	if (this->get_civilization() != nullptr) {
+		this->get_civilization()->add_character(this);
 	}
 
 	this->GenerateMissingDates();

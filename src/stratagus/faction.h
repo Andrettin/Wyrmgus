@@ -159,6 +159,16 @@ public:
 		}
 	}
 
+	const std::vector<character *> &get_characters() const
+	{
+		return this->characters;
+	}
+
+	void add_character(character *character)
+	{
+		this->characters.push_back(character);
+	}
+
 	const std::map<const resource *, int> &get_resources() const
 	{
 		return this->resources;
@@ -208,6 +218,9 @@ private:
 public:
 	std::vector<site *> Cores; /// Core sites of this faction (required to found it)
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
+private:
+	std::vector<character *> characters;
+public:
 	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
 	std::map<ForceType, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates

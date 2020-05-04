@@ -112,6 +112,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(QString surname READ get_surname_qstring)
 	Q_PROPERTY(CUnitType* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
 	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 
@@ -164,6 +165,11 @@ public:
 		return this->civilization;
 	}
 
+	faction *get_faction() const
+	{
+		return this->faction;
+	}
+
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
@@ -204,8 +210,8 @@ public:
 	CDate DeathDate;			/// Date in which the character historically died
 private:
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
+	faction *faction = nullptr;	/// Faction to which the character belongs
 public:
-	faction *Faction = nullptr;	/// Faction to which the character belongs
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
@@ -230,7 +236,6 @@ public:
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<character *> Children;	/// Children of the character
 	std::vector<character *> Siblings;	/// Siblings of the character
-	std::vector<faction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 public:
@@ -243,9 +248,9 @@ public:
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
-	std::vector<std::pair<CDate, faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
+	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
-	std::vector<std::tuple<CDate, CDate, faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::tuple<CDate, CDate, stratagus::faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 
 	friend ::Spell_Polymorph;

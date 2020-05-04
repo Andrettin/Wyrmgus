@@ -2485,14 +2485,33 @@ void CUnit::UpdateSoldUnits()
 			civilization_id = this->Player->Race;
 		}
 		const stratagus::civilization *civilization = civilization_id != -1 ? stratagus::civilization::get_all()[civilization_id] : nullptr;
+		const stratagus::faction *faction = this->Player->Faction != -1 ? stratagus::faction::get_all()[this->Player->Faction] : nullptr;
 		
 		if (CurrentQuest == nullptr) {
+			//give priority to heroes with the building's settlement as their home settlement
 			if (this->settlement != nullptr) {
 				potential_heroes = this->Player->get_recruitable_heroes_from_list(this->settlement->get_characters());
 			}
 
-			if (static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-				std::vector<stratagus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(stratagus::character::get_all());
+			//then give priority to heroes belonging to the building's player's faction
+			if (faction != nullptr && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
+				std::vector<stratagus::character *> potential_faction_heroes = this->Player->get_recruitable_heroes_from_list(faction->get_characters());
+
+				while (!potential_faction_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
+					stratagus::character *hero = potential_faction_heroes[SyncRand(potential_faction_heroes.size())];
+					stratagus::vector::remove(potential_faction_heroes, hero);
+
+					if (stratagus::vector::contains(potential_heroes, hero)) {
+						continue;
+					}
+
+					potential_heroes.push_back(hero);
+				}
+			}
+
+			//if there are still recruitable hero slots available, then try to place characters belonging to the civilization in them
+			if (civilization != nullptr && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
+				std::vector<stratagus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(civilization->get_characters());
 
 				while (!potential_civilization_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
 					stratagus::character *hero = potential_civilization_heroes[SyncRand(potential_civilization_heroes.size())];

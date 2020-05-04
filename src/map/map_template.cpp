@@ -1547,7 +1547,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		if (character->Faction == nullptr && !character->get_unit_type()->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
+		if (character->get_faction() == nullptr && !character->get_unit_type()->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
 			continue;
 		}
 		
@@ -1555,7 +1555,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		const faction *hero_faction = character->Faction;
+		const faction *hero_faction = character->get_faction();
 		for (int i = ((int) character->HistoricalFactions.size() - 1); i >= 0; --i) {
 			if (start_date.ContainsDate(character->HistoricalFactions[i].first)) {
 				hero_faction = character->HistoricalFactions[i].second;
