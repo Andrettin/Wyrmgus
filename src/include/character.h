@@ -110,9 +110,10 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_OBJECT
 
 	Q_PROPERTY(QString surname READ get_surname_qstring)
-	Q_PROPERTY(CUnitType* unit_type MEMBER unit_type READ get_unit_type)
+	Q_PROPERTY(CUnitType* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
+	Q_PROPERTY(QString variation READ get_variation_qstring)
 
 public:
 	static constexpr const char *class_identifier = "character";
@@ -178,6 +179,22 @@ public:
 	bool CanWorship() const;
 	bool HasMajorDeity() const;
 	std::string GetFullName() const;
+
+	const std::string &get_variation() const
+	{
+		return this->variation;
+	}
+
+	Q_INVOKABLE void set_variation(const std::string &variation)
+	{
+		this->variation = FindAndReplaceString(variation, "_", "-");
+	}
+
+	QString get_variation_qstring() const
+	{
+		return QString::fromStdString(this->get_variation());
+	}
+
 	IconConfig GetIcon() const;
 	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
@@ -196,8 +213,8 @@ public:
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 private:
 	std::string surname; //the character's surname
+	std::string variation; //the identifier of the character variation
 public:
-	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 private:

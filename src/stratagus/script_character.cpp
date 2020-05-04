@@ -101,10 +101,10 @@ static int CclDefineCharacter(lua_State *l)
 			character->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
 			character->set_quote(LuaToString(l, -1));
-		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
-			character->HairVariation = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation")) {
+			character->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "HairVariation")) {
-			character->HairVariation = LuaToString(l, -1);
+			character->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::get(unit_type_ident);
@@ -532,10 +532,10 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			hero->set_description(LuaToString(l, -1));
-		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
-			hero->HairVariation = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation")) {
+			hero->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "HairVariation")) {
-			hero->HairVariation = LuaToString(l, -1);
+			hero->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::get(unit_type_ident);
@@ -891,7 +891,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushstring(l, character->Icon.Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "HairVariation")) {
-		lua_pushstring(l, character->HairVariation.c_str());
+		lua_pushstring(l, character->get_variation().c_str());
 		return 1;
 	} else if (!strcmp(data, "IsUsable")) {
 		lua_pushboolean(l, character->IsUsable());

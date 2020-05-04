@@ -138,13 +138,11 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
 			faction *faction = faction::get(value);
-			if (!this->Faction) {
-				this->Faction = faction;
-			}
+			this->Faction = faction;
 			this->Factions.push_back(faction);
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->HairVariation = value;
+			this->variation = value;
 		} else if (key == "trait") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
@@ -584,8 +582,8 @@ IconConfig character::GetIcon() const
 		return this->HeroicIcon;
 	} else if (this->Icon.Icon) {
 		return this->Icon;
-	} else if (!this->HairVariation.empty() && this->get_unit_type()->GetVariation(this->HairVariation) != nullptr && !this->get_unit_type()->GetVariation(this->HairVariation)->Icon.Name.empty()) {
-		return this->get_unit_type()->GetVariation(this->HairVariation)->Icon;
+	} else if (!this->get_variation().empty() && this->get_unit_type()->GetVariation(this->get_variation()) != nullptr && !this->get_unit_type()->GetVariation(this->get_variation())->Icon.Name.empty()) {
+		return this->get_unit_type()->GetVariation(this->get_variation())->Icon;
 	} else {
 		return this->get_unit_type()->Icon;
 	}
@@ -745,8 +743,8 @@ void SaveHero(stratagus::character *hero)
 		if (hero->Trait != nullptr) {
 			fprintf(fd, "\tTrait = \"%s\",\n", hero->Trait->Ident.c_str());
 		}
-		if (!hero->HairVariation.empty()) {
-			fprintf(fd, "\tHairVariation = \"%s\",\n", hero->HairVariation.c_str());
+		if (!hero->get_variation().empty()) {
+			fprintf(fd, "\tVariation = \"%s\",\n", hero->get_variation().c_str());
 		}
 	}
 	if (hero->Level != 0) {

@@ -1144,14 +1144,14 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
-		if (this->Character != nullptr && !this->Character->HairVariation.empty()) {
-			priority_variation = this->Character->HairVariation;
+		if (this->Character != nullptr && !this->Character->get_variation().empty()) {
+			priority_variation = this->Character->get_variation();
 		} else if (this->GetVariation() != nullptr) {
 			priority_variation = this->GetVariation()->VariationId;
 		}
 	} else {
-		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->HairVariation.empty()) {
-			priority_variation = this->Character->HairVariation;
+		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->get_variation().empty()) {
+			priority_variation = this->Character->get_variation();
 		} else if (this->GetLayerVariation(image_layer)) {
 			priority_variation = this->GetLayerVariation(image_layer)->VariationId;
 		}
