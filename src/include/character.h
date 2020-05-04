@@ -45,6 +45,12 @@ class CUnitType;
 class CUnit;
 class CUpgrade;
 class LuaCallback;
+class Spell_Polymorph;
+struct lua_State;
+
+void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
+int CclDefineCharacter(lua_State *l);
+int CclDefineCustomHero(lua_State *l);
 
 namespace stratagus {
 	class calendar;
@@ -97,27 +103,72 @@ enum CharacterTitles {
 	MaxCharacterTitles
 };
 
-class CCharacter : public stratagus::detailed_data_entry, public stratagus::data_type<CCharacter>, public CDataType
+namespace stratagus {
+
+class character : public detailed_data_entry, public data_type<character>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(QString surname READ get_surname_qstring)
+	Q_PROPERTY(CUnitType* unit_type MEMBER unit_type READ get_unit_type)
+	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
+
 public:
 	static constexpr const char *class_identifier = "character";
 	static constexpr const char *database_folder = "characters";
 
 	static void clear();
 	
-	CCharacter(const std::string &identifier);
-	~CCharacter();
+	character(const std::string &identifier);
+	~character();
 	
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+
+	const std::string &get_surname() const
+	{
+		return this->surname;
+	}
+
+	Q_INVOKABLE void set_surname(const std::string &surname)
+	{
+		this->surname = surname;
+	}
+
+	QString get_surname_qstring() const
+	{
+		return QString::fromStdString(this->get_surname());
+	}
+
+	CUnitType *get_unit_type() const
+	{
+		return this->unit_type;
+	}
+
+	void set_unit_type(CUnitType *unit_type)
+	{
+		if (unit_type == this->get_unit_type()) {
+			return;
+		}
+
+		this->unit_type = unit_type;
+	}
+
+	civilization *get_civilization() const
+	{
+		return this->civilization;
+	}
 
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	CReligion *GetReligion() const;
 	CLanguage *GetLanguage() const;
-	stratagus::calendar *get_calendar() const;
+	calendar *get_calendar() const;
 	bool IsParentOf(const std::string &child_full_name) const;
 	bool IsChildOf(const std::string &parent_full_name) const;
 	bool IsSiblingOf(const std::string &sibling_full_name) const;
@@ -134,29 +185,38 @@ public:
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
-	stratagus::civilization *civilization = nullptr;	/// Culture to which the character belongs
-	stratagus::faction *Faction = nullptr;	/// Faction to which the character belongs
+private:
+	civilization *civilization = nullptr;	/// Culture to which the character belongs
+public:
+	faction *Faction = nullptr;	/// Faction to which the character belongs
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool Custom = false;		/// Whether this character is a custom hero
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
-	std::string FamilyName;		/// Name of the character's family
+private:
+	std::string surname; //the character's surname
+public:
 	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
-	CUnitType *Type = nullptr;
+private:
+	CUnitType *unit_type = nullptr;
+public:
 	CUpgrade *Trait = nullptr;
 	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
-	CCharacter *Father = nullptr;		/// Character's father
-	CCharacter *Mother = nullptr;		/// Character's mother
+	character *Father = nullptr;		/// Character's father
+	character *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
-	stratagus::dependency *Predependency = nullptr;
-	stratagus::dependency *Dependency = nullptr;
+	dependency *Predependency = nullptr;
+	dependency *Dependency = nullptr;
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
-	std::vector<CCharacter *> Children;	/// Children of the character
-	std::vector<CCharacter *> Siblings;	/// Siblings of the character
-	std::vector<stratagus::faction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
+	std::vector<character *> Children;	/// Children of the character
+	std::vector<character *> Siblings;	/// Siblings of the character
+	std::vector<faction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
+private:
+	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
+public:
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
@@ -166,27 +226,26 @@ public:
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
-	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
-	std::vector<std::unique_ptr<stratagus::historical_location>> HistoricalLocations;	/// historical locations of the character
-	std::vector<std::tuple<CDate, CDate, stratagus::faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::pair<CDate, faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
+	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
+	std::vector<std::tuple<CDate, CDate, faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
+
+	friend ::Spell_Polymorph;
+	friend void ::ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
+	friend int ::CclDefineCharacter(lua_State *l);
+	friend int ::CclDefineCustomHero(lua_State *l);
 };
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
+}
 
-extern std::map<std::string, CCharacter *> CustomHeroes;
-extern CCharacter *CurrentCustomHero;
+extern std::map<std::string, stratagus::character *> CustomHeroes;
+extern stratagus::character *CurrentCustomHero;
 extern bool LoadingPersistentHeroes;
 
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
 extern int GetAttributeVariableIndex(int attribute);
-extern CCharacter *GetCustomHero(const std::string &hero_ident);
-extern void SaveHero(CCharacter *hero);
+extern stratagus::character *GetCustomHero(const std::string &hero_ident);
+extern void SaveHero(stratagus::character *hero);
 extern void SaveHeroes();
 extern void SaveCustomHero(const std::string &hero_ident);
 extern void DeleteCustomHero(const std::string &hero_ident);

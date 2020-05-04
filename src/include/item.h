@@ -39,11 +39,14 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCharacter;
 class CConfigData;
 class CUnitType;
 class CUpgrade;
 class CSpell;
+
+namespace stratagus {
+	class character;
+}
 
 /**
 **  Indexes into item class array.
@@ -144,7 +147,7 @@ public:
 	CUpgrade *Work = nullptr;
 	CUpgrade *Elixir = nullptr;
 	CUniqueItem *Unique = nullptr;
-	CCharacter *Owner = nullptr;
+	stratagus::character *Owner = nullptr;
 };
 
 /*----------------------------------------------------------------------------

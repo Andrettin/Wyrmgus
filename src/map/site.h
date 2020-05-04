@@ -42,6 +42,7 @@ int CclDefineSite(lua_State *l);
 
 namespace stratagus {
 
+class character;
 class civilization;
 class faction;
 class map_template;
@@ -159,18 +160,31 @@ public:
 	Q_INVOKABLE void add_region(region *region);
 	Q_INVOKABLE void remove_region(region *region);
 
+	const std::vector<character *> &get_characters() const
+	{
+		return this->characters;
+	}
+
+	void add_character(character *character)
+	{
+		this->characters.push_back(character);
+	}
+
 private:
 	bool major = false; /// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
 	map_template *map_template = nullptr; /// Map template where this site is located
 	CPlayer *owner = nullptr;
-	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is set to its player owner's faction
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 	std::vector<region *> regions;								/// Regions where this site is located
 	std::vector<faction *> cores;						/// Factions which have this site as a core
 public:
 	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
+private:
+	std::vector<character *> characters; //characters which can be recruited at this site
+	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is 	set to its player owner's faction
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start
+public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)

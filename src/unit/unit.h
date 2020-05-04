@@ -45,9 +45,6 @@ class CBuildRestrictionOnTop;
 class CConstructionFrame;
 class CFile;
 class Missile;
-//Wyrmgus start
-class CCharacter;
-//Wyrmgus end
 class CMapField;
 class COrder;
 class CPlayer;
@@ -69,6 +66,7 @@ struct lua_State;
 typedef COrder *COrderPtr;
 
 namespace stratagus {
+	class character;
 	class player_color;
 	class time_of_day;
 }
@@ -537,7 +535,7 @@ public:
 	std::string Name;		/// Unit's personal/proper name (if any)
 	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
 	std::string FamilyName;	/// Unit's family name
-	CCharacter *Character;	/// Pointer to the character represented by this unit
+	stratagus::character *Character;	/// Pointer to the character represented by this unit
 	stratagus::site *settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has

@@ -31,14 +31,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-#include "character.h" // because of "MaxCharacterTitles"
-#include "color.h"
-//Wyrmgus end
-//Wyrmgus start
-#include "item.h"
-#include "time/date.h"
-//Wyrmgus end
 #include "ui/button_cmd.h"
 #include "ui/icon.h"
 //Wyrmgus start
@@ -63,7 +55,6 @@ static constexpr int DefaultTradeCost = 30;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCharacter;
 class CCurrency;
 class CDeity;
 class CDeityDomain;
@@ -88,6 +79,7 @@ struct lua_State;
 namespace stratagus {
 	class age;
 	class calendar;
+	class character;
 	class civilization;
 	class player_color;
 	class quest;
@@ -269,7 +261,8 @@ public:
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
-	bool CanRecruitHero(const CCharacter *character, bool ignore_neutral = false) const;
+	bool can_recruit_hero(const stratagus::character *character, bool ignore_neutral = false) const;
+	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
@@ -433,7 +426,7 @@ public:
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasNeutralFactionType() const;
 	bool HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action = ButtonCmd::None) const;
-	bool HasHero(const CCharacter *hero) const;
+	bool HasHero(const stratagus::character *hero) const;
 	//Wyrmgus end
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);

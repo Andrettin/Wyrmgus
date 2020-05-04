@@ -48,7 +48,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCharacter;
 class CDeityDomain;
 class CSchoolOfMagic;
 class CUniqueItem;
@@ -57,6 +56,7 @@ class CUpgradeModifier;
 struct lua_State;
 
 namespace stratagus {
+	class character;
 	class civilization;
 	class dependency;
 	class icon;
@@ -241,13 +241,13 @@ public:
 	int MagicLevel = 0;					/// Magic level of an affix
 	int Work = -1;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
-	CCharacter *Author = nullptr;		/// Author of this literary work (if it is one)
+	stratagus::character *Author = nullptr;		/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
-	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
+	std::vector<stratagus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
 	stratagus::dependency *Predependency = nullptr;

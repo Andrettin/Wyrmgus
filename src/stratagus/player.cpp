@@ -1842,22 +1842,17 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 	return true;
 }
 
-/**
-**  Check if the player can recruit a particular hero.
-**
-**  @param character    Hero.
-*/
-bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) const
+bool CPlayer::can_recruit_hero(const stratagus::character *character, bool ignore_neutral) const
 {
 	if (character->Deity != nullptr) { //character is a deity
 		return false;
 	}
 	
-	if (!character->civilization || character->civilization->ID != this->Race) {
+	if (!character->get_civilization() || character->get_civilization()->ID != this->Race) {
 		return false;
 	}
 	
-	if (!CheckDependencies(character->Type, this, true)) {
+	if (!CheckDependencies(character->get_unit_type(), this, true)) {
 		return false;
 	}
 	
@@ -1881,6 +1876,18 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 	return true;
 }
 
+std::vector<stratagus::character *> CPlayer::get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes)
+{
+	std::vector<stratagus::character *> recruitable_heroes;
+
+	for (stratagus::character *hero : heroes) {
+		if (this->can_recruit_hero(hero)) {
+			recruitable_heroes.push_back(hero);
+		}
+	}
+
+	return recruitable_heroes;
+}
 /**
 **  Check if the upgrade removes an existing upgrade of the player.
 **
@@ -2731,7 +2738,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 				return false;
 			}
 		} else if (objective->ObjectiveType == ObjectiveType::RecruitHero) {
-			if (!this->CanRecruitHero(objective->Character, true)) {
+			if (!this->can_recruit_hero(objective->Character, true)) {
 				return false;
 			}
 			recruit_heroes_quantity++;
@@ -2913,7 +2920,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 				}
 			}
 		} else if (quest_objective->ObjectiveType == ObjectiveType::RecruitHero) {
-			if (!this->HasHero(quest_objective->Character) && !this->CanRecruitHero(quest_objective->Character, true)) {
+			if (!this->HasHero(quest_objective->Character) && !this->can_recruit_hero(quest_objective->Character, true)) {
 				return "The hero can no longer be recruited.";
 			}
 		} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyUnits || quest_objective->ObjectiveType == ObjectiveType::DestroyHero || quest_objective->ObjectiveType == ObjectiveType::DestroyUnique) {
@@ -4267,7 +4274,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 	return false;
 }
 
-bool CPlayer::HasHero(const CCharacter *hero) const
+bool CPlayer::HasHero(const stratagus::character *hero) const
 {
 	if (!hero) {
 		return false;

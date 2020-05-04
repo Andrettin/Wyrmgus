@@ -841,9 +841,9 @@ void CUnit::Retrain()
 						this->Variable[LEVELUP_INDEX].Enable = 1;
 						TransformUnitIntoType(*this, *unit_type);
 						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
-							if (Character->Type != unit_type) {
+							if (Character->get_unit_type() != unit_type) {
 								if (Player->AiEnabled == false) {
-									Character->Type = unit_type;
+									Character->set_unit_type(unit_type);
 									SaveHero(Character);
 									CAchievement::CheckAchievements();
 								}
@@ -911,9 +911,9 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
 	
-	CCharacter *character = nullptr;
+	stratagus::character *character = nullptr;
 	if (!custom_hero) {
-		character = CCharacter::get(character_ident);
+		character = stratagus::character::get(character_ident);
 	} else {
 		character = GetCustomHero(character_ident);
 	}
@@ -932,14 +932,14 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	this->Name = this->Character->get_name();
 	this->ExtraName = this->Character->ExtraName;
-	this->FamilyName = this->Character->FamilyName;
+	this->FamilyName = this->Character->get_surname();
 	
-	if (this->Character->Type != nullptr) {
-		if (this->Character->Type != this->Type) { //set type to that of the character
-			TransformUnitIntoType(*this, *this->Character->Type);
+	if (this->Character->get_unit_type() != nullptr) {
+		if (this->Character->get_unit_type() != this->Type) { //set type to that of the character
+			TransformUnitIntoType(*this, *this->Character->get_unit_type());
 		}
 		
-		this->Variable = this->Character->Type->Stats[this->Player->Index].Variables;
+		this->Variable = this->Character->get_unit_type()->Stats[this->Player->Index].Variables;
 	} else {
 		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_ident.c_str());
 		return;
@@ -2461,6 +2461,8 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::UpdateSoldUnits()
 {
+	static constexpr int recruitable_hero_max = 4;
+
 	if (!this->Type->BoolFlag[RECRUITHEROES_INDEX].value && this->Type->SoldUnits.empty() && this->SoldUnits.empty()) {
 		return;
 	}
@@ -2476,25 +2478,40 @@ void CUnit::UpdateSoldUnits()
 	this->SoldUnits.clear();
 	
 	std::vector<CUnitType *> potential_items;
-	std::vector<CCharacter *> potential_heroes;
+	std::vector<stratagus::character *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->civilization;
 		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 			civilization_id = this->Player->Race;
 		}
+		const stratagus::civilization *civilization = civilization_id != -1 ? stratagus::civilization::get_all()[civilization_id] : nullptr;
 		
 		if (CurrentQuest == nullptr) {
-			for (CCharacter *character : CCharacter::get_all()) {
-				if (this->Player->CanRecruitHero(character)) {
-					potential_heroes.push_back(character);
+			if (this->settlement != nullptr) {
+				potential_heroes = this->Player->get_recruitable_heroes_from_list(this->settlement->get_characters());
+			}
+
+			if (static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
+				std::vector<stratagus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(stratagus::character::get_all());
+
+				while (!potential_civilization_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
+					stratagus::character *hero = potential_civilization_heroes[SyncRand(potential_civilization_heroes.size())];
+
+					if (stratagus::vector::contains(potential_heroes, hero)) {
+						continue;
+					}
+
+					potential_heroes.push_back(hero);
+					stratagus::vector::remove(potential_civilization_heroes, hero);
 				}
 			}
 		}
+
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->civilization && iterator->second->civilization->ID == civilization_id || iterator->second->Type == stratagus::civilization::get_all()[civilization_id]->get_class_unit_type(iterator->second->Type->get_unit_class()))
-					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
+					(iterator->second->get_civilization() && iterator->second->get_civilization()->ID == civilization_id || iterator->second->get_unit_type() == stratagus::civilization::get_all()[civilization_id]->get_class_unit_type(iterator->second->get_unit_type()->get_unit_class()))
+					&& CheckDependencies(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
 				}
@@ -2512,7 +2529,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	int sold_unit_max = 4;
+	int sold_unit_max = recruitable_hero_max;
 	if (!potential_items.empty()) {
 		sold_unit_max = 15;
 	}
@@ -2520,8 +2537,8 @@ void CUnit::UpdateSoldUnits()
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
-			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			stratagus::character *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {

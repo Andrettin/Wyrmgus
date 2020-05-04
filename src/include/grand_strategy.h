@@ -195,10 +195,10 @@ public:
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
 
-class CGrandStrategyHero : public CCharacter
+class CGrandStrategyHero : public stratagus::character
 {
 public:
-	CGrandStrategyHero() : CCharacter(""),
+	CGrandStrategyHero() : stratagus::character(""),
 		State(0), Existed(false),
 		Province(nullptr), ProvinceOfOrigin(nullptr),
 		Father(nullptr), Mother(nullptr)
@@ -206,7 +206,6 @@ public:
 	}
 	
 	void Die();
-	void SetType(int unit_type_id);
 	bool IsAlive();
 	bool IsVisible();
 	bool IsGenerated();

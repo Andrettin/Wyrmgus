@@ -195,7 +195,7 @@ static int CclDefineQuest(lua_State *l)
 						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
-						CCharacter *character = CCharacter::get(LuaToString(l, -1, k + 1));
+						stratagus::character *character = stratagus::character::get(LuaToString(l, -1, k + 1));
 						objective->Character = character;
 					} else if (!strcmp(value, "unique")) {
 						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, k + 1));
@@ -220,7 +220,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->HeroesMustSurvive.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CCharacter *hero = CCharacter::get(LuaToString(l, -1, j + 1));
+				stratagus::character *hero = stratagus::character::get(LuaToString(l, -1, j + 1));
 				quest->HeroesMustSurvive.push_back(hero);
 			}
 		} else {
@@ -584,7 +584,7 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Load();
 		} else if (!strcmp(value, "Character")) {
 			std::string character_name = LuaToString(l, -1);
-			CCharacter *character = CCharacter::get(character_name);
+			stratagus::character *character = stratagus::character::get(character_name);
 			achievement->Character = character;
 		} else if (!strcmp(value, "CharacterType")) {
 			const std::string unit_type_ident = LuaToString(l, -1);

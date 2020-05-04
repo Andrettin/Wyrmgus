@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "character.h" //for MaxCharacterTitles
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "player.h" //for certain enums
@@ -44,6 +45,7 @@ int CclDefineFaction(lua_State *l);
 
 namespace stratagus {
 
+class character;
 class civilization;
 class icon;
 class resource;
@@ -209,7 +211,7 @@ public:
 	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
 	std::map<ForceType, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
-	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
+	std::map<std::tuple<CDate, CDate, int>, character *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year

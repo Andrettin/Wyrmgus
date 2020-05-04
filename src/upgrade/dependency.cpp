@@ -413,7 +413,7 @@ void character_dependency::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "character") {
-		this->Character = CCharacter::get(value);
+		this->character = character::get(value);
 	} else {
 		throw std::runtime_error("Invalid character dependency property: \"" + property.get_key() + "\".");
 	}
@@ -424,7 +424,7 @@ void character_dependency::ProcessConfigDataProperty(const std::pair<std::string
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "character") {
-		this->Character = CCharacter::get(value);
+		this->character = character::get(value);
 	} else {
 		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
 	}
@@ -432,17 +432,17 @@ void character_dependency::ProcessConfigDataProperty(const std::pair<std::string
 
 bool character_dependency::check(const CPlayer *player, bool ignore_units) const
 {
-	return player->HasHero(this->Character);
+	return player->HasHero(this->character);
 }
 
 bool character_dependency::check(const CUnit *unit, bool ignore_units) const
 {
-	return unit->Character == this->Character;
+	return unit->Character == this->character;
 }
 
 std::string character_dependency::get_string(const std::string &prefix) const
 {
-	std::string str = prefix + this->Character->GetFullName() + '\n';
+	std::string str = prefix + this->character->GetFullName() + '\n';
 	return str;
 }
 

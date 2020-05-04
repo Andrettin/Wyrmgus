@@ -120,7 +120,7 @@
 			type = new_unit_type;
 		}
 	}
-	if (target->Character && target->Character->Custom && target->Character->civilization && this->civilization != -1 && this->civilization != target->Character->civilization->ID) {
+	if (target->Character && target->Character->Custom && target->Character->get_civilization() && this->civilization != -1 && this->civilization != target->Character->get_civilization()->ID) {
 		target->Character->civilization = stratagus::civilization::get_all()[this->civilization];
 		SaveHero(target->Character);
 	}
@@ -191,7 +191,7 @@
 //	target->Release();
 	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
 		if (target->Player->AiEnabled == false) {
-			target->Character->Type = type;
+			target->Character->set_unit_type(type);
 			SaveHero(target->Character);
 		}
 	}

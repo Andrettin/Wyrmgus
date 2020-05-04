@@ -137,7 +137,7 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "character") {
-			const CCharacter *character = CCharacter::get(value);
+			const stratagus::character *character = stratagus::character::get(value);
 			this->Character = character;
 		} else if (key == "character_type") {
 			const CUnitType *unit_type = CUnitType::get(value);
@@ -164,7 +164,7 @@ bool CAchievement::CanObtain() const
 	}
 
 	if (this->Character) {
-		if (this->CharacterType && this->Character->Type != this->CharacterType) {
+		if (this->CharacterType && this->Character->get_unit_type() != this->CharacterType) {
 			return false;
 		}
 		if (this->CharacterLevel && this->Character->Level < this->CharacterLevel) {
@@ -172,8 +172,8 @@ bool CAchievement::CanObtain() const
 		}
 	} else if (this->CharacterType || this->CharacterLevel) {
 		bool found_hero = false;
-		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			if (this->CharacterType && iterator->second->Type != this->CharacterType) {
+		for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			if (this->CharacterType && iterator->second->get_unit_type() != this->CharacterType) {
 				continue;
 			}
 			if (this->CharacterLevel && iterator->second->Level < this->CharacterLevel) {
@@ -227,7 +227,7 @@ int CAchievement::GetProgress() const
 		}
 	} else if (this->CharacterLevel) {
 		int highest_level = 0;
-		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 			highest_level = std::max(highest_level, iterator->second->Level);
 			if (highest_level >= this->CharacterLevel) {
 				highest_level = this->CharacterLevel;

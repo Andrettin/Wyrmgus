@@ -28,6 +28,7 @@
 #include "database/database.h"
 
 #include "age.h"
+#include "character.h"
 #include "civilization.h"
 #include "database/data_type_metadata.h"
 #include "database/defines.h"
@@ -159,6 +160,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
 		} else if (property_class_name == "stratagus::calendar*") {
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
+		} else if (property_class_name == "stratagus::character*") {
+			new_property_value = QVariant::fromValue(character::get(property.get_value()));
 		} else if (property_class_name == "stratagus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
 		} else if (property_class_name == "stratagus::dialogue*") {

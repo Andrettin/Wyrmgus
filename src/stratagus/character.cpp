@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "character.h"
@@ -43,6 +39,7 @@
 #include "item.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "parameters.h"
 #include "player.h"
 #include "province.h"
@@ -59,34 +56,28 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::map<std::string, CCharacter *> CustomHeroes;
-CCharacter *CurrentCustomHero = nullptr;
+std::map<std::string, stratagus::character *> CustomHeroes;
+stratagus::character *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-void CCharacter::clear()
+void character::clear()
 {
 	data_type::clear();
 	
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+	for (std::map<std::string, character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 		delete iterator->second;
 	}
 	CustomHeroes.clear();
 }
 
-CCharacter::CCharacter(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+character::character(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 {
 	memset(Attributes, 0, sizeof(Attributes));
 }
 
-CCharacter::~CCharacter()
+character::~character()
 {
 	if (this->Conditions) {
 		delete Conditions;
@@ -97,48 +88,56 @@ CCharacter::~CCharacter()
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CCharacter::ProcessConfigData(const CConfigData *config_data)
+void character::process_sml_property(const sml_property &property)
 {
-	bool name_changed = false;
-	bool family_name_changed = false;
-	
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "gender") {
+		this->Gender = GetGenderIdByName(value);
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void character::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "deities") {
+		for (const std::string &value : values) {
+			CDeity *deity = CDeity::GetDeity(value);
+			if (deity) {
+				this->Deities.push_back(deity);
+			}
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void character::ProcessConfigData(const CConfigData *config_data)
+{
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
 			this->set_name(value);
-			name_changed = true;
 		} else if (key == "family_name") {
-			this->FamilyName = value;
-			family_name_changed = true;
+			this->surname = value;
 		} else if (key == "unit_type") {
 			CUnitType *unit_type = CUnitType::get(value);
-			if (this->Type == nullptr || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
-				this->Type = unit_type;
-				if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-					this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
-				}
-					
-				if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
-					if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-						this->Gender = this->Type->DefaultStat.Variables[GENDER_INDEX].Value;
-					}
-				}
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+			if (this->get_unit_type() == nullptr || this->get_unit_type() == unit_type || this->get_unit_type()->CanExperienceUpgradeTo(unit_type)) {
+				this->unit_type = unit_type;
 			}
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
-			this->civilization = stratagus::civilization::get(value);
+			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
-			stratagus::faction *faction = stratagus::faction::get(value);
+			faction *faction = faction::get(value);
 			if (!this->Faction) {
 				this->Faction = faction;
 			}
@@ -165,13 +164,13 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->DeathDate = CDate::FromString(value);
 		} else if (key == "father") {
-			CCharacter *father = CCharacter::get(value);
+			character *father = character::get(value);
 			this->Father = father;
 			if (!father->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the father
 				father->Children.push_back(this);
 			}
 			// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-			for (CCharacter *sibling : father->Children) {
+			for (character *sibling : father->Children) {
 				if (sibling != this) {
 					if (!this->IsSiblingOf(sibling->Ident)) {
 						this->Siblings.push_back(sibling);
@@ -182,13 +181,13 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (key == "mother") {
-			CCharacter *mother = CCharacter::get(value);
+			character *mother = character::get(value);
 			this->Mother = mother;
 			if (!mother->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the mother
 				mother->Children.push_back(this);
 			}
 			// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-			for (CCharacter *sibling : mother->Children) {
+			for (character *sibling : mother->Children) {
 				if (sibling != this) {
 					if (!this->IsSiblingOf(sibling->Ident)) {
 						this->Siblings.push_back(sibling);
@@ -255,14 +254,14 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "historical_location") {
-			auto location = std::make_unique<stratagus::historical_location>();
+			auto location = std::make_unique<historical_location>();
 			location->ProcessConfigData(child_config_data);
 			this->HistoricalLocations.push_back(std::move(location));
 		} else if (child_config_data->Tag == "historical_title") {
 			int title = -1;
 			CDate start_date;
 			CDate end_date;
-			stratagus::faction *title_faction = nullptr;
+			faction *title_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -281,7 +280,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					value = FindAndReplaceString(value, "_", "-");
 					end_date = CDate::FromString(value);
 				} else if (key == "faction") {
-					title_faction = stratagus::faction::get(value);
+					title_faction = faction::get(value);
 				} else {
 					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.c_str());
 				}
@@ -301,7 +300,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = this;
 			}
 				
-			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, stratagus::faction *, int>(start_date, end_date, title_faction, title));
+			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, faction *, int>(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;
@@ -313,48 +312,61 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void CCharacter::initialize()
+void character::initialize()
 {
+	if (this->Level < this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
+		this->Level = this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+	}
+
+	if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+		if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+			this->Gender = this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value;
+		}
+	}
 
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
-	if (this->Type != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 		if (!this->get_name().empty()) {
-			this->Type->PersonalNames[this->Gender].push_back(this->get_name());
+			this->get_unit_type()->PersonalNames[this->Gender].push_back(this->get_name());
 		}
 	} else if (this->civilization != nullptr) {
 		if (!this->get_name().empty()) {
 			this->civilization->PersonalNames[this->Gender].push_back(this->get_name());
 		}
-		if (!this->FamilyName.empty()) {
-			this->civilization->FamilyNames.push_back(this->FamilyName);
+		if (!this->get_surname().empty()) {
+			this->civilization->FamilyNames.push_back(this->get_surname());
 		}
 	}
 
 	if (this->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (this->Type != nullptr && this->Type->Traits.size() == 1) {
-			this->Trait = this->Type->Traits[0];
+		if (this->get_unit_type() != nullptr && this->get_unit_type()->Traits.size() == 1) {
+			this->Trait = this->get_unit_type()->Traits[0];
 		}
 	}
 
 	//check if the abilities are correct for this character's unit type
-	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
+	if (this->get_unit_type() != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->get_unit_type()->Slot) {
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (!stratagus::vector::contains(AiHelpers.LearnableAbilities[this->Type->Slot], this->Abilities[i])) {
-				stratagus::vector::remove(this->Abilities, this->Abilities[i]);
+			if (!vector::contains(AiHelpers.LearnableAbilities[this->get_unit_type()->Slot], this->Abilities[i])) {
+				vector::remove(this->Abilities, this->Abilities[i]);
 			}
 		}
+	}
+
+	if (this->home_settlement != nullptr) {
+		this->home_settlement->add_character(this);
 	}
 
 	this->GenerateMissingDates();
 	this->UpdateAttributes();
 
-	for (const std::unique_ptr<stratagus::historical_location> &location : this->HistoricalLocations) {
+	for (const std::unique_ptr<historical_location> &location : this->HistoricalLocations) {
 		location->initialize();
 	}
 }
 
-void CCharacter::check() const
+void character::check() const
 {
 	if (this->Father != nullptr && this->Father->Gender != MaleGender) {
 		throw std::runtime_error("Character \"" + this->Father->get_identifier() + "\" is set to be the biological father of \"" + this->get_identifier() + "\", but isn't male.");
@@ -365,7 +377,7 @@ void CCharacter::check() const
 	}
 }
 
-void CCharacter::GenerateMissingDates()
+void character::GenerateMissingDates()
 {
 	if (this->DeathDate.Year == 0 && this->BirthDate.Year != 0) { //if the character is missing a death date so far, give it +60 years after the birth date
 		this->DeathDate.Year = this->BirthDate.Year + 60;
@@ -404,16 +416,16 @@ void CCharacter::GenerateMissingDates()
 	}
 }
 
-int CCharacter::GetMartialAttribute() const
+int character::GetMartialAttribute() const
 {
-	if ((this->Type->get_unit_class() != nullptr && this->Type->get_unit_class()->get_identifier() == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+	if ((this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "thief") || this->get_unit_type()->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
 	} else {
 		return StrengthAttribute;
 	}
 }
 
-int CCharacter::GetAttributeModifier(int attribute) const
+int character::GetAttributeModifier(int attribute) const
 {
 	return this->Attributes[attribute] - 10;
 }
@@ -423,7 +435,7 @@ int CCharacter::GetAttributeModifier(int attribute) const
 **
 **	@return	The religion if found, or null otherwise
 */
-CReligion *CCharacter::GetReligion() const
+CReligion *character::GetReligion() const
 {
 	//get the first religion of the character's first deity, since at present we don't set the religion directly for the character
 	
@@ -436,12 +448,12 @@ CReligion *CCharacter::GetReligion() const
 	return nullptr;
 }
 
-CLanguage *CCharacter::GetLanguage() const
+CLanguage *character::GetLanguage() const
 {
 	return PlayerRaces.get_civilization_language(this->civilization->ID);
 }
 
-stratagus::calendar *CCharacter::get_calendar() const
+calendar *character::get_calendar() const
 {
 	if (this->civilization != nullptr) {
 		return this->civilization->get_calendar();
@@ -450,7 +462,7 @@ stratagus::calendar *CCharacter::get_calendar() const
 	return nullptr;
 }
 
-bool CCharacter::IsParentOf(const std::string &child_ident) const
+bool character::IsParentOf(const std::string &child_ident) const
 {
 	for (size_t i = 0; i < this->Children.size(); ++i) {
 		if (this->Children[i]->Ident == child_ident) {
@@ -460,7 +472,7 @@ bool CCharacter::IsParentOf(const std::string &child_ident) const
 	return false;
 }
 
-bool CCharacter::IsChildOf(const std::string &parent_ident) const
+bool character::IsChildOf(const std::string &parent_ident) const
 {
 	if ((this->Father != nullptr && this->Father->Ident == parent_ident) || (this->Mother != nullptr && this->Mother->Ident == parent_ident)) {
 		return true;
@@ -468,7 +480,7 @@ bool CCharacter::IsChildOf(const std::string &parent_ident) const
 	return false;
 }
 
-bool CCharacter::IsSiblingOf(const std::string &sibling_ident) const
+bool character::IsSiblingOf(const std::string &sibling_ident) const
 {
 	for (size_t i = 0; i < this->Siblings.size(); ++i) {
 		if (this->Siblings[i]->Ident == sibling_ident) {
@@ -478,7 +490,7 @@ bool CCharacter::IsSiblingOf(const std::string &sibling_ident) const
 	return false;
 }
 
-bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
+bool character::IsItemEquipped(const CPersistentItem *item) const
 {
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
 	
@@ -493,16 +505,16 @@ bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 	return false;
 }
 
-bool CCharacter::IsUsable() const
+bool character::IsUsable() const
 {
-	if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->Type->DefaultStat.Variables[GENDER_INDEX].Value) {
+	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
 	
 	return true;
 }
 
-bool CCharacter::CanAppear(bool ignore_neutral) const
+bool character::CanAppear(bool ignore_neutral) const
 {
 	if (!this->IsUsable()) {
 		return false;
@@ -525,13 +537,13 @@ bool CCharacter::CanAppear(bool ignore_neutral) const
 **
 **	@return True if the character can worship, false otherwise
 */
-bool CCharacter::CanWorship() const
+bool character::CanWorship() const
 {
 	if (this->Deity) {
 		return false; //the character cannot worship a deity if it is itself a deity
 	}
 	
-	if (this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 		return false; //the character cannot worship a deity if it is not sentient
 	}
 	
@@ -543,7 +555,7 @@ bool CCharacter::CanWorship() const
 **
 **	@return True if the character has a major deity, false otherwise
 */
-bool CCharacter::HasMajorDeity() const
+bool character::HasMajorDeity() const
 {
 	for (size_t i = 0; i < this->Deities.size(); ++i) {
 		if (this->Deities[i]->Major) {
@@ -554,32 +566,32 @@ bool CCharacter::HasMajorDeity() const
 	return false;
 }
 
-std::string CCharacter::GetFullName() const
+std::string character::GetFullName() const
 {
 	std::string full_name = this->get_name();
 	if (!this->ExtraName.empty()) {
 		full_name += " " + this->ExtraName;
 	}
-	if (!this->FamilyName.empty()) {
-		full_name += " " + this->FamilyName;
+	if (!this->get_surname().empty()) {
+		full_name += " " + this->get_surname();
 	}
 	return full_name;
 }
 
-IconConfig CCharacter::GetIcon() const
+IconConfig character::GetIcon() const
 {
 	if (this->Level >= 3 && this->HeroicIcon.Icon) {
 		return this->HeroicIcon;
 	} else if (this->Icon.Icon) {
 		return this->Icon;
-	} else if (!this->HairVariation.empty() && this->Type->GetVariation(this->HairVariation) != nullptr && !this->Type->GetVariation(this->HairVariation)->Icon.Name.empty()) {
-		return this->Type->GetVariation(this->HairVariation)->Icon;
+	} else if (!this->HairVariation.empty() && this->get_unit_type()->GetVariation(this->HairVariation) != nullptr && !this->get_unit_type()->GetVariation(this->HairVariation)->Icon.Name.empty()) {
+		return this->get_unit_type()->GetVariation(this->HairVariation)->Icon;
 	} else {
-		return this->Type->Icon;
+		return this->get_unit_type()->Icon;
 	}
 }
 
-CPersistentItem *CCharacter::GetItem(CUnit &item) const
+CPersistentItem *character::GetItem(CUnit &item) const
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
 		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Elixir == item.Elixir && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
@@ -591,15 +603,15 @@ CPersistentItem *CCharacter::GetItem(CUnit &item) const
 	return nullptr;
 }
 
-void CCharacter::UpdateAttributes()
+void character::UpdateAttributes()
 {
-	if (this->Type == nullptr) {
+	if (this->get_unit_type() == nullptr) {
 		return;
 	}
 	
 	for (int i = 0; i < MaxAttributes; ++i) {
 		int var = GetAttributeVariableIndex(i);
-		this->Attributes[i] = this->Type->DefaultStat.Variables[var].Value;
+		this->Attributes[i] = this->get_unit_type()->DefaultStat.Variables[var].Value;
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			if (
 				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
@@ -611,6 +623,8 @@ void CCharacter::UpdateAttributes()
 			}
 		}
 	}
+}
+
 }
 
 int GetAttributeVariableIndex(int attribute)
@@ -628,13 +642,13 @@ int GetAttributeVariableIndex(int attribute)
 	}
 }
 
-CCharacter *GetCustomHero(const std::string &hero_ident)
+stratagus::character *GetCustomHero(const std::string &hero_ident)
 {
 	if (CustomHeroes.find(hero_ident) != CustomHeroes.end()) {
 		return CustomHeroes[hero_ident];
 	}
 	
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
+	for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
 		if (iterator->second->GetFullName() == hero_ident) {
 			return iterator->second;
 		}
@@ -648,11 +662,11 @@ CCharacter *GetCustomHero(const std::string &hero_ident)
 */
 void SaveHeroes()
 {
-	for (CCharacter *character : CCharacter::get_all()) { //save characters
+	for (stratagus::character *character : stratagus::character::get_all()) { //save characters
 		SaveHero(character);
 	}
 
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
+	for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
 		SaveHero(iterator->second);
 	}
 			
@@ -671,7 +685,7 @@ void SaveHeroes()
 	}
 }
 
-void SaveHero(CCharacter *hero)
+void SaveHero(stratagus::character *hero)
 {
 	struct stat tmp;
 	std::string path = Parameters::Instance.GetUserDirectory();
@@ -714,18 +728,18 @@ void SaveHero(CCharacter *hero)
 		if (!hero->ExtraName.empty()) {
 			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
 		}
-		if (!hero->FamilyName.empty()) {
-			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->FamilyName.c_str());
+		if (!hero->get_surname().empty()) {
+			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->get_surname().c_str());
 		}
 		if (hero->Gender != NoGender) {
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
 		}
-		if (hero->civilization) {
-			fprintf(fd, "\tCivilization = \"%s\",\n", hero->civilization->get_identifier().c_str());
+		if (hero->get_civilization()) {
+			fprintf(fd, "\tCivilization = \"%s\",\n", hero->get_civilization()->get_identifier().c_str());
 		}
 	}
-	if (hero->Type != nullptr) {
-		fprintf(fd, "\tType = \"%s\",\n", hero->Type->Ident.c_str());
+	if (hero->get_unit_type() != nullptr) {
+		fprintf(fd, "\tType = \"%s\",\n", hero->get_unit_type()->Ident.c_str());
 	}
 	if (hero->Custom) {
 		if (hero->Trait != nullptr) {
@@ -831,7 +845,7 @@ void SaveHero(CCharacter *hero)
 
 void SaveCustomHero(const std::string &hero_full_name)
 {
-	CCharacter *hero = GetCustomHero(hero_full_name);
+	stratagus::character *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
 		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
@@ -841,7 +855,7 @@ void SaveCustomHero(const std::string &hero_full_name)
 
 void DeleteCustomHero(const std::string &hero_full_name)
 {
-	CCharacter *hero = GetCustomHero(hero_full_name);
+	stratagus::character *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
 		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
@@ -874,12 +888,12 @@ void DeleteCustomHero(const std::string &hero_full_name)
 void SetCurrentCustomHero(const std::string &hero_full_name)
 {
 	if (!hero_full_name.empty()) {
-		CCharacter *hero = GetCustomHero(hero_full_name);
+		stratagus::character *hero = GetCustomHero(hero_full_name);
 		if (!hero) {
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 		
-		CurrentCustomHero = const_cast<CCharacter *>(&(*hero));
+		CurrentCustomHero = hero;
 	} else {
 		CurrentCustomHero = nullptr;
 	}
@@ -897,7 +911,7 @@ std::string GetCurrentCustomHero()
 void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name)
 {
 	if (!hero_full_name.empty()) {
-		CCharacter *hero = GetCustomHero(hero_full_name);
+		stratagus::character *hero = GetCustomHero(hero_full_name);
 		if (!hero) {
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
@@ -922,11 +936,11 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 
 		//now, update the hero
 		hero->civilization = civilization;
-		CUnitType *new_unit_type = hero->civilization->get_class_unit_type(hero->Type->get_unit_class());
+		CUnitType *new_unit_type = hero->civilization->get_class_unit_type(hero->get_unit_type()->get_unit_class());
 		if (new_unit_type != nullptr) {
-			hero->Type = new_unit_type;
+			hero->unit_type = new_unit_type;
 			hero->set_name(new_hero_name);
-			hero->FamilyName = new_hero_family_name;
+			hero->surname = new_hero_family_name;
 			SaveHero(hero);
 
 			CustomHeroes.erase(hero_full_name);

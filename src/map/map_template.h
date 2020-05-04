@@ -35,7 +35,6 @@
 #include "util/point_container.h"
 #include "vec2i.h"
 
-class CCharacter;
 class CMapField;
 class CUniqueItem;
 class CUnitType;
@@ -45,6 +44,7 @@ int CclDefineMapTemplate(lua_State *l);
 
 namespace stratagus {
 
+class character;
 class faction;
 class historical_location;
 class plane;
@@ -539,7 +539,7 @@ public:
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, faction *, CDate, CDate, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
-	std::vector<std::tuple<Vec2i, CCharacter *, faction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
+	std::vector<std::tuple<Vec2i, character *, faction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::plane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, stratagus::world *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles

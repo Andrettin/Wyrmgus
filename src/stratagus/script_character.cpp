@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "character.h"
@@ -53,10 +49,6 @@
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /**
 **  Define a character.
 **
@@ -70,14 +62,14 @@ static int CclDefineCharacter(lua_State *l)
 	}
 
 	std::string character_ident = LuaToString(l, 1);
-	CCharacter *character = CCharacter::try_get(character_ident);
+	stratagus::character *character = stratagus::character::try_get(character_ident);
 	bool redefinition = false;
 	if (!character) {
 		if (LoadingPersistentHeroes) {
 			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.", character_ident.c_str());
 			return 0;
 		}
-		character = CCharacter::get_or_add(character_ident, nullptr);
+		character = stratagus::character::get_or_add(character_ident, nullptr);
 	} else {
 		redefinition = true;
 		if (!LoadingPersistentHeroes) {
@@ -102,7 +94,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ExtraName")) {
 			character->ExtraName = LuaToString(l, -1);
 		} else if (!strcmp(value, "FamilyName")) {
-			character->FamilyName = LuaToString(l, -1);
+			character->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			character->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
@@ -116,11 +108,8 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::get(unit_type_ident);
-			if (character->Type == nullptr || character->Type == unit_type || character->Type->CanExperienceUpgradeTo(unit_type)) {
-				character->Type = unit_type;
-				if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-					character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
-				}
+			if (character->get_unit_type() == nullptr || character->get_unit_type() == unit_type || character->get_unit_type()->CanExperienceUpgradeTo(unit_type)) {
+				character->unit_type = unit_type;
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
@@ -139,7 +128,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->Faction = faction;
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
-			CCharacter *father = CCharacter::get(father_ident);
+			stratagus::character *father = stratagus::character::get(father_ident);
 			character->Father = father;
 			if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
 				father->Children.push_back(character);
@@ -157,7 +146,7 @@ static int CclDefineCharacter(lua_State *l)
 			}
 		} else if (!strcmp(value, "Mother")) {
 			std::string mother_ident = LuaToString(l, -1);
-			CCharacter *mother = CCharacter::get(mother_ident);
+			stratagus::character *mother = stratagus::character::get(mother_ident);
 
 			character->Mother = mother;
 			if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
@@ -178,7 +167,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string child_ident = LuaToString(l, -1, j + 1);
-				CCharacter *child = CCharacter::get(child_ident);
+				stratagus::character *child = stratagus::character::get(child_ident);
 				if (child) {
 					if (character->Gender == MaleGender) {
 						child->Father = character;
@@ -493,20 +482,14 @@ static int CclDefineCharacter(lua_State *l)
 	}
 	
 	if (!redefinition) {
-		if (character->Type->BoolFlag[FAUNA_INDEX].value) {
+		if (character->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
-				character->Type->PersonalNames[character->Gender].push_back(alternate_names[i]);
+				character->get_unit_type()->PersonalNames[character->Gender].push_back(alternate_names[i]);
 			}
 		} else if (character->civilization) {
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
 				character->civilization->PersonalNames[character->Gender].push_back(alternate_names[i]);
 			}
-		}
-	}
-	
-	if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
-		if (character->Type != nullptr && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
 	}
 	
@@ -526,9 +509,9 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 
 	std::string hero_ident = LuaToString(l, 1);
-	CCharacter *hero = GetCustomHero(hero_ident);
+	stratagus::character *hero = GetCustomHero(hero_ident);
 	if (!hero) {
-		hero = new CCharacter(hero_ident);
+		hero = new stratagus::character(hero_ident);
 		CustomHeroes[hero_ident] = hero;
 	} else {
 		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_ident.c_str());
@@ -544,9 +527,9 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "ExtraName")) {
 			hero->ExtraName = LuaToString(l, -1);
 		} else if (!strcmp(value, "FamilyName")) {
-			hero->FamilyName = LuaToString(l, -1);
+			hero->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Dynasty")) { // for backwards compatibility
-			hero->FamilyName = LuaToString(l, -1);
+			hero->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			hero->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
@@ -556,9 +539,9 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			CUnitType *unit_type = CUnitType::get(unit_type_ident);
-			hero->Type = unit_type;
-			if (hero->Level < hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-				hero->Level = hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+			hero->unit_type = unit_type;
+			if (hero->Level < hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
+				hero->Level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
@@ -742,16 +725,16 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 	
 	if (hero->Gender == NoGender) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
-		if (hero->Type != nullptr && hero->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			hero->Gender = hero->Type->DefaultStat.Variables[GENDER_INDEX].Value;
+		if (hero->get_unit_type() != nullptr && hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+			hero->Gender = hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
 	}
 	
 	//check if the abilities are correct for this hero's unit type
-	if (hero->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->Type->Slot) {
+	if (hero->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->get_unit_type()->Slot) {
 		int ability_count = (int) hero->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[hero->Type->Slot].begin(), AiHelpers.LearnableAbilities[hero->Type->Slot].end(), hero->Abilities[i]) == AiHelpers.LearnableAbilities[hero->Type->Slot].end()) {
+			if (std::find(AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].begin(), AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].end(), hero->Abilities[i]) == AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].end()) {
 				hero->Abilities.erase(std::remove(hero->Abilities.begin(), hero->Abilities.end(), hero->Abilities[i]), hero->Abilities.end());
 			}
 		}
@@ -771,14 +754,14 @@ static int CclGetCharacterData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	CCharacter *character = CCharacter::get(character_name);
+	stratagus::character *character = stratagus::character::get(character_name);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, character->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "FamilyName")) {
-		lua_pushstring(l, character->FamilyName.c_str());
+		lua_pushstring(l, character->get_surname().c_str());
 		return 1;
 	} else if (!strcmp(data, "FullName")) {
 		lua_pushstring(l, character->GetFullName().c_str());
@@ -793,8 +776,8 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushstring(l, character->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (character->civilization) {
-			lua_pushstring(l, character->civilization->get_identifier().c_str());
+		if (character->get_civilization()) {
+			lua_pushstring(l, character->get_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -843,8 +826,8 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushnumber(l, character->Level);
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (character->Type != nullptr) {
-			lua_pushstring(l, character->Type->Ident.c_str());
+		if (character->get_unit_type() != nullptr) {
+			lua_pushstring(l, character->get_unit_type()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -939,7 +922,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	CCharacter *character = GetCustomHero(character_name);
+	stratagus::character *character = GetCustomHero(character_name);
 	if (!character) {
 		LuaError(l, "Custom hero \"%s\" doesn't exist." _C_ character_name.c_str());
 	}
@@ -949,14 +932,14 @@ static int CclGetCustomHeroData(lua_State *l)
 		lua_pushstring(l, character->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "FamilyName")) {
-		lua_pushstring(l, character->FamilyName.c_str());
+		lua_pushstring(l, character->get_surname().c_str());
 		return 1;
 	} else if (!strcmp(data, "FullName")) {
 		lua_pushstring(l, character->GetFullName().c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (character->civilization) {
-			lua_pushstring(l, character->civilization->get_identifier().c_str());
+		if (character->get_civilization() != nullptr) {
+			lua_pushstring(l, character->get_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -968,8 +951,8 @@ static int CclGetCustomHeroData(lua_State *l)
 		lua_pushnumber(l, character->Level);
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (character->Type != nullptr) {
-			lua_pushstring(l, character->Type->Ident.c_str());
+		if (character->get_unit_type() != nullptr) {
+			lua_pushstring(l, character->get_unit_type()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -994,7 +977,7 @@ static int CclGetCustomHeroData(lua_State *l)
 static int CclGetCharacters(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (const CCharacter *character : CCharacter::get_all()) {
+	for (const stratagus::character *character : stratagus::character::get_all()) {
 		character_names.push_back(character->Ident);
 	}
 	
@@ -1010,7 +993,7 @@ static int CclGetCharacters(lua_State *l)
 static int CclGetCustomHeroes(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+	for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 		character_names.push_back(iterator->first);
 	}
 	
@@ -1047,7 +1030,7 @@ static int CclCharacter(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CCharacter *character = CCharacter::try_get(ident);
+	stratagus::character *character = stratagus::character::try_get(ident);
 	if (!character) {
 		return 0;
 	}

@@ -853,7 +853,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 	std::string map_template_ident = LuaToString(l, 1);
 	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 
-	CCharacter *hero = CCharacter::get(LuaToString(l, 2));
+	stratagus::character *hero = stratagus::character::get(LuaToString(l, 2));
 
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
@@ -874,7 +874,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 		CclGetDate(l, &end_date, 6);
 	}
 	
-	map_template->Heroes.push_back(std::tuple<Vec2i, CCharacter *, stratagus::faction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
+	map_template->Heroes.push_back(std::tuple<Vec2i, stratagus::character *, stratagus::faction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
 	
 	return 1;
 }

@@ -247,7 +247,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->civilization_equivalent != -1) {
-		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent && (!caster.Character || (caster.Character->civilization && caster.Character->civilization->ID == condition->civilization_equivalent))) || PlayerRaces.Species[caster.Type->civilization] != PlayerRaces.Species[condition->civilization_equivalent] || stratagus::civilization::get_all()[condition->civilization_equivalent]->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent && (!caster.Character || (caster.Character->get_civilization() && caster.Character->get_civilization()->ID == condition->civilization_equivalent))) || PlayerRaces.Species[caster.Type->civilization] != PlayerRaces.Species[condition->civilization_equivalent] || stratagus::civilization::get_all()[condition->civilization_equivalent]->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

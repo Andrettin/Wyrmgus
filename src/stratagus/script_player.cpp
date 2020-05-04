@@ -2679,7 +2679,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "HasHero")) {
 		LuaCheckArgs(l, 3);
 		
-		CCharacter *hero = CCharacter::get(LuaToString(l, 3));
+		stratagus::character *hero = stratagus::character::get(LuaToString(l, 3));
 
 		lua_pushboolean(l, p->HasHero(hero));
 		return 1;

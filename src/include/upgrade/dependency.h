@@ -85,7 +85,6 @@
 **
 */
 
-class CCharacter;
 class CConfigData;
 class CPlayer;
 class CUnitType;
@@ -96,6 +95,7 @@ class ButtonAction;
 namespace stratagus {
 
 class age;
+class character;
 class faction;
 class season;
 class site;
@@ -306,7 +306,7 @@ public:
 	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
-	const CCharacter *Character = nullptr;
+	const character *character = nullptr;
 };
 
 class season_dependency : public dependency

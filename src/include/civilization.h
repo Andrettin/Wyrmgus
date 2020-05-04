@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "character.h" //for MaxCharacterTitles
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "player.h" //for certain enums

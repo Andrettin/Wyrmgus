@@ -31,7 +31,6 @@
 #include "database/detailed_data_entry.h"
 #include "ui/icon.h"
 
-class CCharacter;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
@@ -41,6 +40,7 @@ struct lua_State;
 int CclDefineQuest(lua_State *l);
 
 namespace stratagus {
+	class character;
 	class civilization;
 	class dialogue;
 	class faction;
@@ -115,7 +115,7 @@ private:
 public:
 	std::vector<const CUnitType *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
-	const CCharacter *Character = nullptr;
+	const stratagus::character *Character = nullptr;
 	const CUniqueItem *Unique = nullptr;
 private:
 	const stratagus::site *settlement = nullptr;
@@ -224,7 +224,7 @@ public:
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
-	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
+	std::vector<character *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 
 	friend int ::CclDefineQuest(lua_State *l);
 };
