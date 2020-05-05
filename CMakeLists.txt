@@ -735,6 +735,7 @@ set(stratagus_util_HDRS
 	src/util/date_util.h
 	src/util/exception_util.h
 	src/util/image_util.h
+	src/util/number_util.h
 	src/util/point_container.h
 	src/util/point_util.h
 	src/util/qunique_ptr.h
