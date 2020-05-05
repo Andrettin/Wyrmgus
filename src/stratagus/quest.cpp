@@ -95,7 +95,7 @@ std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type)
 	} else if (objective_type == ObjectiveType::ResearchUpgrade) {
 		return "research-upgrade";
 	} else if (objective_type == ObjectiveType::RecruitHero) {
-		return "recruit-hero";
+		return "recruit_hero";
 	} else if (objective_type == ObjectiveType::DestroyHero) {
 		return "destroy-hero";
 	} else if (objective_type == ObjectiveType::HeroMustSurvive) {
@@ -123,7 +123,7 @@ ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 		return ObjectiveType::DestroyUnits;
 	} else if (objective_type == "research-upgrade") {
 		return ObjectiveType::ResearchUpgrade;
-	} else if (objective_type == "recruit-hero") {
+	} else if (objective_type == "recruit_hero") {
 		return ObjectiveType::RecruitHero;
 	} else if (objective_type == "destroy-hero") {
 		return ObjectiveType::DestroyHero;
@@ -150,6 +150,8 @@ void CQuestObjective::process_sml_property(const stratagus::sml_property &proper
 		this->settlement = stratagus::site::get(value);
 	} else if (key == "faction") {
 		this->faction = stratagus::faction::get(value);
+	} else if (key == "character") {
+		this->character = stratagus::character::get(value);
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}

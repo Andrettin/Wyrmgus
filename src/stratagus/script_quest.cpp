@@ -196,7 +196,7 @@ static int CclDefineQuest(lua_State *l)
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
 						stratagus::character *character = stratagus::character::get(LuaToString(l, -1, k + 1));
-						objective->Character = character;
+						objective->character = character;
 					} else if (!strcmp(value, "unique")) {
 						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, k + 1));
 						if (!unique) {

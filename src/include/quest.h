@@ -100,6 +100,11 @@ public:
 		return this->faction;
 	}
 
+	const stratagus::character *get_character() const
+	{
+		return this->character;
+	}
+
 private:
 	int index = -1;
 public:
@@ -115,7 +120,9 @@ private:
 public:
 	std::vector<const CUnitType *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
-	const stratagus::character *Character = nullptr;
+private:
+	const stratagus::character *character = nullptr;
+public:
 	const CUniqueItem *Unique = nullptr;
 private:
 	const stratagus::site *settlement = nullptr;

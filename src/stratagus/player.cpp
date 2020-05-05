@@ -2532,7 +2532,7 @@ void CPlayer::update_current_quests()
 		} else if (quest_objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
 			objective->Counter = UpgradeIdAllowed(*this, quest_objective->Upgrade->ID) == 'R' ? 1 : 0;
 		} else if (quest_objective->ObjectiveType == ObjectiveType::RecruitHero) {
-			objective->Counter = this->HasHero(quest_objective->Character) ? 1 : 0;
+			objective->Counter = this->HasHero(quest_objective->get_character()) ? 1 : 0;
 		}
 	}
 	
@@ -2734,7 +2734,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 				return false;
 			}
 		} else if (objective->ObjectiveType == ObjectiveType::RecruitHero) {
-			if (!this->can_recruit_hero(objective->Character, true)) {
+			if (!this->can_recruit_hero(objective->get_character(), true)) {
 				return false;
 			}
 			recruit_heroes_quantity++;
@@ -2751,7 +2751,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 			}
 			
 			if (objective->ObjectiveType == ObjectiveType::DestroyHero) {
-				if (objective->Character->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
+				if (objective->get_character()->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
 			} else if (objective->ObjectiveType == ObjectiveType::DestroyUnique) {
@@ -2916,7 +2916,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 				}
 			}
 		} else if (quest_objective->ObjectiveType == ObjectiveType::RecruitHero) {
-			if (!this->HasHero(quest_objective->Character) && !this->can_recruit_hero(quest_objective->Character, true)) {
+			if (!this->HasHero(quest_objective->get_character()) && !this->can_recruit_hero(quest_objective->get_character(), true)) {
 				return "The hero can no longer be recruited.";
 			}
 		} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyUnits || quest_objective->ObjectiveType == ObjectiveType::DestroyHero || quest_objective->ObjectiveType == ObjectiveType::DestroyUnique) {
@@ -2932,7 +2932,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 			}
 			
 			if (quest_objective->ObjectiveType == ObjectiveType::DestroyHero) {
-				if (objective->Counter == 0 && quest_objective->Character->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
+				if (objective->Counter == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
 			} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyUnique) {
