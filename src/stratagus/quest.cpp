@@ -232,6 +232,19 @@ void quest::initialize()
 	}
 }
 
+std::string quest::get_rewards_string() const
+{
+	if (!this->rewards_string.empty()) {
+		return "- " + this->rewards_string;
+	}
+
+	if (this->completion_effects != nullptr) {
+		return this->completion_effects->get_effects_string();
+	}
+
+	return std::string();
+}
+
 }
 
 void SetCurrentQuest(const std::string &quest_ident)

@@ -33,6 +33,7 @@
 #include "luacallback.h"
 #include "player.h"
 #include "script.h"
+#include "util/string_util.h"
 
 namespace stratagus {
 
@@ -204,7 +205,7 @@ void dialogue_node::call(CPlayer *player) const
 	lua_command += "nil, nil, nil, ";
 	
 	lua_command += "{";
-	if (!this->options.empty() && !this->options.front()->tooltip.empty()) {
+	if (!this->options.empty() && !this->options.front()->get_tooltip().empty()) {
 		lua_command += "OptionTooltips = {";
 		bool first = true;
 		for (const auto &option : this->options) {
@@ -213,7 +214,10 @@ void dialogue_node::call(CPlayer *player) const
 			} else {
 				first = false;
 			}
-			lua_command += "\"" + option->tooltip + "\"";
+			std::string tooltip = option->get_tooltip();
+			string::replace(tooltip, "\n", "\\n");
+			string::replace(tooltip, "\t", "\\t");
+			lua_command += "\"" + tooltip + "\"";
 		}
 		lua_command += "}";
 	}

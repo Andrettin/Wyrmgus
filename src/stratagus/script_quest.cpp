@@ -107,7 +107,7 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "CompletionSpeech")) {
 			quest->CompletionSpeech = LuaToString(l, -1);
 		} else if (!strcmp(value, "Rewards")) {
-			quest->Rewards = LuaToString(l, -1);
+			quest->rewards_string = LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {

@@ -55,6 +55,7 @@ public:
 	}
 
 	void do_effects(CPlayer *player) const;
+	std::string get_tooltip() const;
 
 private:
 	std::string name;
@@ -62,7 +63,6 @@ private:
 	std::unique_ptr<LuaCallback> lua_effects = nullptr;
 	std::string tooltip;
 
-	friend class dialogue_node;
 	friend int ::CclDefineDialogue(lua_State *l);
 };
 

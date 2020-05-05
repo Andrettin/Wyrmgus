@@ -83,4 +83,17 @@ void dialogue_option::do_effects(CPlayer *player) const
 	}
 }
 
+std::string dialogue_option::get_tooltip() const
+{
+	if (!this->tooltip.empty()) {
+		return this->tooltip;
+	}
+
+	if (this->effects != nullptr) {
+		return this->effects->get_effects_string();
+	}
+
+	return std::string();
+}
+
 }

@@ -2497,8 +2497,9 @@ void CPlayer::available_quests_changed()
 			for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j) {
 				UnitButtonTable[i]->Description += "\n" + quest->ObjectiveStrings[j];
 			}
-			if (!quest->Rewards.empty()) {
-				UnitButtonTable[i]->Description += "\n \nRewards: " + quest->Rewards;
+			const std::string rewards_string = quest->get_rewards_string();
+			if (!rewards_string.empty()) {
+				UnitButtonTable[i]->Description += "\n \nRewards:\n" + rewards_string;
 			}
 			if (!quest->Hint.empty()) {
 				UnitButtonTable[i]->Description += "\n \nHint: " + quest->Hint;
@@ -2606,9 +2607,11 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 			stratagus::defines::get()->get_campaign_victory_dialogue()->call(this);
 		}
 
-		std::string rewards_string;
-		if (!quest->Rewards.empty()) {
-			rewards_string = "Rewards: " + quest->Rewards;
+		std::string rewards_string = quest->get_rewards_string();
+		if (!rewards_string.empty()) {
+			string::replace(rewards_string, "\n", "\\n");
+			string::replace(rewards_string, "\t", "\\t");
+			rewards_string = "Rewards:\\n" + rewards_string;
 		}
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");
 	}

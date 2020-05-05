@@ -202,6 +202,8 @@ public:
 		return this->completion_effects;
 	}
 
+	std::string get_rewards_string() const;
+
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -216,7 +218,9 @@ public:
 	std::string StartSpeech;		/// Speech given by the quest giver when offering the quest
 	std::string InProgressSpeech;	/// Speech given by the quest giver while the quest is in progress
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
-	std::string Rewards;			/// Description of the quest's rewards
+private:
+	std::string rewards_string;		/// Description of the quest's rewards
+public:
 	std::string Hint;				/// Quest hint
 	int ID = -1;
 	civilization *civilization = nullptr; //civilization to which civilization the quest belongs to
