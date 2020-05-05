@@ -194,18 +194,6 @@ quest::~quest()
 	}
 }
 
-void quest::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "player_color") {
-		this->PlayerColor = player_color::get(value);
-	} else {
-		data_entry::process_sml_property(property);
-	}
-}
-
 void quest::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();

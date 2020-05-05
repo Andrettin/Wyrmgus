@@ -149,6 +149,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(stratagus::player_color* player_color MEMBER player_color READ get_player_color)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 
 public:
@@ -165,13 +166,17 @@ public:
 	quest(const std::string &identifier);
 	~quest();
 	
-	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
 	icon *get_icon() const
 	{
 		return this->icon;
+	}
+
+	player_color *get_player_color() const
+	{
+		return this->player_color;
 	}
 
 	bool is_unobtainable() const
@@ -204,8 +209,8 @@ public:
 	civilization *civilization = nullptr; //civilization to which civilization the quest belongs to
 private:
 	icon *icon = nullptr;
+	player_color *player_color = nullptr;		/// Player color used for the quest's icon
 public:
-	const player_color *PlayerColor = nullptr;		/// Player color used for the quest's icon
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden
 	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others

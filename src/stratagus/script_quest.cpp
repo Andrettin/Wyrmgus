@@ -115,7 +115,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->civilization = civilization;
 		} else if (!strcmp(value, "PlayerColor")) {
 			const std::string color_name = LuaToString(l, -1);
-			quest->PlayerColor = stratagus::player_color::get(color_name);
+			quest->player_color = stratagus::player_color::get(color_name);
 		} else if (!strcmp(value, "Hidden")) {
 			quest->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Competitive")) {
@@ -312,8 +312,8 @@ static int CclGetQuestData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		if (quest->PlayerColor != nullptr) {
-			lua_pushstring(l, quest->PlayerColor->get_identifier().c_str());
+		if (quest->get_player_color() != nullptr) {
+			lua_pushstring(l, quest->get_player_color()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

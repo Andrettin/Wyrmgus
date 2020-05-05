@@ -2604,7 +2604,7 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->PlayerColor ? quest->PlayerColor->get_identifier() : "") + "\", " + std::to_string((long long) (quest->get_icon() ? quest->get_icon()->get_frame() : 0)) + ") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");
 	}
 }
 
@@ -2624,7 +2624,7 @@ void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason
 			stratagus::defines::get()->get_campaign_defeat_dialogue()->call(this);
 		}
 
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->PlayerColor ? quest->PlayerColor->get_identifier() : "") + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\") end;");
 	}
 }
 
