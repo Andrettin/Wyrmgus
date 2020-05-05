@@ -37,7 +37,8 @@ namespace stratagus {
 class accept_quest_effect final : public effect
 {
 public:
-	explicit accept_quest_effect(const std::string &quest_identifier)
+	explicit accept_quest_effect(const std::string &quest_identifier, const sml_operator effect_operator)
+		: effect(effect_operator)
 	{
 		this->quest = quest::get(quest_identifier);
 	}
@@ -48,12 +49,12 @@ public:
 		return class_identifier;
 	}
 
-	virtual void do_effect(CPlayer *player) const override
+	virtual void do_assignment_effect(CPlayer *player) const override
 	{
 		player->accept_quest(this->quest);
 	}
 
-	virtual std::string get_string(const CPlayer *player) const override
+	virtual std::string get_assignment_string() const override
 	{
 		return "Receive the " + string::highlight(this->quest->get_name()) + " quest";
 	}

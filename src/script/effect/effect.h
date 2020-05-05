@@ -27,15 +27,14 @@
 
 #pragma once
 
-class CConfigData;
 class CPlayer;
-class CUnitType;
 
 namespace stratagus {
 
 class dialogue;
 class sml_data;
 class sml_property;
+enum class sml_operator;
 
 //a scripted effect
 class effect
@@ -44,17 +43,60 @@ public:
 	static std::unique_ptr<effect> from_sml_property(const sml_property &property);
 	static std::unique_ptr<effect> from_sml_scope(const sml_data &scope);
 
+	explicit effect(const sml_operator effect_operator);
+
 	virtual const std::string &get_class_identifier() const = 0;
 
 	virtual void process_sml_property(const sml_property &property);
 	virtual void process_sml_scope(const sml_data &scope);
-	virtual void do_effect(CPlayer *player) const = 0;
-	virtual std::string get_string(const CPlayer *player) const = 0;
+
+	void do_effect(CPlayer *player) const;
+
+	virtual void do_assignment_effect(CPlayer *player) const
+	{
+		Q_UNUSED(player)
+
+		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
+
+	virtual void do_addition_effect(CPlayer *player) const
+	{
+		Q_UNUSED(player)
+
+		throw std::runtime_error("The addition operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
+
+	virtual void do_subtraction_effect(CPlayer *player) const
+	{
+		Q_UNUSED(player)
+
+		throw std::runtime_error("The subtraction operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
+
+	std::string get_string() const;
+
+	virtual std::string get_assignment_string() const
+	{
+		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
+
+	virtual std::string get_addition_string() const
+	{
+		throw std::runtime_error("The addition operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
+
+	virtual std::string get_subtraction_string() const
+	{
+		throw std::runtime_error("The subtraction operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
 
 	virtual bool is_hidden() const
 	{
 		return false;
 	}
+
+private:
+	sml_operator effect_operator;
 };
 
 }

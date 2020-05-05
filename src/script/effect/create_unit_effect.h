@@ -40,11 +40,13 @@ namespace stratagus {
 class create_unit_effect final : public effect
 {
 public:
-	create_unit_effect()
+	explicit create_unit_effect(const sml_operator effect_operator)
+		: effect(effect_operator)
 	{
 	}
 
-	explicit create_unit_effect(const std::string &unit_type_identifier)
+	explicit create_unit_effect(const std::string &unit_type_identifier, const sml_operator effect_operator)
+		: create_unit_effect(effect_operator)
 	{
 		this->unit_type = CUnitType::get(unit_type_identifier);
 	}
@@ -71,7 +73,7 @@ public:
 		}
 	}
 
-	virtual void do_effect(CPlayer *player) const override
+	virtual void do_assignment_effect(CPlayer *player) const override
 	{
 		QPoint unit_top_left_pos = this->site ? this->site->get_site_unit()->get_center_tile_pos() : player->StartPos;
 		unit_top_left_pos -= this->unit_type->get_tile_center_pos_offset();
@@ -83,7 +85,7 @@ public:
 		}
 	}
 
-	virtual std::string get_string(const CPlayer *player) const override
+	virtual std::string get_assignment_string() const override
 	{
 		std::string str = "Receive a " + string::highlight(this->unit_type->get_name()) + " unit";
 		if (this->site != nullptr) {

@@ -37,7 +37,8 @@ namespace stratagus {
 class call_dialogue_effect final : public effect
 {
 public:
-	explicit call_dialogue_effect(const std::string &dialogue_identifier)
+	explicit call_dialogue_effect(const std::string &dialogue_identifier, const sml_operator effect_operator)
+		: effect(effect_operator)
 	{
 		this->dialogue = dialogue::get(dialogue_identifier);
 	}
@@ -48,12 +49,12 @@ public:
 		return class_identifier;
 	}
 
-	virtual void do_effect(CPlayer *player) const override
+	virtual void do_assignment_effect(CPlayer *player) const override
 	{
 		this->dialogue->call(player);
 	}
 
-	virtual std::string get_string(const CPlayer *player) const override
+	virtual std::string get_assignment_string() const override
 	{
 		return "Trigger the " + string::highlight(this->dialogue->get_identifier()) + " dialogue";
 	}

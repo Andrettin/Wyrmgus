@@ -39,17 +39,19 @@ namespace stratagus {
 
 std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
 {
-	const std::string &effect_identifier = property.get_key();
+	const std::string &key = property.get_key();
+	const sml_operator effect_operator = property.get_operator();
+	const std::string &value = property.get_value();
 
-	if (effect_identifier == "accept_quest") {
-		return std::make_unique<accept_quest_effect>(property.get_value());
-	} else if (effect_identifier == "call_dialogue") {
-		return std::make_unique<call_dialogue_effect>(property.get_value());
-	} else if (effect_identifier == "create_unit") {
-		return std::make_unique<create_unit_effect>(property.get_value());
+	if (key == "accept_quest") {
+		return std::make_unique<accept_quest_effect>(value, effect_operator);
+	} else if (key == "call_dialogue") {
+		return std::make_unique<call_dialogue_effect>(value, effect_operator);
+	} else if (key == "create_unit") {
+		return std::make_unique<create_unit_effect>(value, effect_operator);
 	}
 
-	throw std::runtime_error("Invalid property effect: \"" + effect_identifier + "\".");
+	throw std::runtime_error("Invalid property effect: \"" + key + "\".");
 }
 
 std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
@@ -58,7 +60,7 @@ std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
 	std::unique_ptr<effect> effect;
 
 	if (effect_identifier == "create_unit") {
-		effect = std::make_unique<create_unit_effect>();
+		effect = std::make_unique<create_unit_effect>(scope.get_operator());
 	}
 
 	if (effect == nullptr) {
@@ -70,6 +72,10 @@ std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
 	return effect;
 }
 
+effect::effect(const sml_operator effect_operator) : effect_operator(effect_operator)
+{
+}
+
 void effect::process_sml_property(const sml_property &property)
 {
 	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
@@ -78,6 +84,37 @@ void effect::process_sml_property(const sml_property &property)
 void effect::process_sml_scope(const sml_data &scope)
 {
 	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
+}
+
+void effect::do_effect(CPlayer *player) const
+{
+	switch (this->effect_operator) {
+		case sml_operator::assignment:
+			this->do_assignment_effect(player);
+			break;
+		case sml_operator::addition:
+			this->do_addition_effect(player);
+			break;
+		case sml_operator::subtraction:
+			this->do_subtraction_effect(player);
+			break;
+		default:
+			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");
+	}
+}
+
+std::string effect::get_string() const
+{
+	switch (this->effect_operator) {
+		case sml_operator::assignment:
+			return this->get_assignment_string();
+		case sml_operator::addition:
+			return this->get_addition_string();
+		case sml_operator::subtraction:
+			return this->get_subtraction_string();
+		default:
+			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");
+	}
 }
 
 }
