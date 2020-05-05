@@ -29,10 +29,13 @@
 
 #include "dialogue.h"
 
+#include "character.h"
 #include "dialogue_option.h"
+#include "faction.h"
 #include "luacallback.h"
 #include "player.h"
 #include "script.h"
+#include "unit/unit_type.h"
 #include "util/string_util.h"
 
 namespace stratagus {
@@ -110,7 +113,11 @@ void dialogue_node::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "text") {
-		this->Text = value;
+		this->text = value;
+	} else if (key == "speaker") {
+		this->speaker = character::get(value);
+	} else if (key == "speaker_unit_type") {
+		this->speaker_unit_type = CUnitType::get(value);
 	} else {
 		throw std::runtime_error("Invalid dialogue node property: \"" + key + "\".");
 	}
@@ -147,23 +154,23 @@ void dialogue_node::call(CPlayer *player) const
 	
 	std::string lua_command = "Event(";
 	
-	if (this->SpeakerType == "character") {
-		lua_command += "FindHero(\"" + this->Speaker;
-	} else if (this->SpeakerType == "unit") {
-		lua_command += "FindUnit(\"" + this->Speaker;
+	if (this->speaker != nullptr) {
+		lua_command += "FindHero(\"" + this->speaker->get_identifier();
+	} else if (this->speaker_unit_type != nullptr) {
+		lua_command += "FindUnit(\"" + this->speaker_unit_type->get_identifier();
 	} else {
-		lua_command += "\"" + this->Speaker + "\", ";
+		lua_command += "\"" + this->speaker_name + "\", ";
 	}
 	
-	if (this->SpeakerType == "character" || this->SpeakerType == "unit") {
+	if (this->speaker != nullptr || this->speaker_unit_type != nullptr) {
 		lua_command += "\"";
-		if (!this->SpeakerPlayer.empty()) {
-			lua_command += ", GetFactionPlayer(\"" + this->SpeakerPlayer + "\")";
+		if (this->speaker_faction != nullptr) {
+			lua_command += ", GetFactionPlayer(\"" + this->speaker_faction->get_identifier() + "\")";
 		}
 		lua_command += "), ";
 	}
 	
-	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->Text, "\"", "\\\""), "\n", "\\n") + "\", ";
+	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->text, "\"", "\\\""), "\n", "\\n") + "\", ";
 	lua_command += std::to_string(player->Index) + ", ";
 	
 	lua_command += "{";

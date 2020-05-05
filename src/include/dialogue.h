@@ -31,6 +31,7 @@
 #include "database/data_type.h"
 
 class CPlayer;
+class CUnitType;
 class LuaCallback;
 struct lua_State;
 
@@ -38,8 +39,10 @@ int CclDefineDialogue(lua_State *l);
 
 namespace stratagus {
 
+class character;
 class dialogue_node;
 class dialogue_option;
+class faction;
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
@@ -77,14 +80,19 @@ public:
 	void option_effect(const int option_index, CPlayer *player) const;
 	
 	int ID = -1;
-	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
-	std::string SpeakerPlayer;			/// name of the player to whom the speaker belongs
-	std::string Speaker;
-	std::string Text;
+private:
+	const character *speaker = nullptr;
+	const CUnitType *speaker_unit_type = nullptr;
+	std::string speaker_name;
+	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
+	std::string text;
+public:
 	stratagus::dialogue *Dialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *ImmediateEffects = nullptr;
 	std::vector<std::unique_ptr<dialogue_option>> options;
+
+	friend int ::CclDefineDialogue(lua_State *l);
 };
 
 }

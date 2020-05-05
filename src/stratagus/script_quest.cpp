@@ -726,13 +726,20 @@ static int CclDefineDialogue(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "speaker")) {
-						node->SpeakerType = LuaToString(l, -1, k + 1);
+						const std::string speaker_type = LuaToString(l, -1, k + 1);
 						++k;
-						node->Speaker = LuaToString(l, -1, k + 1);
+						const std::string speaker = LuaToString(l, -1, k + 1);
+						if (speaker_type == "character") {
+							node->speaker = stratagus::character::get(speaker);
+						} else if (speaker_type == "unit") {
+							node->speaker_unit_type = CUnitType::get(speaker);
+						} else {
+							node->speaker_name = speaker;
+						}
 					} else if (!strcmp(value, "speaker-player")) {
-						node->SpeakerPlayer = LuaToString(l, -1, k + 1);
+						node->speaker_faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "text")) {
-						node->Text = LuaToString(l, -1, k + 1);
+						node->text = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "conditions")) {
 						lua_rawgeti(l, -1, k + 1);
 						node->Conditions = new LuaCallback(l, -1);
