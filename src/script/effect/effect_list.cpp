@@ -60,7 +60,7 @@ void effect_list::do_effects(CPlayer *player) const
 	}
 }
 
-std::string effect_list::get_effects_string(const CPlayer *player, const size_t indent) const
+std::string effect_list::get_effects_string(const size_t indent) const
 {
 	std::string effects_string;
 	bool first = true;
@@ -69,7 +69,7 @@ std::string effect_list::get_effects_string(const CPlayer *player, const size_t 
 			continue;
 		}
 
-		const std::string effect_string = effect->get_string(player);
+		const std::string effect_string = effect->get_string();
 		if (effect_string.empty()) {
 			continue;
 		}
@@ -83,6 +83,8 @@ std::string effect_list::get_effects_string(const CPlayer *player, const size_t 
 		if (indent > 0) {
 			effects_string += std::string(indent, '\t');
 		}
+
+		effects_string += "- ";
 
 		effects_string += effect_string;
 	}

@@ -44,7 +44,7 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void do_effects(CPlayer *player) const;
-	std::string get_effects_string(const CPlayer *player, const size_t indent = 0) const;
+	std::string get_effects_string(const size_t indent = 0) const;
 
 private:
 	std::vector<std::unique_ptr<effect>> effects;

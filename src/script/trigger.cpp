@@ -681,7 +681,7 @@ void trigger::InitActiveTriggers()
 		if (vector::contains(trigger::DeactivatedTriggers, trigger->get_identifier())) {
 			continue;
 		}
-		if (trigger->is_campaign_only() && stratagus::game::get()->get_current_campaign() == nullptr) {
+		if (trigger->is_campaign_only() && game::get()->get_current_campaign() == nullptr) {
 			continue;
 		}
 		trigger::ActiveTriggers.push_back(trigger);
@@ -708,7 +708,7 @@ void trigger::ClearActiveTriggers()
 	trigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
-	for (stratagus::quest *quest : stratagus::quest::get_all()) {
+	for (quest *quest : quest::get_all()) {
 		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
@@ -754,7 +754,7 @@ void trigger::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "effects") {
-		this->effects = std::make_unique<stratagus::effect_list>();
+		this->effects = std::make_unique<effect_list>();
 		database::process_sml_data(this->effects, scope);
 	} else if (tag == "dependencies") {
 		this->Dependency = new and_dependency;
