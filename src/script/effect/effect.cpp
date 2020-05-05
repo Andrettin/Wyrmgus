@@ -34,6 +34,7 @@
 #include "script/effect/accept_quest_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/create_unit_effect.h"
+#include "script/effect/resource_effect.h"
 
 namespace stratagus {
 
@@ -49,6 +50,8 @@ std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
 		return std::make_unique<call_dialogue_effect>(value, effect_operator);
 	} else if (key == "create_unit") {
 		return std::make_unique<create_unit_effect>(value, effect_operator);
+	} else if (resource::try_get(key) != nullptr) {
+		return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
 	}
 
 	throw std::runtime_error("Invalid property effect: \"" + key + "\".");
