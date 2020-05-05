@@ -43,6 +43,7 @@ namespace stratagus {
 	class character;
 	class civilization;
 	class dialogue;
+	class effect_list;
 	class faction;
 	class player_color;
 	class quest;
@@ -196,6 +197,11 @@ public:
 		return this->Completed;
 	}
 
+	const std::unique_ptr<effect_list> &get_completion_effects() const
+	{
+		return this->completion_effects;
+	}
+
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -233,6 +239,7 @@ public:
 	LuaCallback *AcceptEffects = nullptr;
 	LuaCallback *CompletionEffects = nullptr;
 	LuaCallback *FailEffects = nullptr;
+	std::unique_ptr<effect_list> completion_effects;
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest

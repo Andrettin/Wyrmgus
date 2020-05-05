@@ -69,8 +69,10 @@
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/religion.h"
-#include "settings.h"
 //Wyrmgus end
+#include "script/effect/effect_list.h"
+//Wyrmgus start
+#include "settings.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "time/calendar.h"
@@ -2590,6 +2592,10 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 	if (quest->CompletionEffects) {
 		quest->CompletionEffects->pushPreamble();
 		quest->CompletionEffects->run();
+	}
+
+	if (quest->get_completion_effects() != nullptr) {
+		quest->get_completion_effects()->do_effects(this);
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {

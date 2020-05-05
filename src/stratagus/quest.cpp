@@ -41,6 +41,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "player_color.h"
+#include "script/effect/effect_list.h"
 #include "script.h"
 #include "unit/unit_class.h"
 
@@ -216,6 +217,9 @@ void quest::process_sml_scope(const sml_data &scope)
 
 			database::process_sml_data(objective, child_scope);
 		});
+	} else if (tag == "completion_effects") {
+		this->completion_effects = std::make_unique<effect_list>();
+		database::process_sml_data(this->completion_effects, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
