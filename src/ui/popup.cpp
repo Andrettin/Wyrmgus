@@ -825,8 +825,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	Assert(lua_istable(l, -1));
 
 	bool wrap = true;
-	int marginX = MARGIN_X;
-	int marginY = MARGIN_Y;
+	int marginX = MARGIN_X * stratagus::defines::get()->get_scale_factor();
+	int marginY = MARGIN_Y * stratagus::defines::get()->get_scale_factor();
 	int minWidth = 0;
 	int minHeight = 0;
 	std::string textColor("white");
@@ -886,7 +886,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 }
 
 CPopup::CPopup() :
-	Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
+	Contents(), MarginX(MARGIN_X *stratagus::defines::get()->get_scale_factor()), MarginY(MARGIN_Y *stratagus::defines::get()->get_scale_factor()), MinWidth(0), MinHeight(0),
 	DefaultFont(nullptr), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
 {}
 

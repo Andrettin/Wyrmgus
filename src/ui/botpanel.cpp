@@ -855,6 +855,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
 	if (!popup) {
 		return;
@@ -916,9 +917,9 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
 	clamp<int>(&x, 0, Video.Width - 1);
 	if (above) {
-		y = y - popupHeight - 10 * stratagus::defines::get()->get_scale_factor();
+		y = y - popupHeight - 10 * scale_factor;
 	} else { //below
-		y = y + 10 * stratagus::defines::get()->get_scale_factor();
+		y = y + 10 * scale_factor;
 	}
 	clamp<int>(&y, 0, Video.Height - 1);
 
@@ -951,7 +952,8 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 {
 	const CFont &font = GetGameFont();
 	
-	int MaxWidth = std::max(512, Video.Width / 5);
+	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	int MaxWidth = std::max(512 * scale_factor, Video.Width / 5);
 
 	int i;
 		
@@ -964,7 +966,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 		int cost_symbol_pos = content_width_sub.find("COST_", 0);
 		if (cost_symbol_pos != std::string::npos) {
 			int res = std::stoi(content_width_sub.substr(cost_symbol_pos + 5, content_width_sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
-			line_width -= font.getWidth("COST_" + std::to_string((long long) res));
+			line_width -= font.getWidth("COST_" + std::to_string(res));
 			line_width += UI.Resources[res].G->Width;
 		}
 		content_width = std::max(content_width, line_width);
@@ -978,38 +980,38 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	int content_height = 0;
 	i = 1;
 	while ((GetLineFont(i++, popup_text, MaxWidth, &font)).length()) {
-		content_height += font.Height() + 2;
+		content_height += font.Height() + 2 * scale_factor;
 	}
 	
 	int popupWidth, popupHeight;
 
-	int contentWidth = MARGIN_X;
+	int contentWidth = MARGIN_X * scale_factor;
 	int contentHeight = 0;
 	int maxContentWidth = 0;
 	int maxContentHeight = 0;
-	popupWidth = MARGIN_X;
-	popupHeight = MARGIN_Y;
+	popupWidth = MARGIN_X * scale_factor;
+	popupHeight = MARGIN_Y * scale_factor;
 	PixelPos pos(0, 0);
 	
 	bool wrap = true;
 
 	// Automatically write the calculated coordinates.
-	pos.x = contentWidth + MARGIN_X;
-	pos.y = popupHeight + MARGIN_Y;
+	pos.x = contentWidth + MARGIN_X * scale_factor;
+	pos.y = popupHeight + MARGIN_Y * scale_factor;
 
-	contentWidth += std::max(0, 2 * MARGIN_X + content_width);
-	contentHeight = std::max(0, 2 * MARGIN_Y + content_height);
+	contentWidth += std::max(0, 2 * MARGIN_X * scale_factor + content_width);
+	contentHeight = std::max(0, 2 * MARGIN_Y * scale_factor + content_height);
 	maxContentHeight = std::max(contentHeight, maxContentHeight);
 	if (wrap) {
 		popupWidth += std::max(0, contentWidth - maxContentWidth);
 		popupHeight += maxContentHeight;
 		maxContentWidth = std::max(maxContentWidth, contentWidth);
-		contentWidth = MARGIN_X;
+		contentWidth = MARGIN_X * scale_factor;
 		maxContentHeight = 0;
 	}
 
-	popupWidth += MARGIN_X;
-	popupHeight += MARGIN_Y;
+	popupWidth += MARGIN_X * scale_factor;
+	popupHeight += MARGIN_Y * scale_factor;
 	
 	popupWidth = std::min(popupWidth, MaxWidth);
 	popupHeight = std::max(popupHeight, 0);
@@ -1017,9 +1019,9 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
 	clamp<int>(&x, 0, Video.Width - 1);
 	if (above) {
-		y = y - popupHeight - 10;
+		y = y - popupHeight - 10 * scale_factor;
 	} else { //below
-		y = y + 10;
+		y = y + 10 * scale_factor;
 	}
 	clamp<int>(&y, 0, Video.Height - 1);
 
@@ -1045,12 +1047,12 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	i = 0;
 	int y_off = y;
 	unsigned int width = MaxWidth
-						 ? std::min(MaxWidth, popupWidth - 2 * MARGIN_X)
+						 ? std::min(MaxWidth, popupWidth - 2 * MARGIN_X * scale_factor)
 						 : 0;
 	while ((sub = GetLineFont(++i, popup_text, width, &font)).length()) {
 		if (sub.find("LINE", 0) != std::string::npos) {
-			Video.FillRectangle(BorderColor, x - MARGIN_X + 1 - MARGIN_X,
-								y_off, popupWidth - 2, 1);
+			Video.FillRectangle(BorderColor, x + (-MARGIN_X + 1 - MARGIN_X) * scale_factor,
+								y_off, popupWidth - 2 * scale_factor, 1);
 			sub = sub.substr(sub.find("LINE", 0) + 4, sub.length());
 		}
 		int cost_symbol_pos = sub.find("COST_", 0);
@@ -1067,7 +1069,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 		} else {
 			label.Draw(x, y_off, sub);
 		}
-		y_off += font.Height() + 2;
+		y_off += font.Height() + 2 * scale_factor;
 	}
 }
 //Wyrmgus end
