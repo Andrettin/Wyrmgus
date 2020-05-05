@@ -197,14 +197,14 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		CPlayer::Players[player]->SetResource(resId, value, STORE_BOTH);
+		CPlayer::Players[player]->set_resource(stratagus::resource::get_all()[resId], value, STORE_BOTH);
 	} else if (!strcmp(prop, "StoredResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		CPlayer::Players[player]->SetResource(resId, value, STORE_BUILDING);
+		CPlayer::Players[player]->set_resource(stratagus::resource::get_all()[resId], value, STORE_BUILDING);
 	} else if (!strcmp(prop, "UnitLimit")) {
 		CPlayer::Players[player]->UnitLimit = value;
 	} else if (!strcmp(prop, "BuildingLimit")) {

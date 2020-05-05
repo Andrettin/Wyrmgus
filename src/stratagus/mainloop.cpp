@@ -616,14 +616,14 @@ void GameMainLoop()
 
 						for (std::map<std::pair<CDate, int>, int>::iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
 							if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
-								player->SetResource(iterator->first.second, iterator->second);
+								player->set_resource(stratagus::resource::get_all()[iterator->first.second], iterator->second);
 							}
 						}
 
 						for (const auto &kv_pair : faction->get_resources()) {
 							const stratagus::resource *resource = kv_pair.first;
 							const int quantity = kv_pair.second;
-							player->SetResource(resource->ID, quantity);
+							player->set_resource(resource, quantity);
 						}
 					}
 				}

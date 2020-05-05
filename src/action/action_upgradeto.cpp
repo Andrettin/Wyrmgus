@@ -152,7 +152,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
 			if (player.MaxResources[i] != -1) {
 				player.MaxResources[i] += newtype.Stats[player.Index].Storing[i] - oldtype.Stats[player.Index].Storing[i];
-				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
+				player.set_resource(stratagus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 	}

@@ -2528,7 +2528,7 @@ void CPlayer::update_current_quests()
 	for (CPlayerQuestObjective *objective : this->QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
 		if (quest_objective->ObjectiveType == ObjectiveType::HaveResource) {
-			objective->Counter = std::min(this->GetResource(quest_objective->Resource, STORE_BOTH), quest_objective->Quantity);
+			objective->Counter = std::min(this->get_resource(stratagus::resource::get_all()[quest_objective->Resource], STORE_BOTH), quest_objective->Quantity);
 		} else if (quest_objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
 			objective->Counter = UpgradeIdAllowed(*this, quest_objective->Upgrade->ID) == 'R' ? 1 : 0;
 		} else if (quest_objective->ObjectiveType == ObjectiveType::RecruitHero) {
@@ -3038,15 +3038,15 @@ int CPlayer::GetUnitCount() const
 **
 **  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
-int CPlayer::GetResource(const int resource, const int type)
+int CPlayer::get_resource(const stratagus::resource *resource, const int type)
 {
 	switch (type) {
 		case STORE_OVERALL:
-			return this->Resources[resource];
+			return this->Resources[resource->ID];
 		case STORE_BUILDING:
-			return this->StoredResources[resource];
+			return this->StoredResources[resource->ID];
 		case STORE_BOTH:
-			return this->Resources[resource] + this->StoredResources[resource];
+			return this->Resources[resource->ID] + this->StoredResources[resource->ID];
 		default:
 			DebugPrint("Wrong resource type\n");
 			return -1;
@@ -3060,18 +3060,18 @@ int CPlayer::GetResource(const int resource, const int type)
 **  @param value     How many of this resource (can be negative).
 **  @param store     If true, sets the building store resources, else the overall resources.
 */
-void CPlayer::ChangeResource(const int resource, const int value, const bool store)
+void CPlayer::change_resource(const stratagus::resource *resource, const int value, const bool store)
 {
 	if (value < 0) {
-		const int fromStore = std::min(this->StoredResources[resource], abs(value));
-		this->StoredResources[resource] -= fromStore;
-		this->Resources[resource] -= abs(value) - fromStore;
-		this->Resources[resource] = std::max(this->Resources[resource], 0);
+		const int fromStore = std::min(this->StoredResources[resource->ID], abs(value));
+		this->StoredResources[resource->ID] -= fromStore;
+		this->Resources[resource->ID] -= abs(value) - fromStore;
+		this->Resources[resource->ID] = std::max(this->Resources[resource->ID], 0);
 	} else {
-		if (store && this->MaxResources[resource] != -1) {
-			this->StoredResources[resource] += std::min(value, this->MaxResources[resource] - this->StoredResources[resource]);
+		if (store && this->MaxResources[resource->ID] != -1) {
+			this->StoredResources[resource->ID] += std::min(value, this->MaxResources[resource->ID] - this->StoredResources[resource->ID]);
 		} else {
-			this->Resources[resource] += value;
+			this->Resources[resource->ID] += value;
 		}
 	}
 }
@@ -3083,20 +3083,20 @@ void CPlayer::ChangeResource(const int resource, const int value, const bool sto
 **  @param value     How many of this resource.
 **  @param type      Resource types: 0 - overall store, 1 - store buildings, 2 - both
 */
-void CPlayer::SetResource(const int resource, const int value, const int type)
+void CPlayer::set_resource(const stratagus::resource *resource, const int value, const int type)
 {
 	if (type == STORE_BOTH) {
-		if (this->MaxResources[resource] != -1) {
-			const int toRes = std::max(0, value - this->StoredResources[resource]);
-			this->Resources[resource] = std::max(0, toRes);
-			this->StoredResources[resource] = std::min(value - toRes, this->MaxResources[resource]);
+		if (this->MaxResources[resource->ID] != -1) {
+			const int toRes = std::max(0, value - this->StoredResources[resource->ID]);
+			this->Resources[resource->ID] = std::max(0, toRes);
+			this->StoredResources[resource->ID] = std::min(value - toRes, this->MaxResources[resource->ID]);
 		} else {
-			this->Resources[resource] = value;
+			this->Resources[resource->ID] = value;
 		}
-	} else if (type == STORE_BUILDING && this->MaxResources[resource] != -1) {
-		this->StoredResources[resource] = std::min(value, this->MaxResources[resource]);
+	} else if (type == STORE_BUILDING && this->MaxResources[resource->ID] != -1) {
+		this->StoredResources[resource->ID] = std::min(value, this->MaxResources[resource->ID]);
 	} else if (type == STORE_OVERALL) {
-		this->Resources[resource] = value;
+		this->Resources[resource->ID] = value;
 	}
 }
 
@@ -3412,7 +3412,7 @@ int CPlayer::CheckUnitType(const CUnitType &type, bool hire) const
 void CPlayer::AddCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		ChangeResource(i, costs[i], false);
+		change_resource(stratagus::resource::get_all()[i], costs[i], false);
 	}
 }
 
@@ -3447,7 +3447,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 	}
 	
 	for (int i = 1; i < MaxCosts; ++i) {
-		ChangeResource(i, costs[i] * factor / 100, true);
+		change_resource(stratagus::resource::get_all()[i], costs[i] * factor / 100, true);
 	}
 }
 
@@ -3459,7 +3459,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 void CPlayer::SubCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		ChangeResource(i, -costs[i], true);
+		this->change_resource(stratagus::resource::get_all()[i], -costs[i], true);
 	}
 }
 
@@ -3490,7 +3490,7 @@ void CPlayer::SubUnitType(const CUnitType &type, bool hire)
 void CPlayer::SubCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		ChangeResource(i, -costs[i] * 100 / factor);
+		this->change_resource(stratagus::resource::get_all()[i], -costs[i] * 100 / factor);
 	}
 }
 

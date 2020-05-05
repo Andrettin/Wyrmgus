@@ -2587,7 +2587,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
-	CPlayer::Players[player]->ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
+	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[CopperCost], -sold_unit->GetPrice(), true);
 	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		CPlayer::Players[player]->Ai->Force.RemoveDeadUnit();
 		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
@@ -2646,8 +2646,8 @@ void CUnit::SellResource(const int resource, const int player)
 		return;
 	}
 
-	CPlayer::Players[player]->ChangeResource(resource, -100, true);
-	CPlayer::Players[player]->ChangeResource(CopperCost, this->Player->GetEffectiveResourceSellPrice(resource), true);
+	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[resource], -100, true);
+	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[CopperCost], this->Player->GetEffectiveResourceSellPrice(resource), true);
 	
 	this->Player->DecreaseResourcePrice(resource);
 }
@@ -2663,8 +2663,8 @@ void CUnit::BuyResource(const int resource, const int player)
 		return;
 	}
 
-	CPlayer::Players[player]->ChangeResource(resource, 100, true);
-	CPlayer::Players[player]->ChangeResource(CopperCost, -this->Player->GetEffectiveResourceBuyPrice(resource), true);
+	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[resource], 100, true);
+	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[CopperCost], -this->Player->GetEffectiveResourceBuyPrice(resource), true);
 	
 	this->Player->IncreaseResourcePrice(resource);
 }
@@ -4111,7 +4111,7 @@ void UnitLost(CUnit &unit)
 				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
+				player.set_resource(stratagus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 		//  Handle income improvements, look if a player loses a building
@@ -6989,10 +6989,10 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (target.Type->Stats[target.Player->Index].Costs[i] > 0) {
 			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
-			resource_change = std::min(resource_change, target.Player->GetResource(i, STORE_BOTH));
-			attacker->Player->ChangeResource(i, resource_change);
+			resource_change = std::min(resource_change, target.Player->get_resource(stratagus::resource::get_all()[i], STORE_BOTH));
+			attacker->Player->change_resource(stratagus::resource::get_all()[i], resource_change);
 			attacker->Player->TotalResources[i] += resource_change;
-			target.Player->ChangeResource(i, -resource_change);
+			target.Player->change_resource(stratagus::resource::get_all()[i], -resource_change);
 		}
 	}
 }
@@ -7038,7 +7038,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 				&& (stratagus::vector::contains(quest_objective->UnitTypes, target.Type) || stratagus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
 				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
 			)
-			|| (quest_objective->ObjectiveType == ObjectiveType::DestroyHero && target.Character && quest_objective->Character == target.Character)
+			|| (quest_objective->ObjectiveType == ObjectiveType::DestroyHero && target.Character && quest_objective->get_character() == target.Character)
 			|| (quest_objective->ObjectiveType == ObjectiveType::DestroyUnique && target.Unique && quest_objective->Unique == target.Unique)
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {

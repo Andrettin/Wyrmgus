@@ -1045,7 +1045,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						return 0;
 					}
 					
-					unit.Player->ChangeResource(input_resource, -addload, true);
+					unit.Player->change_resource(stratagus::resource::get_all()[input_resource], -addload, true);
 				}
 				unit.ChangeResourcesHeld(addload);
 				if (!source->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
@@ -1371,12 +1371,12 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 	
 	if (!player.Overlord) {
-		player.ChangeResource(rindex, processed_resource_change, true);
+		player.change_resource(stratagus::resource::get_all()[rindex], processed_resource_change, true);
 		player.TotalResources[rindex] += processed_resource_change;
 	} else { // if the player has an overlord, give 10% of the resources gathered to them
-		player.ChangeResource(rindex, processed_resource_change * 90 / 100, true);
+		player.change_resource(stratagus::resource::get_all()[rindex], processed_resource_change * 90 / 100, true);
 		player.TotalResources[rindex] += processed_resource_change * 90 / 100;
-		player.Overlord->ChangeResource(rindex, processed_resource_change / 10, true);
+		player.Overlord->change_resource(stratagus::resource::get_all()[rindex], processed_resource_change / 10, true);
 		player.Overlord->TotalResources[rindex] += processed_resource_change / 10;
 	}
 	

@@ -308,11 +308,11 @@ public:
 	//Wyrmgus end
 
 	/// Get a resource of the player
-	int GetResource(const int resource, const int type);
+	int get_resource(const stratagus::resource *resource, const int type);
 	/// Adds/subtracts some resources to/from the player store
-	void ChangeResource(const int resource, const int value, const bool store = false);
+	void change_resource(const stratagus::resource *resource, const int value, const bool store = false);
 	/// Set a resource of the player
-	void SetResource(const int resource, const int value, const int type = STORE_OVERALL);
+	void set_resource(const stratagus::resource *resource, const int value, const int type = STORE_OVERALL);
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
 	//Wyrmgus start

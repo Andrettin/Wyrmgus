@@ -502,7 +502,7 @@ void CPlayer::Load(lua_State *l)
 	// Manage max
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (this->MaxResources[i] != -1) {
-			this->SetResource(i, this->Resources[i] + this->StoredResources[i], STORE_BOTH);
+			this->set_resource(stratagus::resource::get_all()[i], this->Resources[i] + this->StoredResources[i], STORE_BOTH);
 		}
 	}
 }
@@ -2946,13 +2946,13 @@ static int CclSetPlayerData(lua_State *l)
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		p->SetResource(resId, LuaToNumber(l, 4));
+		p->set_resource(stratagus::resource::get_all()[resId], LuaToNumber(l, 4));
 	} else if (!strcmp(data, "StoredResources")) {
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		p->SetResource(resId, LuaToNumber(l, 4), STORE_BUILDING);
+		p->set_resource(stratagus::resource::get_all()[resId], LuaToNumber(l, 4), STORE_BUILDING);
 		// } else if (!strcmp(data, "UnitTypesCount")) {
 		// } else if (!strcmp(data, "AiEnabled")) {
 		// } else if (!strcmp(data, "TotalNumUnits")) {

@@ -244,7 +244,7 @@ enum {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
 					}
-					unit.Player->ChangeResource(goal->Type->GivesResource, goal->ResourcesHeld);
+					unit.Player->change_resource(stratagus::resource::get_all()[goal->Type->GivesResource], goal->ResourcesHeld);
 					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
