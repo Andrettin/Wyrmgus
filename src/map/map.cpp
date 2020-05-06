@@ -1319,7 +1319,7 @@ void SetSeason(const std::string &season_ident, int z)
 		if (schedule) {
 			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
 				CScheduledSeason *season = schedule->ScheduledSeasons[i];
-				if (season->Season->Ident == season_ident)  {
+				if (season->Season->get_identifier() == season_ident)  {
 					CMap::Map.MapLayers[z]->SetSeason(season);
 					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
 					break;

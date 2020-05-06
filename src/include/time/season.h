@@ -41,7 +41,7 @@ public:
 	static constexpr const char *class_identifier = "season";
 	static constexpr const char *database_folder = "seasons";
 
-	season(const std::string &identifier) : named_data_entry(identifier)
+	season(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
 
