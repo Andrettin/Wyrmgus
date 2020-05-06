@@ -80,7 +80,7 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldCoastAllowed;
 	} else if (flag_name == "water") {
 		return MapFieldWaterAllowed;
-	} else if (flag_name == "no-building") {
+	} else if (flag_name == "no-building" || flag_name == "no_building") {
 		return MapFieldNoBuilding;
 	} else if (flag_name == "unpassable") {
 		return MapFieldUnpassable;
@@ -90,7 +90,7 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldRocks;
 	} else if (flag_name == "forest") {
 		return MapFieldForest;
-	} else if (flag_name == "air-unpassable") {
+	} else if (flag_name == "air-unpassable" || flag_name == "air_unpassable") {
 		return MapFieldAirUnpassable;
 	} else if (flag_name == "desert") {
 		return MapFieldDesert;
@@ -267,10 +267,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			this->add_base_terrain_type(base_terrain_type);
 		} else if (key == "inner_border_terrain_type") {
 			terrain_type *border_terrain_type = terrain_type::get(value);
-			this->InnerBorderTerrains.push_back(border_terrain_type);
-			this->BorderTerrains.push_back(border_terrain_type);
-			border_terrain_type->outer_border_terrain_types.push_back(this);
-			border_terrain_type->BorderTerrains.push_back(this);
+			this->add_inner_border_terrain_type(border_terrain_type);
 		} else if (key == "outer_border_terrain_type") {
 			terrain_type *border_terrain_type = terrain_type::get(value);
 			this->add_outer_border_terrain_type(border_terrain_type);
@@ -478,6 +475,16 @@ QVariantList terrain_type::get_outer_border_terrain_types_qvariant_list() const
 void terrain_type::remove_outer_border_terrain_type(terrain_type *terrain_type)
 {
 	vector::remove(this->outer_border_terrain_types, terrain_type);
+}
+
+QVariantList terrain_type::get_inner_border_terrain_types_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_inner_border_terrain_types());
+}
+
+void terrain_type::remove_inner_border_terrain_type(terrain_type *terrain_type)
+{
+	vector::remove(this->inner_border_terrain_types, terrain_type);
 }
 
 }

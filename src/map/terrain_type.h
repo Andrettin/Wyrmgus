@@ -62,6 +62,7 @@ class terrain_type : public named_data_entry, public data_type<terrain_type>, pu
 	Q_PROPERTY(stratagus::resource* resource MEMBER resource READ get_resource)
 	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
 	Q_PROPERTY(QVariantList outer_border_terrain_types READ get_outer_border_terrain_types_qvariant_list)
+	Q_PROPERTY(QVariantList inner_border_terrain_types READ get_inner_border_terrain_types_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "terrain_type";
@@ -281,11 +282,29 @@ public:
 		this->outer_border_terrain_types.push_back(terrain_type);
 
 		this->BorderTerrains.push_back(terrain_type);
-		terrain_type->InnerBorderTerrains.push_back(this);
+		terrain_type->inner_border_terrain_types.push_back(this);
 		terrain_type->BorderTerrains.push_back(this);
 	}
 
 	Q_INVOKABLE void remove_outer_border_terrain_type(terrain_type *terrain_type);
+
+	const std::vector<terrain_type *> &get_inner_border_terrain_types() const
+	{
+		return this->inner_border_terrain_types;
+	}
+
+	QVariantList get_inner_border_terrain_types_qvariant_list() const;
+
+	Q_INVOKABLE void add_inner_border_terrain_type(terrain_type *terrain_type)
+	{
+		this->inner_border_terrain_types.push_back(terrain_type);
+
+		this->BorderTerrains.push_back(terrain_type);
+		terrain_type->outer_border_terrain_types.push_back(this);
+		terrain_type->BorderTerrains.push_back(this);
+	}
+
+	Q_INVOKABLE void remove_inner_border_terrain_type(terrain_type *terrain_type);
 
 	const std::vector<int> &get_solid_tiles() const
 	{
@@ -363,10 +382,10 @@ private:
 private:
 	std::vector<terrain_type *> base_terrain_types; //possible base terrain types for this terrain type (if it is an overlay terrain)
 public:
-	std::vector<terrain_type *> BorderTerrains;					/// Terrain types which this one can border
-	std::vector<terrain_type *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
+	std::vector<terrain_type *> BorderTerrains;				/// Terrain types which this one can border
 private:
-	std::vector<terrain_type *> outer_border_terrain_types;			/// Terrain types which this one can border, and which are "entered" by this tile type in transitions
+	std::vector<terrain_type *> outer_border_terrain_types; //terrain types which this one can border, and which are "entered" by this tile type in transitions
+	std::vector<terrain_type *> inner_border_terrain_types; //terrain types which this one can border, and which "enter" this tile type in transitions
 	std::vector<int> solid_tiles;
 	std::vector<int> damaged_tiles;
 	std::vector<int> destroyed_tiles;

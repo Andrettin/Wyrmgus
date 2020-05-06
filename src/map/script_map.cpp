@@ -1357,10 +1357,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::terrain_type *border_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
-				terrain->InnerBorderTerrains.push_back(border_terrain);
-				terrain->BorderTerrains.push_back(border_terrain);
-				border_terrain->outer_border_terrain_types.push_back(terrain);
-				border_terrain->BorderTerrains.push_back(terrain);
+				terrain->add_inner_border_terrain_type(border_terrain);
 			}
 		} else if (!strcmp(value, "OuterBorderTerrains")) {
 			if (!lua_istable(l, -1)) {

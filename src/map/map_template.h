@@ -102,7 +102,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(stratagus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type*border_overlay_terrain_type MEMBER border_overlay_terrain_type READ get_border_overlay_terrain_type)
+	Q_PROPERTY(stratagus::terrain_type* border_overlay_terrain_type MEMBER border_overlay_terrain_type READ get_border_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)

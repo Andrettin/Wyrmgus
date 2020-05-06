@@ -538,7 +538,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain
 				if (
 					adjacent_top_terrain
 					&& adjacent_top_terrain != top_terrain
-					&& (std::find(top_terrain->InnerBorderTerrains.begin(), top_terrain->InnerBorderTerrains.end(), adjacent_top_terrain) == top_terrain->InnerBorderTerrains.end() || std::find(new_terrain_type->InnerBorderTerrains.begin(), new_terrain_type->InnerBorderTerrains.end(), adjacent_top_terrain) == new_terrain_type->InnerBorderTerrains.end())
+					&& (!stratagus::vector::contains(top_terrain->get_inner_border_terrain_types(), adjacent_top_terrain) || !stratagus::vector::contains(new_terrain_type->get_inner_border_terrain_types(), adjacent_top_terrain))
 					&& adjacent_top_terrain != new_terrain_type
 				) {
 					return false;
@@ -725,7 +725,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const str
 			
 			if (terrain_type->is_overlay()) {
 				if ( //if the terrain type is an overlay one, the adjacent tile terrain is incompatible with it if it both cannot be a base terrain for the overlay terrain type, and it "expands into" the tile (that is, the tile has the adjacent terrain as an inner border terrain)
-					std::find(tile_terrain->InnerBorderTerrains.begin(), tile_terrain->InnerBorderTerrains.end(), adjacent_terrain) != tile_terrain->InnerBorderTerrains.end()
+					stratagus::vector::contains(tile_terrain->get_inner_border_terrain_types(), adjacent_terrain)
 					&& !stratagus::vector::contains(terrain_type->get_base_terrain_types(), adjacent_terrain)
 				) {
 					return true;
@@ -773,7 +773,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 
 			if (overlay_terrain_type != nullptr) {
 				if ( //if the terrain type is an overlay one, the adjacent tile terrain is incompatible with it if it both cannot be a base terrain for the overlay terrain type, and it "expands into" the tile (that is, the tile has the adjacent terrain as an inner border terrain)
-					std::find(terrain_type->InnerBorderTerrains.begin(), terrain_type->InnerBorderTerrains.end(), adjacent_terrain) != terrain_type->InnerBorderTerrains.end()
+					stratagus::vector::contains(terrain_type->get_inner_border_terrain_types(), adjacent_terrain)
 					&& !stratagus::vector::contains(overlay_terrain_type->get_base_terrain_types(), adjacent_terrain)
 					) {
 					return true;
@@ -2150,11 +2150,11 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 						adjacent_terrain = nullptr;
 					}
 					if (adjacent_terrain && terrain != adjacent_terrain) {
-						if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
+						if (stratagus::vector::contains(terrain->get_inner_border_terrain_types(), adjacent_terrain)) {
 							adjacent_terrain_directions[adjacent_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
 						} else if (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end()) { //if the two terrain types can't border, look for a third terrain type which can border both, and which treats both as outer border terrains, and then use for transitions between both tiles
 							for (const stratagus::terrain_type *border_terrain : terrain->BorderTerrains) {
-								if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), border_terrain) != terrain->InnerBorderTerrains.end() && std::find(adjacent_terrain->InnerBorderTerrains.begin(), adjacent_terrain->InnerBorderTerrains.end(), border_terrain) != adjacent_terrain->InnerBorderTerrains.end()) {
+								if (stratagus::vector::contains(terrain->get_inner_border_terrain_types(), border_terrain) && stratagus::vector::contains(adjacent_terrain->get_inner_border_terrain_types(), border_terrain)) {
 									adjacent_terrain_directions[border_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
 									break;
 								}
@@ -2249,7 +2249,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			swapped = false;
 			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
 				bool change_order = false;
-				if (std::find(mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.begin(), mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.end(), mf.OverlayTransitionTiles[i].first) != mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.end()) {
+				if (stratagus::vector::contains(mf.OverlayTransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].first)) {
 					std::pair<stratagus::terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
 					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
 					mf.OverlayTransitionTiles[i + 1] = temp_transition;
@@ -2263,7 +2263,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			swapped = false;
 			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
 				bool change_order = false;
-				if (std::find(mf.TransitionTiles[i + 1].first->InnerBorderTerrains.begin(), mf.TransitionTiles[i + 1].first->InnerBorderTerrains.end(), mf.TransitionTiles[i].first) != mf.TransitionTiles[i + 1].first->InnerBorderTerrains.end()) {
+				if (stratagus::vector::contains(mf.TransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.TransitionTiles[i].first)) {
 					std::pair<stratagus::terrain_type *, int> temp_transition = mf.TransitionTiles[i];
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
 					mf.TransitionTiles[i + 1] = temp_transition;
