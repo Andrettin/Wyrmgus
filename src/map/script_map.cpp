@@ -649,13 +649,17 @@ static int CclSetMapTemplateTile(lua_State *l)
 	const std::string map_template_ident = LuaToString(l, 1);
 	stratagus::map_template *map_template = stratagus::map_template::get(map_template_ident);
 
-	const int tile_number = LuaToNumber(l, 2);
-	stratagus::terrain_type *terrain = stratagus::terrain_type::get_by_tile_number(tile_number);
-
 	const int x = LuaToNumber(l, 3);
 	const int y = LuaToNumber(l, 4);
 
-	map_template->set_tile_terrain(QPoint(x, y), terrain);
+	try {
+		const int tile_number = LuaToNumber(l, 2);
+		stratagus::terrain_type *terrain = stratagus::terrain_type::get_by_tile_number(tile_number);
+
+		map_template->set_tile_terrain(QPoint(x, y), terrain);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to set tile (" + std::to_string(x) + ", " + std::to_string(y) + ") for map template \"" + map_template->get_identifier() + "\"."));
+	}
 	
 	return 1;
 }
