@@ -335,7 +335,7 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "regions" || property_name == "superregions") {
 		region *region_value = region::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(region *, region_value));
-	} else if (property_name == "terrain_types" || property_name == "base_terrain_types") {
+	} else if (property_name == "terrain_types" || property_name == "base_terrain_types" || property_name == "outer_border_terrain_types" || property_name == "inner_border_terrain_types") {
 		terrain_type *terrain_type_value = terrain_type::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(terrain_type *, terrain_type_value));
 	} else if (property_name == "unit_classes" || property_name == "building_classes") {

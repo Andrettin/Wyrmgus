@@ -1332,7 +1332,7 @@ static int CclDefineTerrainType(lua_State *l)
 		} else if (!strcmp(value, "Overlay")) {
 			terrain->overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {
-			terrain->Buildable = LuaToBoolean(l, -1);
+			terrain->buildable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AllowSingle")) {
 			terrain->AllowSingle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Hidden")) {
@@ -1359,7 +1359,7 @@ static int CclDefineTerrainType(lua_State *l)
 				stratagus::terrain_type *border_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
 				terrain->InnerBorderTerrains.push_back(border_terrain);
 				terrain->BorderTerrains.push_back(border_terrain);
-				border_terrain->OuterBorderTerrains.push_back(terrain);
+				border_terrain->outer_border_terrain_types.push_back(terrain);
 				border_terrain->BorderTerrains.push_back(terrain);
 			}
 		} else if (!strcmp(value, "OuterBorderTerrains")) {
@@ -1369,10 +1369,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::terrain_type *border_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
-				terrain->OuterBorderTerrains.push_back(border_terrain);
-				terrain->BorderTerrains.push_back(border_terrain);
-				border_terrain->InnerBorderTerrains.push_back(terrain);
-				border_terrain->BorderTerrains.push_back(terrain);
+				terrain->add_outer_border_terrain_type(border_terrain);
 			}
 		} else if (!strcmp(value, "OverlayTerrains")) {
 			if (!lua_istable(l, -1)) {

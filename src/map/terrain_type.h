@@ -55,10 +55,12 @@ class terrain_type : public named_data_entry, public data_type<terrain_type>, pu
 	Q_PROPERTY(QString transition_image_file READ get_transition_image_file_qstring)
 	Q_PROPERTY(QString elevation_image_file READ get_elevation_image_file_qstring)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
+	Q_PROPERTY(bool buildable MEMBER buildable READ is_buildable)
 	Q_PROPERTY(bool tiled_background MEMBER tiled_background READ has_tiled_background)
 	Q_PROPERTY(bool transition_mask MEMBER transition_mask READ has_transition_mask)
 	Q_PROPERTY(stratagus::resource* resource MEMBER resource READ get_resource)
 	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
+	Q_PROPERTY(QVariantList outer_border_terrain_types READ get_outer_border_terrain_types_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "terrain_type";
@@ -232,6 +234,11 @@ public:
 		return this->overlay;
 	}
 
+	bool is_buildable() const
+	{
+		return this->buildable;
+	}
+
 	bool has_tiled_background() const
 	{
 		return this->tiled_background;
@@ -255,6 +262,24 @@ public:
 	}
 
 	Q_INVOKABLE void remove_base_terrain_type(terrain_type *terrain_type);
+
+	const std::vector<terrain_type *> &get_outer_border_terrain_types() const
+	{
+		return this->outer_border_terrain_types;
+	}
+
+	QVariantList get_outer_border_terrain_types_qvariant_list() const;
+
+	Q_INVOKABLE void add_outer_border_terrain_type(terrain_type *terrain_type)
+	{
+		this->outer_border_terrain_types.push_back(terrain_type);
+
+		this->BorderTerrains.push_back(terrain_type);
+		terrain_type->InnerBorderTerrains.push_back(this);
+		terrain_type->BorderTerrains.push_back(this);
+	}
+
+	Q_INVOKABLE void remove_outer_border_terrain_type(terrain_type *terrain_type);
 
 	const std::vector<int> &get_solid_tiles() const
 	{
@@ -313,9 +338,7 @@ public:
 	unsigned long Flags = 0;
 private:
 	bool overlay = false;				/// Whether this terrain type belongs to the overlay layer
-public:
-	bool Buildable = false;				/// Whether structures can be built upon this terrain type
-private:
+	bool buildable = false;				/// Whether structures can be built upon this terrain type
 	bool tiled_background = false;
 	bool transition_mask = false;
 public:
@@ -336,8 +359,8 @@ private:
 public:
 	std::vector<terrain_type *> BorderTerrains;					/// Terrain types which this one can border
 	std::vector<terrain_type *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
-	std::vector<terrain_type *> OuterBorderTerrains;			/// Terrain types which this one can border, and which are "entered" by this tile type in transitions
 private:
+	std::vector<terrain_type *> outer_border_terrain_types;			/// Terrain types which this one can border, and which are "entered" by this tile type in transitions
 	std::vector<int> solid_tiles;
 	std::vector<int> damaged_tiles;
 	std::vector<int> destroyed_tiles;

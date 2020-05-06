@@ -65,6 +65,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/vector_util.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -327,7 +328,7 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 							if (tile_terrain->is_overlay() && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
-							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+							if (tile_terrain != adjacent_terrain && !stratagus::vector::contains(tile_terrain->get_outer_border_terrain_types(), adjacent_terrain)) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 								solid_tile = false;
 								break;
 							}
@@ -395,7 +396,7 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 												if (adjacent_terrain->is_overlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
-												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+												if (adjacent_terrain != sub_adjacent_terrain && !stratagus::vector::contains(adjacent_terrain->get_outer_border_terrain_types(), sub_adjacent_terrain)) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 													solid_tile = false;
 													break;
 												}

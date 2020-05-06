@@ -2445,9 +2445,7 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 				}
 				std::vector<stratagus::terrain_type *> acceptable_adjacent_tile_types;
 				acceptable_adjacent_tile_types.push_back(terrain);
-				for (size_t i = 0; i < terrain->OuterBorderTerrains.size(); ++i) {
-					acceptable_adjacent_tile_types.push_back(terrain->OuterBorderTerrains[i]);
-				}
+				stratagus::vector::merge(acceptable_adjacent_tile_types, terrain->get_outer_border_terrain_types());
 				
 				int horizontal_adjacent_tiles = 0;
 				int vertical_adjacent_tiles = 0;
@@ -2550,7 +2548,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 						mf.Terrain != tile_terrain
 						&& tile_top_terrain->is_overlay()
 						&& tile_top_terrain != mf.OverlayTerrain
-						&& std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), mf.Terrain) == tile_terrain->OuterBorderTerrains.end()
+						&& !stratagus::vector::contains(tile_terrain->get_outer_border_terrain_types(), mf.Terrain)
 						&& !stratagus::vector::contains(tile_top_terrain->get_base_terrain_types(), mf.Terrain)
 					) {
 						mf.SetTerrain(tile_terrain);

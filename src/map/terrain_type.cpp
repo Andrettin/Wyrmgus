@@ -241,7 +241,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "overlay") {
 			this->overlay = string::to_bool(value);
 		} else if (key == "buildable") {
-			this->Buildable = string::to_bool(value);
+			this->buildable = string::to_bool(value);
 		} else if (key == "allow_single") {
 			this->AllowSingle = string::to_bool(value);
 		} else if (key == "hidden") {
@@ -269,14 +269,11 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			terrain_type *border_terrain_type = terrain_type::get(value);
 			this->InnerBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
-			border_terrain_type->OuterBorderTerrains.push_back(this);
+			border_terrain_type->outer_border_terrain_types.push_back(this);
 			border_terrain_type->BorderTerrains.push_back(this);
 		} else if (key == "outer_border_terrain_type") {
 			terrain_type *border_terrain_type = terrain_type::get(value);
-			this->OuterBorderTerrains.push_back(border_terrain_type);
-			this->BorderTerrains.push_back(border_terrain_type);
-			border_terrain_type->InnerBorderTerrains.push_back(this);
-			border_terrain_type->BorderTerrains.push_back(this);
+			this->add_outer_border_terrain_type(border_terrain_type);
 		} else if (key == "solid_tile") {
 			this->solid_tiles.push_back(std::stoi(value));
 		} else if (key == "damaged_tile") {
@@ -471,6 +468,16 @@ QVariantList terrain_type::get_base_terrain_types_qvariant_list() const
 void terrain_type::remove_base_terrain_type(terrain_type *terrain_type)
 {
 	vector::remove(this->base_terrain_types, terrain_type);
+}
+
+QVariantList terrain_type::get_outer_border_terrain_types_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_outer_border_terrain_types());
+}
+
+void terrain_type::remove_outer_border_terrain_type(terrain_type *terrain_type)
+{
+	vector::remove(this->outer_border_terrain_types, terrain_type);
 }
 
 }
