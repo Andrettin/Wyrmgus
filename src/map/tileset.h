@@ -120,7 +120,7 @@ enum class tile_transition_type {
 	northwest_southeast_inner,
 	northeast_southwest_inner,
 	
-	//single tile transition types (enabled for terrain types with the AllowSingle field)
+	//single tile transition types (enabled for terrain types with the allow_single field set to true)
 	single,
 	north_single,
 	south_single,

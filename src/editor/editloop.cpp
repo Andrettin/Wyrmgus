@@ -316,7 +316,7 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 		bool has_transitions = terrain->is_overlay() ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
-		if (tile_terrain && !tile_terrain->AllowSingle) {
+		if (tile_terrain && !tile_terrain->allows_single()) {
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
@@ -386,7 +386,7 @@ static void EditTilesInternal(const Vec2i &pos, stratagus::terrain_type *terrain
 										break;
 									}
 								}
-							} else if (!adjacent_terrain->AllowSingle) {
+							} else if (!adjacent_terrain->allows_single()) {
 								for (int sub_x_offset = -1; sub_x_offset <= 1; ++sub_x_offset) {
 									for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
 										if (sub_x_offset != 0 || sub_y_offset != 0) {

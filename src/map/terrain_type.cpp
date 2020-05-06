@@ -243,7 +243,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "buildable") {
 			this->buildable = string::to_bool(value);
 		} else if (key == "allow_single") {
-			this->AllowSingle = string::to_bool(value);
+			this->allow_single = string::to_bool(value);
 		} else if (key == "hidden") {
 			this->Hidden = string::to_bool(value);
 		} else if (key == "resource") {

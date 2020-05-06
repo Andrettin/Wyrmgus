@@ -458,7 +458,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 		return true;
 	}
 	
-	if (terrain->AllowSingle) {
+	if (terrain->allows_single()) {
 		return true;
 	}
 
@@ -2172,7 +2172,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
 		int adjacent_terrain_id = iterator->first;
 		stratagus::terrain_type *adjacent_terrain = adjacent_terrain_id < (int) stratagus::terrain_type::get_all().size() ? stratagus::terrain_type::get_all()[adjacent_terrain_id] : nullptr;
-		const stratagus::tile_transition_type transition_type = GetTransitionType(iterator->second, terrain->AllowSingle);
+		const stratagus::tile_transition_type transition_type = GetTransitionType(iterator->second, terrain->allows_single());
 		
 		if (transition_type != stratagus::tile_transition_type::none) {
 			bool found_transition = false;
@@ -2440,7 +2440,7 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
 				CMapField &mf = *this->Field(x, y, z);
 				stratagus::terrain_type *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
-				if (!terrain || terrain->AllowSingle) {
+				if (!terrain || terrain->allows_single()) {
 					continue;
 				}
 				std::vector<stratagus::terrain_type *> acceptable_adjacent_tile_types;
@@ -3385,7 +3385,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	}
 
 	//check if any further tile should be removed with the clearing of this one
-	if (!mf.OverlayTerrain->AllowSingle) {
+	if (!mf.OverlayTerrain->allows_single()) {
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {

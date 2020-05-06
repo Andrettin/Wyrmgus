@@ -1334,7 +1334,7 @@ static int CclDefineTerrainType(lua_State *l)
 		} else if (!strcmp(value, "Buildable")) {
 			terrain->buildable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AllowSingle")) {
-			terrain->AllowSingle = LuaToBoolean(l, -1);
+			terrain->allow_single = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Hidden")) {
 			terrain->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SolidAnimationFrames")) {
