@@ -163,7 +163,15 @@ public:
 
 	bool contains_pos(const QPoint &pos) const
 	{
-		return pos.x() >= this->get_start_pos().x() && pos.y() >= this->get_start_pos().y() && pos.x() <= this->get_end_pos().x() && pos.y() <= this->get_end_pos().y();
+		if (this->get_end_pos().x() != -1 && pos.x() > this->get_end_pos().x()) {
+			return false;
+		}
+
+		if (this->get_end_pos().y() != -1 && pos.y() > this->get_end_pos().y()) {
+			return false;
+		}
+
+		return pos.x() >= this->get_start_pos().x() && pos.y() >= this->get_start_pos().y();
 	}
 
 	QSize get_applied_size() const;
