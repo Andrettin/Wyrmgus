@@ -166,13 +166,13 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "priority") {
 			this->Priority = std::stoi(value);
 		} else if (key == "min_x") {
-			this->MinPos.setX(std::stoi(value));
+			this->min_subtemplate_pos.setX(std::stoi(value));
 		} else if (key == "min_y") {
-			this->MinPos.setY(std::stoi(value));
+			this->min_subtemplate_pos.setY(std::stoi(value));
 		} else if (key == "max_x") {
-			this->MaxPos.setX(std::stoi(value));
+			this->max_subtemplate_pos.setX(std::stoi(value));
 		} else if (key == "max_y") {
-			this->MaxPos.setY(std::stoi(value));
+			this->max_subtemplate_pos.setY(std::stoi(value));
 		} else if (key == "main_template") {
 			map_template *main_template = map_template::get(value);
 			this->set_main_template(main_template);
@@ -298,7 +298,15 @@ void map_template::initialize()
 				return b->is_optional();
 			} else if (a->Priority != b->Priority) {
 				return a->Priority > b->Priority;
-			} else if (a->get_applied_area_with_dependent_template_offsets() != b->get_applied_area_with_dependent_template_offsets()) {
+			}
+
+			const bool a_has_subtemplate_min_max_pos = a->get_min_subtemplate_pos().x() != -1 || a->get_min_subtemplate_pos().y() != -1 || a->get_max_subtemplate_pos().x() != -1 || a->get_max_subtemplate_pos().y() != -1;
+			const bool b_has_subtemplate_min_max_pos = b->get_min_subtemplate_pos().x() != -1 || b->get_min_subtemplate_pos().y() != -1 || b->get_max_subtemplate_pos().x() != -1 || b->get_max_subtemplate_pos().y() != -1;
+			if (a_has_subtemplate_min_max_pos != b_has_subtemplate_min_max_pos) {
+				return a_has_subtemplate_min_max_pos;
+			}
+			
+			if (a->get_applied_area_with_dependent_template_offsets() != b->get_applied_area_with_dependent_template_offsets()) {
 				return a->get_applied_area_with_dependent_template_offsets() > b->get_applied_area_with_dependent_template_offsets();
 			} else if (a->get_total_adjacent_template_count() != b->get_total_adjacent_template_count()) {
 				return a->get_total_adjacent_template_count() < b->get_total_adjacent_template_count();
@@ -1724,18 +1732,18 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 	QPoint min_pos(map_start_pos);
 	QPoint max_pos(map_end.x() - subtemplate->get_applied_width(), map_end.y() - subtemplate->get_applied_height());
 
-	if (subtemplate->MinPos.x() != -1) {
-		min_pos.setX(min_pos.x() + subtemplate->MinPos.x() - template_start_pos.x());
+	if (subtemplate->get_min_subtemplate_pos().x() != -1) {
+		min_pos.setX(min_pos.x() + subtemplate->get_min_subtemplate_pos().x() - template_start_pos.x());
 	}
-	if (subtemplate->MinPos.y() != -1) {
-		min_pos.setY(min_pos.y() + subtemplate->MinPos.y() - template_start_pos.y());
+	if (subtemplate->get_min_subtemplate_pos().y() != -1) {
+		min_pos.setY(min_pos.y() + subtemplate->get_min_subtemplate_pos().y() - template_start_pos.y());
 	}
 
-	if (subtemplate->MaxPos.x() != -1) {
-		max_pos.setX(max_pos.x() + subtemplate->MaxPos.x() - this->get_applied_width());
+	if (subtemplate->get_max_subtemplate_pos().x() != -1) {
+		max_pos.setX(max_pos.x() + subtemplate->get_max_subtemplate_pos().x() - this->get_applied_width());
 	}
-	if (subtemplate->MaxPos.y() != -1) {
-		max_pos.setY(max_pos.y() + subtemplate->MaxPos.y() - this->get_applied_height());
+	if (subtemplate->get_max_subtemplate_pos().y() != -1) {
+		max_pos.setY(max_pos.y() + subtemplate->get_max_subtemplate_pos().y() - this->get_applied_height());
 	}
 
 	//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
