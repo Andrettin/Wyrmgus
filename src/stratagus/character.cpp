@@ -126,6 +126,10 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
+			if (this->faction != nullptr) {
+				throw std::runtime_error("Character \"" + this->get_identifier() + "\" already has a faction.");
+			}
+
 			this->faction = faction::get(value);
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
