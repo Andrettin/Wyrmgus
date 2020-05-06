@@ -505,6 +505,16 @@ public:
 	{
 		return this->output_terrain_image;
 	}
+
+	const point_map<terrain_type *> &get_tile_terrains() const
+	{
+		return this->tile_terrains;
+	}
+
+	void set_tile_terrain(const QPoint &tile_pos, terrain_type *terrain)
+	{
+		this->tile_terrains[tile_pos] = terrain;
+	}
 	
 private:
 	std::filesystem::path terrain_file;
@@ -564,6 +574,9 @@ public:
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<site *> sites;
 	point_map<site *> sites_by_position;
+private:
+	point_map<terrain_type *> tile_terrains;
+public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 
 	friend int ::CclDefineMapTemplate(lua_State *l);

@@ -110,6 +110,27 @@ public:
 		return nullptr;
 	}
 
+	static terrain_type *get_by_tile_number(const int tile_number)
+	{
+		terrain_type *terrain_type = terrain_type::try_get_by_tile_number(tile_number);
+
+		if (terrain_type == nullptr) {
+			throw std::runtime_error("No terrain type found for tile number: " + std::to_string(tile_number) + ".");
+		}
+
+		return terrain_type;
+	}
+
+	static terrain_type *try_get_by_tile_number(const int tile_number)
+	{
+		auto find_iterator = terrain_type::terrain_types_by_tile_number.find(tile_number);
+		if (find_iterator != terrain_type::terrain_types_by_tile_number.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
 	static terrain_type *add(const std::string &identifier, const stratagus::module *module)
 	{
 		terrain_type *terrain_type = data_type::add(identifier, module);
@@ -123,6 +144,7 @@ public:
 
 		terrain_type::terrain_types_by_character.clear();
 		terrain_type::terrain_types_by_color.clear();
+		terrain_type::terrain_types_by_tile_number.clear();
 	}
 
 	terrain_type(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
@@ -137,6 +159,7 @@ public:
 private:
 	static inline std::map<char, terrain_type *> terrain_types_by_character;
 	static inline color_map<terrain_type *> terrain_types_by_color;
+	static inline std::map<int, terrain_type *> terrain_types_by_tile_number;
 
 public:
 	virtual void process_sml_property(const sml_property &property) override;
@@ -158,6 +181,8 @@ public:
 	}
 
 	void set_color(const QColor &color);
+
+	void map_to_tile_number(const int tile_number);
 
 	const std::filesystem::path &get_image_file() const
 	{

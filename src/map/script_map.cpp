@@ -644,6 +644,22 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 	}
 }
 
+static int CclSetMapTemplateTile(lua_State *l)
+{
+	const std::string map_template_ident = LuaToString(l, 1);
+	stratagus::map_template *map_template = stratagus::map_template::get(map_template_ident);
+
+	const int tile_number = LuaToNumber(l, 2);
+	stratagus::terrain_type *terrain = stratagus::terrain_type::get_by_tile_number(tile_number);
+
+	const int x = LuaToNumber(l, 3);
+	const int y = LuaToNumber(l, 4);
+
+	map_template->set_tile_terrain(QPoint(x, y), terrain);
+	
+	return 1;
+}
+
 static int CclSetMapTemplateTileTerrain(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
@@ -2137,6 +2153,7 @@ void MapCclRegister()
 	lua_register(Lua, "GetSiteData", CclGetSiteData);
 	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
 	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
+	lua_register(Lua, "SetMapTemplateTile", CclSetMapTemplateTile);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
 	lua_register(Lua, "SetMapTemplatePathway", CclSetMapTemplatePathway);

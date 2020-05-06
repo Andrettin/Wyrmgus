@@ -165,6 +165,10 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->map_to_character(value.front());
 		}
+	} else if (tag == "tile_numbers") {
+		for (const std::string &value : values) {
+			this->map_to_tile_number(std::stoi(value));
+		}
 	} else if (tag == "flags") {
 		for (const std::string &value : values) {
 			const unsigned long flag = terrain_type::GetTerrainFlagByName(value);
@@ -417,6 +421,15 @@ void terrain_type::set_color(const QColor &color)
 
 	this->color = color;
 	terrain_type::terrain_types_by_color[color] = this;
+}
+
+void terrain_type::map_to_tile_number(const int tile_number)
+{
+	if (terrain_type::try_get_by_tile_number(tile_number) != nullptr) {
+		throw std::runtime_error("Tile number \"" + std::to_string(tile_number) + "\" is already used by another terrain type.");
+	}
+
+	terrain_type::terrain_types_by_tile_number[tile_number] = this;
 }
 
 void terrain_type::set_image_file(const std::filesystem::path &filepath)

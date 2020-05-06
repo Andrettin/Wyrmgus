@@ -614,17 +614,28 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	if (this->outputs_terrain_image()) {
-		std::string filename = this->Ident;
-		filename = FindAndReplaceString(filename, "-", "_");
-		filename += ".png";
-		
-		std::string overlay_filename = this->Ident;
-		overlay_filename = FindAndReplaceString(overlay_filename, "-", "_");
-		overlay_filename += "_overlay";
-		overlay_filename += ".png";
+		const std::string filename = this->get_identifier() + ".png";
+		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 		
 		save_map_template_png(filename.c_str(), this, false);
 		save_map_template_png(overlay_filename.c_str(), this, true);
+	}
+
+	for (const auto &kv_pair : this->get_tile_terrains()) {
+		const QPoint &tile_pos = kv_pair.first;
+
+		if (!this->contains_pos(tile_pos)) {
+			continue;
+		}
+
+		terrain_type *terrain = kv_pair.second;
+		const QPoint tile_map_pos = map_start_pos + tile_pos - template_start_pos;
+
+		if (!this->contains_map_pos(tile_map_pos)) {
+			continue;
+		}
+
+		CMap::Map.Field(tile_map_pos, z)->SetTerrain(terrain);
 	}
 
 	if (current_campaign) {

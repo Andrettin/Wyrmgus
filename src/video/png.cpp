@@ -202,7 +202,6 @@ void SaveScreenshotPNG(const char *name)
 	fclose(fp);
 }
 
-//Wyrmgus start
 /**
 **  Convert a map template's terrain file to a PNG one.
 **
@@ -256,36 +255,31 @@ void save_map_template_png(const char *name, const stratagus::map_template *map_
 			y += 1;
 		}
 	} else {
-		std::map<int, std::map<int, stratagus::terrain_type *>> terrain_map;
-		for (size_t i = 0; i < map_template->HistoricalTerrains.size(); ++i) {
-			if (std::get<2>(map_template->HistoricalTerrains[i]).Year == 0) {
-				Vec2i terrain_pos = std::get<0>(map_template->HistoricalTerrains[i]);
-				stratagus::terrain_type *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
-				if (terrain_type->is_overlay() == overlay) {
-					terrain_map[terrain_pos.y][terrain_pos.x] = terrain_type;
-				}
+		stratagus::point_map<const stratagus::terrain_type *> terrain_map;
+
+		for (const auto &kv_pair : map_template->get_tile_terrains()) {
+			const QPoint &tile_pos = kv_pair.first;
+			const stratagus::terrain_type *terrain = kv_pair.second;
+
+			if (terrain->is_overlay() == overlay) {
+				terrain_map[tile_pos] = terrain;
 			}
 		}
-		
-		for (int y = 0; y < map_template->get_height(); ++y) {
-			for (int x = 0; x < map_template->get_width(); ++x) {
-				image.setPixelColor(QPoint(x, y), QColor(0, 0, 0));
-			}
-			
-			for (std::map<int, stratagus::terrain_type *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
-				int x = iterator->first;
-				stratagus::terrain_type *terrain_type = iterator->second;
-				
-				QColor color(0, 0, 0);
-				if (terrain_type != nullptr) {
-					color = terrain_type->get_color();
+
+		for (int x = 0; x < map_template->get_width(); ++x) {
+			for (int y = 0; y < map_template->get_height(); ++y) {
+				const QPoint tile_pos(x, y);
+
+				auto find_iterator = terrain_map.find(tile_pos);
+				if (find_iterator != terrain_map.end()) {
+					const stratagus::terrain_type *terrain = find_iterator->second;
+					image.setPixelColor(tile_pos, terrain->get_color());
+				} else {
+					image.setPixelColor(tile_pos, QColor(0, 0, 0));
 				}
-				
-				image.setPixelColor(QPoint(x, y), color);
 			}
 		}
 	}
 
 	image.save(name);
 }
-//Wyrmgus end
