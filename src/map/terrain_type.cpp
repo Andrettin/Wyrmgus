@@ -401,7 +401,7 @@ void terrain_type::set_character(const char character)
 void terrain_type::map_to_character(const char character)
 {
 	if (terrain_type::try_get_by_character(character) != nullptr) {
-		throw std::runtime_error("Character \"" + std::string(character, 1) + "\" is already used by another terrain type.");
+		throw std::runtime_error("Character \"" + std::string(1, character) + "\" is already used by another terrain type.");
 	}
 
 	terrain_type::terrain_types_by_character[character] = this;
