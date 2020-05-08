@@ -89,7 +89,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool optional MEMBER optional READ is_optional)
 	Q_PROPERTY(QPoint start_pos MEMBER start_pos READ get_start_pos)
 	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
-	Q_PROPERTY(QPoint subtemplate_pos MEMBER subtemplate_pos READ get_subtemplate_pos)
+	Q_PROPERTY(QPoint subtemplate_top_left_pos MEMBER subtemplate_top_left_pos READ get_subtemplate_top_left_pos)
+	Q_PROPERTY(QPoint subtemplate_center_pos MEMBER subtemplate_center_pos READ get_subtemplate_center_pos)
 	Q_PROPERTY(QPoint min_subtemplate_pos MEMBER min_subtemplate_pos READ get_min_subtemplate_pos)
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
 	Q_PROPERTY(stratagus::plane* plane MEMBER plane READ get_plane)
@@ -426,9 +427,14 @@ public:
 		this->set_overlay_terrain_image(std::filesystem::path(filepath));
 	}
 
-	const QPoint &get_subtemplate_pos() const
+	const QPoint &get_subtemplate_top_left_pos() const
 	{
-		return this->subtemplate_pos;
+		return this->subtemplate_top_left_pos;
+	}
+
+	const QPoint &get_subtemplate_center_pos() const
+	{
+		return this->subtemplate_center_pos;
 	}
 
 	const QPoint &get_min_subtemplate_pos() const
@@ -529,7 +535,8 @@ private:
 	bool optional = false;
 	bool output_terrain_image = false;
 private:
-	QPoint subtemplate_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
+	QPoint subtemplate_top_left_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's top left
+	QPoint subtemplate_center_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
 	QPoint min_subtemplate_pos = QPoint(-1, -1); //the minimum position this subtemplate can be applied to in its main template; the position is relative to the subtemplate's center
 	QPoint max_subtemplate_pos = QPoint(-1, -1); //the maximum position this subtemplate can be applied to in its main template; the position is relative to the subtemplate's center
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used

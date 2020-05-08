@@ -274,6 +274,11 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 
 void map_template::initialize()
 {
+	if (this->get_subtemplate_top_left_pos().x() == -1 && this->get_subtemplate_top_left_pos().y() == -1 && this->get_subtemplate_center_pos().x() == -1 && this->get_subtemplate_center_pos().y() == -1) {
+		const QPoint subtemplate_offset = size::to_point(this->get_applied_size()) - QPoint(1, 1) / 2;
+		this->subtemplate_top_left_pos = this->get_subtemplate_center_pos() - subtemplate_offset;
+	}
+
 	if (this->get_main_template() != nullptr) {
 		if (!this->get_main_template()->is_initialized()) {
 			this->get_main_template()->initialize();
@@ -890,7 +895,7 @@ void map_template::apply_subtemplates(const QPoint &template_start_pos, const QP
 
 void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	QPoint subtemplate_pos(subtemplate->get_subtemplate_pos() - Vec2i((subtemplate->get_applied_width() - 1) / 2, (subtemplate->get_applied_height() - 1) / 2));
+	QPoint subtemplate_pos = subtemplate->get_subtemplate_top_left_pos();
 	bool found_location = false;
 
 	if (subtemplate->UpperTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead

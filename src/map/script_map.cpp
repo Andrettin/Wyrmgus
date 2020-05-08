@@ -1555,8 +1555,6 @@ static int CclDefineMapTemplate(lua_State *l)
 	std::string map_template_ident = LuaToString(l, 1);
 	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
 	
-	Vec2i subtemplate_position_top_left(-1, -1);
-	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
@@ -1587,9 +1585,11 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "SubtemplatePosition")) {
 			Vec2i subtemplate_pos;
 			CclGetPos(l, &subtemplate_pos.x, &subtemplate_pos.y);
-			map_template->subtemplate_pos = subtemplate_pos;
+			map_template->subtemplate_center_pos = subtemplate_pos;
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
-			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
+			Vec2i subtemplate_pos;
+			CclGetPos(l, &subtemplate_pos.x, &subtemplate_pos.y);
+			map_template->subtemplate_top_left_pos = subtemplate_pos;
 		} else if (!strcmp(value, "MainTemplate")) {
 			stratagus::map_template *main_template = stratagus::map_template::get(LuaToString(l, -1));
 			map_template->set_main_template(main_template);
@@ -1631,11 +1631,6 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-	}
-	
-	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
-		map_template->subtemplate_pos.setX(subtemplate_position_top_left.x + ((map_template->get_width() - 1) / 2));
-		map_template->subtemplate_pos.setY(subtemplate_position_top_left.y + ((map_template->get_height() - 1) / 2));
 	}
 	
 	return 0;
