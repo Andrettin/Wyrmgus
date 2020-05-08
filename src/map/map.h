@@ -220,7 +220,7 @@ public:
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
-	void GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template);
+	void generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void generate_settlement_territories(const int z);
 	stratagus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
 	void calculate_settlement_territory_border_tiles(const int z);

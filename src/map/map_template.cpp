@@ -716,7 +716,9 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true);
 	}
 
-	CMap::Map.GenerateMissingTerrain(map_start_pos, map_end - Vec2i(1, 1), z, this);
+	if (!this->IsSubtemplateArea()) {
+		CMap::Map.generate_missing_terrain(map_start_pos, map_end - Vec2i(1, 1), z);
+	}
 	
 	if (!has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());

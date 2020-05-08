@@ -2939,7 +2939,7 @@ bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const 
 	return false;
 }
 
-void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z, const stratagus::map_template *map_template)
+void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z)
 {
 	if (SaveGameLoading) {
 		return;
@@ -2952,15 +2952,6 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
 			const QPoint tile_pos(x, y);
-
-			if (!map_template->is_map_pos_usable(tile_pos)) {
-				continue;
-			}
-
-			if (!this->is_point_adjacent_to_non_subtemplate_area(tile_pos, z)) {
-				continue;
-			}
-
 			const CMapField *tile = this->Field(x, y, z);
 
 			if (tile->GetTopTerrain() == nullptr) {
@@ -3034,15 +3025,6 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 					continue;
 				}
 
-				//tiles within a subtemplate area can only be used as seeds, they cannot be modified themselves
-				if (
-					(this->is_point_in_a_subtemplate_area(diagonal_pos, z) && diagonal_tile_top_terrain == nullptr)
-					|| (this->is_point_in_a_subtemplate_area(vertical_pos, z) && vertical_tile_top_terrain == nullptr)
-					|| (this->is_point_in_a_subtemplate_area(horizontal_pos, z) && horizontal_tile_top_terrain == nullptr)
-				) {
-					continue;
-				}
-
 				if (overlay_terrain_type != nullptr) {
 					if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, overlay_terrain_type, z)) {
 						continue;
@@ -3086,10 +3068,6 @@ void CMap::GenerateMissingTerrain(const Vec2i &min_pos, const Vec2i &max_pos, co
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
 			const Vec2i tile_pos(x, y);
-
-			if (this->is_point_in_a_subtemplate_area(tile_pos, z)) {
-				continue;
-			}
 
 			CMapField *tile = this->Field(x, y, z);
 
