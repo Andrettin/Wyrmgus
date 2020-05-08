@@ -321,6 +321,14 @@ void map_template::initialize()
 		});
 	}
 
+	if (this->outputs_terrain_image()) {
+		const std::string filename = this->get_identifier() + ".png";
+		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
+
+		save_map_template_png(filename.c_str(), this, false);
+		save_map_template_png(overlay_filename.c_str(), this, true);
+	}
+
 	data_entry::initialize();
 }
 
@@ -618,14 +626,6 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		std::throw_with_nested(std::runtime_error("Failed to apply terrain file for map template \"" + this->get_identifier() + "\"."));
 	}
 	
-	if (this->outputs_terrain_image()) {
-		const std::string filename = this->get_identifier() + ".png";
-		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
-		
-		save_map_template_png(filename.c_str(), this, false);
-		save_map_template_png(overlay_filename.c_str(), this, true);
-	}
-
 	for (const auto &kv_pair : this->get_tile_terrains()) {
 		const QPoint &tile_pos = kv_pair.first;
 
