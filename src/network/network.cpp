@@ -238,6 +238,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/random.h"
 #include "video.h"
 
 //----------------------------------------------------------------------------
@@ -1014,7 +1015,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 		CNetworkCommandSync nc;
 		ncq[0].Type = MessageSync;
 		nc.syncHash = SyncHash;
-		nc.syncSeed = SyncRandSeed;
+		nc.syncSeed = stratagus::random::get()->get_seed();
 		ncq[0].Data.resize(nc.Size());
 		nc.Serialize(&ncq[0].Data[0]);
 		ncq[0].Time = gameNetCycle;
@@ -1050,7 +1051,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	if (numcommands != MaxNetworkCommands) {
 		ncq[numcommands].Type = MessageNone;
 	}
-	NetworkSyncSeeds[gameNetCycle & 0xFF] = SyncRandSeed;
+	NetworkSyncSeeds[gameNetCycle & 0xFF] = stratagus::random::get()->get_seed();
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
 	NetworkSendPacket(ncq);
 }

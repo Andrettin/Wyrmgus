@@ -34,6 +34,7 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "util/random.h"
 
 #include <boost/tokenizer.hpp>
 
@@ -55,39 +56,6 @@
 --  Random
 ----------------------------------------------------------------------------*/
 
-unsigned SyncRandSeed;				/// sync random seed value.
-
-/**
-**  Inititalize sync rand seed.
-*/
-void InitSyncRand()
-{
-	if (!IsNetworkGame()) { //if isn't a network game, make the seed vary according to the date and time
-		time_t time_curr;
-		time(&time_curr);
-		SyncRandSeed = static_cast<unsigned>(time_curr);
-	} else {
-		SyncRandSeed = 0x87654321;
-	}
-}
-
-/**
-**  Synchronized random number.
-**
-**  @note This random value must be same on all machines in network game.
-**  Very simple random generations, enough for us.
-*/
-int SyncRand()
-{
-	int val;
-
-	val = SyncRandSeed >> 16;
-
-	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
-
-	return val;
-}
-
 /**
 **  Synchronized random number.
 **
@@ -95,10 +63,8 @@ int SyncRand()
 */
 int SyncRand(int max)
 {
-	return SyncRand() % max;
+	return stratagus::random::get()->generate(max);
 }
-
-
 
 int MyRand()
 {

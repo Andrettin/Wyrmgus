@@ -44,7 +44,7 @@
 	Assert(unit.Anim.Anim == this);
 
 	if (unit.IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
-		const size_t index = SyncRand() % this->sounds.size();
+		const size_t index = SyncRand(this->sounds.size());
 		PlayUnitSound(unit, this->sounds[index].Sound);
 	}
 }

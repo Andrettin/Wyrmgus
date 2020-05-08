@@ -77,13 +77,13 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
+#include "util/random.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 unsigned SyncHash; /// Hash calculated to find sync failures
-
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -624,7 +624,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? static_cast<int>(unit.CurrentAction()) : -1,
-			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
+			unit.Player ? unit.Player->Index : -1, unit.Refs, stratagus::random::get()->get_seed(),
 			unit.tilePos.x, unit.tilePos.y, unit.get_pixel_offset().x(), unit.get_pixel_offset().y());
 #if 0
 	SaveUnit(unit, logf);

@@ -42,7 +42,7 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	if ((SyncRand() >> 8) & 1) {
+	if (SyncRand(2)) {
 		UnitRotate(unit, -ParseAnimInt(unit, this->rotateStr.c_str()));
 	} else {
 		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));

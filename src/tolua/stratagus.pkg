@@ -134,7 +134,6 @@ extern void DeleteSaveGame(const std::string filename);
 
 extern const char *Translate @ _(const char *str);
 
-extern int SyncRand(void);
 extern int SyncRand(int max);
 extern bool CanAccessFile(const char *filename);
 void Exit(int err);

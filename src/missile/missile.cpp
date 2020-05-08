@@ -736,7 +736,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		}
 		//Wyrmgus end
 		
-		damage -= SyncRand() % ((damage + 2) / 2);
+		damage -= SyncRand((damage + 2) / 2);
 	}
 	
 	Assert(damage >= 0);
@@ -957,7 +957,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				if (GameSettings.NoRandomness) {
 					thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
 				} else {
-					thorns_damage -= SyncRand() % ((thorns_damage + 2) / 2);
+					thorns_damage -= SyncRand((thorns_damage + 2) / 2);
 				}
 				HitUnit(goal, unit, thorns_damage);
 			}
@@ -1524,7 +1524,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			if (GameSettings.NoRandomness) {
 				thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
 			} else {
-				thorns_damage -= SyncRand() % ((thorns_damage + 2) / 2);
+				thorns_damage -= SyncRand((thorns_damage + 2) / 2);
 			}
 			HitUnit(&goal, *missile.SourceUnit, thorns_damage);
 		}

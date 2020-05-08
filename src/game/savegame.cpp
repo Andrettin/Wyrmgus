@@ -56,6 +56,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
+#include "util/random.h"
 #include "version.h"
 
 extern void StartMap(const std::string &filename, bool clean);
@@ -154,7 +155,7 @@ int SaveGame(const std::string &filename)
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
-	file.printf("  SyncRandSeed = %d, \n", SyncRandSeed);
+	file.printf("  SyncRandSeed = %d, \n", stratagus::random::get()->get_seed());
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);
 	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
 	file.printf("} )\n\n");

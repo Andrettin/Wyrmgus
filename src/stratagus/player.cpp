@@ -2390,7 +2390,7 @@ CUnit *CPlayer::GetMarketUnit() const
 			std::vector<CUnit *> market_table;
 			FindPlayerUnitsByType(*this, market_type, market_table);
 			if (market_table.size() > 0) {
-				market_unit = market_table[SyncRand() % market_table.size()];
+				market_unit = market_table[SyncRand(market_table.size())];
 				break;
 			}
 		}

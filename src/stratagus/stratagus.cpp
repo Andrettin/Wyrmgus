@@ -735,8 +735,6 @@ int stratagusMain(int argc, char **argv)
 
 	// FIXME: Parse options before or after scripts?
 	ParseCommandLine(argc, argv, parameters);
-	// Init the random number generator.
-	InitSyncRand();
 
 	makedir(parameters.GetUserDirectory().c_str(), 0777);
 

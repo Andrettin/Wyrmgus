@@ -1330,7 +1330,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		}
 
 		// Move blocker in a rand dir
-		int r = SyncRand() & 7;
+		int r = SyncRand(8);
 		int trycount = 8;
 		while (trycount > 0) {
 			r = (r + 1) & 7;
@@ -1363,7 +1363,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 	// Don't move more than 1 unit.
 	if (movablenb) {
-		const int index = SyncRand() % movablenb;
+		const int index = SyncRand(movablenb);
 		COrder *savedOrder = nullptr;
 		if (movableunits[index]->IsIdle() == false) {
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {

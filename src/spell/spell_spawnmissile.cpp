@@ -254,11 +254,11 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	}
 	res->x += location.AddX;
 	if (location.AddRandX) {
-		res->x += SyncRand() % location.AddRandX;
+		res->x += SyncRand(location.AddRandX);
 	}
 	res->y += location.AddY;
 	if (location.AddRandY) {
-		res->y += SyncRand() % location.AddRandY;
+		res->y += SyncRand(location.AddRandY);
 	}
 }
 

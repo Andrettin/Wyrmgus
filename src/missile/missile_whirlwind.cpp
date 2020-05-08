@@ -73,8 +73,8 @@ void MissileWhirlwind::Action()
 
 		do {
 			// find new destination in the map
-			newPos.x = center.x + SyncRand() % 5 - 2;
-			newPos.y = center.y + SyncRand() % 5 - 2;
+			newPos.x = center.x + SyncRand(5) - 2;
+			newPos.y = center.y + SyncRand(5) - 2;
 		} while (!CMap::Map.Info.IsPointOnMap(newPos, this->MapLayer));
 		this->destination = CMap::Map.tile_pos_to_map_pixel_pos_center(newPos);
 		this->source = this->position;

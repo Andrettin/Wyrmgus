@@ -39,10 +39,6 @@
 --  Random
 ----------------------------------------------------------------------------*/
 
-extern unsigned SyncRandSeed;           /// Sync random seed value
-
-extern void InitSyncRand();             /// Initialize the syncron rand
-extern int SyncRand();                  /// Syncron rand
 extern int SyncRand(int max);           /// Syncron rand
 
 ///  rand only used on this computer.

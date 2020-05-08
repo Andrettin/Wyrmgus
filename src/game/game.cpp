@@ -97,6 +97,7 @@
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "util/exception_util.h"
+#include "util/random.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
@@ -1479,7 +1480,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus start
 	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
 		SyncHash = 0;
-		InitSyncRand();
+		stratagus::random::get()->reset_seed(true);
 	}
 	
 	const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
@@ -1544,7 +1545,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	SyncHash = 0;
-	InitSyncRand();
+	stratagus::random::get()->reset_seed(IsNetworkGame());
 
 	if (IsNetworkGame()) { // Prepare network play
 		NetworkOnStartGame();
@@ -2168,7 +2169,7 @@ static int CclSavedGameInfo(lua_State *l)
 		} else if (!strcmp(value, "SyncHash")) {
 			SyncHash = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
-			SyncRandSeed = LuaToNumber(l, -1);
+			stratagus::random::get()->set_seed(LuaToNumber(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

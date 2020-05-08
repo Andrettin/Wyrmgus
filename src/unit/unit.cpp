@@ -2778,7 +2778,7 @@ void CUnit::Init(const CUnitType &type)
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
 	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.BoolFlag[BUILDING_INDEX].value) {
-		Direction = (SyncRand() >> 8) & 0xFF; // random heading
+		this->Direction = SyncRand(256); // random heading
 		UnitUpdateHeading(*this);
 	}
 
@@ -3058,7 +3058,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.BoolFlag[BUILDING_INDEX].value && FancyBuildings
-		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
+		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && SyncRand(2) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
 	
@@ -3834,7 +3834,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 		unit->MapLayer = CMap::Map.MapLayers[z];
 
 		Vec2i res_pos;
-		const int heading = SyncRand() % 256;
+		const int heading = SyncRand(256);
 		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
@@ -7246,8 +7246,8 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	if (!d) {
 		d = 1;
 	}
-	pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
-	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
+	pos.x = target.tilePos.x + (pos.x * 5) / d + SyncRand(4);
+	pos.y = target.tilePos.y + (pos.y * 5) / d + SyncRand(4);
 	CMap::Map.Clamp(pos, target.MapLayer->ID);
 	CommandStopUnit(target);
 	CommandMove(target, pos, 0, target.MapLayer->ID);

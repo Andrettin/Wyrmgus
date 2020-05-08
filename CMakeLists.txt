@@ -425,6 +425,7 @@ set(util_SRCS
 	src/util/image_util.cpp
 	src/util/point_container.cpp
 	src/util/point_util.cpp
+	src/util/random.cpp
 	src/util/util.cpp
 )
 source_group(util FILES ${util_SRCS})
@@ -740,6 +741,7 @@ set(stratagus_util_HDRS
 	src/util/point_container.h
 	src/util/point_util.h
 	src/util/qunique_ptr.h
+	src/util/random.h
 	src/util/singleton.h
 	src/util/size_util.h
 	src/util/string_util.h
@@ -1439,6 +1441,7 @@ target_precompile_headers(stratagus PRIVATE
 	<mutex>
 	<optional>
 	<queue>
+	<random>
 	<set>
 	<shared_mutex>
 	<sstream>

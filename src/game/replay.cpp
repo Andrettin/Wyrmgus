@@ -56,6 +56,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/random.h"
 #include "version.h"
 
 extern void ExpandPath(std::string &newpath, const std::string &path);
@@ -548,7 +549,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	log->Num = num;
 
-	log->SyncRandSeed = SyncRandSeed;
+	log->SyncRandSeed = stratagus::random::get()->get_seed();
 
 	// Append it to ReplayLog list
 	AppendLog(log, *LogFile);
@@ -864,7 +865,7 @@ static void DoNextReplay()
 
 	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
 
-	if (SyncRandSeed != ReplayStep->SyncRandSeed) {
+	if (stratagus::random::get()->get_seed() != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info

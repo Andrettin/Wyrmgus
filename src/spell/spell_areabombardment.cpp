@@ -97,8 +97,8 @@
 		// FIXME: radius configurable...
 		do {
 			// find new destination in the map
-			dpos.x = goalPos.x + SyncRand() % 5 - 2;
-			dpos.y = goalPos.y + SyncRand() % 5 - 2;
+			dpos.x = goalPos.x + SyncRand(5) - 2;
+			dpos.y = goalPos.y + SyncRand(5) - 2;
 		} while (!CMap::Map.Info.IsPointOnMap(dpos, z));
 
 		const PixelPos dest = CMap::Map.tile_pos_to_map_pixel_pos_center(dpos);

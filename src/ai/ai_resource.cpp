@@ -380,8 +380,8 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
-	CUnit &unit = near_unit ? *near_unit : ((num == 1) ? *table[0] : *table[SyncRand() % num]);
+//	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand(num)];
+	CUnit &unit = near_unit ? *near_unit : ((num == 1) ? *table[0] : *table[SyncRand(num)]);
 	//Wyrmgus end
 	
 	if (!CMap::Map.Info.IsPointOnMap(nearPos, z)) {
@@ -1765,7 +1765,7 @@ static void AiCollectResources()
 					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
 					
 					if (market_table.size() > 0) {
-						CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+						CUnit &market_unit = *market_table[SyncRand(market_table.size())];
 						CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
 						break;
 					}
@@ -1803,7 +1803,7 @@ static void AiCollectResources()
 					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
 
 					if (market_table.size() > 0) {
-						CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+						CUnit &market_unit = *market_table[SyncRand(market_table.size())];
 						CommandSellResource(market_unit, c, AiPlayer->Player->Index);
 						break;
 					}

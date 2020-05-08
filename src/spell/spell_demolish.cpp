@@ -207,7 +207,7 @@
 					damage += this->AcidDamage * (100 - unit.Variable[ACIDRESISTANCE_INDEX].Value) / 100;
 					damage *= modifier;
 					damage /= 100;
-					damage -= SyncRand() % ((damage + 2) / 2);
+					damage -= SyncRand((damage + 2) / 2);
 				}
 				HitUnit(&caster, unit, this->Damage + damage);
 				//Wyrmgus end

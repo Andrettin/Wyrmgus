@@ -742,7 +742,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorityVar, autocast->ReverseSort));
 				return NewTargetUnit(*table[0]);
 			} else { // Use the old behavior
-				return NewTargetUnit(*table[SyncRand() % table.size()]);
+				return NewTargetUnit(*table[SyncRand(table.size())]);
 			}
 		}
 	} else {

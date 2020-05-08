@@ -784,7 +784,7 @@ static int CclMoveUnit(lua_State *l)
 	if (UnitCanBeAt(*unit, ipos, unit->MapLayer->ID)) {
 		unit->Place(ipos, unit->MapLayer->ID);
 	} else {
-		const int heading = SyncRand() % 256;
+		const int heading = SyncRand(256);
 
 		unit->tilePos = ipos;
 		DropOutOnSide(*unit, heading, nullptr);
@@ -884,7 +884,7 @@ static int CclCreateUnit(lua_State *l)
 			unit->Place(ipos, z);
 			//Wyrmgus end
 		} else {
-			const int heading = SyncRand() % 256;
+			const int heading = SyncRand(256);
 
 			Vec2i res_pos;
 			FindNearestDrop(*unit->Type, ipos, res_pos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
@@ -951,7 +951,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, transporter->MapLayer->ID))) {
 			unit->Place(ipos, transporter->MapLayer->ID);
 		} else {
-			const int heading = SyncRand() % 256;
+			const int heading = SyncRand(256);
 
 			unit->tilePos = ipos;
 			unit->MapLayer = transporter->MapLayer;
@@ -1089,7 +1089,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, new_pos, 0, true, worker->MapLayer->ID))) {
 			unit->Place(new_pos, worker->MapLayer->ID);
 		} else {
-			const int heading = SyncRand() % 256;
+			const int heading = SyncRand(256);
 
 			unit->tilePos = new_pos;
 			unit->MapLayer = worker->MapLayer;

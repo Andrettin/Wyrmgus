@@ -86,6 +86,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
+#include "util/random.h"
 #include "video.h"
 #include "world.h"
 
@@ -168,7 +169,6 @@ void InitModules()
 	SyncHash = 0;
 
 	CallbackMusicOn();
-	InitSyncRand();
 	InitVideoCursors();
 	InitUserInterface();
 	InitPlayers();
@@ -290,7 +290,7 @@ void LoadGame(const std::string &filename)
 
 	const unsigned long game_cycle = GameCycle;
 	const unsigned long long current_total_hours = CDate::CurrentTotalHours;
-	const unsigned syncrand = SyncRandSeed;
+	const unsigned syncrand = stratagus::random::get()->get_seed();
 	const unsigned synchash = SyncHash;
 
 	InitModules();
@@ -298,7 +298,7 @@ void LoadGame(const std::string &filename)
 
 	GameCycle = game_cycle;
 	CDate::CurrentTotalHours = current_total_hours;
-	SyncRandSeed = syncrand;
+	stratagus::random::get()->set_seed(syncrand);
 	SyncHash = synchash;
 	SelectionChanged();
 }

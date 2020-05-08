@@ -44,7 +44,7 @@
 	const int arg1 = ParseAnimInt(unit, this->minWait.c_str());
 	const int arg2 = ParseAnimInt(unit, this->maxWait.c_str());
 
-	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
+	unit.Anim.Wait = arg1 + SyncRand(arg2 - arg1 + 1);
 }
 
 /*

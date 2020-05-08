@@ -474,8 +474,8 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 	int ray = 3;
 	const int maxTryCount = 8;
 	for (int i = 0; i != maxTryCount; ++i) {
-		pos->x = center.x + SyncRand() % (2 * ray + 1) - ray;
-		pos->y = center.y + SyncRand() % (2 * ray + 1) - ray;
+		pos->x = center.x + SyncRand(2 * ray + 1) - ray;
+		pos->y = center.y + SyncRand(2 * ray + 1) - ray;
 
 		if (Map.Info.IsPointOnMap(*pos)
 			&& Map.Field(*pos)->playerInfo.IsTeamExplored(*AiPlayer->Player) == false) {
@@ -649,7 +649,7 @@ void AiSendExplorers()
 	const int maxTryCount = 5;
 	for (int i = 0; i != maxTryCount; ++i) {
 		// Choose a request
-		const int requestid = SyncRand() % requestcount;
+		const int requestid = SyncRand(requestcount);
 		const AiExplorationRequest &request = AiPlayer->FirstExplorationRequest[requestid];
 
 		Vec2i pos;

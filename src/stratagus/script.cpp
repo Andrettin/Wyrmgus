@@ -1263,7 +1263,7 @@ int EvalNumber(const NumberDesc *number)
 
 		case ENumber_Rand :    // random(a) [0..a-1]
 			a = EvalNumber(number->D.N);
-			return SyncRand() % a;
+			return SyncRand(a);
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
 			if (unit != nullptr) {
