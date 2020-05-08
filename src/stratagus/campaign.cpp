@@ -46,6 +46,8 @@ namespace stratagus {
 
 void campaign::initialize_all()
 {
+	data_type::initialize_all();
+
 	campaign::sort_instances([](campaign *a, campaign *b) {
 		if (a->GetSpecies() != b->GetSpecies()) {
 			return a->GetSpecies() < b->GetSpecies();
