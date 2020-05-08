@@ -1074,46 +1074,31 @@ bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 		if (!CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
+
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
 				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->Terrains.end()) {
-						terrain_check = false;
-						break;
+					if (!stratagus::vector::contains(variation->Terrains, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
+						return false;
 					}
 				}
 			}
-			if (!terrain_check) {
-				break;
-			}
-		}
-		if (!terrain_check) {
-			return false;
 		}
 	}
 	
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (variation->TerrainsForbidden.size() > 0) {
-		if (!CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
-			return false;
-		}
-		bool terrain_check = true;
-		for (int x = 0; x < this->Type->TileSize.x; ++x) {
-			for (int y = 0; y < this->Type->TileSize.y; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->TerrainsForbidden.end()) {
-						terrain_check = false;
-						break;
+		if (CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+			for (int x = 0; x < this->Type->TileSize.x; ++x) {
+				for (int y = 0; y < this->Type->TileSize.y; ++y) {
+					if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+						if (stratagus::vector::contains(variation->TerrainsForbidden, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
+							return false;
+						}
 					}
 				}
 			}
-			if (!terrain_check) {
-				break;
-			}
-		}
-		if (terrain_check) {
-			return false;
 		}
 	}
 	
