@@ -961,14 +961,14 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
 void CommandResource(CUnit &unit, CUnit &dest, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	if (dest.Destroyed) {
-		return ;
+		return;
 	}
 	if (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 		ClearSavedAction(unit);
-		return ;
+		return;
 	}
 	//Wyrmgus start
 	StopRaft(unit);

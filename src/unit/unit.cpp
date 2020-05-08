@@ -5818,7 +5818,7 @@ void CUnit::ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity
 int CUnit::GetResourceStep(const int resource) const
 {
 	if (!this->Type->ResInfo[resource]) {
-		return 0;
+		throw std::runtime_error("Tried to get the resource step for resource \"" + std::to_string(resource) + "\" for a unit of type \"" + this->Type->get_identifier() + "\", which doesn't support gathering that resource.");
 	}
 
 	int resource_step = this->Type->ResInfo[resource]->ResourceStep;

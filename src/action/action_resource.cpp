@@ -180,16 +180,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	COrder_Resource *order = new COrder_Resource(harvester);
 	Vec2i ressourceLoc;
 
-	//Wyrmgus start
-	/*
-	//  Find the closest piece of wood next to a tile where the unit can move
-	if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, MapFieldForest, 20, *harvester.Player, pos, &ressourceLoc)) {
-		DebugPrint("FIXME: Give up???\n");
-		ressourceLoc = pos;
-	}
-	order->goalPos = ressourceLoc;
-	order->CurrentResource = WoodCost; // Hard-coded resource.
-	*/
 	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->get_resource() != nullptr) {
 		order->CurrentResource = CMap::Map.Field(pos, z)->get_resource()->ID;
 		//  Find the closest resource tile next to a tile where the unit can move
