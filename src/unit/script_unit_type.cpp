@@ -61,6 +61,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
+#include "species.h"
 #include "spells.h"
 #include "time/season.h"
 #include "ui/button_action.h"
@@ -1801,11 +1802,8 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
-			type->Species = GetSpecies(LuaToString(l, -1));
-			if (!type->Species) {
-				LuaError(l, "Species doesn't exist.");
-			}
-			type->Species->Type = type;
+			type->species = stratagus::species::get(LuaToString(l, -1));
+			type->species->Type = type;
 		} else if (!strcmp(value, "TerrainType")) {
 			type->TerrainType = stratagus::terrain_type::get(LuaToString(l, -1));
 			type->TerrainType->UnitType = type;
@@ -2418,18 +2416,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "TileHeight")) {
 		lua_pushnumber(l, type->TileSize.y);
 		return 1;
-	//Wyrmgus start
-	/*
-	} else if (!strcmp(data, "ComputerReactionRange")) {
-		lua_pushnumber(l, type->ReactRangeComputer);
-		return 1;
-	} else if (!strcmp(data, "PersonReactionRange")) {
-		lua_pushnumber(l, type->ReactRangePerson);
-		return 1;
-	*/
 	} else if (!strcmp(data, "Species")) {
-		if (type->Species != nullptr) {
-			lua_pushstring(l, type->Species->Ident.c_str());
+		if (type->get_species() != nullptr) {
+			lua_pushstring(l, type->get_species()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2457,7 +2446,6 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	//Wyrmgus end
 	} else if (!strcmp(data, "Missile")) {
 		lua_pushstring(l, type->Missile.Name.c_str());
 		return 1;
@@ -3449,9 +3437,9 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != nullptr && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->get_species() != nullptr && !unit.Type->get_species()->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
-		IndividualUpgradeLost(unit, CUpgrade::get(unit.Type->Species->ChildUpgrade));
+		IndividualUpgradeLost(unit, CUpgrade::get(unit.Type->get_species()->ChildUpgrade));
 	}
 	//Wyrmgus end
 
@@ -3795,25 +3783,20 @@ static int CclDefineSpecies(lua_State *l)
 	}
 
 	std::string species_ident = LuaToString(l, 1);
-	CSpecies *species = GetSpecies(species_ident);
-	if (!species) {
-		species = new CSpecies;
-		Species.push_back(species);
-		species->Ident = species_ident;
-	}
+	stratagus::species *species = stratagus::species::get_or_add(species_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			species->Name = LuaToString(l, -1);
+			species->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
-			species->Description = LuaToString(l, -1);
+			species->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			species->Quote = LuaToString(l, -1);
+			species->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
-			species->Background = LuaToString(l, -1);
+			species->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Era")) {
 			std::string era_ident = LuaToString(l, -1);
 			int era_id = GetEraIdByName(era_ident);
@@ -3862,13 +3845,9 @@ static int CclDefineSpecies(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string evolves_from_ident = LuaToString(l, -1, j + 1);
-				CSpecies *evolves_from = GetSpecies(evolves_from_ident);
-				if (evolves_from) {
-					species->EvolvesFrom.push_back(evolves_from);
-					evolves_from->EvolvesTo.push_back(species);
-				} else {
-					LuaError(l, "Species \"%s\" doesn't exist." _C_ evolves_from_ident.c_str());
-				}
+				stratagus::species *evolves_from = stratagus::species::get(evolves_from_ident);
+				species->EvolvesFrom.push_back(evolves_from);
+				evolves_from->EvolvesTo.push_back(species);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -3877,7 +3856,7 @@ static int CclDefineSpecies(lua_State *l)
 	
 	for (size_t i = 0; i < species->EvolvesFrom.size(); ++i) {
 		if (species->Era != -1 && species->EvolvesFrom[i]->Era != -1 && species->Era <= species->EvolvesFrom[i]->Era) {
-			LuaError(l, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter." _C_ species->Ident.c_str() _C_ species->EvolvesFrom[i]->Ident.c_str());
+			LuaError(l, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter." _C_ species->get_identifier().c_str() _C_ species->EvolvesFrom[i]->get_identifier().c_str());
 		}
 	}
 	
@@ -3886,10 +3865,10 @@ static int CclDefineSpecies(lua_State *l)
 
 static int CclGetSpecies(lua_State *l)
 {
-	lua_createtable(l, Species.size(), 0);
-	for (size_t i = 1; i <= Species.size(); ++i)
+	lua_createtable(l, stratagus::species::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::species::get_all().size(); ++i)
 	{
-		lua_pushstring(l, Species[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::species::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3906,23 +3885,20 @@ static int CclGetSpeciesData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string species_ident = LuaToString(l, 1);
-	const CSpecies *species = GetSpecies(species_ident);
-	if (!species) {
-		LuaError(l, "Species \"%s\" doesn't exist." _C_ species_ident.c_str());
-	}
+	const stratagus::species *species = stratagus::species::get(species_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, species->Name.c_str());
+		lua_pushstring(l, species->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, species->Description.c_str());
+		lua_pushstring(l, species->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, species->Quote.c_str());
+		lua_pushstring(l, species->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, species->Background.c_str());
+		lua_pushstring(l, species->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
 		if (species->Genus != nullptr && species->Genus->Family != nullptr) {
@@ -3983,7 +3959,7 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_createtable(l, species->EvolvesFrom.size(), 0);
 		for (size_t i = 1; i <= species->EvolvesFrom.size(); ++i)
 		{
-			lua_pushstring(l, species->EvolvesFrom[i-1]->Ident.c_str());
+			lua_pushstring(l, species->EvolvesFrom[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3991,7 +3967,7 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_createtable(l, species->EvolvesTo.size(), 0);
 		for (size_t i = 1; i <= species->EvolvesTo.size(); ++i)
 		{
-			lua_pushstring(l, species->EvolvesTo[i-1]->Ident.c_str());
+			lua_pushstring(l, species->EvolvesTo[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

@@ -49,6 +49,7 @@ namespace stratagus {
 
 class calendar;
 class quest;
+class species;
 class unit_class;
 class upgrade_class;
 
@@ -57,6 +58,7 @@ class civilization final : public detailed_data_entry, public data_type<civiliza
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
+	Q_PROPERTY(stratagus::species* species MEMBER species READ get_species)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
@@ -87,6 +89,19 @@ public:
 	civilization *get_parent_civilization() const
 	{
 		return this->parent_civilization;
+	}
+	
+	species *get_species() const
+	{
+		if (this->species != nullptr) {
+			return this->species;
+		}
+
+		if (this->get_parent_civilization() != nullptr) {
+			return this->get_parent_civilization()->get_species();
+		}
+
+		return nullptr;
 	}
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
@@ -233,6 +248,7 @@ public:
 
 	int ID = -1;
 private:
+	species *species = nullptr; //the civilization's species (e.g. human)
 	civilization *parent_civilization = nullptr;
 public:
 	std::string Adjective;			/// adjective pertaining to the civilization

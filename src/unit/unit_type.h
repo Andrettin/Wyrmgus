@@ -71,6 +71,7 @@ namespace stratagus {
 	class dependency;
 	class faction;
 	class plane;
+	class species;
 	class terrain_type;
 	class time_of_day;
 	class unit_class;
@@ -745,31 +746,6 @@ public:
 	std::string Subfamily;
 	std::string Tribe;
 };	
-
-class CSpecies
-{
-public:
-	bool CanEvolveToAUnitType(stratagus::terrain_type *terrain = nullptr, bool sapient_only = false);
-	CSpecies *GetRandomEvolution(stratagus::terrain_type *terrain);
-	
-	int Era = -1;					/// Era ID
-	bool Sapient = false;			/// Whether the species is sapient
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
-	std::string Ident;				/// Ident of the species
-	std::string Name;				/// Name of the species
-	std::string Description;		/// Description of the species
-	std::string Quote;				/// Quote pertaining to the species
-	std::string Background;			/// Background of the species
-	CSpeciesGenus *Genus = nullptr;
-	std::string Species;
-	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
-	stratagus::plane *home_plane = nullptr;
-	stratagus::world *homeworld = nullptr;
-	CUnitType *Type = nullptr;
-	std::vector<stratagus::terrain_type *> Terrains;	/// in which terrains does this species live
-	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
-	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
-};
 //Wyrmgus end
 
 /// Base structure of unit-type
@@ -848,6 +824,11 @@ public:
 	std::vector<std::string> GetPotentialPersonalNames(stratagus::faction *faction, const stratagus::gender gender) const;
 	//Wyrmgus end
 
+	stratagus::species *get_species() const
+	{
+		return this->species;
+	}
+
 public:
 	bool Initialized = false;
 	CUnitType *Parent;				/// Parent unit type
@@ -901,7 +882,9 @@ public:
 	int TrainQuantity;										/// Quantity to be trained
 	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
 	int ItemClass;											/// Item class (if the unit type is an item)
-	CSpecies *Species;
+private:
+	stratagus::species *species = nullptr;
+public:
 	stratagus::terrain_type *TerrainType;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	std::map<stratagus::gender, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
@@ -1205,7 +1188,6 @@ extern CUnitTypeVar UnitTypeVar;
 //Wyrmgus start
 extern CUnitType *settlement_site_unit_type;
 
-extern std::vector<CSpecies *> Species;
 extern std::vector<CSpeciesGenus *> SpeciesGenuses;
 extern std::vector<CSpeciesFamily *> SpeciesFamilies;
 extern std::vector<CSpeciesOrder *> SpeciesOrders;
@@ -1225,7 +1207,6 @@ extern void UpdateStats(int reset_to_default);       /// Update unit stats
 
 extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 
-extern CSpecies *GetSpecies(const std::string &species_ident);
 extern CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident);
 extern CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident);
 extern CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident);

@@ -355,6 +355,7 @@ set(stratagusmain_SRCS
 	src/stratagus/script_quest.cpp
 	src/stratagus/script_text.cpp
 	src/stratagus/selection.cpp
+	src/stratagus/species.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text.cpp
 	src/stratagus/title.cpp
@@ -825,6 +826,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/dialogue_option.h
 	src/stratagus/faction.h
 	src/stratagus/gender.h
+	src/stratagus/species.h
 )
 
 source_group(stratagus FILES ${stratagus_generic_HDRS})

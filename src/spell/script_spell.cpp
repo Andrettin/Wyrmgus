@@ -192,8 +192,8 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->FactionUnit = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "civilization-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			stratagus::civilization *civilization = stratagus::civilization::get(value);
-			condition->civilization_equivalent = civilization->ID;
+			const stratagus::civilization *civilization = stratagus::civilization::get(value);
+			condition->civilization_equivalent = civilization;
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
 			stratagus::faction *faction = stratagus::faction::get(value);

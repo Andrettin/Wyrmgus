@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2016-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,40 +25,53 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "stratagus.h"
 
-#include "database/data_type.h"
-#include "database/detailed_data_entry.h"
-#include "data_type.h"
+#include "species.h"
 
-class CDeityDomain;
-class CSchoolOfMagic;
-class CSeasonSchedule;
-class CTimeOfDaySchedule;
+#include "util/vector_util.h"
 
 namespace stratagus {
 
-class species;
-
-class plane : public detailed_data_entry, public data_type<plane>, public CDataType
+bool species::CanEvolveToAUnitType(terrain_type *terrain, bool sapient_only) const
 {
-	Q_OBJECT
-
-public:
-	static constexpr const char *class_identifier = "plane";
-	static constexpr const char *database_folder = "planes";
-
-	plane(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
-	{
+	for (const species *evolution : this->EvolvesTo) {
+		if (
+			(evolution->Type != nullptr && (!terrain || vector::contains(evolution->Terrains, terrain)) && (!sapient_only || evolution->Sapient))
+			|| evolution->CanEvolveToAUnitType(terrain, sapient_only)
+		) {
+			return true;
+		}
 	}
+	return false;
+}
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
-	std::vector<CDeityDomain *> EmpoweredDeityDomains; ///deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic; ///schools of magic empowered in this plane
-	std::vector<species *> Species; ///species in this plane
-};
+species *species::GetRandomEvolution(terrain_type *terrain) const
+{
+	std::vector<species *> potential_evolutions;
+	
+	for (species *evolution : this->EvolvesTo) {
+		if (
+			(evolution->Type != nullptr && vector::contains(evolution->Terrains, terrain))
+			|| evolution->CanEvolveToAUnitType(terrain)
+		) { //give preference to evolutions that are native to the current terrain
+			potential_evolutions.push_back(evolution);
+		}
+	}
+	
+	if (potential_evolutions.size() == 0) {
+		for (species *evolution : this->EvolvesTo) {
+			if (evolution->Type != nullptr || evolution->CanEvolveToAUnitType()) {
+				potential_evolutions.push_back(evolution);
+			}
+		}
+	}
+	
+	if (potential_evolutions.size() > 0) {
+		return potential_evolutions[SyncRand(potential_evolutions.size())];
+	}
+	
+	return nullptr;
+}
 
 }

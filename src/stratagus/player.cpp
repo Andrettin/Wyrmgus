@@ -385,7 +385,6 @@ void PlayerRace::Clean()
 	//Wyrmgus end
 	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
 		//Wyrmgus start
-		this->Species[i].clear();
 		this->civilization_ui_fillers[i].clear();
 		//Wyrmgus end
 	}
@@ -1373,7 +1372,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && PlayerRaces.Species[unit.Type->civilization] == PlayerRaces.Species[faction->get_civilization()->ID] && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->civilization != -1 && stratagus::civilization::get_all()[unit.Type->civilization]->get_species() == faction->get_civilization()->get_species() && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();

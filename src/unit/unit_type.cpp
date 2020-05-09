@@ -58,6 +58,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
+#include "species.h"
 #include "spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
@@ -496,7 +497,6 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 //Wyrmgus start
 CUnitType *settlement_site_unit_type;
 
-std::vector<CSpecies *> Species;
 std::vector<CSpeciesGenus *> SpeciesGenuses;
 std::vector<CSpeciesFamily *> SpeciesFamilies;
 std::vector<CSpeciesOrder *> SpeciesOrders;
@@ -543,7 +543,7 @@ CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identi
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
-	civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
+	civilization(-1), Faction(-1), TerrainType(nullptr),
 	//Wyrmgus end
 	Animations(nullptr), StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
@@ -798,13 +798,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "species") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Species = GetSpecies(value);
-			if (this->Species) {
-				this->Species->Type = this;
-			} else {
-				fprintf(stderr, "Invalid species: \"%s\".\n", value.c_str());
-			}
+			this->species = stratagus::species::get(value);
+			this->species->Type = this;
 		} else if (key == "right_mouse_action") {
 			if (value == "none") {
 				this->MouseAction = MouseActionNone;
@@ -1841,12 +1836,12 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction
 	}
 	
 	if (potential_names.size() == 0 && this->civilization != -1) {
-		int civilization_id = this->civilization;
+		const int civilization_id = this->civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->get_civilization()->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->get_civilization()->ID] && this == faction->get_class_unit_type(this->get_unit_class())) {
-				civilization_id = faction->get_civilization()->ID;
-			}
 			stratagus::civilization *civilization = stratagus::civilization::get_all()[civilization_id];
+			if (faction && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this == faction->get_class_unit_type(this->get_unit_class())) {
+				civilization = faction->get_civilization();
+			}
 			if (faction && faction->get_civilization() != civilization) {
 				faction = nullptr;
 			}
@@ -2749,10 +2744,6 @@ void CleanUnitTypeVariables()
 	// Clean hardcoded unit types.
 	
 	//Wyrmgus start
-	for (size_t i = 0; i < Species.size(); ++i) {
-		delete Species[i];
-	}
-	Species.clear();
 	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
 		delete SpeciesGenuses[i];
 	}
@@ -2830,17 +2821,6 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 	return "";
 }
 
-CSpecies *GetSpecies(const std::string &species_ident)
-{
-	for (size_t i = 0; i < Species.size(); ++i) {
-		if (species_ident == Species[i]->Ident) {
-			return Species[i];
-		}
-	}
-	
-	return nullptr;
-}
-
 CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident)
 {
 	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
@@ -2891,47 +2871,6 @@ CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident)
 		if (phylum_ident == SpeciesPhylums[i]->Ident) {
 			return SpeciesPhylums[i];
 		}
-	}
-	
-	return nullptr;
-}
-
-bool CSpecies::CanEvolveToAUnitType(stratagus::terrain_type *terrain, bool sapient_only)
-{
-	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-		if (
-			(this->EvolvesTo[i]->Type != nullptr && (!terrain || std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain, sapient_only)
-		) {
-			return true;
-		}
-	}
-	return false;
-}
-
-CSpecies *CSpecies::GetRandomEvolution(stratagus::terrain_type *terrain)
-{
-	std::vector<CSpecies *> potential_evolutions;
-	
-	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-		if (
-			(this->EvolvesTo[i]->Type != nullptr && std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end())
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain)
-		) { //give preference to evolutions that are native to the current terrain
-			potential_evolutions.push_back(this->EvolvesTo[i]);
-		}
-	}
-	
-	if (potential_evolutions.size() == 0) {
-		for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-			if (this->EvolvesTo[i]->Type != nullptr || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
-				potential_evolutions.push_back(this->EvolvesTo[i]);
-			}
-		}
-	}
-	
-	if (potential_evolutions.size() > 0) {
-		return potential_evolutions[SyncRand(potential_evolutions.size())];
 	}
 	
 	return nullptr;

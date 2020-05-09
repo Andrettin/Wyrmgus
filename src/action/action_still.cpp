@@ -58,6 +58,7 @@
 //Wyrmgus start
 #include "sound/sound.h"
 //Wyrmgus end
+#include "species.h"
 #include "spells.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -65,6 +66,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 #include "video.h"
 
 enum {
@@ -213,8 +215,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID)) != unit.Type->Species->Terrains.end()) {
-				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID)) == unit.Type->Species->Terrains.end()) {
+			if (unit.Type->get_species() != nullptr && stratagus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
+				if (!stratagus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
 					return false;
 				}
 			}

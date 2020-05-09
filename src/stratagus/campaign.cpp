@@ -36,6 +36,7 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
+#include "species.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "util/container_util.h"
@@ -49,8 +50,8 @@ void campaign::initialize_all()
 	data_type::initialize_all();
 
 	campaign::sort_instances([](campaign *a, campaign *b) {
-		if (a->GetSpecies() != b->GetSpecies()) {
-			return a->GetSpecies() < b->GetSpecies();
+		if (a->get_species() != b->get_species()) {
+			return a->get_species()->get_identifier() < b->get_species()->get_identifier();
 		} else if (a->get_timeline() != b->get_timeline()) {
 			return a->get_timeline()->get_point_of_divergence() < b->get_timeline()->get_point_of_divergence();
 		} else if (a->get_start_date() != b->get_start_date()) {
@@ -152,13 +153,13 @@ void campaign::initialize()
 	data_entry::initialize();
 }
 
-std::string campaign::GetSpecies() const
+const species *campaign::get_species() const
 {
 	if (this->get_faction() != nullptr && this->get_faction()->get_civilization() != nullptr) {
-		return PlayerRaces.Species[this->get_faction()->get_civilization()->ID];
+		return this->get_faction()->get_civilization()->get_species();
 	}
 
-	return std::string();
+	return nullptr;
 }
 
 bool campaign::IsAvailable() const

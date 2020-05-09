@@ -246,8 +246,8 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 			return false;
 		}
 	}
-	if (condition->civilization_equivalent != -1) {
-		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent && (!caster.Character || (caster.Character->get_civilization() && caster.Character->get_civilization()->ID == condition->civilization_equivalent))) || PlayerRaces.Species[caster.Type->civilization] != PlayerRaces.Species[condition->civilization_equivalent] || stratagus::civilization::get_all()[condition->civilization_equivalent]->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
+	if (condition->civilization_equivalent != nullptr) {
+		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent->ID && (!caster.Character || (caster.Character->get_civilization() && caster.Character->get_civilization() == condition->civilization_equivalent))) || stratagus::civilization::get_all()[caster.Type->civilization]->get_species() != condition->civilization_equivalent->get_species() || condition->civilization_equivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
@@ -990,9 +990,8 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "faction_unit") {
 			this->FactionUnit = StringToCondition(value);
 		} else if (key == "civilization_equivalent") {
-			value = FindAndReplaceString(value, "_", "-");
 			const stratagus::civilization *civilization = stratagus::civilization::get(value);
-			this->civilization_equivalent = civilization->ID;
+			this->civilization_equivalent = civilization;
 		} else if (key == "faction_equivalent") {
 			stratagus::faction *faction = stratagus::faction::get(value);
 			this->FactionEquivalent = faction;

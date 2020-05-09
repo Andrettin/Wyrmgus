@@ -784,7 +784,6 @@ public:
 
 public:
 	//Wyrmgus start
-	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFiller> civilization_ui_fillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages

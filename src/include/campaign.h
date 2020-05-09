@@ -45,6 +45,7 @@ class calendar;
 class faction;
 class map_template;
 class quest;
+class species;
 class timeline;
 
 class campaign : public detailed_data_entry, public data_type<campaign>, public CDataType
@@ -92,7 +93,7 @@ public:
 		return this->completion_quest;
 	}
 
-	std::string GetSpecies() const;
+	const species *get_species() const;
 
 	bool IsHidden() const
 	{

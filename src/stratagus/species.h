@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2016-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,36 +29,43 @@
 
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
-#include "data_type.h"
 
-class CDeityDomain;
-class CSchoolOfMagic;
-class CSeasonSchedule;
-class CTimeOfDaySchedule;
+class CSpeciesGenus;
+class CUnitType;
 
 namespace stratagus {
 
-class species;
+class plane;
+class terrain_type;
+class world;
 
-class plane : public detailed_data_entry, public data_type<plane>, public CDataType
+class species : public detailed_data_entry, public data_type<species>
 {
 	Q_OBJECT
 
 public:
-	static constexpr const char *class_identifier = "plane";
-	static constexpr const char *database_folder = "planes";
+	static constexpr const char *class_identifier = "species";
+	static constexpr const char *database_folder = "species";
 
-	plane(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	species(const std::string &identifier) : detailed_data_entry(identifier)
 	{
 	}
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
-	std::vector<CDeityDomain *> EmpoweredDeityDomains; ///deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic; ///schools of magic empowered in this plane
-	std::vector<species *> Species; ///species in this plane
+	bool CanEvolveToAUnitType(terrain_type *terrain = nullptr, bool sapient_only = false) const;
+	species *GetRandomEvolution(terrain_type *terrain) const;
+	
+	int Era = -1;					/// Era ID
+	bool Sapient = false;			/// Whether the species is sapient
+	bool Prehistoric = false;		/// Whether the species is prehistoric or not
+	CSpeciesGenus *Genus = nullptr;
+	std::string Species;
+	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+	plane *home_plane = nullptr;
+	world *homeworld = nullptr;
+	CUnitType *Type = nullptr;
+	std::vector<terrain_type *> Terrains;	/// in which terrains does this species live
+	std::vector<species *> EvolvesFrom;	/// from which species this one can evolve
+	std::vector<species *> EvolvesTo;		/// to which species this one can evolve
 };
 
 }

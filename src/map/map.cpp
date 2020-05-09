@@ -52,6 +52,7 @@
 #include "quest.h"
 #include "settings.h"
 #include "sound/sound_server.h"
+#include "species.h"
 //Wyrmgus end
 #include "time/calendar.h"
 #include "time/season.h"
@@ -353,17 +354,17 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::fa
 	Vec2i random_pos(-1, -1);
 	
 	std::vector<stratagus::terrain_type *> allowed_terrains;
-	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->Species) { //if the unit is a fauna one, it has to start on terrain it is native to
-		for (size_t i = 0; i < unit_type->Species->Terrains.size(); ++i) {
-			allowed_terrains.push_back(unit_type->Species->Terrains[i]);
+	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->get_species() != nullptr) { //if the unit is a fauna one, it has to start on terrain it is native to
+		for (size_t i = 0; i < unit_type->get_species()->Terrains.size(); ++i) {
+			allowed_terrains.push_back(unit_type->get_species()->Terrains[i]);
 		}
 	}
 	
 	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
 		CUnitType *spawned_type = unit_type->SpawnUnits[i];
-		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->Species) {
-			for (size_t j = 0; j < spawned_type->Species->Terrains.size(); ++j) {
-				allowed_terrains.push_back(spawned_type->Species->Terrains[j]);
+		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
+			for (size_t j = 0; j < spawned_type->get_species()->Terrains.size(); ++j) {
+				allowed_terrains.push_back(spawned_type->get_species()->Terrains[j]);
 			}
 		}
 	}

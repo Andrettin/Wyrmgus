@@ -144,7 +144,7 @@ class ConditionInfo
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
 		//Wyrmgus start
-		ThrustingWeapon(0), FactionUnit(0), civilization_equivalent(-1), FactionEquivalent(nullptr),
+		ThrustingWeapon(0), FactionUnit(0),
 		//Wyrmgus end
 		BoolFlag(nullptr), Variable(nullptr), CheckFunc(nullptr) {};
 	~ConditionInfo()
@@ -168,8 +168,8 @@ public:
 	//Wyrmgus start
 	char ThrustingWeapon;	/// Caster has a thrusting weapon as the current weapon.
 	char FactionUnit;		/// Caster is a faction-specific unit.
-	int civilization_equivalent;
-	stratagus::faction *FactionEquivalent;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
+	const stratagus::civilization *civilization_equivalent = nullptr;
+	const stratagus::faction *FactionEquivalent = nullptr;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
 	//Wyrmgus end
 
 	char *BoolFlag;         /// User defined boolean flag.

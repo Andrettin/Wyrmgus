@@ -61,6 +61,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "script.h"
+#include "species.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
 #include "unit/unit.h"
@@ -745,7 +746,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Playable")) {
 			civilization->playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
-			PlayerRaces.Species[civilization_id] = LuaToString(l, -1);
+			civilization->species = stratagus::species::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->parent_civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
@@ -1387,10 +1388,14 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushboolean(l, civilization->is_playable());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
-		lua_pushstring(l, PlayerRaces.Species[civilization_id].c_str());
+		if (civilization->get_species() != nullptr) {
+			lua_pushstring(l, civilization->get_species()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "ParentCivilization")) {
-		if (civilization->get_parent_civilization()) {
+		if (civilization->get_parent_civilization() != nullptr) {
 			lua_pushstring(l, civilization->get_parent_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");

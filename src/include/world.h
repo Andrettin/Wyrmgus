@@ -37,13 +37,13 @@
 
 class CProvince;
 class CSeasonSchedule;
-class CSpecies;
 class CTerrainFeature;
 class CTimeOfDaySchedule;
 
 namespace stratagus {
 
 class plane;
+class species;
 
 class world final : public detailed_data_entry, public data_type<world>, public CDataType
 {
@@ -76,7 +76,7 @@ public:
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
-	std::vector<CSpecies *> Species;									/// Species in this world
+	std::vector<species *> Species;									/// Species in this world
 };
 
 }

@@ -40,7 +40,6 @@
 class CDeityDomain;
 class CGraphic;
 class CProvince;
-class CSpecies;
 class CTerrainFeature;
 class CUnitType;
 class CUpgrade;
