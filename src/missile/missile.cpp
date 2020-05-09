@@ -1334,7 +1334,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
-								if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
+								if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
 									missile.position = CMap::Map.tile_pos_to_map_pixel_pos_top_left(unit.tilePos);
 								}
 							} else {
@@ -1356,7 +1356,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit)) {
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
-						if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
+						if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
 							missile.position = CMap::Map.tile_pos_to_map_pixel_pos_top_left(unit.tilePos);
 						}
 						missile.DestroyMissile = 1;
@@ -1661,7 +1661,7 @@ void Missile::MissileHit(CUnit *unit)
 			}
 		}
 		MissileHitsGoal(*this, *unit, 1);
-		if (mtype.Class == MissileClassPointToPointBounce && (unit->Type->TileSize.x > mtype.MaxBounceSize || unit->Type->TileSize.y > mtype.MaxBounceSize)) {
+		if (mtype.Class == MissileClassPointToPointBounce && (unit->Type->get_tile_width() > mtype.MaxBounceSize || unit->Type->get_tile_height() > mtype.MaxBounceSize)) {
 			this->TTL = 0;
 		}
 		return;
@@ -1695,7 +1695,7 @@ void Missile::MissileHit(CUnit *unit)
 				splash = mtype.SplashFactor;
 			}
 			MissileHitsGoal(*this, goal, splash);
-			if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->TileSize.x > mtype.MaxBounceSize || goal.Type->TileSize.y > mtype.MaxBounceSize)) {
+			if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
 				this->TTL = 0;
 			}
 			return;
@@ -1779,7 +1779,7 @@ void Missile::MissileHit(CUnit *unit)
 						}
 					}
 					MissileHitsGoal(*this, goal, splash);
-					if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->TileSize.x > mtype.MaxBounceSize || goal.Type->TileSize.y > mtype.MaxBounceSize)) {
+					if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
 						this->TTL = 0;
 					}
 				}

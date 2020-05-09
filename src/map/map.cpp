@@ -370,8 +370,8 @@ Vec2i CMap::GenerateUnitLocation(const stratagus::unit_type *unit_type, const st
 	}
 
 	std::vector<Vec2i> potential_positions;
-	for (int x = min_pos.x; x <= (max_pos.x - (unit_type->GetTileSize().x - 1)); ++x) {
-		for (int y = min_pos.y; y <= (max_pos.y - (unit_type->GetTileSize().y - 1)); ++y) {
+	for (int x = min_pos.x; x <= (max_pos.x - (unit_type->get_tile_width() - 1)); ++x) {
+		for (int y = min_pos.y; y <= (max_pos.y - (unit_type->get_tile_height() - 1)); ++y) {
 			potential_positions.push_back(Vec2i(x, y));
 		}
 	}
@@ -390,15 +390,15 @@ Vec2i CMap::GenerateUnitLocation(const stratagus::unit_type *unit_type, const st
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->GivesResource && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		}
 		
 		if (!table.empty()) {
@@ -406,8 +406,8 @@ Vec2i CMap::GenerateUnitLocation(const stratagus::unit_type *unit_type, const st
 		}
 
 		bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
-		for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
-			for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
+		for (int x = random_pos.x - 1; x < random_pos.x + unit_type->get_tile_width() + 1; ++x) {
+			for (int y = random_pos.y - 1; y < random_pos.y + unit_type->get_tile_height() + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
 					passable_surroundings = false;
 					break;
@@ -1098,8 +1098,8 @@ bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z)
 	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
 	//Wyrmgus end
 
-	for (int addy = 0; addy < type.TileSize.y; ++addy) {
-		for (int addx = 0; addx < type.TileSize.x; ++addx) {
+	for (int addy = 0; addy < type.get_tile_height(); ++addy) {
+		for (int addx = 0; addx < type.get_tile_width(); ++addx) {
 			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
 				|| CMap::Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
 				return false;
@@ -3135,8 +3135,8 @@ void CMap::generate_settlement_territories(const int z)
 			continue;
 		}
 
-		for (int x = site_unit->tilePos.x; x < (site_unit->tilePos.x + site_unit->Type->GetTileSize().x); ++x) {
-			for (int y = site_unit->tilePos.y; y < (site_unit->tilePos.y + site_unit->Type->GetTileSize().y); ++y) {
+		for (int x = site_unit->tilePos.x; x < (site_unit->tilePos.x + site_unit->Type->get_tile_width()); ++x) {
+			for (int y = site_unit->tilePos.y; y < (site_unit->tilePos.y + site_unit->Type->get_tile_height()); ++y) {
 				QPoint tile_pos(x, y);
 				this->Field(tile_pos, z)->set_settlement(site_unit->settlement);
 
@@ -3330,7 +3330,7 @@ void CMap::GenerateNeutralUnits(stratagus::unit_type *unit_type, int quantity, c
 		if (unit_type->GivesResource) {
 			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CUnit *unit = CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileSize.x > 1 && unit_type->TileSize.y > 1);
+			CUnit *unit = CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->get_tile_width() > 1 && unit_type->get_tile_height() > 1);
 		}
 	}
 }

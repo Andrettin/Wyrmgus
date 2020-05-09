@@ -160,14 +160,14 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const stratagus::uni
 		|| this->DistanceType == DistanceTypeType::NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance, CMap::Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance, CMap::Map.Info.MapHeights[z]);
+		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance, CMap::Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance, CMap::Map.Info.MapHeights[z]);
 		distance = this->Distance;
 	} else if (this->DistanceType == DistanceTypeType::LessThan || this->DistanceType == DistanceTypeType::GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance + 1, CMap::Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance + 1, CMap::Map.Info.MapHeights[z]);
+		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance + 1, CMap::Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance + 1, CMap::Map.Info.MapHeights[z]);
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
@@ -287,15 +287,15 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const stratagus:
 		|| this->DistanceType == DistanceTypeType::NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance, CMap::Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance, CMap::Map.Info.MapHeights[z]);
+		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance, CMap::Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance, CMap::Map.Info.MapHeights[z]);
 		distance = this->Distance;
 	}
 	else if (this->DistanceType == DistanceTypeType::LessThan || this->DistanceType == DistanceTypeType::GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance + 1, CMap::Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance + 1, CMap::Map.Info.MapHeights[z]);
+		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance + 1, CMap::Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance + 1, CMap::Map.Info.MapHeights[z]);
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
@@ -428,7 +428,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const stratagus::unit_t
 	if (it != cache.end() && (*it)->tilePos == pos) {
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
-		Vec2i endPos(found.tilePos + found.Type->TileSize - 1);
+		Vec2i endPos(found.tilePos + found.Type->get_tile_size() - QSize(1, 1));
 		Select(found.tilePos, endPos, table, found.MapLayer->ID);
 		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
 			if (*it == *it2) {
@@ -466,8 +466,8 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const stratagus::unit
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
-	for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
-		for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
+	for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
+		for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {
 			if (!CMap::Map.Info.IsPointOnMap(x, y, z)) {
 				continue;
 			}
@@ -501,17 +501,17 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 		return nullptr;
 	}
 
-	if (pos.x + type.TileSize.x > CMap::Map.Info.MapWidths[z]) {
+	if (pos.x + type.get_tile_width() > CMap::Map.Info.MapWidths[z]) {
 		return nullptr;
 	}
-	if (pos.y + type.TileSize.y > CMap::Map.Info.MapHeights[z]) {
+	if (pos.y + type.get_tile_height() > CMap::Map.Info.MapHeights[z]) {
 		return nullptr;
 	}
 	
 	//Wyrmgus start
 	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a game is starting, only place buildings with a certain space from other buildings
-		for (int x = pos.x - 1; x < pos.x + type.TileSize.x + 1; ++x) {
-			for (int y = pos.y - 1; y < pos.y + type.TileSize.y + 1; ++y) {
+		for (int x = pos.x - 1; x < pos.x + type.get_tile_width() + 1; ++x) {
+			for (int y = pos.y - 1; y < pos.y + type.get_tile_height() + 1; ++y) {
 				if (CMap::Map.Info.IsPointOnMap(x, y, z) && (CMap::Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
 					return nullptr;
 				}
@@ -520,8 +520,8 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 	}
 	
 	if (unit) {
-		for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
-			for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
+		for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
+			for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {
 				if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->get_owner() != nullptr && CMap::Map.Field(x, y, z)->get_owner() != unit->Player) {
 					return nullptr;
 				}
@@ -532,8 +532,8 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 
 	// Must be checked before oil!
 	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
-		const int width = type.TileSize.x;
-		int h = type.TileSize.y;
+		const int width = type.get_tile_width();
+		int h = type.get_tile_height();
 		bool success = false;
 
 		// Need at least one coast tile
@@ -683,11 +683,11 @@ CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, con
 //	unsigned int index = pos.y * CMap::Map.Info.MapWidth;
 	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
 	//Wyrmgus end
-	for (int h = 0; h < type.TileSize.y; ++h) {
-		for (int w = type.TileSize.x; w--;) {
+	for (int h = 0; h < type.get_tile_height(); ++h) {
+		for (int w = type.get_tile_width(); w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			if (!CMap::Map.Info.IsPointOnMap(pos.x + w, pos.y + h, z)) {
-				h = type.TileSize.y;
+				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
@@ -707,7 +707,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, con
 			const CMapField &mf = *CMap::Map.Field(index + pos.x + w, z);
 			//Wyrmgus end
 			if (mf.CheckMask(testmask)) {
-				h = type.TileSize.y;
+				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
@@ -715,7 +715,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, con
 //			if (player && !mf.playerInfo.IsExplored(*player)) {
 			if (player && !ignore_exploration && !mf.playerInfo.IsTeamExplored(*player)) {
 			//Wyrmgus end
-				h = type.TileSize.y;
+				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}

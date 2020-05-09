@@ -751,9 +751,9 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		
 		const unit_type *type = std::get<0>(iterator->second);
 		
-		Vec2i unit_offset((type->TileSize - 1) / 2);
+		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z)) {
+		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
@@ -825,7 +825,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
 			unit_type *worker_type = faction::get_all()[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
-				Vec2i worker_unit_offset((worker_type->TileSize - 1) / 2);
+				Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
 				
 				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
 
@@ -866,7 +866,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
-		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->TileSize.x == 1 && this->GeneratedNeutralUnits[i].first->TileSize.y == 1; // group small resources
+		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->get_tile_width() == 1 && this->GeneratedNeutralUnits[i].first->get_tile_height() == 1; // group small resources
 		CMap::Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
 
@@ -1004,7 +1004,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		const QPoint site_raw_pos = site->get_pos();
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
-		Vec2i unit_offset((settlement_site_unit_type->TileSize - 1) / 2);
+		Vec2i unit_offset((settlement_site_unit_type->get_tile_size() - QSize(1, 1)) / 2);
 			
 		if (random) {
 			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
@@ -1027,7 +1027,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		site->load_history();
 
 		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
-			if (!UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->TileSize - 1), z)) {
+			if (!UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 			}
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true);
@@ -1049,7 +1049,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
 					continue;
 				}
-				Vec2i unit_offset((type->TileSize - 1) / 2);
+				Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 				CUnit *unit = CreateResourceUnit(site_pos - unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
 				if (std::get<3>(site->HistoricalResources[j])) {
 					unit->SetUnique(std::get<3>(site->HistoricalResources[j]));
@@ -1139,7 +1139,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 
 			const QPoint unit_offset = unit_type->get_tile_center_pos_offset();
 			if (first_building) {
-				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + QPoint(unit_type->TileSize - 1), z)) {
+				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on (" + std::to_string(site_raw_pos.x()) + ", " + std::to_string(site_raw_pos.y()) + "), but it cannot be there.");
 				}
 			}
@@ -1158,8 +1158,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 
 			if (pathway_type) {
-				for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
-					for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
+				for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
+					for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
 						if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 							continue;
 						}
@@ -1200,9 +1200,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
 					continue;
 				}
-				Vec2i unit_offset((unit_type->TileSize - 1) / 2);
+				Vec2i unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
 				if (first_building) {
-					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(unit_type->TileSize - 1), z)) {
+					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 					}
 				}
@@ -1232,8 +1232,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {
-					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
-						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
+					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
+						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
 							if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 								continue;
 							}
@@ -1279,7 +1279,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					} else {
 						unit_player = player;
 					}
-					Vec2i unit_offset((type->TileSize - 1) / 2);
+					Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
 					for (int j = 0; j < unit_quantity; ++j) {
 						CUnit *unit = CreateUnit(site_pos - unit_offset, *type, unit_player, z);
@@ -1300,7 +1300,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 		const unit_type *type = std::get<1>(this->PlaneConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->PlaneConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
-		Vec2i unit_offset((type->TileSize - 1) / 2);
+		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
@@ -1312,7 +1312,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			continue;
 		}
 		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z)) {
+		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
@@ -1343,7 +1343,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 		const unit_type *type = std::get<1>(this->WorldConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->WorldConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
-		Vec2i unit_offset((type->TileSize - 1) / 2);
+		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
@@ -1355,7 +1355,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			continue;
 		}
 		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z)) {
+		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
@@ -1395,7 +1395,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		const unit_type *type = std::get<1>(this->Units[i]);
-		Vec2i unit_offset((type->TileSize - 1) / 2);
+		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
@@ -1430,7 +1430,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player = CPlayer::Players[PlayerNumNeutral];
 			}
 
-			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z, type->BoolFlag[BUILDING_INDEX].value && type->TileSize.x > 1 && type->TileSize.y > 1);
+			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z, type->BoolFlag[BUILDING_INDEX].value && type->get_tile_width() > 1 && type->get_tile_height() > 1);
 			if (!type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
 				player->ChangeUnitTypeAiActiveCount(type, -1);
@@ -1449,7 +1449,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		Vec2i unit_raw_pos(std::get<0>(this->Heroes[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		character *hero = std::get<1>(this->Heroes[i]);
-		Vec2i unit_offset((hero->get_unit_type()->TileSize - 1) / 2);
+		Vec2i unit_offset((hero->get_unit_type()->get_tile_size() - QSize(1, 1)) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
@@ -1530,7 +1530,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		}
 		
 		const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
-		const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->GetTileSize()) - QPoint(1, 1);
+		const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->get_tile_size()) - QPoint(1, 1);
 		if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
 			continue;
 		}

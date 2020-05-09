@@ -1076,8 +1076,8 @@ bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 		}
 
 		bool terrain_check = true;
-		for (int x = 0; x < this->Type->TileSize.x; ++x) {
-			for (int y = 0; y < this->Type->TileSize.y; ++y) {
+		for (int x = 0; x < this->Type->get_tile_width(); ++x) {
+			for (int y = 0; y < this->Type->get_tile_height(); ++y) {
 				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
 					if (!stratagus::vector::contains(variation->Terrains, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 						return false;
@@ -1090,8 +1090,8 @@ bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (variation->TerrainsForbidden.size() > 0) {
 		if (CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
-			for (int x = 0; x < this->Type->TileSize.x; ++x) {
-				for (int y = 0; y < this->Type->TileSize.y; ++y) {
+			for (int x = 0; x < this->Type->get_tile_width(); ++x) {
+				for (int y = 0; y < this->Type->get_tile_height(); ++y) {
 					if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
 						if (stratagus::vector::contains(variation->TerrainsForbidden, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 							return false;
@@ -1768,7 +1768,7 @@ void CUnit::ApplyAura(int aura_index)
 	this->ApplyAuraEffect(aura_index);
 			
 	//apply aura to all appropriate nearby units
-	int aura_range = AuraRange - (this->Type->TileSize.x - 1);
+	int aura_range = AuraRange - (this->Type->get_tile_width() - 1);
 	std::vector<CUnit *> table;
 	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), true);
 	for (size_t i = 0; i != table.size(); ++i) {
@@ -2077,8 +2077,8 @@ void CUnit::GenerateDrop()
 	}
 	
 	Vec2i drop_pos = this->tilePos;
-	drop_pos.x += SyncRand(this->Type->TileSize.x);
-	drop_pos.y += SyncRand(this->Type->TileSize.y);
+	drop_pos.x += SyncRand(this->Type->get_tile_width());
+	drop_pos.y += SyncRand(this->Type->get_tile_height());
 	CUnit *droppedUnit = nullptr;
 	stratagus::unit_type *chosen_drop = nullptr;
 	std::vector<stratagus::unit_type *> potential_drops;
@@ -2725,8 +2725,8 @@ bool CUnit::IsAlive() const
 int CUnit::GetDrawLevel() const
 {
 	return ((Type->CorpseType && CurrentAction() == UnitAction::Die) ?
-		Type->CorpseType->DrawLevel :
-	((CurrentAction() == UnitAction::Die) ? Type->DrawLevel - 10 : Type->DrawLevel));
+		Type->CorpseType->get_draw_level() :
+	((CurrentAction() == UnitAction::Die) ? Type->get_draw_level() - 10 : Type->get_draw_level()));
 }
 
 /**
@@ -3131,7 +3131,7 @@ void MapMarkUnitSight(CUnit &unit)
 	CUnit *container = unit.GetFirstContainer(); //first container of the unit.
 	Assert(container->Type);
 
-	MapMarkUnitSightRec(unit, container->tilePos, container->Type->TileSize.x, container->Type->TileSize.y,
+	MapMarkUnitSightRec(unit, container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height(),
 						//Wyrmgus start
 //						MapMarkTileSight, MapMarkTileDetectCloak);
 						MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal);
@@ -3140,12 +3140,12 @@ void MapMarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-						 unit.Type->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
+			MapMarkRadar(*unit.Player, unit.tilePos, unit.Type->get_tile_width(),
+						 unit.Type->get_tile_height(), unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-							   unit.Type->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
+			MapMarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->get_tile_width(),
+							   unit.Type->get_tile_height(), unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
 		}
 	}
 }
@@ -3164,7 +3164,7 @@ void MapUnmarkUnitSight(CUnit &unit)
 	CUnit *container = unit.GetFirstContainer();
 	Assert(container->Type);
 	MapMarkUnitSightRec(unit,
-						container->tilePos, container->Type->TileSize.x, container->Type->TileSize.y,
+						container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height(),
 						//Wyrmgus start
 //						MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 						MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal);
@@ -3173,12 +3173,12 @@ void MapUnmarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-						   unit.Type->TileSize.y, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
+			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->get_tile_width(),
+						   unit.Type->get_tile_height(), unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileSize.x,
-								 unit.Type->TileSize.y, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
+			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->get_tile_width(),
+								 unit.Type->get_tile_height(), unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
 		}
 		
 	}
@@ -3255,8 +3255,8 @@ void UpdateUnitSightRange(CUnit &unit)
 void MarkUnitFieldFlags(const CUnit &unit)
 {
 	const unsigned int flags = unit.Type->FieldFlags;
-	int h = unit.Type->TileSize.y;          // Tile height of the unit.
-	const int width = unit.Type->TileSize.x; // Tile width of the unit.
+	int h = unit.Type->get_tile_height();          // Tile height of the unit.
+	const int width = unit.Type->get_tile_width(); // Tile width of the unit.
 	unsigned int index = unit.Offset;
 
 	//Wyrmgus start
@@ -3302,8 +3302,8 @@ private:
 void UnmarkUnitFieldFlags(const CUnit &unit)
 {
 	const unsigned int flags = ~unit.Type->FieldFlags;
-	const int width = unit.Type->TileSize.x;
-	int h = unit.Type->TileSize.y;
+	const int width = unit.Type->get_tile_width();
+	int h = unit.Type->get_tile_height();
 	unsigned int index = unit.Offset;
 
 	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
@@ -3551,7 +3551,7 @@ void CUnit::UpdateSettlement()
 			return;
 		}
 		
-		this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->TileSize);
+		this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size());
 	}
 }
 
@@ -3735,8 +3735,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		
 		//remove pathways, destroyed walls and decoration units under buildings
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
-			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileSize.x; ++x) {
-				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileSize.y; ++y) {
+			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->get_tile_width(); ++x) {
+				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->get_tile_height(); ++y) {
 					if (!CMap::Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
@@ -3850,7 +3850,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, in
 		metal_rock_type = stratagus::unit_type::get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
-		Vec2i metal_rock_offset((type.TileSize - 1) / 2);
+		Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
 		for (int i = 0; i < 9; ++i) {
 			CUnit *metal_rock_unit = CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
@@ -4269,8 +4269,8 @@ void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 	const int y = unit.tilePos.y;
 
 	*dpos = pos;
-	clamp<short int>(&dpos->x, x, x + unit.Type->TileSize.x - 1);
-	clamp<short int>(&dpos->y, y, y + unit.Type->TileSize.y - 1);
+	clamp<short int>(&dpos->x, x, x + unit.Type->get_tile_width() - 1);
+	clamp<short int>(&dpos->y, y, y + unit.Type->get_tile_height() - 1);
 }
 
 /**
@@ -4451,8 +4451,8 @@ void UnitCountSeen(CUnit &unit)
 	}
 
 	//  Calculate new VisCount values.
-	const int height = unit.Type->TileSize.y;
-	const int width = unit.Type->TileSize.x;
+	const int height = unit.Type->get_tile_height();
+	const int width = unit.Type->get_tile_width();
 
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (CPlayer::Players[p]->Type != PlayerNobody) {
@@ -4579,9 +4579,6 @@ bool CUnit::IsVisibleOnMinimap() const
 bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
-	//Wyrmgus start
-//	int x = tilePos.x * stratagus::defines::get()->get_tile_width() + IX - (Type->Width - Type->TileSize.x * stratagus::defines::get()->get_tile_width()) / 2 + Type->OffsetX;
-//	int y = tilePos.y * stratagus::defines::get()->get_tile_height() + IY - (Type->Height - Type->TileSize.y * stratagus::defines::get()->get_tile_height()) / 2 + Type->OffsetY;
 
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
@@ -4595,9 +4592,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	frame_width *= scale_factor;
 	frame_height *= scale_factor;
 
-	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2 + Type->OffsetX * scale_factor;
-	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY * scale_factor;
-	//Wyrmgus end
+	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width()) / 2 + Type->OffsetX * scale_factor;
+	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY * scale_factor;
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
@@ -5071,9 +5067,9 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 
 	if (container) {
 		pos = container->tilePos;
-		pos -= unit.Type->TileSize - 1;
-		addx = container->Type->TileSize.x + unit.Type->TileSize.x - 1;
-		addy = container->Type->TileSize.y + unit.Type->TileSize.y - 1;
+		pos -= Vec2i(unit.Type->get_tile_size() - QSize(1, 1));
+		addx = container->Type->get_tile_width() + unit.Type->get_tile_width() - 1;
+		addy = container->Type->get_tile_height() + unit.Type->get_tile_height() - 1;
 		z = container->MapLayer->ID;
 
 		if (heading < LookingNE || heading > LookingNW) {
@@ -5178,9 +5174,9 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 	if (container) {
 		Assert(unit.Removed);
 		pos = container->tilePos;
-		pos -= unit.Type->TileSize - 1;
-		addx = container->Type->TileSize.x + unit.Type->TileSize.x - 1;
-		addy = container->Type->TileSize.y + unit.Type->TileSize.y - 1;
+		pos -= Vec2i(unit.Type->get_tile_size() - QSize(1, 1));
+		addx = container->Type->get_tile_width() + unit.Type->get_tile_width() - 1;
+		addy = container->Type->get_tile_height() + unit.Type->get_tile_height() - 1;
 		--pos.x;
 		z = container->MapLayer->ID;
 	} else {
@@ -5327,19 +5323,19 @@ CUnit *UnitOnScreen(int x, int y)
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->File.empty()) {
-			unitSpritePos.x = unitSpritePos.x - type.BoxWidth * scale_factor / 2 -
+			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
 							  (variation->FrameWidth * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
-			unitSpritePos.y = unitSpritePos.y - type.BoxHeight * scale_factor / 2 -
+			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
 							  (variation->FrameHeight * scale_factor - variation->Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		} else {
-			unitSpritePos.x = unitSpritePos.x - type.BoxWidth * scale_factor / 2 -
+			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
 							  (type.Width * scale_factor - type.Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
-			unitSpritePos.y = unitSpritePos.y - type.BoxHeight * scale_factor / 2 -
+			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
 							  (type.Height * scale_factor - type.Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		}
 		//Wyrmgus end
-		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.BoxWidth * scale_factor)
-			&& y >= unitSpritePos.y  && y < (unitSpritePos.y + type.BoxHeight * scale_factor)) {
+		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.get_box_width() * scale_factor)
+			&& y >= unitSpritePos.y  && y < (unitSpritePos.y + type.get_box_height() * scale_factor)) {
 			// Check if there are other units on this place
 			candidate = &unit;
 			//Wyrmgus start
@@ -5383,7 +5379,7 @@ PixelPos CUnit::get_scaled_map_pixel_pos_center() const
 //Wyrmgus start
 Vec2i CUnit::GetTileSize() const
 {
-	return this->Type->GetTileSize();
+	return this->Type->get_tile_size();
 }
 
 Vec2i CUnit::GetHalfTileSize() const
@@ -6431,7 +6427,7 @@ bool CUnit::HasAdjacentRailForUnitType(const stratagus::unit_type *type) const
 {
 	bool has_adjacent_rail = false;
 	Vec2i top_left_pos(this->tilePos - Vec2i(1, 1));
-	Vec2i bottom_right_pos(this->tilePos + this->Type->TileSize);
+	Vec2i bottom_right_pos(this->tilePos + this->Type->get_tile_size());
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 		Vec2i tile_pos(x, top_left_pos.y);
@@ -7417,7 +7413,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 //	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning) {
-	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.UnderConstruction && target.Type->TileSize.x != 1 && target.Type->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.UnderConstruction && target.Type->get_tile_width() != 1 && target.Type->get_tile_height() != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
@@ -7516,19 +7512,19 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 		dx = tilePos.x - pos.x;
 	//Wyrmgus start
 	} else if (this->Container) { //if unit is within another, use the tile size of the transporter to calculate the distance
-		dx = std::max<int>(0, pos.x - tilePos.x - this->Container->Type->TileSize.x + 1);
+		dx = std::max<int>(0, pos.x - tilePos.x - this->Container->Type->get_tile_width() + 1);
 	//Wyrmgus end
 	} else {
-		dx = std::max<int>(0, pos.x - tilePos.x - Type->TileSize.x + 1);
+		dx = std::max<int>(0, pos.x - tilePos.x - Type->get_tile_width() + 1);
 	}
 	if (pos.y <= tilePos.y) {
 		dy = tilePos.y - pos.y;
 	//Wyrmgus start
 	} else if (this->Container) {
-		dy = std::max<int>(0, pos.y - tilePos.y - this->Container->Type->TileSize.y + 1);
+		dy = std::max<int>(0, pos.y - tilePos.y - this->Container->Type->get_tile_height() + 1);
 	//Wyrmgus end
 	} else {
-		dy = std::max<int>(0, pos.y - tilePos.y - Type->TileSize.y + 1);
+		dy = std::max<int>(0, pos.y - tilePos.y - Type->get_tile_height() + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
@@ -7545,7 +7541,7 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 */
 int MapDistanceBetweenTypes(const stratagus::unit_type &src, const Vec2i &pos1, int src_z, const stratagus::unit_type &dst, const Vec2i &pos2, int dst_z)
 {
-	return MapDistance(src.TileSize, pos1, src_z, dst.TileSize, pos2, dst_z);
+	return MapDistance(src.get_tile_size(), pos1, src_z, dst.get_tile_size(), pos2, dst_z);
 }
 
 int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z)

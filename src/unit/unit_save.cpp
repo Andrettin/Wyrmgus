@@ -259,8 +259,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"host-info\", {%d, %d, %d, %d, %d}, ",
 					unit.Container->MapLayer->ID,
 					unit.Container->tilePos.x, unit.Container->tilePos.y,
-					unit.Container->Type->TileSize.x,
-					unit.Container->Type->TileSize.y);
+					unit.Container->Type->get_tile_width(),
+					unit.Container->Type->get_tile_height());
 	}
 	file.printf(" \"seen-by-player\", \"");
 	for (int i = 0; i < PlayerMax; ++i) {

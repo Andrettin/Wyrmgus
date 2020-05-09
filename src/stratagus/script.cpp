@@ -1419,7 +1419,7 @@ std::string EvalString(const StringDesc *s)
 					} else if (unit->Elixir != nullptr) {
 						return unit->Elixir->get_quote();
 					} else {
-						return unit->Type->Quote;
+						return unit->Type->get_quote();
 					}
 				} else {
 					return unit->Unique->Quote;
@@ -1505,14 +1505,14 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeDescription : // name of the unit type's description
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Description;
+				return (**type).get_description();
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeQuote : // name of the unit type's quote
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Quote;
+				return (**type).get_quote();
 			} else { // ERROR.
 				return std::string("");
 			}

@@ -70,7 +70,7 @@
 /* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	const Vec2i range(this->Range, this->Range);
-	const Vec2i typeSize(caster.Type->TileSize);
+	const Vec2i typeSize(caster.Type->get_tile_size());
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit

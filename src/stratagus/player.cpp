@@ -1700,7 +1700,7 @@ stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Ve
 		if (!this->HasNeutralFactionType() && this != settlement_unit->Player) {
 			continue;
 		}
-		int distance = MapDistance(size, pos, z, settlement_unit->Type->TileSize, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		int distance = MapDistance(size, pos, z, settlement_unit->Type->get_tile_size(), settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (!best_hall || distance < best_distance) {
 			best_hall = settlement_unit;
 			best_distance = distance;

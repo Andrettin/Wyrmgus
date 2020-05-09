@@ -116,7 +116,7 @@ static bool AnimateActionDie(CUnit &unit)
 	}
 
 	const stratagus::unit_type &corpseType = *type.CorpseType;
-	Assert(type.TileSize.x >= corpseType.TileSize.x && type.TileSize.y >= corpseType.TileSize.y);
+	Assert(type.get_tile_width() >= corpseType.get_tile_width() && type.get_tile_height() >= corpseType.get_tile_height());
 
 	// Update sight for new corpse
 	// We have to unmark BEFORE changing the type.

@@ -368,9 +368,9 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 {
 	const Vec2i offset(range, range);
 	//Wyrmgus start
-//	const Vec2i typeSize(unit.Type->TileSize.x - 1, unit.Type->TileSize.y - 1);
+//	const Vec2i typeSize(unit.Type->get_tile_width() - 1, unit.Type->get_tile_height() - 1);
 	const CUnit *firstContainer = unit.GetFirstContainer();
-	const Vec2i typeSize(firstContainer->Type->TileSize - 1);
+	const Vec2i typeSize(firstContainer->Type->get_tile_size() - QSize(1, 1));
 	//Wyrmgus end
 
 	Select(unit.tilePos - offset,

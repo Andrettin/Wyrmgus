@@ -722,8 +722,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	const CUnitTypeFinder unit_finder((UnitTypeType)unit.Type->UnitType);
 
 	// verify each tile of the unit.
-	int h = unit.Type->TileSize.y;
-	const int w = unit.Type->TileSize.x;
+	int h = unit.Type->get_tile_height();
+	const int w = unit.Type->get_tile_width();
 	do {
 		const CMapField *mf = CMap::Map.Field(index, z);
 		int i = w;

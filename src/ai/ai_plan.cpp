@@ -74,8 +74,8 @@ public:
 		if (unit->Type->UnitType == UnitTypeType::Fly && unit->IsAgressive() == false) {
 			return;
 		}
-		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileSize.x
-			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileSize.y) {
+		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.get_tile_width()
+			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.get_tile_height()) {
 			return;
 		}
 		if (!CanTarget(*source->Type, type)) {

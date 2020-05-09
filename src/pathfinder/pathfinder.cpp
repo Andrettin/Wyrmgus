@@ -133,7 +133,7 @@ void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 	}
 	//Wyrmgus end
 	const Vec2i offset(1, 1);
-	const Vec2i extraTileSize(startUnit->Type->TileSize - 1);
+	const Vec2i extraTileSize(startUnit->Type->get_tile_size() - QSize(1, 1));
 	const Vec2i start = startUnit->tilePos - offset;
 	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
 
@@ -222,11 +222,11 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 	int i = PF_FAILED;
 	if (!src.Container || !from_outside_container) {
 		i = AStarFindPath(src.tilePos, goalPos, w, h,
-						  src.Type->TileSize.x, src.Type->TileSize.y,
+						  src.Type->get_tile_width(), src.Type->get_tile_height(),
 						  minrange, range, nullptr, 0, src, max_length, z);
 	} else {
 		const Vec2i offset(1, 1);
-		const Vec2i extra_tile_size(src.Container->Type->TileSize - 1);
+		const Vec2i extra_tile_size(src.Container->Type->get_tile_size() - QSize(1, 1));
 		const Vec2i start_pos = src.Container->tilePos - offset;
 		const Vec2i end_pos = src.Container->tilePos + extra_tile_size + offset;
 		const Vec2i pos_diff = end_pos - start_pos;
@@ -238,7 +238,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 					continue;
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
-						  src.Type->TileSize.x, src.Type->TileSize.y,
+						  src.Type->get_tile_width(), src.Type->get_tile_height(),
 						  minrange, range, nullptr, 0, src, max_length, z);
 						  
 				if (temp_i > i && i < PF_REACHED) {
@@ -290,8 +290,8 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 	}
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
-//									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range);
-									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range, max_length, dst.MapLayer->ID, from_outside_container);
+//									 dst.Type->get_tile_width(), dst.Type->get_tile_height(), 0, range);
+									 dst.Type->get_tile_width(), dst.Type->get_tile_height(), 0, range, max_length, dst.MapLayer->ID, from_outside_container);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
@@ -321,7 +321,7 @@ const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
 const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer->ID; }
 Vec2i PathFinderInput::GetUnitSize() const
 {
-	return unit->Type->TileSize;
+	return unit->Type->get_tile_size();
 }
 
 void PathFinderInput::SetUnit(CUnit &_unit)
@@ -338,11 +338,11 @@ void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
 	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
-	if (newPos.x + unit->Type->TileSize.x - 1 >= CMap::Map.Info.MapWidths[z]) {
-		newPos.x = CMap::Map.Info.MapWidths[z] - unit->Type->TileSize.x;
+	if (newPos.x + unit->Type->get_tile_width() - 1 >= CMap::Map.Info.MapWidths[z]) {
+		newPos.x = CMap::Map.Info.MapWidths[z] - unit->Type->get_tile_width();
 	}
-	if (newPos.y + unit->Type->TileSize.y - 1 >= CMap::Map.Info.MapHeights[z]) {
-		newPos.y = CMap::Map.Info.MapHeights[z] - unit->Type->TileSize.y;
+	if (newPos.y + unit->Type->get_tile_height() - 1 >= CMap::Map.Info.MapHeights[z]) {
+		newPos.y = CMap::Map.Info.MapHeights[z] - unit->Type->get_tile_height();
 	}
 	//Wyrmgus end
 	//Wyrmgus start
@@ -376,7 +376,7 @@ void PathFinderInput::SetMaxRange(int range)
 
 void PathFinderInput::PathRacalculated()
 {
-	unitSize = unit->Type->TileSize;
+	unitSize = unit->Type->get_tile_size();
 
 	isRecalculatePathNeeded = false;
 }

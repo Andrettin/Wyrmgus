@@ -39,3 +39,18 @@ inline QPoint to_point(const QSize &size)
 }
 
 }
+
+inline const QSize &operator *=(QSize &lhs, const QSize &rhs)
+{
+	lhs.setWidth(lhs.width() * rhs.width());
+	lhs.setHeight(lhs.height() * rhs.height());
+	return lhs;
+}
+
+inline QSize operator *(const QSize &lhs, const QSize &rhs)
+{
+	QSize res(lhs);
+
+	res *= rhs;
+	return res;
+}

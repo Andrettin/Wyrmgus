@@ -71,6 +71,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "video.h"
@@ -185,13 +186,9 @@
 **
 **    Tile size on map
 **
-**  unit_type::BoxWidth
+**  unit_type::box_size
 **
-**    Selected box size width
-**
-**  unit_type::BoxHeight
-**
-**    Selected box size height
+**    Selected box size
 **
 **  unit_type::NumDirections
 **
@@ -514,7 +511,7 @@ std::string GetResourceNameById(int resource_id)
 namespace stratagus {
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
-	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
+	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
@@ -523,12 +520,9 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
 	TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
-	CorpseType(nullptr), Construction(nullptr), RepairHP(0), TileSize(0, 0),
-	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
-	//Wyrmgus start
-//	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
+	CorpseType(nullptr), Construction(nullptr), RepairHP(0),
+	BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0),
-	//Wyrmgus end
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 	AutoCastActive(nullptr),
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
@@ -639,11 +633,44 @@ unit_type::~unit_type()
 #endif
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
+void unit_type::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
+
+	int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()]; // variable index
+	if (index != -1) { // valid index
+		if (string::is_number(value)) {
+			this->DefaultStat.Variables[index].Enable = 1;
+			this->DefaultStat.Variables[index].Value = std::stoi(value);
+			this->DefaultStat.Variables[index].Max = std::stoi(value);
+		} else if (IsStringBool(value)) {
+			this->DefaultStat.Variables[index].Enable = string::to_bool(value);
+		} else { // error
+			fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->get_identifier().c_str());
+		}
+
+		return;
+	}
+	
+	index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
+	if (index != -1) {
+		if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+			this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+		}
+
+		if (string::is_number(value)) {
+			this->BoolFlag[index].value = (std::stoi(value) != 0);
+		} else {
+			this->BoolFlag[index].value = string::to_bool(value);
+		}
+	}
+
+	data_entry::process_sml_property(property);
+}
+
 void unit_type::ProcessConfigData(const CConfigData *config_data)
 {
 	this->RemoveButtons(ButtonCmd::Move);
@@ -676,15 +703,15 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "tile_width") {
-			this->TileSize.x = std::stoi(value);
+			this->tile_size.setWidth(std::stoi(value));
 		} else if (key == "tile_height") {
-			this->TileSize.y = std::stoi(value);
+			this->tile_size.setHeight(std::stoi(value));
 		} else if (key == "box_width") {
-			this->BoxWidth = std::stoi(value);
+			this->box_size.setWidth(std::stoi(value));
 		} else if (key == "box_height") {
-			this->BoxHeight = std::stoi(value);
+			this->box_size.setHeight(std::stoi(value));
 		} else if (key == "draw_level") {
-			this->DrawLevel = std::stoi(value);
+			this->draw_level = std::stoi(value);
 		} else if (key == "type") {
 			if (value == "land") {
 				this->UnitType = UnitTypeType::Land;
@@ -708,11 +735,11 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 			this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
 		} else if (key == "description") {
-			this->Description = value;
+			this->set_description(value);
 		} else if (key == "background") {
-			this->Background = value;
+			this->set_background(value);
 		} else if (key == "quote") {
-			this->Quote = value;
+			this->set_quote(value);
 		} else if (key == "requirements_string") {
 			this->RequirementsString = value;
 		} else if (key == "experience_requirements_string") {
@@ -1216,19 +1243,14 @@ void unit_type::set_unit_class(stratagus::unit_class *unit_class)
 	}
 }
 
-Vec2i unit_type::GetTileSize() const
+QSize unit_type::get_half_tile_size() const
 {
-	return this->TileSize;
-}
-
-Vec2i unit_type::GetHalfTileSize() const
-{
-	return this->GetTileSize() / 2;
+	return this->get_tile_size() / 2;
 }
 
 PixelSize unit_type::get_tile_pixel_size() const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * defines::get()->get_tile_size());
+	return this->get_tile_size() * defines::get()->get_tile_size();
 }
 
 PixelSize unit_type::get_scaled_tile_pixel_size() const
@@ -1239,7 +1261,7 @@ PixelSize unit_type::get_scaled_tile_pixel_size() const
 QPoint unit_type::get_tile_center_pos_offset() const
 {
 	//the offset from the tile's top-left position to its center tile
-	return (this->GetTileSize() - 1) / 2;
+	return (size::to_point(this->get_tile_size()) - QPoint(1, 1)) / 2;
 }
 	
 bool unit_type::CheckUserBoolFlags(const char *BoolFlags) const
@@ -1288,7 +1310,7 @@ void unit_type::SetParent(const unit_type *parent_type)
 	if (this->get_unit_class() != nullptr && !this->get_unit_class()->has_unit_type(this)) {
 		this->get_unit_class()->add_unit_type(this);
 	}
-	this->DrawLevel = parent_type->DrawLevel;
+	this->draw_level = parent_type->draw_level;
 	this->File = parent_type->File;
 	this->Width = parent_type->Width;
 	this->Height = parent_type->Height;
@@ -1300,9 +1322,8 @@ void unit_type::SetParent(const unit_type *parent_type)
 	this->ShadowOffsetX = parent_type->ShadowOffsetX;
 	this->ShadowOffsetY = parent_type->ShadowOffsetY;
 	this->LightFile = parent_type->LightFile;
-	this->TileSize = parent_type->TileSize;
-	this->BoxWidth = parent_type->BoxWidth;
-	this->BoxHeight = parent_type->BoxHeight;
+	this->tile_size = parent_type->tile_size;
+	this->box_size = parent_type->box_size;
 	this->BoxOffsetX = parent_type->BoxOffsetX;
 	this->BoxOffsetY = parent_type->BoxOffsetY;
 	this->Construction = parent_type->Construction;
@@ -2329,12 +2350,7 @@ void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite,
 
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
-//	pos.y -= (type.Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
-	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
-	//Wyrmgus end
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
 	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
 

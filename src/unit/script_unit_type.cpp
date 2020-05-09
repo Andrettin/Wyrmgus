@@ -1096,7 +1096,7 @@ static int CclDefineUnitType(lua_State *l)
 			// FIXME: What if constructions aren't yet loaded?
 			type->Construction = ConstructionByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "DrawLevel")) {
-			type->DrawLevel = LuaToNumber(l, -1);
+			type->draw_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {
 			type->MaxOnBoard = LuaToNumber(l, -1);
 			//Wyrmgus start
@@ -1163,11 +1163,15 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
 			}
 		} else if (!strcmp(value, "TileSize")) {
-			CclGetPos(l, &type->TileSize.x, &type->TileSize.y);
+			Vec2i tile_size;
+			CclGetPos(l, &tile_size.x, &tile_size.y);
+			type->tile_size = tile_size;
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "BoxSize")) {
-			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
+			Vec2i box_size;
+			CclGetPos(l, &box_size.x, &box_size.y);
+			type->box_size = box_size;
 		} else if (!strcmp(value, "BoxOffset")) {
 			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
 		} else if (!strcmp(value, "NumDirections")) {
@@ -1719,15 +1723,15 @@ static int CclDefineUnitType(lua_State *l)
 			stratagus::faction *faction = stratagus::faction::get(faction_name);
 			type->Faction = faction->ID;
 		} else if (!strcmp(value, "Description")) {
-			type->Description = LuaToString(l, -1);
+			type->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			type->Quote = LuaToString(l, -1);
+			type->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
 			type->DefaultStat.Variables[GENDER_INDEX].Value = static_cast<int>(stratagus::string_to_gender(LuaToString(l, -1)));
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
-			type->Background = LuaToString(l, -1);
+			type->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "RequirementsString")) {
 			type->RequirementsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "ExperienceRequirementsString")) {
@@ -2163,13 +2167,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, type->Description.c_str());
+		lua_pushstring(l, type->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, type->Quote.c_str());
+		lua_pushstring(l, type->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, type->Background.c_str());
+		lua_pushstring(l, type->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "RequirementsString")) {
 		lua_pushstring(l, type->RequirementsString.c_str());
@@ -2243,13 +2247,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "DrawLevel")) {
-		lua_pushnumber(l, type->DrawLevel);
+		lua_pushnumber(l, type->get_draw_level());
 		return 1;
 	} else if (!strcmp(data, "TileWidth")) {
-		lua_pushnumber(l, type->TileSize.x);
+		lua_pushnumber(l, type->get_tile_width());
 		return 1;
 	} else if (!strcmp(data, "TileHeight")) {
-		lua_pushnumber(l, type->TileSize.y);
+		lua_pushnumber(l, type->get_tile_height());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
 		if (type->get_species() != nullptr) {

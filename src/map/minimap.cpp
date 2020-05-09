@@ -536,17 +536,17 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	//Wyrmgus start
 //	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
 //	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
-//	int w = Map2MinimapX[type->TileSize.x];
+//	int w = Map2MinimapX[type->get_tile_width()];
 	int mx = 1 + UI.Minimap.XOffset[UI.CurrentMapLayer->ID] + Map2MinimapX[UI.CurrentMapLayer->ID][unit.tilePos.x];
 	int my = 1 + UI.Minimap.YOffset[UI.CurrentMapLayer->ID] + Map2MinimapY[UI.CurrentMapLayer->ID][unit.tilePos.y];
-	int w = Map2MinimapX[UI.CurrentMapLayer->ID][type->TileSize.x];
+	int w = Map2MinimapX[UI.CurrentMapLayer->ID][type->get_tile_width()];
 	//Wyrmgus end
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
 	}
 	//Wyrmgus start
-//	int h0 = Map2MinimapY[type->TileSize.y];
-	int h0 = Map2MinimapY[UI.CurrentMapLayer->ID][type->TileSize.y];
+//	int h0 = Map2MinimapY[type->get_tile_height()];
+	int h0 = Map2MinimapY[UI.CurrentMapLayer->ID][type->get_tile_height()];
 	//Wyrmgus end
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;

@@ -61,6 +61,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
+#include "util/size_util.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -149,12 +150,12 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
 		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
 	}
-	int x = screenPos.x - type.BoxWidth * scale_factor / 2 - (frame_width - sprite_width) / 2;
-	int y = screenPos.y - type.BoxHeight * scale_factor / 2 - (frame_height - sprite_height) / 2;
+	int x = screenPos.x - type.get_box_width() * scale_factor / 2 - (frame_width - sprite_width) / 2;
+	int y = screenPos.y - type.get_box_height() * scale_factor / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
 	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor - 1);
+		DrawSelectionCircleWithTrans(Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
@@ -199,15 +200,15 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	int box_width = type.BoxWidth;
-	int box_height = type.BoxHeight;
+	int box_width = type.get_box_width();
+	int box_height = type.get_box_height();
 	if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->BoxWidth > box_width && table[i]->Type->BoxHeight > box_height) {
-				box_width = table[i]->Type->BoxWidth;
-				box_height = table[i]->Type->BoxHeight;
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->get_box_width() > box_width && table[i]->Type->get_box_height() > box_height) {
+				box_width = table[i]->Type->get_box_width();
+				box_height = table[i]->Type->get_box_height();
 			}
 		}
 	}
@@ -449,11 +450,11 @@ void CDecoVarBar::Draw(int x, int y,
 
 	int height = this->Height;
 	if (height == 0) { // Default value
-		height = type.BoxHeight; // Better size ? {,Box, Tile}
+		height = type.get_box_height(); // Better size ? {,Box, Tile}
 	}
 	int width = this->Width;
 	if (width == 0) { // Default value
-		width = type.BoxWidth; // Better size ? {,Box, Tile}
+		width = type.get_box_width(); // Better size ? {,Box, Tile}
 	}
 	int h;
 	int w;
@@ -627,8 +628,8 @@ static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, 
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width() / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height() / 100,
+				x + var.OffsetX + var.OffsetXPercent * unit.Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width() / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height() / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -648,9 +649,9 @@ static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, 
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.Type->TileSize.x * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->BoxWidth * stratagus::defines::get()->get_scale_factor()) / 2 - width;
+		x += (unit.Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * stratagus::defines::get()->get_scale_factor()) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.Type->TileSize.y * stratagus::defines::get()->get_scaled_tile_height() + unit.Type->BoxHeight * stratagus::defines::get()->get_scale_factor()) / 2 - height;
+		y += (unit.Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * stratagus::defines::get()->get_scale_factor()) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -674,8 +675,7 @@ void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, c
 		return;
 	}
 	PixelPos pos = screenPos;
-	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 	pos.x += (type.OffsetX + type.ShadowOffsetX) * stratagus::defines::get()->get_scale_factor();
 	pos.y += (type.OffsetY + type.ShadowOffsetY) * stratagus::defines::get()->get_scale_factor();
 
@@ -716,8 +716,7 @@ void DrawPlayerColorOverlay(const stratagus::unit_type &type, CPlayerColorGraphi
 
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
 	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
 
@@ -758,8 +757,7 @@ void DrawOverlay(const stratagus::unit_type &type, CGraphic *sprite, int player,
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
-	pos.y -= (sprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
 	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
 
@@ -871,7 +869,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 //			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
 			const int value = unit.CurrentSightRange;
 			//Wyrmgus end
-			const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.TileSize.x - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+			const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
 
 			if (value) {
 				// Radius -1 so you can see all ranges
@@ -887,7 +885,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 //				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
 				//Wyrmgus end
-				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.TileSize.x - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -899,7 +897,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 				
 				//Wyrmgus end
-				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.TileSize.x - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					// Radius +1 so you can see all ranges
@@ -912,8 +910,8 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 		if (unit.IsAlive() && unit.CurrentAction() != UnitAction::Built) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
-				const int value = AuraRange - (unit.Type->TileSize.x - 1);
-				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.TileSize.x - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+				const int value = AuraRange - (unit.Type->get_tile_width() - 1);
+				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -945,9 +943,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 	if (cframe->File == ConstructionFileConstruction) {
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
-				pos.x -= (variation->Construction->ShadowSprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
+				pos -= PixelPos((variation->Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 				pos.x += type.OffsetX * scale_factor;
-				pos.y -= (variation->Construction->ShadowSprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
 				pos.y += type.OffsetY * scale_factor;
 				if (frame < 0) {
 					variation->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -957,9 +954,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 			}
 		} else {
 			if (type.Construction->ShadowSprite) {
-				pos.x -= (type.Construction->ShadowSprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
+				pos -= PixelPos((type.Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 				pos.x += type.OffsetX * scale_factor;
-				pos.y -= (type.Construction->ShadowSprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
 				pos.y += type.OffsetY * scale_factor;
 				if (frame < 0) {
 					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -970,9 +966,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 		}
 	} else {
 		if (variation && variation->ShadowSprite) {
-			pos.x -= (variation->ShadowSprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
+			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.OffsetX) * scale_factor;
-			pos.y -= (variation->ShadowSprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
 			pos.y += (type.ShadowOffsetY + type.OffsetY) * scale_factor;
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -980,9 +975,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		} else if (type.ShadowSprite) {
-			pos.x -= (type.ShadowSprite->Width - type.TileSize.x * stratagus::defines::get()->get_scaled_tile_width()) / 2;
+			pos -= PixelPos((type.ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.OffsetX) * scale_factor;
-			pos.y -= (type.ShadowSprite->Height - type.TileSize.y * stratagus::defines::get()->get_scaled_tile_height()) / 2;
 			pos.y += (type.ShadowOffsetY + type.OffsetY) * scale_factor;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -1391,8 +1385,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->tilePos.y + c1->Type->TileSize.y - 1) * stratagus::defines::get()->get_tile_height() + c1->get_pixel_offset().y();
-		const int pos2 = (c2->tilePos.y + c2->Type->TileSize.y - 1) * stratagus::defines::get()->get_tile_height() + c2->get_pixel_offset().y();
+		const int pos1 = (c1->tilePos.y + c1->Type->get_tile_height() - 1) * stratagus::defines::get()->get_tile_height() + c1->get_pixel_offset().y();
+		const int pos2 = (c2->tilePos.y + c2->Type->get_tile_height() - 1) * stratagus::defines::get()->get_tile_height() + c2->get_pixel_offset().y();
 		return pos1 == pos2 ?
 			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

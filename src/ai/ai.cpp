@@ -1246,7 +1246,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 	const stratagus::unit_type &unittype = *unit.Type;
 	const Vec2i u0 = unit.tilePos;
-	const Vec2i u1(u0 + unittype.TileSize - 1);
+	const Vec2i u1(u0 + unittype.get_tile_size() - QSize(1, 1));
 
 	movablenb = 0;
 
@@ -1295,13 +1295,13 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		}
 
 		const Vec2i b0 = blocker.tilePos;
-		const Vec2i b1(b0 + blockertype.TileSize - 1);
+		const Vec2i b1(b0 + blockertype.get_tile_size() - QSize(1, 1));
 
 		if (&unit == &blocker) {
 			continue;
 		}
 		// Check for collision
-		if (unit.MapDistanceTo(blocker) >= unit.Type->TileSize.x + 1) {
+		if (unit.MapDistanceTo(blocker) >= unit.Type->get_tile_width() + 1) {
 			continue;
 		}
 
@@ -1312,7 +1312,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			r = (r + 1) & 7;
 			--trycount;
 
-			const Vec2i pos = blocker.tilePos + blocker.Type->TileSize * dirs[r];
+			const Vec2i pos = blocker.tilePos + Vec2i(blocker.Type->get_tile_size()) * dirs[r];
 
 			// Out of the map => no !
 			if (!CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer)) {

@@ -180,10 +180,10 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * stratagus::defines::get()->get_scaled_tile_size() / 2;
+	targetPos += PixelPos(this->GetUnitType().get_tile_size() - QSize(1, 1)) * stratagus::defines::get()->get_scaled_tile_size() / 2;
 
-	const int w = this->GetUnitType().BoxWidth * stratagus::defines::get()->get_scale_factor();
-	const int h = this->GetUnitType().BoxHeight * stratagus::defines::get()->get_scale_factor();
+	const int w = this->GetUnitType().get_box_width() * stratagus::defines::get()->get_scale_factor();
+	const int h = this->GetUnitType().get_box_height() * stratagus::defines::get()->get_scale_factor();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
 	//Wyrmgus start
 //	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
@@ -203,7 +203,7 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus
 	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
 	input.SetMaxRange(this->Range);
 
-	const Vec2i tileSize(this->Type->TileSize);
+	const Vec2i tileSize(this->Type->get_tile_size());
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 

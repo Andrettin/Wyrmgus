@@ -100,7 +100,7 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
+	const Vec2i pos = unit.tilePos + oldtype.get_half_tile_size() - newtype.get_half_tile_size();
 	CUnit *container = unit.Container;
 
 	//Wyrmgus start

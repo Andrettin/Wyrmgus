@@ -123,8 +123,8 @@ void CancelBuildingMode()
 
 static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 {
-	for (int j = 0; j < unit.Type->TileSize.y; ++j) {
-		for (int i = 0; i < unit.Type->TileSize.x; ++i) {
+	for (int j = 0; j < unit.Type->get_tile_height(); ++j) {
+		for (int i = 0; i < unit.Type->get_tile_width(); ++i) {
 			const Vec2i tempPos(i, j);
 			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				return false;
@@ -1441,9 +1441,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					if (order.Action == UnitAction::Build) {
 						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
 						if (tilePos.x >= build.GetGoalPos().x
-							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileSize.x
+							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().get_tile_width()
 							&& tilePos.y >= build.GetGoalPos().y
-							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileSize.y) {
+							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().get_tile_height()) {
 							buildable = false;
 							break;
 						}

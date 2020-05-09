@@ -179,9 +179,9 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 {
 	Vec2i pos = startPos;
 
-	pos -= unit.Type->TileSize - 1;
-	int addx = transporter.Type->TileSize.x + unit.Type->TileSize.x - 1;
-	int addy = transporter.Type->TileSize.y + unit.Type->TileSize.y - 1;
+	pos -= Vec2i(unit.Type->get_tile_size() - QSize(1, 1));
+	int addx = transporter.Type->get_tile_width() + unit.Type->get_tile_width() - 1;
+	int addy = transporter.Type->get_tile_height() + unit.Type->get_tile_height() - 1;
 
 	--pos.x;
 	for (int range = 0; range < maxRange; ++range) {

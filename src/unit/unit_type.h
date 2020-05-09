@@ -389,8 +389,8 @@ public:
 	int OffsetX;            /// Offset in X coord.
 	int OffsetY;            /// Offset in Y coord.
 
-	int OffsetXPercent;     /// Percent offset (TileSize.x) in X coord.
-	int OffsetYPercent;     /// Percent offset (TileSize.y) in Y coord.
+	int OffsetXPercent;     /// Percent offset (tile_size.width()) in X coord.
+	int OffsetYPercent;     /// Percent offset (tile_size.height()) in Y coord.
 
 	bool IsCenteredInX;     /// if true, use center of deco instead of left border
 	bool IsCenteredInY;     /// if true, use center of deco instead of upper border
@@ -740,6 +740,9 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(stratagus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::animation_set* animation_set MEMBER animation_set READ get_animation_set)
+	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
+	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
+	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -755,6 +758,7 @@ public:
 	unit_type(const std::string &identifier);
 	~unit_type();
 
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	
@@ -770,8 +774,22 @@ public:
 		return this->civilization;
 	}
 
-	Vec2i GetTileSize() const;
-	Vec2i GetHalfTileSize() const;
+	const QSize &get_tile_size() const
+	{
+		return this->tile_size;
+	}
+
+	int get_tile_width() const
+	{
+		return this->get_tile_size().width();
+	}
+
+	int get_tile_height() const
+	{
+		return this->get_tile_size().height();
+	}
+
+	QSize get_half_tile_size() const;
 
 	PixelSize get_half_tile_pixel_size() const
 	{
@@ -787,6 +805,21 @@ public:
 	}
 
 	QPoint get_tile_center_pos_offset() const;
+
+	const QSize &get_box_size() const
+	{
+		return this->box_size;
+	}
+
+	int get_box_width() const
+	{
+		return this->get_box_size().width();
+	}
+
+	int get_box_height() const
+	{
+		return this->get_box_size().height();
+	}
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
@@ -825,6 +858,11 @@ public:
 		return this->animation_set;
 	}
 
+	int get_draw_level() const
+	{
+		return this->draw_level;
+	}
+
 public:
 	const unit_type *Parent;				/// Parent unit type
 	//Wyrmgus start
@@ -833,9 +871,6 @@ private:
 	stratagus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 public:
 	int Faction;					/// Which faction this unit belongs to, if any
-	std::string Description;		/// Description of the unit type
-	std::string Quote;				/// Quote of the unit type
-	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
@@ -868,7 +903,9 @@ public:
 	int Height;                                           /// Sprite height
 	int OffsetX;                                          /// Sprite horizontal offset
 	int OffsetY;                                          /// Sprite vertical offset
-	int DrawLevel;                                        /// Level to Draw UnitType at
+private:
+	int draw_level = 0;                                   /// Level to Draw UnitType at
+public:
 	int ShadowWidth;                                      /// Shadow sprite width
 	int ShadowHeight;                                     /// Shadow sprite height
 	int ShadowOffsetX;                                    /// Shadow horizontal offset
@@ -928,9 +965,10 @@ public:
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
-	Vec2i TileSize;					/// Tile size
-	int BoxWidth;                   /// Selected box size width
-	int BoxHeight;                  /// Selected box size height
+private:
+	QSize tile_size = QSize(0, 0);
+	QSize box_size = QSize(0, 0);
+public:
 	int BoxOffsetX;                 /// Selected box size horizontal offset
 	int BoxOffsetY;                 /// Selected box size vertical offset
 	int NumDirections;              /// Number of directions unit can face

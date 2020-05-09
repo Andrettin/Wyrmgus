@@ -495,15 +495,15 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
-	if (condition->Description && type && type->Description.empty()) {
+	if (condition->Description && type && type->get_description().empty()) {
 		return false;
 	}
 	
-	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->get_quote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->get_quote().empty())) {
+	if (condition->Quote && type && type->get_quote().empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->get_quote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->get_quote().empty())) {
 		return false;
 	}
 	
-	if (condition->Encyclopedia && type && type->Description.empty() && type->Background.empty() && type->Quote.empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == -1)) {
+	if (condition->Encyclopedia && type && type->get_description().empty() && type->get_background().empty() && type->get_quote().empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == -1)) {
 		return false;
 	}
 	

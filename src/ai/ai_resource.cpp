@@ -246,7 +246,7 @@ int AiEnemyUnitsInDistance(const CPlayer &player,
 		//Wyrmgus end
 		return static_cast<int>(units.size());
 	} else {
-		const Vec2i typeSize(type->TileSize - 1);
+		const Vec2i typeSize(type->get_tile_size() - QSize(1, 1));
 		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
 
 		//Wyrmgus start
@@ -2122,14 +2122,14 @@ static void AiCheckPathwayConstruction()
 			}
 			
 			std::vector<Vec2i> pathway_tiles;
-			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileSize.x + 1; ++x) {
-				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileSize.y + 1; ++y) {
+			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->get_tile_width() + 1; ++x) {
+				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->get_tile_height() + 1; ++y) {
 					pathway_tiles.push_back(Vec2i(x, y));
 				}
 			}
 
 			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
-				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
+				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->get_tile_size() - QSize(1, 1)) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
 					stratagus::unit_type *worker_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
@@ -2137,11 +2137,11 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
-						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), *worker_type, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
+						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->get_tile_size() - QSize(1, 1)) / 2), *worker_type, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 						char worker_path[64];
 						
 						//make the first path
-						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
+						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->get_tile_width(), depot->Type->get_tile_height(), test_worker->Type->get_tile_width(), test_worker->Type->get_tile_height(), 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
 						Vec2i worker_path_pos(test_worker->tilePos);
 						std::vector<Vec2i> first_path_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
@@ -2164,7 +2164,7 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
+						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->get_tile_width(), depot->Type->get_tile_height(), test_worker->Type->get_tile_width(), test_worker->Type->get_tile_height(), 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
 						worker_path_pos = test_worker->tilePos;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);

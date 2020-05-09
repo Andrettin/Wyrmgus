@@ -385,7 +385,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 	stratagus::unit_type *typeptr = stratagus::unit_type::get(unit_type);
 
 	stratagus::unit_type &type = *typeptr;
-	const Vec2i tpos(type.TileSize);
+	const Vec2i tpos(type.get_tile_size());
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1));
@@ -396,7 +396,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		const Vec2i tmirrorh(rpos.x, tmirror.y);
 		const Vec2i tmirrorv(tmirror.x, rpos.y);
 		int tile = GRASS_TILE;
-		const int z = type.TileSize.y;
+		const int z = type.get_tile_height();
 
 		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
 		// FIXME: handle units larger than 1 square
