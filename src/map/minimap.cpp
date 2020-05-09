@@ -264,7 +264,6 @@ static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 	int x = (xofs + (7 * scale_factor) + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
 	int y = (yofs + (6 * scale_factor) + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
 	return terrain->get_graphics(season)->get_image().pixelColor(x / scale_factor, y / scale_factor);
-	//Wyrmgus end
 }
 
 /**

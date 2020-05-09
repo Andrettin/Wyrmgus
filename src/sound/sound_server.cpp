@@ -854,10 +854,10 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 			}
 		}
 		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-			stratagus::civilization *parent_civilization = nullptr;
+			const stratagus::civilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {
-					parent_civilization = civilization->parent_civilization;
+					parent_civilization = civilization->get_parent_civilization();
 					if (!parent_civilization) {
 						break;
 					}

@@ -785,10 +785,7 @@ public:
 public:
 	//Wyrmgus start
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
-	std::string civilization_upgrades[MAX_RACES];
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
-	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
-	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
 	std::vector<CFiller> civilization_ui_fillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties

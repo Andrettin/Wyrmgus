@@ -57,6 +57,7 @@ civilization::~civilization()
 void civilization::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "button_icons") {
 		scope.for_each_property([&](const sml_property &property) {
@@ -170,6 +171,12 @@ void civilization::process_sml_scope(const sml_data &scope)
 			const unit_class *unit_class = unit_class::get(tag);
 			vector::merge(this->unit_class_names[unit_class], child_scope.get_values());
 		});
+	} else if (tag == "develops_from") {
+		for (const std::string &value : values) {
+			civilization *other_civilization = civilization::get(value);
+			this->develops_from.push_back(other_civilization);
+			other_civilization->develops_to.push_back(this);
+		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -177,20 +184,20 @@ void civilization::process_sml_scope(const sml_data &scope)
 
 void civilization::initialize()
 {
-	if (this->parent_civilization != nullptr) {
-		if (!this->parent_civilization->is_initialized()) {
-			this->parent_civilization->initialize();
+	if (this->get_parent_civilization() != nullptr) {
+		if (!this->get_parent_civilization()->is_initialized()) {
+			this->get_parent_civilization()->initialize();
 		}
 
-		const stratagus::civilization *parent_civilization = this->parent_civilization;
+		const civilization *parent_civilization = this->get_parent_civilization();
 		const int parent_civilization_id = parent_civilization->ID;
 
 		if (this->get_interface().empty()) {
 			this->interface = parent_civilization->interface;
 		}
 
-		if (PlayerRaces.civilization_upgrades[this->ID].empty() && !PlayerRaces.civilization_upgrades[parent_civilization_id].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
-			PlayerRaces.civilization_upgrades[this->ID] = PlayerRaces.civilization_upgrades[parent_civilization_id];
+		if (this->upgrade == nullptr && parent_civilization->get_upgrade() != nullptr) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
+			this->upgrade = parent_civilization->get_upgrade();
 		}
 
 		//inherit button icons from the parent civilization, for button actions which none are specified

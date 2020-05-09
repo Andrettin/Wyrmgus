@@ -765,7 +765,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "DefaultColor")) {
 			civilization->default_color = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
-			PlayerRaces.civilization_upgrades[civilization_id] = LuaToString(l, -1);
+			civilization->upgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DevelopsFrom")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -775,8 +775,8 @@ static int CclDefineCivilization(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				std::string originary_civilization_name = LuaToString(l, -1, j + 1);
 				stratagus::civilization *originary_civilization = stratagus::civilization::get(originary_civilization_name);
-				PlayerRaces.DevelopsFrom[civilization_id].push_back(originary_civilization->ID);
-				PlayerRaces.DevelopsTo[originary_civilization->ID].push_back(civilization_id);
+				civilization->develops_from.push_back(originary_civilization);
+				originary_civilization->develops_to.push_back(civilization);
 			}
 		} else if (!strcmp(value, "ButtonIcons")) {
 			if (!lua_istable(l, -1)) {
@@ -1390,8 +1390,8 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Species[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "ParentCivilization")) {
-		if (civilization->parent_civilization) {
-			lua_pushstring(l, civilization->parent_civilization->get_identifier().c_str());
+		if (civilization->get_parent_civilization()) {
+			lua_pushstring(l, civilization->get_parent_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1408,21 +1408,25 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, civilization->get_default_color().c_str());
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
-		lua_pushstring(l, PlayerRaces.civilization_upgrades[civilization_id].c_str());
+		if (civilization->get_upgrade() != nullptr) {
+			lua_pushstring(l, civilization->get_upgrade()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "DevelopsFrom")) {
-		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization_id].size(), 0);
-		for (size_t i = 1; i <= PlayerRaces.DevelopsFrom[civilization_id].size(); ++i)
+		lua_createtable(l, civilization->get_develops_from().size(), 0);
+		for (size_t i = 1; i <= civilization->get_develops_from().size(); ++i)
 		{
-			lua_pushstring(l, stratagus::civilization::get_all()[PlayerRaces.DevelopsFrom[civilization_id][i-1]]->get_identifier().c_str());
+			lua_pushstring(l, civilization->get_develops_from()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "DevelopsTo")) {
-		lua_createtable(l, PlayerRaces.DevelopsTo[civilization_id].size(), 0);
-		for (size_t i = 1; i <= PlayerRaces.DevelopsTo[civilization_id].size(); ++i)
+		lua_createtable(l, civilization->get_develops_to().size(), 0);
+		for (size_t i = 1; i <= civilization->get_develops_to().size(); ++i)
 		{
-			lua_pushstring(l, stratagus::civilization::get_all()[PlayerRaces.DevelopsTo[civilization_id][i-1]]->get_identifier().c_str());
+			lua_pushstring(l, civilization->get_develops_to()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

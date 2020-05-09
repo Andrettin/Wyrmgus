@@ -385,10 +385,7 @@ void PlayerRace::Clean()
 	//Wyrmgus end
 	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
 		//Wyrmgus start
-		this->civilization_upgrades[i].clear();
 		this->Species[i].clear();
-		this->DevelopsFrom[i].clear();
-		this->DevelopsTo[i].clear();
 		this->civilization_ui_fillers[i].clear();
 		//Wyrmgus end
 	}
@@ -432,8 +429,8 @@ CLanguage *PlayerRace::get_civilization_language(int civilization)
 		return stratagus::civilization::get_all()[civilization]->Language;
 	}
 	
-	if (stratagus::civilization::get_all()[civilization]->parent_civilization) {
-		return get_civilization_language(stratagus::civilization::get_all()[civilization]->parent_civilization->ID);
+	if (stratagus::civilization::get_all()[civilization]->get_parent_civilization()) {
+		return get_civilization_language(stratagus::civilization::get_all()[civilization]->get_parent_civilization()->ID);
 	}
 	
 	return nullptr;
@@ -449,8 +446,8 @@ std::vector<CFiller> PlayerRace::get_civilization_ui_fillers(int civilization)
 		return civilization_ui_fillers[civilization];
 	}
 	
-	if (stratagus::civilization::get_all()[civilization]->parent_civilization) {
-		return get_civilization_ui_fillers(stratagus::civilization::get_all()[civilization]->parent_civilization->ID);
+	if (stratagus::civilization::get_all()[civilization]->get_parent_civilization()) {
+		return get_civilization_ui_fillers(stratagus::civilization::get_all()[civilization]->get_parent_civilization()->ID);
 	}
 	
 	return std::vector<CFiller>();
@@ -1164,8 +1161,9 @@ const stratagus::civilization *CPlayer::get_civilization() const
 void CPlayer::set_civilization(int civilization)
 {
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
-		if (!PlayerRaces.civilization_upgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::get(PlayerRaces.civilization_upgrades[this->Race])->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::get(PlayerRaces.civilization_upgrades[this->Race])->ID);
+		const stratagus::civilization *old_civilization = stratagus::civilization::get_all()[this->Race];
+		if (old_civilization->get_upgrade() != nullptr && this->Allow.Upgrades[old_civilization->get_upgrade()->ID] == 'R') {
+			UpgradeLost(*this, old_civilization->get_upgrade()->ID);
 		}
 	}
 
@@ -1189,8 +1187,9 @@ void CPlayer::set_civilization(int civilization)
 	}
 	
 	if (this->Race != -1) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[this->Race]);
-		if (civilization_upgrade && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
+		const stratagus::civilization *new_civilization = stratagus::civilization::get_all()[this->Race];
+		CUpgrade *civilization_upgrade = new_civilization->get_upgrade();
+		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
 	}

@@ -948,9 +948,9 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->IndividualUpgrades.clear(); //reset the individual upgrades and then apply the character's
 	this->Trait = nullptr;
 	
-	if (this->Type->civilization != -1 && !PlayerRaces.civilization_upgrades[this->Type->civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[this->Type->civilization]);
-		if (civilization_upgrade) {
+	if (this->Type->civilization != -1) {
+		CUpgrade *civilization_upgrade = stratagus::civilization::get_all()[this->Type->civilization]->get_upgrade();
+		if (civilization_upgrade != nullptr) {
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
@@ -3004,9 +3004,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//Wyrmgus start
 	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
-	if (unit->Type->civilization != -1 && !PlayerRaces.civilization_upgrades[unit->Type->civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[unit->Type->civilization]);
-		if (civilization_upgrade) {
+	if (unit->Type->civilization != -1) {
+		CUpgrade *civilization_upgrade = stratagus::civilization::get_all()[unit->Type->civilization]->get_upgrade();
+		if (civilization_upgrade != nullptr) {
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
@@ -4749,7 +4749,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->is_shield() || EquippedItems[ShieldItemSlot].size() == 0)
 				&& (!modifier_upgrade->is_boots() || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!modifier_upgrade->is_arrows() || EquippedItems[ArrowsItemSlot].size() == 0)
-				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.civilization_upgrades[newplayer.Race])
+				&& !(newplayer.Race != -1 && modifier_upgrade == stratagus::civilization::get_all()[newplayer.Race]->get_upgrade())
 				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == stratagus::faction::get_all()[newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);

@@ -56,10 +56,12 @@ class civilization final : public detailed_data_entry, public data_type<civiliza
 {
 	Q_OBJECT
 
+	Q_PROPERTY(stratagus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
+	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 
 public:
@@ -81,6 +83,11 @@ public:
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+
+	civilization *get_parent_civilization() const
+	{
+		return this->parent_civilization;
+	}
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const ForceType force_type) const;
@@ -115,6 +122,11 @@ public:
 		this->default_color = default_color;
 	}
 
+	CUpgrade *get_upgrade() const
+	{
+		return this->upgrade;
+	}
+
 	calendar *get_calendar() const;
 	CCurrency *GetCurrency() const;
 
@@ -126,6 +138,16 @@ public:
 	bool is_playable() const
 	{
 		return this->playable;
+	}
+
+	const std::vector<civilization *> &get_develops_from() const
+	{
+		return this->develops_from;
+	}
+
+	const std::vector<civilization *> &get_develops_to() const
+	{
+		return this->develops_to;
 	}
 
 	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
@@ -210,11 +232,14 @@ public:
 	}
 
 	int ID = -1;
+private:
 	civilization *parent_civilization = nullptr;
+public:
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
 	std::string interface; //the string identifier for the civilization's interface
 	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
+	CUpgrade *upgrade = nullptr;
 public:
 	CUnitSound UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
@@ -225,6 +250,8 @@ public:
 private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
+	std::vector<civilization *> develops_from; //from which civilizations this civilization develops
+	std::vector<civilization *> develops_to; //to which civilizations this civilization develops
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade

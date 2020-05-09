@@ -250,9 +250,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
-	if (oldtype.civilization != -1 && !PlayerRaces.civilization_upgrades[oldtype.civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[oldtype.civilization]);
-		if (civilization_upgrade) {
+	if (oldtype.civilization != -1) {
+		CUpgrade *civilization_upgrade = stratagus::civilization::get_all()[oldtype.civilization]->get_upgrade();
+		if (civilization_upgrade != nullptr) {
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
@@ -262,9 +262,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
 	}
-	if (newtype.civilization != -1 && !PlayerRaces.civilization_upgrades[newtype.civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::try_get(PlayerRaces.civilization_upgrades[newtype.civilization]);
-		if (civilization_upgrade) {
+	if (newtype.civilization != -1) {
+		CUpgrade *civilization_upgrade = stratagus::civilization::get_all()[newtype.civilization]->get_upgrade();
+		if (civilization_upgrade != nullptr) {
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
