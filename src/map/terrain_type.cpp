@@ -53,6 +53,7 @@ void terrain_type::LoadTerrainTypeGraphics()
 		if (terrain_type->transition_graphics != nullptr) {
 			terrain_type->transition_graphics->Load(false, defines::get()->get_scale_factor());
 		}
+
 		for (const auto &kv_pair : terrain_type->season_graphics) {
 			kv_pair.second->Load(false, defines::get()->get_scale_factor());
 		}
@@ -247,7 +248,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "allow_single") {
 			this->allow_single = string::to_bool(value);
 		} else if (key == "hidden") {
-			this->Hidden = string::to_bool(value);
+			this->hidden = string::to_bool(value);
 		} else if (key == "resource") {
 			this->resource = resource::get(value);
 		} else if (key == "flag") {

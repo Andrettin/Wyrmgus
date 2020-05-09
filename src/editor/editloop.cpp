@@ -2533,7 +2533,7 @@ void CEditor::Init()
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (stratagus::terrain_type *terrain_type : stratagus::terrain_type::get_all()) {
-		if (!terrain_type->Hidden) {
+		if (!terrain_type->is_hidden()) {
 			Editor.ShownTileTypes.push_back(terrain_type);
 		}
 	}

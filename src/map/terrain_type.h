@@ -59,6 +59,7 @@ class terrain_type : public named_data_entry, public data_type<terrain_type>, pu
 	Q_PROPERTY(bool tiled_background MEMBER tiled_background READ has_tiled_background)
 	Q_PROPERTY(bool transition_mask MEMBER transition_mask READ has_transition_mask)
 	Q_PROPERTY(bool allow_single MEMBER allow_single READ allows_single)
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(stratagus::resource* resource MEMBER resource READ get_resource)
 	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
 	Q_PROPERTY(QVariantList outer_border_terrain_types READ get_outer_border_terrain_types_qvariant_list)
@@ -276,6 +277,11 @@ public:
 		return this->allow_single;
 	}
 
+	bool is_hidden() const
+	{
+		return this->hidden;
+	}
+
 	resource *get_resource() const
 	{
 		return this->resource;
@@ -392,8 +398,8 @@ private:
 	bool tiled_background = false;
 	bool transition_mask = false;
 	bool allow_single = false;			/// Whether this terrain type has transitions for single tiles
+	bool hidden = false;
 public:
-	bool Hidden = false;
 	CUnitType *UnitType = nullptr;
 private:
 	std::filesystem::path image_file;
