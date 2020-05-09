@@ -37,15 +37,9 @@ namespace stratagus {
 
 class COrder_Build : public COrder
 {
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, stratagus::site *settlement);
-	//Wyrmgus end
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, stratagus::site *settlement);
 public:
-	//Wyrmgus start
-//	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0)
 	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0), MapLayer(0)
-	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -63,12 +57,12 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	void ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType);
 	//Wyrmgus end
 
 	virtual void AiUnitKilled(CUnit &unit);
 
-	const CUnitType &GetUnitType() const { return *Type; }
+	const stratagus::unit_type &GetUnitType() const { return *Type; }
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const { return MapLayer; }
@@ -81,7 +75,7 @@ private:
 	bool BuildFromOutside(CUnit &unit) const;
 	void HelpBuild(CUnit &unit, CUnit &building);
 private:
-	CUnitType *Type;        /// build a unit of this unit-type
+	stratagus::unit_type *Type;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
 	int State;
 	int Range;

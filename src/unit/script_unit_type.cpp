@@ -696,7 +696,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// Slot identifier
 	const char *str = LuaToString(l, 1);
-	CUnitType *type = CUnitType::try_get(str);
+	stratagus::unit_type *type = stratagus::unit_type::try_get(str);
 	const bool redefine = type != nullptr;
 	if (redefine) {
 		//Wyrmgus start
@@ -708,7 +708,7 @@ static int CclDefineUnitType(lua_State *l)
 		type->RemoveButtons(ButtonCmd::Return);
 		//Wyrmgus end
 	} else {
-		type = CUnitType::add(str, nullptr);
+		type = stratagus::unit_type::add(str, nullptr);
 	}
 
 	//  Parse the list: (still everything could be changed!)
@@ -719,7 +719,7 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Parent")) {
 			std::string parent_ident = LuaToString(l, -1);
-			CUnitType *parent_type = CUnitType::get(parent_ident);
+			stratagus::unit_type *parent_type = stratagus::unit_type::get(parent_ident);
 			type->SetParent(parent_type);
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
@@ -834,11 +834,11 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "item-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
-						const CUnitType *type = CUnitType::get(type_ident);
+						const stratagus::unit_type *type = stratagus::unit_type::get(type_ident);
 						variation->ItemsEquipped.push_back(type);
 					} else if (!strcmp(value, "item-not-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
-						const CUnitType *type = CUnitType::get(type_ident);
+						const stratagus::unit_type *type = stratagus::unit_type::get(type_ident);
 						variation->ItemsNotEquipped.push_back(type);
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
@@ -1000,7 +1000,7 @@ static int CclDefineUnitType(lua_State *l)
 				for (int k = 0; k < subargs; ++k) {
 					int item_slot = GetItemSlotIdByName(LuaToString(l, -1, k + 1));
 					++k;
-					CUnitType *default_equipment = CUnitType::get(LuaToString(l, -1, k + 1));
+					stratagus::unit_type *default_equipment = stratagus::unit_type::get(LuaToString(l, -1, k + 1));
 					type->DefaultEquipment[item_slot] = default_equipment;
 				}
 				lua_pop(l, 1);
@@ -1011,7 +1011,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {
-			type->Animations = stratagus::animation_set::get(LuaToString(l, -1));
+			type->animation_set = stratagus::animation_set::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = nullptr;
@@ -1087,7 +1087,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
+				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, k + 1));
 				++k;
 				type->DefaultStat.SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
 			}
@@ -1130,7 +1130,7 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				value = LuaToString(l, -1, j + 1);
-				CUnitType *trained_unit = CUnitType::get(value);
+				stratagus::unit_type *trained_unit = stratagus::unit_type::get(value);
 				type->Trains.push_back(trained_unit);
 				trained_unit->TrainedBy.push_back(type);
 			}
@@ -1744,25 +1744,25 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CUnitType *sold_unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				stratagus::unit_type *sold_unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 				type->SoldUnits.push_back(sold_unit_type);
 			}
 		} else if (!strcmp(value, "SpawnUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CUnitType *spawned_unit_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				stratagus::unit_type *spawned_unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 				type->SpawnUnits.push_back(spawned_unit_type);
 			}
 		} else if (!strcmp(value, "Drops")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CUnitType *drop_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				stratagus::unit_type *drop_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 				type->Drops.push_back(drop_type);
 			}
 		} else if (!strcmp(value, "AiDrops")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CUnitType *drop_type = CUnitType::get(LuaToString(l, -1, j + 1));
+				stratagus::unit_type *drop_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 				type->AiDrops.push_back(drop_type);
 			}
 		} else if (!strcmp(value, "DropSpells")) {
@@ -1875,7 +1875,7 @@ static int CclDefineUnitType(lua_State *l)
 */
 static int CclDefineUnitStats(lua_State *l)
 {
-	CUnitType *type = CUnitType::get(LuaToString(l, 1));
+	stratagus::unit_type *type = stratagus::unit_type::get(LuaToString(l, 1));
 	const int playerId = LuaToNumber(l, 2);
 
 	Assert(playerId < PlayerMax);
@@ -1961,7 +1961,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, 3, j + 1);
-				CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
+				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, k + 1));
 				++k;
 				stats->SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
@@ -1996,7 +1996,7 @@ static int CclDefineUnitStats(lua_State *l)
 **
 **  @param l  Lua state.
 */
-CUnitType *CclGetUnitType(lua_State *l)
+stratagus::unit_type *CclGetUnitType(lua_State *l)
 {
 	//Wyrmgus start
 	if (lua_isnil(l, -1)) {
@@ -2007,11 +2007,11 @@ CUnitType *CclGetUnitType(lua_State *l)
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
 		const char *str = LuaToString(l, -1);
-		return CUnitType::get(str);
+		return stratagus::unit_type::get(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
-			return (CUnitType *)data->Data;
+			return (stratagus::unit_type *)data->Data;
 		}
 	}
 	LuaError(l, "CclGetUnitType: not a unit-type");
@@ -2030,7 +2030,7 @@ static int CclUnitType(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const char *str = LuaToString(l, 1);
-	CUnitType *type = CUnitType::get(str);
+	stratagus::unit_type *type = stratagus::unit_type::get(str);
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
 	data->Data = type;
@@ -2050,7 +2050,7 @@ static int CclUnitTypeArray(lua_State *l)
 
 	lua_newtable(l);
 
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
 		data->Data = unit_type;
@@ -2070,7 +2070,7 @@ static int CclGetUnitTypeIdent(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
-	const CUnitType *type = CclGetUnitType(l);
+	const stratagus::unit_type *type = CclGetUnitType(l);
 	if (type) {
 		lua_pushstring(l, type->Ident.c_str());
 	} else {
@@ -2090,7 +2090,7 @@ static int CclGetUnitTypeName(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
-	const CUnitType *type = CclGetUnitType(l);
+	const stratagus::unit_type *type = CclGetUnitType(l);
 	lua_pushstring(l, type->get_name().c_str());
 	return 1;
 }
@@ -2107,7 +2107,7 @@ static int CclSetUnitTypeName(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
-	CUnitType *type = CclGetUnitType(l);
+	stratagus::unit_type *type = CclGetUnitType(l);
 	lua_pop(l, 1);
 	type->set_name(LuaToString(l, 2));
 
@@ -2126,7 +2126,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string ident = LuaToString(l, 1);
-	const CUnitType *type = CUnitType::get(ident.c_str());
+	const stratagus::unit_type *type = stratagus::unit_type::get(ident.c_str());
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -2195,8 +2195,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->Height);
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
-		if (type->Animations != nullptr) {
-			lua_pushstring(l, type->Animations->get_identifier().c_str());
+		if (type->get_animation_set() != nullptr) {
+			lua_pushstring(l, type->get_animation_set()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2228,7 +2228,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "UnitStock")) {
 		LuaCheckArgs(l, 3);
-		CUnitType *unit_type = CUnitType::get(LuaToString(l, 3));
+		stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, 3));
 		if (!GameRunning && Editor.Running != EditorEditing) {
 			lua_pushnumber(l, type->DefaultStat.GetUnitStock(unit_type));
 		} else {
@@ -2534,7 +2534,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			mod_file = LuaToString(l, 3);
 		}
 
-		std::map<std::string, std::vector<CUnitType *>>::const_iterator mod_find_iterator = type->ModAiDrops.find(mod_file);
+		std::map<std::string, std::vector<stratagus::unit_type *>>::const_iterator mod_find_iterator = type->ModAiDrops.find(mod_file);
 		if (is_mod && mod_find_iterator != type->ModAiDrops.end()) {
 			lua_createtable(l, mod_find_iterator->second.size(), 0);
 			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
@@ -2561,8 +2561,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
-		std::vector<const CUnitType *> droppers;
-		for (const CUnitType *other_unit_type : CUnitType::get_all()) {
+		std::vector<const stratagus::unit_type *> droppers;
+		for (const stratagus::unit_type *other_unit_type : stratagus::unit_type::get_all()) {
 			if (
 				std::find(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), type) != other_unit_type->Drops.end()
 				|| std::find(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), type) != other_unit_type->AiDrops.end()
@@ -2718,7 +2718,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			mod_file = LuaToString(l, 3);
 		}
 
-		std::map<std::string, std::vector<CUnitType *>>::const_iterator mod_find_iterator = type->ModTrains.find(mod_file);
+		std::map<std::string, std::vector<stratagus::unit_type *>>::const_iterator mod_find_iterator = type->ModTrains.find(mod_file);
 		if (is_mod && mod_find_iterator != type->ModTrains.end()) {
 			lua_createtable(l, mod_find_iterator->second.size(), 0);
 			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
@@ -2842,7 +2842,7 @@ static int CclDefineBoolFlags(lua_State *l)
 
 	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
 		size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-		for (CUnitType *unit_type : CUnitType::get_all()) { // adjust array for unit already defined
+		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { // adjust array for unit already defined
 			unit_type->BoolFlag.resize(new_size);
 		}
 	}
@@ -3075,7 +3075,7 @@ static int CclGetUnitTypes(lua_State *l)
 	}
 	
 	std::vector<std::string> unit_types;
-	for (const CUnitType *unit_type : CUnitType::get_all()) {
+	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		if (mod_file.empty() || unit_type->Mod == mod_file) {
 			unit_types.push_back(unit_type->Ident);
 		}
@@ -3115,7 +3115,7 @@ static int CclGetAnimations(lua_State *l)
 */
 void UpdateUnitVariables(CUnit &unit)
 {
-	const CUnitType *type = unit.Type;
+	const stratagus::unit_type *type = unit.Type;
 	
 	//Wyrmgus start
 	if (!type) {
@@ -3856,7 +3856,7 @@ static int CclGetSpeciesGenusData(lua_State *l)
 static int CclSetSettlementSiteUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	settlement_site_unit_type = CUnitType::get(LuaToString(l, 1));
+	settlement_site_unit_type = stratagus::unit_type::get(LuaToString(l, 1));
 
 	return 0;
 }
@@ -3872,7 +3872,7 @@ static int CclSetSettlementSiteUnit(lua_State *l)
 */
 void SetModStat(const std::string &mod_file, const std::string &ident, const std::string &variable_key, const int value, const std::string &variable_type)
 {
-	CUnitType *type = CUnitType::get(ident);
+	stratagus::unit_type *type = stratagus::unit_type::get(ident);
 	
 	if (type->ModDefaultStats.find(mod_file) == type->ModDefaultStats.end()) {
 		type->ModDefaultStats[mod_file].Variables.resize(UnitTypeVar.GetNumberVariable());
@@ -3909,7 +3909,7 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 			}
 		}
 	} else if (variable_key == "UnitStock") {
-		CUnitType *unit_type = CUnitType::get(variable_type);
+		stratagus::unit_type *unit_type = stratagus::unit_type::get(variable_type);
 		if (GameRunning || Editor.Running == EditorEditing) {
 			type->MapDefaultStat.ChangeUnitStock(unit_type, - type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
@@ -3999,7 +3999,7 @@ void SetModSound(const std::string &mod_file, const std::string &ident, const st
 	if (sound.empty()) {
 		return;
 	}
-	CUnitType *type = CUnitType::get(ident);
+	stratagus::unit_type *type = stratagus::unit_type::get(ident);
 	
 	if (sound_type == "selected") {
 		type->ModSounds[mod_file].Selected.Name = sound;
@@ -4122,7 +4122,7 @@ static int CclSetModTrains(lua_State *l)
 	LuaCheckArgs(l, 3);
 	
 	std::string mod_file = LuaToString(l, 1);
-	CUnitType *type = CUnitType::get(LuaToString(l, 2));
+	stratagus::unit_type *type = stratagus::unit_type::get(LuaToString(l, 2));
 
 	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
 		if (std::find(type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].begin(), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end(), type) != type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end()) {
@@ -4138,7 +4138,7 @@ static int CclSetModTrains(lua_State *l)
 	int subargs = lua_rawlen(l, 3);
 	for (int i = 0; i < subargs; ++i) {
 		const char *value = LuaToString(l, 3, i + 1);
-		CUnitType *trained_unit = CUnitType::get(value);
+		stratagus::unit_type *trained_unit = stratagus::unit_type::get(value);
 		type->ModTrains[mod_file].push_back(trained_unit);
 		trained_unit->ModTrainedBy[mod_file].push_back(type);
 	}
@@ -4176,7 +4176,7 @@ static int CclSetModAiDrops(lua_State *l)
 	LuaCheckArgs(l, 3);
 	
 	std::string mod_file = LuaToString(l, 1);
-	CUnitType *type = CUnitType::get(LuaToString(l, 2));
+	stratagus::unit_type *type = stratagus::unit_type::get(LuaToString(l, 2));
 
 	type->ModAiDrops[mod_file].clear();
 	
@@ -4186,7 +4186,7 @@ static int CclSetModAiDrops(lua_State *l)
 	int subargs = lua_rawlen(l, 3);
 	for (int i = 0; i < subargs; ++i) {
 		const char *value = LuaToString(l, 3, i + 1);
-		CUnitType *dropped_unit = CUnitType::get(value);
+		stratagus::unit_type *dropped_unit = stratagus::unit_type::get(value);
 		type->ModAiDrops[mod_file].push_back(dropped_unit);
 	}
 	

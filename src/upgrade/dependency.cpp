@@ -302,7 +302,7 @@ void unit_type_dependency::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "unit_type") {
-		this->UnitType = CUnitType::get(value);
+		this->UnitType = unit_type::get(value);
 	} else if (key == "count") {
 		this->Count = std::stoi(value);
 	} else {
@@ -315,7 +315,7 @@ void unit_type_dependency::ProcessConfigDataProperty(const std::pair<std::string
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "unit_type") {
-		this->UnitType = CUnitType::get(value);
+		this->UnitType = unit_type::get(value);
 	} else if (key == "count") {
 		this->Count = std::stoi(value);
 	} else {
@@ -558,7 +558,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	//
 	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
-		const CUnitType *unit_type = CUnitType::get(button.ValueStr);
+		const stratagus::unit_type *unit_type = stratagus::unit_type::get(button.ValueStr);
 		rules = unit_type->Dependency->get_string();
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade", 7)) {
 		// target string refers to upgrade-XXX
@@ -580,7 +580,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	return rules;
 }
 
-bool CheckDependencies(const CUnitType *target, const CPlayer *player, bool ignore_units, bool is_predependency, bool is_neutral_use)
+bool CheckDependencies(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units, bool is_predependency, bool is_neutral_use)
 {
 	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
@@ -632,7 +632,7 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignor
 	}
 }
 
-bool CheckDependencies(const CUnitType *target, const CUnit *unit, bool ignore_units, bool is_predependency)
+bool CheckDependencies(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units, bool is_predependency)
 {
 	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
 		return false;
@@ -706,7 +706,7 @@ static int CclDefineDependency(lua_State *l)
 			stratagus::dependency *dependency = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
-				const CUnitType *unit_type = CUnitType::get(required);
+				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
 				dependency = new stratagus::unit_type_dependency(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
 				const CUpgrade *upgrade = CUpgrade::get(required);
@@ -743,7 +743,7 @@ static int CclDefineDependency(lua_State *l)
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
-		CUnitType *unit_type = CUnitType::get(target);
+		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
 		unit_type->Dependency = dependency;
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
@@ -786,7 +786,7 @@ static int CclDefinePredependency(lua_State *l)
 			stratagus::dependency *dependency = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
-				const CUnitType *unit_type = CUnitType::get(required);
+				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
 				dependency = new stratagus::unit_type_dependency(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
 				const CUpgrade *upgrade = CUpgrade::get(required);
@@ -823,7 +823,7 @@ static int CclDefinePredependency(lua_State *l)
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
-		CUnitType *unit_type = CUnitType::get(target);
+		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
 		unit_type->Predependency = dependency;
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
@@ -856,7 +856,7 @@ static int CclCheckDependency(lua_State *l)
 	const CPlayer *player = CPlayer::Players[plynr];
 	
 	if (!strncmp(object, "unit-", 5)) {
-		const CUnitType *unit_type = CUnitType::get(object);
+		const stratagus::unit_type *unit_type = stratagus::unit_type::get(object);
 		lua_pushboolean(l, CheckDependencies(unit_type, player));
 	} else if (!strncmp(object, "upgrade", 7)) {
 		const CUpgrade *upgrade = CUpgrade::get(object);

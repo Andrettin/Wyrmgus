@@ -333,7 +333,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				time_of_day_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "unit_type") {
-			CUnitType *unit_type = CUnitType::get_or_add(ident, nullptr);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				unit_type->ProcessConfigData(config_data);
 			}

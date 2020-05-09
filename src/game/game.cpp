@@ -460,7 +460,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("})\n\n");
 		}
 		
-		for (const CUnitType *unit_type : CUnitType::get_all()) {
+		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (unit_type->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -487,8 +487,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!unit_type->Icon.Name.empty() && (!unit_type->Parent || unit_type->Icon.Name != unit_type->Parent->Icon.Name)) {
 				f->printf("\tIcon = \"%s\",\n", unit_type->Icon.Name.c_str());
 			}
-			if (unit_type->Animations != nullptr && (!unit_type->Parent || unit_type->Animations != unit_type->Parent->Animations)) {
-				f->printf("\tAnimations = \"%s\",\n", unit_type->Animations->get_identifier().c_str());
+			if (unit_type->get_animation_set() != nullptr && (!unit_type->Parent || unit_type->get_animation_set() != unit_type->Parent->get_animation_set())) {
+				f->printf("\tAnimations = \"%s\",\n", unit_type->get_animation_set()->get_identifier().c_str());
 			}
 			
 			f->printf("\tCosts = {");
@@ -508,8 +508,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
-			for (std::map<CUnitType *, int>::const_iterator iterator = unit_type->DefaultStat.UnitStock.begin(); iterator != unit_type->DefaultStat.UnitStock.end(); ++iterator) {
-				CUnitType *unit_type = iterator->first;
+			for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit_type->DefaultStat.UnitStock.begin(); iterator != unit_type->DefaultStat.UnitStock.end(); ++iterator) {
+				stratagus::unit_type *unit_type = iterator->first;
 				int unit_stock = iterator->second;
 				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(unit_type))) {
 					f->printf("\"%s\", ", unit_type->Ident.c_str());
@@ -619,7 +619,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 		
 		//save the definition of trained unit types separately, to avoid issues like a trained unit being defined after the unit that trains it
-		for (const CUnitType *unit_type : CUnitType::get_all()) {
+		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (unit_type->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -637,7 +637,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 		}		
 
-		for (CUnitType *unit_type : CUnitType::get_all()) {
+		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (unit_type->ModTrains.find(CMap::Map.Info.Filename) != unit_type->ModTrains.end()) {
 				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
 				for (size_t j = 0; j < unit_type->ModTrains[CMap::Map.Info.Filename].size(); ++j) {
@@ -746,7 +746,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");
-		for (CUnitType *unit_type : CUnitType::get_all()) {
+		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (unit_type->ModDefaultStats.find(CMap::Map.Info.Filename) != unit_type->ModDefaultStats.end()) {
 				for (unsigned int j = 0; j < MaxCosts; ++j) {
 					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Costs[j] != 0) {
@@ -758,8 +758,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModDefaultStats[CMap::Map.Info.Filename].ImproveIncomes[j], DefaultResourceNames[j].c_str());
 					}
 				}
-				for (std::map<CUnitType *, int>::const_iterator iterator = unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.begin(); iterator != unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.end(); ++iterator) {
-					const CUnitType *unit_type = iterator->first;
+				for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.begin(); iterator != unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.end(); ++iterator) {
+					const stratagus::unit_type *unit_type = iterator->first;
 					int unit_stock = iterator->second;
 					if (unit_stock != 0) {
 						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_stock, unit_type->Ident.c_str());

@@ -117,7 +117,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "family_name") {
 			this->surname = value;
 		} else if (key == "unit_type") {
-			CUnitType *unit_type = CUnitType::get(value);
+			stratagus::unit_type *unit_type = unit_type::get(value);
 			if (this->get_unit_type() == nullptr || this->get_unit_type() == unit_type || this->get_unit_type()->CanExperienceUpgradeTo(unit_type)) {
 				this->unit_type = unit_type;
 			}
@@ -209,8 +209,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			this->HeroicIcon.Icon = nullptr;
 			this->HeroicIcon.Load();
 		} else if (key == "forbidden_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = CUnitType::get(value);
+			stratagus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
 		} else if (key == "ability") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -929,7 +928,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 
 		//now, update the hero
 		hero->civilization = civilization;
-		CUnitType *new_unit_type = hero->civilization->get_class_unit_type(hero->get_unit_type()->get_unit_class());
+		stratagus::unit_type *new_unit_type = hero->civilization->get_class_unit_type(hero->get_unit_type()->get_unit_class());
 		if (new_unit_type != nullptr) {
 			hero->unit_type = new_unit_type;
 			hero->set_name(new_hero_name);

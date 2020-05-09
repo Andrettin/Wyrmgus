@@ -357,7 +357,7 @@ CSpell *CSpell::GetOrAddSpell(const std::string &ident)
 	
 	if (!spell) {
 		spell = new CSpell(Spells.size(), ident);
-		for (CUnitType *unit_type : CUnitType::get_all()) { // adjust array for casters that have already been defined
+		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { // adjust array for casters that have already been defined
 			if (unit_type->AutoCastActive) {
 				char *newc = new char[(Spells.size() + 1) * sizeof(char)];
 				memcpy(newc, unit_type->AutoCastActive, Spells.size() * sizeof(char));

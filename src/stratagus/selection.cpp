@@ -378,12 +378,9 @@ int ToggleSelectUnit(CUnit &unit)
 **
 **  FIXME: should always select the nearest 9 units to the base!
 */
-//Wyrmgus start
-//int SelectUnitsByType(CUnit &base)
 int SelectUnitsByType(CUnit &base, bool only_visible)
-//Wyrmgus end
 {
-	const CUnitType &type = *base.Type;
+	const stratagus::unit_type &type = *base.Type;
 	const CViewport *vp = UI.MouseViewport;
 
 	Assert(UI.MouseViewport);
@@ -499,7 +496,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 */
 int ToggleUnitsByType(CUnit &base)
 {
-	const CUnitType &type = *base.Type;
+	const stratagus::unit_type &type = *base.Type;
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -594,7 +591,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	std::vector<CUnit *> table;
 
 	for (size_t i = 0; i != units.size(); ++i) {
-		const CUnitType *type = units[i]->Type;
+		const stratagus::unit_type *type = units[i]->Type;
 		if (type && type->CanSelect(mode)) {
 			table.push_back(units[i]);
 		}
@@ -741,7 +738,7 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		const CUnitType &type = *unit.Type;
+		const stratagus::unit_type &type = *unit.Type;
 		PixelPos spritePos = unit.get_scaled_map_pixel_pos_center();
 
 		spritePos.x += type.OffsetX * scale_factor - (type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor) / 2;
@@ -814,7 +811,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
 			continue;
 		}
-		const CUnitType &type = *unit.Type;
+		const stratagus::unit_type &type = *unit.Type;
 		// Buildings are visible but not selectable
 		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;

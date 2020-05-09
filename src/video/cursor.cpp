@@ -75,13 +75,13 @@ PixelPos CursorStartMapPos;/// position of starting point of selection rectangle
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-CUnitType *CursorBuilding;           /// building cursor
-
+stratagus::unit_type *CursorBuilding;           /// building cursor
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 CCursor *GameCursor;                 /// current shown cursor-type
 
 static SDL_Surface *HiddenSurface;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

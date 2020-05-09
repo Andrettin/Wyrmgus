@@ -129,7 +129,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
-		const CUnitType &dtype = *dest->Type;
+		const stratagus::unit_type &dtype = *dest->Type;
 
 		if (!dest->IsAliveOnMap()) {
 			continue;
@@ -271,7 +271,7 @@ private:
 	int *result_enemy_wall_map_layer;
 	const bool IncludeNeutral;
 	const bool allow_water;
-	std::vector<const CUnitType *> CheckedTypes;
+	std::vector<const stratagus::unit_type *> CheckedTypes;
 	//Wyrmgus end
 };
 
@@ -314,7 +314,7 @@ void AiResetUnitTypeEquiv()
 **  @param a  the first unittype
 **  @param b  the second unittype
 */
-void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
+void AiNewUnitTypeEquiv(const stratagus::unit_type &a, const stratagus::unit_type &b)
 {
 	int find = UnitTypeEquivs[a.Slot];
 	int replace = UnitTypeEquivs[b.Slot];
@@ -341,7 +341,7 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 **
 **  @return          the number of unittype found
 */
-int AiFindUnitTypeEquiv(const CUnitType &unittype, int *result)
+int AiFindUnitTypeEquiv(const stratagus::unit_type &unittype, int *result)
 {
 	const int search = UnitTypeEquivs[unittype.Slot];
 	int count = 0;
@@ -361,7 +361,7 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return CUnitType::get_all()[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > CUnitType::get_all()[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		return stratagus::unit_type::get_all()[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > stratagus::unit_type::get_all()[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
 	}
 };
 
@@ -374,13 +374,13 @@ public:
 **
 **  @return             the number of unittype found
 */
-int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
+int AiFindAvailableUnitTypeEquiv(const stratagus::unit_type &unittype, int *usableTypes)
 {
 	// 1 - Find equivalents
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependencies(CUnitType::get_all()[usableTypes[i]], AiPlayer->Player)) {
+		if (!CheckDependencies(stratagus::unit_type::get_all()[usableTypes[i]], AiPlayer->Player)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;
@@ -409,7 +409,7 @@ public:
 		
 		const stratagus::unit_class *unit_class = unit->Type->get_unit_class();
 		if (unit_class != nullptr) {
-			for (const CUnitType *class_unit_type : unit_class->get_unit_types()) {
+			for (const stratagus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != unit->Type) {
 					data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
@@ -432,7 +432,7 @@ void AiForce::CountTypes(unsigned int *counter, const size_t len)
 **
 **  @return       True if it fits, false otherwise.
 */
-bool AiForce::IsBelongsTo(const CUnitType &type)
+bool AiForce::IsBelongsTo(const stratagus::unit_type &type)
 {
 	bool flag = false;
 	unsigned int counter[UnitTypeMax + 1];
@@ -1166,14 +1166,14 @@ void AiForceManager::CheckUnits(int *counter)
 			const unsigned int t = aiut.Type->Slot;
 			const stratagus::unit_class *unit_class = aiut.Type->get_unit_class();
 			const int wantedCount = aiut.Want;
-			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::get_all()[t]);
+			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(stratagus::unit_type::get_all()[t]);
 			if (t < AiHelpers.Equiv.size()) {
 				for (unsigned int k = 0; k < AiHelpers.Equiv[t].size(); ++k) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
 				}
 			}
 			if (unit_class != nullptr) {
-				for (const CUnitType *class_unit_type : unit_class->get_unit_types()) {
+				for (const stratagus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 					if (class_unit_type != aiut.Type) {
 						e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 					}
@@ -1914,7 +1914,7 @@ void AiForceManager::CheckForceRecruitment()
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->get_units().size(); ++j) {
 					const stratagus::unit_class *unit_class = faction_force_templates[i]->get_units()[j].first;
-					CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					stratagus::unit_type *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
 					if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
 						break;
@@ -1946,7 +1946,7 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Role = AiForceRole::Default;
 				for (size_t i = 0; i < force_template->get_units().size(); ++i) {
 					const stratagus::unit_class *unit_class = force_template->get_units()[i].first;
-					CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					stratagus::unit_type *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
 					const int count = force_template->get_units()[i].second;
 					
 					AiUnitType newaiut;

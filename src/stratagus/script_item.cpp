@@ -73,7 +73,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 			item->Type = unit_type;
 		} else if (!strcmp(value, "Icon")) {
 			item->Icon.Name = LuaToString(l, -1);
@@ -126,8 +126,8 @@ static int CclDefineUniqueItem(lua_State *l)
 
 static int CclGetItems(lua_State *l)
 {
-	std::vector<const CUnitType *> items;
-	for (const CUnitType *unit_type : CUnitType::get_all()) {
+	std::vector<const stratagus::unit_type *> items;
+	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		if (unit_type->BoolFlag[ITEM_INDEX].value) {
 			items.push_back(unit_type);
 		}

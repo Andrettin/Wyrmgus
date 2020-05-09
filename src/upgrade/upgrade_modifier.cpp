@@ -139,7 +139,7 @@ void CUpgradeModifier::process_sml_scope(const stratagus::sml_data &scope)
 	}
 }
 
-int CUpgradeModifier::GetUnitStock(CUnitType *unit_type) const
+int CUpgradeModifier::GetUnitStock(stratagus::unit_type *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
 		return this->UnitStock.find(unit_type)->second;
@@ -148,7 +148,7 @@ int CUpgradeModifier::GetUnitStock(CUnitType *unit_type) const
 	}
 }
 
-void CUpgradeModifier::SetUnitStock(CUnitType *unit_type, int quantity)
+void CUpgradeModifier::SetUnitStock(stratagus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -163,7 +163,7 @@ void CUpgradeModifier::SetUnitStock(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUpgradeModifier::ChangeUnitStock(CUnitType *unit_type, int quantity)
+void CUpgradeModifier::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }

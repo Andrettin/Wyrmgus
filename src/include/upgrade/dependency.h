@@ -87,7 +87,6 @@
 
 class CConfigData;
 class CPlayer;
-class CUnitType;
 class CUnit;
 class CUpgrade;
 class ButtonAction;
@@ -102,6 +101,7 @@ class site;
 class sml_data;
 class sml_property;
 class trigger;
+class unit_type;
 
 /// Dependency rule
 class dependency
@@ -257,7 +257,7 @@ class unit_type_dependency : public dependency
 {
 public:
 	unit_type_dependency() {}
-	unit_type_dependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
+	unit_type_dependency(const unit_type *unit_type, const int count) : UnitType(unit_type), Count(count) {}
 	
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -265,7 +265,7 @@ public:
 	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
-	const CUnitType *UnitType = nullptr;
+	const unit_type *UnitType = nullptr;
 	int Count = 1;		/// How many of the unit type are required
 };
 
@@ -357,7 +357,7 @@ extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &
 extern void AddDependency(const int rule_type, const std::string &target, const int required_rule_type, const std::string &required, const int count, const int or_flag, const bool is_predependency);
 
 /// Check dependencies for player
-extern bool CheckDependencies(const CUnitType *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
+extern bool CheckDependencies(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
 extern bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
 
 template <typename T>
@@ -383,7 +383,7 @@ extern bool CheckDependencies(const T *target, const CPlayer *player, bool ignor
 }
 
 /// Check dependencies for unit
-extern bool CheckDependencies(const CUnitType *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
+extern bool CheckDependencies(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
 extern bool CheckDependencies(const CUpgrade *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
 
 template <typename T>

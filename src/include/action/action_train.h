@@ -33,15 +33,9 @@
 
 class COrder_Train : public COrder
 {
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
-	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player);
-	//Wyrmgus end
+	friend COrder *COrder::NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player);
 public:
-	//Wyrmgus start
-//	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Ticks(0) {}
 	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Player(0), Ticks(0) {}
-	//Wyrmgus end
 
 	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
 
@@ -56,11 +50,11 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	void ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType);
 
-	const CUnitType &GetUnitType() const { return *Type; }
+	const stratagus::unit_type &GetUnitType() const { return *Type; }
 private:
-	CUnitType *Type; /// train a unit of this unit-type
+	stratagus::unit_type *Type; /// train a unit of this unit-type
 	//Wyrmgus start
 	int Player;      /// Player doing the training (needed for neutral building training)
 	//Wyrmgus end

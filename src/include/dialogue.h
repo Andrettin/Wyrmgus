@@ -31,7 +31,6 @@
 #include "database/data_type.h"
 
 class CPlayer;
-class CUnitType;
 class LuaCallback;
 struct lua_State;
 
@@ -43,6 +42,7 @@ class character;
 class dialogue_node;
 class dialogue_option;
 class faction;
+class unit_type;
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
@@ -82,7 +82,7 @@ public:
 	int ID = -1;
 private:
 	const character *speaker = nullptr;
-	const CUnitType *speaker_unit_type = nullptr;
+	const unit_type *speaker_unit_type = nullptr;
 	std::string speaker_name;
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
 	std::string text;

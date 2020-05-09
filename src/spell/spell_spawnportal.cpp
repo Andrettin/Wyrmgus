@@ -42,7 +42,7 @@
 		++j;
 		if (!strcmp(value, "portal-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->PortalType = CUnitType::get(value);
+			this->PortalType = stratagus::unit_type::get(value);
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "current-player")) {

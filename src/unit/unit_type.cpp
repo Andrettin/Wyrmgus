@@ -80,7 +80,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class CUnitType unit_type.h
+**  @class unit_type unit_type.h
 **
 **  \#include "unit/unit_type.h"
 **
@@ -90,77 +90,64 @@
 **
 **  The unit-type class members:
 **
-**  CUnitType::Ident
-**
-**    Unique identifier of the unit-type, used to reference it in
-**    config files and during startup. As convention they start with
-**    "unit-" fe. "unit-farm".
-**  @note Don't use this member in game, use instead the pointer
-**  to this structure. See CUnitType::get().
-**
-**  CUnitType::Name
-**
-**    Pretty name shown by the engine. The name should be shorter
-**    than 17 characters and no word can be longer than 8 characters.
-**
-**  CUnitType::File
+**  unit_type::File
 **
 **    Path file name of the sprite file.
 **
-**  CUnitType::ShadowFile
+**  unit_type::ShadowFile
 **
 **    Path file name of shadow sprite file.
 **
-**  CUnitType::DrawLevel
+**  unit_type::DrawLevel
 **
 **    The Level/Order to draw this type of unit in. 0-255 usually.
 **
-**  CUnitType::Width CUnitType::Height
+**  unit_type::Width unit_type::Height
 **
 **    Size of a sprite frame in pixels. All frames of a sprite have
 **    the same size. Also all sprites (tilesets) must have the same
 **    size.
 **
-**  CUnitType::ShadowWidth CUnitType::ShadowHeight
+**  unit_type::ShadowWidth unit_type::ShadowHeight
 **
 **    Size of a shadow sprite frame in pixels. All frames of a sprite
 **    have the same size. Also all sprites (tilesets) must have the
 **    same size.
 **
-**  CUnitType::ShadowOffsetX CUnitType::ShadowOffsetY
+**  unit_type::ShadowOffsetX unit_type::ShadowOffsetY
 **
 **    Vertical offset to draw the shadow in pixels.
 **
-**  CUnitType::Animations
+**  unit_type::animation_set
 **
 **    Animation scripts for the different actions. Currently the
 **    animations still, move, attack and die are supported.
 **  @see stratagus::animation_set
 **  @see CAnimation
 **
-**  CUnitType::Icon
+**  unit_type::Icon
 **
 **    Icon to display for this unit-type. Contains configuration and
 **    run time variable.
 **  @note This icon can be used for training, but isn't used.
 **
-**  CUnitType::Missile
+**  unit_type::Missile
 **
 **    Configuration and run time variable of the missile weapon.
 **  @note It is planned to support more than one weapons.
 **  And the sound of the missile should be used as fire sound.
 **
-**  CUnitType::Explosion
+**  unit_type::Explosion
 **
 **    Configuration and run time variable of the missile explosion.
 **    This is the explosion that happens if unit is set to
 **    ExplodeWhenKilled
 **
-**  CUnitType::CorpseName
+**  unit_type::CorpseName
 **
 **    Corpse unit-type name, should only be used during setup.
 **
-**  CUnitType::CorpseType
+**  unit_type::CorpseType
 **
 **    Corpse unit-type pointer, only this should be used during run
 **    time. Many unit-types can share the same corpse.
@@ -168,173 +155,173 @@
 **
 **  @todo continue this documentation
 **
-**  CUnitType::Construction
+**  unit_type::Construction
 **
 **    What is shown in construction phase.
 **
-**  CUnitType::SightRange
+**  unit_type::SightRange
 **
 **    Sight range
 **
-**  CUnitType::_HitPoints
+**  unit_type::_HitPoints
 **
 **    Maximum hit points
 **
 **
-**  CUnitType::_Costs[::MaxCosts]
+**  unit_type::_Costs[::MaxCosts]
 **
 **    How many resources needed
 **
-**  CUnitType::RepairHP
+**  unit_type::RepairHP
 **
 **    The HP given to a unit each cycle it's repaired.
 **    If zero, unit cannot be repaired
 **
-**    CUnitType::RepairCosts[::MaxCosts]
+**    unit_type::RepairCosts[::MaxCosts]
 **
 **    Costs per repair cycle to fix a unit.
 **
-**  CUnitType::TileSize
+**  unit_type::TileSize
 **
 **    Tile size on map
 **
-**  CUnitType::BoxWidth
+**  unit_type::BoxWidth
 **
 **    Selected box size width
 **
-**  CUnitType::BoxHeight
+**  unit_type::BoxHeight
 **
 **    Selected box size height
 **
-**  CUnitType::NumDirections
+**  unit_type::NumDirections
 **
 **    Number of directions the unit can face
 **
-**  CUnitType::MinAttackRange
+**  unit_type::MinAttackRange
 **
 **    Minimal attack range
 **
-**  CUnitType::ReactRangeComputer
+**  unit_type::ReactRangeComputer
 **
 **    Reacts on enemy for computer
 **
-**  CUnitType::ReactRangePerson
+**  unit_type::ReactRangePerson
 **
 **    Reacts on enemy for person player
 **
-**  CUnitType::Priority
+**  unit_type::Priority
 **
 **    Priority value / AI Treatment
 **
-**  CUnitType::BurnPercent
+**  unit_type::BurnPercent
 **
 **    The burning limit in percents. If the unit has lees than
 **    this it will start to burn.
 **
-**  CUnitType::BurnDamageRate
+**  unit_type::BurnDamageRate
 **
 **    Burn rate in HP per second
 **
-**  CUnitType::UnitType
+**  unit_type::UnitType
 **
 **    Land / fly / naval
 **
 **  @note original only visual effect, we do more with this!
 **
-**  CUnitType::DecayRate
+**  unit_type::DecayRate
 **
 **    Decay rate in 1/6 seconds
 **
-**  CUnitType::AnnoyComputerFactor
+**  unit_type::AnnoyComputerFactor
 **
 **    How much this annoys the computer
 **
 **  @todo not used
 **
-**  CUnitType::MouseAction
+**  unit_type::MouseAction
 **
 **    Right click action
 **
-**  CUnitType::Points
+**  unit_type::Points
 **
 **    How many points you get for unit. Used in the final score table.
 **
-**  CUnitType::CanTarget
+**  unit_type::CanTarget
 **
 **    Which units can it attack
 **
-**  CUnitType::LandUnit
+**  unit_type::LandUnit
 **
 **    Land animated
 **
-**  CUnitType::AirUnit
+**  unit_type::AirUnit
 **
 **    Air animated
 **
-**  CUnitType::SeaUnit
+**  unit_type::SeaUnit
 **
 **    Sea animated
 **
-**  CUnitType::ExplodeWhenKilled
+**  unit_type::ExplodeWhenKilled
 **
 **    Death explosion animated
 **
-**  CUnitType::RandomMovementProbability
+**  unit_type::RandomMovementProbability
 **
 **    When the unit is idle this is the probability that it will
 **    take a step in a random direction, in percents.
 **
-**  CUnitType::ClicksToExplode
+**  unit_type::ClicksToExplode
 **
 **    If this is non-zero, then after that many clicks the unit will
 **    commit suicide. Doesn't work with resource workers/resources.
 **
-**  CUnitType::Building
+**  unit_type::Building
 **
 **    Unit is a Building
 **
-**  CUnitType::Transporter
+**  unit_type::Transporter
 **
 **    Can transport units
 **
-**  CUnitType::MaxOnBoard
+**  unit_type::MaxOnBoard
 **
 **    Maximum units on board (for transporters), and resources
 **
-**  CUnitType::StartingResources
+**  unit_type::StartingResources
 **    Amount of Resources a unit has when It's Built
 **
-**  CUnitType::DamageType
+**  unit_type::DamageType
 **    Unit's missile damage type (used for extra death animations)
 **
-**  CUnitType::GivesResource
+**  unit_type::GivesResource
 **
 **    This equals to the resource Id of the resource given
 **    or 0 (TimeCost) for other buildings.
 **
-**  CUnitType::ResInfo[::MaxCosts]
+**  unit_type::ResInfo[::MaxCosts]
 **
 **    Information about resource harvesting. If null, it can't
 **    harvest it.
 **
-**  CUnitType::NeutralMinimapColorRGB
+**  unit_type::NeutralMinimapColorRGB
 **
 **    Says what color a unit will have when it's neutral and
 **    is displayed on the minimap.
 **
-**  CUnitType::CanStore[::MaxCosts]
+**  unit_type::CanStore[::MaxCosts]
 **
 **    What resource types we can store here.
 **
-**  CUnitType::Spells
+**  unit_type::Spells
 **
 **    Spells the unit is able to use
 **
-**  CUnitType::CanAttack
+**  unit_type::CanAttack
 **
 **    Unit is able to attack.
 **
-**  CUnitType::RepairRange
+**  unit_type::RepairRange
 **
 **    Unit can repair buildings. It will use the actack animation.
 **    It will heal 4 points for every repair cycle, and cost 1 of
@@ -343,52 +330,52 @@
 **    If units have a repair range, they can repair, and this is the
 **    distance.
 **
-**    CUnitType::ShieldPiercing
+**    unit_type::ShieldPiercing
 **
 **    Can directly damage shield-protected units, without shield damaging.
 **
-**  CUnitType::Sound
+**  unit_type::Sound
 **
 **    Sounds for events
 **
-**  CUnitType::Weapon
+**  unit_type::Weapon
 **
 **    Current sound for weapon
 **
 **  @todo temporary solution
 **
-**  CUnitType::FieldFlags
+**  unit_type::FieldFlags
 **
 **    Flags that are set, if a unit enters a map field or cleared, if
 **    a unit leaves a map field.
 **
-**  CUnitType::MovementMask
+**  unit_type::MovementMask
 **
 **    Movement mask, this value is and'ed to the map field flags, to
 **    see if a unit can enter or placed on the map field.
 **
-**  CUnitType::Stats[::PlayerMax]
+**  unit_type::Stats[::PlayerMax]
 **
 **    Unit status for each player
 **  @todo This stats should? be moved into the player struct
 **
-**  CUnitType::Type
+**  unit_type::Type
 **
 **    Type as number
 **  @todo Should us a general name f.e. Slot here?
 **
-**  CUnitType::Sprite
+**  unit_type::Sprite
 **
 **    Sprite images
 **
-**  CUnitType::ShadowSprite
+**  unit_type::ShadowSprite
 **
 **    Shadow sprite images
 **
-**  CUnitType::PlayerColorSprite
+**  unit_type::PlayerColorSprite
 **
 **    Sprite images of the player colors.  This image is drawn
-**    over CUnitType::Sprite.  Used with OpenGL only.
+**    over unit_type::Sprite.  Used with OpenGL only.
 **
 **
 */
@@ -468,20 +455,6 @@
 **
 */
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/**
-**  Next unit type are used hardcoded in the source.
-**
-**  @todo find a way to make it configurable!
-*/
-//Wyrmgus start
-//CUnitType *UnitTypeHumanWall;       /// Human wall
-//CUnitType *UnitTypeOrcWall;         /// Orc wall
-//Wyrmgus end
-
 /**
 **  Default names for the resources.
 */
@@ -495,7 +468,7 @@ std::vector<int> LuxuryResources;
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-CUnitType *settlement_site_unit_type;
+stratagus::unit_type *settlement_site_unit_type;
 
 std::vector<CSpeciesGenus *> SpeciesGenuses;
 std::vector<CSpeciesFamily *> SpeciesFamilies;
@@ -538,14 +511,16 @@ std::string GetResourceNameById(int resource_id)
 }
 //Wyrmgus end
 
-CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
+namespace stratagus {
+
+unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
 	Faction(-1), TerrainType(nullptr),
 	//Wyrmgus end
-	Animations(nullptr), StillFrame(0),
+	StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
 	TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
 	CorpseType(nullptr), Construction(nullptr), RepairHP(0), TileSize(0, 0),
@@ -596,7 +571,7 @@ CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identi
 	}
 }
 
-CUnitType::~CUnitType()
+unit_type::~unit_type()
 {
 	delete DeathExplosion;
 	delete OnHit;
@@ -605,17 +580,6 @@ CUnitType::~CUnitType()
 	delete OnInit;
 	delete TeleportEffectIn;
 	delete TeleportEffectOut;
-
-	//Wyrmgus start
-	SoldUnits.clear();
-	SpawnUnits.clear();
-	Drops.clear();
-	AiDrops.clear();
-	DropSpells.clear();
-	Affixes.clear();
-	Traits.clear();
-	StartingAbilities.clear();
-	//Wyrmgus end
 
 	BoolFlag.clear();
 
@@ -680,7 +644,7 @@ CUnitType::~CUnitType()
 **
 **	@param	config_data	The configuration data
 */
-void CUnitType::ProcessConfigData(const CConfigData *config_data)
+void unit_type::ProcessConfigData(const CConfigData *config_data)
 {
 	this->RemoveButtons(ButtonCmd::Move);
 	this->RemoveButtons(ButtonCmd::Stop);
@@ -696,17 +660,16 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "parent") {
-			CUnitType *parent_type = CUnitType::get(value);
+			unit_type *parent_type = unit_type::get(value);
 			this->SetParent(parent_type);
 		} else if (key == "civilization") {
-			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			stratagus::civilization *civilization = civilization::get(value);
 			this->civilization = civilization;
 		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			stratagus::faction *faction = stratagus::faction::get(value);
+			stratagus::faction *faction = faction::get(value);
 			this->Faction = faction->ID;
 		} else if (key == "animations") {
-			this->Animations = stratagus::animation_set::get(value);
+			this->animation_set = animation_set::get(value);
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
@@ -781,8 +744,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid weapon class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "ai_drop") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *drop_type = CUnitType::get(value);
+			unit_type *drop_type = unit_type::get(value);
 			this->AiDrops.push_back(drop_type);
 		} else if (key == "item_class") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -793,7 +755,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "species") {
-			this->species = stratagus::species::get(value);
+			this->species = species::get(value);
 			this->species->Type = this;
 		} else if (key == "right_mouse_action") {
 			if (value == "none") {
@@ -953,7 +915,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				key = FindAndReplaceString(key, "_", "-");
-				value = FindAndReplaceString(value, "_", "-");
 				
 				int item_slot = GetItemSlotIdByName(key);
 				if (item_slot == -1) {
@@ -961,7 +922,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					continue;
 				}
 				
-				CUnitType *item = CUnitType::get(value);
+				unit_type *item = unit_type::get(value);
 				
 				this->DefaultEquipment[item_slot] = item;
 			}
@@ -1036,10 +997,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "predependencies") {
-			this->Predependency = new stratagus::and_dependency;
+			this->Predependency = new and_dependency;
 			this->Predependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new stratagus::and_dependency;
+			this->Dependency = new and_dependency;
 			this->Dependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "variation") {
 			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
@@ -1088,22 +1049,22 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	this->set_defined(true);
 }
 
-void CUnitType::initialize()
+void unit_type::initialize()
 {
 	if (this->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+		for (stratagus::civilization *civilization : civilization::get_all()) {
 			civilization->remove_class_unit_type(this);
 		}
 
-		for (stratagus::faction *faction : stratagus::faction::get_all()) {
+		for (stratagus::faction *faction : faction::get_all()) {
 			faction->remove_class_unit_type(this);
 		}
 
 		const stratagus::unit_class *unit_class = this->get_unit_class();
 		if (unit_class != nullptr) {
 			if (this->Faction != -1) {
-				stratagus::faction::get_all()[this->Faction]->set_class_unit_type(unit_class, this);
+				faction::get_all()[this->Faction]->set_class_unit_type(unit_class, this);
 			} else if (this->get_civilization() != nullptr) {
 				this->get_civilization()->set_class_unit_type(unit_class, this);
 			}
@@ -1238,7 +1199,7 @@ void CUnitType::initialize()
 	data_entry::initialize();
 }
 
-void CUnitType::set_unit_class(stratagus::unit_class *unit_class)
+void unit_type::set_unit_class(stratagus::unit_class *unit_class)
 {
 	if (unit_class == this->get_unit_class()) {
 		return;
@@ -1255,33 +1216,33 @@ void CUnitType::set_unit_class(stratagus::unit_class *unit_class)
 	}
 }
 
-Vec2i CUnitType::GetTileSize() const
+Vec2i unit_type::GetTileSize() const
 {
 	return this->TileSize;
 }
 
-Vec2i CUnitType::GetHalfTileSize() const
+Vec2i unit_type::GetHalfTileSize() const
 {
 	return this->GetTileSize() / 2;
 }
 
-PixelSize CUnitType::get_tile_pixel_size() const
+PixelSize unit_type::get_tile_pixel_size() const
 {
-	return PixelSize(PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size());
+	return PixelSize(PixelSize(this->GetTileSize()) * defines::get()->get_tile_size());
 }
 
-PixelSize CUnitType::get_scaled_tile_pixel_size() const
+PixelSize unit_type::get_scaled_tile_pixel_size() const
 {
-	return this->get_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
+	return this->get_tile_pixel_size() * defines::get()->get_scale_factor();
 }
 
-QPoint CUnitType::get_tile_center_pos_offset() const
+QPoint unit_type::get_tile_center_pos_offset() const
 {
 	//the offset from the tile's top-left position to its center tile
 	return (this->GetTileSize() - 1) / 2;
 }
 	
-bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
+bool unit_type::CheckUserBoolFlags(const char *BoolFlags) const
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
 		if (BoolFlags[i] != CONDITION_TRUE &&
@@ -1292,12 +1253,12 @@ bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
 	return true;
 }
 
-bool CUnitType::CanMove() const
+bool unit_type::CanMove() const
 {
-	return Animations && Animations->Move;
+	return this->get_animation_set() != nullptr && this->get_animation_set()->Move != nullptr;
 }
 
-bool CUnitType::CanSelect(GroupSelectionMode mode) const
+bool unit_type::CanSelect(GroupSelectionMode mode) const
 {
 	if (!BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		switch (mode) {
@@ -1312,7 +1273,7 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 	return false;
 }
 
-void CUnitType::SetParent(CUnitType *parent_type)
+void unit_type::SetParent(const unit_type *parent_type)
 {
 	if (!parent_type->is_defined()) {
 		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from a non-defined parent (\"" + parent_type->get_identifier() + "\").");
@@ -1384,7 +1345,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->BurnDamageRate = parent_type->BurnDamageRate;
 	this->PoisonDrain = parent_type->PoisonDrain;
 	this->AutoBuildRate = parent_type->AutoBuildRate;
-	this->Animations = parent_type->Animations;
+	this->animation_set = parent_type->animation_set;
 	this->Sound = parent_type->Sound;
 	this->NumDirections = parent_type->NumDirections;
 	this->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
@@ -1567,19 +1528,19 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			}
 		}
 	}
-	for (std::map<ButtonCmd, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
+	for (std::map<ButtonCmd, IconConfig>::const_iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
 		this->ButtonIcons[iterator->first].Name = iterator->second.Name;
 		this->ButtonIcons[iterator->first].Icon = nullptr;
 		this->ButtonIcons[iterator->first].Load();
 	}
-	for (std::map<int, CUnitType *>::iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
+	for (std::map<int, unit_type *>::const_iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
 		this->DefaultEquipment[iterator->first] = iterator->second;
 	}
 	this->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
 	this->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
 }
 
-void CUnitType::UpdateDefaultBoolFlags()
+void unit_type::UpdateDefaultBoolFlags()
 {
 	// BoolFlag
 	this->BoolFlag[FLIP_INDEX].value = this->Flip;
@@ -1591,7 +1552,7 @@ void CUnitType::UpdateDefaultBoolFlags()
 }
 
 //Wyrmgus start
-void CUnitType::RemoveButtons(const ButtonCmd button_action, const std::string &mod_file)
+void unit_type::RemoveButtons(const ButtonCmd button_action, const std::string &mod_file)
 {
 	int buttons_size = UnitButtonTable.size();
 	for (int i = (buttons_size - 1); i >= 0; --i) {
@@ -1611,7 +1572,7 @@ void CUnitType::RemoveButtons(const ButtonCmd button_action, const std::string &
 	}
 }
 
-int CUnitType::GetAvailableLevelUpUpgrades() const
+int unit_type::GetAvailableLevelUpUpgrades() const
 {
 	int value = 0;
 	int upgrade_value = 0;
@@ -1639,7 +1600,7 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	return value;
 }
 
-int CUnitType::GetResourceStep(const int resource, const int player) const
+int unit_type::GetResourceStep(const int resource, const int player) const
 {
 	if (!this->ResInfo[resource]) {
 		return 0;
@@ -1678,7 +1639,7 @@ int CUnitType::GetResourceStep(const int resource, const int player) const
 	return resource_step;
 }
 
-const CUnitTypeVariation *CUnitType::GetDefaultVariation(const CPlayer *player, const int image_layer) const
+const CUnitTypeVariation *unit_type::GetDefaultVariation(const CPlayer *player, const int image_layer) const
 {
 	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
 	for (CUnitTypeVariation *variation : variation_list) {
@@ -1707,7 +1668,7 @@ const CUnitTypeVariation *CUnitType::GetDefaultVariation(const CPlayer *player, 
 	return nullptr;
 }
 
-CUnitTypeVariation *CUnitType::GetVariation(const std::string &variation_name, int image_layer) const
+CUnitTypeVariation *unit_type::GetVariation(const std::string &variation_name, int image_layer) const
 {
 	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
 	for (CUnitTypeVariation *variation : variation_list) {
@@ -1718,7 +1679,7 @@ CUnitTypeVariation *CUnitType::GetVariation(const std::string &variation_name, i
 	return nullptr;
 }
 
-std::string CUnitType::GetRandomVariationIdent(int image_layer) const
+std::string unit_type::GetRandomVariationIdent(int image_layer) const
 {
 	std::vector<std::string> variation_idents;
 	
@@ -1734,7 +1695,7 @@ std::string CUnitType::GetRandomVariationIdent(int image_layer) const
 	return "";
 }
 
-const std::string &CUnitType::GetDefaultName(const CPlayer *player) const
+const std::string &unit_type::GetDefaultName(const CPlayer *player) const
 {
 	const CUnitTypeVariation *variation = this->GetDefaultVariation(player);
 	if (variation && !variation->TypeName.empty()) {
@@ -1744,7 +1705,7 @@ const std::string &CUnitType::GetDefaultName(const CPlayer *player) const
 	}
 }
 
-CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(const CPlayer *player, int image_layer) const
+CPlayerColorGraphic *unit_type::GetDefaultLayerSprite(const CPlayer *player, int image_layer) const
 {
 	const CUnitTypeVariation *variation = this->GetDefaultVariation(player);
 	if (this->LayerVariations[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
@@ -1758,7 +1719,7 @@ CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(const CPlayer *player, int
 	}
 }
 
-bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
+bool unit_type::CanExperienceUpgradeTo(const unit_type *type) const
 {
 	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Slot].size(); ++i) {
@@ -1771,12 +1732,12 @@ bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
 	return false;
 }
 
-std::string CUnitType::GetNamePlural() const
+std::string unit_type::GetNamePlural() const
 {
 	return GetPluralForm(this->get_name());
 }
 
-std::string CUnitType::GeneratePersonalName(stratagus::faction *faction, const stratagus::gender gender) const
+std::string unit_type::GeneratePersonalName(stratagus::faction *faction, const gender gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
@@ -1791,7 +1752,7 @@ std::string CUnitType::GeneratePersonalName(stratagus::faction *faction, const s
 	return "";
 }
 
-bool CUnitType::IsPersonalNameValid(const std::string &name, stratagus::faction *faction, const stratagus::gender gender) const
+bool unit_type::IsPersonalNameValid(const std::string &name, stratagus::faction *faction, const gender gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -1806,16 +1767,16 @@ bool CUnitType::IsPersonalNameValid(const std::string &name, stratagus::faction 
 	return false;
 }
 
-std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction *faction, const stratagus::gender gender) const
+std::vector<std::string> unit_type::GetPotentialPersonalNames(stratagus::faction *faction, const gender gender) const
 {
 	std::vector<std::string> potential_names;
 	
-	if (this->PersonalNames.find(stratagus::gender::none) != this->PersonalNames.end()) {
-		for (size_t i = 0; i < this->PersonalNames.find(stratagus::gender::none)->second.size(); ++i) {
-			potential_names.push_back(this->PersonalNames.find(stratagus::gender::none)->second[i]);
+	if (this->PersonalNames.find(gender::none) != this->PersonalNames.end()) {
+		for (size_t i = 0; i < this->PersonalNames.find(gender::none)->second.size(); ++i) {
+			potential_names.push_back(this->PersonalNames.find(gender::none)->second[i]);
 		}
 	}
-	if (gender != stratagus::gender::none && this->PersonalNames.find(gender) != this->PersonalNames.end()) {
+	if (gender != gender::none && this->PersonalNames.find(gender) != this->PersonalNames.end()) {
 		for (size_t i = 0; i < this->PersonalNames.find(gender)->second.size(); ++i) {
 			potential_names.push_back(this->PersonalNames.find(gender)->second[i]);
 		}
@@ -1830,16 +1791,16 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction
 			faction = nullptr;
 		}
 		if (this->Faction != -1 && !faction) {
-			faction = stratagus::faction::get_all()[this->Faction];
+			faction = faction::get_all()[this->Faction];
 		}
 
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
-			if (civilization->get_personal_names().find(stratagus::gender::none) != civilization->get_personal_names().end()) {
-				for (size_t i = 0; i < civilization->get_personal_names().find(stratagus::gender::none)->second.size(); ++i) {
-					potential_names.push_back(civilization->get_personal_names().find(stratagus::gender::none)->second[i]);
+			if (civilization->get_personal_names().find(gender::none) != civilization->get_personal_names().end()) {
+				for (size_t i = 0; i < civilization->get_personal_names().find(gender::none)->second.size(); ++i) {
+					potential_names.push_back(civilization->get_personal_names().find(gender::none)->second[i]);
 				}
 			}
-			if (gender != stratagus::gender::none && civilization->get_personal_names().find(gender) != civilization->get_personal_names().end()) {
+			if (gender != gender::none && civilization->get_personal_names().find(gender) != civilization->get_personal_names().end()) {
 				for (size_t i = 0; i < civilization->get_personal_names().find(gender)->second.size(); ++i) {
 					potential_names.push_back(civilization->get_personal_names().find(gender)->second[i]);
 				}
@@ -1863,9 +1824,10 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction
 	
 	return potential_names;
 }
-//Wyrmgus end
 
-void UpdateUnitStats(CUnitType &type, int reset)
+}
+
+void UpdateUnitStats(stratagus::unit_type &type, int reset)
 {
 	if (reset) {
 		type.MapDefaultStat = type.DefaultStat;
@@ -1878,8 +1840,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					type.MapDefaultStat.Variables[i].Enable = iterator->second.Variables[i].Enable;
 				}
 			}
-			for (std::map<CUnitType *, int>::const_iterator unit_stock_iterator = iterator->second.UnitStock.begin(); unit_stock_iterator != iterator->second.UnitStock.end(); ++unit_stock_iterator) {
-				CUnitType *unit_type = unit_stock_iterator->first;
+			for (std::map<stratagus::unit_type *, int>::const_iterator unit_stock_iterator = iterator->second.UnitStock.begin(); unit_stock_iterator != iterator->second.UnitStock.end(); ++unit_stock_iterator) {
+				stratagus::unit_type *unit_type = unit_stock_iterator->first;
 				int unit_stock = unit_stock_iterator->second;
 				type.MapDefaultStat.ChangeUnitStock(unit_type, unit_stock);
 			}
@@ -2246,7 +2208,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 void UpdateStats(int reset)
 {
 	// Update players stats
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		UpdateUnitStats(*unit_type, reset);
 	}
 }
@@ -2259,7 +2221,7 @@ void UpdateStats(int reset)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int plynr,
+static bool SaveUnitStats(const CUnitStats &stats, const stratagus::unit_type &type, int plynr,
 						  CFile &file)
 {
 	Assert(plynr < PlayerMax);
@@ -2304,7 +2266,7 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
 	}
 	file.printf("},\n\"unit-stock\", {");
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		if (stats.GetUnitStock(unit_type) == type.DefaultStat.GetUnitStock(unit_type)) {
 			continue;
 		}
@@ -2329,7 +2291,7 @@ void SaveUnitTypes(CFile &file)
 	file.printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
-	for (const CUnitType *unit_type : CUnitType::get_all()) {
+	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
@@ -2355,7 +2317,7 @@ void SaveUnitTypes(CFile &file)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	//Wyrmgus start
 	if (sprite == nullptr) {
@@ -2429,15 +2391,13 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 /**
 **  Get the still animation frame
 */
-static int GetStillFrame(const CUnitType &type)
+static int GetStillFrame(const stratagus::unit_type &type)
 {
-	//Wyrmgus start
-	if (type.Animations == nullptr) {
+	if (type.get_animation_set() == nullptr) {
 		return 0;
 	}
-	//Wyrmgus end
 	
-	CAnimation *anim = type.Animations->Still.get();
+	CAnimation *anim = type.get_animation_set()->Still.get();
 
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
@@ -2459,8 +2419,8 @@ static int GetStillFrame(const CUnitType &type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (CUnitType *unit_type : CUnitType::get_all()) {
-		if (unit_type->Animations == nullptr) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		if (unit_type->get_animation_set() == nullptr) {
 			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ unit_type->Ident.c_str());
 			continue;
 		}
@@ -2491,7 +2451,7 @@ void InitUnitTypes(int reset_player_stats)
 }
 
 //Wyrmgus start
-void InitUnitType(CUnitType &type)
+void InitUnitType(stratagus::unit_type &type)
 {
 	// Determine still frame
 	type.StillFrame = GetStillFrame(type);
@@ -2515,7 +2475,7 @@ void InitUnitType(CUnitType &type)
 **
 **  @param type  type of unit to load
 */
-void LoadUnitTypeSprite(CUnitType &type)
+void LoadUnitTypeSprite(stratagus::unit_type &type)
 {
 	if (!type.ShadowFile.empty()) {
 		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
@@ -2627,7 +2587,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 int GetUnitTypesCount()
 {
 	int count = 0;
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		if (unit_type->Missile.IsEmpty() == false) count++;
 		if (unit_type->FireMissile.IsEmpty() == false) count++;
 		if (unit_type->Explosion.IsEmpty() == false) count++;
@@ -2645,14 +2605,14 @@ int GetUnitTypesCount()
 */
 void LoadUnitTypes()
 {
-	for (CUnitType *unit_type : CUnitType::get_all()) {
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->Slot + 1) * 100 / CUnitType::get_all().size());
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->Slot + 1) * 100 / stratagus::unit_type::get_all().size());
 		LoadUnitType(*unit_type);
 	}
 }
 
 //Wyrmgus start
-void LoadUnitType(CUnitType &type)
+void LoadUnitType(stratagus::unit_type &type)
 {
 	// Lookup icons.
 	if (!type.Icon.Name.empty()) {
@@ -2678,7 +2638,7 @@ void LoadUnitType(CUnitType &type)
 	}
 	// Lookup corpse.
 	if (!type.CorpseName.empty()) {
-		type.CorpseType = CUnitType::get(type.CorpseName);
+		type.CorpseType = stratagus::unit_type::get(type.CorpseName);
 	}
 #ifndef DYNAMIC_LOAD
 	// Load Sprite
@@ -2697,7 +2657,7 @@ void CUnitTypeVar::Init()
 	// Variables.
 	Variable.resize(GetNumberVariable());
 	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-	for (CUnitType *unit_type : CUnitType::get_all()) { // adjust array for unit already defined
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { // adjust array for unit already defined
 		unit_type->BoolFlag.resize(new_size);
 	}
 }
@@ -2752,7 +2712,7 @@ void CleanUnitTypeVariables()
 //Wyrmgus start
 std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
-	const CUnitType *unit_type = CUnitType::get(unit_type_ident);
+	const stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 
 	if (unit_type) {
 		std::string unit_type_stats_string;

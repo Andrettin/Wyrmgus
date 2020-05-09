@@ -42,8 +42,11 @@ struct lua_State;
 //Wyrmgus start
 class CGraphic;
 class CPlayerColorGraphic;
-class CUnitType;
 //Wyrmgus end
+
+namespace stratagus {
+	class unit_type;
+}
 
 enum MapFieldFlag : unsigned long long {
 	MapFieldSpeedMask = 1 << 0,		/// Move faster on this tile

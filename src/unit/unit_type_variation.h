@@ -44,12 +44,12 @@
 class CConstruction;
 class CGraphic;
 class CPlayerColorGraphic;
-class CUnitType;
 
 namespace stratagus {
 	class animation_set;
 	class season;
 	class terrain_type;
+	class unit_type;
 }
 
 class CUnitTypeVariation
@@ -89,8 +89,8 @@ public:
 	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
 	std::vector<int> ItemClassesEquipped;
 	std::vector<int> ItemClassesNotEquipped;
-	std::vector<const CUnitType *> ItemsEquipped;
-	std::vector<const CUnitType *> ItemsNotEquipped;
+	std::vector<const stratagus::unit_type *> ItemsEquipped;
+	std::vector<const stratagus::unit_type *> ItemsNotEquipped;
 	std::vector<const stratagus::terrain_type *> Terrains;
 	std::vector<const stratagus::terrain_type *> TerrainsForbidden;
 	std::vector<const stratagus::season *> Seasons;

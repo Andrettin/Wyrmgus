@@ -57,10 +57,7 @@
 /// How many resources the player gets back if canceling building
 static constexpr int CancelBuildingCostsFactor = 75;
 
-//Wyrmgus start
-//extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const stratagus::site *settlement);
-//Wyrmgus end
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement);
 
 /* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
@@ -167,7 +164,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 
 static void Finish(COrder_Built &order, CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
 	//Wyrmgus start
@@ -379,7 +376,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 /* virtual */ void COrder_Built::Execute(CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 
 	int amount;
 	if (type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
@@ -473,7 +470,7 @@ static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cfr
 */
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	//Wyrmgus start
 //	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);

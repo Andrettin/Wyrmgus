@@ -82,7 +82,6 @@ class CAnimation;
 class CConstructionFrame;
 class CFile;
 class CUnit;
-class CUnitType;
 class CUpgrade;
 class PathFinderInput;
 class CSpell;
@@ -91,6 +90,7 @@ struct lua_State;
 
 namespace stratagus {
 	class site;
+	class unit_type;
 }
 
 /**
@@ -142,10 +142,7 @@ public:
 	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
-	//Wyrmgus start
-//	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, stratagus::site *settlement);
-	//Wyrmgus end
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, stratagus::site *settlement);
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();
@@ -174,16 +171,10 @@ public:
 	static COrder *NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
-	//Wyrmgus start
-//	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
-	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type, int player);
-	//Wyrmgus end
-	static COrder *NewActionTransformInto(CUnitType &type);
-	//Wyrmgus start
-//	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
+	static COrder *NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player);
+	static COrder *NewActionTransformInto(stratagus::unit_type &type);
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
-	//Wyrmgus end
-	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	static COrder *NewActionUpgradeTo(CUnit &unit, stratagus::unit_type &type);
 	//Wyrmgus start
 	static COrder *NewActionUse(CUnit &dest);
 	static COrder *NewActionTrade(CUnit &dest, CUnit &home_market);

@@ -30,13 +30,13 @@
 #include "data_type.h"
 #include "ui/icon.h"
 
-class CUnitType;
 struct lua_State;
 
 namespace stratagus {
 	class character;
 	class player_color;
 	class quest;
+	class unit_type;
 }
 
 class CAchievement : public CDataType
@@ -95,7 +95,7 @@ public:
 	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
 	const stratagus::character *Character = nullptr;	/// Character related to the achievement's requirements
-	const CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
+	const stratagus::unit_type *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
 	std::vector<const stratagus::quest *> RequiredQuests;	/// Quests required for obtaining this achievement
 
 	friend int CclDefineAchievement(lua_State *l);

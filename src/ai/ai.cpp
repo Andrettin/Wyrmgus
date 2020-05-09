@@ -229,7 +229,7 @@ static void AiCheckUnits()
 			}
 		}
 		if (unit_class != nullptr) {
-			for (const CUnitType *class_unit_type : unit_class->get_unit_types()) {
+			for (const stratagus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 				}
@@ -327,8 +327,8 @@ static void AiCheckUnits()
 				}
 
 				bool mercenary_recruited = false;
-				for (std::map<CUnitType *, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
-					CUnitType *mercenary_type = iterator->first;
+				for (std::map<stratagus::unit_type *, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
+					stratagus::unit_type *mercenary_type = iterator->first;
 					if (
 						iterator->second
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
@@ -753,10 +753,7 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-//Wyrmgus start
-//static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0, const stratagus::site *settlement = nullptr)
-//Wyrmgus end
+static int AiRemoveFromBuilt2(PlayerAi *pai, const stratagus::unit_type &type, int landmass = 0, const stratagus::site *settlement = nullptr)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -787,10 +784,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-//Wyrmgus start
-//static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
-static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass, const stratagus::site *settlement)
-//Wyrmgus end
+static void AiRemoveFromBuilt(PlayerAi *pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
 {
 	//Wyrmgus start
 	if (
@@ -813,10 +807,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 	int equivalents[UnitTypeMax + 1];
 	const int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (int i = 0; i < equivalentsCount; ++i) {
-		//Wyrmgus start
-//		if (AiRemoveFromBuilt2(pai, *CUnitType::get_all()[equivalents[i]])) {
-		if (AiRemoveFromBuilt2(pai, *CUnitType::get_all()[equivalents[i]], landmass, settlement)) {
-		//Wyrmgus end
+		if (AiRemoveFromBuilt2(pai, *stratagus::unit_type::get_all()[equivalents[i]], landmass, settlement)) {
 			return;
 		}
 	}
@@ -834,10 +825,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-//Wyrmgus start
-//static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0, const stratagus::site *settlement = nullptr)
-//Wyrmgus end
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const stratagus::unit_type &type, int landmass = 0, const stratagus::site *settlement = nullptr)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -864,10 +852,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landm
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-//Wyrmgus start
-//void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
-void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const stratagus::site *settlement)
-//Wyrmgus end
+void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
 {
 	//Wyrmgus start
 	if (
@@ -890,10 +875,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, con
 	const unsigned int equivnb = AiFindUnitTypeEquiv(type, equivs);
 
 	for (unsigned int i = 0; i < equivnb; ++i) {
-		//Wyrmgus start
-//		if (AiReduceMadeInBuilt2(pai, *CUnitType::get_all()[equivs[i]])) {
-		if (AiReduceMadeInBuilt2(pai, *CUnitType::get_all()[equivs[i]], landmass, settlement)) {
-		//Wyrmgus end
+		if (AiReduceMadeInBuilt2(pai, *stratagus::unit_type::get_all()[equivs[i]], landmass, settlement)) {
 			return;
 		}
 	}
@@ -1217,10 +1199,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-//Wyrmgus start
-//void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
-void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, stratagus::site *settlement)
-//Wyrmgus end
+void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int landmass, stratagus::site *settlement)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
@@ -1239,10 +1218,7 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, strat
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-//Wyrmgus start
-//void AiCanNotReach(CUnit &unit, const CUnitType &what)
-void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, stratagus::site *settlement)
-//Wyrmgus end
+void AiCanNotReach(CUnit &unit, const stratagus::unit_type &what, int landmass, stratagus::site *settlement)
 {
 	Assert(unit.Player->Type != PlayerPerson);
 	//Wyrmgus start
@@ -1268,7 +1244,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		return;
 	}
 
-	const CUnitType &unittype = *unit.Type;
+	const stratagus::unit_type &unittype = *unit.Type;
 	const Vec2i u0 = unit.tilePos;
 	const Vec2i u1(u0 + unittype.TileSize - 1);
 
@@ -1312,7 +1288,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			}
 		}
 		//Wyrmgus end
-		const CUnitType &blockertype = *blocker.Type;
+		const stratagus::unit_type &blockertype = *blocker.Type;
 
 		if (blockertype.UnitType != unittype.UnitType) {
 			continue;
@@ -1434,7 +1410,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		CUnitType *requested_unit_type = stratagus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
+		stratagus::unit_type *requested_unit_type = stratagus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
 			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}
@@ -1461,7 +1437,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 **  @param unit Pointer to unit working.
 **  @param what Pointer to the new unit-type.
 */
-void AiUpgradeToComplete(CUnit &unit, const CUnitType &what)
+void AiUpgradeToComplete(CUnit &unit, const stratagus::unit_type &what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
@@ -1593,7 +1569,7 @@ void AiEachMinute(CPlayer &player)
 	AiForceManagerEachMinute();
 }
 
-int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const bool include_requests, const bool include_upgrades)
+int AiGetUnitTypeCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades)
 {
 	int count = 0;
 	
@@ -1628,7 +1604,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int lan
 	return count;
 }
 
-int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const stratagus::site *settlement)
+int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass, const stratagus::site *settlement)
 {
 	int count = 0;
 	

@@ -117,7 +117,7 @@ void dialogue_node::process_sml_property(const sml_property &property)
 	} else if (key == "speaker") {
 		this->speaker = character::get(value);
 	} else if (key == "speaker_unit_type") {
-		this->speaker_unit_type = CUnitType::get(value);
+		this->speaker_unit_type = unit_type::get(value);
 	} else {
 		throw std::runtime_error("Invalid dialogue node property: \"" + key + "\".");
 	}

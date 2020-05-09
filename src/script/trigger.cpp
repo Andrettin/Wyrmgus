@@ -100,7 +100,7 @@ int TriggerGetPlayer(lua_State *l)
 **
 **  @return   The unit-type pointer.
 */
-const CUnitType *TriggerGetUnitType(lua_State *l)
+const stratagus::unit_type *TriggerGetUnitType(lua_State *l)
 {
 	const char *unit = LuaToString(l, -1);
 
@@ -169,7 +169,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 	int plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 
 	Vec2i minPos;
@@ -249,10 +249,10 @@ static int CclIfNearUnit(lua_State *l)
 	const char *op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 5);
-	const CUnitType *ut2 = CclGetUnitType(l);
+	const stratagus::unit_type *ut2 = CclGetUnitType(l);
 	lua_pop(l, 1);
 	if (!unittype || !ut2) {
 		LuaError(l, "CclIfNearUnit: not a unit-type valid");
@@ -325,9 +325,9 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	const char *op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	const CUnitType *ut2 = CclGetUnitType(l);
+	const stratagus::unit_type *ut2 = CclGetUnitType(l);
 	if (!unittype || !ut2) {
 		LuaError(l, "CclIfRescuedNearUnit: not a unit-type valid");
 	}

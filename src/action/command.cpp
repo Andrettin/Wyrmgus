@@ -841,10 +841,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z, stratagus::site *settlement)
-//Wyrmgus end
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &what, int flush, int z, stratagus::site *settlement)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1035,10 +1032,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
-void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
-//Wyrmgus end
+void CommandTrainUnit(CUnit &unit, stratagus::unit_type &type, int player, int)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1102,7 +1096,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 **  @param slot  slot number to cancel.
 **  @param type  Unit-type to cancel.
 */
-void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
+void CommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type)
 {
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
 			   type ? type->Ident.c_str() : "-any-");
@@ -1149,7 +1143,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
+void CommandUpgradeTo(CUnit &unit, stratagus::unit_type &type, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1175,7 +1169,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
 */
-void CommandTransformIntoType(CUnit &unit, CUnitType &type)
+void CommandTransformIntoType(CUnit &unit, stratagus::unit_type &type)
 {
 	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 		return;

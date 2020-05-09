@@ -300,7 +300,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
 	}
 	
-	for (const CUnitType *unit_type : CUnitType::get_all()) { //change the province's military score to be appropriate for the new faction's technologies
+	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { //change the province's military score to be appropriate for the new faction's technologies
 		if (IsMilitaryUnit(*unit_type)) {
 			int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type->Slot] : 0);
 			int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[unit_type->Slot] : 0);
@@ -309,7 +309,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->OffensiveMilitaryScore += this->Units[unit_type->Slot] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
 		} else if (unit_type->get_unit_class() != nullptr && unit_type->get_unit_class()->get_identifier() == "worker") {
-			const CUnitType *militia_unit_type = unit_type->get_civilization()->get_class_unit_type(stratagus::unit_class::get("militia"));
+			const stratagus::unit_type *militia_unit_type = unit_type->get_civilization()->get_class_unit_type(stratagus::unit_class::get("militia"));
 			if (militia_unit_type != nullptr) {
 				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
 				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
@@ -343,12 +343,12 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	
 	int change = has_settlement_building ? 1 : -1;
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (CUnitType::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-			this->ProductionEfficiencyModifier[i] += CUnitType::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
+		if (stratagus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+			this->ProductionEfficiencyModifier[i] += stratagus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
 		}
 	}
 	
-	if (CUnitType::get_all()[building_id]->get_unit_class() != nullptr && CUnitType::get_all()[building_id]->get_unit_class()->get_identifier() == "stronghold") { //increase the military score of the province, if this building is a stronghold
+	if (stratagus::unit_type::get_all()[building_id]->get_unit_class() != nullptr && stratagus::unit_type::get_all()[building_id]->get_unit_class()->get_identifier() == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
 	}
 }
@@ -388,16 +388,16 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 	
 	this->TotalUnits += change;
 	
-	if (IsMilitaryUnit(*CUnitType::get_all()[unit_type_id])) {
-		this->MilitaryScore += change * (CUnitType::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
-		this->OffensiveMilitaryScore += change * (CUnitType::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+	if (IsMilitaryUnit(*stratagus::unit_type::get_all()[unit_type_id])) {
+		this->MilitaryScore += change * (stratagus::unit_type::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+		this->OffensiveMilitaryScore += change * (stratagus::unit_type::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
 	}
 	
-	if (CUnitType::get_all()[unit_type_id]->get_unit_class() != nullptr && CUnitType::get_all()[unit_type_id]->get_unit_class()->get_identifier() == "worker") {
+	if (stratagus::unit_type::get_all()[unit_type_id]->get_unit_class() != nullptr && stratagus::unit_type::get_all()[unit_type_id]->get_unit_class()->get_identifier() == "worker") {
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		const CUnitType *militia_unit_type = CUnitType::get_all()[unit_type_id]->get_civilization()->get_class_unit_type(stratagus::unit_class::get("militia"));
+		const stratagus::unit_type *militia_unit_type = stratagus::unit_type::get_all()[unit_type_id]->get_civilization()->get_class_unit_type(stratagus::unit_class::get("militia"));
 		if (militia_unit_type != nullptr) {
 			this->MilitaryScore += change * ((militia_unit_type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0)) / 2);
 		}
@@ -570,7 +570,7 @@ int CGrandStrategyProvince::GetPopulation()
 
 int CGrandStrategyProvince::GetClassUnitType(const stratagus::unit_class *unit_class)
 {
-	const CUnitType *unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(unit_class);
+	const stratagus::unit_type *unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(unit_class);
 
 	if (unit_type != nullptr) {
 		return unit_type->Slot;
@@ -661,7 +661,7 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 		
 	//add military score bonuses
 	for (size_t z = 0; z < CUpgrade::get_all()[upgrade_id]->UpgradeModifiers.size(); ++z) {
-		for (const CUnitType *unit_type : CUnitType::get_all()) {
+		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 				
 			Assert(CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == '?' || CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X');
 
@@ -1427,7 +1427,7 @@ std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std:
 	return "";
 }
 
-bool IsGrandStrategyUnit(const CUnitType &type)
+bool IsGrandStrategyUnit(const stratagus::unit_type &type)
 {
 	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "caravan") {
 		return true;
@@ -1435,7 +1435,7 @@ bool IsGrandStrategyUnit(const CUnitType &type)
 	return false;
 }
 
-bool IsMilitaryUnit(const CUnitType &type)
+bool IsMilitaryUnit(const stratagus::unit_type &type)
 {
 	if (IsGrandStrategyUnit(type) && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "worker") {
 		return true;

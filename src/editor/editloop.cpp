@@ -106,7 +106,7 @@ enum EditorActionType {
 struct EditorAction {
 	EditorActionType Type;
 	Vec2i tilePos;
-	const CUnitType *UnitType;
+	const stratagus::unit_type *UnitType;
 	CPlayer *Player;
 };
 
@@ -495,7 +495,7 @@ static void EditTiles(const Vec2i &pos, stratagus::terrain_type *terrain, int si
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+static void EditorActionPlaceUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
@@ -561,7 +561,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
+static void EditorPlaceUnit(const Vec2i &pos, stratagus::unit_type &type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
@@ -708,7 +708,7 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = CUnitType::get(Editor.UnitTypes[i].c_str());
+		const stratagus::unit_type *type = stratagus::unit_type::get(Editor.UnitTypes[i].c_str());
 		Assert(type->Icon.Icon);
 		const stratagus::icon &icon = *type->Icon.Icon;
 
@@ -728,7 +728,7 @@ void RecalculateShownUnits()
 	Editor.ShownUnitTypes.clear();
 
 	for (size_t i = 0; i != Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = CUnitType::get(Editor.UnitTypes[i].c_str());
+		const stratagus::unit_type *type = stratagus::unit_type::get(Editor.UnitTypes[i].c_str());
 		Editor.ShownUnitTypes.push_back(type);
 	}
 
@@ -825,7 +825,7 @@ static void DrawPlayers()
 }
 
 #if 0
-extern void DrawPopupUnitInfo(const CUnitType *type,
+extern void DrawPopupUnitInfo(const stratagus::unit_type *type,
 							  int player_index, CFont *font,
 							  Uint32 backgroundColor, int buttonX, int buttonY);
 
@@ -1274,12 +1274,12 @@ static void DrawMapCursor()
 				break;
 			case EditorEditUnit:
 				if (Editor.SelectedUnitIndex != -1) {
-					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
+					CursorBuilding = const_cast<stratagus::unit_type *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
 				}
 				break;
 			case EditorSetStartLocation:
 				if (Editor.StartUnit) {
-					CursorBuilding = const_cast<CUnitType *>(Editor.StartUnit);
+					CursorBuilding = const_cast<stratagus::unit_type *>(Editor.StartUnit);
 				}
 				break;
 		}
@@ -1349,7 +1349,7 @@ static void DrawCross(const PixelPos &topleft_pos, const QSize &size, Uint32 col
 */
 static void DrawStartLocations()
 {
-	const CUnitType *type = Editor.StartUnit;
+	const stratagus::unit_type *type = Editor.StartUnit;
 	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		PushClipping();
 		vp->SetClipping();
@@ -1706,24 +1706,10 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (Editor.State == EditorEditUnit) {
 		// Cursor on unit icons
 		if (Editor.CursorUnitIndex != -1) {
-			//Wyrmgus start
-			/*
-			if (MouseButtons & LeftButton) {
-				Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
-				return;
-			} else if (MouseButtons & RightButton) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
-				Editor.CursorUnitIndex = -1;
-				CclCommand(buf);
-				return;
-			}
-			*/
 			if (Editor.CursorUnitIndex != (int) Editor.ShownUnitTypes.size()) {
 				if (MouseButtons & LeftButton) {
 					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+					CursorBuilding = const_cast<stratagus::unit_type *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
 					return;
 				} else if (MouseButtons & RightButton) {
 					char buf[256];
@@ -2416,7 +2402,7 @@ void CEditor::Init()
 	//Wyrmgus start
 	if (this->UnitTypes.size() == 0) {
 		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
-		for (const CUnitType *unit_type : CUnitType::get_all()) {
+		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (unit_type->Icon.Name.empty() || unit_type->BoolFlag[VANISHES_INDEX].value || unit_type->BoolFlag[HIDDENINEDITOR_INDEX].value) {
 				continue;
 			}
@@ -2522,7 +2508,7 @@ void CEditor::Init()
 	VisibleUnitIcons = CalculateVisibleIcons();
 
 	if (!StartUnitName.empty()) {
-		StartUnit = CUnitType::get(StartUnitName);
+		StartUnit = stratagus::unit_type::get(StartUnitName);
 	}
 	Select.Icon = nullptr;
 	Select.Load();

@@ -326,7 +326,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CUnitType *unit_type = CUnitType::get(LuaToString(l, j + 1, k + 1));
+				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, j + 1, k + 1));
 				++k;
 				this->UnitTypeKills[unit_type->Slot] = LuaToNumber(l, j + 1, k + 1);
 			}
@@ -1494,7 +1494,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization && unit_class != nullptr) {
-		const CUnitType *unit_type = civilization->get_class_unit_type(unit_class);
+		const stratagus::unit_type *unit_type = civilization->get_class_unit_type(unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->get_identifier();
 		}
@@ -1542,7 +1542,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	}
 	std::string unit_type_ident;
 	if (unit_class != nullptr) {
-		const CUnitType *unit_type = faction->get_class_unit_type(unit_class);
+		const stratagus::unit_type *unit_type = faction->get_class_unit_type(unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->get_identifier();
 		}
@@ -2695,19 +2695,19 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus end
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		LuaCheckArgs(l, 3);
-		CUnitType *type = CclGetUnitType(l);
+		stratagus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesUnderConstructionCount")) {
 		LuaCheckArgs(l, 3);
-		CUnitType *type = CclGetUnitType(l);
+		stratagus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeUnderConstructionCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesAiActiveCount")) {
 		LuaCheckArgs(l, 3);
-		CUnitType *type = CclGetUnitType(l);
+		stratagus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeAiActiveCount(type));
 		return 1;
@@ -2789,7 +2789,7 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "UnitTypeKills")) {
 		LuaCheckArgs(l, 3);
-		CUnitType *type = CclGetUnitType(l);
+		stratagus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->UnitTypeKills[type->Slot]);
 		return 1;

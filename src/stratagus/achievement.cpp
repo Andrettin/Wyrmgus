@@ -140,7 +140,7 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			const stratagus::character *character = stratagus::character::get(value);
 			this->Character = character;
 		} else if (key == "character_type") {
-			const CUnitType *unit_type = CUnitType::get(value);
+			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
 			this->CharacterType = unit_type;
 		} else if (key == "required_quest") {
 			const stratagus::quest *required_quest = stratagus::quest::get(value);

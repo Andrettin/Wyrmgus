@@ -135,7 +135,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	IntColor color;
 
 	//Wyrmgus start
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	int frame_width = type.Width * scale_factor;
@@ -191,7 +191,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	//Wyrmgus start
 	/*
-//	const CUnitType &type = *unit.Type;
+//	const stratagus::unit_type &type = *unit.Type;
 //	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
 //	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
 //	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
@@ -443,7 +443,7 @@ void CleanDecorations()
 **  @todo fix color configuration.
 */
 void CDecoVarBar::Draw(int x, int y,
-					   const CUnitType &type, const stratagus::unit_variable &var) const
+					   const stratagus::unit_type &type, const stratagus::unit_variable &var) const
 {
 	Assert(var.Max);
 
@@ -504,7 +504,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix font/color configuration.
 */
-void CDecoVarText::Draw(int x, int y, const CUnitType &/*type*/, const stratagus::unit_variable &var) const
+void CDecoVarText::Draw(int x, int y, const stratagus::unit_type &/*type*/, const stratagus::unit_variable &var) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
@@ -523,7 +523,7 @@ void CDecoVarText::Draw(int x, int y, const CUnitType &/*type*/, const stratagus
 **  @param unit    Unit pointer
 **  @todo fix sprite configuration.
 */
-void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const stratagus::unit_variable &var) const
+void CDecoVarSpriteBar::Draw(int x, int y, const stratagus::unit_type &/*type*/, const stratagus::unit_variable &var) const
 {
 	Assert(var.Max);
 	Assert(this->NSprite != -1);
@@ -560,7 +560,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const stra
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const stratagus::unit_variable &var) const
+void CDecoVarStaticSprite::Draw(int x, int y, const stratagus::unit_type &/*type*/, const stratagus::unit_variable &var) const
 {
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
@@ -588,7 +588,7 @@ void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const s
 **  @param type       Type of the unit.
 **  @param screenPos  Screen position of the unit.
 */
-static void DrawDecoration(const CUnit &unit, const CUnitType &type, const PixelPos &screenPos)
+static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, const PixelPos &screenPos)
 {
 	int x = screenPos.x;
 	int y = screenPos.y;
@@ -664,10 +664,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-//Wyrmgus start
-//void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
-void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelPos &screenPos)
-//Wyrmgus end
+void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, const PixelPos &screenPos)
 {
 	// Draw normal shadow sprite if available
 	//Wyrmgus start
@@ -709,7 +706,7 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+void DrawPlayerColorOverlay(const stratagus::unit_type &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
@@ -754,7 +751,7 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	}
 }
 
-void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+void DrawOverlay(const stratagus::unit_type &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
@@ -852,7 +849,7 @@ void ShowOrder(const CUnit &unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit &unit, const CUnitType &type, const PixelPos &screenPos)
+static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type, const PixelPos &screenPos)
 {
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
@@ -940,11 +937,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 **  @param frame   Frame number to draw.
 **  @param screenPos  screen (top left) position of the unit.
 */
-//Wyrmgus start
-//static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
-static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, const CConstructionFrame *cframe,
-//Wyrmgus end
-								   int frame, const PixelPos &screenPos)
+static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type &type, const CConstructionFrame *cframe, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
@@ -1010,10 +1003,7 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 **  @param screenPos  screen (top left) position of the unit.
 */
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
-							//Wyrmgus start
-//							 const CUnitType &type, int frame, const PixelPos &screenPos)
-							 const CUnit &unit, const CUnitType &type, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
-							//Wyrmgus end
+							 const CUnit &unit, const stratagus::unit_type &type, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
 {
 	PixelPos pos = screenPos;
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
@@ -1083,7 +1073,7 @@ void CUnit::Draw(const CViewport &vp) const
 	int state;
 	int under_construction;
 	const CConstructionFrame *cframe;
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 
 	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
 		return;

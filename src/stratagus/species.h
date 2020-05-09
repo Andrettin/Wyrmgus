@@ -31,12 +31,12 @@
 #include "database/detailed_data_entry.h"
 
 class CSpeciesGenus;
-class CUnitType;
 
 namespace stratagus {
 
 class plane;
 class terrain_type;
+class unit_type;
 class world;
 
 class species : public detailed_data_entry, public data_type<species>
@@ -62,7 +62,7 @@ public:
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	plane *home_plane = nullptr;
 	world *homeworld = nullptr;
-	CUnitType *Type = nullptr;
+	unit_type *Type = nullptr;
 	std::vector<terrain_type *> Terrains;	/// in which terrains does this species live
 	std::vector<species *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<species *> EvolvesTo;		/// to which species this one can evolve

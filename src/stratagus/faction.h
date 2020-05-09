@@ -38,7 +38,6 @@ class CCurrency;
 class CDeity;
 class CDynasty;
 class CForceTemplate;
-class CUnitType;
 class CUpgrade;
 class LuaCallback;
 
@@ -51,6 +50,7 @@ class civilization;
 class icon;
 class resource;
 class unit_class;
+class unit_type;
 class upgrade_class;
 
 class faction : public detailed_data_entry, public data_type<faction>
@@ -118,9 +118,9 @@ public:
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &get_ship_names() const;
 
-	CUnitType *get_class_unit_type(const unit_class *unit_class) const;
+	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
-	void set_class_unit_type(const unit_class *unit_class, CUnitType *unit_type)
+	void set_class_unit_type(const unit_class *unit_class, unit_type *unit_type)
 	{
 		if (unit_type == nullptr) {
 			this->class_unit_types.erase(unit_class);
@@ -130,9 +130,9 @@ public:
 		this->class_unit_types[unit_class] = unit_type;
 	}
 
-	void remove_class_unit_type(CUnitType *unit_type)
+	void remove_class_unit_type(unit_type *unit_type)
 	{
-		for (std::map<const unit_class *, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (std::map<const unit_class *, stratagus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -210,7 +210,7 @@ public:
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
 private:
-	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for the faction
+	std::map<const unit_class *, unit_type *> class_unit_types; //the unit type slot of a particular class for the faction
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the faction
 public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction

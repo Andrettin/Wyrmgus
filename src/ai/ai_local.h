@@ -46,13 +46,13 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-class CUnitType;
 class CUpgrade;
 class CPlayer;
 enum class ForceType;
 
 namespace stratagus {
 	class site;
+	class unit_type;
 }
 
 /**
@@ -75,16 +75,9 @@ public:
 class AiRequestType
 {
 public:
-	//Wyrmgus start
-//	AiRequestType() : Count(0), Type(nullptr) {}
-	AiRequestType() : Count(0), Type(nullptr), Landmass(0) {}
-	//Wyrmgus end
-
-	unsigned int Count;  /// elements in table
-	CUnitType *Type;     /// the type
-	//Wyrmgus start
-	int Landmass;		 /// in which landmass the unit should be created
-	//Wyrmgus end
+	unsigned int Count = 0;  /// elements in table
+	stratagus::unit_type *Type = nullptr;     /// the type
+	int Landmass = 0;		 /// in which landmass the unit should be created
 };
 
 /**
@@ -96,7 +89,7 @@ public:
 	AiUnitType() : Want(0), Type(nullptr) {}
 
 	unsigned int Want; /// number of this unit-type wanted
-	CUnitType *Type;   /// unit-type self
+	stratagus::unit_type *Type;   /// unit-type self
 };
 
 /**
@@ -198,7 +191,7 @@ public:
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
-	bool IsBelongsTo(const CUnitType &type);
+	bool IsBelongsTo(const stratagus::unit_type &type);
 
 	void Update();
 
@@ -300,7 +293,7 @@ public:
 public:
 	unsigned int Want;  /// requested number
 	unsigned int Made;  /// built number
-	CUnitType *Type;    /// unit-type
+	stratagus::unit_type *Type;    /// unit-type
 	unsigned long Wait; /// wait until this cycle
 	Vec2i Pos;          /// build near pos on map
 	//Wyrmgus start
@@ -363,7 +356,7 @@ public:
 	unsigned long LastExplorationGameCycle = 0;	/// When did the last explore occur?
 	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
-	std::vector<CUnitType *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
+	std::vector<stratagus::unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
 	std::vector<CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;		/// What the resource manager should build
 	int LastRepairBuilding = 0;						/// Last building checked for repair in this turn
@@ -388,62 +381,62 @@ public:
 	** The index is the unit that should be trained, giving a table of all
 	** units/buildings which could train this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > Train;
+	std::vector<std::vector<stratagus::unit_type *> > Train;
 	/**
 	** The index is the unit that should be build, giving a table of all
 	** units/buildings which could build this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > Build;
+	std::vector<std::vector<stratagus::unit_type *> > Build;
 	/**
 	** The index is the upgrade that should be made, giving a table of all
 	** units/buildings which could do the upgrade.
 	*/
-	std::vector<std::vector<CUnitType *> > Upgrade;
+	std::vector<std::vector<stratagus::unit_type *> > Upgrade;
 	/**
 	** The index is the research that should be made, giving a table of all
 	** units/buildings which could research this upgrade.
 	*/
-	std::vector<std::vector<CUnitType *> > Research;
+	std::vector<std::vector<stratagus::unit_type *> > Research;
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > Repair;
+	std::vector<std::vector<stratagus::unit_type *> > Repair;
 	/**
 	** The index is the unit-limit that should be solved, giving a table of all
 	** units/buildings which could reduce this unit-limit.
 	*/
-	std::vector<std::vector<CUnitType *> > UnitLimit;
+	std::vector<std::vector<stratagus::unit_type *> > UnitLimit;
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
 	*/
-	std::vector<std::vector<CUnitType *> > Equiv;
+	std::vector<std::vector<stratagus::unit_type *> > Equiv;
 
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > Mines;
+	std::vector<std::vector<stratagus::unit_type *> > Mines;
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
 	** units/buildings/mines which can store this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > Depots;
+	std::vector<std::vector<stratagus::unit_type *> > Depots;
 	
 	//Wyrmgus start
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can sell this resource. In index 0 (respective to CopperCost) we store all units with the "Market" tag instead.
 	*/
-	std::vector<std::vector<CUnitType *> > SellMarkets;
+	std::vector<std::vector<stratagus::unit_type *> > SellMarkets;
 	
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can buy this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > BuyMarkets;
+	std::vector<std::vector<stratagus::unit_type *> > BuyMarkets;
 
 	/**
 	** The index is the unit type id, giving a table of all
@@ -461,13 +454,13 @@ public:
 	** The index is the unit that should perform an upgrade, giving a table of all
 	** possible (non-experience) upgrades for it.
 	*/
-	std::vector<std::vector<CUnitType *> > UpgradesTo;
+	std::vector<std::vector<stratagus::unit_type *> > UpgradesTo;
 	
 	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/
-	std::vector<std::vector<CUnitType *> > ExperienceUpgrades;
+	std::vector<std::vector<stratagus::unit_type *> > ExperienceUpgrades;
 	
 	/**
 	** The index is the unit type that should acquire a learnable ability, giving a table of all
@@ -479,7 +472,7 @@ public:
 	** The sole index is 0, giving a table of all
 	** naval transporter units.
 	*/
-	std::vector<std::vector<CUnitType *> > NavalTransporters;
+	std::vector<std::vector<stratagus::unit_type *> > NavalTransporters;
 	//Wyrmgus end
 };
 
@@ -502,12 +495,9 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
-//Wyrmgus start
-//extern void AiAddUnitTypeRequest(CUnitType &type, int count);
-extern void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass = 0, stratagus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
-//Wyrmgus end
+extern void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass = 0, stratagus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 /// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(CUnitType &type);
+extern void AiAddUpgradeToRequest(stratagus::unit_type &type);
 /// Add research request to resource manager
 extern void AiAddResearchRequest(CUpgrade *upgrade);
 /// Periodic called resource manager handler
@@ -515,14 +505,14 @@ extern void AiResourceManager();
 /// Ask the ai to explore around pos
 extern void AiExplore(const Vec2i &pos, int exploreMask);
 /// Make two unittypes be considered equals
-extern void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b);
+extern void AiNewUnitTypeEquiv(const stratagus::unit_type &a, const stratagus::unit_type &b);
 /// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv();
 /// Finds all equivalents units to a given one
-extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
+extern int AiFindUnitTypeEquiv(const stratagus::unit_type &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
-extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
-extern bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder = false, bool include_upgrade = false);
+extern int AiFindAvailableUnitTypeEquiv(const stratagus::unit_type &type, int *result);
+extern bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &type, bool allow_can_build_builder = false, bool include_upgrade = false);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
@@ -540,10 +530,7 @@ extern void AiCheckBuildings();
 // Buildings
 //
 /// Find nice building place
-//Wyrmgus start
-//extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, stratagus::site *settlement = nullptr);
-//Wyrmgus end
+extern bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, stratagus::site *settlement = nullptr);
 
 //
 // Forces
@@ -585,16 +572,16 @@ extern int AiGetTransportCapacity(int water_landmass);
 /// Get the current requested transport capacity of the AI for a given water zone
 extern int AiGetRequestedTransportCapacity(int water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
-extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const bool include_requests, const bool include_upgrades);
+extern int AiGetUnitTypeCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
-extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass = 0, const stratagus::site *settlement = nullptr);
+extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass = 0, const stratagus::site *settlement = nullptr);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end
 /// Check if the costs for an unit-type are available for the AI
-extern int AiCheckUnitTypeCosts(const CUnitType &type);
+extern int AiCheckUnitTypeCosts(const stratagus::unit_type &type);
 /// Enemy units in distance
-extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
+extern int AiEnemyUnitsInDistance(const CPlayer &player, const stratagus::unit_type *type,
 								  //Wyrmgus start
 //								  const Vec2i &pos, unsigned range);
 								  const Vec2i &pos, unsigned range, int z);

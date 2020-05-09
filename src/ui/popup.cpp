@@ -523,23 +523,9 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	}
 
 	if (this->Index != -1) {
-		//Wyrmgus start
-		/*
-		CUnitType &type = *UnitTypes[button.Value];
-		int value = type.DefaultStat.Variables[this->Index].Value;
-		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
-
-		if (!diff) {
-			label.Draw(x, y, value);
-		} else {
-			char buf[64];
-			snprintf(buf, sizeof(buf), diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
-			label.Draw(x, y, buf);
-		}
-		*/
 		int value;
 		if (button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy) {
-			value = CUnitType::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
+			value = stratagus::unit_type::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
 			}

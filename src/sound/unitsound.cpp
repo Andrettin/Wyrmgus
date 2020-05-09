@@ -102,27 +102,27 @@ static void MapAnimSounds2(CAnimation *anim)
 /**
 **  Map animation sounds for a unit type
 */
-static void MapAnimSounds(CUnitType &type)
+static void MapAnimSounds(stratagus::unit_type &type)
 {
-	if (!type.Animations) {
+	if (!type.get_animation_set()) {
 		return;
 	}
-	MapAnimSounds2(type.Animations->Start.get());
-	MapAnimSounds2(type.Animations->Still.get());
-	MapAnimSounds2(type.Animations->Move.get());
-	MapAnimSounds2(type.Animations->Attack.get());
-	MapAnimSounds2(type.Animations->RangedAttack.get());
-	MapAnimSounds2(type.Animations->SpellCast.get());
+	MapAnimSounds2(type.get_animation_set()->Start.get());
+	MapAnimSounds2(type.get_animation_set()->Still.get());
+	MapAnimSounds2(type.get_animation_set()->Move.get());
+	MapAnimSounds2(type.get_animation_set()->Attack.get());
+	MapAnimSounds2(type.get_animation_set()->RangedAttack.get());
+	MapAnimSounds2(type.get_animation_set()->SpellCast.get());
 	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-		MapAnimSounds2(type.Animations->Death[i].get());
+		MapAnimSounds2(type.get_animation_set()->Death[i].get());
 	}
-	MapAnimSounds2(type.Animations->Repair.get());
-	MapAnimSounds2(type.Animations->Train.get());
-	MapAnimSounds2(type.Animations->Research.get());
-	MapAnimSounds2(type.Animations->Upgrade.get());
-	MapAnimSounds2(type.Animations->Build.get());
+	MapAnimSounds2(type.get_animation_set()->Repair.get());
+	MapAnimSounds2(type.get_animation_set()->Train.get());
+	MapAnimSounds2(type.get_animation_set()->Research.get());
+	MapAnimSounds2(type.get_animation_set()->Upgrade.get());
+	MapAnimSounds2(type.get_animation_set()->Build.get());
 	for (int i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type.Animations->Harvest[i].get());
+		MapAnimSounds2(type.get_animation_set()->Harvest[i].get());
 	}
 	//Wyrmgus start
 	for (CUnitTypeVariation *variation : type.Variations) {
@@ -183,7 +183,7 @@ void MapUnitSounds()
 	}
 
 	// Parse all units sounds.
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		MapAnimSounds(*unit_type);
 
 		unit_type->MapSound.Selected.MapSound();

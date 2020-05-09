@@ -73,13 +73,13 @@ public:
 class HasSameTypeAs : public CUnitFilter
 {
 public:
-	explicit HasSameTypeAs(const CUnitType &_type) : type(&_type) {}
+	explicit HasSameTypeAs(const stratagus::unit_type &_type) : type(&_type) {}
 	bool operator()(const CUnit *unit) const
 	{
 		return unit->Type == type;
 	}	
 private:
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 };
 
 class HasSamePlayerAs : public CUnitFilter
@@ -137,7 +137,7 @@ public:
 		player(unit.Player), type(unit.Type)
 	{}
 	
-	HasSamePlayerAndTypeAs(const CPlayer &_player, const CUnitType &_type) :
+	HasSamePlayerAndTypeAs(const CPlayer &_player, const stratagus::unit_type &_type) :
 		player(&_player), type(&_type)
 	{}
 
@@ -148,7 +148,7 @@ public:
 
 private:
 	const CPlayer *player;
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 };
 
 class IsNotTheSameUnitAs : public CUnitFilter
@@ -279,7 +279,7 @@ public:
 			return false;
 		}
 
-		const CUnitType &type = *unit->Type;
+		const stratagus::unit_type &type = *unit->Type;
 		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;
 		}
@@ -470,10 +470,10 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 extern bool FindTerrainType(int movemask, const stratagus::resource *resource, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, int landmass = 0);
 
-extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
+extern void FindUnitsByType(const stratagus::unit_type &type, std::vector<CUnit *> &units, bool everybody = false);
 
 /// Find all units of this type of the player
-extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, bool ai_active = false);
+extern void FindPlayerUnitsByType(const CPlayer &player, const stratagus::unit_type &type, std::vector<CUnit *> &units, bool ai_active = false);
 /// Return any unit on that map tile
 //Wyrmgus start
 //extern CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type);// = -1);

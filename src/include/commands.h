@@ -38,13 +38,13 @@
 class CUnit;
 class CFile;
 class CSpell;
-class CUnitType;
 class CUpgrade;
 enum class diplomacy_state;
 
 namespace stratagus {
 	class quest;
 	class site;
+	class unit_type;
 }
 
 /*----------------------------------------------------------------------------
@@ -126,10 +126,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
 //Wyrmgus end
 /// Prepare command build
-//Wyrmgus start
-//extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, stratagus::site *settlement = nullptr);
-//Wyrmgus end
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &, int flush, int z = 0, stratagus::site *settlement = nullptr);
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);
 /// Prepare command resource location
@@ -142,16 +139,13 @@ extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command return
 extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
 /// Prepare command train
-//Wyrmgus start
-//extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
-extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush);
-//Wyrmgus end
+extern void CommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, int flush);
 /// Prepare command cancel training
-extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
+extern void CommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, stratagus::unit_type &what, int flush);
 /// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
+extern void CommandTransformIntoType(CUnit &unit, stratagus::unit_type &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
@@ -250,10 +244,7 @@ extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
 //Wyrmgus end
 /// Send build building command
-//Wyrmgus start
-//extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush);
-extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z = 0);
-//Wyrmgus end
+extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &what, int flush, int z = 0);
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit, bool salvage = false);
 /// Send harvest location command
@@ -266,19 +257,16 @@ extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Send return goods command
 extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
 /// Send train command
-//Wyrmgus start
-//extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
-extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush);
-//Wyrmgus end
+extern void SendCommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, int flush);
 /// Send cancel training command
-extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
+extern void SendCommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type);
 /// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+extern void SendCommandUpgradeTo(CUnit &unit, stratagus::unit_type &what, int flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
 //Wyrmgus start
 /// Send transform into command
-extern void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush);
+extern void SendCommandTransformInto(CUnit &unit, stratagus::unit_type &what, int flush);
 //Wyrmgus end
 /// Send research command
 //Wyrmgus start

@@ -922,7 +922,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "unload")) {
 		SendCommandUnload(*unit, pos, dunit, flags);
 	} else if (!strcmp(action, "build")) {
-		SendCommandBuildBuilding(*unit, pos, *CUnitType::get(val), flags);
+		SendCommandBuildBuilding(*unit, pos, *stratagus::unit_type::get(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
 		SendCommandDismiss(*unit, arg1 > 0);
 	} else if (!strcmp(action, "resource-loc")) {
@@ -932,20 +932,15 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "return")) {
 		SendCommandReturnGoods(*unit, dunit, flags);
 	} else if (!strcmp(action, "train")) {
-		//Wyrmgus start
-//		SendCommandTrainUnit(*unit, *CUnitType::get(val), flags);
-		SendCommandTrainUnit(*unit, *CUnitType::get(val), num, flags);
-		//Wyrmgus end
+		SendCommandTrainUnit(*unit, *stratagus::unit_type::get(val), num, flags);
 	} else if (!strcmp(action, "cancel-train")) {
-		SendCommandCancelTraining(*unit, num, (val && *val) ? CUnitType::get(val) : nullptr);
+		SendCommandCancelTraining(*unit, num, (val && *val) ? stratagus::unit_type::get(val) : nullptr);
 	} else if (!strcmp(action, "upgrade-to")) {
-		SendCommandUpgradeTo(*unit, *CUnitType::get(val), flags);
+		SendCommandUpgradeTo(*unit, *stratagus::unit_type::get(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
 		SendCommandCancelUpgradeTo(*unit);
-	//Wyrmgus start
 	} else if (!strcmp(action, "transform-into")) {
-		SendCommandTransformInto(*unit, *CUnitType::get(val), flags);
-	//Wyrmgus end
+		SendCommandTransformInto(*unit, *stratagus::unit_type::get(val), flags);
 	} else if (!strcmp(action, "research")) {
 		//Wyrmgus start
 //		SendCommandResearch(*unit, *CUpgrade::get(val), flags);

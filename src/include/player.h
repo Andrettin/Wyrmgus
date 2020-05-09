@@ -66,7 +66,6 @@ class CProvince;
 class CPlayerQuestObjective;
 class CReligion;
 class CUnit;
-class CUnitType;
 class PlayerAi;
 //Wyrmgus start
 class CFiller;
@@ -85,6 +84,7 @@ namespace stratagus {
 	class quest;
 	class site;
 	class unit_class;
+	class unit_type;
 	class upgrade_class;
 	enum class gender;
 }
@@ -176,11 +176,11 @@ public:
 	int SpeedUpgrade;                /// speed factor for upgrading
 	int SpeedResearch;               /// speed factor for researching
 
-	std::map<const CUnitType *, int> UnitTypesCount;  						/// total units of unit-type
-	std::map<const CUnitType *, int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
-	std::map<const CUnitType *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
-	std::map<const CUnitType *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
-	std::map<const CUnitType *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
+	std::map<const stratagus::unit_type *, int> UnitTypesCount;  						/// total units of unit-type
+	std::map<const stratagus::unit_type *, int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
+	std::map<const stratagus::unit_type *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
+	std::map<const stratagus::unit_type *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
+	std::map<const stratagus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;											/// hero units owned by this player
 	std::vector<CDeity *> Deities;											/// deities chosen by this player
 	std::vector<stratagus::quest *> AvailableQuests;			/// quests available to this player
@@ -258,7 +258,7 @@ public:
 	bool HasSettlement(const stratagus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
-	bool HasUnitBuilder(const CUnitType *type, const stratagus::site *settlement = nullptr) const;
+	bool HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
@@ -267,7 +267,7 @@ public:
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
-	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
+	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const stratagus::unit_type *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
 	std::vector<CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end
 
@@ -337,61 +337,52 @@ public:
 	//Wyrmgus end
 	
 	/// Returns count of specified unittype
-	int GetUnitTotalCount(const CUnitType &type) const;
+	int GetUnitTotalCount(const stratagus::unit_type &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand
-	int CheckLimits(const CUnitType &type) const;
+	int CheckLimits(const stratagus::unit_type &type) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const int *costs, bool notify = true) const;
 	/// Check if enough resources are available for a new unit-type
-	//Wyrmgus start
-//	int CheckUnitType(const CUnitType &type) const;
-	int CheckUnitType(const CUnitType &type, bool hire = false) const;
-	//Wyrmgus end
+	int CheckUnitType(const stratagus::unit_type &type, bool hire = false) const;
 
 	/// Add costs to the resources
 	void AddCosts(const int *costs);
 	/// Add costs for an unit-type to the resources
-	//Wyrmgus start
-//	void AddUnitType(const CUnitType &type);
-	void AddUnitType(const CUnitType &type, bool hire = false);
-	//Wyrmgus end
+	void AddUnitType(const stratagus::unit_type &type, bool hire = false);
 	/// Add a factor of costs to the resources
 	void AddCostsFactor(const int *costs, int factor);
 	/// Remove costs from the resources
 	void SubCosts(const int *costs);
 	/// Remove costs for an unit-type from the resources
-	//Wyrmgus start
-//	void SubUnitType(const CUnitType &type);
-	void SubUnitType(const CUnitType &type, bool hire = false);
-	//Wyrmgus end
+	void SubUnitType(const stratagus::unit_type &type, bool hire = false);
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const int *costs, int factor);
 	
 	//Wyrmgus start
-	void GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
-	int GetUnitTypeCostsMask(const CUnitType *type, bool hire = false) const;
+	void GetUnitTypeCosts(const stratagus::unit_type *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
+	int GetUnitTypeCostsMask(const stratagus::unit_type *type, bool hire = false) const;
 	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
 	int GetUpgradeCostsMask(const CUpgrade *upgrade) const;
 	
-	void SetUnitTypeCount(const CUnitType *type, int quantity);
-	void ChangeUnitTypeCount(const CUnitType *type, int quantity);
-	int GetUnitTypeCount(const CUnitType *type) const;
+	void SetUnitTypeCount(const stratagus::unit_type *type, int quantity);
+	void ChangeUnitTypeCount(const stratagus::unit_type *type, int quantity);
+	int GetUnitTypeCount(const stratagus::unit_type *type) const;
 	
-	void SetUnitTypeUnderConstructionCount(const CUnitType *type, int quantity);
-	void ChangeUnitTypeUnderConstructionCount(const CUnitType *type, int quantity);
-	int GetUnitTypeUnderConstructionCount(const CUnitType *type) const;
+	void SetUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity);
+	void ChangeUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity);
+	int GetUnitTypeUnderConstructionCount(const stratagus::unit_type *type) const;
 	
-	void SetUnitTypeAiActiveCount(const CUnitType *type, int quantity);
-	void ChangeUnitTypeAiActiveCount(const CUnitType *type, int quantity);
-	int GetUnitTypeAiActiveCount(const CUnitType *type) const;
+	void SetUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity);
+	void ChangeUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity);
+	int GetUnitTypeAiActiveCount(const stratagus::unit_type *type) const;
 	
 	void IncreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	void DecreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	//Wyrmgus end
 
 	/// Does the player have units of a given type
-	bool has_unit_type(const CUnitType *unit_type) const;
+	bool has_unit_type(const stratagus::unit_type *unit_type) const;
 
 	/// Notify player about a problem
 	//Wyrmgus start

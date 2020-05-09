@@ -41,7 +41,6 @@ class CLanguage;
 class CPersistentItem;
 class CProvince;
 class CReligion;
-class CUnitType;
 class CUnit;
 class CUpgrade;
 class LuaCallback;
@@ -60,6 +59,7 @@ namespace stratagus {
 	class historical_location;
 	class quest;
 	class site;
+	class unit_type;
 	enum class gender;
 }
 
@@ -99,7 +99,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_OBJECT
 
 	Q_PROPERTY(QString surname READ get_surname_qstring)
-	Q_PROPERTY(CUnitType* unit_type READ get_unit_type WRITE set_unit_type)
+	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
 	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
@@ -135,12 +135,12 @@ public:
 		return QString::fromStdString(this->get_surname());
 	}
 
-	CUnitType *get_unit_type() const
+	unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
 
-	void set_unit_type(CUnitType *unit_type)
+	void set_unit_type(unit_type *unit_type)
 	{
 		if (unit_type == this->get_unit_type()) {
 			return;
@@ -218,7 +218,7 @@ public:
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 private:
-	CUnitType *unit_type = nullptr;
+	stratagus::unit_type *unit_type = nullptr;
 public:
 	CUpgrade *Trait = nullptr;
 	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
@@ -241,7 +241,7 @@ public:
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
-	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
+	std::vector<stratagus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
 	std::vector<std::tuple<CDate, CDate, stratagus::faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)

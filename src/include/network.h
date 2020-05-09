@@ -39,7 +39,10 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-class CUnitType;
+
+namespace stratagus {
+	class unit_type;
+}
 
 class CNetworkParameter
 {
@@ -82,7 +85,7 @@ extern void NetworkCommands();  /// Get all network commands
 extern void NetworkSendChatMessage(const std::string &msg);  /// Send chat message
 /// Send network command.
 extern void NetworkSendCommand(int command, const CUnit &unit, int x,
-							   int y, const CUnit *dest, const CUnitType *type, int status);
+							   int y, const CUnit *dest, const stratagus::unit_type *type, int status);
 /// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 									   int arg3, int arg4, int status);

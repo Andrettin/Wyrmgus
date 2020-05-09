@@ -66,10 +66,7 @@ static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr);
-//Wyrmgus end
+static int AiMakeUnit(stratagus::unit_type &type, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr);
 
 /**
 **  Check if the costs are available for the AI.
@@ -133,7 +130,7 @@ static int AiCheckCosts(const int *costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
+static int AiCheckSupply(const PlayerAi &pai, const stratagus::unit_type &type)
 {
 	// Count food supplies under construction.
 	int remaining = 0;
@@ -174,7 +171,7 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 **
 **  @return      A bit field of the missing costs.
 */
-int AiCheckUnitTypeCosts(const CUnitType &type)
+int AiCheckUnitTypeCosts(const stratagus::unit_type &type)
 {
 	int type_costs[MaxCosts];
 	AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
@@ -212,7 +209,7 @@ private:
 class IsAEnemyUnitWhichCanCounterAttackOf
 {
 public:
-	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer &_player, const CUnitType &_type) :
+	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer &_player, const stratagus::unit_type &_type) :
 		player(&_player), type(&_type)
 	{}
 	bool operator()(const CUnit *unit) const
@@ -223,7 +220,7 @@ public:
 	}
 private:
 	const CPlayer *player;
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 };
 
 /**
@@ -237,10 +234,7 @@ private:
 **  @return       Number of enemy units.
 */
 int AiEnemyUnitsInDistance(const CPlayer &player,
-						   //Wyrmgus start
-//						   const CUnitType *type, const Vec2i &pos, unsigned range)
-						   const CUnitType *type, const Vec2i &pos, unsigned range, int z)
-						   //Wyrmgus end
+						   const stratagus::unit_type *type, const Vec2i &pos, unsigned range, int z)
 {
 	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
@@ -312,10 +306,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-//Wyrmgus start
-//static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr)
-//Wyrmgus end
+static int AiBuildBuilding(const stratagus::unit_type &type, stratagus::unit_type &building, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -426,10 +417,10 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	return 0;
 }
 
-bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder, bool include_upgrade)
+bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &type, bool allow_can_build_builder, bool include_upgrade)
 {
 	//Wyrmgus start
-	std::vector<std::vector<CUnitType *> > *tablep;
+	std::vector<std::vector<stratagus::unit_type *> > *tablep;
 	if (type.BoolFlag[BUILDING_INDEX].value) {
 		if (
 			include_upgrade
@@ -450,10 +441,7 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool a
 	const size_t size = (*tablep)[type.Slot].size();
 	//Wyrmgus end
 	for (size_t i = 0; i != size; ++i) {
-		//Wyrmgus start
-//		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
-		CUnitType &builder = *(*tablep)[type.Slot][i];
-		//Wyrmgus end
+		stratagus::unit_type &builder = *(*tablep)[type.Slot][i];
 
 		if ((player.GetUnitTypeAiActiveCount(&builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, builder)))
 			&& CheckDependencies(&type, &player)) {
@@ -474,7 +462,7 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 	}
 	const size_t size = AiHelpers.Research[upgrade->ID].size();
 	for (size_t i = 0; i < size; ++i) {
-		CUnitType &researcher = *AiHelpers.Research[upgrade->ID][i];
+		stratagus::unit_type &researcher = *AiHelpers.Research[upgrade->ID][i];
 
 		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependencies(upgrade, &player)) {
 			return true;
@@ -487,7 +475,7 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 struct cnode {
 	int unit_cost;
 	int needmask;
-	CUnitType *type;
+	stratagus::unit_type *type;
 };
 
 static bool cnode_cmp(const cnode &lhs, const cnode &rhs)
@@ -537,7 +525,7 @@ void AiNewDepotRequest(CUnit &worker)
 		 */
 		return;
 	}
-	CUnitType *best_type = nullptr;
+	stratagus::unit_type *best_type = nullptr;
 	int best_cost = 0;
 	//int best_mask = 0;
 	// Count the already made build requests.
@@ -548,7 +536,7 @@ void AiNewDepotRequest(CUnit &worker)
 	const int n = AiHelpers.Depots[resource].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.Depots[resource][i];
+		stratagus::unit_type &type = *AiHelpers.Depots[resource][i];
 
 		if (counter[type.Slot]) { // Already ordered.
 			return;
@@ -683,13 +671,13 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 //Wyrmgus start
 void AiTransportCapacityRequest(int capacity_needed, int landmass)
 {
-	CUnitType *best_type = nullptr;
+	stratagus::unit_type *best_type = nullptr;
 	int best_cost = 0;
 
 	const int n = AiHelpers.NavalTransporters[0].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.NavalTransporters[0][i];
+		stratagus::unit_type &type = *AiHelpers.NavalTransporters[0][i];
 
 		if (!AiRequestedTypeAllowed(*AiPlayer->Player, type, true)) {
 			continue;
@@ -720,7 +708,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		bool has_builder = false;
 		const size_t size = AiHelpers.Train[best_type->Slot].size();
 		for (size_t i = 0; i != size; ++i) {
-			CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
+			stratagus::unit_type &builder = *AiHelpers.Train[best_type->Slot][i];
 
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(&builder) > 0) {
 				std::vector<CUnit *> builder_table;
@@ -754,7 +742,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		if (!has_builder) { // if doesn't have a builder, request one
 			const size_t size = AiHelpers.Train[best_type->Slot].size();
 			for (size_t i = 0; i != size; ++i) {
-				CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
+				stratagus::unit_type &builder = *AiHelpers.Train[best_type->Slot][i];
 				
 				if (!AiRequestedTypeAllowed(*AiPlayer->Player, builder)) {
 					continue;
@@ -801,7 +789,7 @@ static bool AiRequestSupply()
 	const int n = AiHelpers.UnitLimit[0].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.UnitLimit[0][i];
+		stratagus::unit_type &type = *AiHelpers.UnitLimit[0][i];
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
@@ -836,7 +824,7 @@ static bool AiRequestSupply()
 	}
 	if (j) {
 		if (!cache[0].needmask) {
-			CUnitType &type = *cache[0].type;
+			stratagus::unit_type &type = *cache[0].type;
 			Vec2i invalidPos(-1, -1);
 			//Wyrmgus start
 //			if (AiMakeUnit(type, invalidPos)) {
@@ -909,10 +897,7 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-//Wyrmgus start
-//static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, stratagus::site *settlement = nullptr)
-//Wyrmgus end
+static bool AiTrainUnit(const stratagus::unit_type &type, stratagus::unit_type &what, int landmass = 0, stratagus::site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -950,10 +935,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-//Wyrmgus start
-//static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, stratagus::site *settlement)
-//Wyrmgus end
+static int AiMakeUnit(stratagus::unit_type &typeToMake, const Vec2i &nearPos, int z, int landmass, stratagus::site *settlement)
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -961,9 +943,9 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 
 	// Iterate them
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
-		CUnitType &type = *CUnitType::get_all()[usableTypes[currentType]];
+		stratagus::unit_type &type = *stratagus::unit_type::get_all()[usableTypes[currentType]];
 		int n;
-		std::vector<std::vector<CUnitType *> > *tablep;
+		std::vector<std::vector<stratagus::unit_type *> > *tablep;
 		//
 		// Check if we have a place for building or a unit to build.
 		//
@@ -979,7 +961,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
 		}
-		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
+		std::vector<stratagus::unit_type *> &table = (*tablep)[type.Slot];
 		if (table.empty()) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -1022,7 +1004,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
+static bool AiResearchUpgrade(const stratagus::unit_type &type, CUpgrade &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1062,14 +1044,14 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	// Check if we have a place for the upgrade to research
 	//
 	const int n = AiHelpers.Research.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
+	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Research;
 
 	if (upgrade->ID >= n) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
 	}
-	std::vector<CUnitType *> &table = tablep[upgrade->ID];
+	std::vector<stratagus::unit_type *> &table = tablep[upgrade->ID];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
@@ -1095,7 +1077,7 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
+static bool AiUpgradeTo(const stratagus::unit_type &type, stratagus::unit_type &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1117,7 +1099,7 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 **
 **  @param type  FIXME: docu
 */
-void AiAddUpgradeToRequest(CUnitType &type)
+void AiAddUpgradeToRequest(stratagus::unit_type &type)
 {
 	// Check if resources are available.
 	const int resourceNeeded = AiCheckUnitTypeCosts(type);
@@ -1132,14 +1114,14 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	// Check if we have a place for the upgrade to.
 	//
 	const int n = AiHelpers.Upgrade.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade;
+	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Upgrade;
 
 	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
-	std::vector<CUnitType *> &table = tablep[type.Slot];
+	std::vector<stratagus::unit_type *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -1174,7 +1156,7 @@ static void AiCheckingWork()
 	const int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		CUnitType &type = *queuep->Type;
+		stratagus::unit_type &type = *queuep->Type;
 		
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 			queuep->settlement
@@ -1297,7 +1279,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const stratagus::resource *res
 			const int n = AiHelpers.Mines[mine->GivesResource].size();
 
 			for (int i = 0; i < n; ++i) {
-				CUnitType &type = *AiHelpers.Mines[mine->GivesResource][i];
+				stratagus::unit_type &type = *AiHelpers.Mines[mine->GivesResource][i];
 
 				if (
 					type.Slot < (int) AiHelpers.Build.size()
@@ -1317,7 +1299,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const stratagus::resource *res
 	int exploremask = 0;
 
 	for (size_t i = 0; i != UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypes[i];
+		const stratagus::unit_type *type = UnitTypes[i];
 
 		if (type && type->GivesResource == resource) {
 			switch (type->UnitType) {
@@ -1758,7 +1740,7 @@ static void AiCollectResources()
 			const int n_m = AiHelpers.BuyMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
-				CUnitType &market_type = *AiHelpers.BuyMarkets[c - 1][i];
+				stratagus::unit_type &market_type = *AiHelpers.BuyMarkets[c - 1][i];
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
@@ -1796,7 +1778,7 @@ static void AiCollectResources()
 			const int n_m = AiHelpers.SellMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
-				CUnitType &market_type = *AiHelpers.SellMarkets[c - 1][i];
+				stratagus::unit_type &market_type = *AiHelpers.SellMarkets[c - 1][i];
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
@@ -1858,10 +1840,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 **
 **  @return          True if can repair, false if can't repair..
 */
-//Wyrmgus start
-//static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
-static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
-//Wyrmgus end
+static bool AiRepairBuilding(const CPlayer &player, const stratagus::unit_type &type, CUnit &building)
 {
 	if (type.RepairRange == 0) {
 		return false;
@@ -1915,14 +1894,14 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 static int AiRepairUnit(CUnit &unit)
 {
 	int n = AiHelpers.Repair.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
-	const CUnitType &type = *unit.Type;
+	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Repair;
+	const stratagus::unit_type &type = *unit.Type;
 	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}
-	std::vector<CUnitType *> &table = tablep[type.Slot];
+	std::vector<stratagus::unit_type *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -2067,9 +2046,9 @@ static void AiCheckPathwayConstruction()
 		return;
 	}
 
-	std::vector<CUnitType *> pathway_types;
+	std::vector<stratagus::unit_type *> pathway_types;
 	
-	for (CUnitType *unit_type : CUnitType::get_all()) { //assumes the pathways are listed in order of speed bonus
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { //assumes the pathways are listed in order of speed bonus
 		if (!unit_type || !unit_type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 			continue;
 		}
@@ -2089,7 +2068,7 @@ static void AiCheckPathwayConstruction()
 	}
 	
 	int n_t = AiHelpers.Build.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
+	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Build;
 	for (size_t i = 0; i != pathway_types.size(); ++i) {
 		if (pathway_types[i]->Slot >= n_t) { // Oops not known.
 			DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
@@ -2097,7 +2076,7 @@ static void AiCheckPathwayConstruction()
 			return;
 		}
 		
-		std::vector<CUnitType *> &table = tablep[pathway_types[i]->Slot];
+		std::vector<stratagus::unit_type *> &table = tablep[pathway_types[i]->Slot];
 		if (table.empty()) { // Oops not known.
 			DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
@@ -2153,7 +2132,7 @@ static void AiCheckPathwayConstruction()
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					CUnitType *worker_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
+					stratagus::unit_type *worker_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("worker"));
 					if (worker_type != nullptr) {						
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
@@ -2296,7 +2275,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	CUnitType *town_hall_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
+	stratagus::unit_type *town_hall_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
 	if (town_hall_type == nullptr) {
 		return;
 	}
@@ -2306,14 +2285,14 @@ void AiCheckSettlementConstruction()
 	}
 
 	int n_t = AiHelpers.Build.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
+	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Build;
 	if (town_hall_type->Slot >= n_t) { // Oops not known.
 		DebugPrint("%d: AiCheckSettlementConstruction I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
 		return;
 	}
 		
-	std::vector<CUnitType *> &table = tablep[town_hall_type->Slot];
+	std::vector<stratagus::unit_type *> &table = tablep[town_hall_type->Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiCheckSettlementConstruction II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
@@ -2387,7 +2366,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	CUnitType *dock_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("dock"));
+	stratagus::unit_type *dock_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("dock"));
 	if (dock_type == nullptr) {
 		return;
 	}
@@ -2528,7 +2507,7 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
+		stratagus::unit_type *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
 		if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type, false, true)) {
 			continue;
 		}
@@ -2564,7 +2543,7 @@ void AiCheckBuildings()
 	
 	const CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	CUnitType *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
+	stratagus::unit_type *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
 	
 	if (unit_type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[unit_type->Slot].empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);
@@ -2577,7 +2556,7 @@ void AiCheckBuildings()
 
 static void AiCheckMinecartConstruction()
 {
-	CUnitType *minecart_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
+	stratagus::unit_type *minecart_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
@@ -2604,7 +2583,7 @@ static void AiCheckMinecartConstruction()
 		}
 				
 		for (size_t i = 0; i < AiHelpers.Mines[res].size(); ++i) {
-			CUnitType &mine_type = *AiHelpers.Mines[res][i];
+			stratagus::unit_type &mine_type = *AiHelpers.Mines[res][i];
 					
 			std::vector<CUnit *> mine_table;
 			FindPlayerUnitsByType(*AiPlayer->Player, mine_type, mine_table, true);
@@ -2648,7 +2627,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	CUnitType *minecart_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
+	stratagus::unit_type *minecart_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
@@ -2715,10 +2694,7 @@ void AiCheckWorkers()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-//Wyrmgus start
-//void AiAddUnitTypeRequest(CUnitType &type, int count)
-void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, stratagus::site *settlement, const Vec2i pos, int z)
-//Wyrmgus end
+void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass, stratagus::site *settlement, const Vec2i pos, int z)
 {
 	AiBuildQueue queue;
 

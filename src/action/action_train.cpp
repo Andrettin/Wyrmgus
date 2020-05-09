@@ -61,10 +61,7 @@ static constexpr int CancelTrainingCostsFactor = 100;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-// /* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
-/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player)
-//Wyrmgus end
+COrder *COrder::NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player)
 {
 	COrder_Train *order = new COrder_Train;
 
@@ -97,7 +94,7 @@ static constexpr int CancelTrainingCostsFactor = 100;
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
+		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "player")) {
 		++j;
@@ -150,7 +147,7 @@ static constexpr int CancelTrainingCostsFactor = 100;
 	//Wyrmgus end
 }
 
-void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_Train::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
 {
 	//Wyrmgus start
 //	const CPlayer &player = *unit.Player;
@@ -236,7 +233,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	CUnitType &nType = *this->Type;
+	stratagus::unit_type &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	
 	//Wyrmgus start
@@ -449,7 +446,7 @@ static void AnimateActionTrain(CUnit &unit)
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
-					for (CUnitType *other_unit_type : CUnitType::get_all()) {
+					for (stratagus::unit_type *other_unit_type : stratagus::unit_type::get_all()) {
 						if (other_unit_type->GivesResource == table[j]->Type->GivesResource && other_unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *other_unit_type, table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
 							CommandBuildBuilding(*newUnit, table[j]->tilePos, *other_unit_type, FlushCommands, table[j]->MapLayer->ID);
 							command_found = true;

@@ -508,7 +508,7 @@ void civilization::remove_ship_name(const std::string &ship_name)
 }
 
 
-CUnitType *civilization::get_class_unit_type(const unit_class *unit_class) const
+unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const
 {
 	if (unit_class == nullptr) {
 		return nullptr;

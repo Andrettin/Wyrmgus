@@ -444,17 +444,11 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, in
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-//Wyrmgus start
-//void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z)
-//Wyrmgus end
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &what, int flush, int z)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
-		//Wyrmgus start
-//		CommandBuildBuilding(unit, pos, what, flush);
 		CommandBuildBuilding(unit, pos, what, flush, z);
-		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, &what, flush);
 	}
@@ -540,10 +534,7 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-//Wyrmgus start
-//void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
-void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush)
-//Wyrmgus end
+void SendCommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, int flush)
 {
 	if (!IsNetworkGame()) {
 		//Wyrmgus start
@@ -567,7 +558,7 @@ void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush)
 ** @param slot    Slot of training queue to cancel.
 ** @param type    Unit-type of unit to cancel.
 */
-void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
+void SendCommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
@@ -586,7 +577,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
+void SendCommandUpgradeTo(CUnit &unit, stratagus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
@@ -620,7 +611,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush)
+void SendCommandTransformInto(CUnit &unit, stratagus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("transform-into", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
@@ -1002,8 +993,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandBuild:
-			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, *CUnitType::get_all()[dstnr], status);
+			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+			CommandBuildBuilding(unit, pos, *stratagus::unit_type::get_all()[dstnr], status);
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, arg1, -1, nullptr, nullptr, -1);
@@ -1029,19 +1020,15 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandTrain:
-			//Wyrmgus start
-//			CommandLog("train", &unit, status, -1, -1, NoUnitP, CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
-//			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
-			CommandLog("train", &unit, status, -1, -1, NoUnitP, CUnitType::get_all()[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
-			CommandTrainUnit(unit, *CUnitType::get_all()[dstnr], arg1, status);
-			//Wyrmgus end
+			CommandLog("train", &unit, status, -1, -1, NoUnitP, stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
+			CommandTrainUnit(unit, *stratagus::unit_type::get_all()[dstnr], arg1, status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-					CUnitType::get_all()[dstnr]->Ident.c_str(), (short)x);
-				CommandCancelTraining(unit, (short)x, CUnitType::get_all()[dstnr]);
+					stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), (short)x);
+				CommandCancelTraining(unit, (short)x, stratagus::unit_type::get_all()[dstnr]);
 			} else {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP, nullptr, (short)x);
 				CommandCancelTraining(unit, (short)x, nullptr);
@@ -1057,12 +1044,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			*/
 			if (arg1 == 2) { //use X as a way to mark whether this is an upgrade or a transformation
 				CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
-					CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
-				CommandTransformIntoType(unit, *CUnitType::get_all()[dstnr]);
+					stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+				CommandTransformIntoType(unit, *stratagus::unit_type::get_all()[dstnr]);
 			} else {
 				CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
-					CUnitType::get_all()[dstnr]->Ident.c_str(), -1);
-				CommandUpgradeTo(unit, *CUnitType::get_all()[dstnr], status);
+					stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+				CommandUpgradeTo(unit, *stratagus::unit_type::get_all()[dstnr], status);
 			}
 			break;
 			//Wyrmgus end

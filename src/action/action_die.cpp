@@ -103,7 +103,7 @@ static bool AnimateActionDie(CUnit &unit)
 	if (unit.Anim.Unbreakable) {
 		return ;
 	}
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 
 	// Die sequence terminated, generate corpse.
 	if (type.CorpseType == nullptr) {
@@ -115,7 +115,7 @@ static bool AnimateActionDie(CUnit &unit)
 		return ;
 	}
 
-	const CUnitType &corpseType = *type.CorpseType;
+	const stratagus::unit_type &corpseType = *type.CorpseType;
 	Assert(type.TileSize.x >= corpseType.TileSize.x && type.TileSize.y >= corpseType.TileSize.y);
 
 	// Update sight for new corpse

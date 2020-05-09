@@ -46,7 +46,7 @@ public:
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	CUnitType *UnitType;    /// Type of unit to be summoned.
+	stratagus::unit_type *UnitType;    /// Type of unit to be summoned.
 	int TTL;                /// Time to live for summoned unit. 0 means infinite
 	int RequireCorpse;      /// Corpse consumed while summoning.
 	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available

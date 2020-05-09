@@ -135,7 +135,7 @@ static constexpr int CancelResearchCostsFactor = 100;
 /* virtual */ void COrder_Research::Execute(CUnit &unit)
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 
 	UnitShowAnimation(unit, unit.GetAnimations()->Research ? unit.GetAnimations()->Research.get() : unit.GetAnimations()->Still.get());
 	if (unit.Wait) {

@@ -66,6 +66,8 @@ class Mng;
 class LuaCallback;
 enum class UnitTypeType;
 
+int CclDefineUnitType(lua_State *l);
+
 namespace stratagus {
 	class animation_set;
 	class dependency;
@@ -75,6 +77,7 @@ namespace stratagus {
 	class terrain_type;
 	class time_of_day;
 	class unit_class;
+	class unit_type;
 	class world;
 	enum class gender;
 }
@@ -357,7 +360,6 @@ enum {
 };
 
 class CUnit;
-class CUnitType;
 class CFont;
 
 /**
@@ -376,7 +378,7 @@ public:
 	};
 
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const = 0;
+	virtual void Draw(int x, int y, const stratagus::unit_type &type, const stratagus::unit_variable &var) const = 0;
 
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
@@ -413,7 +415,7 @@ class CDecoVarBar : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const stratagus::unit_type &type, const stratagus::unit_variable &var) const;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
 	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
@@ -431,7 +433,7 @@ class CDecoVarText : public CDecoVar
 public:
 	CDecoVarText() : Font(nullptr) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const stratagus::unit_type &type, const stratagus::unit_variable &var) const;
 
 	CFont *Font;  /// Font to use to display value.
 	// FIXME : Add Color, format
@@ -444,7 +446,7 @@ public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y,
-					  const CUnitType &type, const stratagus::unit_variable &var) const;
+					  const stratagus::unit_type &type, const stratagus::unit_variable &var) const;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
@@ -456,7 +458,7 @@ class CDecoVarStaticSprite : public CDecoVar
 public:
 	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const stratagus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const stratagus::unit_type &type, const stratagus::unit_variable &var) const;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
 	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
@@ -478,10 +480,7 @@ class CBuildRestriction
 public:
 	virtual ~CBuildRestriction() {}
 	virtual void Init() {};
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
 };
 
 class CBuildRestrictionAnd : public CBuildRestriction
@@ -502,10 +501,7 @@ public:
 			(*i)->Init();
 		}
 	}
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
@@ -531,7 +527,7 @@ public:
 			(*i)->Init();
 		}
 	}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
@@ -544,24 +540,21 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 	class functor
 	{
 	public:
-		functor(const CUnitType *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
+		functor(const stratagus::unit_type *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
 		inline bool operator()(const CUnit *const unit) const;
 	private:
-		const CUnitType *const Parent;   /// building that is unit is an addon too.
+		const stratagus::unit_type *const Parent;   /// building that is unit is an addon too.
 		const Vec2i pos; //functor work position
 	};
 public:
 	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init();
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	Vec2i Offset;           /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
-	CUnitType *Parent;      /// building that is unit is an addon too.
+	stratagus::unit_type *Parent;      /// building that is unit is an addon too.
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction
@@ -569,24 +562,21 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 	class functor
 	{
 	public:
-		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
+		functor(const stratagus::unit_type *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
 		inline bool operator()(CUnit *const unit);
 		CUnit *ontop;   /// building that is unit is an addon too.
 	private:
-		const CUnitType *const Parent;  /// building that is unit is an addon too.
+		const stratagus::unit_type *const Parent;  /// building that is unit is an addon too.
 		const Vec2i pos;  //functor work position
 	};
 public:
 	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init();
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	std::string ParentName;  /// building that is unit is an addon too.
-	CUnitType *Parent;       /// building that is unit is an addon too.
+	stratagus::unit_type *Parent;       /// building that is unit is an addon too.
 	int ReplaceOnDie: 1;     /// recreate the parent on destruction
 	int ReplaceOnBuild: 1;   /// remove the parent, or just build over it.
 };
@@ -596,16 +586,13 @@ class CBuildRestrictionDistance : public CBuildRestriction
 public:
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init();
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	int Distance = 0;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType = nullptr;
+	stratagus::unit_type *RestrictType = nullptr;
 	std::string restrict_class_name;
 	const stratagus::unit_class *restrict_class = nullptr;
 	bool CheckBuilder = false;
@@ -618,15 +605,12 @@ public:
 	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
 	virtual ~CBuildRestrictionHasUnit() {};
 	virtual void Init();
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	
 	int Count;
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
-	CUnitType *RestrictType;
+	stratagus::unit_type *RestrictType;
 	std::string RestrictTypeOwner;
 };
 
@@ -640,10 +624,7 @@ public:
 
 	virtual ~CBuildRestrictionSurroundedBy() {};
 	virtual void Init();
-	//Wyrmgus start
-//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
-	//Wyrmgus end
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	
 	int Distance;
 	DistanceTypeType DistanceType;
@@ -651,7 +632,7 @@ public:
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType;
+	stratagus::unit_type *RestrictType;
 	bool CheckBuilder;
 };
 
@@ -661,7 +642,7 @@ class CBuildRestrictionTerrain : public CBuildRestriction
 public:
 	virtual ~CBuildRestrictionTerrain() {};
 	virtual void Init();
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	std::string RestrictTerrainTypeName;
 	stratagus::terrain_type *RestrictTerrainType = nullptr;
@@ -748,40 +729,43 @@ public:
 };	
 //Wyrmgus end
 
+namespace stratagus {
+
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType final : public stratagus::detailed_data_entry, public stratagus::data_type<CUnitType>, public CDataType
+class unit_type final : public detailed_data_entry, public data_type<unit_type>, public CDataType
 {
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(stratagus::animation_set* animation_set MEMBER animation_set READ get_animation_set)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
 	static constexpr const char *database_folder = "unit_types";
 
-	static CUnitType *add(const std::string &identifier, const stratagus::module *module)
+	static unit_type *add(const std::string &identifier, const stratagus::module *module)
 	{
-		CUnitType *unit_type = data_type::add(identifier, module);
-		unit_type->Slot = CUnitType::get_all().size() - 1;
+		unit_type *unit_type = data_type::add(identifier, module);
+		unit_type->Slot = unit_type::get_all().size() - 1;
 		return unit_type;
 	}
 
-	CUnitType(const std::string &identifier);
-	~CUnitType();
+	unit_type(const std::string &identifier);
+	~unit_type();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	
-	stratagus::unit_class *get_unit_class() const
+	unit_class *get_unit_class() const
 	{
 		return this->unit_class;
 	}
 
-	void set_unit_class(stratagus::unit_class *unit_class);
+	void set_unit_class(unit_class *unit_class);
 
-	stratagus::civilization *get_civilization() const
+	civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
@@ -814,7 +798,7 @@ public:
 	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
-	void SetParent(CUnitType *parent_type);
+	void SetParent(const unit_type *parent_type);
 	void RemoveButtons(const ButtonCmd button_action = ButtonCmd::None, const std::string &mod_file = "");
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
@@ -824,20 +808,25 @@ public:
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	const std::string &GetDefaultName(const CPlayer *player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
-	bool CanExperienceUpgradeTo(CUnitType *type) const;
+	bool CanExperienceUpgradeTo(const unit_type *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(stratagus::faction *faction, const stratagus::gender gender) const;
-	bool IsPersonalNameValid(const std::string &name, stratagus::faction *faction, const stratagus::gender gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(stratagus::faction *faction, const stratagus::gender gender) const;
+	std::string GeneratePersonalName(faction *faction, const gender gender) const;
+	bool IsPersonalNameValid(const std::string &name, faction *faction, const gender gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(faction *faction, const gender gender) const;
 	//Wyrmgus end
 
-	stratagus::species *get_species() const
+	species *get_species() const
 	{
 		return this->species;
 	}
 
+	animation_set *get_animation_set() const
+	{
+		return this->animation_set;
+	}
+
 public:
-	CUnitType *Parent;				/// Parent unit type
+	const unit_type *Parent;				/// Parent unit type
 	//Wyrmgus start
 private:
 	stratagus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)
@@ -851,19 +840,19 @@ public:
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
 	CUpgrade *Elixir;						/// Which elixir does this (item) unit type always have
-	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
-	std::vector<CUnitType *> SpawnUnits;	/// Units which this unit can spawn.
-	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
-	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
+	std::vector<unit_type *> SoldUnits;		/// Units which this unit can sell.
+	std::vector<unit_type *> SpawnUnits;	/// Units which this unit can spawn.
+	std::vector<unit_type *> Drops;			/// Units which can spawn upon death (i.e. items).
+	std::vector<unit_type *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CSpell *> DropSpells;		/// Spells which can be applied to dropped items
 	std::vector<CUpgrade *> Affixes;		/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> Traits;			/// Which traits this unit type can have
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
-	std::vector<CUnitType *> Trains;		/// Units trained by this unit
-	std::vector<CUnitType *> TrainedBy;		/// Units which can train this unit
-	std::map<std::string, std::vector<CUnitType *>> ModTrains;	/// Units trained by this unit (as set in a mod)
-	std::map<std::string, std::vector<CUnitType *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
-	std::map<std::string, std::vector<CUnitType *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
+	std::vector<unit_type *> Trains;		/// Units trained by this unit
+	std::vector<unit_type *> TrainedBy;		/// Units which can train this unit
+	std::map<std::string, std::vector<unit_type *>> ModTrains;	/// Units trained by this unit (as set in a mod)
+	std::map<std::string, std::vector<unit_type *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
+	std::map<std::string, std::vector<unit_type *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
@@ -872,7 +861,7 @@ public:
 	std::string LightFile;			/// Light file
 	std::string LayerFiles[MaxImageLayers];	/// Layer files
 	std::map<ButtonCmd, IconConfig> ButtonIcons;			/// icons for button actions
-	std::map<int, CUnitType *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
+	std::map<int, unit_type *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
 	int Width;                                            /// Sprite width
@@ -893,11 +882,13 @@ private:
 public:
 	stratagus::terrain_type *TerrainType;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
-	std::map<stratagus::gender, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::map<gender, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
-	stratagus::animation_set *Animations;        /// Animation scripts
+private:
+	stratagus::animation_set *animation_set = nullptr;        /// Animation scripts
+public:
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
@@ -930,7 +921,7 @@ public:
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 
 	std::string CorpseName;         /// Corpse type name
-	CUnitType *CorpseType;          /// Corpse unit-type
+	unit_type *CorpseType;          /// Corpse unit-type
 
 	CConstruction *Construction;    /// What is shown in construction phase
 
@@ -1061,8 +1052,10 @@ public:
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
 
-	friend int CclDefineUnitType(lua_State *l);
+	friend int ::CclDefineUnitType(lua_State *l);
 };
+
+}
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1192,7 +1185,7 @@ public:
 extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
-extern CUnitType *settlement_site_unit_type;
+extern stratagus::unit_type *settlement_site_unit_type;
 
 extern std::vector<CSpeciesGenus *> SpeciesGenuses;
 extern std::vector<CSpeciesFamily *> SpeciesFamilies;
@@ -1204,10 +1197,10 @@ extern std::vector<CSpeciesPhylum *> SpeciesPhylums;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-extern CUnitType *CclGetUnitType(lua_State *l);  /// Access unit-type object
+extern stratagus::unit_type *CclGetUnitType(lua_State *l);  /// Access unit-type object
 extern void UnitTypeCclRegister();               /// Register ccl features
 
-extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
+extern void UpdateUnitStats(stratagus::unit_type &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 //Wyrmgus start
 
@@ -1222,18 +1215,18 @@ extern CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident);
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 /// Draw the sprite frame of unit-type
-extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
+extern void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite,
 						 int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 //Wyrmgus start
-extern void InitUnitType(CUnitType &type);			/// Init unit-type
+extern void InitUnitType(stratagus::unit_type &type);			/// Init unit-type
 //Wyrmgus end
-extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype
+extern void LoadUnitTypeSprite(stratagus::unit_type &unittype); /// Load the sprite for a unittype
 extern int GetUnitTypesCount();                     /// Get the amount of unit-types
 extern void LoadUnitTypes();                     /// Load the unit-type data
 //Wyrmgus start
-extern void LoadUnitType(CUnitType &unittype);	/// Load a unittype
+extern void LoadUnitType(stratagus::unit_type &unittype);	/// Load a unittype
 //Wyrmgus end
 extern void CleanUnitTypeVariables();                    /// Cleanup unit-type module
 

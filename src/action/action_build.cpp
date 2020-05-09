@@ -65,10 +65,7 @@
 #include "unit/unit_type_type.h"
 #include "video.h"
 
-//Wyrmgus start
-//extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const stratagus::site *settlement);
-//Wyrmgus end
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement);
 
 enum {
 	State_Start = 0,
@@ -85,10 +82,7 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, stratagus::site *settlement)
-//Wyrmgus end
+COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, stratagus::site *settlement)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -157,7 +151,7 @@ enum {
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "type")) {
 		++j;
-		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
+		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
@@ -290,7 +284,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 }
 
-static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, stratagus::site *settlement)
+static bool CheckLimit(const CUnit &unit, const stratagus::unit_type &type, int landmass, stratagus::site *settlement)
 {
 	const CPlayer &player = *unit.Player;
 	bool isOk = true;
@@ -328,7 +322,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, s
 class AlreadyBuildingFinder
 {
 public:
-	AlreadyBuildingFinder(const CUnit &unit, const CUnitType &t) :
+	AlreadyBuildingFinder(const CUnit &unit, const stratagus::unit_type &t) :
 		worker(&unit), type(&t) {}
 	bool operator()(const CUnit *const unit) const
 	{
@@ -341,7 +335,7 @@ public:
 	}
 private:
 	const CUnit *worker;
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 };
 
 /**
@@ -354,7 +348,7 @@ private:
 CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 {
 	const Vec2i pos = this->goalPos;
-	const CUnitType &type = this->GetUnitType();
+	const stratagus::unit_type &type = this->GetUnitType();
 
 	// Check if the building could be built there.
 
@@ -409,11 +403,11 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 
 bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 {
-	const CUnitType &type = this->GetUnitType();
+	const stratagus::unit_type &type = this->GetUnitType();
 
 	unit.Player->SubUnitType(type);
 
-	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
+	CUnit *build = MakeUnit(const_cast<stratagus::unit_type &>(type), unit.Player);
 	
 	//Wyrmgus start
 	build->Name.clear(); // under construction buildings should have no proper name
@@ -491,12 +485,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	return true;
 }
 
-//Wyrmgus start
-void COrder_Build::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_Build::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
 {
 	this->Type = &newType;
 }
-//Wyrmgus end
 
 static void AnimateActionBuild(CUnit &unit)
 {
@@ -561,7 +553,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			return ;
 		}
 	}
-	const CUnitType &type = this->GetUnitType();
+	const stratagus::unit_type &type = this->GetUnitType();
 
 	if (State_NearOfLocation <= this->State && this->State < State_StartBuilding_Failed) {
 		//Wyrmgus start
@@ -586,12 +578,9 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		else { /* can't be built */
 			// Check if already building
 			const Vec2i pos = this->goalPos;
-			const CUnitType &type = this->GetUnitType();
+			const stratagus::unit_type &type = this->GetUnitType();
 
-			//Wyrmgus start
-//			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::Map.Field(pos));
 			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::Map.Field(pos, this->MapLayer));
-			//Wyrmgus end
 
 			if (building != nullptr) {
 				this->HelpBuild(unit, *building);

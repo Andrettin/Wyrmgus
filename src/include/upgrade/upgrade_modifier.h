@@ -42,13 +42,13 @@
 
 class CConfigData;
 class CDynasty;
-class CUnitType;
 class CUpgrade;
 
 namespace stratagus {
 	class faction;
 	class sml_data;
 	class sml_property;
+	class unit_type;
 }
 
 /**
@@ -73,9 +73,9 @@ public:
 	void process_sml_property(const stratagus::sml_property &property);
 	void process_sml_scope(const stratagus::sml_data &scope);
 	
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
+	int GetUnitStock(stratagus::unit_type *unit_type) const;
+	void SetUnitStock(stratagus::unit_type *unit_type, int quantity);
+	void ChangeUnitStock(stratagus::unit_type *unit_type, int quantity);
 
 	int UpgradeId = 0;						/// used to filter required modifier
 
@@ -83,7 +83,7 @@ public:
 	int *ModifyPercent = nullptr;			/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];			/// improve incomes
-	std::map<CUnitType *, int> UnitStock;	/// unit stock
+	std::map<stratagus::unit_type *, int> UnitStock;	/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?
@@ -92,7 +92,7 @@ public:
 	char ChangeUpgrades[UpgradeMax];		/// allow/forbid upgrades
 	char ApplyTo[UnitTypeMax];				/// which unit types are affected
 
-	CUnitType *ConvertTo = nullptr;			/// convert to this unit-type.
+	stratagus::unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
 
 	//Wyrmgus start
 	int change_civilization_to = -1;		/// changes the player's civilization to this one

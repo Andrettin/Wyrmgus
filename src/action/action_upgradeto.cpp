@@ -68,7 +68,7 @@ static constexpr int CancelUpgradeCostsFactor = 100;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionTransformInto(CUnitType &type)
+COrder *COrder::NewActionTransformInto(stratagus::unit_type &type)
 {
 	COrder_TransformInto *order = new COrder_TransformInto;
 
@@ -76,7 +76,7 @@ static constexpr int CancelUpgradeCostsFactor = 100;
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
+/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, stratagus::unit_type &type)
 {
 	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
@@ -94,12 +94,9 @@ static constexpr int CancelUpgradeCostsFactor = 100;
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-//Wyrmgus start
-//static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
-int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
-//Wyrmgus end
+int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 {
-	const CUnitType &oldtype = *unit.Type;
+	const stratagus::unit_type &oldtype = *unit.Type;
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
@@ -215,8 +212,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	//Wyrmgus start
-	for (std::map<CUnitType *, int>::iterator iterator = unit.UnitStock.begin(); iterator != unit.UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<stratagus::unit_type *, int>::iterator iterator = unit.UnitStock.begin(); iterator != unit.UnitStock.end(); ++iterator) {
+		stratagus::unit_type *unit_type = iterator->first;
 		
 		int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
 		if (unit_stock_change < 0) {
@@ -245,7 +242,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 	
-	unit.Type = const_cast<CUnitType *>(&newtype);
+	unit.Type = const_cast<stratagus::unit_type *>(&newtype);
 	unit.Stats = &unit.Type->Stats[player.Index];
 	
 	//Wyrmgus start
@@ -413,7 +410,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
+		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 	} else {
 		return false;
 	}
@@ -438,13 +435,11 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	this->Finished = true;
 }
 
-//Wyrmgus start
-void COrder_TransformInto::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_TransformInto::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
 	this->Type = &newType;
 }
-//Wyrmgus end
 
 #endif
 
@@ -465,7 +460,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, CUnitType &newType
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = CUnitType::get(LuaToString(l, -1, j + 1));
+		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 	} else if (!strcmp(value, "ticks")) {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);
@@ -500,7 +495,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 		return ;
 	}
 	CPlayer &player = *unit.Player;
-	const CUnitType &newtype = *this->Type;
+	const stratagus::unit_type &newtype = *this->Type;
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	//Wyrmgus start
@@ -563,8 +558,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
 }
 
-//Wyrmgus start
-void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
 	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
@@ -575,5 +569,4 @@ void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 	this->Type = &newType;
 }
 
-//Wyrmgus end
 #endif

@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/unit_type_variation.h"
@@ -43,10 +39,6 @@
 #include "time/season.h"
 #include "ui/button_action.h"
 #include "video.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 CUnitTypeVariation::~CUnitTypeVariation()
 {
@@ -142,10 +134,10 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_equipped") {
-			const CUnitType *unit_type = CUnitType::get(value);
+			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
 			this->ItemsEquipped.push_back(unit_type);
 		} else if (key == "item_not_equipped") {
-			const CUnitType *unit_type = CUnitType::get(value);
+			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
 			this->ItemsNotEquipped.push_back(unit_type);
 		} else if (key == "terrain") {
 			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);

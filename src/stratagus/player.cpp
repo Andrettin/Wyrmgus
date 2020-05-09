@@ -780,7 +780,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 	//Wyrmgus start
 	file.printf("\n  \"unit-type-kills\", {");
-	for (const CUnitType *unit_type : CUnitType::get_all()) {
+	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		if (p.UnitTypeKills[unit_type->Slot] != 0) {
 			file.printf("\"%s\", %d, ", unit_type->Ident.c_str(), p.UnitTypeKills[unit_type->Slot]);
 		}
@@ -1331,7 +1331,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 
 			//update the borders on the minimap for the new color
 			for (const auto &kv_pair : this->UnitsByType) {
-				const CUnitType *unit_type = kv_pair.first;
+				const stratagus::unit_type *unit_type = kv_pair.first;
 				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 					continue;
 				}
@@ -1643,14 +1643,14 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	const CUnitType *town_hall_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
+	const stratagus::unit_type *town_hall_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
 	if (town_hall_type == nullptr) {
 		return false;
 	}
 	
-	const CUnitType *stronghold_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::unit_class::get("stronghold"));
+	const stratagus::unit_type *stronghold_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::unit_class::get("stronghold"));
 
-	const CUnitType *fortress_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::unit_class::get("fortress"));
+	const stratagus::unit_type *fortress_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::unit_class::get("fortress"));
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
 	
@@ -1714,7 +1714,7 @@ stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Ve
 	}
 }
 
-bool CPlayer::HasUnitBuilder(const CUnitType *type, const stratagus::site *settlement) const
+bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
 		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
@@ -1752,7 +1752,7 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 {
 	if (upgrade->ID < (int) AiHelpers.Research.size()) {
 		for (size_t j = 0; j < AiHelpers.Research[upgrade->ID].size(); ++j) {
-			CUnitType *researcher_type = AiHelpers.Research[upgrade->ID][j];
+			stratagus::unit_type *researcher_type = AiHelpers.Research[upgrade->ID][j];
 			if (this->GetUnitTypeCount(researcher_type) > 0 || HasUnitBuilder(researcher_type)) {
 				return true;
 			}
@@ -2113,7 +2113,7 @@ std::string CPlayer::GetCharacterTitleName(const int title_type, const stratagus
 	return "";
 }
 
-void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building)
+void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const stratagus::unit_type *building)
 {
 	for (unsigned int i = 0; i < AiHelpers.Build[building->Slot].size(); ++i) {
 		if (this->GetUnitTypeAiActiveCount(AiHelpers.Build[building->Slot][i])) {
@@ -2134,8 +2134,8 @@ void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUn
 std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
 {
 	std::vector<CUpgrade *> researchable_upgrades;
-	for (std::map<const CUnitType *, int>::iterator iterator = this->UnitTypesAiActiveCount.begin(); iterator != this->UnitTypesAiActiveCount.end(); ++iterator) {
-		const CUnitType *type = iterator->first;
+	for (std::map<const stratagus::unit_type *, int>::iterator iterator = this->UnitTypesAiActiveCount.begin(); iterator != this->UnitTypesAiActiveCount.end(); ++iterator) {
+		const stratagus::unit_type *type = iterator->first;
 		if (type->Slot < ((int) AiHelpers.ResearchedUpgrades.size())) {
 			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->Slot].size(); ++i) {
 				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->Slot][i];
@@ -2360,7 +2360,7 @@ bool CPlayer::HasMarketUnit() const
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
-		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
+		stratagus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			return true;
@@ -2382,7 +2382,7 @@ CUnit *CPlayer::GetMarketUnit() const
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
-		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
+		stratagus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			std::vector<CUnit *> market_table;
@@ -2660,12 +2660,12 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 		CQuestObjective *objective = quest->Objectives[i];
 		if (objective->ObjectiveType == ObjectiveType::BuildUnits || objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
+			std::vector<const stratagus::unit_type *> unit_types = objective->UnitTypes;
 
 			if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 				unit_types.clear();
 				for (const stratagus::unit_class *unit_class : objective->get_unit_classes()) {
-					const CUnitType *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+					const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 					if (unit_type == nullptr) {
 						continue;
 					}
@@ -2678,7 +2678,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 			}
 
 			bool validated = false;
-			for (const CUnitType *unit_type : unit_types) {
+			for (const stratagus::unit_type *unit_type : unit_types) {
 				if (objective->get_settlement() != nullptr && !this->HasSettlement(objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 					continue;
 				}
@@ -2705,13 +2705,13 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 					}
 						
 					if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
+						std::vector<const stratagus::unit_type *> unit_types = second_objective->UnitTypes;
 
 						if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 							unit_types.clear();
 
 							for (const stratagus::unit_class *unit_class : second_objective->get_unit_classes()) {
-								const CUnitType *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+								const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 								if (unit_type == nullptr) {
 									continue;
 								}
@@ -2723,7 +2723,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 							}
 						}
 
-						for (const CUnitType *unit_type : unit_types) {
+						for (const stratagus::unit_type *unit_type : unit_types) {
 							if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
 								has_researcher = true;
 								break;
@@ -2836,12 +2836,12 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 		}
 		if (quest_objective->ObjectiveType == ObjectiveType::BuildUnits || quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 			if (objective->Counter < quest_objective->Quantity) {
-				std::vector<const CUnitType *> unit_types = quest_objective->UnitTypes;
+				std::vector<const stratagus::unit_type *> unit_types = quest_objective->UnitTypes;
 				if (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 					unit_types.clear();
 
 					for (const stratagus::unit_class *unit_class : quest_objective->get_unit_classes()) {
-						const CUnitType *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+						const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 						if (unit_type == nullptr) {
 							continue;
 						}
@@ -2855,7 +2855,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 				
 				bool validated = false;
 				std::string validation_error;
-				for (const CUnitType *unit_type : unit_types) {
+				for (const stratagus::unit_type *unit_type : unit_types) {
 					if (quest_objective->get_settlement() != nullptr && !this->HasSettlement(quest_objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 						validation_error = "You no longer hold the required settlement.";
 						continue;
@@ -2887,12 +2887,12 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 						}
 						
 						if (second_quest_objective->ObjectiveType == ObjectiveType::BuildUnits || second_quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-							std::vector<const CUnitType *> unit_types = second_quest_objective->UnitTypes;
+							std::vector<const stratagus::unit_type *> unit_types = second_quest_objective->UnitTypes;
 							if (second_quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
 								unit_types.clear();
 
 								for (const stratagus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
-									const CUnitType *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+									const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 									if (unit_type == nullptr) {
 										continue;
 									}
@@ -2904,7 +2904,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 								}
 							}
 
-							for (const CUnitType *unit_type : unit_types) {
+							for (const stratagus::unit_type *unit_type : unit_types) {
 								if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
 									has_researcher = true;
 									break;
@@ -3290,7 +3290,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 }
 //Wyrmgus end
 
-int CPlayer::GetUnitTotalCount(const CUnitType &type) const
+int CPlayer::GetUnitTotalCount(const stratagus::unit_type &type) const
 {
 	int count = this->GetUnitTypeCount(&type);
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
@@ -3321,7 +3321,7 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckLimits(const CUnitType &type) const
+int CPlayer::CheckLimits(const stratagus::unit_type &type) const
 {
 	//  Check game limits.
 	if (type.BoolFlag[BUILDING_INDEX].value && NumBuildings >= BuildingLimit) {
@@ -3398,10 +3398,7 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 **
 **  @return        False if all enough, otherwise a bit mask.
 */
-//Wyrmgus start
-//int CPlayer::CheckUnitType(const CUnitType &type) const
-int CPlayer::CheckUnitType(const CUnitType &type, bool hire) const
-//Wyrmgus end
+int CPlayer::CheckUnitType(const stratagus::unit_type &type, bool hire) const
 {
 	//Wyrmgus start
 //	return this->CheckCosts(type.Stats[this->Index].Costs);
@@ -3428,10 +3425,7 @@ void CPlayer::AddCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-//Wyrmgus start
-//void CPlayer::AddUnitType(const CUnitType &type)
-void CPlayer::AddUnitType(const CUnitType &type, bool hire)
-//Wyrmgus end
+void CPlayer::AddUnitType(const stratagus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
 //	AddCosts(type.Stats[this->Index].Costs);
@@ -3475,10 +3469,7 @@ void CPlayer::SubCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-//Wyrmgus start
-//void CPlayer::SubUnitType(const CUnitType &type)
-void CPlayer::SubUnitType(const CUnitType &type, bool hire)
-//Wyrmgus end
+void CPlayer::SubUnitType(const stratagus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
 //	this->SubCosts(type.Stats[this->Index].Costs);
@@ -3505,7 +3496,7 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 /**
 **  Gives the cost of a unit type for the player
 */
-void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire, bool ignore_one) const
+void CPlayer::GetUnitTypeCosts(const stratagus::unit_type *type, int *type_costs, bool hire, bool ignore_one) const
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		type_costs[i] = 0;
@@ -3534,7 +3525,7 @@ void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire
 	}
 }
 
-int CPlayer::GetUnitTypeCostsMask(const CUnitType *type, bool hire) const
+int CPlayer::GetUnitTypeCostsMask(const stratagus::unit_type *type, bool hire) const
 {
 	int costs_mask = 0;
 	
@@ -3581,7 +3572,7 @@ int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
 
 //Wyrmgus end
 
-void CPlayer::SetUnitTypeCount(const CUnitType *type, int quantity)
+void CPlayer::SetUnitTypeCount(const stratagus::unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
@@ -3596,12 +3587,12 @@ void CPlayer::SetUnitTypeCount(const CUnitType *type, int quantity)
 	}
 }
 
-void CPlayer::ChangeUnitTypeCount(const CUnitType *type, int quantity)
+void CPlayer::ChangeUnitTypeCount(const stratagus::unit_type *type, int quantity)
 {
 	this->SetUnitTypeCount(type, this->GetUnitTypeCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeCount(const CUnitType *type) const
+int CPlayer::GetUnitTypeCount(const stratagus::unit_type *type) const
 {
 	if (type && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
 		return this->UnitTypesCount.find(type)->second;
@@ -3610,7 +3601,7 @@ int CPlayer::GetUnitTypeCount(const CUnitType *type) const
 	}
 }
 
-void CPlayer::SetUnitTypeUnderConstructionCount(const CUnitType *type, int quantity)
+void CPlayer::SetUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
@@ -3625,12 +3616,12 @@ void CPlayer::SetUnitTypeUnderConstructionCount(const CUnitType *type, int quant
 	}
 }
 
-void CPlayer::ChangeUnitTypeUnderConstructionCount(const CUnitType *type, int quantity)
+void CPlayer::ChangeUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity)
 {
 	this->SetUnitTypeUnderConstructionCount(type, this->GetUnitTypeUnderConstructionCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeUnderConstructionCount(const CUnitType *type) const
+int CPlayer::GetUnitTypeUnderConstructionCount(const stratagus::unit_type *type) const
 {
 	if (type && this->UnitTypesUnderConstructionCount.find(type) != this->UnitTypesUnderConstructionCount.end()) {
 		return this->UnitTypesUnderConstructionCount.find(type)->second;
@@ -3639,7 +3630,7 @@ int CPlayer::GetUnitTypeUnderConstructionCount(const CUnitType *type) const
 	}
 }
 
-void CPlayer::SetUnitTypeAiActiveCount(const CUnitType *type, int quantity)
+void CPlayer::SetUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
@@ -3654,12 +3645,12 @@ void CPlayer::SetUnitTypeAiActiveCount(const CUnitType *type, int quantity)
 	}
 }
 
-void CPlayer::ChangeUnitTypeAiActiveCount(const CUnitType *type, int quantity)
+void CPlayer::ChangeUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity)
 {
 	this->SetUnitTypeAiActiveCount(type, this->GetUnitTypeAiActiveCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeAiActiveCount(const CUnitType *type) const
+int CPlayer::GetUnitTypeAiActiveCount(const stratagus::unit_type *type) const
 {
 	if (type && this->UnitTypesAiActiveCount.find(type) != this->UnitTypesAiActiveCount.end()) {
 		return this->UnitTypesAiActiveCount.find(type)->second;
@@ -3670,7 +3661,7 @@ int CPlayer::GetUnitTypeAiActiveCount(const CUnitType *type) const
 
 void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 {
-	const CUnitType *type = unit->Type;
+	const stratagus::unit_type *type = unit->Type;
 
 	this->ChangeUnitTypeCount(type, 1);
 	this->UnitsByType[type].push_back(unit);
@@ -3701,7 +3692,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 
 void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 {
-	const CUnitType *type = unit->Type;
+	const stratagus::unit_type *type = unit->Type;
 
 	this->ChangeUnitTypeCount(type, -1);
 	
@@ -3747,7 +3738,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 **
 **  @return        How many exists, false otherwise.
 */
-bool CPlayer::has_unit_type(const CUnitType *unit_type) const
+bool CPlayer::has_unit_type(const stratagus::unit_type *unit_type) const
 {
 	return this->GetUnitTypeCount(unit_type) > 0;
 }

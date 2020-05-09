@@ -32,20 +32,19 @@
 #include "data_type.h"
 #include "time/date.h"
 
-class CUnitType;
-
 namespace stratagus {
 
 class faction;
 class historical_location;
 class unit_class;
+class unit_type;
 
 class historical_unit : public named_data_entry, public data_type<historical_unit>
 {
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::unit_class* unit_class MEMBER unit_class READ get_unit_class)
-	Q_PROPERTY(CUnitType* unit_type MEMBER unit_type READ get_unit_type)
+	Q_PROPERTY(stratagus::unit_type* unit_type MEMBER unit_type READ get_unit_type)
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
@@ -69,7 +68,7 @@ public:
 		return this->unit_class;
 	}
 
-	CUnitType *get_unit_type() const
+	stratagus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
@@ -110,8 +109,8 @@ public:
 	}
 	
 private:
-	unit_class *unit_class = nullptr; //the unit's unit class
-	CUnitType *unit_type = nullptr; //the unit's unit type
+	stratagus::unit_class *unit_class = nullptr; //the unit's unit class
+	stratagus::unit_type *unit_type = nullptr; //the unit's unit type
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 	bool ai_active = true; //whether the unit's AI is active

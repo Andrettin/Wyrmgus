@@ -41,7 +41,6 @@ class CDeityDomain;
 class CGraphic;
 class CProvince;
 class CTerrainFeature;
-class CUnitType;
 class CUpgrade;
 class WorldMapTile;
 
@@ -50,6 +49,7 @@ namespace stratagus {
 	class faction;
 	class region;
 	class site;
+	class unit_type;
 	class world;
 }
 

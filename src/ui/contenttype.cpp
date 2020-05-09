@@ -53,7 +53,7 @@ struct UStrInt {
 };
 
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
-extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
+extern UStrInt GetComponent(const stratagus::unit_type &type, int index, EnumVariable e);
 
 /* virtual */ CContentType::~CContentType()
 {

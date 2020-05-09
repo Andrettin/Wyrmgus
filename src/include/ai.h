@@ -36,11 +36,11 @@
 class CPlayer;
 class CFile;
 class CUnit;
-class CUnitType;
 class CUpgrade;
 
 namespace stratagus {
 	class site;
+	class unit_type;
 }
 
 /*----------------------------------------------------------------------------
@@ -89,20 +89,14 @@ extern void AiNeedMoreSupply(const CPlayer &player);
 /// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
 /// Called if AI unit can't build
-//Wyrmgus start
-//extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
-extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass = 0, stratagus::site *settlement = nullptr);
-//Wyrmgus end
+extern void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int landmass = 0, stratagus::site *settlement = nullptr);
 /// Called if AI unit can't reach building place
-//Wyrmgus start
-//extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
-extern void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, stratagus::site *settlement);
-//Wyrmgus end
+extern void AiCanNotReach(CUnit &unit, const stratagus::unit_type &what, int landmass, stratagus::site *settlement);
 /// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);
 /// Called if AI unit has completed training
 extern void AiTrainingComplete(CUnit &unit, CUnit &what);
 /// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(CUnit &unit, const CUnitType &what);
+extern void AiUpgradeToComplete(CUnit &unit, const stratagus::unit_type &what);
 /// Called if AI unit has completed research
 extern void AiResearchComplete(CUnit &unit, const CUpgrade *what);

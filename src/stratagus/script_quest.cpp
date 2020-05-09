@@ -189,7 +189,7 @@ static int CclDefineQuest(lua_State *l)
 						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
 						objective->unit_classes.push_back(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
-						CUnitType *unit_type = CUnitType::get(LuaToString(l, -1, k + 1));
+						stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, k + 1));
 						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
 						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
@@ -588,7 +588,7 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Character = character;
 		} else if (!strcmp(value, "CharacterType")) {
 			const std::string unit_type_ident = LuaToString(l, -1);
-			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 			achievement->CharacterType = unit_type;
 		} else if (!strcmp(value, "RequiredQuests")) {
 			achievement->RequiredQuests.clear();
@@ -732,7 +732,7 @@ static int CclDefineDialogue(lua_State *l)
 						if (speaker_type == "character") {
 							node->speaker = stratagus::character::get(speaker);
 						} else if (speaker_type == "unit") {
-							node->speaker_unit_type = CUnitType::get(speaker);
+							node->speaker_unit_type = stratagus::unit_type::get(speaker);
 						} else {
 							node->speaker_name = speaker;
 						}

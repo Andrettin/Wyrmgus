@@ -62,10 +62,7 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-//Wyrmgus start
-//CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
-CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *parent)
-//Wyrmgus end
+CBuildRestrictionOnTop *OnTopDetails(const stratagus::unit_type &type, const stratagus::unit_type *parent)
 {
 	//Wyrmgus start
 //	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
@@ -110,10 +107,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *par
 /**
 **  Check And Restriction
 */
-//Wyrmgus start
-//bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const
-bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
-//Wyrmgus end
+bool CBuildRestrictionAnd::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
 	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
 		//Wyrmgus start
@@ -130,7 +124,7 @@ bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, co
 /**
 **  Check Or Restriction
 */
-bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+bool CBuildRestrictionOr::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
 	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
 		if ((*i)->Check(builder, type, pos, ontoptarget, z)) {
@@ -146,17 +140,14 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, con
 */
 void CBuildRestrictionDistance::Init()
 {
-	this->RestrictType = CUnitType::try_get(this->RestrictTypeName);
+	this->RestrictType = stratagus::unit_type::try_get(this->RestrictTypeName);
 	this->restrict_class = stratagus::unit_class::try_get(this->restrict_class_name);
 }
 
 /**
 **  Check Distance Restriction
 */
-//Wyrmgus start
-//bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
-//Wyrmgus end
+bool CBuildRestrictionDistance::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
@@ -231,16 +222,13 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 
 void CBuildRestrictionHasUnit::Init()
 {
-	this->RestrictType = CUnitType::get(this->RestrictTypeName);
+	this->RestrictType = stratagus::unit_type::get(this->RestrictTypeName);
 }
 
 /**
 **  Check HasUnit Restriction
 */
-//Wyrmgus start
-//bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
-//Wyrmgus end
+bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
@@ -280,16 +268,13 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 
 void CBuildRestrictionSurroundedBy::Init()
 {
-	this->RestrictType = CUnitType::get(this->RestrictTypeName);
+	this->RestrictType = stratagus::unit_type::get(this->RestrictTypeName);
 }
 
 /**
 **  Check Surrounded By Restriction
 */
-//Wyrmgus start
-//bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
-//Wyrmgus end
+bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
@@ -375,16 +360,13 @@ inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit)
 
 void CBuildRestrictionAddOn::Init()
 {
-	this->Parent = CUnitType::get(this->ParentName);
+	this->Parent = stratagus::unit_type::get(this->ParentName);
 }
 
 /**
 **  Check AddOn Restriction
 */
-//Wyrmgus start
-//bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&) const
-bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&, int z) const
-//Wyrmgus end
+bool CBuildRestrictionAddOn::Check(const CUnit *, const stratagus::unit_type &, const Vec2i &pos, CUnit *&, int z) const
 {
 	Vec2i pos1 = pos - this->Offset;
 
@@ -419,21 +401,21 @@ inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 class AliveConstructedAndSameTypeAs
 {
 public:
-	explicit AliveConstructedAndSameTypeAs(const CUnitType &unitType) : type(&unitType) {}
+	explicit AliveConstructedAndSameTypeAs(const stratagus::unit_type &unitType) : type(&unitType) {}
 	bool operator()(const CUnit *unit) const
 	{
 		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitAction::Built;
 	}
 private:
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 };
 
 void CBuildRestrictionOnTop::Init()
 {
-	this->Parent = CUnitType::get(this->ParentName);
+	this->Parent = stratagus::unit_type::get(this->ParentName);
 }
 
-bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+bool CBuildRestrictionOnTop::Check(const CUnit *builder, const stratagus::unit_type &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -480,7 +462,7 @@ void CBuildRestrictionTerrain::Init()
 /**
 **  Check Terrain Restriction
 */
-bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+bool CBuildRestrictionTerrain::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -512,10 +494,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==nullptr, null false.
 */
-//Wyrmgus start
-//CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
-CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z, bool no_bordering_building)
-//Wyrmgus end
+CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int z, bool no_bordering_building)
 {
 	//  Can't build outside the map
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
@@ -672,10 +651,7 @@ bool CanBuildOn(const Vec2i &pos, int mask, int z)
 **  @return      OnTop, parent unit, builder on true, null false.
 **
 */
-//Wyrmgus start
-//CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
-CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration, int z)
-//Wyrmgus end
+CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z)
 {
 	// Terrain Flags don't matter if building on top of a unit.
 	//Wyrmgus start

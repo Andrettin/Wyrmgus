@@ -35,12 +35,12 @@
 
 namespace stratagus {
 
-bool unit_class::has_unit_type(CUnitType *unit_type) const
+bool unit_class::has_unit_type(unit_type *unit_type) const
 {
 	return vector::contains(this->unit_types, unit_type);
 }
 
-void unit_class::remove_unit_type(CUnitType *unit_type)
+void unit_class::remove_unit_type(unit_type *unit_type)
 {
 	vector::remove(this->unit_types, unit_type);
 }

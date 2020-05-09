@@ -108,7 +108,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 			if (character->get_unit_type() == nullptr || character->get_unit_type() == unit_type || character->get_unit_type()->CanExperienceUpgradeTo(unit_type)) {
 				character->unit_type = unit_type;
 			}
@@ -308,7 +308,7 @@ static int CclDefineCharacter(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						std::string item_ident = LuaToString(l, -1, k + 1);
-						CUnitType *item_type = CUnitType::try_get(item_ident);
+						stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
 						if (item_type != nullptr) {
 							item->Type = item_type;
 						} else {
@@ -399,7 +399,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				CUnitType *unit_type = CUnitType::get(unit_type_ident);
+				stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 				character->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "HistoricalFactions")) {
@@ -539,7 +539,7 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			CUnitType *unit_type = CUnitType::get(unit_type_ident);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 			hero->unit_type = unit_type;
 			if (hero->Level < hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
 				hero->Level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
@@ -618,7 +618,7 @@ static int CclDefineCustomHero(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						std::string item_ident = LuaToString(l, -1, k + 1);
-						CUnitType *item_type = CUnitType::try_get(item_ident);
+						stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
 						if (item_type != nullptr) {
 							item->Type = item_type;
 						} else {
@@ -709,7 +709,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				CUnitType *unit_type = CUnitType::get(unit_type_ident);
+				stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 				hero->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "Icon")) {

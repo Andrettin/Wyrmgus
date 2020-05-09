@@ -194,9 +194,9 @@ public:
 
 	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
 
-	CUnitType *get_class_unit_type(const unit_class *unit_class) const;
+	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
-	void set_class_unit_type(const unit_class *unit_class, CUnitType *unit_type)
+	void set_class_unit_type(const unit_class *unit_class, unit_type *unit_type)
 	{
 		if (unit_type == nullptr) {
 			this->class_unit_types.erase(unit_class);
@@ -206,9 +206,9 @@ public:
 		this->class_unit_types[unit_class] = unit_type;
 	}
 
-	void remove_class_unit_type(CUnitType *unit_type)
+	void remove_class_unit_type(unit_type *unit_type)
 	{
-		for (std::map<const unit_class *, CUnitType *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (std::map<const unit_class *, stratagus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -282,7 +282,7 @@ public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
-	std::map<const unit_class *, CUnitType *> class_unit_types; //the unit type slot of a particular class for the civilization
+	std::map<const unit_class *, unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::vector<character *> characters;
 public:

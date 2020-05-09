@@ -48,7 +48,7 @@ public:
 	explicit create_unit_effect(const std::string &unit_type_identifier, const sml_operator effect_operator)
 		: create_unit_effect(effect_operator)
 	{
-		this->unit_type = CUnitType::get(unit_type_identifier);
+		this->unit_type = unit_type::get(unit_type_identifier);
 	}
 
 	virtual const std::string &get_class_identifier() const override
@@ -63,7 +63,7 @@ public:
 		const std::string &value = property.get_value();
 
 		if (key == "unit_type") {
-			this->unit_type = CUnitType::get(value);
+			this->unit_type = unit_type::get(value);
 		} else if (key == "site") {
 			this->site = site::get(value);
 		} else if (key == "ttl") {
@@ -98,7 +98,7 @@ public:
 	}
 
 private:
-	const CUnitType *unit_type = nullptr; //the unit type to be created
+	const stratagus::unit_type *unit_type = nullptr; //the unit type to be created
 	const site *site = nullptr; //the site where the unit type is to be located, if any
 	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
 };

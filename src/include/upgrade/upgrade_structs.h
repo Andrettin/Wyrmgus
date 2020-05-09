@@ -51,7 +51,6 @@
 class CDeityDomain;
 class CSchoolOfMagic;
 class CUniqueItem;
-class CUnitType;
 class CUpgradeModifier;
 struct lua_State;
 
@@ -60,6 +59,7 @@ namespace stratagus {
 	class civilization;
 	class dependency;
 	class icon;
+	class unit_type;
 	class upgrade_class;
 }
 
@@ -84,16 +84,16 @@ public:
 	bool operator != (const CUnitStats &rhs) const;
 	
  	int GetPrice() const;
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
+	int GetUnitStock(stratagus::unit_type *unit_type) const;
+	void SetUnitStock(stratagus::unit_type *unit_type, int quantity);
+	void ChangeUnitStock(stratagus::unit_type *unit_type, int quantity);
 public:
 	std::vector<stratagus::unit_variable> Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 	int ResourceDemand[MaxCosts];	/// Resource demand
-	std::map<CUnitType *, int> UnitStock;	/// Units in stock
+	std::map<stratagus::unit_type *, int> UnitStock;	/// Units in stock
 };
 
 class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::data_type<CUpgrade>, public CDataType
@@ -230,7 +230,7 @@ public:
 	std::vector<int> WeaponClasses;		/// if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	//Wyrmgus start
 	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
-	CUnitType *Item = nullptr;
+	stratagus::unit_type *Item = nullptr;
 	//Wyrmgus end
 	int   ID = 0;						/// numerical id
 	int   Costs[MaxCosts];				/// costs for the upgrade
@@ -244,7 +244,7 @@ public:
 	stratagus::character *Author = nullptr;		/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
-	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
+	std::vector<stratagus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
 	std::vector<stratagus::character *> Characters;	/// Characters who appear in this literary work (if it is one)

@@ -32,7 +32,6 @@
 
 class CFile;
 class CUnit;
-class CUnitType;
 class CUpgrade;
 class LuaCallback;
 struct lua_State;
@@ -42,6 +41,7 @@ namespace stratagus {
 	class effect;
 	class effect_list;
 	class faction;
+	class unit_type;
 }
 
 /**
@@ -124,9 +124,9 @@ public:
 
 }
 
-#define ANY_UNIT ((const CUnitType *)0)
-#define ALL_FOODUNITS ((const CUnitType *)-1)
-#define ALL_BUILDINGS ((const CUnitType *)-2)
+#define ANY_UNIT ((const stratagus::unit_type *)0)
+#define ALL_FOODUNITS ((const stratagus::unit_type *)-1)
+#define ALL_BUILDINGS ((const stratagus::unit_type *)-2)
 
 /**
 **  Data to referer game info when game running.
@@ -138,7 +138,7 @@ struct TriggerDataType {
 	//Wyrmgus start
 	CUnit *Unit;	  /// Unit used in trigger
 	//Wyrmgus end
-	const CUnitType *Type;  /// Type used in trigger;
+	const stratagus::unit_type *Type;  /// Type used in trigger;
 	//Wyrmgus start
 	CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger
@@ -160,7 +160,7 @@ extern TriggerDataType TriggerData;
 ----------------------------------------------------------------------------*/
 
 extern int TriggerGetPlayer(lua_State *l);/// get player number.
-extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
+extern const stratagus::unit_type *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features

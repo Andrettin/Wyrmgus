@@ -45,7 +45,7 @@ public:
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	CUnitType *NewForm = nullptr;	/// The new form
+	stratagus::unit_type *NewForm = nullptr;	/// The new form
 	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
 	//Wyrmgus start
 	stratagus::civilization *civilization = nullptr;			/// For using with the Faction value.

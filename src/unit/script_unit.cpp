@@ -298,8 +298,8 @@ static int CclUnit(lua_State *l)
 	}
 
 	CUnit *unit = nullptr;
-	CUnitType *type = nullptr;
-	CUnitType *seentype = nullptr;
+	stratagus::unit_type *type = nullptr;
+	stratagus::unit_type *seentype = nullptr;
 	CPlayer *player = nullptr;
 
 	// Parse the list:
@@ -309,9 +309,9 @@ static int CclUnit(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "type")) {
-			type = CUnitType::get(LuaToString(l, 2, j + 1));
+			type = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "seen-type")) {
-			seentype = CUnitType::get(LuaToString(l, 2, j + 1));
+			seentype = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "player")) {
 			player = CPlayer::Players[LuaToNumber(l, 2, j + 1)];
 
@@ -704,11 +704,11 @@ static int CclUnit(lua_State *l)
 				LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 			}
 		} else if (!strcmp(value, "unit-stock")) {
-			CUnitType *stocked_unit_type = CUnitType::get(LuaToString(l, 2, j + 1));
+			stratagus::unit_type *stocked_unit_type = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->SetUnitStock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "unit-stock-replenishment-timer")) {
-			CUnitType *stocked_unit_type = CUnitType::get(LuaToString(l, 2, j + 1));
+			stratagus::unit_type *stocked_unit_type = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->SetUnitStockReplenishmentTimer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "character")) {
@@ -839,7 +839,7 @@ static int CclCreateUnit(lua_State *l)
 	//Wyrmgus end
 
 	lua_pushvalue(l, 1);
-	CUnitType *unittype = CclGetUnitType(l);
+	stratagus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -914,7 +914,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	}
 
 	lua_pushvalue(l, 1);
-	CUnitType *unittype = CclGetUnitType(l);
+	stratagus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -987,7 +987,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 	}
 
 	lua_pushvalue(l, 1);
-	CUnitType *unittype = CclGetUnitType(l);
+	stratagus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -1043,7 +1043,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	LuaCheckArgs(l, 4);
 
 	lua_pushvalue(l, 1);
-	CUnitType *unittype = CclGetUnitType(l);
+	stratagus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -1117,9 +1117,9 @@ static int CclTransformUnit(lua_State *l)
 	CUnit *targetUnit = CclGetUnit(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1);
+	CommandUpgradeTo(*targetUnit, *(stratagus::unit_type *)unittype, 1);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -1217,7 +1217,7 @@ static int CclOrderUnit(lua_State *l)
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3)) {
 		LuaError(l, "incorrect argument");
@@ -1299,7 +1299,7 @@ static int CclOrderUnit(lua_State *l)
 class HasSameUnitTypeAs
 {
 public:
-	explicit HasSameUnitTypeAs(const CUnitType *_type) : type(_type) {}
+	explicit HasSameUnitTypeAs(const stratagus::unit_type *_type) : type(_type) {}
 	bool operator()(const CUnit *unit) const
 	{
 		return (type == ANY_UNIT || type == unit->Type
@@ -1307,7 +1307,7 @@ public:
 				|| (type == ALL_BUILDINGS && unit->Type->BoolFlag[BUILDING_INDEX].value));
 	}
 private:
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 };
 
 
@@ -1325,32 +1325,6 @@ static int CclKillUnit(lua_State *l)
 	LuaCheckArgs(l, 1);
 	//Wyrmgus end
 
-	//Wyrmgus start
-	/*
-	lua_pushvalue(l, 1);
-	const CUnitType *unittype = TriggerGetUnitType(l);
-	lua_pop(l, 1);
-	const int plynr = TriggerGetPlayer(l);
-	if (plynr == -1) {
-		CUnitManager::Iterator it = std::find_if(UnitManager.begin(), UnitManager.end(), HasSameUnitTypeAs(unittype));
-
-		if (it != UnitManager.end()) {
-			LetUnitDie(**it);
-			lua_pushboolean(l, 1);
-			return 1;
-		}
-	} else {
-		CPlayer &player = *CPlayer::Players[plynr];
-		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), HasSameUnitTypeAs(unittype));
-
-		if (it != player.UnitEnd()) {
-			LetUnitDie(**it);
-			lua_pushboolean(l, 1);
-			return 1;
-		}
-	}
-	*/
-	
 	if (lua_isnil(l, 1)) {
 		return 0;
 	}
@@ -1381,7 +1355,7 @@ static int CclKillUnitAt(lua_State *l)
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
 	int plynr = TriggerGetPlayer(l);
@@ -1462,7 +1436,7 @@ static int CclConvertUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	lua_pushvalue(l, 2);
-	CUnitType *unittype = CclGetUnitType(l);
+	stratagus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}

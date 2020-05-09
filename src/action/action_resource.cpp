@@ -797,7 +797,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
-	const CUnitType &source_type = *source.Type;
+	const stratagus::unit_type &source_type = *source.Type;
 	
 //	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
 //		   || (!unit.Container && resinfo.HarvestFromOutside));

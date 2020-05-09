@@ -338,8 +338,8 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 
-	for (std::map<CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
+		stratagus::unit_type *unit_type = iterator->first;
 		int unit_stock = iterator->second;
 		
 		if (unit_stock <= 0) {
@@ -691,7 +691,7 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		unit.UpdateSoldUnits();
 		
 		for (size_t i = 0; i < unit.Type->SpawnUnits.size(); ++i) {
-			CUnitType *spawned_type = unit.Type->SpawnUnits[i];
+			stratagus::unit_type *spawned_type = unit.Type->SpawnUnits[i];
 			int spawned_type_demand = spawned_type->Stats[unit.Player->Index].Variables[DEMAND_INDEX].Value;
 			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
 				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached

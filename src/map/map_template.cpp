@@ -116,13 +116,13 @@ void map_template::process_sml_scope(const sml_data &scope)
 		});
 	} else if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
 		scope.for_each_property([&](const sml_property &property) {
-			CUnitType *unit_type = CUnitType::get(property.get_key());
+			unit_type *unit_type = unit_type::get(property.get_key());
 			const int quantity = std::stoi(property.get_value());
 
 			if (tag == "generated_neutral_units") {
-				this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				this->GeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
 			} else if (tag == "player_location_generated_neutral_units") {
-				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
 			}
 		});
 	} else {
@@ -230,7 +230,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "generated_neutral_unit" || child_config_data->Tag == "player_location_generated_neutral_unit") {
-			CUnitType *unit_type = nullptr;
+			unit_type *unit_type = nullptr;
 			int quantity = 1;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -238,7 +238,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "unit_type") {
-					unit_type = CUnitType::get(value);
+					unit_type = unit_type::get(value);
 				} else if (key == "quantity") {
 					quantity = std::stoi(value);
 				} else {
@@ -252,9 +252,9 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			if (child_config_data->Tag == "generated_neutral_unit") {
-				this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				this->GeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
 			} else if (child_config_data->Tag == "player_location_generated_neutral_unit") {
-				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
 			}
 		} else if (child_config_data->Tag == "generated_terrain") {
 			auto generated_terrain = std::make_unique<stratagus::generated_terrain>();
@@ -742,14 +742,14 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
 
-	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
+	for (std::map<std::pair<int, int>, std::tuple<unit_type *, int, CUniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
 		Vec2i unit_pos(map_start_pos.x() + unit_raw_pos.x - template_start_pos.x(), map_start_pos.y() + unit_raw_pos.y - template_start_pos.y());
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z)) {
 			continue;
 		}
 		
-		const CUnitType *type = std::get<0>(iterator->second);
+		const unit_type *type = std::get<0>(iterator->second);
 		
 		Vec2i unit_offset((type->TileSize - 1) / 2);
 		
@@ -823,7 +823,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			CUnitType *worker_type = faction::get_all()[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
+			unit_type *worker_type = faction::get_all()[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((worker_type->TileSize - 1) / 2);
 				
@@ -1044,7 +1044,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					&& (!start_date.ContainsDate(std::get<1>(site->HistoricalResources[j])) || std::get<1>(site->HistoricalResources[j]).Year == 0)
 				)
 			) {
-				const CUnitType *type = std::get<2>(site->HistoricalResources[j]);
+				const unit_type *type = std::get<2>(site->HistoricalResources[j]);
 				if (!type) {
 					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
 					continue;
@@ -1103,13 +1103,13 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			player->SetStartView(site_pos, z);
 		}
 		
-		CUnitType *pathway_type = nullptr;
+		unit_type *pathway_type = nullptr;
 		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
 			if (
 				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
 				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
-				CUnitType *unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
+				unit_type *unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
 				if (unit_type == nullptr) {
 					continue;
 				}
@@ -1123,7 +1123,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		
 		bool first_building = true;
 		for (const unit_class *building_class : site->get_building_classes()) {
-			const CUnitType *unit_type = site_owner->get_class_unit_type(building_class);
+			const unit_type *unit_type = site_owner->get_class_unit_type(building_class);
 
 			if (unit_type == nullptr) {
 				continue;
@@ -1184,7 +1184,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
 				const faction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
-				const CUnitType *unit_type = nullptr;
+				const unit_type *unit_type = nullptr;
 				if (building_owner) {
 					unit_type = building_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
 				} else {
@@ -1261,7 +1261,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				int unit_quantity = std::get<3>(site->HistoricalUnits[j]);
 						
 				if (unit_quantity > 0) {
-					const CUnitType *type = std::get<2>(site->HistoricalUnits[j]);
+					const unit_type *type = std::get<2>(site->HistoricalUnits[j]);
 					if (type->BoolFlag[ORGANIC_INDEX].value) {
 						unit_quantity = std::max(1, unit_quantity / PopulationPerUnit); //each organic unit represents 1,000 people
 					}
@@ -1297,7 +1297,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
 	for (size_t i = 0; i < this->PlaneConnectors.size(); ++i) {
-		const CUnitType *type = std::get<1>(this->PlaneConnectors[i]);
+		const unit_type *type = std::get<1>(this->PlaneConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->PlaneConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		Vec2i unit_offset((type->TileSize - 1) / 2);
@@ -1340,7 +1340,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 	}
 	
 	for (size_t i = 0; i < this->WorldConnectors.size(); ++i) {
-		const CUnitType *type = std::get<1>(this->WorldConnectors[i]);
+		const unit_type *type = std::get<1>(this->WorldConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->WorldConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		Vec2i unit_offset((type->TileSize - 1) / 2);
@@ -1394,7 +1394,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 	for (size_t i = 0; i < this->Units.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
-		const CUnitType *type = std::get<1>(this->Units[i]);
+		const unit_type *type = std::get<1>(this->Units[i]);
 		Vec2i unit_offset((type->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
@@ -1490,7 +1490,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		
 		faction *unit_faction = historical_unit->get_faction();
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
-		CUnitType *unit_type = historical_unit->get_unit_type();
+		unit_type *unit_type = historical_unit->get_unit_type();
 		if (unit_type == nullptr && historical_unit->get_unit_class() != nullptr) {
 			unit_type = unit_faction->get_class_unit_type(historical_unit->get_unit_class());
 		}

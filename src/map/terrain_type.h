@@ -35,7 +35,6 @@
 
 class CGraphic;
 class CPlayerColorGraphic;
-class CUnitType;
 struct lua_State;
 
 int CclDefineTerrainType(lua_State *l);
@@ -44,6 +43,7 @@ namespace stratagus {
 
 class resource;
 class season;
+class unit_type;
 enum class tile_transition_type;
 
 class terrain_type : public named_data_entry, public data_type<terrain_type>, public CDataType
@@ -400,7 +400,7 @@ private:
 	bool allow_single = false;			/// Whether this terrain type has transitions for single tiles
 	bool hidden = false;
 public:
-	CUnitType *UnitType = nullptr;
+	unit_type *UnitType = nullptr;
 private:
 	std::filesystem::path image_file;
 	CPlayerColorGraphic *graphics = nullptr;

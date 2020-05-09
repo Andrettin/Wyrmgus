@@ -40,13 +40,13 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnitType;
 //Wyrmgus start
 class CUnit;
 //Wyrmgus end
 
 namespace stratagus {
 	class terrain_type;
+	class unit_type;
 }
 
 enum EditorRunningType {
@@ -75,7 +75,7 @@ public:
 
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
-	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
+	std::vector<const stratagus::unit_type *> ShownUnitTypes;  /// Shown editor unit-type table.
 	//Wyrmgus start
 //	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
 	std::vector<stratagus::terrain_type *> ShownTileTypes;        /// Shown editor tile-type table.
@@ -85,7 +85,7 @@ public:
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
 	std::string StartUnitName;   /// name of the Unit used to display the start location.
-	const CUnitType *StartUnit;  /// Unit used to display the start location.
+	const stratagus::unit_type *StartUnit;  /// Unit used to display the start location.
 
 	int UnitIndex;               /// Unit icon draw index.
 	int CursorUnitIndex;         /// Unit icon under cursor.

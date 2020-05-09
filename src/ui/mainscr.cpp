@@ -421,7 +421,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	return val;
 }
 
-UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
+UStrInt GetComponent(const stratagus::unit_type &type, int index, EnumVariable e, int t)
 {
 	UStrInt val;
 	const stratagus::unit_variable *var;
@@ -568,7 +568,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 #ifdef USE_MNG
 	if (type.Portrait.Num) {
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
@@ -757,7 +757,7 @@ static void DrawUnitInfo(CUnit &unit)
 		}
 	}
 
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 	Assert(&type);
 
 	// Draw IconUnit

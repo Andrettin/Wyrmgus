@@ -380,11 +380,9 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = CUnitType::get(value);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
 			this->Type = unit_type;
 		} else if (key == "prefix") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Prefix = upgrade;
@@ -460,7 +458,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 
 std::string GetItemEffectsString(const std::string &item_ident)
 {
-	const CUnitType *item = CUnitType::get(item_ident);
+	const stratagus::unit_type *item = stratagus::unit_type::get(item_ident);
 
 	std::string item_effects_string;
 	

@@ -276,7 +276,7 @@ const std::vector<std::string> &faction::get_ship_names() const
 	return this->civilization->get_ship_names();
 }
 
-CUnitType *faction::get_class_unit_type(const unit_class *unit_class) const
+unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
 {
 	if (unit_class == nullptr) {
 		return nullptr;

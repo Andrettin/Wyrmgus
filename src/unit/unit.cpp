@@ -739,13 +739,13 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		upgrade_found = false;
 
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
-			std::vector<CUnitType *> potential_upgrades;
+			std::vector<stratagus::unit_type *> potential_upgrades;
 			
 			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
+					stratagus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (CheckDependencies(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
@@ -775,7 +775,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			if (potential_upgrades.size() > 0) {
 				this->Variable[LEVELUP_INDEX].Value -= 1;
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
-				CUnitType *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
+				stratagus::unit_type *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
 					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->get_name().c_str());
 				}
@@ -829,7 +829,7 @@ void CUnit::Retrain()
 	//now, revert the unit's type to the level 1 one
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
 		bool found_previous_unit_type = false;
-		for (CUnitType *unit_type : CUnitType::get_all()) {
+		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
@@ -1125,7 +1125,7 @@ bool CUnit::CheckSeasonForVariation(const CUnitTypeVariation *variation) const
 	return true;
 }
 
-void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation, int image_layer)
+void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_old_variation, int image_layer)
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
@@ -1256,7 +1256,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	}
 }
 
-void CUnit::SetVariation(CUnitTypeVariation *new_variation, const CUnitType *new_type, int image_layer)
+void CUnit::SetVariation(CUnitTypeVariation *new_variation, const stratagus::unit_type *new_type, int image_layer)
 {
 	if (image_layer == -1) {
 		if (
@@ -2080,8 +2080,8 @@ void CUnit::GenerateDrop()
 	drop_pos.x += SyncRand(this->Type->TileSize.x);
 	drop_pos.y += SyncRand(this->Type->TileSize.y);
 	CUnit *droppedUnit = nullptr;
-	CUnitType *chosen_drop = nullptr;
-	std::vector<CUnitType *> potential_drops;
+	stratagus::unit_type *chosen_drop = nullptr;
+	std::vector<stratagus::unit_type *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
 		if (CheckDependencies(this->Type->Drops[i], this)) {
 			potential_drops.push_back(this->Type->Drops[i]);
@@ -2093,7 +2093,7 @@ void CUnit::GenerateDrop()
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
-		for (std::map<std::string, std::vector<CUnitType *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
+		for (std::map<std::string, std::vector<stratagus::unit_type *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
 				if (CheckDependencies(iterator->second[i], this)) {
 					potential_drops.push_back(iterator->second[i]);
@@ -2462,7 +2462,7 @@ void CUnit::UpdateSoldUnits()
 	}
 	this->SoldUnits.clear();
 	
-	std::vector<CUnitType *> potential_items;
+	std::vector<stratagus::unit_type *> potential_items;
 	std::vector<stratagus::character *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		const stratagus::civilization *civilization = this->Type->get_civilization();
@@ -2545,7 +2545,7 @@ void CUnit::UpdateSoldUnits()
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
-			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
+			stratagus::unit_type *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
@@ -2734,7 +2734,7 @@ int CUnit::GetDrawLevel() const
 **
 **  @param type    Unit-type
 */
-void CUnit::Init(const CUnitType &type)
+void CUnit::Init(const stratagus::unit_type &type)
 {
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	Refs = 1;
@@ -2865,7 +2865,7 @@ bool CUnit::CanStoreOrder(COrder *order)
 */
 void CUnit::AssignToPlayer(CPlayer &player)
 {
-	const CUnitType &type = *Type;
+	const stratagus::unit_type &type = *Type;
 
 	// Build player unit table
 	//Wyrmgus start
@@ -2980,7 +2980,7 @@ const stratagus::player_color *CUnit::get_player_color() const
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
+CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player)
 {
 	CUnit *unit = UnitManager.AllocUnit();
 	if (unit == nullptr) {
@@ -3781,10 +3781,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 **
 **  @return        Pointer to created unit.
 */
-//Wyrmgus start
-//CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player)
-CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z)
-//Wyrmgus end
+CUnit *MakeUnitAndPlace(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -3804,7 +3801,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building)
+CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -3834,23 +3831,23 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 	return unit;
 }
 
-CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique)
+CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, CPlayer::Players[PlayerNumNeutral], z, true);
 	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
 			
 	// create metal rocks near metal resources
-	CUnitType *metal_rock_type = nullptr;
+	stratagus::unit_type *metal_rock_type = nullptr;
 	if (type.Ident == "unit-gold-deposit") {
-		metal_rock_type = CUnitType::get("unit-gold-rock");
+		metal_rock_type = stratagus::unit_type::get("unit-gold-rock");
 	} else if (type.Ident == "unit-silver-deposit") {
-		metal_rock_type = CUnitType::get("unit-silver-rock");
+		metal_rock_type = stratagus::unit_type::get("unit-silver-rock");
 	} else if (type.Ident == "unit-copper-deposit") {
-		metal_rock_type = CUnitType::get("unit-copper-rock");
+		metal_rock_type = stratagus::unit_type::get("unit-copper-rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
-		metal_rock_type = CUnitType::get("unit-diamond-rock");
+		metal_rock_type = stratagus::unit_type::get("unit-diamond-rock");
 	} else if (type.Ident == "unit-emerald-deposit") {
-		metal_rock_type = CUnitType::get("unit-emerald-rock");
+		metal_rock_type = stratagus::unit_type::get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileSize - 1) / 2);
@@ -3871,10 +3868,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 **  @param resPos   Holds the nearest point.
 **  @param heading  preferense side to drop out of.
 */
-//Wyrmgus start
-//void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements)
-//Wyrmgus end
+void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements)
 {
 	int addx = 0;
 	int addy = 0;
@@ -4034,7 +4028,7 @@ void UnitLost(CUnit &unit)
 
 	//  Remove the unit from the player's units table.
 
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 	if (!type.BoolFlag[VANISHES_INDEX].value) {
 		player.RemoveUnit(unit);
 
@@ -4224,7 +4218,7 @@ void UnitClearOrders(CUnit &unit)
 */
 void UpdateForNewUnit(const CUnit &unit, int upgrade)
 {
-	const CUnitType &type = *unit.Type;
+	const stratagus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
 	// Handle unit supply and max resources.
@@ -5316,7 +5310,7 @@ CUnit *UnitOnScreen(int x, int y)
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
-		const CUnitType &type = *unit.Type;
+		const stratagus::unit_type &type = *unit.Type;
 		if (!type.Sprite) {
 			continue;
 		}
@@ -5733,7 +5727,7 @@ int CUnit::GetPrice() const
 	return cost;
 }
 
-int CUnit::GetUnitStock(CUnitType *unit_type) const
+int CUnit::GetUnitStock(stratagus::unit_type *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
 		return this->UnitStock.find(unit_type)->second;
@@ -5742,7 +5736,7 @@ int CUnit::GetUnitStock(CUnitType *unit_type) const
 	}
 }
 
-void CUnit::SetUnitStock(CUnitType *unit_type, int quantity)
+void CUnit::SetUnitStock(stratagus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5757,12 +5751,12 @@ void CUnit::SetUnitStock(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUnit::ChangeUnitStock(CUnitType *unit_type, int quantity)
+void CUnit::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-int CUnit::GetUnitStockReplenishmentTimer(CUnitType *unit_type) const
+int CUnit::GetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type) const
 {
 	if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
 		return this->UnitStockReplenishmentTimers.find(unit_type)->second;
@@ -5771,7 +5765,7 @@ int CUnit::GetUnitStockReplenishmentTimer(CUnitType *unit_type) const
 	}
 }
 
-void CUnit::SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
+void CUnit::SetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5786,7 +5780,7 @@ void CUnit::SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUnit::ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
+void CUnit::ChangeUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
 }
@@ -5830,7 +5824,7 @@ int CUnit::GetResourceStep(const int resource) const
 	return resource_step;
 }
 
-int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const CUnitType *type) const
+int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const stratagus::unit_type *type) const
 {
 	if (!this->UnitInside) {
 		return 0;
@@ -6071,7 +6065,7 @@ bool CUnit::IsItemClassEquipped(int item_class) const
 	return false;
 }
 
-bool CUnit::IsItemTypeEquipped(const CUnitType *item_type) const
+bool CUnit::IsItemTypeEquipped(const stratagus::unit_type *item_type) const
 {
 	int item_slot = GetItemClassSlot(item_type->ItemClass);
 	
@@ -6331,7 +6325,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 	return true;
 }
 
-bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
+bool CUnit::CanHireMercenary(stratagus::unit_type *type, int civilization_id) const
 {
 	if (civilization_id == -1) {
 		civilization_id = type->get_civilization() ? type->get_civilization()->ID : -1;
@@ -6433,7 +6427,7 @@ bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
 	return false;
 }
 
-bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
+bool CUnit::HasAdjacentRailForUnitType(const stratagus::unit_type *type) const
 {
 	bool has_adjacent_rail = false;
 	Vec2i top_left_pos(this->tilePos - Vec2i(1, 1));
@@ -6478,7 +6472,7 @@ stratagus::animation_set *CUnit::GetAnimations() const
 	if (variation && variation->Animations) {
 		return variation->Animations;
 	} else {
-		return this->Type->Animations;
+		return this->Type->get_animation_set();
 	}
 }
 
@@ -6635,7 +6629,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	unit.TTL = 0;
 	unit.Anim.Unbreakable = 0;
 
-	const CUnitType *type = unit.Type;
+	const stratagus::unit_type *type = unit.Type;
 
 	while (unit.Resource.Workers) {
 		unit.Resource.Workers->DeAssignWorkerFromMine(unit);
@@ -6836,8 +6830,8 @@ void DestroyAllInside(CUnit &source)
 
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
-	const CUnitType &type = *unit.Type;
-	const CUnitType &dtype = *dest.Type;
+	const stratagus::unit_type &type = *unit.Type;
+	const stratagus::unit_type &dtype = *dest.Type;
 	int cost = 0;
 
 	// Buildings, non-aggressive and invincible units have the lowest priority
@@ -7111,7 +7105,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 static void HitUnit_ShowImpactMissile(const CUnit &target)
 {
 	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
-	const CUnitType &type = *target.Type;
+	const stratagus::unit_type &type = *target.Type;
 
 	if (target.Variable[SHIELD_INDEX].Value > 0
 		&& !type.Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
@@ -7305,7 +7299,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile, bool show_damage)
 //Wyrmgus end
 {
-	const CUnitType *type = target.Type;
+	const stratagus::unit_type *type = target.Type;
 	if (!damage) {
 		// Can now happen by splash damage
 		// Multiple places send x/y as damage, which may be zero
@@ -7549,7 +7543,7 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 **
 **	@return	The distance between the types
 */
-int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z)
+int MapDistanceBetweenTypes(const stratagus::unit_type &src, const Vec2i &pos1, int src_z, const stratagus::unit_type &dst, const Vec2i &pos2, int dst_z)
 {
 	return MapDistance(src.TileSize, pos1, src_z, dst.TileSize, pos2, dst_z);
 }
@@ -7619,7 +7613,7 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 **
 **  @return        0 if attacker can't target the unit, else a positive number.
 */
-int CanTarget(const CUnitType &source, const CUnitType &dest)
+int CanTarget(const stratagus::unit_type &source, const stratagus::unit_type &dest)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (source.BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {

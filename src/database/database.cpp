@@ -28,6 +28,7 @@
 #include "database/database.h"
 
 #include "age.h"
+#include "animation.h"
 #include "character.h"
 #include "civilization.h"
 #include "database/data_type_metadata.h"
@@ -161,6 +162,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 
 		if (property_class_name == "stratagus::age*") {
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
+		} else if (property_class_name == "stratagus::animation_set*") {
+			new_property_value = QVariant::fromValue(animation_set::get(property.get_value()));
 		} else if (property_class_name == "stratagus::calendar*") {
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
 		} else if (property_class_name == "stratagus::character*") {
@@ -201,8 +204,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
 		} else if (property_class_name == "stratagus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
-		} else if (property_class_name == "CUnitType*") {
-			new_property_value = QVariant::fromValue(CUnitType::get(property.get_value()));
+		} else if (property_class_name == "stratagus::unit_type*") {
+			new_property_value = QVariant::fromValue(unit_type::get(property.get_value()));
 		} else if (property_class_name == "CUpgrade*") {
 			new_property_value = QVariant::fromValue(CUpgrade::get(property.get_value()));
 		} else if (property_class_name == "stratagus::upgrade_class*") {

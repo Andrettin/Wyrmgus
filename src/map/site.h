@@ -34,7 +34,6 @@
 
 class CPlayer;
 class CUnit;
-class CUnitType;
 class CUniqueItem;
 struct lua_State;
 
@@ -48,6 +47,7 @@ class faction;
 class map_template;
 class region;
 class unit_class;
+class unit_type;
 
 class site : public named_data_entry, public data_type<site>, public CDataType
 {
@@ -187,9 +187,9 @@ private:
 public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
+	std::vector<std::tuple<CDate, CDate, const unit_type *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
+	std::vector<std::tuple<CDate, CDate, const unit_type *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 private:
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement
 

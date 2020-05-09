@@ -414,7 +414,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 */
 static bool CanShowPopupContent(const PopupConditionPanel *condition,
 								const ButtonAction &button,
-								const CUnitType *type)
+								const stratagus::unit_type *type)
 {
 	if (!condition) {
 		return true;
@@ -818,7 +818,7 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 		if (
-			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, CUnitType::get_all()[button.Value]))
+			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, stratagus::unit_type::get_all()[button.Value]))
 			|| ((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && CanShowPopupContent(content.Condition, button, UnitManager.GetSlotUnit(button.Value).Type))
 		) {
 		//Wyrmgus end
@@ -888,9 +888,9 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 //				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
 //			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
 			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::get_all()[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::get_all()[button.Value]) != 0);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(stratagus::unit_type::get_all()[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button.Value]) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
-			Costs[FoodCost] = CUnitType::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
+			Costs[FoodCost] = stratagus::unit_type::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
@@ -935,7 +935,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 		if (
-			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, CUnitType::get_all()[button.Value]))
+			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, stratagus::unit_type::get_all()[button.Value]))
 			|| ((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && CanShowPopupContent(content.Condition, button, UnitManager.GetSlotUnit(button.Value).Type))
 		) {
 		//Wyrmgus end
@@ -1173,12 +1173,12 @@ void CButtonPanel::Draw()
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
 		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
-		} else if (buttons[i].Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && CUnitType::get_all()[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !CUnitType::get_all()[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
-			button_icon = CUnitType::get_all()[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonCmd::Train || buttons[i].Action == ButtonCmd::Build || buttons[i].Action == ButtonCmd::UpgradeTo || buttons[i].Action == ButtonCmd::ExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && CUnitType::get_all()[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !CUnitType::get_all()[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
-			button_icon = CUnitType::get_all()[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonCmd::Train || buttons[i].Action == ButtonCmd::Build || buttons[i].Action == ButtonCmd::UpgradeTo || buttons[i].Action == ButtonCmd::ExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !CUnitType::get_all()[buttons[i].Value]->Icon.Name.empty()) {
-			button_icon = CUnitType::get_all()[buttons[i].Value]->Icon.Icon;
+		} else if (buttons[i].Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && stratagus::unit_type::get_all()[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !stratagus::unit_type::get_all()[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
+			button_icon = stratagus::unit_type::get_all()[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
+		} else if ((buttons[i].Action == ButtonCmd::Train || buttons[i].Action == ButtonCmd::Build || buttons[i].Action == ButtonCmd::UpgradeTo || buttons[i].Action == ButtonCmd::ExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && stratagus::unit_type::get_all()[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !stratagus::unit_type::get_all()[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
+			button_icon = stratagus::unit_type::get_all()[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
+		} else if ((buttons[i].Action == ButtonCmd::Train || buttons[i].Action == ButtonCmd::Build || buttons[i].Action == ButtonCmd::UpgradeTo || buttons[i].Action == ButtonCmd::ExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !stratagus::unit_type::get_all()[buttons[i].Value]->Icon.Name.empty()) {
+			button_icon = stratagus::unit_type::get_all()[buttons[i].Value]->Icon.Icon;
 		} else if (buttons[i].Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
 		} else if (buttons[i].Action == ButtonCmd::Research && buttons[i].Icon.Name.empty() && CUpgrade::get_all()[buttons[i].Value]->get_icon()) {
@@ -1218,12 +1218,12 @@ void CButtonPanel::Draw()
 												   pos, buf, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 												   
 				if (
-					(buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::get_all()[buttons[i].Value]) != 0)
+					(buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[buttons[i].Value]) != 0)
 					|| buttons[i].Action == ButtonCmd::SellResource || buttons[i].Action == ButtonCmd::BuyResource
 				) {
 					std::string number_string;
-					if (buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::get_all()[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string((long long) Selected[0]->GetUnitStock(CUnitType::get_all()[buttons[i].Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::get_all()[buttons[i].Value]));
+					if (buttons[i].Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string((long long) Selected[0]->GetUnitStock(stratagus::unit_type::get_all()[buttons[i].Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[buttons[i].Value]));
 					} else if (buttons[i].Action == ButtonCmd::SellResource) {
 						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
 					} else if (buttons[i].Action == ButtonCmd::BuyResource) {
@@ -1316,8 +1316,8 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 //			const CUnitStats &stats = UnitTypes[button.Value]->Stats[CPlayer::GetThisPlayer()->Index];
 //			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(CUnitType::get_all()[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(CUnitType::get_all()[button.Value]) != 0);
-			UI.StatusLine.SetCosts(0, CUnitType::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value * (CUnitType::get_all()[button.Value]->TrainQuantity ? CUnitType::get_all()[button.Value]->TrainQuantity : 1), type_costs);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(stratagus::unit_type::get_all()[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button.Value]) != 0);
+			UI.StatusLine.SetCosts(0, stratagus::unit_type::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value * (stratagus::unit_type::get_all()[button.Value]->TrainQuantity ? stratagus::unit_type::get_all()[button.Value]->TrainQuantity : 1), type_costs);
 			//Wyrmgus end
 			break;
 		}
@@ -1428,7 +1428,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
-			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(CUnitType::get_all()[buttonaction.Value])) {
+			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(stratagus::unit_type::get_all()[buttonaction.Value])) {
 				break;
 			}
 		// FALL THROUGH
@@ -1445,13 +1445,13 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 					//Wyrmgus end
 				}
 			} else {
-				res = CheckDependencies(CUnitType::get_all()[buttonaction.Value], unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckDependencies(CUnitType::get_all()[buttonaction.Value], &unit, true, true);
+			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, true);
 			if (res && unit.Character != nullptr) {
-				res = std::find(unit.Character->ForbiddenUpgrades.begin(), unit.Character->ForbiddenUpgrades.end(), CUnitType::get_all()[buttonaction.Value]) == unit.Character->ForbiddenUpgrades.end();
+				res = std::find(unit.Character->ForbiddenUpgrades.begin(), unit.Character->ForbiddenUpgrades.end(), stratagus::unit_type::get_all()[buttonaction.Value]) == unit.Character->ForbiddenUpgrades.end();
 			}
 			break;
 		case ButtonCmd::LearnAbility:
@@ -1560,11 +1560,11 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 					res = UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' && CheckDependencies(CUpgrade::get_all()[buttonaction.Value], CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				}
 			} else {
-				res = CheckDependencies(CUnitType::get_all()[buttonaction.Value], unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+				res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckDependencies(CUnitType::get_all()[buttonaction.Value], &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
 		case ButtonCmd::LearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::get(buttonaction.ValueStr));
@@ -2064,7 +2064,7 @@ void CButtonPanel::DoClicked_CancelBuild()
 void CButtonPanel::DoClicked_Build(int button)
 {
 	// FIXME: store pointer in button table!
-	CUnitType &type = *CUnitType::get_all()[CurrentButtons[button].Value];
+	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button].Value];
 	if (!CPlayer::GetThisPlayer()->CheckUnitType(type)) {
 		UI.StatusLine.Set(_("Select Location"));
 		UI.StatusLine.ClearCosts();
@@ -2078,7 +2078,7 @@ void CButtonPanel::DoClicked_Build(int button)
 void CButtonPanel::DoClicked_Train(int button)
 {
 	// FIXME: store pointer in button table!
-	CUnitType &type = *CUnitType::get_all()[CurrentButtons[button].Value];
+	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button].Value];
 	// FIXME: Johns: I want to place commands in queue, even if not
 	// FIXME:        enough resources are available.
 	// FIXME: training queue full check is not correct for network.
@@ -2166,7 +2166,7 @@ void CButtonPanel::DoClicked_Train(int button)
 void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
-	CUnitType &type = *CUnitType::get_all()[CurrentButtons[button].Value];
+	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button].Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
@@ -2184,7 +2184,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
-	CUnitType &type = *CUnitType::get_all()[CurrentButtons[button].Value];
+	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button].Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
@@ -2193,7 +2193,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				if (!IsNetworkGame() && Selected[i]->Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->get_unit_type()->Slot != type.Slot) {
 						if (Selected[i]->Player->AiEnabled == false) {
-							Selected[i]->Character->set_unit_type(CUnitType::get_all()[CurrentButtons[button].Value]);
+							Selected[i]->Character->set_unit_type(stratagus::unit_type::get_all()[CurrentButtons[button].Value]);
 							SaveHero(Selected[i]->Character);
 							CAchievement::CheckAchievements();
 						}

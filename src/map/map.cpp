@@ -343,7 +343,7 @@ int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 	return mf.Landmass;
 }
 
-Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
+Vec2i CMap::GenerateUnitLocation(const stratagus::unit_type *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
 {
 	if (SaveGameLoading) {
 		return Vec2i(-1, -1);
@@ -361,7 +361,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const stratagus::fa
 	}
 	
 	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
-		CUnitType *spawned_type = unit_type->SpawnUnits[i];
+		stratagus::unit_type *spawned_type = unit_type->SpawnUnits[i];
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
 			for (size_t j = 0; j < spawned_type->get_species()->Terrains.size(); ++j) {
 				allowed_terrains.push_back(spawned_type->get_species()->Terrains[j]);
@@ -1090,10 +1090,7 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
 **
 **  @return      True if could be entered, false otherwise.
 */
-//Wyrmgus start
-//bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
-bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
-//Wyrmgus end
+bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z)
 {
 	const int mask = type.MovementMask;
 	//Wyrmgus start
@@ -3315,7 +3312,7 @@ void CMap::calculate_settlement_territory_border_tiles(const int z)
 	}
 }
 
-void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z)
+void CMap::GenerateNeutralUnits(stratagus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z)
 {
 	if (SaveGameLoading) {
 		return;

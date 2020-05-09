@@ -32,7 +32,6 @@
 #include "ui/icon.h"
 
 class CUniqueItem;
-class CUnitType;
 class CUpgrade;
 class LuaCallback;
 struct lua_State;
@@ -49,6 +48,7 @@ namespace stratagus {
 	class quest;
 	class site;
 	class unit_class;
+	class unit_type;
 }
 
 enum class ObjectiveType {
@@ -119,7 +119,7 @@ public:
 private:
 	std::vector<const stratagus::unit_class *> unit_classes;
 public:
-	std::vector<const CUnitType *> UnitTypes;
+	std::vector<const stratagus::unit_type *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 private:
 	const stratagus::character *character = nullptr;

@@ -127,15 +127,15 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 	//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);
-		CUnitType *type = CUnitType::get(unit);
+		stratagus::unit_type *type = stratagus::unit_type::get(unit);
 		return CPlayer::Players[player]->GetUnitTypeCount(type);
 	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
 		const std::string unit(arg);
-		CUnitType *type = CUnitType::get(unit);
+		stratagus::unit_type *type = stratagus::unit_type::get(unit);
 		return CPlayer::Players[player]->GetUnitTypeUnderConstructionCount(type);
 	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
 		const std::string unit(arg);
-		CUnitType *type = CUnitType::get(unit);
+		stratagus::unit_type *type = stratagus::unit_type::get(unit);
 		return CPlayer::Players[player]->GetUnitTypeAiActiveCount(type);
 	} else if (!strcmp(prop, "AiEnabled")) {
 		return CPlayer::Players[player]->AiEnabled;

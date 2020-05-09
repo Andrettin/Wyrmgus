@@ -169,7 +169,7 @@ int CUnitStats::GetPrice() const
 	return cost;
 }
 
-int CUnitStats::GetUnitStock(CUnitType *unit_type) const
+int CUnitStats::GetUnitStock(stratagus::unit_type *unit_type) const
 {
 	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
 		return this->UnitStock.find(unit_type)->second;
@@ -178,7 +178,7 @@ int CUnitStats::GetUnitStock(CUnitType *unit_type) const
 	}
 }
 
-void CUnitStats::SetUnitStock(CUnitType *unit_type, int quantity)
+void CUnitStats::SetUnitStock(stratagus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -193,7 +193,7 @@ void CUnitStats::SetUnitStock(CUnitType *unit_type, int quantity)
 	}
 }
 
-void CUnitStats::ChangeUnitStock(CUnitType *unit_type, int quantity)
+void CUnitStats::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
@@ -244,7 +244,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "arrows") {
 			this->arrows = string::to_bool(value);
 		} else if (key == "item") {
-			CUnitType *item = CUnitType::get(value);
+			stratagus::unit_type *item = stratagus::unit_type::get(value);
 			this->Item = item;
 		} else if (key == "description") {
 			this->set_description(value);
@@ -420,7 +420,7 @@ void SaveUpgrades(CFile &file)
 	//
 	//  Save the allow
 	//
-	for (const CUnitType *unit_type : CUnitType::get_all()) {
+	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		file.printf("DefineUnitAllow(\"%s\", ", unit_type->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {
@@ -561,7 +561,7 @@ static int CclDefineUpgrade(lua_State *l)
 				LuaError(l, "Work item class doesn't exist.");
 			}
 		} else if (!strcmp(value, "Item")) {
-			CUnitType *item = CUnitType::get(LuaToString(l, -1));
+			stratagus::unit_type *item = stratagus::unit_type::get(LuaToString(l, -1));
 			upgrade->Item = item;
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
@@ -678,7 +678,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CUnitType *scaled_cost_unit = CUnitType::get(LuaToString(l, -1, j + 1));
+				stratagus::unit_type *scaled_cost_unit = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 				upgrade->ScaledCostUnits.push_back(scaled_cost_unit);
 			}
 		} else if (!strcmp(value, "WeaponClasses")) {
@@ -781,7 +781,7 @@ static int CclDefineModifier(lua_State *l)
 			um->Modifier.ResourceDemand[resId] = LuaToNumber(l, j + 1, 3);
 		} else if (!strcmp(key, "unit-stock")) {
 			std::string value = LuaToString(l, j + 1, 2);
-			CUnitType *unit_type = CUnitType::get(value);
+			stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
 			um->Modifier.SetUnitStock(unit_type, LuaToNumber(l, j + 1, 3));
 		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
@@ -806,10 +806,10 @@ static int CclDefineModifier(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ApplyTo[CUnitType::get(value)->Slot] = 'X';
+			um->ApplyTo[stratagus::unit_type::get(value)->Slot] = 'X';
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ConvertTo = CUnitType::get(value);
+			um->ConvertTo = stratagus::unit_type::get(value);
 		//Wyrmgus start
 		} else if (!strcmp(key, "research-speed")) {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
@@ -1169,7 +1169,7 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-			for (const CUnitType *unit_type : CUnitType::get_all()) {
+			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 				if (unit_type->get_identifier().find("template") != std::string::npos) { //if is a template, continue
 					continue;
 				}
@@ -1233,7 +1233,7 @@ void UpgradesCclRegister()
 */
 int UnitTypeIdByIdent(const std::string &ident)
 {
-	const CUnitType *type = CUnitType::try_get(ident);
+	const stratagus::unit_type *type = stratagus::unit_type::try_get(ident);
 
 	if (type) {
 		return type->Slot;
@@ -1271,7 +1271,7 @@ int UpgradeIdByIdent(const std::string &ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &dst)
+static void ConvertUnitTypeTo(CPlayer &player, const stratagus::unit_type &src, stratagus::unit_type &dst)
 {
 	//Wyrmgus start
 	if (player.AiEnabled && GameCycle > 0) {
@@ -1427,7 +1427,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 	//Wyrmgus end
 
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
@@ -1494,8 +1494,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				//Wyrmgus end
 			}
 			
-			for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-				CUnitType *unit_type = iterator->first;
+			for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+				stratagus::unit_type *unit_type = iterator->first;
 				int unit_stock = iterator->second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, unit_stock);
@@ -1612,8 +1612,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						//Wyrmgus end
 					}
 					
-					for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-						CUnitType *unit_type = iterator->first;
+					for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+						stratagus::unit_type *unit_type = iterator->first;
 						int unit_stock = iterator->second;
 						if (unit_stock < 0) {
 							unit.ChangeUnitStock(unit_type, unit_stock);
@@ -1718,7 +1718,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 	}
 
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
@@ -1786,8 +1786,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				//Wyrmgus end
 			}
 			
-			for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-				CUnitType *unit_type = iterator->first;
+			for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+				stratagus::unit_type *unit_type = iterator->first;
 				int unit_stock = iterator->second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, - unit_stock);
@@ -1906,8 +1906,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						//Wyrmgus end
 					}
 					
-					for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-						CUnitType *unit_type = iterator->first;
+					for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+						stratagus::unit_type *unit_type = iterator->first;
 						int unit_stock = iterator->second;
 						if (unit_stock > 0) {
 							unit.ChangeUnitStock(unit_type, - unit_stock);
@@ -2030,8 +2030,8 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		//Wyrmgus end
 	}
 	
-	for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+		stratagus::unit_type *unit_type = iterator->first;
 		int unit_stock = iterator->second;
 		if (unit_stock < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock);
@@ -2129,8 +2129,8 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		//Wyrmgus end
 	}
 	
-	for (std::map<CUnitType *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-		CUnitType *unit_type = iterator->first;
+	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
+		stratagus::unit_type *unit_type = iterator->first;
 		int unit_stock = iterator->second;
 		if (unit_stock > 0) {
 			unit.ChangeUnitStock(unit_type, - unit_stock);
@@ -2400,7 +2400,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
-			for (const CUnitType *unit_type : CUnitType::get_all()) {
+			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
@@ -2454,7 +2454,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
-			for (const CUnitType *unit_type : CUnitType::get_all()) {
+			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 				if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
@@ -2634,7 +2634,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					upgrade_effects_string += GetVariableDisplayName(var);
 						
 					bool first_unit_type = true;
-					for (const CUnitType *unit_type : CUnitType::get_all()) {
+					for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 						if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
@@ -2685,7 +2685,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 						upgrade_effects_string += " Processing";
 							
 						bool first_unit_type = true;
-						for (const CUnitType *unit_type : CUnitType::get_all()) {
+						for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 							if (upgrade->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
 								if (!first_unit_type) {
 									upgrade_effects_string += ", ";

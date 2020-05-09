@@ -53,7 +53,7 @@
 
 	CPlayer &player = *CPlayer::Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
-	CUnitType *type = CUnitType::get(this->unitTypeStr.c_str());
+	stratagus::unit_type *type = stratagus::unit_type::get(this->unitTypeStr.c_str());
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->get_name().c_str());
 	FindNearestDrop(*type, pos, resPos, LookingW, unit.MapLayer->ID);

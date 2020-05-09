@@ -35,17 +35,13 @@
 
 #include "ui/icon.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CConfigData;
-class CUnitType;
 class CUpgrade;
 class CSpell;
 
 namespace stratagus {
 	class character;
+	class unit_type;
 }
 
 /**
@@ -123,7 +119,7 @@ public:
 	std::string Background;
 	std::string Quote;
 	IconConfig Icon;			/// Unique item's icon (if it differs from that of its type)
-	CUnitType *Type;			/// Item type of the item
+	stratagus::unit_type *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
 	CUpgrade *Set;
@@ -140,7 +136,7 @@ public:
 	std::string Name;
 	bool Bound = false;			/// Whether the item is bound to its owner and can't be dropped
 	bool Identified = true;		/// Whether the item has been identified
-	CUnitType *Type = nullptr;	/// Item type of the item
+	stratagus::unit_type *Type = nullptr;	/// Item type of the item
 	CUpgrade *Prefix = nullptr;
 	CUpgrade *Suffix = nullptr;
 	CSpell *Spell = nullptr;

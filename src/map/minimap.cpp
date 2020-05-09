@@ -496,7 +496,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 */
 static void DrawUnitOn(CUnit &unit, int red_phase)
 {
-	const CUnitType *type;
+	const stratagus::unit_type *type;
 
 	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*CPlayer::GetThisPlayer())) {
 		type = unit.Type;

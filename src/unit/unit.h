@@ -55,7 +55,6 @@ class CUniqueItem;
 class CUnit;
 class CUnitPtr;
 class CUnitStats;
-class CUnitType;
 class CUnitTypeVariation;
 class CUpgrade;
 class CViewport;
@@ -70,6 +69,7 @@ namespace stratagus {
 	class character;
 	class player_color;
 	class time_of_day;
+	class unit_type;
 }
 
 /*
@@ -90,7 +90,7 @@ static constexpr int ExperienceRange = 6;
 extern void SelectedUnitChanged();
 
 /// Returns the map distance between to unittype as locations
-extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z);
+extern int MapDistanceBetweenTypes(const stratagus::unit_type &src, const Vec2i &pos1, int src_z, const stratagus::unit_type &dst, const Vec2i &pos2, int dst_z);
 								   
 extern int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z);
 
@@ -141,7 +141,7 @@ public:
 	void RefsDecrease();
 
 	/// Initialize unit structure with default values
-	void Init(const CUnitType &type);
+	void Init(const stratagus::unit_type &type);
 	/// Assign unit to player
 	void AssignToPlayer(CPlayer &player);
 
@@ -200,8 +200,8 @@ public:
 	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
 	bool CheckTerrainForVariation(const CUnitTypeVariation *variation) const;
 	bool CheckSeasonForVariation(const CUnitTypeVariation *variation) const;
-	void ChooseVariation(const CUnitType *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(CUnitTypeVariation *new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
+	void ChooseVariation(const stratagus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
+	void SetVariation(CUnitTypeVariation *new_variation, const stratagus::unit_type *new_type = nullptr, int image_layer = -1);
 	const CUnitTypeVariation *GetVariation() const;
 	const CUnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
@@ -427,14 +427,14 @@ public:
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
 	int GetPrice() const;
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
-	int GetUnitStockReplenishmentTimer(CUnitType *unit_type) const;
-	void SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
-	void ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
+	int GetUnitStock(stratagus::unit_type *unit_type) const;
+	void SetUnitStock(stratagus::unit_type *unit_type, int quantity);
+	void ChangeUnitStock(stratagus::unit_type *unit_type, int quantity);
+	int GetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type) const;
+	void SetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int quantity);
+	void ChangeUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int quantity);
 	int GetResourceStep(const int resource) const;
-	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const CUnitType *type = nullptr) const;
+	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const stratagus::unit_type *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
@@ -444,7 +444,7 @@ public:
 	bool CanAutoCastSpell(const CSpell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
-	bool IsItemTypeEquipped(const CUnitType *item_type) const;
+	bool IsItemTypeEquipped(const stratagus::unit_type *item_type) const;
 	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(int item_class) const;
@@ -454,13 +454,13 @@ public:
 	bool DeequippingItemBreaksSet(const CUnit *item) const;
 	bool HasInventory() const;
 	bool CanLearnAbility(CUpgrade *ability, bool pre = false) const;
-	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;
+	bool CanHireMercenary(stratagus::unit_type *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;
 	bool IsAbilityEmpowered(const CUpgrade *ability) const;
 	bool IsSpellEmpowered(const CSpell *spell) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
-	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
+	bool HasAdjacentRailForUnitType(const stratagus::unit_type *type) const;
 	stratagus::animation_set *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
@@ -527,7 +527,7 @@ public:
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
-	const CUnitType  *Type;        /// Pointer to unit-type (peon,...)
+	const stratagus::unit_type *Type;        /// Pointer to unit-type (peon,...)
 	CPlayer    *Player;            /// Owner of this unit
 	const CUnitStats *Stats;       /// Current unit stats
 	int         CurrentSightRange; /// Unit's Current Sight Range
@@ -568,8 +568,8 @@ public:
 	//Wyrmgus end
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
-	std::map<CUnitType *, int> UnitStock; 						/// How many of each unit type this unit has stocked
-	std::map<CUnitType *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
+	std::map<stratagus::unit_type *, int> UnitStock; 						/// How many of each unit type this unit has stocked
+	std::map<stratagus::unit_type *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked
@@ -600,7 +600,7 @@ public:
 	struct _seen_stuff_ {
 		const CConstructionFrame *CFrame = nullptr;  /// Seen construction frame
 		int         Frame;                  /// last seen frame/stage of buildings
-		const CUnitType *Type = nullptr;             /// Pointer to last seen unit-type
+		const stratagus::unit_type *Type = nullptr;             /// Pointer to last seen unit-type
 		Vec2i       tilePos = Vec2i(-1, -1);                /// Last unit->tilePos Seen
 		QPoint pixel_offset;                /// seen pixel image displacement to map position
 		unsigned    UnderConstruction : 1;        /// Unit seen construction
@@ -738,22 +738,14 @@ void UnmarkUnitFieldFlags(const CUnit &unit);
 /// Update unit->CurrentSightRange.
 void UpdateUnitSightRange(CUnit &unit);
 /// Create a new unit
-extern CUnit *MakeUnit(const CUnitType &type, CPlayer *player);
+extern CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player);
 /// Create a new unit and place on map
-//Wyrmgus start
-//extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
-extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z);
-//Wyrmgus end
-//Wyrmgus start
+extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z);
 /// Create a new unit and place it on the map, and update its player accordingly
-extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building = false);
-extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique = true);
-//Wyrmgus end
+extern CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building = false);
+extern CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, int z, bool allow_unique = true);
 /// Find the nearest position at which unit can be placed.
-//Wyrmgus start
-//void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false);
-//Wyrmgus end
+void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false);
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 /// Remove the Orders of a Unit
@@ -798,25 +790,16 @@ extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *conta
 extern void DropOutAll(const CUnit &unit);
 
 /// Return the rule used to build this building.
-//Wyrmgus start
-//extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent);
-extern CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *parent);
-//Wyrmgus end
+extern CBuildRestrictionOnTop *OnTopDetails(const stratagus::unit_type &type, const stratagus::unit_type *parent);
 /// @todo more docu
-//Wyrmgus start
-//extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z, bool no_bordering_building = false);
-//Wyrmgus end
+extern CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int z, bool no_bordering_building = false);
 /// @todo more docu
 //Wyrmgus start
 //extern bool CanBuildOn(const Vec2i &pos, int mask);
 extern bool CanBuildOn(const Vec2i &pos, int mask, int z);
 //Wyrmgus end
 /// FIXME: more docu
-//Wyrmgus start
-//extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration, int z);
-//Wyrmgus end
+extern CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z);
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);
 
@@ -844,7 +827,7 @@ extern int ViewPointDistance(const Vec2i &pos);
 extern int ViewPointDistanceToUnit(const CUnit &dest);
 
 /// Can this unit-type attack the other (destination)
-extern int CanTarget(const CUnitType &type, const CUnitType &dest);
+extern int CanTarget(const stratagus::unit_type &type, const stratagus::unit_type &dest);
 /// Can transporter transport the other unit
 extern int CanTransport(const CUnit &transporter, const CUnit &unit);
 //Wyrmgus start
@@ -890,14 +873,11 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 /// Draw unit's shadow
-//Wyrmgus start
-//extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
-extern void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelPos &screenPos);
-//Wyrmgus end
+extern void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, const PixelPos &screenPos);
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
-extern void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
+extern void DrawPlayerColorOverlay(const stratagus::unit_type &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
+extern void DrawOverlay(const stratagus::unit_type &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day);
 //Wyrmgus end
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);

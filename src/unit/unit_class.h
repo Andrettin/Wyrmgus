@@ -30,9 +30,9 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-class CUnitType;
-
 namespace stratagus {
+
+class unit_type;
 
 class unit_class final : public named_data_entry, public data_type<unit_class>
 {
@@ -53,23 +53,23 @@ public:
 	{
 	}
 
-	const std::vector<CUnitType *> &get_unit_types() const
+	const std::vector<unit_type *> &get_unit_types() const
 	{
 		return this->unit_types;
 	}
 
-	bool has_unit_type(CUnitType *unit_type) const;
+	bool has_unit_type(unit_type *unit_type) const;
 
-	void add_unit_type(CUnitType *unit_type)
+	void add_unit_type(unit_type *unit_type)
 	{
 		this->unit_types.push_back(unit_type);
 	}
 
-	void remove_unit_type(CUnitType *unit_type);
+	void remove_unit_type(unit_type *unit_type);
 
 private:
 	int index = -1;
-	std::vector<CUnitType *> unit_types;
+	std::vector<unit_type *> unit_types;
 };
 
 }

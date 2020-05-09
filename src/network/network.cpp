@@ -524,7 +524,7 @@ void NetworkOnStartGame()
 **  @warning  Destination and unit-type shares the same network slot.
 */
 void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-						const CUnit *dest, const CUnitType *type, int status)
+						const CUnit *dest, const stratagus::unit_type *type, int status)
 {
 	CNetworkCommandQueue ncq;
 

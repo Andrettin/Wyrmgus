@@ -171,7 +171,7 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 void ButtonAction::SetTriggerData() const
 {
 	if (this->Action != ButtonCmd::Unit && this->Action != ButtonCmd::Buy) {
-		TriggerData.Type = CUnitType::get_all()[this->Value];
+		TriggerData.Type = stratagus::unit_type::get_all()[this->Value];
 	} else {
 		TriggerData.Type = UnitManager.GetSlotUnit(this->Value).Type;
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);

@@ -94,7 +94,6 @@ class CMapLayer;
 class CTileset;
 class CUniqueItem;
 class CUnit;
-class CUnitType;
 
 namespace stratagus {
 	class faction;
@@ -102,6 +101,7 @@ namespace stratagus {
 	class map_template;
 	class plane;
 	class site;
+	class unit_type;
 	class world;
 }
 
@@ -224,7 +224,7 @@ public:
 	void generate_settlement_territories(const int z);
 	stratagus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
 	void calculate_settlement_territory_border_tiles(const int z);
-	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
+	void GenerateNeutralUnits(stratagus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
 	void ClearOverlayTile(const Vec2i &pos, int z);
@@ -243,7 +243,7 @@ public:
 	stratagus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
 	stratagus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
-	Vec2i GenerateUnitLocation(const CUnitType *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
+	Vec2i GenerateUnitLocation(const stratagus::unit_type *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
@@ -496,7 +496,7 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z);
 /// Returns true, if the unit-type can enter the field
-extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z);
+extern bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z);
 /// Returns true, if the unit can enter the field
 extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 

@@ -111,8 +111,11 @@
 ----------------------------------------------------------------------------*/
 
 class CGraphic;
-class CUnitType;
 enum class ButtonCmd;
+
+namespace stratagus {
+	class unit_type;
+}
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -165,7 +168,7 @@ enum class CursorState {
 extern CursorState CurrentCursorState;  /// current cursor state (point,...)
 extern ButtonCmd CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
-extern CUnitType *CursorBuilding; /// building cursor
+extern stratagus::unit_type *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button
 
 extern CCursor *GameCursor;     /// cursor-type

@@ -99,7 +99,7 @@ struct UStrInt {
 /// Get component for unit variable.
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 /// Get component for unit type variable.
-extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t);
+extern UStrInt GetComponent(const stratagus::unit_type &type, int index, EnumVariable e, int t);
 
 //Wyrmgus start
 std::map<std::string, std::string> DLCFileEquivalency;
@@ -510,9 +510,9 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static const CUnitType **Str2TypeRef(lua_State *l, const char *s)
+static const stratagus::unit_type **Str2TypeRef(lua_State *l, const char *s)
 {
-	const CUnitType **res = nullptr; // Result.
+	const stratagus::unit_type **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Type")) {
@@ -627,9 +627,9 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 **
 **  @return   unit type referernce definition.
 */
-const CUnitType **CclParseTypeDesc(lua_State *l)
+const stratagus::unit_type **CclParseTypeDesc(lua_State *l)
 {
-	const CUnitType **res = nullptr;
+	const stratagus::unit_type **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -1204,7 +1204,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
-	const CUnitType **type;
+	const stratagus::unit_type **type;
 	std::string s;
 	int a;
 	int b;
@@ -1342,7 +1342,7 @@ std::string EvalString(const StringDesc *s)
 	std::string tmp1;   // Temporary string.
 	const CUnit *unit;  // Temporary unit
 	//Wyrmgus start
-	const CUnitType **type;	// Temporary unit type
+	const stratagus::unit_type **type;	// Temporary unit type
 	CUpgrade **upgrade;	// Temporary upgrade
 	int **resource;		// Temporary resource
 	stratagus::faction **faction;	// Temporary faction
@@ -3532,7 +3532,7 @@ void DeleteModFaction(const std::string &faction_name)
 
 void DeleteModUnitType(const std::string &unit_type_ident)
 {
-	CUnitType *unit_type = CUnitType::get(unit_type_ident.c_str());
+	stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 	
 	if (Editor.Running == EditorEditing) {
 		std::vector<CUnit *> units_to_remove;
@@ -3557,7 +3557,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 	for (stratagus::faction *faction : stratagus::faction::get_all()) {
 		faction->remove_class_unit_type(unit_type);
 	}
-	for (CUnitType *other_unit_type : CUnitType::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
+	for (stratagus::unit_type *other_unit_type : stratagus::unit_type::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
 		if (std::find(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type) != other_unit_type->Trains.end()) {
 			other_unit_type->Trains.erase(std::remove(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type), other_unit_type->Trains.end());
 		}
@@ -3581,20 +3581,20 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
 		}
 	}
-	CUnitType::remove(unit_type);
+	stratagus::unit_type::remove(unit_type);
 }
 
 void DisableMod(const std::string &mod_file)
 {
-	const int unit_types_size = CUnitType::get_all().size();
+	const int unit_types_size = stratagus::unit_type::get_all().size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {
 		
-		if (CUnitType::get_all()[i]->Mod == mod_file) {
-			DeleteModUnitType(CUnitType::get_all()[i]->Ident);
+		if (stratagus::unit_type::get_all()[i]->Mod == mod_file) {
+			DeleteModUnitType(stratagus::unit_type::get_all()[i]->Ident);
 		}
 	}
 		
-	for (CUnitType *unit_type : CUnitType::get_all()) {
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		if (unit_type->ModTrains.find(mod_file) != unit_type->ModTrains.end()) {
 			unit_type->ModTrains.erase(mod_file);
 			unit_type->RemoveButtons(ButtonCmd::None, mod_file);

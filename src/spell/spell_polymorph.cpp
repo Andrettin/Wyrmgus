@@ -56,7 +56,7 @@
 		++j;
 		if (!strcmp(value, "new-form")) {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = CUnitType::get(value);
+			this->NewForm = stratagus::unit_type::get(value);
 			// FIXME: temp polymorphs? hard to do.
 		} else if (!strcmp(value, "player-neutral")) {
 			this->PlayerNeutral = 1;
@@ -104,10 +104,10 @@
 	if (!target) {
 		return 0;
 	}
-	CUnitType *type = this->NewForm;
+	stratagus::unit_type *type = this->NewForm;
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
-		CUnitType *new_unit_type = nullptr;
+		stratagus::unit_type *new_unit_type = nullptr;
 		if (this->civilization != nullptr && this->Faction != -1 && this->civilization == target->Type->get_civilization()) { //get faction equivalent, if is of the same civilization
 			new_unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
 		} else if (this->civilization != nullptr && this->civilization != target->Type->get_civilization()) {

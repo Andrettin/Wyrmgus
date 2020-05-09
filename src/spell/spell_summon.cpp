@@ -49,7 +49,7 @@
 		++j;
 		if (!strcmp(value, "unit-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = CUnitType::get(value);
+			this->UnitType = stratagus::unit_type::get(value);
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {
@@ -92,7 +92,7 @@ public:
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
-	CUnitType &unittype = *this->UnitType;
+	stratagus::unit_type &unittype = *this->UnitType;
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
