@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/terrain_type.h"
@@ -50,16 +46,18 @@ namespace stratagus {
 void terrain_type::LoadTerrainTypeGraphics()
 {
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
-		if (terrain_type->graphics) {
+		if (terrain_type->graphics != nullptr) {
 			terrain_type->graphics->Load(false, defines::get()->get_scale_factor());
 		}
-		if (terrain_type->transition_graphics) {
+
+		if (terrain_type->transition_graphics != nullptr) {
 			terrain_type->transition_graphics->Load(false, defines::get()->get_scale_factor());
 		}
 		for (const auto &kv_pair : terrain_type->season_graphics) {
 			kv_pair.second->Load(false, defines::get()->get_scale_factor());
 		}
-		if (terrain_type->elevation_graphics) {
+
+		if (terrain_type->elevation_graphics != nullptr) {
 			terrain_type->elevation_graphics->Load(false, defines::get()->get_scale_factor());
 		}
 	}
@@ -443,13 +441,15 @@ void terrain_type::set_image_file(const std::filesystem::path &filepath)
 
 CPlayerColorGraphic *terrain_type::get_graphics(const season *season) const
 {
-	auto find_iterator = this->season_graphics.find(season);
+	if (season != nullptr) {
+		auto find_iterator = this->season_graphics.find(season);
 
-	if (find_iterator != this->season_graphics.end()) {
-		return find_iterator->second;
-	} else {
-		return this->graphics;
+		if (find_iterator != this->season_graphics.end()) {
+			return find_iterator->second;
+		}
 	}
+
+	return this->graphics;
 }
 
 void terrain_type::set_transition_image_file(const std::filesystem::path &filepath)

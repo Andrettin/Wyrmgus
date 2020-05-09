@@ -330,9 +330,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 
-			if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-				if (CMap::Map.BorderTerrain->get_graphics(season)) {
-					CMap::Map.BorderTerrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
+			if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && stratagus::defines::get()->get_border_terrain_type() && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (stratagus::defines::get()->get_border_terrain_type()->get_graphics(season)) {
+					stratagus::defines::get()->get_border_terrain_type()->get_graphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
 				}
 			}
 
@@ -355,9 +355,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 
-			if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && CMap::Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-				if (CMap::Map.BorderTerrain->get_graphics(season)) {
-					CMap::Map.BorderTerrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
+			if (mf.get_owner() != nullptr && mf.OwnershipBorderTile != -1 && stratagus::defines::get()->get_border_terrain_type() && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (stratagus::defines::get()->get_border_terrain_type()->get_graphics(season)) {
+					stratagus::defines::get()->get_border_terrain_type()->get_graphics(season)->DrawPlayerColorFrameClip(player_color, mf.OwnershipBorderTile, dx, dy, nullptr);
 				}
 			}
 

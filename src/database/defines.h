@@ -35,6 +35,7 @@ class dialogue;
 class player_color;
 class sml_data;
 class sml_property;
+class terrain_type;
 class time_of_day;
 
 class defines final : public QObject, public singleton<defines>
@@ -46,6 +47,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(stratagus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
+	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
 	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
 	Q_PROPERTY(stratagus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(stratagus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
@@ -110,6 +112,11 @@ public:
 		return this->underground_time_of_day;
 	}
 
+	terrain_type *get_border_terrain_type() const
+	{
+		return this->border_terrain_type;
+	}
+
 	bool is_documents_modules_loading_enabled() const
 	{
 		return this->documents_modules_loading_enabled;
@@ -131,6 +138,7 @@ private:
 	int scale_factor = 1;
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;
+	terrain_type *border_terrain_type = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
 	bool documents_modules_loading_enabled = true;
 	dialogue *campaign_victory_dialogue = nullptr;

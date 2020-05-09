@@ -4567,19 +4567,17 @@ bool CUnit::IsVisibleOnMinimap() const
 	if (IsInvisibile(*CPlayer::GetThisPlayer())) {
 		return false;
 	}
+
 	if (IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap || IsVisibleOnRadar(*CPlayer::GetThisPlayer())) {
 		return IsAliveOnMap();
-	} else {
-		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
-			   && (Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index))
-			   //Wyrmgus start
-//			   && !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index));
-			   && !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index))
-			   && !Destroyed
-			   && CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
-			   && this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
-			   //Wyrmgus end
 	}
+
+	return this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
+		&& (Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index))
+		&& !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index))
+		&& !Destroyed
+		&& CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
+		&& this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
 }
 
 /**

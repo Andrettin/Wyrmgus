@@ -171,7 +171,8 @@ void CMinimap::Create()
 
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		// Scale to biggest value.
-		const int n = std::max(std::max(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]), 32);
+		int n = std::max(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
+		n = std::max(n, 32);
 
 		MinimapScaleX.push_back((W * MINIMAP_FAC + n - 1) / n);
 		MinimapScaleY.push_back((H * MINIMAP_FAC + n - 1) / n);
@@ -509,12 +510,10 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		}
 	}
 
-	//Wyrmgus start
 	//don't draw decorations or diminutive fauna units on the minimap
 	if (type->BoolFlag[DECORATION_INDEX].value || (type->BoolFlag[DIMINUTIVE_INDEX].value && type->BoolFlag[FAUNA_INDEX].value)) {
 		return;
 	}
-	//Wyrmgus end
 
 	Uint32 color;
 	//Wyrmgus start

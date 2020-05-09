@@ -1423,7 +1423,7 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : NoFogOfWar(false), TileGraphic(nullptr), Landmasses(0), BorderTerrain(nullptr)
+CMap::CMap() : NoFogOfWar(false), TileGraphic(nullptr), Landmasses(0)
 {
 	Tileset = new CTileset;
 }
@@ -2406,7 +2406,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	const stratagus::tile_transition_type transition_type = GetTransitionType(adjacent_directions, true);
 	
 	if (transition_type != stratagus::tile_transition_type::none) {
-		const std::vector<int> &transition_tiles = Map.BorderTerrain->get_transition_tiles(nullptr, transition_type);
+		const std::vector<int> &transition_tiles = stratagus::defines::get()->get_border_terrain_type()->get_transition_tiles(nullptr, transition_type);
 		if (!transition_tiles.empty()) {
 			mf.OwnershipBorderTile = transition_tiles[SyncRand(transition_tiles.size())];
 		}

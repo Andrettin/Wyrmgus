@@ -350,7 +350,6 @@ public:
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	static CGraphic *FogGraphics; //graphics for fog of war
 	//Wyrmgus start
-	stratagus::terrain_type *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<CUnit *> site_units;	/// the town hall / settlement site units
