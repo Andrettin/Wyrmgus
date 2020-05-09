@@ -159,10 +159,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 			this->TTL = std::stoi(value);
 		} else if (key == "missile") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Missile = MissileTypeByIdent(value.c_str());
-			if (this->Missile == nullptr) {
-				fprintf(stderr, "Invalid missile: \"%s\".\n", value.c_str());
-			}
+			this->Missile = stratagus::missile_type::get(value);
 		} else {
 			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());
 		}
@@ -217,10 +214,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = MissileTypeByIdent(value);
-			if (this->Missile == nullptr) {
-				DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value);
-			}
+			this->Missile = stratagus::missile_type::get(value);
 		} else {
 			LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value);
 		}
@@ -329,7 +323,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 
 		//Wyrmgus start
 //		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
-		MissileType *mtype = this->Missile;
+		stratagus::missile_type *mtype = this->Missile;
 		if (mtype->Class == MissileClassNone && this->UseUnitVar) {
 			mtype = caster.GetMissile().Missile;
 		}

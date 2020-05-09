@@ -54,7 +54,6 @@ class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
 class CUnitTypeVariation;
-class MissileType;
 //Wyrmgus start
 class CButtonLevel;
 class CUniqueItem;
@@ -72,6 +71,7 @@ namespace stratagus {
 	class animation_set;
 	class dependency;
 	class faction;
+	class missile_type;
 	class plane;
 	class species;
 	class terrain_type;

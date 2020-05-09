@@ -66,14 +66,12 @@
 #undef Wait
 #endif
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
 /**
 **  Missile class names, used to load/save the missiles.
 */
-const char *MissileType::MissileClassNames[] = {
+const char *missile_type::MissileClassNames[] = {
 	"missile-class-none",
 	"missile-class-point-to-point",
 	"missile-class-point-to-point-with-hit",
@@ -95,24 +93,20 @@ const char *MissileType::MissileClassNames[] = {
 	nullptr
 };
 
+}
+
 unsigned int Missile::Count = 0;
 
 static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
 static std::vector<Missile *> LocalMissiles;     /// all local missiles on map
 
-/// lookup table for missile names
-typedef std::map<std::string, MissileType *> MissileTypeMap;
-static MissileTypeMap MissileTypes;
-
 std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
 
 extern NumberDesc *Damage;                   /// Damage calculation for missile.
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-void MissileType::ProcessConfigData(const CConfigData *config_data)
+void missile_type::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -251,7 +245,7 @@ void MissileType::ProcessConfigData(const CConfigData *config_data)
 /**
 **  Load the graphics for a missile type
 */
-void MissileType::LoadMissileSprite()
+void missile_type::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
 		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
@@ -263,10 +257,12 @@ void MissileType::LoadMissileSprite()
 	}
 }
 
+}
+
 int GetMissileSpritesCount()
 {
 #ifndef DYNAMIC_LOAD
-	return MissileTypes.size();
+	return stratagus::missile_type::get_all().size();
 #else
 	return 0;
 #endif
@@ -278,43 +274,10 @@ int GetMissileSpritesCount()
 void LoadMissileSprites()
 {
 #ifndef DYNAMIC_LOAD
-	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
-		(*it).second->LoadMissileSprite();
+	for (stratagus::missile_type *missile_type : stratagus::missile_type::get_all()) {
+		missile_type->LoadMissileSprite();
 	}
 #endif
-}
-/**
-**  Get Missile type by identifier.
-**
-**  @param ident  Identifier.
-**
-**  @return       Missile type pointer.
-*/
-MissileType *MissileTypeByIdent(const std::string &ident)
-{
-	if (ident.empty()) {
-		return nullptr;
-	}
-	MissileTypeMap::iterator it = MissileTypes.find(ident);
-	if (it != MissileTypes.end()) {
-		return it->second;
-	}
-	return nullptr;
-}
-
-/**
-**  Allocate an empty missile-type slot.
-**
-**  @param ident  Identifier to identify the slot.
-**
-**  @return       New allocated (zeroed) missile-type pointer.
-*/
-MissileType *NewMissileTypeSlot(const std::string &ident)
-{
-	MissileType *mtype = new MissileType(ident);
-
-	MissileTypes[ident] = mtype;
-	return mtype;
 }
 
 /**
@@ -349,10 +312,7 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-//Wyrmgus start
-///* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
-/* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
-//Wyrmgus end
+Missile *Missile::Init(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
 	Missile *missile = nullptr;
 
@@ -442,15 +402,9 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-//Wyrmgus start
-//Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
-Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
-//Wyrmgus end
+Missile *MakeMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
-	//Wyrmgus start
-//	Missile *missile = Missile::Init(mtype, startPos, destPos);
 	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
-	//Wyrmgus end
 
 	GlobalMissiles.push_back(missile);
 	return missile;
@@ -465,15 +419,9 @@ Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const P
 **
 **  @return       created missile.
 */
-//Wyrmgus start
-//Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
-Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
-//Wyrmgus end
+Missile *MakeLocalMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
-	//Wyrmgus start
-//	Missile *missile = Missile::Init(mtype, startPos, destPos);
 	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
-	//Wyrmgus end
 
 	missile->Local = 1;
 	LocalMissiles.push_back(missile);
@@ -1079,13 +1027,15 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 	return 0;
 }
 
+namespace stratagus {
+
 /**
 **  Draw missile.
 **
 **  @param frame  Animation frame
 **  @param pos    Screen pixel position
 */
-void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
+void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 {
 #ifdef DYNAMIC_LOAD
 	if (!this->G->IsLoaded()) {
@@ -1139,6 +1089,8 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 			//Wyrmgus end
 		}
 	}
+}
+
 }
 
 /**
@@ -1308,7 +1260,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 
 bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 {
-	const MissileType &mtype = *missile.Type;
+	const stratagus::missile_type &mtype = *missile.Type;
 	if (missile.SourceUnit) {
 		bool shouldHit = false;
 		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
@@ -1605,7 +1557,7 @@ bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
 */
 void Missile::MissileHit(CUnit *unit)
 {
-	const MissileType &mtype = *this->Type;
+	const stratagus::missile_type &mtype = *this->Type;
 
 	if (mtype.ImpactSound.Sound) {
 		PlayMissileSound(*this, mtype.ImpactSound.Sound);
@@ -1958,7 +1910,7 @@ int ViewPointDistanceToMissile(const Missile &missile)
 **
 **  @return  the missile used for burning.
 */
-MissileType *MissileBurningBuilding(int percent)
+stratagus::missile_type *MissileBurningBuilding(int percent)
 {
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
 		 i != BurningBuildingFrames.end(); ++i) {
@@ -2036,10 +1988,9 @@ void SaveMissiles(CFile &file)
 	}
 }
 
-/**
-**  Initialize missile type.
-*/
-void MissileType::Init()
+namespace stratagus {
+
+void missile_type::Init()
 {
 	// Resolve impact missiles and sounds.
 	this->FiredSound.MapSound();
@@ -2052,20 +2003,21 @@ void MissileType::Init()
 	this->Smoke.MapMissile();
 }
 
+}
+
 /**
 **  Initialize missile-types.
 */
 void InitMissileTypes()
 {
-	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
-		(*it).second->Init();
+	for (stratagus::missile_type *missile_type : stratagus::missile_type::get_all()) {
+		missile_type->Init();
 	}
 }
 
-/**
-**  Constructor.
-*/
-MissileType::MissileType(const std::string &ident) :
+namespace stratagus {
+
+missile_type::missile_type(const std::string &identifier) : data_entry(identifier), CDataType(identifier),
 	Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(1), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	//Wyrmgus start
@@ -2085,15 +2037,11 @@ MissileType::MissileType(const std::string &ident) :
 	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
 	G(nullptr)
 {
-	this->Ident = ident;
 	size.x = 0;
 	size.y = 0;
 }
 
-/**
-**  Destructor.
-*/
-MissileType::~MissileType()
+missile_type::~missile_type()
 {
 	CGraphic::Free(this->G);
 	Impact.clear();
@@ -2103,22 +2051,6 @@ MissileType::~MissileType()
 	FreeNumberDesc(this->Damage);
 }
 
-/**
-**  Clean up missile-types.
-*/
-void CleanMissileTypes()
-{
-	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
-		delete it->second;
-	}
-	MissileTypes.clear();
-}
-
-/**
-**  Initialize missiles.
-*/
-void InitMissiles()
-{
 }
 
 /**

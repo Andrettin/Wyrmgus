@@ -29,7 +29,9 @@
 
 #pragma once
 
-class MissileType;
+namespace stratagus {
+	class missile_type;
+}
 
 /**
 **  Missile type definition (used in config tables)
@@ -47,5 +49,5 @@ public:
 
 public:
 	std::string Name;        /// Config missile name
-	MissileType *Missile;    /// Identifier to use to run time
+	stratagus::missile_type *Missile;    /// Identifier to use to run time
 };

@@ -45,6 +45,7 @@
 #include "map/region.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
+#include "missile.h"
 #include "plane.h"
 #include "player_color.h"
 #include "quest.h"
@@ -180,6 +181,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
 		} else if (property_class_name == "stratagus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
+		} else if (property_class_name == "stratagus::missile_type*") {
+			new_property_value = QVariant::fromValue(missile_type::get(property.get_value()));
 		} else if (property_class_name == "stratagus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
 		} else if (property_class_name == "stratagus::plane*") {

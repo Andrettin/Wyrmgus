@@ -143,7 +143,6 @@ void CleanModules()
 	CleanUpgradeModifiers();
 	CleanButtons();
 	CButtonLevel::ClearButtonLevels();
-	CleanMissileTypes();
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
@@ -173,7 +172,6 @@ void InitModules()
 	InitUserInterface();
 	InitPlayers();
 	InitMissileTypes();
-	InitMissiles();
 	InitConstructions();
 
 	// LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !

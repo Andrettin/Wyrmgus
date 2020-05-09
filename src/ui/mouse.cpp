@@ -2260,7 +2260,7 @@ static void UISelectStateButtonDown(unsigned)
 			const PixelPos mapPixelPos = vp.screen_to_map_pixel_pos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+				MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
 			SendCommand(CMap::Map.map_pixel_pos_to_tile_pos(mapPixelPos));
 		}
@@ -2284,7 +2284,7 @@ static void UISelectStateButtonDown(unsigned)
 			CurrentButtonLevel = nullptr;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+				MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
 			SendCommand(cursorTilePos);
 		} else {
@@ -2401,7 +2401,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 				if (!ClickMissile.empty()) {
 					const PixelPos mapPixelPos = UI.MouseViewport->screen_to_map_pixel_pos(CursorScreenPos);
 
-					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+					MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 				}
 			}
 			const PixelPos mapPixelPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
@@ -2431,7 +2431,7 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
 			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursorTilePos);
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+				MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
 			DoRightButton(mapPixelPos);
 		}

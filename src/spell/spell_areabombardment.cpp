@@ -56,10 +56,7 @@
 			this->StartOffsetY = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = MissileTypeByIdent(value);
-			if (this->Missile == nullptr) {
-				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
-			}
+			this->Missile = stratagus::missile_type::get(value);
 		} else {
 			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
 		}
@@ -89,7 +86,7 @@
 	const int shards = this->Shards;
 	const int damage = this->Damage * modifier / 100;
 	const PixelDiff offset(this->StartOffsetX, this->StartOffsetY);
-	const MissileType *missile = this->Missile;
+	const stratagus::missile_type *missile = this->Missile;
 
 	while (fields--) {
 		Vec2i dpos;

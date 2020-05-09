@@ -32,7 +32,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class MissileType missile.h
+**  @class stratagus::missile_type missile.h
 **
 **  \#include "missile.h"
 **
@@ -43,23 +43,16 @@
 **
 **  The missile-type structure members:
 **
-**  MissileType::Ident
-**
-**    Unique identifier of the missile-type, used to reference it in
-**    config files and during startup.
-**    @note Don't use this member in game, use instead the pointer
-**    to this structure. See MissileTypeByIdent().
-**
-**  MissileType::DrawLevel
+**  missile_type::DrawLevel
 **
 **    The Level/Order to draw the missile in, usually 0-255
 **
-**  MissileType::Width MissileType::Height
+**  missile_type::Width missile_type::Height
 **
 **    Size (width and height) of a frame in the image. All sprite
 **    frames of the missile-type must have the same size.
 **
-**  MissileType::SpriteFrames
+**  missile_type::SpriteFrames
 **
 **    Total number of sprite frames in the graphic image.
 **    @note If the image is smaller than the number of directions,
@@ -67,52 +60,52 @@
 **    @note There is currently a limit of 127 sprite frames, which
 **    can be lifted if needed.
 **
-**  MissileType::NumDirections
+**  missile_type::NumDirections
 **
 **    Number of directions missile can face.
 **
-**  MissileType::Transparency
+**  missile_type::Transparency
 **
 **    Set a missile transparency.
 **
-**  MissileType::FiredSound
+**  missile_type::FiredSound
 **
 **    Sound of the missile, if fired. @note currently not used.
 **
-**  MissileType::ImpactSound
+**  missile_type::ImpactSound
 **
 **    Impact sound for this missile.
 **
-**  MissileType::CanHitOwner
+**  missile_type::CanHitOwner
 **
 **    Can hit the unit that have fired the missile.
 **    @note Currently no missile can hurt its owner.
 **
-**  MissileType::FriendlyFire
+**  missile_type::FriendlyFire
 **
 **    Can't hit the units of the same player, that has the
 **    missile fired.
 **
-**  MissileType::Class
+**  missile_type::Class
 **
 **    Class of the missile-type, defines the basic effects of the
 **    missile. Look at the different class identifiers for more
 **    information (::MissileClassNone, ...).
 **
-**  MissileType::NumBounces
+**  missile_type::NumBounces
 **
 **    This is the number of bounces, and it is only valid with
 **    MissileClassBounce. The missile will hit this many times in
 **    a row.
 **
-**  MissileType::StartDelay
+**  missile_type::StartDelay
 **
 **    Delay in game cycles after the missile generation, until the
 **    missile animation and effects starts. Delay denotes the number
 **    of display cycles to skip before drawing the first sprite frame
 **    and only happens once at start.
 **
-**  MissileType::Sleep
+**  missile_type::Sleep
 **
 **    This are the number of game cycles to wait for the next
 **    animation or the sleeping between the animation steps.
@@ -121,18 +114,18 @@
 **    @note Perhaps we should later allow animation scripts for
 **    more complex animations.
 **
-**  MissileType::Speed
+**  missile_type::Speed
 **
 **    The speed how fast the missile moves. 0 the missile didn't
 **    move, 1 is the slowest speed and 32 s the fastest supported
 **    speed. This is how many pixels the missiles moves with each
 **    animation step.  The real use of this member depends on the
-**    MissileType::Class
+**    missile_type::Class
 **    @note This is currently only used by the point-to-point
 **    missiles (::MissileClassPointToPoint, ...).  Perhaps we should
 **    later allow animation scripts for more complex animations.
 **
-**  MissileType::Range
+**  missile_type::Range
 **
 **    Determines the range in which a projectile will deal its damage.
 **    A range of 0 will mean that the damage will be limited to the
@@ -144,32 +137,32 @@
 **    get only 1/SpashFactor of the damage. Fields 2 away get
 **    1/(SplashFactor*2), and following...
 **
-**  MissileType::SplashFactor
+**  missile_type::SplashFactor
 **
 **    Determines The Splash damage divisor, see Range
 **
-**  MissileType::Impact
+**  missile_type::Impact
 **
 **    The config of the next (other) missile to generate, when this
 **    missile reached its end point or its life time is over.  So it
 **    can be used to generate a chain of missiles.
 **
-**  MissileType::Smoke
+**  missile_type::Smoke
 **
 **    The config of the next (other) missile to generate a trailing smoke.  So it
 **    can be used to generate a chain of missiles.
 **
-**  MissileType::Sprite
+**  missile_type::Sprite
 **
-**    Missile sprite image loaded from MissileType::File
+**    Missile sprite image loaded from missile_type::File
 **
-**  MissileType::G
+**  missile_type::G
 **
 **    File containing the image (sprite) graphics of the missile.
 **    The file can contain multiple sprite frames.  The sprite frames
 **    for the different directions are placed in the row.
 **    The different animations steps are placed in the column. But
-**    the correct order depends on MissileType::Class. Missiles like fire
+**    the correct order depends on missile_type::Class. Missiles like fire
 **    have no directions, missiles like arrows have a direction.
 */
 
@@ -199,20 +192,20 @@
 **    Missile destination on the map in pixels.  If
 **    Missile::X==Missile::DX and Missile::Y==Missile::DY the missile
 **    stays at its position.  But the movement also depends on
-**    MissileType::Class.
+**    missile_type::Class.
 **
 **  Missile::Type
 **
-**    ::MissileType pointer of the missile, contains the shared
+**    ::missile_type pointer of the missile, contains the shared
 **    information of all missiles of the same type.
 **
 **  Missile::SpriteFrame
 **
 **    Current sprite frame of the missile.  The range is from 0
-**    to MissileType::SpriteFrames-1.  The topmost bit (128) is
+**    to missile_type::SpriteFrames-1.  The topmost bit (128) is
 **    used as flag to mirror the sprites in X direction.
 **    Animation scripts aren't currently supported for missiles,
-**    everything is handled by MissileType::Class
+**    everything is handled by missile_type::Class
 **    @note If wanted, we can add animation scripts support to the
 **    engine.
 **
@@ -229,21 +222,21 @@
 **
 **    Wait this number of game cycles until the next state or
 **    animation of this missile is handled. This counts down from
-**    MissileType::Sleep to 0.
+**    missile_type::Sleep to 0.
 **
 **  Missile::Delay
 **
 **    Number of game cycles the missile isn't shown on the map.
-**    This counts down from MissileType::StartDelay to 0, before this
+**    This counts down from missile_type::StartDelay to 0, before this
 **    happens the missile isn't shown and has no effects.
-**    @note This can also be used by MissileType::Class
+**    @note This can also be used by missile_type::Class
 **    for temporary removement of the missile.
 **
 **  Missile::SourceUnit
 **
 **    The owner of the missile. Normally the one who fired the
 **    missile.  Used to check units, to prevent hitting the owner
-**    when field MissileType::CanHitOwner==true. Also used for kill
+**    when field missile_type::CanHitOwner==true. Also used for kill
 **    and experience points.
 **
 **  Missile::TargetUnit
@@ -253,7 +246,7 @@
 **
 **  Missile::Damage
 **
-**    Damage done by missile. See also MissileType::Range, which
+**    Damage done by missile. See also missile_type::Range, which
 **    denoted the 100% damage in center.
 **
 **  Missile::TTL
@@ -261,7 +254,7 @@
 **    Time to live in game cycles of the missile, if it reaches zero
 **    the missile is automatic removed from the map. If -1 the
 **    missile lives for ever and the lifetime is handled by
-**    Missile::Type:MissileType::Class
+**    Missile::Type:missile_type::Class
 **
 **  Missile::Hidden
 **
@@ -286,20 +279,14 @@
 **    Pointer to the slot of this missile. Used for faster freeing.
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "data_type.h"
 #include "missileconfig.h"
 #include "script.h"
 #include "sound/unitsound.h"
 #include "unit/unitptr.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CGraphic;
 class CUnit;
@@ -335,12 +322,17 @@ enum {
 	MissileClassStraightFly               /// Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
 };
 
+namespace stratagus {
+
 /// Base structure of missile-types
-class MissileType : public CDataType
+class missile_type : public data_entry, public data_type<missile_type>, public CDataType
 {
 public:
-	explicit MissileType(const std::string &ident);
-	~MissileType();
+	static constexpr const char *class_identifier = "missile_type";
+	static constexpr const char *database_folder = "missile_types";
+
+	explicit missile_type(const std::string &identifier);
+	~missile_type();
 
 	static const char *MissileClassNames[];
 	
@@ -412,6 +404,8 @@ public:
 	CGraphic *G;         /// missile graphic
 };
 
+}
+
 /*----------------------------------------------------------------------------
 --  Missile
 ----------------------------------------------------------------------------*/
@@ -425,10 +419,7 @@ protected:
 public:
 	virtual ~Missile();
 
-	//Wyrmgus start
-//	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
-	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
-	//Wyrmgus end
+	static Missile *Init(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 
 	virtual void Action() = 0;
 
@@ -444,7 +435,7 @@ public:
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
 	PixelPos destination;  /// missile pixel destination
-	const MissileType *Type;  /// missile-type pointer
+	const stratagus::missile_type *Type;  /// missile-type pointer
 	int SpriteFrame;  /// sprite frame counter
 	int State;        /// state
 	int AnimWait;     /// Animation wait.
@@ -589,18 +580,10 @@ public:
 	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
 
 	int          Percent;  /// HP percent
-	MissileType *Missile;  /// Missile to draw
+	stratagus::missile_type *Missile;  /// Missile to draw
 } ;
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning building frames
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 // In ccl_missile.c
 
@@ -613,20 +596,10 @@ extern void MissileCclRegister();
 extern void LoadMissileSprites();
 /// count missile sprites
 extern int GetMissileSpritesCount();
-/// allocate an empty missile-type slot
-extern MissileType *NewMissileTypeSlot(const std::string &ident);
-/// Get missile-type by ident
-extern MissileType *MissileTypeByIdent(const std::string &ident);
 /// create a missile
-//Wyrmgus start
-//extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
-extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
-//Wyrmgus end
+extern Missile *MakeMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 /// create a local missile
-//Wyrmgus start
-//extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
-extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
-//Wyrmgus end
+extern Missile *MakeLocalMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 
 /// Calculates damage done to goal by attacker using formula
 //Wyrmgus start
@@ -647,17 +620,13 @@ extern void MissileActions();
 extern int ViewPointDistanceToMissile(const Missile &missile);
 
 /// Get the burning building missile based on hp percent
-extern MissileType *MissileBurningBuilding(int percent);
+extern stratagus::missile_type *MissileBurningBuilding(int percent);
 
 /// Save missiles
 extern void SaveMissiles(CFile &file);
 
 /// Initialize missile-types
 extern void InitMissileTypes();
-/// Clean missile-types
-extern void CleanMissileTypes();
-/// Initialize missiles
-extern void InitMissiles();
 /// Clean missiles
 extern void CleanMissiles();
 

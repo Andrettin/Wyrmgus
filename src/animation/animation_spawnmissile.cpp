@@ -61,7 +61,7 @@
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
 	PixelPos dest;
-	MissileType *mtype = MissileTypeByIdent(this->missileTypeStr);
+	stratagus::missile_type *mtype = stratagus::missile_type::try_get(this->missileTypeStr);
 	if (mtype == nullptr) {
 		return;
 	}

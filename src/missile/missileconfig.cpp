@@ -41,7 +41,7 @@ bool MissileConfig::MapMissileNoLog()
 		Missile = nullptr;
 		return true;
 	}
-	Missile = MissileTypeByIdent(Name);
+	Missile = stratagus::missile_type::try_get(Name);
 	return Missile != nullptr;
 }
 

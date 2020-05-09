@@ -50,10 +50,10 @@ class CPlayer;
 class CSpell;
 class CUnit;
 struct lua_State;
-class MissileType;
 
 namespace stratagus {
 	class faction;
+	class missile_type;
 	class unit_type;
 }
 

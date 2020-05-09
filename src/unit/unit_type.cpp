@@ -638,37 +638,73 @@ void unit_type::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
-
-	int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()]; // variable index
-	if (index != -1) { // valid index
-		if (string::is_number(value)) {
-			this->DefaultStat.Variables[index].Enable = 1;
-			this->DefaultStat.Variables[index].Value = std::stoi(value);
-			this->DefaultStat.Variables[index].Max = std::stoi(value);
-		} else if (IsStringBool(value)) {
-			this->DefaultStat.Variables[index].Enable = string::to_bool(value);
-		} else { // error
-			fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->get_identifier().c_str());
-		}
-
-		return;
-	}
-	
-	index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
-	if (index != -1) {
-		if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
-			this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
-		}
-
-		if (string::is_number(value)) {
-			this->BoolFlag[index].value = (std::stoi(value) != 0);
+	if (key == "icon") {
+		this->Icon.Name = value;
+		this->Icon.Icon = nullptr;
+		this->Icon.Load();
+	} else if (key == "missile") {
+		this->Missile.Name = value;
+		this->Missile.Missile = nullptr;
+	} else if (key == "fire_missile") {
+		this->FireMissile.Name = value;
+		this->FireMissile.Missile = nullptr;
+	} else if (key == "priority") {
+		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
+		this->DefaultStat.Variables[PRIORITY_INDEX].Max = std::stoi(value);
+	} else if (key == "type") {
+		if (value == "land") {
+			this->UnitType = UnitTypeType::Land;
+			this->LandUnit = true;
+		} else if (value == "fly") {
+			this->UnitType = UnitTypeType::Fly;
+			this->AirUnit = true;
+		} else if (value == "fly_low") {
+			this->UnitType = UnitTypeType::FlyLow;
+			this->AirUnit = true;
+		} else if (value == "naval") {
+			this->UnitType = UnitTypeType::Naval;
+			this->SeaUnit = true;
+		} else if (value == "space") {
+			this->UnitType = UnitTypeType::Space;
+			this->AirUnit = true;
 		} else {
-			this->BoolFlag[index].value = string::to_bool(value);
+			throw std::runtime_error("Invalid unit type type: \"" + value + "\"");
 		}
-	}
+	} else {
+		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
 
-	data_entry::process_sml_property(property);
+		int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()]; // variable index
+		if (index != -1) { // valid index
+			if (string::is_number(value)) {
+				this->DefaultStat.Variables[index].Enable = 1;
+				this->DefaultStat.Variables[index].Value = std::stoi(value);
+				this->DefaultStat.Variables[index].Max = std::stoi(value);
+			} else if (IsStringBool(value)) {
+				this->DefaultStat.Variables[index].Enable = string::to_bool(value);
+			} else { // error
+				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->get_identifier().c_str());
+			}
+
+			return;
+		}
+
+		index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
+		if (index != -1) {
+			if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+			}
+
+			if (string::is_number(value)) {
+				this->BoolFlag[index].value = (std::stoi(value) != 0);
+			} else {
+				this->BoolFlag[index].value = string::to_bool(value);
+			}
+
+			return;
+		}
+
+		data_entry::process_sml_property(property);
+	}
 }
 
 void unit_type::ProcessConfigData(const CConfigData *config_data)
@@ -698,7 +734,6 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "animations") {
 			this->animation_set = animation_set::get(value);
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
@@ -751,15 +786,12 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
 			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
 		} else if (key == "missile") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->Missile.Name = value;
 			this->Missile.Missile = nullptr;
 		} else if (key == "fire_missile") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->FireMissile.Name = value;
 			this->FireMissile.Missile = nullptr;
 		} else if (key == "corpse") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->CorpseName = value;
 			this->CorpseType = nullptr;
 		} else if (key == "weapon_class") {

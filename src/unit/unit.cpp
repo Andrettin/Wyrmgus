@@ -7091,7 +7091,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 
 	if ((target.IsVisibleOnMap(*CPlayer::GetThisPlayer()) || ReplayRevealMap) && !DamageMissile.empty()) {
-		const MissileType *mtype = MissileTypeByIdent(DamageMissile);
+		const stratagus::missile_type *mtype = stratagus::missile_type::get(DamageMissile);
 		const PixelDiff offset(3, -mtype->Range);
 
 		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset, target.MapLayer->ID)->Damage = -damage;
@@ -7155,7 +7155,7 @@ static void HitUnit_Burning(CUnit &target)
 //	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
 	const int f = (100 * target.Variable[HP_INDEX].Value) / target.GetModifiedVariable(HP_INDEX, VariableMax);
 	//Wyrmgus end
-	MissileType *fire = MissileBurningBuilding(f);
+	stratagus::missile_type *fire = MissileBurningBuilding(f);
 
 	if (fire) {
 		const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();

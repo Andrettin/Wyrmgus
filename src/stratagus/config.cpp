@@ -280,10 +280,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				map_template->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "missile_type") {
-			MissileType *missile_type = MissileTypeByIdent(ident);
-			if (!missile_type) {
-				missile_type = NewMissileTypeSlot(ident);
-			}
+			stratagus::missile_type *missile_type = stratagus::missile_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}

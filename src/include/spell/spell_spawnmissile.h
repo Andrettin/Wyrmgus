@@ -85,5 +85,5 @@ private:
 	//Wyrmgus end
 	SpellActionMissileLocation StartPoint;	/// Start point description.
 	SpellActionMissileLocation EndPoint;	/// Start point description.
-	MissileType *Missile = nullptr;			/// Missile fired on cast
+	stratagus::missile_type *Missile = nullptr;			/// Missile fired on cast
 };

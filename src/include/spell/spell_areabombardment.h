@@ -51,5 +51,5 @@ private:
 	int Damage;             /// Damage for every shard.
 	int StartOffsetX;       /// The offset of the missile start point to the hit location.
 	int StartOffsetY;       /// The offset of the missile start point to the hit location.
-	MissileType *Missile;   /// Missile fired on cast
+	stratagus::missile_type *Missile;   /// Missile fired on cast
 };
