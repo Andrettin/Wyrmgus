@@ -250,25 +250,25 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
-	if (oldtype.civilization != -1) {
-		CUpgrade *civilization_upgrade = stratagus::civilization::get_all()[oldtype.civilization]->get_upgrade();
+	if (oldtype.get_civilization() != nullptr) {
+		CUpgrade *civilization_upgrade = oldtype.get_civilization()->get_upgrade();
 		if (civilization_upgrade != nullptr) {
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
-	if (oldtype.civilization != -1 && oldtype.Faction != -1 && !stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade.empty()) {
+	if (oldtype.get_civilization() != nullptr && oldtype.Faction != -1 && !stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
 	}
-	if (newtype.civilization != -1) {
-		CUpgrade *civilization_upgrade = stratagus::civilization::get_all()[newtype.civilization]->get_upgrade();
+	if (newtype.get_civilization() != nullptr) {
+		CUpgrade *civilization_upgrade = newtype.get_civilization()->get_upgrade();
 		if (civilization_upgrade != nullptr) {
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (newtype.civilization != -1 && newtype.Faction != -1 && !stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade.empty()) {
+	if (newtype.get_civilization() != nullptr && newtype.Faction != -1 && !stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 1);
@@ -292,12 +292,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		&& (
 			oldtype.PersonalNames != newtype.PersonalNames
 			|| (
-				oldtype.civilization != -1 && newtype.civilization != -1 && oldtype.civilization != newtype.civilization
+				oldtype.get_civilization() != nullptr && newtype.get_civilization() != nullptr && oldtype.get_civilization() != newtype.get_civilization()
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
-					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.get_unit_class()) != stratagus::civilization::get_all()[newtype.civilization]->get_unit_class_names(newtype.get_unit_class()))
-					|| (stratagus::civilization::get_all()[oldtype.civilization]->get_unit_class_names(oldtype.get_unit_class()) != stratagus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.get_unit_class()))
+					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != newtype.get_civilization()->get_unit_class_names(newtype.get_unit_class()))
+					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != stratagus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.get_unit_class()))
 				)
 			)
 		)

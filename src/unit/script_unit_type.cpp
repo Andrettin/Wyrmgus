@@ -1719,7 +1719,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-			type->civilization = civilization->ID;
+			type->civilization = civilization;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			stratagus::faction *faction = stratagus::faction::get(faction_name);
@@ -1868,167 +1868,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 	}
-	
-	//Wyrmgus start
-	if (type->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
-			civilization->remove_class_unit_type(type);
-		}
 
-		for (stratagus::faction *faction : stratagus::faction::get_all()) {
-			faction->remove_class_unit_type(type);
-		}
-		
-		const stratagus::unit_class *unit_class = type->get_unit_class();
-		if (type->civilization != -1) {
-			int civilization_id = type->civilization;
-			
-			if (type->Faction != -1) {
-				int faction_id = type->Faction;
-				if (faction_id != -1) {
-					stratagus::faction::get_all()[faction_id]->set_class_unit_type(unit_class, type);
-				}
-			} else {
-				if (civilization_id != -1) {
-					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(unit_class, type);
-				}
-			}
-		}
-	}
-	//Wyrmgus end
-
-	// If number of directions is not specified, make a guess
-	// Building have 1 direction and units 8
-	if (type->BoolFlag[BUILDING_INDEX].value && type->NumDirections == 0) {
-		type->NumDirections = 1;
-	} else if (type->NumDirections == 0) {
-		type->NumDirections = 8;
-	}
-	
-	//Wyrmgus start
-	//unit type's level must be at least 1
-	if (type->DefaultStat.Variables[LEVEL_INDEX].Value == 0) {
-		type->DefaultStat.Variables[LEVEL_INDEX].Enable = 1;
-		type->DefaultStat.Variables[LEVEL_INDEX].Value = 1;
-		type->DefaultStat.Variables[LEVEL_INDEX].Max = 1;
-	}
-	//Wyrmgus end
-
-	// FIXME: try to simplify/combine the flags instead
-	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->get_name().c_str());
-	}
-	type->UpdateDefaultBoolFlags();
-	//Wyrmgus start
-	if (GameRunning || Editor.Running == EditorEditing) {
-		InitUnitType(*type);
-		LoadUnitType(*type);
-	}
-	//Wyrmgus end
-	//Wyrmgus start
-//	if (!CclInConfigFile) {
-	if (!CclInConfigFile || GameRunning || Editor.Running == EditorEditing) {
-	//Wyrmgus end
-		UpdateUnitStats(*type, 1);
-	}
-	//Wyrmgus start
-	if (Editor.Running == EditorEditing && std::find(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), type->Ident) == Editor.UnitTypes.end()) {
-		Editor.UnitTypes.push_back(type->Ident);
-		RecalculateShownUnits();
-	}
-	
-	for (size_t i = 0; i < type->Trains.size(); ++i) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = " + std::to_string((long long) type->Trains[i]->ButtonPos) + ",\n";
-		if (type->Trains[i]->ButtonLevel) {
-			button_definition += "\tLevel = " + type->Trains[i]->ButtonLevel->Ident + ",\n";
-		}
-		button_definition += "\tAction = ";
-		if (type->Trains[i]->BoolFlag[BUILDING_INDEX].value) {
-			button_definition += "\"build\"";
-		} else {
-			button_definition += "\"train-unit\"";
-		}
-		button_definition += ",\n";
-		button_definition += "\tValue = \"" + type->Trains[i]->Ident + "\",\n";
-		if (!type->Trains[i]->ButtonPopup.empty()) {
-			button_definition += "\tPopup = \"" + type->Trains[i]->ButtonPopup + "\",\n";
-		}
-		button_definition += "\tKey = \"" + type->Trains[i]->ButtonKey + "\",\n";
-		button_definition += "\tHint = \"" + type->Trains[i]->ButtonHint + "\",\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (type->CanMove()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 1,\n";
-		button_definition += "\tAction = \"move\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"m\",\n";
-		button_definition += "\tHint = _(\"~!Move\"),\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (type->CanMove()) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 2,\n";
-		button_definition += "\tAction = \"stop\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"s\",\n";
-		button_definition += "\tHint = _(\"~!Stop\"),\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (type->CanMove() && type->CanAttack) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 3,\n";
-		button_definition += "\tAction = \"attack\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"a\",\n";
-		button_definition += "\tHint = _(\"~!Attack\"),\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (type->CanMove() && ((!type->BoolFlag[COWARD_INDEX].value && type->CanAttack) || type->UnitType == UnitTypeType::Fly || type->UnitType == UnitTypeType::Space)) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 4,\n";
-		button_definition += "\tAction = \"patrol\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"p\",\n";
-		button_definition += "\tHint = _(\"~!Patrol\"),\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	if (type->CanMove() && !type->BoolFlag[COWARD_INDEX].value && type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 5,\n";
-		button_definition += "\tAction = \"stand-ground\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"t\",\n";
-		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	// make units allowed by default
-	for (int i = 0; i < PlayerMax; ++i) {
-		AllowUnitId(*CPlayer::Players[i], type->Slot, 65536);
-	}
-	//Wyrmgus end
-	
-	type->Initialized = true;
+	type->initialize();
 	
 	return 0;
 }
@@ -2314,8 +2155,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (type->civilization != -1) {
-			lua_pushstring(l, stratagus::civilization::get_all()[type->civilization]->get_identifier().c_str());
+		if (type->get_civilization() != nullptr) {
+			lua_pushstring(l, type->get_civilization()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

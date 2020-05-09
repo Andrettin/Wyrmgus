@@ -1430,11 +1430,11 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->settlement != nullptr && unit->settlement->get_site_unit() != nullptr) {
-				int civilization = unit->settlement->get_site_unit()->Type->civilization;
-				if (civilization != -1 && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization || unit->settlement->get_site_unit()->Type == stratagus::faction::get_all()[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
-					civilization = unit->settlement->get_site_unit()->Player->Race;
+				const stratagus::civilization *civilization = unit->settlement->get_site_unit()->Type->get_civilization();
+				if (civilization != nullptr && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization->ID || unit->settlement->get_site_unit()->Type == stratagus::faction::get_all()[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
+					civilization = unit->settlement->get_site_unit()->Player->Race != -1 ? stratagus::civilization::get_all()[unit->settlement->get_site_unit()->Player->Race] : nullptr;
 				}
-				return unit->settlement->GetCulturalName(civilization != -1 ? stratagus::civilization::get_all()[civilization] : nullptr);
+				return unit->settlement->GetCulturalName(civilization);
 			} else {
 				return std::string("");
 			}

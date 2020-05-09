@@ -806,7 +806,7 @@ static int CclDefineModifier(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
+			um->ApplyTo[CUnitType::get(value)->Slot] = 'X';
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = CUnitType::get(value);

@@ -543,7 +543,7 @@ CUnitType::CUnitType(const std::string &identifier) : detailed_data_entry(identi
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
-	civilization(-1), Faction(-1), TerrainType(nullptr),
+	Faction(-1), TerrainType(nullptr),
 	//Wyrmgus end
 	Animations(nullptr), StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
@@ -699,9 +699,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			CUnitType *parent_type = CUnitType::get(value);
 			this->SetParent(parent_type);
 		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
 			stratagus::civilization *civilization = stratagus::civilization::get(value);
-			this->civilization = civilization->ID;
+			this->civilization = civilization;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			stratagus::faction *faction = stratagus::faction::get(value);
@@ -1089,10 +1088,13 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		}
 	}
-	
-	if (this->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		const stratagus::unit_class *unit_class = this->get_unit_class();
 
+	this->initialize();
+}
+
+void CUnitType::initialize()
+{
+	if (this->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
 			civilization->remove_class_unit_type(this);
@@ -1101,23 +1103,17 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		for (stratagus::faction *faction : stratagus::faction::get_all()) {
 			faction->remove_class_unit_type(this);
 		}
-		
-		if (this->civilization != -1) {
-			int civilization_id = this->civilization;
-			
+
+		const stratagus::unit_class *unit_class = this->get_unit_class();
+		if (unit_class != nullptr) {
 			if (this->Faction != -1) {
-				int faction_id = this->Faction;
-				if (faction_id != -1) {
-					stratagus::faction::get_all()[faction_id]->set_class_unit_type(unit_class, this);
-				}
-			} else {
-				if (civilization_id != -1) {
-					stratagus::civilization::get_all()[civilization_id]->set_class_unit_type(unit_class, this);
-				}
+				stratagus::faction::get_all()[this->Faction]->set_class_unit_type(unit_class, this);
+			} else if (this->get_civilization() != nullptr) {
+				this->get_civilization()->set_class_unit_type(unit_class, this);
 			}
 		}
 	}
-	
+
 	// If number of directions is not specified, make a guess
 	// Building have 1 direction and units 8
 	if (this->BoolFlag[BUILDING_INDEX].value && this->NumDirections == 0) {
@@ -1125,39 +1121,33 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	} else if (this->NumDirections == 0) {
 		this->NumDirections = 8;
 	}
-	
-	//Wyrmgus start
+
 	//unit type's level must be at least 1
 	if (this->DefaultStat.Variables[LEVEL_INDEX].Value == 0) {
 		this->DefaultStat.Variables[LEVEL_INDEX].Enable = 1;
 		this->DefaultStat.Variables[LEVEL_INDEX].Value = 1;
 		this->DefaultStat.Variables[LEVEL_INDEX].Max = 1;
 	}
-	//Wyrmgus end
 
 	// FIXME: try to simplify/combine the flags instead
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
 		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->get_name().c_str());
 	}
 	this->UpdateDefaultBoolFlags();
-	//Wyrmgus start
 	if (GameRunning || Editor.Running == EditorEditing) {
 		InitUnitType(*this);
 		LoadUnitType(*this);
 	}
-	//Wyrmgus end
-	//Wyrmgus start
-//	if (!CclInConfigFile) {
+
 	if (!CclInConfigFile || GameRunning || Editor.Running == EditorEditing) {
-	//Wyrmgus end
 		UpdateUnitStats(*this, 1);
 	}
-	//Wyrmgus start
+
 	if (Editor.Running == EditorEditing && std::find(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), this->Ident) == Editor.UnitTypes.end()) {
 		Editor.UnitTypes.push_back(this->Ident);
 		RecalculateShownUnits();
 	}
-	
+
 	for (size_t i = 0; i < this->Trains.size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string((long long) this->Trains[i]->ButtonPos) + ",\n";
@@ -1181,7 +1171,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
-	
+
 	if (this->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
@@ -1193,7 +1183,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
-	
+
 	if (this->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
@@ -1205,7 +1195,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
-	
+
 	if (this->CanMove() && this->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
@@ -1217,7 +1207,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
-	
+
 	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeType::Fly || this->UnitType == UnitTypeType::Space)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
@@ -1229,7 +1219,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
-	
+
 	if (this->CanMove() && !this->BoolFlag[COWARD_INDEX].value && this->CanAttack && !(this->CanTransport() && this->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
@@ -1241,15 +1231,15 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
-	
+
 	// make units allowed by default
 	for (int i = 0; i < PlayerMax; ++i) {
 		AllowUnitId(*CPlayer::Players[i], this->Slot, 65536);
 	}
-	
-	this->Initialized = true;
-	
-	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+
+	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+
+	data_entry::initialize();
 }
 
 void CUnitType::set_unit_class(stratagus::unit_class *unit_class)
@@ -1328,7 +1318,7 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 
 void CUnitType::SetParent(CUnitType *parent_type)
 {
-	if (!parent_type->Initialized) {
+	if (!parent_type->is_initialized()) {
 		fprintf(stderr, "Unit type \"%s\" is inheriting features from a non-initialized parent (\"%s\").\n", this->Ident.c_str(), parent_type->Ident.c_str());
 	}
 	
@@ -1835,44 +1825,41 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(stratagus::faction
 		}
 	}
 	
-	if (potential_names.size() == 0 && this->civilization != -1) {
-		const int civilization_id = this->civilization;
-		if (civilization_id != -1) {
-			stratagus::civilization *civilization = stratagus::civilization::get_all()[civilization_id];
-			if (faction && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this == faction->get_class_unit_type(this->get_unit_class())) {
-				civilization = faction->get_civilization();
-			}
-			if (faction && faction->get_civilization() != civilization) {
-				faction = nullptr;
-			}
-			if (this->Faction != -1 && !faction) {
-				faction = stratagus::faction::get_all()[this->Faction];
-			}
-			
-			if (this->BoolFlag[ORGANIC_INDEX].value) {
-				if (civilization->get_personal_names().find(stratagus::gender::none) != civilization->get_personal_names().end()) {
-					for (size_t i = 0; i < civilization->get_personal_names().find(stratagus::gender::none)->second.size(); ++i) {
-						potential_names.push_back(civilization->get_personal_names().find(stratagus::gender::none)->second[i]);
-					}
+	if (potential_names.size() == 0 && this->get_civilization() != nullptr) {
+		const stratagus::civilization *civilization = this->get_civilization();
+		if (faction && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this == faction->get_class_unit_type(this->get_unit_class())) {
+			civilization = faction->get_civilization();
+		}
+		if (faction && faction->get_civilization() != civilization) {
+			faction = nullptr;
+		}
+		if (this->Faction != -1 && !faction) {
+			faction = stratagus::faction::get_all()[this->Faction];
+		}
+
+		if (this->BoolFlag[ORGANIC_INDEX].value) {
+			if (civilization->get_personal_names().find(stratagus::gender::none) != civilization->get_personal_names().end()) {
+				for (size_t i = 0; i < civilization->get_personal_names().find(stratagus::gender::none)->second.size(); ++i) {
+					potential_names.push_back(civilization->get_personal_names().find(stratagus::gender::none)->second[i]);
 				}
-				if (gender != stratagus::gender::none && civilization->get_personal_names().find(gender) != civilization->get_personal_names().end()) {
-					for (size_t i = 0; i < civilization->get_personal_names().find(gender)->second.size(); ++i) {
-						potential_names.push_back(civilization->get_personal_names().find(gender)->second[i]);
-					}
+			}
+			if (gender != stratagus::gender::none && civilization->get_personal_names().find(gender) != civilization->get_personal_names().end()) {
+				for (size_t i = 0; i < civilization->get_personal_names().find(gender)->second.size(); ++i) {
+					potential_names.push_back(civilization->get_personal_names().find(gender)->second[i]);
 				}
-			} else {
-				if (this->get_unit_class() != nullptr && civilization->get_unit_class_names(this->get_unit_class()).size() > 0) {
-					return civilization->get_unit_class_names(this->get_unit_class());
+			}
+		} else {
+			if (this->get_unit_class() != nullptr && civilization->get_unit_class_names(this->get_unit_class()).size() > 0) {
+				return civilization->get_unit_class_names(this->get_unit_class());
+			}
+
+			if (this->UnitType == UnitTypeType::Naval) { // if is a ship
+				if (faction && !faction->get_ship_names().empty()) {
+					return faction->get_ship_names();
 				}
-				
-				if (this->UnitType == UnitTypeType::Naval) { // if is a ship
-					if (faction && !faction->get_ship_names().empty()) {
-						return faction->get_ship_names();
-					}
-					
-					if (!civilization->get_ship_names().empty()) {
-						return civilization->get_ship_names();
-					}
+
+				if (!civilization->get_ship_names().empty()) {
+					return civilization->get_ship_names();
 				}
 			}
 		}

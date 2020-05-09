@@ -247,12 +247,12 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->civilization_equivalent != nullptr) {
-		if (caster.Type->civilization == -1 || (caster.Type->civilization == condition->civilization_equivalent->ID && (!caster.Character || (caster.Character->get_civilization() && caster.Character->get_civilization() == condition->civilization_equivalent))) || stratagus::civilization::get_all()[caster.Type->civilization]->get_species() != condition->civilization_equivalent->get_species() || condition->civilization_equivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->get_civilization() == nullptr || (caster.Type->get_civilization() == condition->civilization_equivalent && (!caster.Character || (caster.Character->get_civilization() && caster.Character->get_civilization() == condition->civilization_equivalent))) || caster.Type->get_civilization()->get_species() != condition->civilization_equivalent->get_species() || condition->civilization_equivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->civilization == -1 || caster.Type->civilization != condition->FactionEquivalent->get_civilization()->ID || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->get_civilization() == nullptr || caster.Type->get_civilization() != condition->FactionEquivalent->get_civilization() || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

@@ -754,7 +754,8 @@ class CUnitType final : public stratagus::detailed_data_entry, public stratagus:
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::unit_class*unit_class READ get_unit_class WRITE set_unit_class)
+	Q_PROPERTY(stratagus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
+	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -771,6 +772,7 @@ public:
 	~CUnitType();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void initialize() override;
 	
 	stratagus::unit_class *get_unit_class() const
 	{
@@ -778,6 +780,11 @@ public:
 	}
 
 	void set_unit_class(stratagus::unit_class *unit_class);
+
+	stratagus::civilization *get_civilization() const
+	{
+		return this->civilization;
+	}
 
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
@@ -830,13 +837,12 @@ public:
 	}
 
 public:
-	bool Initialized = false;
 	CUnitType *Parent;				/// Parent unit type
 	//Wyrmgus start
 private:
 	stratagus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)
+	stratagus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 public:
-	int civilization;				/// Which civilization this unit belongs to, if any
 	int Faction;					/// Which faction this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type

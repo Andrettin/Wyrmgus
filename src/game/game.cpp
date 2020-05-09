@@ -472,8 +472,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!unit_type->get_name().empty() && (!unit_type->Parent || unit_type->get_name() != unit_type->Parent->get_name())) {
 				f->printf("\tName = \"%s\",\n", unit_type->get_name().c_str());
 			}
-			if (unit_type->civilization != -1) {
-				f->printf("\tCivilization = \"%s\",\n", stratagus::civilization::get_all()[unit_type->civilization]->get_identifier().c_str());
+			if (unit_type->get_civilization() != nullptr) {
+				f->printf("\tCivilization = \"%s\",\n", unit_type->get_civilization()->get_identifier().c_str());
 			}
 			if (unit_type->Faction != -1) {
 				f->printf("\tFaction = \"%s\",\n", stratagus::faction::get_all()[unit_type->Faction]->get_identifier().c_str());
