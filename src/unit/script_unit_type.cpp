@@ -1869,7 +1869,7 @@ static int CclDefineUnitType(lua_State *l)
 		}
 	}
 
-	type->initialize();
+	type->set_defined(true);
 	
 	return 0;
 }

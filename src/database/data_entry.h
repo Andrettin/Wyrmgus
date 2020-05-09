@@ -37,7 +37,7 @@ class module;
 class sml_data;
 class sml_property;
 
-//a de(serializable) and identifiable entry to the database
+//a (de)serializable and identifiable entry to the database
 class data_entry : public QObject
 {
 	Q_OBJECT
@@ -76,6 +76,16 @@ public:
 	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date);
 	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date);
 
+	bool is_defined() const
+	{
+		return this->defined;
+	}
+
+	void set_defined(const bool defined)
+	{
+		this->defined = defined;
+	}
+
 	bool is_initialized() const
 	{
 		return this->initialized;
@@ -109,6 +119,7 @@ public:
 private:
 	std::string identifier;
 	std::set<std::string> aliases;
+	bool defined = false; //whether the data entry's definition has been concluded (with its data having been processed)
 	bool initialized = false;
 	const module *module = nullptr; //the module to which the data entry belongs, if any
 	std::vector<sml_data> history_data;

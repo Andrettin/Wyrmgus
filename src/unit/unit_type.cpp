@@ -1089,7 +1089,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 
-	this->initialize();
+	this->set_defined(true);
 }
 
 void CUnitType::initialize()
@@ -1318,8 +1318,8 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 
 void CUnitType::SetParent(CUnitType *parent_type)
 {
-	if (!parent_type->is_initialized()) {
-		fprintf(stderr, "Unit type \"%s\" is inheriting features from a non-initialized parent (\"%s\").\n", this->Ident.c_str(), parent_type->Ident.c_str());
+	if (!parent_type->is_defined()) {
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from a non-defined parent (\"" + parent_type->get_identifier() + "\").");
 	}
 	
 	this->Parent = parent_type;
