@@ -6472,7 +6472,7 @@ bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 	return has_adjacent_rail;
 }
 
-CAnimations *CUnit::GetAnimations() const
+stratagus::animation_set *CUnit::GetAnimations() const
 {
 	const CUnitTypeVariation *variation = this->GetVariation();
 	if (variation && variation->Animations) {

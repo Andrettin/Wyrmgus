@@ -41,13 +41,13 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CAnimations;
 class CConstruction;
 class CGraphic;
 class CPlayerColorGraphic;
 class CUnitType;
 
 namespace stratagus {
+	class animation_set;
 	class season;
 	class terrain_type;
 }
@@ -82,7 +82,7 @@ public:
 	CPlayerColorGraphic *Sprite = nullptr;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite = nullptr;		/// The graphic corresponding to ShadowFile.
 	CGraphic *LightSprite = nullptr;		/// The graphic corresponding to LightFile.
-	CAnimations *Animations = nullptr;		/// Animation scripts
+	stratagus::animation_set *Animations = nullptr;		/// Animation scripts
 	CConstruction *Construction = nullptr;	/// What is shown in construction phase
 
 	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation

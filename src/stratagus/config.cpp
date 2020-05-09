@@ -237,17 +237,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			continue;
 		}
 		
-		if (config_data->Tag == "animations") {
-			CAnimations *animations = AnimationsByIdent(ident);
-			if (!animations) {
-				animations = new CAnimations;
-				AnimationMap[ident] = animations;
-				animations->Ident = ident;
-			}
-			if (!define_only) {
-				animations->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "button") {
+		if (config_data->Tag == "button") {
 			if (!define_only) {
 				ButtonAction::ProcessConfigData(config_data);
 			}

@@ -488,7 +488,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tIcon = \"%s\",\n", unit_type->Icon.Name.c_str());
 			}
 			if (unit_type->Animations != nullptr && (!unit_type->Parent || unit_type->Animations != unit_type->Parent->Animations)) {
-				f->printf("\tAnimations = \"%s\",\n", unit_type->Animations->Ident.c_str());
+				f->printf("\tAnimations = \"%s\",\n", unit_type->Animations->get_identifier().c_str());
 			}
 			
 			f->printf("\tCosts = {");

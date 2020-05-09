@@ -66,6 +66,7 @@ struct lua_State;
 typedef COrder *COrderPtr;
 
 namespace stratagus {
+	class animation_set;
 	class character;
 	class player_color;
 	class time_of_day;
@@ -460,7 +461,7 @@ public:
 	bool IsSpellEmpowered(const CSpell *spell) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
-	CAnimations *GetAnimations() const;
+	stratagus::animation_set *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
 	stratagus::icon *GetButtonIcon(const ButtonCmd button_action) const;

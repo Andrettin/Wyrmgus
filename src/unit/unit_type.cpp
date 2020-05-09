@@ -135,7 +135,7 @@
 **
 **    Animation scripts for the different actions. Currently the
 **    animations still, move, attack and die are supported.
-**  @see CAnimations
+**  @see stratagus::animation_set
 **  @see CAnimation
 **
 **  CUnitType::Icon
@@ -706,11 +706,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			stratagus::faction *faction = stratagus::faction::get(value);
 			this->Faction = faction->ID;
 		} else if (key == "animations") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Animations = AnimationsByIdent(value);
-			if (!this->Animations) {
-				fprintf(stderr, "Animations \"%s\" do not exist.\n", value.c_str());
-			}
+			this->Animations = stratagus::animation_set::get(value);
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
@@ -2441,7 +2437,7 @@ static int GetStillFrame(const CUnitType &type)
 	}
 	//Wyrmgus end
 	
-	CAnimation *anim = type.Animations->Still;
+	CAnimation *anim = type.Animations->Still.get();
 
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
@@ -2453,7 +2449,7 @@ static int GetStillFrame(const CUnitType &type)
 
 			return a_frame.ParseAnimInt(nullptr);
 		}
-		anim = anim->Next;
+		anim = anim->get_next();
 	}
 	return type.NumDirections / 2;
 }
@@ -2723,7 +2719,6 @@ void CUnitTypeVar::Clear()
 void CleanUnitTypeVariables()
 {
 	DebugPrint("FIXME: icon, sounds not freed.\n");
-	FreeAnimations();
 
 	// Clean all unit-types
 	UnitTypeVar.Clear();

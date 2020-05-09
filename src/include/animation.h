@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "data_type.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 
@@ -38,9 +40,9 @@ class CFile;
 class CUnit;
 struct lua_State;
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+namespace stratagus {
+	class animation_set;
+}
 
 /**
 **  Default names for the extra death types.
@@ -89,45 +91,61 @@ enum SetVar_ModifyTypes {
 class CAnimation
 {
 public:
-	CAnimation(AnimationType type) : Type(type), Next(nullptr) {}
+	static inline std::vector<CAnimation *> animation_list;
+
+	CAnimation(AnimationType type) : Type(type) {}
 
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
 	virtual void Init(const char *s, lua_State *l = nullptr) {}
 
-	const AnimationType Type;
-	CAnimation *Next;
-};
-
-class CAnimations : public CDataType
-{
-public:
-	CAnimations()
+	CAnimation *get_next() const
 	{
-		memset(Death, 0, sizeof(Death));
-		memset(Harvest, 0, sizeof(Harvest));
+		return this->next_ptr;
 	}
 
-	~CAnimations()
+	void set_next(std::unique_ptr<CAnimation> &&animation)
 	{
-		delete Attack;
-		delete RangedAttack;
-		delete Build;
-		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
-			delete Death[i];
+		this->next = std::move(animation);
+		this->set_next(this->next.get());
+	}
+
+	void set_next(CAnimation *animation)
+	{
+		if (animation == nullptr) {
+			throw std::runtime_error("Tried to set a null animation pointer as the next animation of another animation.");
 		}
-		for (int i = 0; i < MaxCosts; ++i) {
-			delete Harvest[i];
-		}
-		delete Move;
-		delete Repair;
-		delete Research;
-		delete SpellCast;
-		delete Start;
-		delete Still;
-		delete Train;
-		delete Upgrade;
+
+		this->next_ptr = animation;
+	}
+
+	const AnimationType Type;
+private:
+	std::unique_ptr<CAnimation> next;
+	CAnimation *next_ptr = nullptr; //non-owning next pointer, needed to circle back to the beginning
+};
+
+namespace stratagus {
+
+class animation_set : public data_entry, public data_type<animation_set>
+{
+public:
+	static constexpr const char *class_identifier = "animation_set";
+	static constexpr const char *database_folder = "animation_sets";
+
+	static void clear()
+	{
+		CAnimation::animation_list.clear();
+		data_type::clear();
+	}
+
+	animation_set(const std::string &identifier) : data_entry(identifier)
+	{
+	}
+
+	~animation_set()
+	{
 	}
 
 	static void AddAnimationToArray(CAnimation *anim);
@@ -135,30 +153,30 @@ public:
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 	
 public:
-	CAnimation *Attack = nullptr;
-	CAnimation *RangedAttack = nullptr;
-	CAnimation *Build = nullptr;
-	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
-	CAnimation *Harvest[MaxCosts];
-	CAnimation *Move = nullptr;
-	CAnimation *Repair = nullptr;
-	CAnimation *Research = nullptr;
-	CAnimation *SpellCast = nullptr;
-	CAnimation *Start = nullptr;
-	CAnimation *Still = nullptr;
-	CAnimation *Train = nullptr;
-	CAnimation *Upgrade = nullptr;
+	std::unique_ptr<CAnimation> Attack;
+	std::unique_ptr<CAnimation> RangedAttack;
+	std::unique_ptr<CAnimation> Build;
+	std::unique_ptr<CAnimation> Death[ANIMATIONS_DEATHTYPES + 1];
+	std::unique_ptr<CAnimation> Harvest[MaxCosts];
+	std::unique_ptr<CAnimation> Move;
+	std::unique_ptr<CAnimation> Repair;
+	std::unique_ptr<CAnimation> Research;
+	std::unique_ptr<CAnimation> SpellCast;
+	std::unique_ptr<CAnimation> Start;
+	std::unique_ptr<CAnimation> Still;
+	std::unique_ptr<CAnimation> Train;
+	std::unique_ptr<CAnimation> Upgrade;
 };
+
+}
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/// Get the animations structure by ident
-extern CAnimations *AnimationsByIdent(const std::string &ident);
 
 extern void AnimationCclRegister();
 
@@ -167,14 +185,7 @@ extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scal
 /// Handle the animation of a unit
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
-
 extern int ParseAnimInt(const CUnit &unit, const char *parseint);
 extern int ParseAnimFlags(const CUnit &unit, const char *parseflag);
 
 extern void FindLabelLater(CAnimation **anim, const std::string &name);
-
-extern void FreeAnimations();
-
-//Wyrmgus start
-extern std::map<std::string, CAnimations *> AnimationMap;
-//Wyrmgus end

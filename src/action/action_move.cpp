@@ -193,10 +193,7 @@ int DoActionMove(CUnit &unit)
 
 	Assert(unit.CanMove());
 
-	//Wyrmgus start
-//	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
-	if (!unit.Moving && (unit.GetAnimations()->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
-	//Wyrmgus end
+	if (!unit.Moving && (unit.GetAnimations()->Move.get() != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
@@ -302,10 +299,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
-	//Wyrmgus start
-//	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
-	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
-	//Wyrmgus end
+	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move.get(), DefaultTileMovementCost);
 
 	unit.pixel_offset += QPoint(posd.x * move, posd.y * move);
 	
@@ -360,10 +354,7 @@ int DoActionMove(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		UnitShowAnimation(unit, unit.GetAnimations()->Still);
-		//Wyrmgus end
+		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 		unit.Wait--;
 		return;
 	}

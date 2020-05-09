@@ -526,16 +526,13 @@ bool AutoAttack(CUnit &unit)
 
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
-			//Wyrmgus start
-//			UnitShowAnimation(unit, unit.Type->Animations->Still);
 			if (unit.Variable[STUN_INDEX].Value == 0) { //only show the idle animation when still if the unit is not stunned
-				UnitShowAnimation(unit, unit.GetAnimations()->Still);
+				UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 			}
 			if (SyncRand(100000) == 0) {
 				PlayUnitSound(unit, UnitVoiceGroup::Idle);
 			}
 			unit.StepCount = 0;
-			//Wyrmgus end
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit, *this);

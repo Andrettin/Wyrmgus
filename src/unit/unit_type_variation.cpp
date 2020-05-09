@@ -112,11 +112,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "animations") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Animations = AnimationsByIdent(value);
-			if (!this->Animations) {
-				fprintf(stderr, "Invalid animations: \"%s\".\n", value.c_str());
-			}
+			this->Animations = stratagus::animation_set::get(value);
 		} else if (key == "construction") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Construction = ConstructionByIdent(value);
@@ -124,12 +120,10 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid construction: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "required_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CUpgrade *upgrade = CUpgrade::get(value);
 			this->UpgradesRequired.push_back(upgrade);
 		} else if (key == "forbidden_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUpgrade *upgrade = CUpgrade::try_get(value);
+			const CUpgrade *upgrade = CUpgrade::get(value);
 			this->UpgradesForbidden.push_back(upgrade);
 		} else if (key == "item_class_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -148,18 +142,15 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CUnitType *unit_type = CUnitType::get(value);
 			this->ItemsEquipped.push_back(unit_type);
 		} else if (key == "item_not_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
 			const CUnitType *unit_type = CUnitType::get(value);
 			this->ItemsNotEquipped.push_back(unit_type);
 		} else if (key == "terrain") {
 			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
 			this->Terrains.push_back(terrain_type);
 		} else if (key == "forbidden_terrain") {
-			value = FindAndReplaceString(value, "_", "-");
 			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
 			this->TerrainsForbidden.push_back(terrain_type);
 		} else if (key == "season") {

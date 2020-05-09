@@ -582,11 +582,11 @@ static int CclUnit(lua_State *l)
 			unit->Wait = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
-			CAnimations::LoadUnitAnim(l, *unit, -1);
+			stratagus::animation_set::LoadUnitAnim(l, *unit, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "wait-anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
-			CAnimations::LoadWaitUnitAnim(l, *unit, -1);
+			stratagus::animation_set::LoadWaitUnitAnim(l, *unit, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "blink")) {
 			unit->Blink = LuaToNumber(l, 2, j + 1);

@@ -73,16 +73,14 @@ void LoadUnitSounds()
 {
 }
 
-static void MapAnimSound(CAnimation &anim)
+static void MapAnimSound(CAnimation *anim)
 {
-	if (anim.Type == AnimationSound) {
-		CAnimation_Sound &anim_sound = *static_cast<CAnimation_Sound *>(&anim);
-
-		anim_sound.MapSound();
-	} else if (anim.Type == AnimationRandomSound) {
-		CAnimation_RandomSound &anim_rsound = *static_cast<CAnimation_RandomSound *>(&anim);
-
-		anim_rsound.MapSound();
+	if (anim->Type == AnimationSound) {
+		CAnimation_Sound *anim_sound = static_cast<CAnimation_Sound *>(anim);
+		anim_sound->MapSound();
+	} else if (anim->Type == AnimationRandomSound) {
+		CAnimation_RandomSound *anim_rsound = static_cast<CAnimation_RandomSound *>(anim);
+		anim_rsound->MapSound();
 	}
 }
 
@@ -92,11 +90,12 @@ static void MapAnimSound(CAnimation &anim)
 static void MapAnimSounds2(CAnimation *anim)
 {
 	if (anim == nullptr) {
-		return ;
+		return;
 	}
-	MapAnimSound(*anim);
-	for (CAnimation *it = anim->Next; it != anim; it = it->Next) {
-		MapAnimSound(*it);
+
+	MapAnimSound(anim);
+	for (CAnimation *it = anim->get_next(); it != anim; it = it->get_next()) {
+		MapAnimSound(it);
 	}
 }
 
@@ -108,22 +107,22 @@ static void MapAnimSounds(CUnitType &type)
 	if (!type.Animations) {
 		return;
 	}
-	MapAnimSounds2(type.Animations->Start);
-	MapAnimSounds2(type.Animations->Still);
-	MapAnimSounds2(type.Animations->Move);
-	MapAnimSounds2(type.Animations->Attack);
-	MapAnimSounds2(type.Animations->RangedAttack);
-	MapAnimSounds2(type.Animations->SpellCast);
+	MapAnimSounds2(type.Animations->Start.get());
+	MapAnimSounds2(type.Animations->Still.get());
+	MapAnimSounds2(type.Animations->Move.get());
+	MapAnimSounds2(type.Animations->Attack.get());
+	MapAnimSounds2(type.Animations->RangedAttack.get());
+	MapAnimSounds2(type.Animations->SpellCast.get());
 	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-		MapAnimSounds2(type.Animations->Death[i]);
+		MapAnimSounds2(type.Animations->Death[i].get());
 	}
-	MapAnimSounds2(type.Animations->Repair);
-	MapAnimSounds2(type.Animations->Train);
-	MapAnimSounds2(type.Animations->Research);
-	MapAnimSounds2(type.Animations->Upgrade);
-	MapAnimSounds2(type.Animations->Build);
+	MapAnimSounds2(type.Animations->Repair.get());
+	MapAnimSounds2(type.Animations->Train.get());
+	MapAnimSounds2(type.Animations->Research.get());
+	MapAnimSounds2(type.Animations->Upgrade.get());
+	MapAnimSounds2(type.Animations->Build.get());
 	for (int i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type.Animations->Harvest[i]);
+		MapAnimSounds2(type.Animations->Harvest[i].get());
 	}
 	//Wyrmgus start
 	for (CUnitTypeVariation *variation : type.Variations) {
@@ -133,22 +132,22 @@ static void MapAnimSounds(CUnitType &type)
 		if (!variation->Animations) {
 			continue;
 		}
-		MapAnimSounds2(variation->Animations->Start);
-		MapAnimSounds2(variation->Animations->Still);
-		MapAnimSounds2(variation->Animations->Move);
-		MapAnimSounds2(variation->Animations->Attack);
-		MapAnimSounds2(variation->Animations->RangedAttack);
-		MapAnimSounds2(variation->Animations->SpellCast);
+		MapAnimSounds2(variation->Animations->Start.get());
+		MapAnimSounds2(variation->Animations->Still.get());
+		MapAnimSounds2(variation->Animations->Move.get());
+		MapAnimSounds2(variation->Animations->Attack.get());
+		MapAnimSounds2(variation->Animations->RangedAttack.get());
+		MapAnimSounds2(variation->Animations->SpellCast.get());
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			MapAnimSounds2(variation->Animations->Death[i]);
+			MapAnimSounds2(variation->Animations->Death[i].get());
 		}
-		MapAnimSounds2(variation->Animations->Repair);
-		MapAnimSounds2(variation->Animations->Train);
-		MapAnimSounds2(variation->Animations->Research);
-		MapAnimSounds2(variation->Animations->Upgrade);
-		MapAnimSounds2(variation->Animations->Build);
+		MapAnimSounds2(variation->Animations->Repair.get());
+		MapAnimSounds2(variation->Animations->Train.get());
+		MapAnimSounds2(variation->Animations->Research.get());
+		MapAnimSounds2(variation->Animations->Upgrade.get());
+		MapAnimSounds2(variation->Animations->Build.get());
 		for (int i = 0; i < MaxCosts; ++i) {
-			MapAnimSounds2(variation->Animations->Harvest[i]);
+			MapAnimSounds2(variation->Animations->Harvest[i].get());
 		}
 	}
 	//Wyrmgus end

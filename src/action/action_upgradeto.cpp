@@ -488,12 +488,8 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, CUnitType &newType
 
 static void AnimateActionUpgradeTo(CUnit &unit)
 {
-	//Wyrmgus start
-//	CAnimations &animations = *unit.Type->Animations;
-//	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
-	CAnimations &animations = *unit.GetAnimations();
-	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
-	//Wyrmgus end
+	const stratagus::animation_set *animations = unit.GetAnimations();
+	UnitShowAnimation(unit, animations->Upgrade.get() ? animations->Upgrade.get() : animations->Still.get());
 }
 
 /* virtual */ void COrder_UpgradeTo::Execute(CUnit &unit)

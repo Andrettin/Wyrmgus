@@ -288,10 +288,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 			if (this->WaitForTransporter(unit)) {
 				this->State = State_EnterTransporter;
 			} else {
-				//Wyrmgus start
-//				UnitShowAnimation(unit, unit.Type->Animations->Still);
-				UnitShowAnimation(unit, unit.GetAnimations()->Still);
-				//Wyrmgus end
+				UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 			}
 			break;
 

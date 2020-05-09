@@ -77,19 +77,16 @@
 
 static bool AnimateActionDie(CUnit &unit)
 {
-	//Wyrmgus start
-//	const CAnimations *animations = unit.Type->Animations;
-	const CAnimations *animations = unit.GetAnimations();
-	//Wyrmgus end
+	const stratagus::animation_set *animations = unit.GetAnimations();
 
 	if (animations == nullptr) {
 		return false;
 	}
 	if (animations->Death[unit.DamagedType]) {
-		UnitShowAnimation(unit, animations->Death[unit.DamagedType]);
+		UnitShowAnimation(unit, animations->Death[unit.DamagedType].get());
 		return true;
 	} else if (animations->Death[ANIMATIONS_DEATHTYPES]) {
-		UnitShowAnimation(unit, animations->Death[ANIMATIONS_DEATHTYPES]);
+		UnitShowAnimation(unit, animations->Death[ANIMATIONS_DEATHTYPES].get());
 		return true;
 	}
 	return false;

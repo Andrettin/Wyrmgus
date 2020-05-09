@@ -797,10 +797,7 @@ static int CclDefineUnitType(lua_State *l)
 						variation->ButtonIcons[button_action].Icon = nullptr;
 						variation->ButtonIcons[button_action].Load();
 					} else if (!strcmp(value, "animations")) {
-						variation->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
-						if (!variation->Animations) {
-							DebugPrint("Warning animation '%s' not found\n" _C_ LuaToString(l, -1, k + 1));
-						}
+						variation->Animations = stratagus::animation_set::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "construction")) {
 						variation->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {
@@ -1014,10 +1011,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {
-			type->Animations = AnimationsByIdent(LuaToString(l, -1));
-			if (!type->Animations) {
-				DebugPrint("Warning animation '%s' not found\n" _C_ LuaToString(l, -1));
-			}
+			type->Animations = stratagus::animation_set::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = nullptr;
@@ -2202,7 +2196,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
 		if (type->Animations != nullptr) {
-			lua_pushstring(l, type->Animations->Ident.c_str());
+			lua_pushstring(l, type->Animations->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3100,9 +3094,8 @@ static int CclGetAnimations(lua_State *l)
 {
 	std::vector<std::string> animations;
 
-	std::map<std::string, CAnimations *>::iterator it;
-	for (it = AnimationMap.begin(); it != AnimationMap.end(); ++it) {
-		animations.push_back((*it).first);
+	for (const stratagus::animation_set *animation_set : stratagus::animation_set::get_all()) {
+		animations.push_back(animation_set->get_identifier());
 	}
 
 	lua_createtable(l, animations.size(), 0);
@@ -3114,6 +3107,7 @@ static int CclGetAnimations(lua_State *l)
 	return 1;
 }
 //Wyrmgus end
+
 // ----------------------------------------------------------------------------
 
 /**

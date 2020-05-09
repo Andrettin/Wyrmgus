@@ -50,7 +50,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CAnimations;
 class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
@@ -68,6 +67,7 @@ class LuaCallback;
 enum class UnitTypeType;
 
 namespace stratagus {
+	class animation_set;
 	class dependency;
 	class faction;
 	class plane;
@@ -897,7 +897,7 @@ public:
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
-	CAnimations *Animations;        /// Animation scripts
+	stratagus::animation_set *Animations;        /// Animation scripts
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit

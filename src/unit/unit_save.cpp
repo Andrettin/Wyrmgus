@@ -316,7 +316,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	unit.pathFinderData->output.Save(file);
 
 	file.printf("\"wait\", %d, ", unit.Wait);
-	CAnimations::SaveUnitAnim(file, unit);
+	stratagus::animation_set::SaveUnitAnim(file, unit);
 	file.printf(",\n  \"blink\", %d,", unit.Blink);
 	if (unit.Moving) {
 		file.printf(" \"moving\",");

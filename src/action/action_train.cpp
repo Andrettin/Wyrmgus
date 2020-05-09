@@ -207,20 +207,11 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 
 static void AnimateActionTrain(CUnit &unit)
 {
-	//Wyrmgus start
-	/*
-	if (unit.Type->Animations->Train) {
-		UnitShowAnimation(unit, unit.Type->Animations->Train);
-	} else {
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-	}
-	*/
 	if (unit.GetAnimations()->Train) {
-		UnitShowAnimation(unit, unit.GetAnimations()->Train);
+		UnitShowAnimation(unit, unit.GetAnimations()->Train.get());
 	} else {
-		UnitShowAnimation(unit, unit.GetAnimations()->Still);
+		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 	}
-	//Wyrmgus end
 }
 
 /* virtual */ void COrder_Train::Execute(CUnit &unit)

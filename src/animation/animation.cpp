@@ -67,8 +67,6 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-static constexpr int ANIMATIONS_MAXANIM = 4096;
-
 struct LabelsStruct {
 	CAnimation *Anim;
 	std::string Name;
@@ -81,16 +79,9 @@ struct LabelsLaterStruct {
 };
 static std::vector<LabelsLaterStruct> LabelsLater;
 
-CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
-int NumAnimations;
-
-std::map<std::string, CAnimations *> AnimationMap;/// Animation map
-
-
 /*----------------------------------------------------------------------------
 --  Animation
 ----------------------------------------------------------------------------*/
-
 
 /**
 **  Show unit animation.
@@ -356,7 +347,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		--unit.Anim.Wait;
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
-			unit.Anim.Anim = unit.Anim.Anim->Next;
+			unit.Anim.Anim = unit.Anim.Anim->get_next();
 		}
 		return 0;
 	}
@@ -365,44 +356,16 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		unit.Anim.Anim->Action(unit, move, scale);
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
-			unit.Anim.Anim = unit.Anim.Anim->Next;
+			unit.Anim.Anim = unit.Anim.Anim->get_next();
 		}
 	}
 
 	--unit.Anim.Wait;
 	if (!unit.Anim.Wait) {
 		// Advance to next frame
-		unit.Anim.Anim = unit.Anim.Anim->Next;
+		unit.Anim.Anim = unit.Anim.Anim->get_next();
 	}
 	return move;
-}
-
-
-/**
-**  Get the animations structure by ident.
-**
-**  @param ident  Identifier for the animation.
-**
-**  @return  Pointer to the animation structure.
-*/
-CAnimations *AnimationsByIdent(const std::string &ident)
-{
-	std::map<std::string, CAnimations *>::iterator ret = AnimationMap.find(ident);
-	if (ret != AnimationMap.end()) {
-		return (*ret).second;
-	}
-	return nullptr;
-}
-
-void FreeAnimations()
-{
-	std::map<std::string, CAnimations *>::iterator it;
-	for (it = AnimationMap.begin(); it != AnimationMap.end(); ++it) {
-		CAnimations *anims = (*it).second;
-		delete anims;
-	}
-	AnimationMap.clear();
-	NumAnimations = 0;
 }
 
 static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
@@ -411,7 +374,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 		return 0;
 	}
 	int i = 1;
-	for (const CAnimation *it = base->Next; it != base; it = it->Next) {
+	for (const CAnimation *it = base->get_next(); it != base; it = it->get_next()) {
 		if (it == anim) {
 			return i;
 		}
@@ -420,12 +383,14 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	return -1;
 }
 
-/* static */ void CAnimations::SaveUnitAnim(CFile &file, const CUnit &unit)
+namespace stratagus {
+
+void animation_set::SaveUnitAnim(CFile &file, const CUnit &unit)
 {
 	file.printf("\"anim-data\", {");
 	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
-	for (int i = 0; i < NumAnimations; ++i) {
-		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
+	for (size_t i = 0; i < CAnimation::animation_list.size(); ++i) {
+		if (CAnimation::animation_list[i] == unit.Anim.CurrAnim) {
 			file.printf("\"curr-anim\", %d,", i);
 			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
 			break;
@@ -438,8 +403,8 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	// Wait backup info
 	file.printf("\"wait-anim-data\", {");
 	file.printf("\"anim-wait\", %d,", unit.WaitBackup.Wait);
-	for (int i = 0; i < NumAnimations; ++i) {
-		if (AnimationsArray[i] == unit.WaitBackup.CurrAnim) {
+	for (size_t i = 0; i < CAnimation::animation_list.size(); ++i) {
+		if (CAnimation::animation_list[i] == unit.WaitBackup.CurrAnim) {
 			file.printf("\"curr-anim\", %d,", i);
 			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
 			break;
@@ -451,17 +416,19 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	file.printf("}");
 }
 
+}
 
 static const CAnimation *Advance(const CAnimation *anim, int n)
 {
 	for (int i = 0; i < n; ++i) {
-		anim = anim->Next;
+		anim = anim->get_next();
 	}
 	return anim;
 }
 
+namespace stratagus {
 
-/* static */ void CAnimations::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
+void animation_set::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 {
 	if (!lua_istable(l, luaIndex)) {
 		LuaError(l, "incorrect argument");
@@ -476,7 +443,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			unit.Anim.Wait = LuaToNumber(l, luaIndex, j + 1);
 		} else if (!strcmp(value, "curr-anim")) {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.Anim.CurrAnim = AnimationsArray[animIndex];
+			unit.Anim.CurrAnim = CAnimation::animation_list.at(animIndex);
 		} else if (!strcmp(value, "anim")) {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
@@ -489,7 +456,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	}
 }
 
-/* static */ void CAnimations::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
+void animation_set::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 {
 	if (!lua_istable(l, luaIndex)) {
 		LuaError(l, "incorrect argument");
@@ -504,7 +471,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			unit.WaitBackup.Wait = LuaToNumber(l, luaIndex, j + 1);
 		} else if (!strcmp(value, "curr-anim")) {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.WaitBackup.CurrAnim = AnimationsArray[animIndex];
+			unit.WaitBackup.CurrAnim = CAnimation::animation_list.at(animIndex);
 		} else if (!strcmp(value, "anim")) {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
@@ -517,166 +484,160 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	}
 }
 
-void CAnimations::ProcessConfigData(const CConfigData *config_data)
+void animation_set::process_sml_scope(const sml_data &scope)
 {
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (
-			child_config_data->Tag == "start"
-			|| child_config_data->Tag == "still"
-			|| child_config_data->Tag == "death"
-			|| child_config_data->Tag == "attack"
-			|| child_config_data->Tag == "ranged_attack"
-			|| child_config_data->Tag == "spell_cast"
-			|| child_config_data->Tag == "move"
-			|| child_config_data->Tag == "repair"
-			|| child_config_data->Tag == "train"
-			|| child_config_data->Tag == "research"
-			|| child_config_data->Tag == "upgrade"
-			|| child_config_data->Tag == "build"
-			|| child_config_data->Tag == "harvest"
-		) {
-			int res = -1;
-			std::string death_type;
-			CAnimation *first_anim = nullptr;
-			CAnimation *prev_anim = nullptr;
-			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+	const std::string &tag = scope.get_tag();
 
-				CAnimation *anim = nullptr;
-				
-				if (child_config_data->Tag == "death" && key == "death_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					death_type = value.c_str();
-				} else if (child_config_data->Tag == "harvest" && key == "resource") {
-					value = FindAndReplaceString(value, "_", "-");
-					res = GetResourceIdByName(value.c_str());
-					if (res == -1) {
-						fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "frame") {
-					anim = new CAnimation_Frame;
-				} else if (key == "exact-frame") {
-					anim = new CAnimation_ExactFrame;
-				} else if (key == "wait") {
-					anim = new CAnimation_Wait;
-				} else if (key == "random-wait") {
-					anim = new CAnimation_RandomWait;
-				} else if (key == "sound") {
-					anim = new CAnimation_Sound;
-				} else if (key == "random-sound") {
-					anim = new CAnimation_RandomSound;
-				} else if (key == "attack") {
-					anim = new CAnimation_Attack;
-				} else if (key == "spawn-missile") {
-					anim = new CAnimation_SpawnMissile;
-				} else if (key == "spawn-unit") {
-					anim = new CAnimation_SpawnUnit;
-				} else if (key == "if-var") {
-					anim = new CAnimation_IfVar;
-				} else if (key == "set-var") {
-					anim = new CAnimation_SetVar;
-				} else if (key == "set-player-var") {
-					anim = new CAnimation_SetPlayerVar;
-				} else if (key == "die") {
-					anim = new CAnimation_Die();
-				} else if (key == "rotate") {
-					anim = new CAnimation_Rotate;
-				} else if (key == "random-rotate") {
-					anim = new CAnimation_RandomRotate;
-				} else if (key == "move") {
-					anim = new CAnimation_Move;
-				} else if (key == "unbreakable") {
-					anim = new CAnimation_Unbreakable;
-				} else if (key == "goto") {
-					anim = new CAnimation_Goto;
-				} else if (key == "random-goto") {
-					anim = new CAnimation_RandomGoto;
+	if (
+		tag == "start"
+		|| tag == "still"
+		|| tag == "death"
+		|| tag == "attack"
+		|| tag == "ranged_attack"
+		|| tag == "spell_cast"
+		|| tag == "move"
+		|| tag == "repair"
+		|| tag == "train"
+		|| tag == "research"
+		|| tag == "upgrade"
+		|| tag == "build"
+		|| tag == "harvest"
+	) {
+		const resource *resource = nullptr;
+		std::string death_type;
+		std::unique_ptr<CAnimation> first_anim;
+		CAnimation *prev_anim = nullptr;
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();;
+
+			std::unique_ptr<CAnimation> anim;
+
+			if (tag == "death" && key == "death_type") {
+				death_type = FindAndReplaceString(value, "_", "-");
+			} else if (tag == "harvest" && key == "resource") {
+				resource = resource::get(value);
+			} else if (key == "frame") {
+				anim = std::make_unique<CAnimation_Frame>();
+			} else if (key == "exact-frame") {
+				anim = std::make_unique<CAnimation_ExactFrame>();
+			} else if (key == "wait") {
+				anim = std::make_unique<CAnimation_Wait>();
+			} else if (key == "random-wait") {
+				anim = std::make_unique<CAnimation_RandomWait>();
+			} else if (key == "sound") {
+				anim = std::make_unique<CAnimation_Sound>();
+			} else if (key == "random-sound") {
+				anim = std::make_unique<CAnimation_RandomSound>();
+			} else if (key == "attack") {
+				anim = std::make_unique<CAnimation_Attack>();
+			} else if (key == "spawn-missile") {
+				anim = std::make_unique<CAnimation_SpawnMissile>();
+			} else if (key == "spawn-unit") {
+				anim = std::make_unique<CAnimation_SpawnUnit>();
+			} else if (key == "if-var") {
+				anim = std::make_unique<CAnimation_IfVar>();
+			} else if (key == "set-var") {
+				anim = std::make_unique<CAnimation_SetVar>();
+			} else if (key == "set-player-var") {
+				anim = std::make_unique<CAnimation_SetPlayerVar>();
+			} else if (key == "die") {
+				anim = std::make_unique<CAnimation_Die>();
+			} else if (key == "rotate") {
+				anim = std::make_unique<CAnimation_Rotate>();
+			} else if (key == "random-rotate") {
+				anim = std::make_unique<CAnimation_RandomRotate>();
+			} else if (key == "move") {
+				anim = std::make_unique<CAnimation_Move>();
+			} else if (key == "unbreakable") {
+				anim = std::make_unique<CAnimation_Unbreakable>();
+			} else if (key == "goto") {
+				anim = std::make_unique<CAnimation_Goto>();
+			} else if (key == "random-goto") {
+				anim = std::make_unique<CAnimation_RandomGoto>();
+			} else {
+				throw std::runtime_error("Invalid animation property: \"" + key + "\".");
+			}
+
+			if (anim) {
+				anim->Init(value.c_str(), nullptr);
+
+				CAnimation *temp_prev_anim = prev_anim;
+				prev_anim = anim.get();
+
+				if (!first_anim) {
+					first_anim = std::move(anim);
 				} else {
-					fprintf(stderr, "Invalid animation property: \"%s\".\n", key.c_str());
-					continue;
-				}
-				
-				if (anim) {
-					anim->Init(value.c_str(), nullptr);
-					
-					if (!first_anim) {
-						first_anim = anim;
-					}
-					
-					if (prev_anim) {
-						prev_anim->Next = anim;
-					}
-					
-					prev_anim = anim;
+					temp_prev_anim->set_next(std::move(anim));
 				}
 			}
-			
-			if (first_anim && prev_anim) {
-				prev_anim->Next = first_anim;
-			}
-			
-			if (child_config_data->Tag == "start") {
-				this->Start = first_anim;
-			} else if (child_config_data->Tag == "still") {
-				this->Still = first_anim;
-			} else if (child_config_data->Tag == "death") {
-				if (!death_type.empty()) {
-					const int death_index = ExtraDeathIndex(death_type.c_str());
-					if (death_index == ANIMATIONS_DEATHTYPES) {
-						this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
-					} else {
-						this->Death[death_index] = first_anim;
-					}
+		});
+
+		if (first_anim && prev_anim) {
+			prev_anim->set_next(first_anim.get());
+		}
+
+		if (tag == "start") {
+			this->Start = std::move(first_anim);
+		} else if (tag == "still") {
+			this->Still = std::move(first_anim);
+		} else if (tag == "death") {
+			if (!death_type.empty()) {
+				const int death_index = ExtraDeathIndex(death_type.c_str());
+				if (death_index == ANIMATIONS_DEATHTYPES) {
+					this->Death[ANIMATIONS_DEATHTYPES] = std::move(first_anim);
 				} else {
-					this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+					this->Death[death_index] = std::move(first_anim);
 				}
-			} else if (child_config_data->Tag == "attack") {
-				this->Attack = first_anim;
-			} else if (child_config_data->Tag == "ranged_attack") {
-				this->RangedAttack = first_anim;
-			} else if (child_config_data->Tag == "spell_cast") {
-				this->SpellCast = first_anim;
-			} else if (child_config_data->Tag == "move") {
-				this->Move = first_anim;
-			} else if (child_config_data->Tag == "repair") {
-				this->Repair = first_anim;
-			} else if (child_config_data->Tag == "train") {
-				this->Train = first_anim;
-			} else if (child_config_data->Tag == "research") {
-				this->Research = first_anim;
-			} else if (child_config_data->Tag == "upgrade") {
-				this->Upgrade = first_anim;
-			} else if (child_config_data->Tag == "build") {
-				this->Build = first_anim;
-			} else if (child_config_data->Tag == "harvest") {
-				if (res == -1) {
-					fprintf(stderr, "Invalid resource for harvest animation.\n");
-					continue;
-				}
-				this->Harvest[res] = first_anim;
+			} else {
+				this->Death[ANIMATIONS_DEATHTYPES] = std::move(first_anim);
 			}
-		} else {
-			fprintf(stderr, "Invalid animations property: \"%s\".\n", child_config_data->Tag.c_str());
+		} else if (tag == "attack") {
+			this->Attack = std::move(first_anim);
+		} else if (tag == "ranged_attack") {
+			this->RangedAttack = std::move(first_anim);
+		} else if (tag == "spell_cast") {
+			this->SpellCast = std::move(first_anim);
+		} else if (tag == "move") {
+			this->Move = std::move(first_anim);
+		} else if (tag == "repair") {
+			this->Repair = std::move(first_anim);
+		} else if (tag == "train") {
+			this->Train = std::move(first_anim);
+		} else if (tag == "research") {
+			this->Research = std::move(first_anim);
+		} else if (tag == "upgrade") {
+			this->Upgrade = std::move(first_anim);
+		} else if (tag == "build") {
+			this->Build = std::move(first_anim);
+		} else if (tag == "harvest") {
+			this->Harvest[resource->ID] = std::move(first_anim);
 		}
 	}
-	
+}
+
+void animation_set::initialize()
+{
 	// Must add to array in a fixed order for save games
-	AddAnimationToArray(this->Start);
-	AddAnimationToArray(this->Still);
+	animation_set::AddAnimationToArray(this->Start.get());
+	animation_set::AddAnimationToArray(this->Still.get());
 	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		AddAnimationToArray(this->Death[i]);
+		animation_set::AddAnimationToArray(this->Death[i].get());
 	}
-	AddAnimationToArray(this->Attack);
-	AddAnimationToArray(this->RangedAttack);
-	AddAnimationToArray(this->SpellCast);
-	AddAnimationToArray(this->Move);
-	AddAnimationToArray(this->Repair);
-	AddAnimationToArray(this->Train);
+	animation_set::AddAnimationToArray(this->Attack.get());
+	animation_set::AddAnimationToArray(this->RangedAttack.get());
+	animation_set::AddAnimationToArray(this->SpellCast.get());
+	animation_set::AddAnimationToArray(this->Move.get());
+	animation_set::AddAnimationToArray(this->Repair.get());
+	animation_set::AddAnimationToArray(this->Train.get());
 	for (int i = 0; i != MaxCosts; ++i) {
-		AddAnimationToArray(this->Harvest[i]);
+		animation_set::AddAnimationToArray(this->Harvest[i].get());
 	}
+
+	data_entry::initialize();
+}
+
 }
 
 /**
@@ -733,7 +694,7 @@ static void FixLabels(lua_State *l)
 **
 **  @param str  string formated as "animationType extraArgs"
 */
-static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
+static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char *str)
 {
 	const std::string all(str);
 	const size_t len = all.size();
@@ -742,50 +703,50 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 	size_t begin = std::min(len, all.find_first_not_of(' ', end));
 	const std::string extraArg(all, begin);
 
-	CAnimation *anim = nullptr;
+	std::unique_ptr<CAnimation> anim;
 	if (op1 == "frame") {
-		anim = new CAnimation_Frame;
+		anim = std::make_unique<CAnimation_Frame>();
 	} else if (op1 == "exact-frame") {
-		anim = new CAnimation_ExactFrame;
+		anim = std::make_unique<CAnimation_ExactFrame>();
 	} else if (op1 == "wait") {
-		anim = new CAnimation_Wait;
+		anim = std::make_unique<CAnimation_Wait>();
 	} else if (op1 == "random-wait") {
-		anim = new CAnimation_RandomWait;
+		anim = std::make_unique<CAnimation_RandomWait>();
 	} else if (op1 == "sound") {
-		anim = new CAnimation_Sound;
+		anim = std::make_unique<CAnimation_Sound>();
 	} else if (op1 == "random-sound") {
-		anim = new CAnimation_RandomSound;
+		anim = std::make_unique<CAnimation_RandomSound>();
 	} else if (op1 == "attack") {
-		anim = new CAnimation_Attack;
+		anim = std::make_unique<CAnimation_Attack>();
 	} else if (op1 == "spawn-missile") {
-		anim = new CAnimation_SpawnMissile;
+		anim = std::make_unique<CAnimation_SpawnMissile>();
 	} else if (op1 == "spawn-unit") {
-		anim = new CAnimation_SpawnUnit;
+		anim = std::make_unique<CAnimation_SpawnUnit>();
 	} else if (op1 == "if-var") {
-		anim = new CAnimation_IfVar;
+		anim = std::make_unique<CAnimation_IfVar>();
 	} else if (op1 == "set-var") {
-		anim = new CAnimation_SetVar;
+		anim = std::make_unique<CAnimation_SetVar>();
 	} else if (op1 == "set-player-var") {
-		anim = new CAnimation_SetPlayerVar;
+		anim = std::make_unique<CAnimation_SetPlayerVar>();
 	} else if (op1 == "die") {
-		anim = new CAnimation_Die();
+		anim = std::make_unique<CAnimation_Die>();
 	} else if (op1 == "rotate") {
-		anim = new CAnimation_Rotate;
+		anim = std::make_unique<CAnimation_Rotate>();
 	} else if (op1 == "random-rotate") {
-		anim = new CAnimation_RandomRotate;
+		anim = std::make_unique<CAnimation_RandomRotate>();
 	} else if (op1 == "move") {
-		anim = new CAnimation_Move;
+		anim = std::make_unique<CAnimation_Move>();
 	} else if (op1 == "unbreakable") {
-		anim = new CAnimation_Unbreakable;
+		anim = std::make_unique<CAnimation_Unbreakable>();
 	} else if (op1 == "label") {
-		anim = new CAnimation_Label;
-		AddLabel(anim, extraArg);
+		anim = std::make_unique<CAnimation_Label>();
+		AddLabel(anim.get(), extraArg);
 	} else if (op1 == "goto") {
-		anim = new CAnimation_Goto;
+		anim = std::make_unique<CAnimation_Goto>();
 	} else if (op1 == "random-goto") {
-		anim = new CAnimation_RandomGoto;
+		anim = std::make_unique<CAnimation_RandomGoto>();
 	} else if (op1 == "lua-callback") {
-		anim = new CAnimation_LuaCallback;
+		anim = std::make_unique<CAnimation_LuaCallback>();
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
@@ -796,7 +757,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 /**
 **  Parse an animation
 */
-static CAnimation *ParseAnimation(lua_State *l, int idx)
+static std::unique_ptr<CAnimation> ParseAnimation(lua_State *l, int idx)
 {
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
@@ -811,29 +772,31 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 
 	const char *str = LuaToString(l, idx, 1);
 
-	CAnimation *firstAnim = ParseAnimationFrame(l, str);
-	CAnimation *prev = firstAnim;
+	std::unique_ptr<CAnimation> firstAnim = ParseAnimationFrame(l, str);
+	CAnimation *prev = firstAnim.get();
 	for (int j = 1; j < args; ++j) {
 		const char *str = LuaToString(l, idx, j + 1);
-		CAnimation *anim = ParseAnimationFrame(l, str);
-		prev->Next = anim;
-		prev = anim;
+		std::unique_ptr<CAnimation> anim = ParseAnimationFrame(l, str);
+		CAnimation *temp_anim = anim.get();
+		prev->set_next(std::move(anim));
+		prev = temp_anim;
 	}
-	prev->Next = firstAnim;
+	prev->set_next(firstAnim.get());
 	FixLabels(l);
 	return firstAnim;
 }
 
-/**
-**  Add animation to AnimationsArray
-*/
-void CAnimations::AddAnimationToArray(CAnimation *anim)
+namespace stratagus {
+
+void animation_set::AddAnimationToArray(CAnimation *anim)
 {
 	if (!anim) {
 		return;
 	}
-	AnimationsArray[NumAnimations++] = anim;
-	Assert(NumAnimations != ANIMATIONS_MAXANIM);
+
+	CAnimation::animation_list.push_back(anim);
+}
+
 }
 
 /**
@@ -849,12 +812,7 @@ static int CclDefineAnimations(lua_State *l)
 	}
 
 	const char *name = LuaToString(l, 1);
-	CAnimations *anims = AnimationsByIdent(name);
-	if (!anims) {
-		anims = new CAnimations;
-		AnimationMap[name] = anims;
-		anims->Ident = std::string(name);
-	}
+	stratagus::animation_set *anims = stratagus::animation_set::get_or_add(name, nullptr);
 
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
@@ -901,21 +859,7 @@ static int CclDefineAnimations(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-	// Must add to array in a fixed order for save games
-	CAnimations::AddAnimationToArray(anims->Start);
-	CAnimations::AddAnimationToArray(anims->Still);
-	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		CAnimations::AddAnimationToArray(anims->Death[i]);
-	}
-	CAnimations::AddAnimationToArray(anims->Attack);
-	CAnimations::AddAnimationToArray(anims->RangedAttack);
-	CAnimations::AddAnimationToArray(anims->SpellCast);
-	CAnimations::AddAnimationToArray(anims->Move);
-	CAnimations::AddAnimationToArray(anims->Repair);
-	CAnimations::AddAnimationToArray(anims->Train);
-	for (int i = 0; i != MaxCosts; ++i) {
-		CAnimations::AddAnimationToArray(anims->Harvest[i]);
-	}
+
 	return 0;
 }
 

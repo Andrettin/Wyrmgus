@@ -277,10 +277,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 */
 static void AnimateActionRepair(CUnit &unit)
 {
-	//Wyrmgus start
-//	UnitShowAnimation(unit, unit.Type->Animations->Repair);
-	UnitShowAnimation(unit, unit.GetAnimations()->Repair);
-	//Wyrmgus end
+	UnitShowAnimation(unit, unit.GetAnimations()->Repair.get());
 }
 
 /* virtual */ void COrder_Repair::Execute(CUnit &unit)

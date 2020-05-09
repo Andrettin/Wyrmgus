@@ -263,10 +263,7 @@
 */
 static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
-	//Wyrmgus start
-//	const CAnimations *animations = unit.Type->Animations;
-	const CAnimations *animations = unit.GetAnimations();
-	//Wyrmgus end
+	const stratagus::animation_set *animations = unit.GetAnimations();
 
 	if (!animations || (!animations->Attack && !animations->SpellCast)) {
 		// if don't have animations just cast spell
@@ -274,9 +271,9 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 		return;
 	}
 	if (animations->SpellCast) {
-		UnitShowAnimation(unit, animations->SpellCast);
+		UnitShowAnimation(unit, animations->SpellCast.get());
 	} else {
-		UnitShowAnimation(unit, animations->Attack);
+		UnitShowAnimation(unit, animations->Attack.get());
 	}
 }
 
@@ -391,10 +388,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		UnitShowAnimation(unit, unit.GetAnimations()->Still);
-		//Wyrmgus end
+		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 		unit.Wait--;
 		return;
 	}

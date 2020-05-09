@@ -137,11 +137,7 @@ static constexpr int CancelResearchCostsFactor = 100;
 	const CUpgrade &upgrade = this->GetUpgrade();
 	const CUnitType &type = *unit.Type;
 
-
-	//Wyrmgus start
-//	UnitShowAnimation(unit, type.Animations->Research ? type.Animations->Research : type.Animations->Still);
-	UnitShowAnimation(unit, unit.GetAnimations()->Research ? unit.GetAnimations()->Research : unit.GetAnimations()->Still);
-	//Wyrmgus end
+	UnitShowAnimation(unit, unit.GetAnimations()->Research ? unit.GetAnimations()->Research.get() : unit.GetAnimations()->Still.get());
 	if (unit.Wait) {
 		unit.Wait--;
 		return ;

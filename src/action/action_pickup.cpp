@@ -185,10 +185,7 @@ enum {
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		UnitShowAnimation(unit, unit.GetAnimations()->Still);
-		//Wyrmgus end
+		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 		unit.Wait--;
 		return;
 	}
