@@ -130,6 +130,8 @@ namespace stratagus {
 
 class animation_set : public data_entry, public data_type<animation_set>
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "animation_set";
 	static constexpr const char *database_folder = "animation_sets";

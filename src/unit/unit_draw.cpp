@@ -139,8 +139,8 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	const stratagus::unit_type &type = *unit.Type;
 	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
-	int frame_width = type.Width * scale_factor;
-	int frame_height = type.Height * scale_factor;
+	int frame_width = type.get_frame_width() * scale_factor;
+	int frame_height = type.get_frame_height() * scale_factor;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
 	const CUnitTypeVariation *variation = unit.GetVariation();
@@ -1028,8 +1028,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus start
 //		pos.x += type.OffsetX - type.Width / 2;
 //		pos.y += type.OffsetY - type.Height / 2;
-		int frame_width = type.Width;
-		int frame_height = type.Height;
+		int frame_width = type.get_frame_width();
+		int frame_height = type.get_frame_height();
 		const CUnitTypeVariation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;

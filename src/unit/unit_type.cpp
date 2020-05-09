@@ -511,7 +511,7 @@ std::string GetResourceNameById(int resource_id)
 namespace stratagus {
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
-	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0),
+	Slot(0), OffsetX(0), OffsetY(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
@@ -943,25 +943,25 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "file") {
-					this->File = CMod::GetCurrentModPath() + value;
+					this->image_file = CMod::GetCurrentModPath() + value;
 				} else if (key == "width") {
-					this->Width = std::stoi(value);
+					this->frame_size.setWidth(std::stoi(value));
 				} else if (key == "height") {
-					this->Height = std::stoi(value);
+					this->frame_size.setHeight(std::stoi(value));
 				} else {
 					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
 				}
 			}
 			
-			if (this->File.empty()) {
+			if (this->image_file.empty()) {
 				fprintf(stderr, "Image has no file.\n");
 			}
 			
-			if (this->Width == 0) {
+			if (this->frame_size.width() == 0) {
 				fprintf(stderr, "Image has no width.\n");
 			}
 			
-			if (this->Height == 0) {
+			if (this->frame_size.height() == 0) {
 				fprintf(stderr, "Image has no height.\n");
 			}
 			
@@ -1295,7 +1295,16 @@ QPoint unit_type::get_tile_center_pos_offset() const
 	//the offset from the tile's top-left position to its center tile
 	return (size::to_point(this->get_tile_size()) - QPoint(1, 1)) / 2;
 }
-	
+
+void unit_type::set_image_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_image_file()) {
+		return;
+	}
+
+	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
+}
+
 bool unit_type::CheckUserBoolFlags(const char *BoolFlags) const
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
@@ -1343,9 +1352,8 @@ void unit_type::SetParent(const unit_type *parent_type)
 		this->get_unit_class()->add_unit_type(this);
 	}
 	this->draw_level = parent_type->draw_level;
-	this->File = parent_type->File;
-	this->Width = parent_type->Width;
-	this->Height = parent_type->Height;
+	this->image_file = parent_type->image_file;
+	this->frame_size = parent_type->frame_size;
 	this->OffsetX = parent_type->OffsetX;
 	this->OffsetY = parent_type->OffsetY;
 	this->ShadowFile = parent_type->ShadowFile;
@@ -2537,20 +2545,19 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 				continue;
 			}
 			if (!resinfo->FileWhenLoaded.empty()) {
-				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-																	 type.Width, type.Height);
+				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded, type.get_frame_size());
 				resinfo->SpriteWhenLoaded->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 			if (!resinfo->FileWhenEmpty.empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-																	type.Width, type.Height);
+																	type.get_frame_size());
 				resinfo->SpriteWhenEmpty->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}
 	}
 
-	if (!type.File.empty()) {
-		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
+	if (!type.get_image_file().empty()) {
+		type.Sprite = CPlayerColorGraphic::New(type.get_image_file().string(), type.get_frame_size());
 		type.Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 	}
 
@@ -2568,12 +2575,12 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {
-		type.LightSprite = CGraphic::New(type.LightFile, type.Width, type.Height);
+		type.LightSprite = CGraphic::New(type.LightFile, type.get_frame_size());
 		type.LightSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (!type.LayerFiles[i].empty()) {
-			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.Width, type.Height);
+			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.get_frame_size());
 			type.LayerSprites[i]->Load(false, stratagus::defines::get()->get_scale_factor());
 		}
 	}
@@ -2581,8 +2588,8 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 
 	//Wyrmgus start
 	for (CUnitTypeVariation *variation : type.Variations) {
-		int frame_width = type.Width;
-		int frame_height = type.Height;
+		int frame_width = type.get_frame_size().width();
+		int frame_height = type.get_frame_size().height();
 		if (variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
@@ -2621,7 +2628,7 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		for (CUnitTypeVariation *layer_variation : type.LayerVariations[i]) {
 			if (!layer_variation->File.empty()) {
-				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.Width, type.Height);
+				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.get_frame_size());
 				layer_variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}

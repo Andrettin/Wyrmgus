@@ -742,6 +742,8 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(stratagus::animation_set* animation_set MEMBER animation_set READ get_animation_set)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
+	Q_PROPERTY(QString image_file READ get_image_file_qstring)
+	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 
 public:
@@ -821,6 +823,38 @@ public:
 		return this->get_box_size().height();
 	}
 
+	const std::filesystem::path &get_image_file() const
+	{
+		return this->image_file;
+	}
+
+	void set_image_file(const std::filesystem::path &filepath);
+
+	QString get_image_file_qstring() const
+	{
+		return QString::fromStdString(this->get_image_file().string());
+	}
+
+	Q_INVOKABLE void set_image_file(const std::string &filepath)
+	{
+		this->set_image_file(std::filesystem::path(filepath));
+	}
+
+	const QSize &get_frame_size() const
+	{
+		return this->frame_size;
+	}
+
+	int get_frame_width() const
+	{
+		return this->get_frame_size().width();
+	}
+
+	int get_frame_height() const
+	{
+		return this->get_frame_size().height();
+	}
+
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
 //	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
@@ -890,7 +924,9 @@ public:
 	std::map<std::string, std::vector<unit_type *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
 	int Slot;                       /// Type as number
-	std::string File;               /// Sprite files
+private:
+	std::filesystem::path image_file;
+public:
 	std::string ShadowFile;         /// Shadow file
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
@@ -899,8 +935,9 @@ public:
 	std::map<int, unit_type *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
-	int Width;                                            /// Sprite width
-	int Height;                                           /// Sprite height
+private:
+	QSize frame_size = QSize(0, 0); //sprite frame size
+public:
 	int OffsetX;                                          /// Sprite horizontal offset
 	int OffsetY;                                          /// Sprite vertical offset
 private:

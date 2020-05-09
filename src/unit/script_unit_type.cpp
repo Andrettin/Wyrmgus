@@ -883,10 +883,12 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 
 				if (!strcmp(value, "file")) {
-					type->File = LuaToString(l, -1, k + 1);
+					type->image_file = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->Width, &type->Height);
+					Vec2i frame_size;
+					CclGetPos(l, &frame_size.x, &frame_size.y);
+					type->frame_size = frame_size;
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
@@ -2185,7 +2187,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->BuildingRulesString.c_str());
 		return 1;
 	} else if (!strcmp(data, "Image")) {
-		lua_pushstring(l, type->File.c_str());
+		lua_pushstring(l, type->get_image_file().string().c_str());
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Shadow")) {
@@ -2193,10 +2195,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Width")) {
-		lua_pushnumber(l, type->Width);
+		lua_pushnumber(l, type->get_frame_size().width());
 		return 1;
 	} else if (!strcmp(data, "Height")) {
-		lua_pushnumber(l, type->Height);
+		lua_pushnumber(l, type->get_frame_size().height());
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
 		if (type->get_animation_set() != nullptr) {

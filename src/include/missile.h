@@ -327,6 +327,8 @@ namespace stratagus {
 /// Base structure of missile-types
 class missile_type : public data_entry, public data_type<missile_type>, public CDataType
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "missile_type";
 	static constexpr const char *database_folder = "missile_types";

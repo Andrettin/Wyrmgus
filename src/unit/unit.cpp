@@ -4582,8 +4582,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
-	int frame_width = Type->Width;
-	int frame_height = Type->Height;
+	int frame_width = this->Type->get_frame_width();
+	int frame_height = this->Type->get_frame_height();
 	const CUnitTypeVariation *variation = this->GetVariation();
 	if (variation && variation->FrameWidth && variation->FrameHeight) {
 		frame_width = variation->FrameWidth;
@@ -5329,9 +5329,9 @@ CUnit *UnitOnScreen(int x, int y)
 							  (variation->FrameHeight * scale_factor - variation->Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		} else {
 			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
-							  (type.Width * scale_factor - type.Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
+							  (type.get_frame_width() * scale_factor - type.Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
 			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
-							  (type.Height * scale_factor - type.Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
+							  (type.get_frame_height() * scale_factor - type.Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		}
 		//Wyrmgus end
 		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.get_box_width() * scale_factor)
@@ -6758,8 +6758,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit.pixel_offset.setX((type->CorpseType->Width - type->CorpseType->Sprite->get_original_frame_size().width()) / 2);
-		unit.pixel_offset.setY((type->CorpseType->Height - type->CorpseType->Sprite->get_original_frame_size().height()) / 2);
+		unit.pixel_offset.setX((type->CorpseType->get_frame_width() - type->CorpseType->Sprite->get_original_frame_size().width()) / 2);
+		unit.pixel_offset.setY((type->CorpseType->get_frame_height() - type->CorpseType->Sprite->get_original_frame_size().height()) / 2);
 
 		unit.CurrentSightRange = type->CorpseType->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
