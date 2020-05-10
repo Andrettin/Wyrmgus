@@ -32,8 +32,8 @@
 
 #include "stratagus.h"
 
-#include "cursor.h"
-#include "intern_video.h"
+#include "ui/cursor.h"
+#include "video/intern_video.h"
 
 #include "civilization.h"
 #include "database/defines.h"

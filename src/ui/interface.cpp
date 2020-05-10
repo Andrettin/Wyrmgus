@@ -37,7 +37,6 @@
 
 #include "ai.h"
 #include "commands.h"
-#include "cursor.h"
 #include "database/defines.h"
 #include "font.h"
 //Wyrmgus start
@@ -54,6 +53,7 @@
 #include "sound/sound_server.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/cursor.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

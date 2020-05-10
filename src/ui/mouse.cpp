@@ -39,7 +39,6 @@
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
-#include "cursor.h"
 #include "font.h"
 #include "item.h"
 #include "map/map.h"
@@ -61,6 +60,7 @@
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/cursor.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

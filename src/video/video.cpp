@@ -83,12 +83,12 @@
 #include "video.h"
 #include "intern_video.h"
 
-#include "cursor.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "font.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "ui/cursor.h"
 #include "ui/ui.h"
 
 #include "SDL.h"

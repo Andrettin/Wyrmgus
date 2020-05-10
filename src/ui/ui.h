@@ -32,15 +32,11 @@
 /// @todo this only the start of the new user interface
 /// @todo all user interface variables should go here and be configurable
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "color.h"
-#include "cursor.h"
 #include "map/minimap.h"
 #include "script.h"
 #include "viewport.h"
+#include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"

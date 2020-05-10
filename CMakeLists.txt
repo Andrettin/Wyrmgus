@@ -382,6 +382,7 @@ set(ui_SRCS
 	src/ui/button_checks.cpp
 	src/ui/button_level.cpp
 	src/ui/contenttype.cpp
+	src/ui/cursor.cpp
 	src/ui/icon.cpp
 	src/ui/interface.cpp
 	src/ui/mainscr.cpp
@@ -434,7 +435,6 @@ source_group(util FILES ${util_SRCS})
 
 set(video_SRCS
 	src/video/color.cpp
-	src/video/cursor.cpp
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
@@ -703,16 +703,17 @@ set(stratagus_time_HDRS
 )
 
 set(stratagus_ui_HDRS
-	src/include/ui/button_action.h
+	src/ui/button_action.h
 	src/ui/button_cmd.h
-	src/include/ui/button_level.h
-	src/include/ui/contenttype.h
+	src/ui/button_level.h
+	src/ui/contenttype.h
+	src/ui/cursor.h
 	src/ui/icon.h
-	src/include/ui/interface.h
-	src/include/ui/popup.h
-	src/include/ui/statusline.h
-	src/include/ui/ui.h
-	src/include/ui/uitimer.h
+	src/ui/interface.h
+	src/ui/popup.h
+	src/ui/statusline.h
+	src/ui/ui.h
+	src/ui/uitimer.h
 )
 
 set(stratagus_unit_HDRS
@@ -777,7 +778,6 @@ set(stratagus_generic_HDRS
 	src/include/config.h
 	src/include/construct.h
 	src/include/currency.h
-	src/include/cursor.h
 	src/include/data_type.h
 	src/include/dialogue.h
 	src/include/editor.h

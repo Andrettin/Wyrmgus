@@ -99,16 +99,7 @@
 **    Pointer to this cursor-type. Used while runtime.
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-
 #include <vec2i.h>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CGraphic;
 enum class ButtonCmd;
@@ -117,28 +108,23 @@ namespace stratagus {
 	class unit_type;
 }
 
-/*----------------------------------------------------------------------------
---  Definitions
-----------------------------------------------------------------------------*/
-
 /// Private type which specifies the cursor-type
 class CCursor
 {
 public:
-	CCursor() : HotPos(0, 0),
-		SpriteFrame(0), FrameRate(0), G(nullptr) {}
+	CCursor() : HotPos(0, 0) {}
 
 	std::string Ident;  /// Identifier to reference it
 	std::string Race;   /// Race name
 
 	PixelPos HotPos;     /// Hot point
 
-	int SpriteFrame;  /// Current displayed cursor frame
-	int FrameRate;    /// Rate of changing the frames
+	int SpriteFrame = 0;  /// Current displayed cursor frame
+	int FrameRate = 0;    /// Rate of changing the frames
 
 	// --- FILLED UP ---
 
-	CGraphic *G; /// Cursor sprite image
+	CGraphic *G = nullptr; /// Cursor sprite image
 };
 
 /// Cursor config reference

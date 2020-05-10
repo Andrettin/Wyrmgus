@@ -42,7 +42,6 @@
 #include "animation.h"
 //Wyrmgus end
 #include "construct.h"
-#include "cursor.h"
 #include "database/defines.h"
 #include "editor.h"
 #include "font.h"
@@ -54,6 +53,7 @@
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "translate.h"
+#include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
