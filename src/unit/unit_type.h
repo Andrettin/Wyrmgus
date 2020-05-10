@@ -740,6 +740,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
+	Q_PROPERTY(stratagus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -898,6 +899,11 @@ public:
 		return this->draw_level;
 	}
 
+	unit_type *get_corpse_type() const
+	{
+		return this->corpse_type;
+	}
+
 public:
 	const unit_type *Parent;				/// Parent unit type
 	//Wyrmgus start
@@ -994,9 +1000,10 @@ public:
 
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 
-	std::string CorpseName;         /// Corpse type name
-	unit_type *CorpseType;          /// Corpse unit-type
+private:
+	unit_type *corpse_type = nullptr; //corpse unit-type
 
+public:
 	CConstruction *Construction;    /// What is shown in construction phase
 
 	int RepairHP;                   /// Amount of HP per repair

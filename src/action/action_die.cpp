@@ -106,7 +106,7 @@ static bool AnimateActionDie(CUnit &unit)
 	const stratagus::unit_type &type = *unit.Type;
 
 	// Die sequence terminated, generate corpse.
-	if (type.CorpseType == nullptr) {
+	if (type.get_corpse_type() == nullptr) {
 		unit.Remove(nullptr);
 		//Wyrmgus start
 		UnitClearOrders(unit);
@@ -115,8 +115,8 @@ static bool AnimateActionDie(CUnit &unit)
 		return ;
 	}
 
-	const stratagus::unit_type &corpseType = *type.CorpseType;
-	Assert(type.get_tile_width() >= corpseType.get_tile_width() && type.get_tile_height() >= corpseType.get_tile_height());
+	const stratagus::unit_type *corpse_type = type.get_corpse_type();
+	Assert(type.get_tile_width() >= corpse_type->get_tile_width() && type.get_tile_height() >= corpse_type->get_tile_height());
 
 	// Update sight for new corpse
 	// We have to unmark BEFORE changing the type.
@@ -126,11 +126,11 @@ static bool AnimateActionDie(CUnit &unit)
 //	unit.Remove(nullptr);
 	MapUnmarkUnitSight(unit);
 	//Wyrmgus end
-	unit.Type = &corpseType;
-	unit.Stats = &corpseType.Stats[unit.Player->Index];
+	unit.Type = corpse_type;
+	unit.Stats = &corpse_type->Stats[unit.Player->Index];
 	//Wyrmgus start
 	const unsigned int var_size = UnitTypeVar.GetNumberVariable();
-	unit.Variable = corpseType.Stats[unit.Player->Index].Variables;
+	unit.Variable = corpse_type->Stats[unit.Player->Index].Variables;
 	//Wyrmgus end
 	UpdateUnitSightRange(unit);
 	//Wyrmgus start

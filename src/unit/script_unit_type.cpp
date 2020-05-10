@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/unit_type.h"
@@ -79,10 +75,6 @@
 //Wyrmgus end
 #include "video.h"
 #include "world.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 
@@ -1207,8 +1199,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "DecayRate")) {
 			type->DecayRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
-			type->CorpseName = LuaToString(l, -1);
-			type->CorpseType = nullptr;
+			type->corpse_type = stratagus::unit_type::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DamageType")) {
 			value = LuaToString(l, -1);
 			//int check = ExtraDeathIndex(value);
@@ -2323,7 +2314,11 @@ static int CclGetUnitTypeData(lua_State *l)
 			return 1;
 		}
 	} else if (!strcmp(data, "Corpse")) {
-		lua_pushstring(l, type->CorpseName.c_str());
+		if (type->get_corpse_type() != nullptr) {
+			lua_pushstring(l, type->get_corpse_type()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "CanAttack")) {
 		lua_pushboolean(l, type->CanAttack);

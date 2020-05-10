@@ -42,6 +42,7 @@
 #include "faction.h"
 #include "game.h"
 #include "iolib.h"
+#include "item.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/region.h"

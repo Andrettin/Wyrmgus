@@ -2719,8 +2719,8 @@ bool CUnit::IsAlive() const
 
 int CUnit::GetDrawLevel() const
 {
-	return ((Type->CorpseType && CurrentAction() == UnitAction::Die) ?
-		Type->CorpseType->get_draw_level() :
+	return ((Type->get_corpse_type() != nullptr && CurrentAction() == UnitAction::Die) ?
+		Type->get_corpse_type()->get_draw_level() :
 	((CurrentAction() == UnitAction::Die) ? Type->get_draw_level() - 10 : Type->get_draw_level()));
 }
 
@@ -6746,26 +6746,23 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// Not good: UnitUpdateHeading(unit);
 	delete unit.Orders[0];
 	unit.Orders[0] = COrder::NewActionDie();
-	if (type->CorpseType) {
+	if (type->get_corpse_type() != nullptr) {
 #ifdef DYNAMIC_LOAD
 		if (!type->Sprite) {
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit.pixel_offset.setX((type->CorpseType->get_frame_width() - type->CorpseType->Sprite->get_original_frame_size().width()) / 2);
-		unit.pixel_offset.setY((type->CorpseType->get_frame_height() - type->CorpseType->Sprite->get_original_frame_size().height()) / 2);
+		unit.pixel_offset.setX((type->get_corpse_type()->get_frame_width() - type->get_corpse_type()->Sprite->get_original_frame_size().width()) / 2);
+		unit.pixel_offset.setY((type->get_corpse_type()->get_frame_height() - type->get_corpse_type()->Sprite->get_original_frame_size().height()) / 2);
 
-		unit.CurrentSightRange = type->CorpseType->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
+		unit.CurrentSightRange = type->get_corpse_type()->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
 		unit.CurrentSightRange = 0;
 	}
 
 	// If we have a corpse, or a death animation, we are put back on the map
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
-	//Wyrmgus start
-//	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
-	if (type->CorpseType || (unit.GetAnimations() && unit.GetAnimations()->Death)) {
-	//Wyrmgus end
+	if (type->get_corpse_type() != nullptr || (unit.GetAnimations() && unit.GetAnimations()->Death)) {
 		unit.Removed = 0;
 		CMap::Map.Insert(unit);
 

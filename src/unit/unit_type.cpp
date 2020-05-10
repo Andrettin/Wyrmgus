@@ -522,7 +522,7 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	StillFrame(0),
 	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
 	TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
-	CorpseType(nullptr), Construction(nullptr), RepairHP(0),
+	Construction(nullptr), RepairHP(0),
 	BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
@@ -889,8 +889,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->FireMissile.Name = value;
 			this->FireMissile.Missile = nullptr;
 		} else if (key == "corpse") {
-			this->CorpseName = value;
-			this->CorpseType = nullptr;
+			this->corpse_type = unit_type::get(value);
 		} else if (key == "weapon_class") {
 			this->WeaponClasses.push_back(string_to_item_class(value));
 		} else if (key == "ai_drop") {
@@ -1458,8 +1457,7 @@ void unit_type::SetParent(const unit_type *parent_type)
 	this->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
 	this->Explosion.Name = parent_type->Explosion.Name;
 	this->Explosion.Missile = nullptr;
-	this->CorpseName = parent_type->CorpseName;
-	this->CorpseType = nullptr;
+	this->corpse_type = parent_type->corpse_type;
 	this->MinAttackRange = parent_type->MinAttackRange;
 	this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
 	this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
@@ -2764,10 +2762,7 @@ void LoadUnitType(stratagus::unit_type &type)
 	for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
 		type.Impact[i].MapMissile();
 	}
-	// Lookup corpse.
-	if (!type.CorpseName.empty()) {
-		type.CorpseType = stratagus::unit_type::get(type.CorpseName);
-	}
+
 #ifndef DYNAMIC_LOAD
 	// Load Sprite
 	if (!type.Sprite) {
