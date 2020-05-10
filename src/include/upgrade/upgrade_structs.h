@@ -30,23 +30,13 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
-//Wyrmgus start
-#include "item.h"
-//Wyrmgus end
+#include "item_class.h"
 #include "resource.h"
 #include "stratagus.h"
 #include "unit/unit_variable.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CDeityDomain;
 class CSchoolOfMagic;
@@ -61,6 +51,7 @@ namespace stratagus {
 	class icon;
 	class unit_type;
 	class upgrade_class;
+	enum class item_class;
 }
 
 /**
@@ -224,10 +215,10 @@ public:
 	bool MagicSuffix = false;
 	bool RunicAffix = false;
 	bool UniqueOnly = false;		/// whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
-	bool ItemPrefix[MaxItemClasses];
-	bool ItemSuffix[MaxItemClasses];
+	bool ItemPrefix[static_cast<int>(stratagus::item_class::count)];
+	bool ItemSuffix[static_cast<int>(stratagus::item_class::count)];
 	bool IncompatibleAffixes[UpgradeMax];
-	std::vector<int> WeaponClasses;		/// if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
+	std::set<stratagus::item_class> WeaponClasses; //if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	//Wyrmgus start
 	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
 	stratagus::unit_type *Item = nullptr;
@@ -239,7 +230,7 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
 	int MagicLevel = 0;					/// Magic level of an affix
-	int Work = -1;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
+	stratagus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	stratagus::character *Author = nullptr;		/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade

@@ -28,11 +28,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
+#include "item_class.h"
 #include "luacallback.h"
 #include "sound/unitsound.h"
 #include "vec2i.h"
@@ -40,10 +37,6 @@
 #ifdef __MORPHOS__
 #undef Enable
 #endif
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CMapLayer;
 class CPlayer;
@@ -275,7 +268,7 @@ public:
 	SoundConfig SoundWhenCast;  /// Sound played if cast
 	
 	//Wyrmgus start
-	bool ItemSpell[MaxItemClasses];
+	bool ItemSpell[static_cast<int>(stratagus::item_class::count)];
 	//Wyrmgus end
 
 	bool IsCasterOnly() const

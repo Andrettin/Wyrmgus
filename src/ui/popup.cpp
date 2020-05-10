@@ -739,7 +739,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "UnitTypeClass")) {
 			condition->unit_class = stratagus::unit_class::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
-			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+			condition->item_class = stratagus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(key, "CanStore")) {
 			condition->CanStore = GetResourceIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "ImproveIncome")) {

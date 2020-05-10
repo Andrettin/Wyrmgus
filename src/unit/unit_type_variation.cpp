@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_type_variation.cpp - The unit type variation source file. */
-//
 //      (c) Copyright 2014-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -34,6 +32,7 @@
 #include "animation.h"
 #include "config.h"
 #include "construct.h"
+#include "item_class.h"
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"
@@ -118,21 +117,9 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			const CUpgrade *upgrade = CUpgrade::get(value);
 			this->UpgradesForbidden.push_back(upgrade);
 		} else if (key == "item_class_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int item_class = GetItemClassIdByName(value);
-			if (item_class != -1) {
-				this->ItemClassesEquipped.push_back(item_class);
-			} else {
-				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
-			}
+			this->item_classes_equipped.insert(stratagus::string_to_item_class(value));
 		} else if (key == "item_class_not_equipped") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int item_class = GetItemClassIdByName(value);
-			if (item_class != -1) {
-				this->ItemClassesNotEquipped.push_back(item_class);
-			} else {
-				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
-			}
+			this->item_classes_not_equipped.insert(stratagus::string_to_item_class(value));
 		} else if (key == "item_equipped") {
 			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
 			this->ItemsEquipped.push_back(unit_type);

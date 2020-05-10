@@ -48,11 +48,12 @@
 //Wyrmgus start
 #include "font.h"
 #include "game.h"
+#include "grand_strategy.h"
 #include "iocompat.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item.h"
 //Wyrmgus start
-#include "grand_strategy.h"
 #include "luacallback.h"
 //Wyrmgus end
 #include "map/map.h"

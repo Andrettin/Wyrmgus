@@ -43,6 +43,7 @@
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item_slot.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -273,9 +274,9 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 	}
 	
 	//deequip the current equipment if they are incompatible with the new unit type
-	for (int i = 0; i < MaxItemSlots; ++i) {
+	for (int i = 0; i < static_cast<int>(stratagus::item_slot::count); ++i) {
 		for (size_t j = 0; j < unit.EquippedItems[i].size(); ++j) {
-			if (!unit.CanEquipItemClass(unit.EquippedItems[i][j]->Type->ItemClass)) {
+			if (!unit.can_equip_item_class(unit.EquippedItems[i][j]->Type->get_item_class())) {
 				unit.DeequipItem(*unit.EquippedItems[i][j]);
 			}
 		}

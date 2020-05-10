@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_use.h"
@@ -39,6 +35,7 @@
 #include "character.h"
 #include "commands.h"
 #include "iolib.h"
+#include "item.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -64,13 +61,7 @@ enum {
 	State_TargetReached = 128,
 };
 
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionUse(CUnit &dest)
+COrder *COrder::NewActionUse(CUnit &dest)
 {
 	COrder_Use *order = new COrder_Use;
 
@@ -270,7 +261,7 @@ enum {
 				return;
 			}
 			PlayUnitSound(*goal, UnitVoiceGroup::Used);
-			if (goal->Type->BoolFlag[POWERUP_INDEX].value || IsItemClassConsumable(goal->Type->ItemClass)) { //only destroy item if it is consumable
+			if (goal->Type->BoolFlag[POWERUP_INDEX].value || stratagus::is_consumable_item_class(goal->Type->get_item_class())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);

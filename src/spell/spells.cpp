@@ -237,7 +237,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 	}
 	//Wyrmgus start
 	if (condition->ThrustingWeapon != CONDITION_TRUE) {
-		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ (caster.GetCurrentWeaponClass() == DaggerItemClass || caster.GetCurrentWeaponClass() == SwordItemClass || caster.GetCurrentWeaponClass() == ThrustingSwordItemClass || caster.GetCurrentWeaponClass() == SpearItemClass)) {
+		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ stratagus::is_thrusting_weapon_item_class(caster.GetCurrentWeaponClass())) {
 			return false;
 		}
 	}
@@ -442,11 +442,8 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_spell") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int item_class = GetItemClassIdByName(value);
-			if (item_class != -1) {
-				this->ItemSpell[item_class] = true;
-			}
+			const int item_class = static_cast<int>(stratagus::string_to_item_class(value));
+			this->ItemSpell[item_class] = true;
 		} else {
 			fprintf(stderr, "Invalid spell property: \"%s\".\n", key.c_str());
 		}

@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "quest.h"
@@ -40,6 +36,7 @@
 #include "dialogue.h"
 #include "dialogue_option.h"
 #include "faction.h"
+#include "item.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_template.h"
@@ -50,10 +47,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Define a quest.

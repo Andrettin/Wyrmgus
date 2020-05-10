@@ -30,7 +30,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
-#include "item.h"
+#include "item_slot.h"
 #include "time/date.h"
 #include "ui/icon.h"
 
@@ -227,7 +227,7 @@ public:
 	LuaCallback *Conditions = nullptr;
 	dependency *Predependency = nullptr;
 	dependency *Dependency = nullptr;
-	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
+	std::vector<CPersistentItem *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
 	std::vector<character *> Children;	/// Children of the character
 	std::vector<character *> Siblings;	/// Siblings of the character
 private:

@@ -57,6 +57,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
+#include "item_class.h"
 #include "map/map.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -198,7 +199,7 @@ void CUnitStats::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), detailed_data_entry(identifier)
+CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), detailed_data_entry(identifier), Work(stratagus::item_class::none)
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
@@ -484,7 +485,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
 				upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 			}
-			for (int i = 0; i < MaxItemClasses; ++i) {
+			for (int i = 0; i < static_cast<int>(stratagus::item_class::count); ++i) {
 				upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
 				upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
 			}
@@ -554,12 +555,7 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "UniqueOnly")) {
 			upgrade->UniqueOnly = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Work")) {
-			int work_type = GetItemClassIdByName(LuaToString(l, -1));
-			if (work_type != -1) {
-				upgrade->Work = work_type;
-			} else {
-				LuaError(l, "Work item class doesn't exist.");
-			}
+			upgrade->Work = stratagus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(value, "Item")) {
 			stratagus::unit_type *item = stratagus::unit_type::get(LuaToString(l, -1));
 			upgrade->Item = item;
@@ -639,10 +635,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (item_class == -1) {
-					LuaError(l, "Item class doesn't exist.");
-				}
+				const int item_class = static_cast<int>(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
 				
 				upgrade->ItemPrefix[item_class] = true;
 			}
@@ -652,10 +645,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (item_class == -1) {
-					LuaError(l, "Item class doesn't exist.");
-				}
+				const int item_class = static_cast<int>(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
 
 				upgrade->ItemSuffix[item_class] = true;
 			}
@@ -687,12 +677,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (item_class == -1) {
-					LuaError(l, "Item class doesn't exist.");
-				}
-
-				upgrade->WeaponClasses.push_back(item_class);
+				upgrade->WeaponClasses.insert(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
 			}
 		} else if (!strcmp(value, "Epithets")) {
 			if (!lua_istable(l, -1)) {
@@ -1044,7 +1029,7 @@ static int CclGetLiteraryWorks(lua_State *l)
 {
 	std::vector<const CUpgrade *> literary_works;
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->Work != -1) {
+		if (upgrade->Work != stratagus::item_class::none) {
 			literary_works.push_back(upgrade);
 		}
 	}
@@ -1133,11 +1118,8 @@ static int CclGetUpgradeData(lua_State *l)
 			}
 		} else {
 			LuaCheckArgs(l, 3);
-			std::string item_class_name = LuaToString(l, 3);
-			int item_class = GetItemClassIdByName(item_class_name);
-			if (item_class == -1) {
-				LuaError(l, "Item class \"%s\" doesn't exist." _C_ item_class_name.c_str());
-			}
+			const std::string item_class_name = LuaToString(l, 3);
+			const int item_class = static_cast<int>(stratagus::string_to_item_class(item_class_name));
 			lua_pushboolean(l, upgrade->ItemPrefix[item_class]);
 			return 1;
 		}
@@ -1152,19 +1134,16 @@ static int CclGetUpgradeData(lua_State *l)
 			}
 		} else {
 			LuaCheckArgs(l, 3);
-			std::string item_class_name = LuaToString(l, 3);
-			int item_class = GetItemClassIdByName(item_class_name);
-			if (item_class == -1) {
-				LuaError(l, "Item class \"%s\" doesn't exist." _C_ item_class_name.c_str());
-			}
+			const std::string item_class_name = LuaToString(l, 3);
+			const int item_class = static_cast<int>(stratagus::string_to_item_class(item_class_name));
 			lua_pushboolean(l, upgrade->ItemSuffix[item_class]);
 			return 1;
 		}
 	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
 		std::vector<std::string> applies_to;
-		for (int i = 0; i < MaxItemClasses; ++i) {
+		for (int i = 0; i < static_cast<int>(stratagus::item_class::count); ++i) {
 			if (upgrade->ItemPrefix[i] || upgrade->ItemSuffix[i]) {
-				applies_to.push_back(GetItemClassNameById(i));
+				applies_to.push_back(stratagus::item_class_to_string(static_cast<stratagus::item_class>(i)));
 			}
 		}
 
@@ -1563,10 +1542,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
@@ -1859,10 +1838,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}

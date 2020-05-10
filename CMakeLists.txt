@@ -335,6 +335,7 @@ set(stratagusmain_SRCS
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
 	src/stratagus/item.cpp
+	src/stratagus/item_class.cpp
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
@@ -830,6 +831,8 @@ set(stratagus_generic_HDRS
 	src/stratagus/dialogue_option.h
 	src/stratagus/faction.h
 	src/stratagus/gender.h
+	src/stratagus/item_class.h
+	src/stratagus/item_slot.h
 	src/stratagus/species.h
 )
 

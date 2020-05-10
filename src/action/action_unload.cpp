@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_unload.h"
@@ -41,6 +37,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 //Wyrmgus start
@@ -55,14 +52,7 @@
 #include "unit/unit_type_type.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-//Wyrmgus start
-///* static */ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
-/* static */ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
-//Wyrmgus end
+COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
 {
 	COrder_Unload *order = new COrder_Unload;
 

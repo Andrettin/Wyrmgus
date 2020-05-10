@@ -27,18 +27,11 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "item_slot.h"
 #include "player.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CAnimation;
 class CBuildRestrictionOnTop;
@@ -70,6 +63,8 @@ namespace stratagus {
 	class player_color;
 	class time_of_day;
 	class unit_type;
+	enum class item_class;
+	enum class item_slot;
 }
 
 /*
@@ -422,8 +417,8 @@ public:
 	int GetModifiedVariable(int index, int variable_type = 0) const;
 
 	int GetReactionRange() const;
-	int GetItemSlotQuantity(int item_slot) const;
-	int GetCurrentWeaponClass() const;
+	int get_item_slot_quantity(const stratagus::item_slot item_slot) const;
+	stratagus::item_class GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
 	int GetPrice() const;
@@ -443,11 +438,11 @@ public:
 	bool CanCastAnySpell() const;
 	bool CanAutoCastSpell(const CSpell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
-	bool IsItemClassEquipped(int item_class) const;
+	bool is_item_class_equipped(const stratagus::item_class item_class) const;
 	bool IsItemTypeEquipped(const stratagus::unit_type *item_type) const;
 	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
 	bool CanEquipItem(CUnit *item) const;
-	bool CanEquipItemClass(int item_class) const;
+	bool can_equip_item_class(const stratagus::item_class item_class) const;
 	bool CanUseItem(CUnit *item) const;
 	bool IsItemSetComplete(const CUnit *item) const;
 	bool EquippingItemCompletesSet(const CUnit *item) const;
@@ -514,7 +509,7 @@ public:
 	} Resource; /// Resource still
 
 	//Wyrmgus start
-	std::vector<CUnit *> EquippedItems[MaxItemSlots];	/// Pointer to unit's equipped items, per slot
+	std::vector<CUnit *> EquippedItems[static_cast<int>(stratagus::item_slot::count)];	/// Pointer to unit's equipped items, per slot
 	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit
 	//Wyrmgus end
 	

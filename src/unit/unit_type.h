@@ -27,10 +27,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "color.h"
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"
@@ -46,13 +42,10 @@
 #undef Enable
 #endif
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
+class CSpell;
 class CUnitTypeVariation;
 //Wyrmgus start
 class CButtonLevel;
@@ -80,6 +73,8 @@ namespace stratagus {
 	class unit_type;
 	class world;
 	enum class gender;
+	enum class item_class;
+	enum class item_slot;
 }
 
 static constexpr int UnitSides = 8;
@@ -882,6 +877,11 @@ public:
 	std::vector<std::string> GetPotentialPersonalNames(faction *faction, const gender gender) const;
 	//Wyrmgus end
 
+	item_class get_item_class() const
+	{
+		return this->item_class;
+	}
+
 	species *get_species() const
 	{
 		return this->species;
@@ -931,8 +931,8 @@ public:
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
 	std::string LayerFiles[MaxImageLayers];	/// Layer files
-	std::map<ButtonCmd, IconConfig> ButtonIcons;			/// icons for button actions
-	std::map<int, unit_type *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
+	std::map<ButtonCmd, IconConfig> ButtonIcons;		//icons for button actions
+	std::map<item_slot, unit_type *> DefaultEquipment; //default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 private:
 	QSize frame_size = QSize(0, 0); //sprite frame size
@@ -949,12 +949,12 @@ public:
 	//Wyrmgus start
 	int TrainQuantity;										/// Quantity to be trained
 	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
-	int ItemClass;											/// Item class (if the unit type is an item)
 private:
+	stratagus::item_class item_class; //item class (if the unit type is an item)
 	stratagus::species *species = nullptr;
 public:
 	stratagus::terrain_type *TerrainType;
-	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
+	std::vector<stratagus::item_class> WeaponClasses; //weapon classes that the unit type can use (if the unit type uses a weapon)
 	std::map<gender, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles

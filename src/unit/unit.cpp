@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/unit.h"
@@ -59,6 +55,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
+#include "item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -443,12 +440,10 @@ void CUnit::Init()
 	Resource.Assigned = 0;
 	Resource.Active = 0;
 	
-	//Wyrmgus start
-	for (int i = 0; i < MaxItemSlots; ++i) {
-		EquippedItems[i].clear();
+	for (int i = 0; i < static_cast<int>(stratagus::item_slot::count); ++i) {
+		this->EquippedItems[i].clear();
 	}
-	SoldUnits.clear();
-	//Wyrmgus end
+	this->SoldUnits.clear();
 
 	tilePos.x = 0;
 	tilePos.y = 0;
@@ -607,10 +602,10 @@ void CUnit::Release(bool final)
 	Identified = true;
 	ConnectingDestination = nullptr;
 	
-	for (int i = 0; i < MaxItemSlots; ++i) {
-		EquippedItems[i].clear();
+	for (int i = 0; i < static_cast<int>(stratagus::item_slot::count); ++i) {
+		this->EquippedItems[i].clear();
 	}
-	SoldUnits.clear();
+	this->SoldUnits.clear();
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -881,7 +876,7 @@ void CUnit::HealingItemAutoUse()
 			continue;
 		}
 		
-		if (!IsItemClassConsumable(uins->Type->ItemClass)) {
+		if (!stratagus::is_consumable_item_class(uins->Type->get_item_class())) {
 			continue;
 		}
 		
@@ -1193,8 +1188,8 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 			}
 		}
 		
-		for (size_t j = 0; j < variation->ItemClassesNotEquipped.size(); ++j) {
-			if (this->IsItemClassEquipped(variation->ItemClassesNotEquipped[j])) {
+		for (const stratagus::item_class item_class_not_equipped : variation->item_classes_not_equipped) {
+			if (this->is_item_class_equipped(item_class_not_equipped)) {
 				upgrades_check = false;
 				break;
 			}
@@ -1208,26 +1203,26 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 		if (upgrades_check == false) {
 			continue;
 		}
-		for (size_t j = 0; j < variation->ItemClassesEquipped.size(); ++j) {
-			if (GetItemClassSlot(variation->ItemClassesEquipped[j]) == WeaponItemSlot) {
+		for (const stratagus::item_class item_class_equipped : variation->item_classes_equipped) {
+			if (stratagus::get_item_class_slot(item_class_equipped) == stratagus::item_slot::weapon) {
 				requires_weapon = true;
-				if (IsItemClassEquipped(variation->ItemClassesEquipped[j])) {
+				if (is_item_class_equipped(item_class_equipped)) {
 					found_weapon = true;
 				}
-			} else if (GetItemClassSlot(variation->ItemClassesEquipped[j]) == ShieldItemSlot) {
+			} else if (stratagus::get_item_class_slot(item_class_equipped) == stratagus::item_slot::shield) {
 				requires_shield = true;
-				if (IsItemClassEquipped(variation->ItemClassesEquipped[j])) {
+				if (is_item_class_equipped(item_class_equipped)) {
 					found_shield = true;
 				}
 			}
 		}
 		for (size_t j = 0; j < variation->ItemsEquipped.size(); ++j) {
-			if (GetItemClassSlot(variation->ItemsEquipped[j]->ItemClass) == WeaponItemSlot) {
+			if (stratagus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == stratagus::item_slot::weapon) {
 				requires_weapon = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_weapon = true;
 				}
-			} else if (GetItemClassSlot(variation->ItemsEquipped[j]->ItemClass) == ShieldItemSlot) {
+			} else if (stratagus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == stratagus::item_slot::shield) {
 				requires_shield = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_shield = true;
@@ -1304,33 +1299,33 @@ void CUnit::UpdateButtonIcons()
 void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 {
 	if (button_action == ButtonCmd::Attack) {
-		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->GetIcon().Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->GetIcon().Icon;
 			return;
 		}
 		
-		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->ItemClass != BowItemClass && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->get_item_class() != stratagus::item_class::bow && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->GetIcon().Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::Stop) {
-		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass == ShieldItemClass && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->Type->get_item_class() == stratagus::item_class::shield && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->GetIcon().Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::Move) {
-		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->GetIcon().Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::StandGround) {
-		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.find(button_action)->second.Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->Type->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->Type->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 
-		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[WeaponItemSlot][0]->Type->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->Type->ButtonIcons.find(button_action)->second.Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 	}
@@ -1354,7 +1349,7 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
 			if (
 				(
-					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->Item->ItemClass != BowItemClass) || upgrade->is_arrows()))
+					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->Item->get_item_class() != stratagus::item_class::bow) || upgrade->is_arrows()))
 					|| (button_action == ButtonCmd::Stop && upgrade->is_shield())
 					|| (button_action == ButtonCmd::Move && upgrade->is_boots())
 				)
@@ -1370,33 +1365,33 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 	}
 	
 	if (button_action == ButtonCmd::Attack) {
-		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(stratagus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->Icon.Icon;
 			return;
 		}
 		
-		if (this->Type->DefaultEquipment.find(WeaponItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(stratagus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::Stop) {
-		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass == ShieldItemClass && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(stratagus::item_slot::shield) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::shield)->second->get_item_class() == stratagus::item_class::shield && this->Type->DefaultEquipment.find(stratagus::item_slot::shield)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::shield)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::Move) {
-		if (this->Type->DefaultEquipment.find(BootsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(stratagus::item_slot::boots) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::boots)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::boots)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::StandGround) {
-		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.find(button_action)->second.Icon;
+		if (this->Type->DefaultEquipment.find(stratagus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 		
-		if (this->Type->DefaultEquipment.find(WeaponItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(WeaponItemSlot)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(WeaponItemSlot)->second->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(WeaponItemSlot)->second->ButtonIcons.find(button_action)->second.Icon;
+		if (this->Type->DefaultEquipment.find(stratagus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 	}
@@ -1430,19 +1425,19 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 
 void CUnit::EquipItem(CUnit &item, bool affect_character)
 {
-	int item_class = item.Type->ItemClass;
-	int item_slot = GetItemClassSlot(item_class);
+	const stratagus::item_class item_class = item.Type->get_item_class();
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_class);
 	
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
 		return;
 	}
 	
-	if (GetItemSlotQuantity(item_slot) > 0 && EquippedItems[item_slot].size() == GetItemSlotQuantity(item_slot)) {
-		DeequipItem(*EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]);
+	if (this->get_item_slot_quantity(item_slot) > 0 && EquippedItems[static_cast<int>(item_slot)].size() == this->get_item_slot_quantity(item_slot)) {
+		DeequipItem(*EquippedItems[static_cast<int>(item_slot)][EquippedItems[static_cast<int>(item_slot)].size() - 1]);
 	}
 	
-	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
+	if (item_slot == stratagus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1469,7 +1464,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 				}
 			}
 		}
-	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
+	} else if (item_slot == stratagus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1477,7 +1472,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
+	} else if (item_slot == stratagus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1485,7 +1480,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
+	} else if (item_slot == stratagus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1504,7 +1499,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
 		if (Character->GetItem(item) != nullptr) {
 			if (!Character->IsItemEquipped(Character->GetItem(item))) {
-				Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
+				Character->EquippedItems[static_cast<int>(item_slot)].push_back(Character->GetItem(item));
 				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", Character->Ident.c_str());
@@ -1513,14 +1508,14 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
 		}
 	}
-	EquippedItems[item_slot].push_back(&item);
+	EquippedItems[static_cast<int>(item_slot)].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
 	const CUnitTypeVariation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
-			std::find(variation->ItemClassesNotEquipped.begin(), variation->ItemClassesNotEquipped.end(), item.Type->ItemClass) != variation->ItemClassesNotEquipped.end()
+			variation->item_classes_not_equipped.contains(item.Type->get_item_class())
 			|| std::find(variation->ItemsNotEquipped.begin(), variation->ItemsNotEquipped.end(), item.Type) != variation->ItemsNotEquipped.end()
 		)
 	) {
@@ -1531,7 +1526,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		if (
 			layer_variation
 			&& (
-				std::find(layer_variation->ItemClassesNotEquipped.begin(), layer_variation->ItemClassesNotEquipped.end(), item.Type->ItemClass) != layer_variation->ItemClassesNotEquipped.end()
+				layer_variation->item_classes_not_equipped.contains(item.Type->get_item_class())
 				|| std::find(layer_variation->ItemsNotEquipped.begin(), layer_variation->ItemsNotEquipped.end(), item.Type) != layer_variation->ItemsNotEquipped.end()
 			)
 		) {
@@ -1539,12 +1534,12 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item_slot == WeaponItemSlot || item_slot == ArrowsItemSlot) {
+	if (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::arrows) {
 		this->ChooseButtonIcon(ButtonCmd::Attack);
 		this->ChooseButtonIcon(ButtonCmd::StandGround);
-	} else if (item_slot == ShieldItemSlot) {
+	} else if (item_slot == stratagus::item_slot::shield) {
 		this->ChooseButtonIcon(ButtonCmd::Stop);
-	} else if (item_slot == BootsItemSlot) {
+	} else if (item_slot == stratagus::item_slot::boots) {
 		this->ChooseButtonIcon(ButtonCmd::Move);
 	}
 	this->ChooseButtonIcon(ButtonCmd::Patrol);
@@ -1622,10 +1617,10 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 
-	int item_class = item.Type->ItemClass;
-	int item_slot = GetItemClassSlot(item_class);
+	const stratagus::item_class item_class = item.Type->get_item_class();
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_class);
 	
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
 		return;
 	}
@@ -1633,7 +1628,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
 		if (Character->GetItem(item) != nullptr) {
 			if (Character->IsItemEquipped(Character->GetItem(item))) {
-				Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
+				stratagus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], this->Character->GetItem(item));
 				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", Character->Ident.c_str());
@@ -1642,9 +1637,9 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
 		}
 	}
-	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
+	stratagus::vector::remove(this->EquippedItems[static_cast<int>(item_slot)], &item);
 	
-	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
+	if (item_slot == stratagus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1671,7 +1666,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 				}
 			}
 		}
-	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
+	} else if (item_slot == stratagus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1679,7 +1674,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
+	} else if (item_slot == stratagus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1687,7 +1682,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
+	} else if (item_slot == stratagus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
 		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
@@ -1702,7 +1697,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	if (
 		variation
 		&& (
-			std::find(variation->ItemClassesEquipped.begin(), variation->ItemClassesEquipped.end(), item.Type->ItemClass) != variation->ItemClassesEquipped.end() 
+			variation->item_classes_equipped.contains(item.Type->get_item_class())
 			|| std::find(variation->ItemsEquipped.begin(), variation->ItemsEquipped.end(), item.Type) != variation->ItemsEquipped.end()
 		)
 	) {
@@ -1714,7 +1709,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		if (
 			layer_variation
 			&& (
-				std::find(layer_variation->ItemClassesEquipped.begin(), layer_variation->ItemClassesEquipped.end(), item.Type->ItemClass) != layer_variation->ItemClassesEquipped.end()
+				layer_variation->item_classes_equipped.contains(item.Type->get_item_class())
 				|| std::find(layer_variation->ItemsEquipped.begin(), layer_variation->ItemsEquipped.end(), item.Type) != layer_variation->ItemsEquipped.end()
 			)
 		) {
@@ -1722,12 +1717,12 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item_slot == WeaponItemSlot || item_slot == ArrowsItemSlot) {
+	if (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::arrows) {
 		this->ChooseButtonIcon(ButtonCmd::Attack);
 		this->ChooseButtonIcon(ButtonCmd::StandGround);
-	} else if (item_slot == ShieldItemSlot) {
+	} else if (item_slot == stratagus::item_slot::shield) {
 		this->ChooseButtonIcon(ButtonCmd::Stop);
-	} else if (item_slot == BootsItemSlot) {
+	} else if (item_slot == stratagus::item_slot::boots) {
 		this->ChooseButtonIcon(ButtonCmd::Move);
 	}
 	this->ChooseButtonIcon(ButtonCmd::Patrol);
@@ -2185,7 +2180,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	
 	if (
 		this->Prefix == nullptr && this->Suffix == nullptr && this->Spell == nullptr && this->Work == nullptr && this->Elixir == nullptr
-		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass || always_magic)
+		&& (this->Type->get_item_class() == stratagus::item_class::scroll || this->Type->get_item_class() == stratagus::item_class::book || this->Type->get_item_class() == stratagus::item_class::ring || this->Type->get_item_class() == stratagus::item_class::amulet || this->Type->get_item_class() == stratagus::item_class::horn || always_magic)
 	) { //scrolls, books, jewelry and horns must always have a property
 		this->GenerateSpecialProperties(dropper, dropper_player, allow_unique, sold_item, always_magic);
 	}
@@ -2196,14 +2191,14 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_prefixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->ItemClass == -1 && affix->MagicPrefix) || (this->Type->ItemClass != -1 && affix->ItemPrefix[Type->ItemClass])) {
+		if ((this->Type->get_item_class() == stratagus::item_class::none && affix->MagicPrefix) || (this->Type->get_item_class() != stratagus::item_class::none && affix->ItemPrefix[static_cast<int>(Type->get_item_class())])) {
 			potential_prefixes.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->ItemClass == -1 || !upgrade->ItemPrefix[Type->ItemClass]) {
+			if (this->Type->get_item_class() == stratagus::item_class::none || !upgrade->ItemPrefix[static_cast<int>(Type->get_item_class())]) {
 				continue;
 			}
 
@@ -2231,7 +2226,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_suffixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->ItemClass == -1 && affix->MagicSuffix) || (this->Type->ItemClass != -1 && affix->ItemSuffix[Type->ItemClass])) {
+		if ((this->Type->get_item_class() == stratagus::item_class::none && affix->MagicSuffix) || (this->Type->get_item_class() != stratagus::item_class::none && affix->ItemSuffix[static_cast<int>(Type->get_item_class())])) {
 			if (Prefix == nullptr || !affix->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 				potential_suffixes.push_back(affix);
 			}
@@ -2240,7 +2235,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->ItemClass == -1 || !upgrade->ItemSuffix[Type->ItemClass]) {
+			if (this->Type->get_item_class() == stratagus::item_class::none || !upgrade->ItemSuffix[static_cast<int>(Type->get_item_class())]) {
 				continue;
 			}
 
@@ -2272,7 +2267,7 @@ void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CSpell *> potential_spells;
 	if (dropper != nullptr) {
 		for (CSpell *spell : dropper->Type->DropSpells) {
-			if (this->Type->ItemClass != -1 && spell->ItemSpell[Type->ItemClass]) {
+			if (this->Type->get_item_class() != stratagus::item_class::none && spell->ItemSpell[static_cast<int>(Type->get_item_class())]) {
 				potential_spells.push_back(spell);
 			}
 		}
@@ -2288,14 +2283,14 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_works;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if (this->Type->ItemClass != -1 && affix->Work == this->Type->ItemClass && !affix->UniqueOnly) {
+		if (this->Type->get_item_class() != stratagus::item_class::none && affix->Work == this->Type->get_item_class() && !affix->UniqueOnly) {
 			potential_works.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->ItemClass == -1 || upgrade->Work != this->Type->ItemClass || upgrade->UniqueOnly) {
+			if (this->Type->get_item_class() == stratagus::item_class::none || upgrade->Work != this->Type->get_item_class() || upgrade->UniqueOnly) {
 				continue;
 			}
 
@@ -4728,10 +4723,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, modifier);
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
-				(!modifier_upgrade->is_weapon() || EquippedItems[WeaponItemSlot].size() == 0)
-				&& (!modifier_upgrade->is_shield() || EquippedItems[ShieldItemSlot].size() == 0)
-				&& (!modifier_upgrade->is_boots() || EquippedItems[BootsItemSlot].size() == 0)
-				&& (!modifier_upgrade->is_arrows() || EquippedItems[ArrowsItemSlot].size() == 0)
+				(!modifier_upgrade->is_weapon() || EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() == 0)
+				&& (!modifier_upgrade->is_shield() || EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() == 0)
+				&& (!modifier_upgrade->is_boots() || EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() == 0)
+				&& (!modifier_upgrade->is_arrows() || EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() == 0)
 				&& !(newplayer.Race != -1 && modifier_upgrade == stratagus::civilization::get_all()[newplayer.Race]->get_upgrade())
 				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == stratagus::faction::get_all()[newplayer.Faction]->FactionUpgrade)
 			) {
@@ -5510,30 +5505,30 @@ int CUnit::GetReactionRange() const
 	return reaction_range;
 }
 
-int CUnit::GetItemSlotQuantity(int item_slot) const
+int CUnit::get_item_slot_quantity(const stratagus::item_slot item_slot) const
 {
-	if (!HasInventory()) {
+	if (!this->HasInventory()) {
 		return 0;
 	}
 	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
-		item_slot == ArrowsItemSlot
-		&& Type->WeaponClasses[0] != BowItemClass
+		item_slot == stratagus::item_slot::arrows
+		&& Type->WeaponClasses[0] != stratagus::item_class::bow
 	) {
 		return 0;
 	}
 	
-	if (item_slot == RingItemSlot) {
+	if (item_slot == stratagus::item_slot::ring) {
 		return 2;
 	}
 	
 	return 1;
 }
 
-int CUnit::GetCurrentWeaponClass() const
+stratagus::item_class CUnit::GetCurrentWeaponClass() const
 {
-	if (HasInventory() && EquippedItems[WeaponItemSlot].size() > 0) {
-		return EquippedItems[WeaponItemSlot][0]->Type->ItemClass;
+	if (HasInventory() && EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0) {
+		return EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->get_item_class();
 	}
 	
 	return Type->WeaponClasses[0];
@@ -5541,12 +5536,12 @@ int CUnit::GetCurrentWeaponClass() const
 
 int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool increase) const
 {
-	if (item->Type->ItemClass == -1) {
+	if (item->Type->get_item_class() == stratagus::item_class::none) {
 		return 0;
 	}
 	
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
-	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Type->get_item_class());
+	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == stratagus::item_slot::none || this->get_item_slot_quantity(item_slot) == 0 || !this->can_equip_item_class(item->Type->get_item_class()))) {
 		return 0;
 	}
 	
@@ -5605,43 +5600,45 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 		}
 		
-		if (EquippedItems[item_slot].size() == this->GetItemSlotQuantity(item_slot)) {
-			int item_slot_used = EquippedItems[item_slot].size() - 1;
-			for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
-				if (EquippedItems[item_slot][i] == item) {
+		if (EquippedItems[static_cast<int>(item_slot)].size() == this->get_item_slot_quantity(item_slot)) {
+			int item_slot_used = EquippedItems[static_cast<int>(item_slot)].size() - 1;
+			for (size_t i = 0; i < EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
+				if (EquippedItems[static_cast<int>(item_slot)][i] == item) {
 					item_slot_used = i;
 				}
 			}
+
+			const CUnit *equipped_item = this->EquippedItems[static_cast<int>(item_slot)][item_slot_used];
 			if (!increase) {
-				value -= EquippedItems[item_slot][item_slot_used]->Variable[variable_index].Value;
+				value -= equipped_item->Variable[variable_index].Value;
 			} else {
-				value -= EquippedItems[item_slot][item_slot_used]->Variable[variable_index].Increase;
+				value -= equipped_item->Variable[variable_index].Increase;
 			}
-			if (EquippedItems[item_slot][item_slot_used] != item && EquippedItems[item_slot][item_slot_used]->Unique && EquippedItems[item_slot][item_slot_used]->Unique->Set) {
-				if (this->DeequippingItemBreaksSet(EquippedItems[item_slot][item_slot_used])) {
-					for (size_t z = 0; z < EquippedItems[item_slot][item_slot_used]->Unique->Set->UpgradeModifiers.size(); ++z) {
+			if (equipped_item != item && equipped_item->Unique && equipped_item->Unique->Set) {
+				if (this->DeequippingItemBreaksSet(equipped_item)) {
+					for (size_t z = 0; z < equipped_item->Unique->Set->UpgradeModifiers.size(); ++z) {
 						if (!increase) {
-							value -= EquippedItems[item_slot][item_slot_used]->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+							value -= equipped_item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
 						} else {
-							value -= EquippedItems[item_slot][item_slot_used]->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+							value -= equipped_item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
 						}
 					}
 				}
 			}
-		} else if (EquippedItems[item_slot].size() == 0 && (item_slot == WeaponItemSlot || item_slot == ShieldItemSlot || item_slot == BootsItemSlot || item_slot == ArrowsItemSlot)) {
+		} else if (EquippedItems[static_cast<int>(item_slot)].size() == 0 && (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::shield || item_slot == stratagus::item_slot::boots || item_slot == stratagus::item_slot::arrows)) {
 			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 				if (
 					(
 						(
-							(modifier_upgrade->is_weapon() && item_slot == WeaponItemSlot)
-							|| (modifier_upgrade->is_shield() && item_slot == ShieldItemSlot)
-							|| (modifier_upgrade->is_boots() && item_slot == BootsItemSlot)
-							|| (modifier_upgrade->is_arrows() && item_slot == ArrowsItemSlot)
+							(modifier_upgrade->is_weapon() && item_slot == stratagus::item_slot::weapon)
+							|| (modifier_upgrade->is_shield() && item_slot == stratagus::item_slot::shield)
+							|| (modifier_upgrade->is_boots() && item_slot == stratagus::item_slot::boots)
+							|| (modifier_upgrade->is_arrows() && item_slot == stratagus::item_slot::arrows)
 						)
 						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X'
 					)
-					|| (item_slot == WeaponItemSlot && modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->GetCurrentWeaponClass()) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item->Type->ItemClass) == modifier_upgrade->WeaponClasses.end())
+					|| (item_slot == stratagus::item_slot::weapon && modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && modifier_upgrade->WeaponClasses.contains(this->GetCurrentWeaponClass()) && !modifier_upgrade->WeaponClasses.contains(item->Type->get_item_class()))
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
 						for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
@@ -5659,7 +5656,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 						}
 					}
 				} else if (
-					modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->GetCurrentWeaponClass()) == modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item->Type->ItemClass) != modifier_upgrade->WeaponClasses.end()
+					modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && !modifier_upgrade->WeaponClasses.contains(this->GetCurrentWeaponClass()) && modifier_upgrade->WeaponClasses.contains(item->Type->get_item_class())
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
 						for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
@@ -5707,7 +5704,7 @@ int CUnit::GetPrice() const
 		cost += 1000;
 	}
 	if (this->Work != nullptr) {
-		if (this->Type->ItemClass == BookItemClass) {
+		if (this->Type->get_item_class() == stratagus::item_class::book) {
 			cost += 5000;
 		} else {
 			cost += 1000;
@@ -6031,29 +6028,29 @@ bool CUnit::CanAutoCastSpell(const CSpell *spell) const
 
 bool CUnit::IsItemEquipped(const CUnit *item) const
 {
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Type->get_item_class());
 	
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		return false;
 	}
 	
-	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
+	if (stratagus::vector::contains(this->EquippedItems[static_cast<int>(item_slot)], item)) {
 		return true;
 	}
 	
 	return false;
 }
 
-bool CUnit::IsItemClassEquipped(int item_class) const
+bool CUnit::is_item_class_equipped(const stratagus::item_class item_class) const
 {
-	int item_slot = GetItemClassSlot(item_class);
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_class);
 	
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		return false;
 	}
 	
-	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Type->ItemClass == item_class) {
+	for (size_t i = 0; i < EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
+		if (EquippedItems[static_cast<int>(item_slot)][i]->Type->get_item_class() == item_class) {
 			return true;
 		}
 	}
@@ -6063,14 +6060,14 @@ bool CUnit::IsItemClassEquipped(int item_class) const
 
 bool CUnit::IsItemTypeEquipped(const stratagus::unit_type *item_type) const
 {
-	int item_slot = GetItemClassSlot(item_type->ItemClass);
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_type->get_item_class());
 	
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		return false;
 	}
 	
-	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Type == item_type) {
+	for (size_t i = 0; i < EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
+		if (EquippedItems[static_cast<int>(item_slot)][i]->Type == item_type) {
 			return true;
 		}
 	}
@@ -6080,15 +6077,15 @@ bool CUnit::IsItemTypeEquipped(const stratagus::unit_type *item_type) const
 
 bool CUnit::IsUniqueItemEquipped(const CUniqueItem *unique) const
 {
-	int item_slot = GetItemClassSlot(unique->Type->ItemClass);
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(unique->Type->get_item_class());
 		
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		return false;
 	}
 		
 	int item_equipped_quantity = 0;
-	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Unique == unique) {
+	for (size_t i = 0; i < this->EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
+		if (EquippedItems[static_cast<int>(item_slot)][i]->Unique == unique) {
 			return true;
 		}
 	}
@@ -6106,32 +6103,32 @@ bool CUnit::CanEquipItem(CUnit *item) const
 		return false;
 	}
 	
-	if (!CanEquipItemClass(item->Type->ItemClass)) {
+	if (!this->can_equip_item_class(item->Type->get_item_class())) {
 		return false;
 	}
 	
 	return true;
 }
 
-bool CUnit::CanEquipItemClass(int item_class) const
+bool CUnit::can_equip_item_class(const stratagus::item_class item_class) const
 {
-	if (item_class == -1) {
+	if (item_class == stratagus::item_class::none) {
 		return false;
 	}
 	
-	if (GetItemClassSlot(item_class) == -1) { //can't equip items that don't correspond to an equippable slot
+	if (stratagus::get_item_class_slot(item_class) == stratagus::item_slot::none) { //can't equip items that don't correspond to an equippable slot
 		return false;
 	}
 	
-	if (GetItemClassSlot(item_class) == WeaponItemSlot && std::find(this->Type->WeaponClasses.begin(), this->Type->WeaponClasses.end(), item_class) == this->Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+	if (stratagus::get_item_class_slot(item_class) == stratagus::item_slot::weapon && !stratagus::vector::contains(this->Type->WeaponClasses, item_class)) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
-		GetItemClassSlot(item_class) == ShieldItemSlot
+		stratagus::get_item_class_slot(item_class) == stratagus::item_slot::shield
 		&& this->Type->WeaponClasses.size() > 0
 		&& (
-			this->Type->WeaponClasses[0] == BowItemClass
+			this->Type->WeaponClasses[0] == stratagus::item_class::bow
 			// add other two-handed weapons here as necessary
 		)
 	) {
@@ -6139,20 +6136,17 @@ bool CUnit::CanEquipItemClass(int item_class) const
 	}
 	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		item_class == ShieldItemClass
+		item_class == stratagus::item_class::shield
 		&& (
 			Type->WeaponClasses.size() == 0
-			|| Type->WeaponClasses[0] == DaggerItemClass
-			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
-			|| Type->WeaponClasses[0] == JavelinItemClass
-			|| Type->WeaponClasses[0] == GunItemClass
+			|| stratagus::is_shield_incompatible_weapon_item_class(this->Type->WeaponClasses[0])
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {
 		return false;
 	}
 	
-	if (this->GetItemSlotQuantity(GetItemClassSlot(item_class)) == 0) {
+	if (this->get_item_slot_quantity(stratagus::get_item_class_slot(item_class)) == 0) {
 		return false;
 	}
 	
@@ -6179,7 +6173,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass != FoodItemClass && item->Type->ItemClass != PotionItemClass && item->Type->ItemClass != ScrollItemClass && item->Type->ItemClass != BookItemClass) {
+	if (item->Type->BoolFlag[ITEM_INDEX].value && !stratagus::is_consumable_item_class(item->Type->get_item_class())) {
 		return false;
 	}
 	
@@ -6222,15 +6216,15 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
 	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
-		int item_slot = GetItemClassSlot(item->Unique->Set->UniqueItems[i]->Type->ItemClass);
+		const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Unique->Set->UniqueItems[i]->Type->get_item_class());
 		
-		if (item_slot == -1) {
+		if (item_slot == stratagus::item_slot::none) {
 			return false;
 		}
 		
 		bool has_item_equipped = false;
-		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
-			if (EquippedItems[item_slot][j]->Unique == item->Unique->Set->UniqueItems[i]) {
+		for (size_t j = 0; j < this->EquippedItems[static_cast<int>(item_slot)].size(); ++j) {
+			if (EquippedItems[static_cast<int>(item_slot)][j]->Unique == item->Unique->Set->UniqueItems[i]) {
 				has_item_equipped = true;
 				break;
 			}
@@ -6253,15 +6247,15 @@ bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
 		return false;
 	}
 	
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Type->get_item_class());
 		
-	if (item_slot == -1) {
+	if (item_slot == stratagus::item_slot::none) {
 		return false;
 	}
 		
 	int item_equipped_quantity = 0;
-	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Unique == item->Unique) {
+	for (size_t i = 0; i < this->EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
+		if (EquippedItems[static_cast<int>(item_slot)][i]->Unique == item->Unique) {
 			item_equipped_quantity += 1;
 		}
 	}
@@ -7709,7 +7703,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !IsItemClassConsumable(unit.Type->ItemClass)) { //only consumable items can be picked up as if they were power-ups for units with no inventory
+	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !stratagus::is_consumable_item_class(unit.Type->get_item_class())) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitAction::Built) { // Under construction

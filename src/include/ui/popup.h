@@ -30,6 +30,7 @@
 #pragma once
 
 #include "color.h"
+#include "item_class.h"
 #include "script.h"
 #include "ui/button_cmd.h"
 #include "unit/unit_type_type.h"
@@ -59,7 +60,7 @@ public:
 		Class(false), Description(false), Quote(false), Encyclopedia(false), CanActiveHarvest(false),
 		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), FactionCoreSettlements(0), Ability(0), ChildResources(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
 //		BoolFlags(nullptr), Variables(nullptr) {}
-		ItemClass(-1), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
+		item_class(stratagus::item_class::none), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
 		//Wyrmgus end
 
 	~PopupConditionPanel()
@@ -83,7 +84,7 @@ public:
 	//Wyrmgus start
 	UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
 	const stratagus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type
-	int ItemClass;				/// item class of the button's item
+	stratagus::item_class item_class;				/// item class of the button's item
 	int CanStore;				/// whether the button's unit type can store a particular resource
 	int ImproveIncome;			/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade

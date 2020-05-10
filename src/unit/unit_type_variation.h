@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_type_variation.h - The unit type variation header file. */
-//
 //      (c) Copyright 2014-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,17 +27,9 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "ui/icon.h"
 #include "unit/unit_type.h" //for the image layers enum
 #include "upgrade/upgrade_structs.h" //for the costs enum
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CConstruction;
 class CGraphic;
@@ -50,6 +40,7 @@ namespace stratagus {
 	class season;
 	class terrain_type;
 	class unit_type;
+	enum class item_class;
 }
 
 class CUnitTypeVariation
@@ -87,8 +78,8 @@ public:
 
 	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation
 	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
-	std::vector<int> ItemClassesEquipped;
-	std::vector<int> ItemClassesNotEquipped;
+	std::set<stratagus::item_class> item_classes_equipped;
+	std::set<stratagus::item_class> item_classes_not_equipped;
 	std::vector<const stratagus::unit_type *> ItemsEquipped;
 	std::vector<const stratagus::unit_type *> ItemsNotEquipped;
 	std::vector<const stratagus::terrain_type *> Terrains;

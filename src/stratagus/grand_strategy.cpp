@@ -1247,7 +1247,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 {
 	//initialize literary works
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->Work == -1 || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
+		if (upgrade->Work == stratagus::item_class::none || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
 			continue;
 		}
 		

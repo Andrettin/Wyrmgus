@@ -44,6 +44,8 @@
 #include "editor.h"
 #include "faction.h"
 #include "font.h"
+#include "item.h"
+#include "item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -817,21 +819,13 @@ static int CclDefineUnitType(lua_State *l)
 							variation->UpgradesForbidden.push_back(CUpgrade::add(upgrade_ident, nullptr)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "item-class-equipped")) {
-						std::string item_class_ident = LuaToString(l, -1, k + 1);
-						int item_class = GetItemClassIdByName(item_class_ident);
-						if (item_class != -1) {
-							variation->ItemClassesEquipped.push_back(item_class);
-						} else {
-							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
-						}
+						const std::string item_class_ident = LuaToString(l, -1, k + 1);
+						const stratagus::item_class item_class = stratagus::string_to_item_class(item_class_ident);
+						variation->item_classes_equipped.insert(item_class);
 					} else if (!strcmp(value, "item-class-not-equipped")) {
-						std::string item_class_ident = LuaToString(l, -1, k + 1);
-						int item_class = GetItemClassIdByName(item_class_ident);
-						if (item_class != -1) {
-							variation->ItemClassesNotEquipped.push_back(item_class);
-						} else {
-							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
-						}
+						const std::string item_class_ident = LuaToString(l, -1, k + 1);
+						const stratagus::item_class item_class = stratagus::string_to_item_class(item_class_ident);
+						variation->item_classes_not_equipped.insert(item_class);
 					} else if (!strcmp(value, "item-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
 						const stratagus::unit_type *type = stratagus::unit_type::get(type_ident);
@@ -1000,7 +994,7 @@ static int CclDefineUnitType(lua_State *l)
 				const int subargs = lua_rawlen(l, -1);
 				int image_layer = 0;
 				for (int k = 0; k < subargs; ++k) {
-					int item_slot = GetItemSlotIdByName(LuaToString(l, -1, k + 1));
+					const stratagus::item_slot item_slot = stratagus::string_to_item_slot(LuaToString(l, -1, k + 1));
 					++k;
 					stratagus::unit_type *default_equipment = stratagus::unit_type::get(LuaToString(l, -1, k + 1));
 					type->DefaultEquipment[item_slot] = default_equipment;
@@ -1800,7 +1794,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->StartingAbilities.push_back(CUpgrade::get(ability_ident));
 			}
 		} else if (!strcmp(value, "ItemClass")) {
-			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+			type->item_class = stratagus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->species = stratagus::species::get(LuaToString(l, -1));
 			type->species->Type = type;
@@ -1811,12 +1805,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int weapon_class_id = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (weapon_class_id != -1) {
-					type->WeaponClasses.push_back(weapon_class_id);
-				} else { // Error
-					LuaError(l, "incorrect weapon class");
-				}
+				type->WeaponClasses.push_back(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
 			}
 		} else if (!strcmp(value, "PersonalNames")) {
 			type->PersonalNames.clear();
@@ -2146,8 +2135,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Parent->Ident.c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		if (type->ItemClass != -1) {
-			lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		if (type->get_item_class() != stratagus::item_class::none) {
+			lua_pushstring(l, stratagus::item_class_to_string(type->get_item_class()).c_str());
 		} else if (type->get_unit_class() != nullptr) {
 			lua_pushstring(l, type->get_unit_class()->get_identifier().c_str());
 		} else {
@@ -2265,25 +2254,29 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemClass")) {
-		lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		if (type->get_item_class() != stratagus::item_class::none) {
+			lua_pushstring(l, stratagus::item_class_to_string(type->get_item_class()).c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlot")) {
-		const int item_slot = GetItemClassSlot(type->ItemClass);
-		if (item_slot != -1) {
-			lua_pushstring(l, GetItemSlotNameById(item_slot).c_str());
+		const stratagus::item_slot item_slot = stratagus::get_item_class_slot(type->get_item_class());
+		if (item_slot != stratagus::item_slot::none) {
+			lua_pushstring(l, stratagus::item_slot_to_string(item_slot).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlotId")) {
-		const int item_slot = GetItemClassSlot(type->ItemClass);
+		const int item_slot = static_cast<int>(stratagus::get_item_class_slot(type->get_item_class()));
 		lua_pushnumber(l, item_slot);
 		return 1;
 	} else if (!strcmp(data, "WeaponClasses")) {
 		lua_createtable(l, type->WeaponClasses.size(), 0);
 		for (size_t i = 1; i <= type->WeaponClasses.size(); ++i)
 		{
-			lua_pushstring(l, GetItemClassNameById(type->WeaponClasses[i-1]).c_str());
+			lua_pushstring(l, stratagus::item_class_to_string(type->WeaponClasses[i-1]).c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2608,9 +2601,9 @@ static int CclGetUnitTypeData(lua_State *l)
 				prefixes.push_back(type->Affixes[i]);
 			}
 		}
-		if (type->ItemClass != -1) {
+		if (type->get_item_class() != stratagus::item_class::none) {
 			for (CUpgrade *upgrade : CUpgrade::get_all()) {
-				if (upgrade->MagicPrefix && upgrade->ItemPrefix[type->ItemClass]) {
+				if (upgrade->MagicPrefix && upgrade->ItemPrefix[static_cast<int>(type->get_item_class())]) {
 					prefixes.push_back(upgrade);
 				}
 			}
@@ -2631,9 +2624,9 @@ static int CclGetUnitTypeData(lua_State *l)
 				suffixes.push_back(type->Affixes[i]);
 			}
 		}
-		if (type->ItemClass != -1) {
+		if (type->get_item_class() != stratagus::item_class::none) {
 			for (CUpgrade *upgrade : CUpgrade::get_all()) {
-				if (upgrade->MagicSuffix && upgrade->ItemSuffix[type->ItemClass]) {
+				if (upgrade->MagicSuffix && upgrade->ItemSuffix[static_cast<int>(type->get_item_class())]) {
 					suffixes.push_back(upgrade);
 				}
 			}
@@ -2648,9 +2641,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Works")) {
 		std::vector<CUpgrade *> works;
-		if (type->ItemClass != -1) {
+		if (type->get_item_class() != stratagus::item_class::none) {
 			for (CUpgrade *upgrade : CUpgrade::get_all()) {
-				if (upgrade->Work == type->ItemClass && !upgrade->UniqueOnly) {
+				if (upgrade->Work == type->get_item_class() && !upgrade->UniqueOnly) {
 					works.push_back(upgrade);
 				}
 			}

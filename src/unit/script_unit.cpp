@@ -45,6 +45,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -389,7 +390,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "equipped")) {
 			bool is_equipped = LuaToBoolean(l, 2, j + 1);
 			if (is_equipped && unit->Container != nullptr) {
-				unit->Container->EquippedItems[GetItemClassSlot(unit->Type->ItemClass)].push_back(unit);
+				unit->Container->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(unit->Type->get_item_class()))].push_back(unit);
 			}
 		} else if (!strcmp(value, "sold-unit")) {
 			bool is_sold = LuaToBoolean(l, 2, j + 1);

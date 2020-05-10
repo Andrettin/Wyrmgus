@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include <iomanip>
 
 #include "stratagus.h"
@@ -42,6 +38,7 @@
 #include "character.h"
 #include "construct.h"
 #include "iolib.h"
+#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -49,10 +46,6 @@
 #include "player.h"
 #include "spells.h"
 #include "unit/unit_type.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Generate a unit reference, a printable unique string for unit.

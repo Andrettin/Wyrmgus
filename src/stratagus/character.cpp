@@ -484,13 +484,13 @@ bool character::IsSiblingOf(const std::string &sibling_ident) const
 
 bool character::IsItemEquipped(const CPersistentItem *item) const
 {
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	const item_slot item_slot = get_item_class_slot(item->Type->get_item_class());
 	
-	if (item_slot == -1) {
+	if (item_slot == item_slot::none) {
 		return false;
 	}
 	
-	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
+	if (vector::contains(this->EquippedItems[static_cast<int>(item_slot)], item)) {
 		return true;
 	}
 	

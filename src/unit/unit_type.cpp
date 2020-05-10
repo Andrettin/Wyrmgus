@@ -48,6 +48,8 @@
 //Wyrmgus end
 #include "faction.h"
 #include "iolib.h"
+#include "item_class.h"
+#include "item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
@@ -514,7 +516,7 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	Slot(0), OffsetX(0), OffsetY(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	TrainQuantity(0), CostModifier(0), ItemClass(-1),
+	TrainQuantity(0), CostModifier(0), item_class(item_class::none),
 	Faction(-1), TerrainType(nullptr),
 	//Wyrmgus end
 	StillFrame(0),
@@ -798,24 +800,12 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->CorpseName = value;
 			this->CorpseType = nullptr;
 		} else if (key == "weapon_class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int weapon_class_id = GetItemClassIdByName(value);
-			if (weapon_class_id != -1) {
-				this->WeaponClasses.push_back(weapon_class_id);
-			} else {
-				fprintf(stderr, "Invalid weapon class: \"%s\".\n", value.c_str());
-			}
+			this->WeaponClasses.push_back(string_to_item_class(value));
 		} else if (key == "ai_drop") {
 			unit_type *drop_type = unit_type::get(value);
 			this->AiDrops.push_back(drop_type);
 		} else if (key == "item_class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int item_class_id = GetItemClassIdByName(value);
-			if (item_class_id != -1) {
-				this->ItemClass = item_class_id;
-			} else {
-				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
-			}
+			this->item_class = string_to_item_class(value);
 		} else if (key == "species") {
 			this->species = species::get(value);
 			this->species->Type = this;
@@ -976,10 +966,9 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				key = FindAndReplaceString(key, "_", "-");
 				
-				int item_slot = GetItemSlotIdByName(key);
-				if (item_slot == -1) {
+				const item_slot item_slot = string_to_item_slot(key);
+				if (item_slot == item_slot::none) {
 					fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.c_str());
 					continue;
 				}
@@ -1388,7 +1377,7 @@ void unit_type::SetParent(const unit_type *parent_type)
 	this->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
 	this->TrainQuantity = parent_type->TrainQuantity;
 	this->CostModifier = parent_type->CostModifier;
-	this->ItemClass = parent_type->ItemClass;
+	this->item_class = parent_type->item_class;
 	this->MaxOnBoard = parent_type->MaxOnBoard;
 	this->RepairRange = parent_type->RepairRange;
 	this->RepairHP = parent_type->RepairHP;
@@ -1535,12 +1524,8 @@ void unit_type::SetParent(const unit_type *parent_type)
 		variation->Construction = parent_variation->Construction;
 		variation->UpgradesRequired = parent_variation->UpgradesRequired;
 		variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
-		for (size_t i = 0; i < parent_variation->ItemClassesEquipped.size(); ++i) {
-			variation->ItemClassesEquipped.push_back(parent_variation->ItemClassesEquipped[i]);
-		}
-		for (size_t i = 0; i < parent_variation->ItemClassesNotEquipped.size(); ++i) {
-			variation->ItemClassesNotEquipped.push_back(parent_variation->ItemClassesNotEquipped[i]);
-		}
+		variation->item_classes_equipped = parent_variation->item_classes_equipped;
+		variation->item_classes_not_equipped = parent_variation->item_classes_not_equipped;
 		for (size_t i = 0; i < parent_variation->ItemsEquipped.size(); ++i) {
 			variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[i]);
 		}
@@ -1575,12 +1560,8 @@ void unit_type::SetParent(const unit_type *parent_type)
 			variation->File = parent_variation->File;
 			variation->UpgradesRequired = parent_variation->UpgradesRequired;
 			variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
-			for (size_t u = 0; u < parent_variation->ItemClassesEquipped.size(); ++u) {
-				variation->ItemClassesEquipped.push_back(parent_variation->ItemClassesEquipped[u]);
-			}
-			for (size_t u = 0; u < parent_variation->ItemClassesNotEquipped.size(); ++u) {
-				variation->ItemClassesNotEquipped.push_back(parent_variation->ItemClassesNotEquipped[u]);
-			}
+			variation->item_classes_equipped = parent_variation->item_classes_equipped;
+			variation->item_classes_not_equipped = parent_variation->item_classes_not_equipped;
 			for (size_t u = 0; u < parent_variation->ItemsEquipped.size(); ++u) {
 				variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[u]);
 			}
@@ -1597,9 +1578,7 @@ void unit_type::SetParent(const unit_type *parent_type)
 		this->ButtonIcons[iterator->first].Icon = nullptr;
 		this->ButtonIcons[iterator->first].Load();
 	}
-	for (std::map<int, unit_type *>::const_iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
-		this->DefaultEquipment[iterator->first] = iterator->second;
-	}
+	this->DefaultEquipment = parent_type->DefaultEquipment;
 	this->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
 	this->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
 }

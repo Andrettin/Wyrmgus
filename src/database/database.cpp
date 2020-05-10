@@ -41,6 +41,8 @@
 #include "dialogue.h"
 #include "faction.h"
 #include "gender.h"
+#include "item_class.h"
+#include "item_slot.h"
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
@@ -180,6 +182,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "stratagus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
+		} else if (property_class_name == "stratagus::item_class") {
+			new_property_value = QVariant::fromValue(string_to_item_class(property.get_value()));
+		} else if (property_class_name == "stratagus::item_slot") {
+			new_property_value = QVariant::fromValue(string_to_item_slot(property.get_value()));
 		} else if (property_class_name == "stratagus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "stratagus::missile_class") {

@@ -423,10 +423,8 @@ static int CclDefineSpell(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {
-			const int item_class = GetItemClassIdByName(LuaToString(l, i + 1));
-			if (item_class != -1) {
-				spell->ItemSpell[item_class] = true;
-			}
+			const int item_class = static_cast<int>(stratagus::string_to_item_class(LuaToString(l, i + 1)));
+			spell->ItemSpell[item_class] = true;
 		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

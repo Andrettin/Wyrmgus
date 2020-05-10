@@ -41,6 +41,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -253,7 +254,7 @@ enum {
 			goal
 			&& (
 				goal->Type->BoolFlag[POWERUP_INDEX].value
-				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && IsItemClassConsumable(goal->Type->ItemClass))
+				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && stratagus::is_consumable_item_class(goal->Type->get_item_class()))
 			)
 		) {
 			if (!unit.CriticalOrder) {

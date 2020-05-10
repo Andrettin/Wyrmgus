@@ -58,6 +58,7 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
+#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -433,7 +434,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->ItemClass != -1)) {
+	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->get_item_class() != stratagus::item_class::none)) {
 		return false;
 	}
 	
@@ -503,7 +504,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Encyclopedia && type && type->get_description().empty() && type->get_background().empty() && type->get_quote().empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == -1)) {
+	if (condition->Encyclopedia && type && type->get_description().empty() && type->get_background().empty() && type->get_quote().empty() && (!type->BoolFlag[ITEM_INDEX].value || type->get_item_class() == stratagus::item_class::none)) {
 		return false;
 	}
 	
@@ -671,7 +672,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Consumable != CONDITION_TRUE) {
-				if ((condition->Consumable == CONDITION_ONLY) ^ IsItemClassConsumable(unit.Type->ItemClass)) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ stratagus::is_consumable_item_class(unit.Type->get_item_class())) {
 					return false;
 				}
 			}
@@ -716,27 +717,27 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Weapon != CONDITION_TRUE) {
-				if ((condition->Weapon == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == WeaponItemSlot)) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::weapon)) {
 					return false;
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ShieldItemSlot)) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::shield)) {
 					return false;
 				}
 			}
 			if (condition->Boots != CONDITION_TRUE) {
-				if ((condition->Boots == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == BootsItemSlot)) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::boots)) {
 					return false;
 				}
 			}
 			if (condition->Arrows != CONDITION_TRUE) {
-				if ((condition->Arrows == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ArrowsItemSlot)) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::arrows)) {
 					return false;
 				}
 			}
-			if (condition->ItemClass != -1) {
-				if (condition->ItemClass != unit.Type->ItemClass) {
+			if (condition->item_class != stratagus::item_class::none) {
+				if (condition->item_class != unit.Type->get_item_class()) {
 					return false;
 				}
 			}

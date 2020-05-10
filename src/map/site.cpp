@@ -32,6 +32,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "faction.h"
+#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"

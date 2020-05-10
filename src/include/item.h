@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name item.h - The item headerfile. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,10 +27,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "ui/icon.h"
 
 class CConfigData;
@@ -43,62 +37,6 @@ namespace stratagus {
 	class character;
 	class unit_type;
 }
-
-/**
-**  Indexes into item class array.
-*/
-enum ItemSlots {
-	WeaponItemSlot,
-	ShieldItemSlot,
-	HelmetItemSlot,
-	ArmorItemSlot,
-	GlovesItemSlot,
-	BootsItemSlot,
-	BeltItemSlot,
-	AmuletItemSlot,
-	RingItemSlot,
-	ArrowsItemSlot,
-	
-	MaxItemSlots
-};
-
-/**
-**  Indexes into item class array.
-*/
-enum ItemClasses {
-	DaggerItemClass,
-	SwordItemClass,
-	ThrustingSwordItemClass,
-	AxeItemClass,
-	MaceItemClass,
-	SpearItemClass,
-	BowItemClass,
-	ThrowingAxeItemClass,
-	JavelinItemClass,
-	GunItemClass,
-
-	ShieldItemClass,
-	HornItemClass,
-
-	HelmetItemClass,
-	ArmorItemClass,
-	CloakItemClass,
-	GlovesItemClass,
-	BeltItemClass,
-	BootsItemClass,
-
-	AmuletItemClass,
-	RingItemClass,
-	
-	ArrowsItemClass,
-
-	FoodItemClass,
-	PotionItemClass,
-	ScrollItemClass,
-	BookItemClass,
-
-	MaxItemClasses
-};
 
 class CUniqueItem
 {
@@ -156,12 +94,6 @@ extern std::vector<CUniqueItem *> UniqueItems;
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern int GetItemSlotIdByName(const std::string &item_slot);
-extern std::string GetItemSlotNameById(int item_slot);
-extern int GetItemClassIdByName(const std::string &item_class);
-extern std::string GetItemClassNameById(int item_class);
-extern int GetItemClassSlot(int item_class);
-extern bool IsItemClassConsumable(int item_class);
 extern void CleanUniqueItems();
 extern CUniqueItem *GetUniqueItem(const std::string &item_ident);
 extern std::string GetItemEffectsString(const std::string &item_ident);
