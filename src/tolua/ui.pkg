@@ -54,18 +54,9 @@ class CViewport
 {
 };
 
-class CFiller
-{
-	CFiller();
-
-	CGraphic *G;
-	int X;
-	int Y;
-};
-
 class vector
 {
-	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, CUIUserButton, string)
+	TOLUA_TEMPLATE_BIND(T, CUIButton, CUIUserButton, string)
 
 	vector();
 	~vector();
@@ -158,8 +149,6 @@ class CUserInterface
 {
 	string NormalFontColor;
 	string ReverseFontColor;
-
-	vector<CFiller> Fillers;
 
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;

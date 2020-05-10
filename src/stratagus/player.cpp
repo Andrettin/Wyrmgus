@@ -384,11 +384,7 @@ void PlayerRace::Clean()
 		}
 	}
 	//Wyrmgus end
-	for (size_t i = 0; i != stratagus::civilization::get_all().size(); ++i) {
-		//Wyrmgus start
-		this->civilization_ui_fillers[i].clear();
-		//Wyrmgus end
-	}
+
 	//Wyrmgus start
 	for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
 		delete this->Dynasties[i];
@@ -434,40 +430,6 @@ CLanguage *PlayerRace::get_civilization_language(int civilization)
 	}
 	
 	return nullptr;
-}
-
-std::vector<CFiller> PlayerRace::get_civilization_ui_fillers(int civilization)
-{
-	if (civilization == -1) {
-		return std::vector<CFiller>();
-	}
-	
-	if (civilization_ui_fillers[civilization].size() > 0) {
-		return civilization_ui_fillers[civilization];
-	}
-	
-	if (stratagus::civilization::get_all()[civilization]->get_parent_civilization()) {
-		return get_civilization_ui_fillers(stratagus::civilization::get_all()[civilization]->get_parent_civilization()->ID);
-	}
-	
-	return std::vector<CFiller>();
-}
-
-std::vector<CFiller> PlayerRace::GetFactionUIFillers(int faction)
-{
-	if (faction == -1) {
-		return std::vector<CFiller>();
-	}
-	
-	if (stratagus::faction::get_all()[faction]->UIFillers.size() > 0) {
-		return stratagus::faction::get_all()[faction]->UIFillers;
-	}
-		
-	if (stratagus::faction::get_all()[faction]->ParentFaction != -1) {
-		return GetFactionUIFillers(stratagus::faction::get_all()[faction]->ParentFaction);
-	}
-	
-	return get_civilization_ui_fillers(stratagus::faction::get_all()[faction]->get_civilization()->ID);
 }
 
 /**

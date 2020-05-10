@@ -461,23 +461,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const stratagus::player_colo
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
+CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 {
-	if (filename.empty()) {
-		return new CGraphic();
+	if (filepath.empty()) {
+		throw std::runtime_error("CGraphic::New() called with an empty filepath.");
 	}
 
-	const std::string file = LibraryFileName(filename.c_str());
-	CGraphic *&g = GraphicHash[file];
+	const std::string library_filepath = LibraryFileName(filepath.c_str());
+	CGraphic *&g = GraphicHash[library_filepath];
 	if (g == nullptr) {
-		g = new CGraphic();
+		g = new CGraphic(library_filepath);
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
 		// FIXME: use a constructor for this
-		g->File = file;
-		g->HashFile = g->File;
+		g->HashFile = library_filepath;
 		g->Width = w;
 		g->Height = h;
 		g->original_frame_size = QSize(w, h);
@@ -498,23 +497,22 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, const int w, const int h)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const int w, const int h)
 {
-	if (filename.empty()) {
-		return new CPlayerColorGraphic();
+	if (filepath.empty()) {
+		throw std::runtime_error("CPlayerColorGraphic::New() called with an empty filepath.");
 	}
 
-	const std::string file = LibraryFileName(filename.c_str());
+	const std::string file = LibraryFileName(filepath.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == nullptr) {
-		g = new CPlayerColorGraphic();
+		g = new CPlayerColorGraphic(file);
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
 		// FIXME: use a constructor for this
-		g->File = file;
-		g->HashFile = g->File;
+		g->HashFile = file;
 		g->Width = w;
 		g->Height = h;
 		g->original_frame_size = QSize(w, h);
@@ -536,17 +534,16 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, const
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
+CGraphic *CGraphic::ForceNew(const std::filesystem::path &filepath, int w, int h)
 {
-	CGraphic *g = new CGraphic;
+	CGraphic *g = new CGraphic(filepath);
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = file;
-	int bufSize = file.size() + 32;
+	int bufSize = filepath.string().size() + 32;
 	char *hashfile = new char[bufSize];
-	snprintf(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
+	snprintf(hashfile, bufSize, "%s%d", filepath.string().c_str(), HashCount++);
 	g->HashFile = hashfile;
 	delete[] hashfile;
 	g->Width = w;
@@ -564,7 +561,7 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 */
 CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 {
-	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File, this->Resized ? 0 : this->Width, this->Resized ? 0 : this->Height);
+	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->get_filepath(), this->Resized ? 0 : this->Width, this->Resized ? 0 : this->Height);
 
 	if (this->IsLoaded()) {
 		g->Load(grayscale);
@@ -618,17 +615,16 @@ const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *p
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int w, int h)
+CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::filesystem::path &filepath, int w, int h)
 {
-	CPlayerColorGraphic *g = new CPlayerColorGraphic;
+	CPlayerColorGraphic *g = new CPlayerColorGraphic(filepath);
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = file;
-	size_t bufSize = file.size() + 32;
+	size_t bufSize = filepath.string().size() + 32;
 	char *hashfile = new char[bufSize];
-	snprintf(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
+	snprintf(hashfile, bufSize, "%s%d", filepath.string().c_str(), HashCount++);
 	g->HashFile = hashfile;
 	delete[] hashfile;
 	g->Width = w;
@@ -869,7 +865,7 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this, scale_factor) == -1) {
-		throw std::runtime_error("Can't load the graphic \"" + this->File + "\".");
+		throw std::runtime_error("Can't load the graphic \"" + this->get_filepath().string() + "\".");
 	}
 
 	if (this->custom_scale_factor != 1) {
@@ -892,7 +888,7 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", this->get_filepath().string().c_str());
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 				Width, Height, GraphicWidth, GraphicHeight);
 		ExitFatal(-1);
@@ -1396,13 +1392,32 @@ void FreeGraphics()
 	}
 }
 
-void CFiller::Load()
+CFiller &CFiller::operator =(const CFiller &other_filler)
 {
-	if (G) {
-		G->Load(false, stratagus::defines::get()->get_scale_factor());
+	if (other_filler.G == nullptr) {
+		throw std::runtime_error("Tried to create a copy of a UI filler which has no graphics.");
 	}
 
-	//Wyrmgus start
+	this->G = CGraphic::New(other_filler.G->get_filepath().string());
+	this->X = other_filler.X;
+	this->Y = other_filler.Y;
+
+	return *this;
+}
+
+CFiller::~CFiller()
+{
+	if (this->G != nullptr) {
+		CGraphic::Free(this->G);
+	}
+}
+
+void CFiller::Load()
+{
+	if (this->G != nullptr) {
+		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
+	}
+
 	this->X *= stratagus::defines::get()->get_scale_factor();
 	this->Y *= stratagus::defines::get()->get_scale_factor();
 
@@ -1413,7 +1428,8 @@ void CFiller::Load()
 	if (this->Y < 0) {
 		this->Y = Video.Height + this->Y;
 	}
-	//Wyrmgus end
+
+	this->loaded = true;
 }
 
 bool CFiller::OnGraphic(int x, int y) const

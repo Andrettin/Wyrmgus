@@ -68,7 +68,7 @@ static int CclDefineCharacter(lua_State *l)
 	bool redefinition = false;
 	if (!character) {
 		if (LoadingPersistentHeroes) {
-			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.", character_ident.c_str());
+			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.\n", character_ident.c_str());
 			return 0;
 		}
 		character = stratagus::character::get_or_add(character_ident, nullptr);

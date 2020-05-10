@@ -883,7 +883,7 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			
-			PlayerRaces.civilization_ui_fillers[civilization_id].clear();
+			civilization->ui_fillers.clear();
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
@@ -897,7 +897,7 @@ static int CclDefineCivilization(lua_State *l)
 				filler.X = LuaToNumber(l, -1, j + 1);
 				++j;
 				filler.Y = LuaToNumber(l, -1, j + 1);
-				PlayerRaces.civilization_ui_fillers[civilization_id].push_back(filler);
+				civilization->ui_fillers.push_back(std::move(filler));
 			}
 		} else if (!strcmp(value, "UnitSounds")) {
 			if (!lua_istable(l, -1)) {
@@ -1798,7 +1798,7 @@ static int CclDefineFaction(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			
-			faction->UIFillers.clear();
+			faction->ui_fillers.clear();
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
@@ -1812,7 +1812,7 @@ static int CclDefineFaction(lua_State *l)
 				filler.X = LuaToNumber(l, -1, j + 1);
 				++j;
 				filler.Y = LuaToNumber(l, -1, j + 1);
-				faction->UIFillers.push_back(filler);
+				faction->ui_fillers.push_back(std::move(filler));
 			}
 		} else if (!strcmp(value, "Conditions")) {
 			faction->Conditions = new LuaCallback(l, -1);

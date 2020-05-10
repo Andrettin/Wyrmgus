@@ -312,4 +312,17 @@ CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const
 	return this->get_civilization()->get_class_upgrade(upgrade_class);
 }
 
+const std::vector<CFiller> &faction::get_ui_fillers() const
+{
+	if (!this->ui_fillers.empty()) {
+		return this->ui_fillers;
+	}
+
+	if (this->ParentFaction != -1) {
+		return faction::get_all()[this->ParentFaction]->get_ui_fillers();
+	}
+
+	return this->get_civilization()->get_ui_fillers();
+}
+
 }

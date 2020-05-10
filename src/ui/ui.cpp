@@ -28,15 +28,13 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/ui.h"
 
+#include "civilization.h"
 #include "database/defines.h"
+#include "faction.h"
 #include "font.h"
 //Wyrmgus start
 #include "game.h"
@@ -246,30 +244,19 @@ void CursorConfig::Load()
 */
 void CUserInterface::Load()
 {
-	//Wyrmgus start
 	// set the correct UI
-	CleanUserInterfaceFillers();
-	std::vector<CFiller> new_ui_fillers;
+	this->Fillers.clear();
 	if (CPlayer::GetThisPlayer()) {
 		if (CPlayer::GetThisPlayer()->Faction != -1) {
-			new_ui_fillers = PlayerRaces.GetFactionUIFillers(CPlayer::GetThisPlayer()->Faction);
-		} else {
-			new_ui_fillers = PlayerRaces.get_civilization_ui_fillers(CPlayer::GetThisPlayer()->Race);
+			this->Fillers = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->get_ui_fillers();
+		} else if (CPlayer::GetThisPlayer()->Race != -1) {
+			this->Fillers = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_ui_fillers();
 		}
 	}
-	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {
-		CFiller filler = CFiller();
-		filler.G = CGraphic::New(new_ui_fillers[i].G->File);
-		filler.X = new_ui_fillers[i].X;
-		filler.Y = new_ui_fillers[i].Y;
-		UI.Fillers.push_back(filler);
-	}
-	//Wyrmgus end
 	
 	//  Load graphics
-	const int size = static_cast<int>(this->Fillers.size());
-	for (int i = 0; i < size; ++i) {
-		this->Fillers[i].Load();
+	for (size_t i = 0; i < this->Fillers.size(); ++i) {
+		this->Fillers.at(i).Load();
 	}
 
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
@@ -376,15 +363,7 @@ CUserInterface::~CUserInterface()
 void CleanUserInterface()
 {
 	// Filler
-	//Wyrmgus start
-	/*
-	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
-		CGraphic::Free(UI.Fillers[i].G);
-	}
 	UI.Fillers.clear();
-	*/
-	CleanUserInterfaceFillers();
-	//Wyrmgus end
 
 	// Resource Icons
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
@@ -451,16 +430,6 @@ void CleanUserInterface()
 		TitleScreens = nullptr;
 	}
 }
-
-//Wyrmgus start
-void CleanUserInterfaceFillers()
-{
-	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
-		CGraphic::Free(UI.Fillers[i].G);
-	}
-	UI.Fillers.clear();
-}
-//Wyrmgus end
 
 void FreeButtonStyles()
 {

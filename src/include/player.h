@@ -768,15 +768,12 @@ public:
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
 	CLanguage *get_civilization_language(int civilization);
-	std::vector<CFiller> get_civilization_ui_fillers(int civilization);
-	std::vector<CFiller> GetFactionUIFillers(int faction);
 	std::string TranslateName(const std::string &name, CLanguage *language);
 	//Wyrmgus end
 
 public:
 	//Wyrmgus start
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
-	std::vector<CFiller> civilization_ui_fillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties
 	//Wyrmgus end

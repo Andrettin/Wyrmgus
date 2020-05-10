@@ -68,67 +68,51 @@ class CGraphic : public gcn::Image
 	};
 
 public:
-	CGraphic() {}
+	CGraphic(const std::filesystem::path &filepath) : filepath(filepath)
+	{
+		if (filepath.empty()) {
+			throw std::runtime_error("Tried to create a CGraphic instance with an empty filepath.");
+		}
+	}
+
 	virtual ~CGraphic();
 
 	// Draw
 	void DrawClip(int x, int y) const;
-	//Wyrmgus start
-	/*
-	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-					  unsigned char alpha) const;
-	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-						  unsigned char alpha) const;
-	*/
 	void DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 					  unsigned char alpha, SDL_Surface *surface = nullptr) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 						  unsigned char alpha, SDL_Surface *surface = nullptr) const;
-	//Wyrmgus end
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
 #endif
-	//Wyrmgus start
-//	void DrawFrameClip(unsigned frame, int x, int y) const;
 	void DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
-	//Wyrmgus end
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-	//Wyrmgus start
-//	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
-	//Wyrmgus end
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClipX(const GLuint *textures, unsigned frame, int x, int y) const;
 #endif
-	//Wyrmgus start
-//	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameClipX(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
-	//Wyrmgus end
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
-	//Wyrmgus start
-//	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
-	//Wyrmgus end
 
 
-	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0);
+	static CGraphic *New(const std::string &filepath, const int w = 0, const int h = 0);
 
-	static CGraphic *New(const std::string &file, const QSize &size)
+	static CGraphic *New(const std::string &filepath, const QSize &size)
 	{
-		return CGraphic::New(file, size.width(), size.height());
+		return CGraphic::New(filepath, size.width(), size.height());
 	}
 
-	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	static CGraphic *ForceNew(const std::filesystem::path &filepath, int w = 0, int h = 0);
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
@@ -139,13 +123,26 @@ public:
 
 	inline bool IsLoaded() const { return !this->image.isNull(); }
 
+	const std::filesystem::path &get_filepath() const
+	{
+		return this->filepath;
+	}
+
+	void set_filepath(const std::filesystem::path &filepath)
+	{
+		if (filepath.empty()) {
+			throw std::runtime_error("Tried to set an empty filepath for a CGraphic instance.");
+		}
+
+		this->filepath = filepath;
+	}
+
 	//guichan
-	virtual int getWidth() const { return Width; }
-	virtual int getHeight() const { return Height; }
+	virtual int getWidth() const override { return Width; }
+	virtual int getHeight() const override { return Height; }
 	//Wyrmgus start
-	virtual std::string getFile() const { return File; }
-	virtual int getGraphicWidth() const { return GraphicWidth; }
-	virtual int getGraphicHeight() const { return GraphicHeight; }
+	int getGraphicWidth() const { return GraphicWidth; }
+	int getGraphicHeight() const { return GraphicHeight; }
 	//Wyrmgus end
 
 	QSize get_size() const
@@ -228,7 +225,9 @@ public:
 		return nullptr;
 	}
 
-	std::string File;          /// Filename
+private:
+	std::filesystem::path filepath;
+public:
 	std::string HashFile;      /// Filename used in hash
 private:
 	QImage image;
@@ -268,7 +267,7 @@ private:
 class CPlayerColorGraphic : public CGraphic
 {
 protected:
-	CPlayerColorGraphic()
+	CPlayerColorGraphic(const std::filesystem::path &filepath) : CGraphic(filepath)
 	{
 	}
 
@@ -282,14 +281,14 @@ public:
 	void DrawPlayerColorFrameClipTransX(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr);
 	void DrawPlayerColorFrameClipTrans(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 
-	static CPlayerColorGraphic *New(const std::string &file, const int w = 0, const int h = 0);
+	static CPlayerColorGraphic *New(const std::string &filepath, const int w = 0, const int h = 0);
 
-	static CPlayerColorGraphic *New(const std::string &file, const QSize &size)
+	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size)
 	{
-		return CPlayerColorGraphic::New(file, size.width(), size.height());
+		return CPlayerColorGraphic::New(filepath, size.width(), size.height());
 	}
 
-	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *ForceNew(const std::filesystem::path &filepath, int w = 0, int h = 0);
 	static CPlayerColorGraphic *Get(const std::string &file);
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;

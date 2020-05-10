@@ -236,6 +236,19 @@ public:
 		}
 	}
 
+	const std::vector<CFiller> &get_ui_fillers() const
+	{
+		if (!this->ui_fillers.empty()) {
+			return this->ui_fillers;
+		}
+
+		if (this->get_parent_civilization() != nullptr) {
+			return this->get_parent_civilization()->get_ui_fillers();
+		}
+
+		return this->ui_fillers;
+	}
+
 	const std::vector<character *> &get_characters() const
 	{
 		return this->characters;
@@ -284,6 +297,7 @@ private:
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
 	std::map<const unit_class *, unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
+	std::vector<CFiller> ui_fillers;
 	std::vector<character *> characters;
 public:
 	std::vector<CDeity *> Deities;

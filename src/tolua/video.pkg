@@ -27,11 +27,10 @@ public:
 	void Load(const bool grayscale = false, const int scale_factor = 1);
 	void Resize(int w, int h);
 	//Wyrmgus start
-	virtual std::string &getFile();
-	virtual int &getWidth();
-	virtual int &getHeight();
-	virtual int &getGraphicWidth();
-	virtual int &getGraphicHeight();
+	virtual int getWidth();
+	virtual int getHeight();
+	int getGraphicWidth();
+	int getGraphicHeight();
 	//Wyrmgus end
 };
 

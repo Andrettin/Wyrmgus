@@ -743,7 +743,7 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 */
 void CFont::MeasureWidths()
 {
-	const QImage image(G->File.c_str());
+	const QImage image(QString::fromStdString(this->G->get_filepath().string()));
 	const QSize &frame_size = G->get_original_frame_size();
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 
@@ -792,7 +792,7 @@ void CFont::MakeFontColorTextures() const
 
 	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
 		CFontColor *fc = it->second;
-		auto newg = std::make_unique<CGraphic>();
+		auto newg = std::make_unique<CGraphic>(g.get_filepath());
 
 		newg->Width = g.Width;
 		newg->Height = g.Height;

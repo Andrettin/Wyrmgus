@@ -219,12 +219,31 @@ public:
 class CFiller
 {
 public:
+	CFiller() {}
+
+	CFiller(const CFiller &filler)
+	{
+		*this = filler;
+	}
+
+	CFiller(CFiller &&filler) = default;
+	~CFiller();
+
+	CFiller &operator =(const CFiller &other_filler);
+
+	bool is_loaded() const
+	{
+		return this->loaded;
+	}
+
 	void Load();
 	bool OnGraphic(int x, int y) const;
 
 	CGraphic *G = nullptr;         /// Graphic
 	int X = 0;               /// X coordinate
 	int Y = 0;               /// Y coordinate
+private:
+	bool loaded = false;
 };
 
 class CButtonPanel
@@ -525,9 +544,6 @@ extern void InitUserInterface();
 extern void SaveUserInterface(CFile &file);
 /// Clean up the ui module
 extern void CleanUserInterface();
-//Wyrmgus start
-void CleanUserInterfaceFillers();
-//Wyrmgus end
 
 extern void FreeButtonStyles();
 

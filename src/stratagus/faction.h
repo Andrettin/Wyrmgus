@@ -160,6 +160,8 @@ public:
 		}
 	}
 
+	const std::vector<CFiller> &get_ui_fillers() const;
+
 	const std::vector<character *> &get_characters() const
 	{
 		return this->characters;
@@ -216,6 +218,7 @@ public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:
 	std::vector<std::string> ship_names;								/// Ship names for the faction
+	std::vector<CFiller> ui_fillers;
 public:
 	std::vector<site *> Cores; /// Core sites of this faction (required to found it)
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
@@ -236,8 +239,6 @@ public:
 	std::map<std::pair<CDate, faction *>, diplomacy_state> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
 	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
-	std::vector<CFiller> UIFillers;
-	
 	std::string Mod;							/// To which mod (or map), if any, this faction belongs
 
 	friend int ::CclDefineFaction(lua_State *l);

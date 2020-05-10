@@ -74,7 +74,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "ui_fillers") {
-		PlayerRaces.civilization_ui_fillers[this->ID].clear();
+		this->ui_fillers.clear();
 
 		scope.for_each_child([&](const sml_data &child_scope) {
 			CFiller filler = CFiller();
@@ -87,7 +87,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 			const QPoint pos = child_scope.get_child("pos").to_point();
 			filler.X = pos.x();
 			filler.Y = pos.y();
-			PlayerRaces.civilization_ui_fillers[this->ID].push_back(std::move(filler));
+			this->ui_fillers.push_back(std::move(filler));
 		});
 	} else if (tag == "force_type_weights") {
 		this->ForceTypeWeights.clear();
