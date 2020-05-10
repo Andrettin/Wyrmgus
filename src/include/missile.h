@@ -310,6 +310,7 @@ class missile_type final : public data_entry, public data_type<missile_type>, pu
 
 	Q_PROPERTY(stratagus::missile_class missile_class MEMBER missile_class READ get_missile_class)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
+	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(int frames MEMBER frames READ get_frames)
 	Q_PROPERTY(int num_directions MEMBER num_directions READ get_num_directions)
