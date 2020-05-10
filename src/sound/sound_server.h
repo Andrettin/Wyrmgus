@@ -30,17 +30,11 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "sound/sound.h"
+#include "util/qunique_ptr.h"
 
 #include <QAudioBuffer>
-
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
+#include <QAudioDecoder>
 
 static constexpr int MaxVolume = 255;
 static constexpr int SOUND_BUFFER_SIZE = 65536;
@@ -64,7 +58,6 @@ public:
 		sample::decoding_loop.reset();
 	}
 
-private:
 	static void decrement_decoding_loop_counter()
 	{
 		sample::decoding_loop_counter--;
@@ -73,11 +66,20 @@ private:
 		}
 	}
 
+	static void clear_decoders()
+	{
+		sample::decoders.clear();
+	}
+
+private:
 	static inline std::unique_ptr<QEventLoop> decoding_loop;
 	static inline int decoding_loop_counter = 0;
+	static inline std::vector<qunique_ptr<QAudioDecoder>> decoders;
 
 public:
-	sample(const std::filesystem::path &filepath);
+	explicit sample(const std::filesystem::path &filepath);
+
+	void decode(const std::filesystem::path &filepath);
 
 	virtual int Read(void *buf, int len) { return 0; }
 

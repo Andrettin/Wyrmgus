@@ -28,11 +28,6 @@
 //      02111-1307, USA.
 //
 
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "sound/sound_server.h"
@@ -57,12 +52,6 @@
 #ifdef USE_OAML
 #include <oaml.h>
 #endif
-
-#include <QAudioDecoder>
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 static bool SoundInitialized;    /// is sound initialized
 static bool MusicPlaying;        /// flag true if playing music
@@ -633,27 +622,34 @@ sample::sample(const std::filesystem::path &filepath)
 		throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
 	}
 
-	QAudioDecoder *decoder = new QAudioDecoder;
+	this->decode(filepath);
+}
+
+void sample::decode(const std::filesystem::path &filepath)
+{
+	auto decoder = make_qunique<QAudioDecoder>();
 	decoder->moveToThread(QApplication::instance()->thread());
 	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
 
-	sample::decoding_loop->connect(decoder, &QAudioDecoder::bufferReady, [this, decoder]() {
-		const QAudioBuffer buffer = decoder->read();
+	QAudioDecoder *decoder_ptr = decoder.get();
+
+	sample::decoding_loop->connect(decoder_ptr, &QAudioDecoder::bufferReady, [this, decoder_ptr]() {
+		const QAudioBuffer buffer = decoder_ptr->read();
 		this->read_audio_buffer(buffer);
 	});
 
-	sample::decoding_loop->connect(decoder, &QAudioDecoder::finished, [this, decoder]() {
-		this->format = decoder->audioFormat();
-		decoder->deleteLater();
+	sample::decoding_loop->connect(decoder_ptr, &QAudioDecoder::finished, [this, decoder_ptr]() {
+		this->format = decoder_ptr->audioFormat();
 		sample::decrement_decoding_loop_counter();
 	});
 
-	sample::decoding_loop->connect(decoder, qOverload<QAudioDecoder::Error>(&QAudioDecoder::error), [this, decoder]() {
-		throw std::runtime_error(decoder->errorString().toStdString());
+	sample::decoding_loop->connect(decoder_ptr, qOverload<QAudioDecoder::Error>(&QAudioDecoder::error), [this, decoder_ptr]() {
+		throw std::runtime_error(decoder_ptr->errorString().toStdString());
 	});
 
 	sample::decoding_loop_counter++;
 	decoder->start();
+	sample::decoders.push_back(std::move(decoder));
 }
 
 void sample::read_audio_buffer(const QAudioBuffer &buffer)

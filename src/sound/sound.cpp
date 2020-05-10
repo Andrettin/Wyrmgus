@@ -26,10 +26,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "sound/sound.h"
@@ -52,10 +48,6 @@
 #include "video.h"
 #include "widgets.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 /**
 **  Various sounds used in game.
 */
@@ -75,10 +67,6 @@ SelectionHandling SelectionHandler;
 
 static int ViewPointOffset;      /// Distance to Volume Mapping
 int DistanceSilent;              /// silent distance
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  "Randomly" choose a sample from a sound group.
@@ -746,6 +734,7 @@ void sound::initialize_all()
 	data_type::initialize_all();
 
 	sample::run_decoding_loop();
+	sample::clear_decoders();
 }
 
 sound::sound(const std::string &identifier) : data_entry(identifier)
