@@ -658,11 +658,12 @@ sample::sample(const std::filesystem::path &filepath)
 
 void sample::read_audio_buffer(const QAudioBuffer &buffer)
 {
-	unsigned char *new_buffer = new unsigned char[this->get_length() + buffer.byteCount()];
-	memcpy(new_buffer, this->get_buffer(), this->get_length());
-	delete[] this->buffer;
-	this->buffer = new_buffer;
-	memcpy(this->buffer + this->get_length(), buffer.constData(), buffer.byteCount());
+	if (buffer.byteCount() == 0) {
+		return;
+	}
+
+	this->buffer.resize(this->get_length() + buffer.byteCount());
+	std::copy_n(buffer.constData<unsigned char>(), buffer.byteCount(), this->buffer.data() + this->get_length());
 	this->length += buffer.byteCount();
 }
 

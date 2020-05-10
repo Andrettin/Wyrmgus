@@ -85,7 +85,7 @@ public:
 
 	const unsigned char *get_buffer() const
 	{
-		return this->buffer;
+		return this->buffer.data();
 	}
 
 	int get_length() const
@@ -99,7 +99,7 @@ public:
 	}
 
 private:
-	unsigned char *buffer = nullptr; //sample buffer
+	std::vector<unsigned char> buffer; //sample buffer
 	int length = 0; //length of the filled buffer
 	QAudioFormat format;
 };
