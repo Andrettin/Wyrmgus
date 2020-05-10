@@ -63,7 +63,7 @@ static std::string DefaultReverseColorIndex; /// Default reverse color index
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
-typedef std::map<const CFontColor *, CGraphic *> FontColorGraphicMap;
+using FontColorGraphicMap = std::map<const CFontColor *, std::unique_ptr<CGraphic>>;
 static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 
 // FIXME: remove these
@@ -428,14 +428,16 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 
 CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 {
-	CGraphic* fontColorG = FontColorGraphics[this][&fontColor];
-	if (!fontColorG) {
-#ifdef DEBUG
-		fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
-#endif
-		return this->G;
+	auto find_iterator = FontColorGraphics[this].find(&fontColor);
+
+	if (find_iterator != FontColorGraphics[this].end()) {
+		return find_iterator->second.get();
 	}
-	return fontColorG;
+
+#ifdef DEBUG
+	fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
+#endif
+	return this->G;
 }
 
 /**
@@ -790,7 +792,7 @@ void CFont::MakeFontColorTextures() const
 
 	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
 		CFontColor *fc = it->second;
-		CGraphic *newg = FontColorGraphics[this][fc] = new CGraphic;
+		auto newg = std::make_unique<CGraphic>();
 
 		newg->Width = g.Width;
 		newg->Height = g.Height;
@@ -812,7 +814,9 @@ void CFont::MakeFontColorTextures() const
 			image = stratagus::image::scale(image, scale_factor, g.get_original_frame_size());
 		}
 
-		MakeTexture(newg);
+		MakeTexture(newg.get());
+
+		FontColorGraphics[this][fc] = std::move(newg);
 	}
 }
 #endif
@@ -885,12 +889,6 @@ void CFont::Reload() const
 {
 	if (this->G) {
 		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[this];
-		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
-			 it != fontColorGraphicMap.end(); ++it) {
-			CGraphic *g = it->second;
-			delete[] g->textures;
-			delete g;
-		}
 		fontColorGraphicMap.clear();
 
 		this->MakeFontColorTextures();
@@ -1001,16 +999,7 @@ void CFont::Clean()
 	CFont *font = this;
 
 	FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
-	if (!fontColorGraphicMap.empty()) {
-		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
-			 it != fontColorGraphicMap.end(); ++it) {
-			CGraphic *g = it->second;
-			glDeleteTextures(g->NumTextures, g->textures);
-			delete[] g->textures;
-			delete g;
-		}
-		fontColorGraphicMap.clear();
-	}
+	fontColorGraphicMap.clear();
 }
 
 /**

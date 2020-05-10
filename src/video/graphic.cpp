@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "database/defines.h"
@@ -56,17 +52,23 @@
 #include "video.h"
 #include "xbrz.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 static int HashCount;
 static std::map<std::string, CGraphic *> GraphicHash;
 static std::list<CGraphic *> Graphics;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+CGraphic::~CGraphic()
+{
+	// No more uses of this graphic
+	if (this->textures != nullptr) {
+		glDeleteTextures(this->NumTextures, this->textures);
+		delete[] this->textures;
+	}
+
+	for (const auto &kv_pair : this->texture_color_modifications) {
+		glDeleteTextures(this->NumTextures, kv_pair.second);
+		delete[] kv_pair.second;
+	}
+}
 
 /**
 **  Video draw the graphic clipped.
@@ -102,6 +104,21 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	DrawTexture(this, this->textures, gx, gy, gx + w, gy + h, x, y, 0);
 #endif
+}
+
+CPlayerColorGraphic::~CPlayerColorGraphic()
+{
+	for (const auto &kv_pair : this->player_color_textures) {
+		glDeleteTextures(this->NumTextures, kv_pair.second);
+		delete[] kv_pair.second;
+	}
+
+	for (const auto &kv_pair : this->player_color_texture_color_modifications) {
+		for (const auto &sub_kv_pair : kv_pair.second) {
+			glDeleteTextures(this->NumTextures, sub_kv_pair.second);
+			delete[] sub_kv_pair.second;
+		}
+	}
 }
 
 void CPlayerColorGraphic::DrawPlayerColorSub(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
@@ -958,39 +975,13 @@ void CGraphic::Free(CGraphic *g)
 	Assert(g->Refs);
 
 	--g->Refs;
-	if (!g->Refs) {
-		// No more uses of this graphic
-		if (g->textures) {
-			glDeleteTextures(g->NumTextures, g->textures);
-			delete[] g->textures;
-		}
-		
-		for (const auto &kv_pair : g->texture_color_modifications) {
-			glDeleteTextures(g->NumTextures, kv_pair.second);
-			delete[] kv_pair.second;
-		}
-
-		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-		if (cg) {
-			for (const auto &kv_pair : cg->player_color_textures) {
-				glDeleteTextures(cg->NumTextures, kv_pair.second);
-				delete[] kv_pair.second;
-			}
-			
-			for (const auto &kv_pair : cg->player_color_texture_color_modifications) {
-				for (const auto &sub_kv_pair : kv_pair.second) {
-					glDeleteTextures(cg->NumTextures, sub_kv_pair.second);
-					delete[] sub_kv_pair.second;
-				}
-			}
-		}
+	if (g->Refs > 0) {
 		Graphics.remove(g);
-
-		g->frame_map.clear();
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
 		}
+
 		delete g;
 	}
 }
@@ -1099,8 +1090,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	int maxh = std::min<int>(image.height() - oh, GLMaxTextureSize);
 	int w = PowerOf2(maxw);
 	int h = PowerOf2(maxh);
-	unsigned char *tex = new unsigned char[w * h * 4];
-	memset(tex, 0, w * h * 4);
+	std::vector<unsigned char> tex(w * h * 4, 0);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1176,7 +1166,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	}
 #endif
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.data());
 
 #ifdef DEBUG
 	int x;
@@ -1184,7 +1174,6 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 		DebugPrint("glTexImage2D(%x)\n" _C_ x);
 	}
 #endif
-	delete[] tex;
 }
 
 static void MakeTextures(CGraphic *g, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)

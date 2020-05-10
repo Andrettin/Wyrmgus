@@ -62,17 +62,15 @@ extern bool GLShaderPipelineSupported;
 
 class CGraphic : public gcn::Image
 {
-
 	struct frame_pos_t {
 		short int x;
 		short int y;
 	};
 
-protected:
-	CGraphic() {}
-	~CGraphic() {}
-
 public:
+	CGraphic() {}
+	virtual ~CGraphic();
+
 	// Draw
 	void DrawClip(int x, int y) const;
 	//Wyrmgus start
@@ -273,6 +271,8 @@ protected:
 	CPlayerColorGraphic()
 	{
 	}
+
+	virtual ~CPlayerColorGraphic();
 
 public:
 	void DrawPlayerColorSub(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
