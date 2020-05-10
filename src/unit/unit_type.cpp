@@ -712,6 +712,98 @@ void unit_type::process_sml_property(const sml_property &property)
 	}
 }
 
+void unit_type::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "weapon_classes") {
+		for (const std::string &value : values) {
+			this->WeaponClasses.push_back(string_to_item_class(value));
+		}
+	} else if (tag == "ai_drops") {
+		for (const std::string &value : values) {
+			this->AiDrops.push_back(unit_type::get(value));
+		}
+	} else if (tag == "default_equipment") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const item_slot item_slot = string_to_item_slot(key);
+			unit_type *item = unit_type::get(value);
+			this->DefaultEquipment[item_slot] = item;
+		});
+	} else if (tag == "sounds") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			if (key == "selected") {
+				this->Sound.Selected.Name = value;
+			} else if (key == "acknowledge") {
+				this->Sound.Acknowledgement.Name = value;
+			} else if (key == "attack") {
+				this->Sound.Attack.Name = value;
+			} else if (key == "idle") {
+				this->Sound.Idle.Name = value;
+			} else if (key == "hit") {
+				this->Sound.Hit.Name = value;
+			} else if (key == "miss") {
+				this->Sound.Miss.Name = value;
+			} else if (key == "fire_missile") {
+				this->Sound.FireMissile.Name = value;
+			} else if (key == "step") {
+				this->Sound.Step.Name = value;
+			} else if (key == "step_dirt") {
+				this->Sound.StepDirt.Name = value;
+			} else if (key == "step_grass") {
+				this->Sound.StepGrass.Name = value;
+			} else if (key == "step_gravel") {
+				this->Sound.StepGravel.Name = value;
+			} else if (key == "step_mud") {
+				this->Sound.StepMud.Name = value;
+			} else if (key == "step_stone") {
+				this->Sound.StepStone.Name = value;
+			} else if (key == "used") {
+				this->Sound.Used.Name = value;
+			} else if (key == "build") {
+				this->Sound.Build.Name = value;
+			} else if (key == "ready") {
+				this->Sound.Ready.Name = value;
+			} else if (key == "repair") {
+				this->Sound.Repair.Name = value;
+			} else if (key.find("harvest_") != std::string::npos) {
+				std::string resource_identifier = key;
+				string::replace(resource_identifier, "harvest_", "");
+				const resource *resource = resource::get(resource_identifier);
+				this->Sound.Harvest[resource->ID].Name = value;
+			} else if (key == "help") {
+				this->Sound.Help.Name = value;
+			} else if (key == "dead") {
+				this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
+			} else if (key.find("dead_") != std::string::npos) {
+				std::string death_type_identifier = key;
+				string::replace(death_type_identifier, "dead_", "");
+				int death;
+				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+					if (death_type_identifier == ExtraDeathTypes[death]) {
+						this->Sound.Dead[death].Name = value;
+						break;
+					}
+				}
+				if (death == ANIMATIONS_DEATHTYPES) {
+					throw std::runtime_error("Invalid death type: \"" + death_type_identifier + "\".");
+				}
+			} else {
+				throw std::runtime_error("Invalid sound tag: \"" + key + "\".");
+			}
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void unit_type::ProcessConfigData(const CConfigData *config_data)
 {
 	this->RemoveButtons(ButtonCmd::Move);
@@ -981,7 +1073,6 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				value = FindAndReplaceString(value, "_", "-");
 				
 				if (key == "selected") {
 					this->Sound.Selected.Name = value;
