@@ -28,27 +28,15 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "database/data_entry.h"
 #include "database/data_type.h"
 #include "sound/unitsound.h"
 #include "stratagus.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CConfigData;
 class CUnit;
 class LuaActionListener;
 class Missile;
-
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
 
 static constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
 

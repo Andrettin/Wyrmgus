@@ -103,11 +103,11 @@
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest, z);
 			if (mis->Type->BlizzardSpeed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->BlizzardSpeed;
-			} else if (mis->Type->Speed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->Speed;
+				mis->Delay = i * mis->Type->get_sleep() * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->BlizzardSpeed;
+			} else if (mis->Type->get_speed()) {
+				mis->Delay = i * mis->Type->get_sleep() * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->get_speed();
 			} else {
-				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;
+				mis->Delay = i * mis->Type->get_sleep() * mis->Type->G->NumFrames;
 			}
 			mis->Damage = damage;
 			// FIXME: not correct -- blizzard should continue even if mage is

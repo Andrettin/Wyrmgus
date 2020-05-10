@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "missile.h"
@@ -45,6 +41,7 @@
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
+#include "missile/missile_class.h"
 #include "mod.h"
 #include "player.h"
 #include "script/trigger.h"
@@ -66,35 +63,6 @@
 #undef Wait
 #endif
 
-namespace stratagus {
-
-/**
-**  Missile class names, used to load/save the missiles.
-*/
-const char *missile_type::MissileClassNames[] = {
-	"missile-class-none",
-	"missile-class-point-to-point",
-	"missile-class-point-to-point-with-hit",
-	"missile-class-point-to-point-cycle-once",
-	"missile-class-point-to-point-bounce",
-	"missile-class-stay",
-	"missile-class-cycle-once",
-	"missile-class-fire",
-	"missile-class-hit",
-	"missile-class-parabolic",
-	"missile-class-land-mine",
-	"missile-class-whirlwind",
-	"missile-class-flame-shield",
-	"missile-class-death-coil",
-	"missile-class-tracer",
-	"missile-class-clip-to-target",
-	"missile-class-continious",
-	"missile-class-straight-fly",
-	nullptr
-};
-
-}
-
 unsigned int Missile::Count = 0;
 
 static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
@@ -112,33 +80,10 @@ void missile_type::ProcessConfigData(const CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "frames") {
-			this->SpriteFrames = std::stoi(value);
-		} else if (key == "flip") {
+		if (key == "flip") {
 			this->Flip = string::to_bool(value);
-		} else if (key == "num_directions") {
-			this->NumDirections = std::stoi(value);
 		} else if (key == "transparency") {
 			this->Transparency = std::stoi(value);
-		} else if (key == "fired_sound") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->FiredSound = value;
-		} else if (key == "impact_sound") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->ImpactSound = value;
-		} else if (key == "class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const char *class_name = value.c_str();
-			unsigned int i = 0;
-			for (; MissileClassNames[i]; ++i) {
-				if (!strcmp(class_name, MissileClassNames[i])) {
-					this->Class = i;
-					break;
-				}
-			}
-			if (!MissileClassNames[i]) {
-				fprintf(stderr, "Invalid missile class: \"%s\".\n", value.c_str());
-			}
 		} else if (key == "num_bounces") {
 			this->NumBounces = std::stoi(value);
 		} else if (key == "max_bounce_size") {
@@ -147,10 +92,6 @@ void missile_type::ProcessConfigData(const CConfigData *config_data)
 			this->ParabolCoefficient = std::stoi(value);
 		} else if (key == "delay") {
 			this->StartDelay = std::stoi(value);
-		} else if (key == "sleep") {
-			this->Sleep = std::stoi(value);
-		} else if (key == "speed") {
-			this->Speed = std::stoi(value);
 		} else if (key == "blizzard_speed") {
 			this->BlizzardSpeed = std::stoi(value);
 		} else if (key == "attack_speed") {
@@ -163,10 +104,6 @@ void missile_type::ProcessConfigData(const CConfigData *config_data)
 			this->SmokePrecision = std::stoi(value);
 		} else if (key == "missile_stop_flags") {
 			this->MissileStopFlags = std::stoi(value);
-		} else if (key == "draw_level") {
-			this->DrawLevel = std::stoi(value);
-		} else if (key == "range") {
-			this->Range = std::stoi(value);
 		} else if (key == "smoke_missile") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Smoke.Name = value;
@@ -196,50 +133,26 @@ void missile_type::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid missile type property: \"%s\".\n", key.c_str());
 		}
 	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "image") {
-			std::string file;
-				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					this->size.x = std::stoi(value);
-				} else if (key == "height") {
-					this->size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
-			
-			if (this->size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (this->size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CGraphic::New(file, this->Width(), this->Height());
-		} else {
-			fprintf(stderr, "Invalid missile type property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-	
+}
+
+void missile_type::initialize()
+{
 	if (!this->SmokePrecision) {
-		this->SmokePrecision = this->Speed;
+		this->SmokePrecision = this->get_speed();
 	}
+
+	if (!this->get_image_file().empty()) {
+		this->G = CGraphic::New(this->get_image_file().string(), this->get_frame_size());
+	}
+}
+
+void missile_type::set_image_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_image_file()) {
+		return;
+	}
+
+	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
 /**
@@ -248,11 +161,11 @@ void missile_type::ProcessConfigData(const CConfigData *config_data)
 void missile_type::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
-		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
+		this->G->Load(false, defines::get()->get_scale_factor());
 
 		// Correct the number of frames in graphic
-		Assert(this->G->NumFrames >= this->SpriteFrames);
-		this->G->NumFrames = this->SpriteFrames;
+		Assert(this->G->NumFrames >= this->get_frames());
+		this->G->NumFrames = this->get_frames();
 		// FIXME: Don't use NumFrames as number of frames.
 	}
 }
@@ -316,63 +229,63 @@ Missile *Missile::Init(const stratagus::missile_type &mtype, const PixelPos &sta
 {
 	Missile *missile = nullptr;
 
-	switch (mtype.Class) {
-		case MissileClassNone :
+	switch (mtype.get_missile_class()) {
+		case stratagus::missile_class::none:
 			missile = new MissileNone;
 			break;
-		case MissileClassPointToPoint :
+		case stratagus::missile_class::point_to_point:
 			missile = new MissilePointToPoint;
 			break;
-		case MissileClassPointToPointWithHit :
+		case stratagus::missile_class::point_to_point_with_hit:
 			missile = new MissilePointToPointWithHit;
 			break;
-		case MissileClassPointToPointCycleOnce :
+		case stratagus::missile_class::point_to_point_cycle_once:
 			missile = new MissilePointToPointCycleOnce;
 			break;
-		case MissileClassPointToPointBounce :
+		case stratagus::missile_class::point_to_point_bounce:
 			missile = new MissilePointToPointBounce;
 			break;
-		case MissileClassStay :
+		case stratagus::missile_class::stay:
 			missile = new MissileStay;
 			break;
-		case MissileClassCycleOnce :
+		case stratagus::missile_class::cycle_once:
 			missile = new MissileCycleOnce;
 			break;
-		case MissileClassFire :
+		case stratagus::missile_class::fire:
 			missile = new MissileFire;
 			break;
-		case MissileClassHit :
+		case stratagus::missile_class::hit:
 			missile = new ::MissileHit;
 			break;
-		case MissileClassParabolic :
+		case stratagus::missile_class::parabolic:
 			missile = new MissileParabolic;
 			break;
-		case MissileClassLandMine :
+		case stratagus::missile_class::land_mine:
 			missile = new MissileLandMine;
 			break;
-		case MissileClassWhirlwind :
+		case stratagus::missile_class::whirlwind:
 			missile = new MissileWhirlwind;
 			break;
-		case MissileClassFlameShield :
+		case stratagus::missile_class::flame_shield:
 			missile = new MissileFlameShield;
 			break;
-		case MissileClassDeathCoil :
+		case stratagus::missile_class::death_coil:
 			missile = new MissileDeathCoil;
 			break;
-		case MissileClassTracer :
+		case stratagus::missile_class::tracer:
 			missile = new MissileTracer;
 			break;
-		case MissileClassClipToTarget :
+		case stratagus::missile_class::clip_to_target:
 			missile = new MissileClipToTarget;
 			break;
-		case MissileClassContinious :
+		case stratagus::missile_class::continuous:
 			missile = new MissileContinious;
 			break;
-		case MissileClassStraightFly :
+		case stratagus::missile_class::straight_fly:
 			missile = new MissileStraightFly;
 			break;
 	}
-	const PixelPos halfSize = mtype.size / 2;
+	const PixelPos halfSize = mtype.get_frame_size() / 2;
 	missile->position = startPos - halfSize;
 	missile->destination = destPos - halfSize;
 	missile->source = missile->position;
@@ -380,14 +293,14 @@ Missile *Missile::Init(const stratagus::missile_type &mtype, const PixelPos &sta
 	missile->MapLayer = z;
 	//Wyrmgus end
 	missile->Type = &mtype;
-	missile->Wait = mtype.Sleep;
+	missile->Wait = mtype.get_sleep();
 	missile->Delay = mtype.StartDelay;
 	missile->TTL = mtype.TTL;
 	//Wyrmgus start
 	missile->AlwaysHits = mtype.AlwaysHits;
 	//Wyrmgus end
-	if (mtype.FiredSound.Sound) {
-		PlayMissileSound(*missile, mtype.FiredSound.Sound);
+	if (mtype.get_fired_sound() != nullptr) {
+		PlayMissileSound(*missile, mtype.get_fired_sound());
 	}
 
 	return missile;
@@ -818,10 +731,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	//Wyrmgus end
 	// Goal dead?
 	if (goal) {
-		//Wyrmgus start
-//		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
-		Assert(!unit.GetMissile().Missile->AlwaysFire || unit.GetMissile().Missile->Range);
-		//Wyrmgus end
+		Assert(!unit.GetMissile().Missile->AlwaysFire || unit.GetMissile().Missile->get_range());
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit\n");
 			return;
@@ -845,9 +755,8 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 
 	// No missile hits immediately!
 	if (
+		unit.GetMissile().Missile->get_missile_class() == stratagus::missile_class::none
 		//Wyrmgus start
-//		unit.Type->Missile.Missile->Class == MissileClassNone
-		unit.GetMissile().Missile->Class == MissileClassNone
 //		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 		|| (unit.GetAnimations() && unit.GetAnimations()->Attack && unit.GetAnimations()->RangedAttack && !unit.IsAttackRanged(goal, goalPos, z)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 		//Wyrmgus end
@@ -857,10 +766,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		//Wyrmgus end
 		// No goal, take target coordinates
 		if (!goal) {
-			//Wyrmgus start
-//			if (CMap::Map.WallOnMap(goalPos)) {
 			if (CMap::Map.WallOnMap(goalPos, z)) {
-			//Wyrmgus end
 				//Wyrmgus start
 //				if (CMap::Map.HumanWallOnMap(goalPos)) {
 				if (CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
@@ -984,7 +890,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 */
 static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
 {
-	PixelSize missileSize(missile.Type->Width(), missile.Type->Height());
+	PixelSize missileSize(missile.Type->get_frame_size());
 	PixelDiff margin(stratagus::defines::get()->get_tile_width() - 1, stratagus::defines::get()->get_tile_height() - 1);
 	boxMin = CMap::Map.map_pixel_pos_to_tile_pos(missile.position);
 	boxMax = CMap::Map.map_pixel_pos_to_tile_pos(missile.position + missileSize + margin);
@@ -1070,12 +976,12 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 			}
 		}
 	} else {
-		const int row = this->NumDirections / 2 + 1;
+		const int row = this->get_num_directions() / 2 + 1;
 
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * this->NumDirections + this->NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * this->get_num_directions() + this->get_num_directions() - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * this->NumDirections + frame % row;
+			frame = (frame / row) * this->get_num_directions() + frame % row;
 		}
 		if (this->Transparency > 0) {
 			//Wyrmgus start
@@ -1110,8 +1016,8 @@ void Missile::DrawMissile(const CViewport &vp) const
 	}
 	const PixelPos screenPixelPos = vp.map_to_screen_pixel_pos(this->position);
 
-	switch (this->Type->Class) {
-		case MissileClassHit:
+	switch (this->Type->get_missile_class()) {
+		case stratagus::missile_class::hit:
 			CLabel(GetGameFont()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
 			break;
 		default:
@@ -1124,10 +1030,10 @@ void Missile::DrawMissile(const CViewport &vp) const
 
 static bool MissileDrawLevelCompare(const Missile *const l, const Missile *const r)
 {
-	if (l->Type->DrawLevel == r->Type->DrawLevel) {
+	if (l->Type->get_draw_level() == r->Type->get_draw_level()) {
 		return l->Slot < r->Slot;
 	} else {
-		return l->Type->DrawLevel < r->Type->DrawLevel;
+		return l->Type->get_draw_level() < r->Type->get_draw_level();
 	}
 }
 
@@ -1179,17 +1085,17 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 */
 void Missile::MissileNewHeadingFromXY(const PixelPos &delta)
 {
-	if (this->Type->NumDirections == 1 || (delta.x == 0 && delta.y == 0)) {
+	if (this->Type->get_num_directions() == 1 || (delta.x == 0 && delta.y == 0)) {
 		return;
 	}
 
 	if (this->SpriteFrame < 0) {
 		this->SpriteFrame = -this->SpriteFrame - 1;
 	}
-	this->SpriteFrame /= this->Type->NumDirections / 2 + 1;
-	this->SpriteFrame *= this->Type->NumDirections / 2 + 1;
+	this->SpriteFrame /= this->Type->get_num_directions() / 2 + 1;
+	this->SpriteFrame *= this->Type->get_num_directions() / 2 + 1;
 
-	const int nextdir = 256 / this->Type->NumDirections;
+	const int nextdir = 256 / this->Type->get_num_directions();
 	Assert(nextdir != 0);
 	const int dir = ((DirectionToHeading(delta) + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
@@ -1224,7 +1130,7 @@ bool MissileInitMove(Missile &missile)
 		return false;
 	}
 	Assert(missile.TotalStep != 0);
-	missile.CurrentStep += missile.Type->Speed;
+	missile.CurrentStep += missile.Type->get_speed();
 	if (missile.CurrentStep >= missile.TotalStep) {
 		missile.CurrentStep = missile.TotalStep;
 		return true;
@@ -1266,17 +1172,14 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
 			shouldHit = true;
 		}
-		if (mtype.Range && mtype.CorrectSphashDamage) {
+		if (mtype.get_range() && mtype.CorrectSphashDamage) {
 			shouldHit = true;
 		}
 		if (shouldHit) {
 			// search for blocking units
 			std::vector<CUnit *> blockingUnits;
 			const Vec2i missilePos = CMap::Map.map_pixel_pos_to_tile_pos(position);
-			//Wyrmgus start
-//			Select(missilePos, missilePos, blockingUnits);
 			Select(missilePos, missilePos, blockingUnits, missile.MapLayer);
-			//Wyrmgus end
 			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
@@ -1347,15 +1250,15 @@ bool PointToPointMissile(Missile &missile)
 		 && pos.y * sign.y <= missile.position.y * sign.y;
 		 pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
 		 pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
-		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-								(int)pos.y + missile.Type->size.y / 2);
+		const PixelPos position((int)pos.x + missile.Type->get_frame_width() / 2,
+								(int)pos.y + missile.Type->get_frame_height() / 2);
 
 		if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
 			//Wyrmgus start
 //			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
 			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position, missile.MapLayer);
 			//Wyrmgus end
-			if (smoke && smoke->Type->NumDirections > 1) {
+			if (smoke && smoke->Type->get_num_directions() > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
 			}
 		}
@@ -1368,7 +1271,7 @@ bool PointToPointMissile(Missile &missile)
 		}
 
 		if (missile.Type->Pierce) {
-			const PixelPos posInt((int)pos.x + missile.Type->size.x / 2, (int)pos.y + missile.Type->size.y / 2);
+			const PixelPos posInt((int)pos.x + missile.Type->get_frame_width() / 2, (int)pos.y + missile.Type->get_frame_height() / 2);
 			MissileHandlePierce(missile, CMap::Map.map_pixel_pos_to_tile_pos(posInt));
 		}
 	}
@@ -1378,8 +1281,8 @@ bool PointToPointMissile(Missile &missile)
 		 && pos.y * sign.y <= missile.position.y * sign.y;
 		 pos.x += (double)diff.x / missile.TotalStep,
 		 pos.y += (double)diff.y / missile.TotalStep) {
-		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-								(int)pos.y + missile.Type->size.y / 2);
+		const PixelPos position((int)pos.x + missile.Type->get_frame_width() / 2,
+								(int)pos.y + missile.Type->get_frame_height() / 2);
 		const Vec2i tilePos(CMap::Map.map_pixel_pos_to_tile_pos(position));
 
 		if (CMap::Map.Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
@@ -1559,10 +1462,10 @@ void Missile::MissileHit(CUnit *unit)
 {
 	const stratagus::missile_type &mtype = *this->Type;
 
-	if (mtype.ImpactSound.Sound) {
-		PlayMissileSound(*this, mtype.ImpactSound.Sound);
+	if (mtype.get_impact_sound() != nullptr) {
+		PlayMissileSound(*this, mtype.get_impact_sound());
 	}
-	const PixelPos pixelPos = this->position + mtype.size / 2;
+	const PixelPos pixelPos = this->position + mtype.get_frame_size() / 2;
 
 	//
 	// The impact generates a new missile.
@@ -1613,12 +1516,12 @@ void Missile::MissileHit(CUnit *unit)
 			}
 		}
 		MissileHitsGoal(*this, *unit, 1);
-		if (mtype.Class == MissileClassPointToPointBounce && (unit->Type->get_tile_width() > mtype.MaxBounceSize || unit->Type->get_tile_height() > mtype.MaxBounceSize)) {
+		if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && (unit->Type->get_tile_width() > mtype.MaxBounceSize || unit->Type->get_tile_height() > mtype.MaxBounceSize)) {
 			this->TTL = 0;
 		}
 		return;
 	}
-	if (!mtype.Range) {
+	if (!mtype.get_range()) {
 		//Wyrmgus start
 //		if (this->TargetUnit && (mtype.FriendlyFire == false
 		if (this->TargetUnit && (mtype.FriendlyFire == true
@@ -1643,11 +1546,11 @@ void Missile::MissileHit(CUnit *unit)
 				return;
 			}
 			int splash = 1;
-			if (mtype.Class == MissileClassPointToPointBounce && this->State > 3) {
+			if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && this->State > 3) {
 				splash = mtype.SplashFactor;
 			}
 			MissileHitsGoal(*this, goal, splash);
-			if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
+			if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
 				this->TTL = 0;
 			}
 			return;
@@ -1660,7 +1563,7 @@ void Missile::MissileHit(CUnit *unit)
 		//
 		// Hits all units in range.
 		//
-		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
+		const Vec2i range(mtype.get_range() - 1, mtype.get_range() - 1);
 		std::vector<CUnit *> table;
 		//Wyrmgus start
 //		Select(pos - range, pos + range, table);
@@ -1726,12 +1629,12 @@ void Missile::MissileHit(CUnit *unit)
 						//Wyrmgus end
 					} else {
 						splash = 1;
-						if (mtype.Class == MissileClassPointToPointBounce && this->State > 3) {
+						if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && this->State > 3) {
 							splash = mtype.SplashFactor;
 						}
 					}
 					MissileHitsGoal(*this, goal, splash);
-					if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
+					if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
 						this->TTL = 0;
 					}
 				}
@@ -1740,10 +1643,10 @@ void Missile::MissileHit(CUnit *unit)
 	}
 
 	// Missile hits ground.
-	const Vec2i offset(mtype.Range, mtype.Range);
+	const Vec2i offset(mtype.get_range(), mtype.get_range());
 	const Vec2i posmin = pos - offset;
-	for (int i = mtype.Range * 2; --i;) {
-		for (int j = mtype.Range * 2; --j;) {
+	for (int i = mtype.get_range() * 2; --i;) {
+		for (int j = mtype.get_range() * 2; --j;) {
 			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
 			if (CMap::Map.Info.IsPointOnMap(posIt, this->MapLayer)) {
@@ -1770,7 +1673,7 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 {
 	int neg = 0; // True for mirroring sprite.
 	bool animationIsFinished = false;
-	int numDirections = this->Type->NumDirections / 2 + 1;
+	int numDirections = this->Type->get_num_directions() / 2 + 1;
 	if (this->SpriteFrame < 0) {
 		neg = 1;
 		this->SpriteFrame = -this->SpriteFrame - 1;
@@ -1781,7 +1684,7 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 		// Covered distance.
 		const int dx = Distance(this->position, this->source);
 		// Total number of frame (for one direction).
-		const int totalf = this->Type->SpriteFrames / numDirections;
+		const int totalf = this->Type->get_frames() / numDirections;
 		// Current frame (for one direction).
 		const int df = this->SpriteFrame / numDirections;
 
@@ -1792,13 +1695,13 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 	}
 	this->SpriteFrame += sign * numDirections;
 	if (sign > 0) {
-		if (this->SpriteFrame >= this->Type->SpriteFrames) {
-			this->SpriteFrame -= this->Type->SpriteFrames;
+		if (this->SpriteFrame >= this->Type->get_frames()) {
+			this->SpriteFrame -= this->Type->get_frames();
 			animationIsFinished = true;
 		}
 	} else {
 		if (this->SpriteFrame < 0) {
-			this->SpriteFrame += this->Type->SpriteFrames;
+			this->SpriteFrame += this->Type->get_frames();
 			animationIsFinished = true;
 		}
 	}
@@ -1822,7 +1725,7 @@ void Missile::NextMissileFrameCycle()
 	}
 	const int totalx = abs(this->destination.x - this->source.x);
 	const int dx = abs(this->position.x - this->source.x);
-	int f = this->Type->SpriteFrames / (this->Type->NumDirections / 2 + 1);
+	int f = this->Type->get_frames() / (this->Type->get_num_directions() / 2 + 1);
 	f = 2 * f - 1;
 	for (int i = 1, j = 1; i <= f; ++i) {
 		if (dx * f / i < totalx) {
@@ -1831,8 +1734,8 @@ void Missile::NextMissileFrameCycle()
 			} else {
 				j = f - i;
 			}
-			this->SpriteFrame = this->SpriteFrame % (this->Type->NumDirections / 2 + 1) +
-								j * (this->Type->NumDirections / 2 + 1);
+			this->SpriteFrame = this->SpriteFrame % (this->Type->get_num_directions() / 2 + 1) +
+								j * (this->Type->get_num_directions() / 2 + 1);
 			break;
 		}
 	}
@@ -1897,7 +1800,7 @@ void MissileActions()
 */
 int ViewPointDistanceToMissile(const Missile &missile)
 {
-	const PixelPos pixelPos = missile.position + missile.Type->size / 2;
+	const PixelPos pixelPos = missile.position + missile.Type->get_frame_size() / 2;
 	const Vec2i tilePos = CMap::Map.map_pixel_pos_to_tile_pos(pixelPos);
 
 	return ViewPointDistance(tilePos);
@@ -1992,9 +1895,7 @@ namespace stratagus {
 
 void missile_type::Init()
 {
-	// Resolve impact missiles and sounds.
-	this->FiredSound.MapSound();
-	this->ImpactSound.MapSound();
+	// Resolve impact missiles
 	for (std::vector<MissileConfig *>::iterator it = this->Impact.begin(); it != this->Impact.end(); ++it) {
 		MissileConfig &mc = **it;
 
@@ -2018,8 +1919,8 @@ void InitMissileTypes()
 namespace stratagus {
 
 missile_type::missile_type(const std::string &identifier) : data_entry(identifier), CDataType(identifier),
-	Transparency(0), DrawLevel(0),
-	SpriteFrames(0), NumDirections(1), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
+	Transparency(0),
+	ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	//Wyrmgus start
 //	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	CorrectSphashDamage(false), Flip(true), CanHitOwner(false), FriendlyFire(true),
@@ -2028,17 +1929,15 @@ missile_type::missile_type(const std::string &identifier) : data_entry(identifie
 	//Wyrmgus start
 	AlwaysHits(false),
 	//Wyrmgus end
-	Class(), NumBounces(0),	MaxBounceSize(0), ParabolCoefficient(2048), StartDelay(0),
+	missile_class(missile_class::none), NumBounces(0),	MaxBounceSize(0), ParabolCoefficient(2048), StartDelay(0),
 	//Wyrmgus start
-//	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
+//	BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
+	BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	//Wyrmgus end
-	MissileStopFlags(0), Damage(nullptr), Range(0), SplashFactor(100),
+	MissileStopFlags(0), Damage(nullptr), SplashFactor(100),
 	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
 	G(nullptr)
 {
-	size.x = 0;
-	size.y = 0;
 }
 
 missile_type::~missile_type()

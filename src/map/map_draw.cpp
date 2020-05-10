@@ -459,7 +459,7 @@ void CViewport::Draw() const
 		while ((i < nunits && j < nmissiles) || (i < nunits && k < nparticles)
 			   || (j < nmissiles && k < nparticles)) {
 			if (i == nunits) {
-				if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
+				if (missiletable[j]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
 					missiletable[j]->DrawMissile(*this);
 					++j;
 				} else {
@@ -475,7 +475,7 @@ void CViewport::Draw() const
 					++k;
 				}
 			} else if (k == nparticles) {
-				if (unittable[i]->Type->get_draw_level() < missiletable[j]->Type->DrawLevel) {
+				if (unittable[i]->Type->get_draw_level() < missiletable[j]->Type->get_draw_level()) {
 					unittable[i]->Draw(*this);
 					++i;
 				} else {
@@ -483,7 +483,7 @@ void CViewport::Draw() const
 					++j;
 				}
 			} else {
-				if (unittable[i]->Type->get_draw_level() <= missiletable[j]->Type->DrawLevel) {
+				if (unittable[i]->Type->get_draw_level() <= missiletable[j]->Type->get_draw_level()) {
 					if (unittable[i]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
 						unittable[i]->Draw(*this);
 						++i;
@@ -492,7 +492,7 @@ void CViewport::Draw() const
 						++k;
 					}
 				} else {
-					if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
+					if (missiletable[j]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
 						missiletable[j]->DrawMissile(*this);
 						++j;
 					} else {

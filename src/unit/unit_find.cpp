@@ -1125,10 +1125,7 @@ public:
 //	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
 	BestRangeTargetFinder(const CUnit &a, const int r, const bool i_n) : attacker(&a), range(r), include_neutral(i_n),
 	//Wyrmgus end
-		//Wyrmgus start
-//		best_unit(0), best_cost(INT_MIN), size((a.Type->Missile.Missile->Range + r) * 2)
-		best_unit(0), best_cost(INT_MIN), size((a.GetMissile().Missile->Range + r) * 2)
-		//Wyrmgus end
+		best_unit(0), best_cost(INT_MIN), size((a.GetMissile().Missile->get_range() + r) * 2)
 	{
 		good = new std::vector<int>(size * size, 0);
 		bad = new std::vector<int>(size * size, 0);
@@ -1369,10 +1366,7 @@ private:
 		}
 		const stratagus::unit_type &type = *attacker->Type;
 		const stratagus::unit_type &dtype = *dest->Type;
-		//Wyrmgus start
-//		const int missile_range = type.Missile.Missile->Range + range - 1;
-		const int missile_range = attacker->GetMissile().Missile->Range + range - 1;
-		//Wyrmgus end
+		const int missile_range = attacker->GetMissile().Missile->get_range() + range - 1;
 		int x = attacker->tilePos.x;
 		int y = attacker->tilePos.y;
 
@@ -1531,19 +1525,12 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 //Wyrmgus end
 {
 	// if necessary, take possible damage on allied units into account...
-	//Wyrmgus start
-//	if (unit.Type->Missile.Missile->Range > 1
-//		&& (range + unit.Type->Missile.Missile->Range < 15)) {
-	if (unit.GetMissile().Missile->Range > 1
-		&& (range + unit.GetMissile().Missile->Range < 15)) {
-	//Wyrmgus end
+	if (unit.GetMissile().Missile->get_range() > 1
+		&& (range + unit.GetMissile().Missile->get_range() < 15)) {
 		//  If catapult, count units near the target...
 		//   FIXME : make it configurable
 
-		//Wyrmgus start
-//		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
-		int missile_range = unit.GetMissile().Missile->Range + range - 1;
-		//Wyrmgus end
+		const int missile_range = unit.GetMissile().Missile->get_range() + range - 1;
 
 		Assert(2 * missile_range + 1 < 32);
 

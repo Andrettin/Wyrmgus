@@ -51,12 +51,12 @@ void MissileWhirlwind::Action()
 			this->SpriteFrame = 0;
 			PointToPointMissile(*this);
 		}
-		this->AnimWait = this->Type->Sleep;
+		this->AnimWait = this->Type->get_sleep();
 	}
 	this->Wait = 1;
 
 	// Center of the tornado
-	const PixelPos pixelCenter = this->position + this->Type->size / 2;
+	const PixelPos pixelCenter = this->position + this->Type->get_frame_size() / 2;
 	const PixelPos centerOffset(stratagus::defines::get()->get_tile_width() / 2, stratagus::defines::get()->get_tile_height());
 	const Vec2i center = CMap::Map.map_pixel_pos_to_tile_pos(pixelCenter + centerOffset);
 

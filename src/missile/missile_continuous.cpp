@@ -40,7 +40,7 @@
 */
 void MissileContinious::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	this->MissileHit();
 	if (this->NextMissileFrame(1, 0)) {
 		this->SpriteFrame = 0;

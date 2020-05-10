@@ -45,7 +45,7 @@ void MissileFire::Action()
 {
 	CUnit &unit = *this->SourceUnit;
 
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (unit.IsAlive() == false) {
 		this->TTL = 0;
 		return;
@@ -63,9 +63,9 @@ void MissileFire::Action()
 			unit.Burning = 0;
 		} else {
 			if (this->Type != fire) {
-				this->position += this->Type->size / 2;
+				this->position += PixelPos(this->Type->get_frame_size() / 2);
 				this->Type = fire;
-				this->position -= this->Type->size / 2;
+				this->position -= PixelPos(this->Type->get_frame_size() / 2);
 			}
 		}
 	}

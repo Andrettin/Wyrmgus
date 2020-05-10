@@ -70,14 +70,11 @@ static bool TracerMissile(Missile &missile)
 		 && pos.y * sign.y <= missile.position.y * sign.y;
 		 pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
 		 pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
-		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-								(int)pos.y + missile.Type->size.y / 2);
+		const PixelPos position((int)pos.x + missile.Type->get_frame_width() / 2,
+								(int)pos.y + missile.Type->get_frame_height() / 2);
 		if (missile.Type->Smoke.Missile && missile.CurrentStep) {
-			//Wyrmgus start
-//			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
 			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position, missile.MapLayer);
-			//Wyrmgus end
-			if (smoke && smoke->Type->NumDirections > 1) {
+			if (smoke && smoke->Type->get_num_directions() > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
 			}
 		}
@@ -100,8 +97,8 @@ static bool TracerMissile(Missile &missile)
 		 && pos.y * sign.y <= missile.position.y * sign.y;
 		 pos.x += (double)diff.x / missile.TotalStep,
 		 pos.y += (double)diff.y / missile.TotalStep) {
-		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-								(int)pos.y + missile.Type->size.y / 2);
+		const PixelPos position((int)pos.x + missile.Type->get_frame_width() / 2,
+								(int)pos.y + missile.Type->get_frame_height() / 2);
 		if (MissileHandleBlocking(missile, position)) {
 			return true;
 		}
@@ -119,7 +116,7 @@ static bool TracerMissile(Missile &missile)
 */
 void MissileTracer::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (TracerMissile(*this)) {
 		this->MissileHit();
 		this->TTL = 0;

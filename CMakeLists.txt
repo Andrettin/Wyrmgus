@@ -643,6 +643,10 @@ set(stratagus_map_HDRS
 	src/map/tileset.h
 )
 
+set(stratagus_missile_HDRS
+	src/missile/missile_class.h
+)
+
 set(stratagus_religion_HDRS
 	src/include/religion/deity.h
 	src/include/religion/deity_domain.h
@@ -835,6 +839,7 @@ source_group(animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
 source_group(guichan FILES ${stratagus_guichan_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
+source_group(missile FILES ${stratagus_missile_HDRS})
 source_group(religion FILES ${stratagus_religion_HDRS})
 source_group(script FILES ${stratagus_script_HDRS})
 source_group(script\\effect FILES ${stratagus_script_effect_HDRS})
@@ -855,6 +860,7 @@ set(stratagus_HDRS
 	${stratagus_database_HDRS}
 	${stratagus_guichan_HDRS}
 	${stratagus_map_HDRS}
+	${stratagus_missile_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_script_HDRS}
 	${stratagus_script_effect_HDRS}

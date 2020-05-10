@@ -27,16 +27,14 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "missile.h"
 
 #include "luacallback.h"
+#include "missile/missile_class.h"
 #include "script.h"
+#include "sound/sound.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
@@ -47,26 +45,27 @@ namespace stratagus {
 void missile_type::Load(lua_State *l)
 {
 	// Parse the arguments
-	std::string file;
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 
 		if (!strcmp(value, "File")) {
-			file = LuaToString(l, -1);
+			this->image_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			CclGetPos(l, &this->size.x, &this->size.y);
+			Vec2i size;
+			CclGetPos(l, &size.x, &size.y);
+			this->frame_size = size;
 		} else if (!strcmp(value, "Frames")) {
-			this->SpriteFrames = LuaToNumber(l, -1);
+			this->frames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Flip")) {
 			this->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NumDirections")) {
-			this->NumDirections = LuaToNumber(l, -1);
+			this->num_directions = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Transparency")) {
 			this->Transparency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "FiredSound")) {
-			this->FiredSound.Name = LuaToString(l, -1);
+			this->fired_sound = sound::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ImpactSound")) {
-			this->ImpactSound.Name = LuaToString(l, -1);
+			this->impact_sound = sound::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ChangeVariable")) {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
@@ -80,17 +79,8 @@ void missile_type::Load(lua_State *l)
 		} else if (!strcmp(value, "ChangeMax")) {
 			this->ChangeMax = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Class")) {
-			const char *className = LuaToString(l, -1);
-			unsigned int i = 0;
-			for (; MissileClassNames[i]; ++i) {
-				if (!strcmp(className, MissileClassNames[i])) {
-					this->Class = i;
-					break;
-				}
-			}
-			if (!MissileClassNames[i]) {
-				LuaError(l, "Unsupported class: %s" _C_ value);
-			}
+			const char *class_name = LuaToString(l, -1);
+			this->missile_class = string_to_missile_class(class_name);
 		} else if (!strcmp(value, "NumBounces")) {
 			this->NumBounces = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxBounceSize")) {
@@ -100,9 +90,9 @@ void missile_type::Load(lua_State *l)
 		} else if (!strcmp(value, "Delay")) {
 			this->StartDelay = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Sleep")) {
-			this->Sleep = LuaToNumber(l, -1);
+			this->sleep = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Speed")) {
-			this->Speed = LuaToNumber(l, -1);
+			this->speed = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BlizzardSpeed")) {
 			this->BlizzardSpeed = LuaToNumber(l, -1);
 		//Wyrmgus start
@@ -121,9 +111,9 @@ void missile_type::Load(lua_State *l)
 		} else if (!strcmp(value, "MissileStopFlags")) {
 			this->MissileStopFlags = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DrawLevel")) {
-			this->DrawLevel = LuaToNumber(l, -1);
+			this->draw_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Range")) {
-			this->Range = LuaToNumber(l, -1);
+			this->range = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ImpactMissile")) {
 			if (!lua_istable(l, -1)) {
 				MissileConfig *mc = new MissileConfig();
@@ -172,13 +162,6 @@ void missile_type::Load(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-	}
-
-	if (!this->SmokePrecision) {
-		this->SmokePrecision = this->Speed;
-	}
-	if (!file.empty()) {
-		this->G = CGraphic::New(file, this->Width(), this->Height());
 	}
 }
 

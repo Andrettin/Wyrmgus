@@ -40,7 +40,7 @@
 */
 void MissilePointToPoint::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (PointToPointMissile(*this)) {
 		this->MissileHit();
 		this->TTL = 0;

@@ -34,6 +34,7 @@
 
 #include "config.h"
 #include "map/map.h"
+#include "missile/missile_class.h"
 #include "missile.h"
 #include "script.h"
 #include "unit/unit.h"
@@ -274,7 +275,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	/*
 		hardcoded, will be done with Lua when it's possible
 	*/
-	if (this->Missile->Class == MissileClassDeathCoil) {
+	if (this->Missile->get_missile_class() == stratagus::missile_class::death_coil) {
 		const Vec2i offset(2, 2);
 		std::vector<CUnit *> table;
 		//Wyrmgus start
@@ -324,7 +325,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		//Wyrmgus start
 //		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 		stratagus::missile_type *mtype = this->Missile;
-		if (mtype->Class == MissileClassNone && this->UseUnitVar) {
+		if (mtype->get_missile_class() == stratagus::missile_class::none && this->UseUnitVar) {
 			mtype = caster.GetMissile().Missile;
 		}
 		::Missile *missile = MakeMissile(*mtype, startPos, endPos, z);

@@ -638,7 +638,10 @@ void unit_type::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "icon") {
+	if (key == "parent") {
+		const unit_type *parent_type = unit_type::get(value);
+		this->SetParent(parent_type);
+	} else if (key == "icon") {
 		this->Icon.Name = value;
 		this->Icon.Icon = nullptr;
 		this->Icon.Load();

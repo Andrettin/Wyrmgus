@@ -934,7 +934,6 @@ public:
 	std::map<ButtonCmd, IconConfig> ButtonIcons;			/// icons for button actions
 	std::map<int, unit_type *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
-
 private:
 	QSize frame_size = QSize(0, 0); //sprite frame size
 public:

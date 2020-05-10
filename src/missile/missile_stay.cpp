@@ -40,7 +40,7 @@
 */
 void MissileStay::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (this->NextMissileFrame(1, 0)) {
 		this->MissileHit();
 		this->TTL = 0;

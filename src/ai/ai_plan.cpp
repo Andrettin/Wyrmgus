@@ -209,10 +209,7 @@ int AiFindWall(AiForce *force)
 		CUnit *aiunit = force->Units[i];
 		if (aiunit->Type->UnitType == UnitTypeType::Land) {
 			unit = aiunit;
-			//Wyrmgus start
-//			if (aiunit->Type->Missile.Missile->Range == 1) {
-			if (aiunit->GetMissile().Missile->Range == 1) {
-			//Wyrmgus end
+			if (aiunit->GetMissile().Missile->get_range() == 1) {
 				break;
 			}
 		}

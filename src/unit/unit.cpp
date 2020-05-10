@@ -7092,7 +7092,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 
 	if ((target.IsVisibleOnMap(*CPlayer::GetThisPlayer()) || ReplayRevealMap) && !DamageMissile.empty()) {
 		const stratagus::missile_type *mtype = stratagus::missile_type::get(DamageMissile);
-		const PixelDiff offset(3, -mtype->Range);
+		const PixelDiff offset(3, -mtype->get_range());
 
 		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset, target.MapLayer->ID)->Damage = -damage;
 	}

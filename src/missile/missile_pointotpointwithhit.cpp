@@ -41,7 +41,7 @@
 */
 void MissilePointToPointWithHit::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (PointToPointMissile(*this)) {
 		if (this->NextMissileFrame(1, 0)) {
 			this->MissileHit();

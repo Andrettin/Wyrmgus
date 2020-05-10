@@ -47,7 +47,7 @@
 */
 void MissileDeathCoil::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (PointToPointMissile(*this) == false) {
 		return;
 	}

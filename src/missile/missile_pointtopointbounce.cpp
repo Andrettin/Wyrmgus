@@ -43,7 +43,7 @@
 */
 void MissilePointToPointBounce::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (PointToPointMissile(*this)) {
 		if (this->State < 2 * this->Type->NumBounces - 1 && this->TotalStep) {
 			const PixelPos step = (this->destination - this->source);

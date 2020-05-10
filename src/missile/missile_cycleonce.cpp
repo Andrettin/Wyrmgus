@@ -41,7 +41,7 @@
 */
 void MissileCycleOnce::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	switch (this->State) {
 		case 0:
 		case 2:

@@ -79,7 +79,7 @@
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
 		if (!target || target->Destroyed) {
-			Assert(!mtype->AlwaysFire || mtype->Range);
+			Assert(!mtype->AlwaysFire || mtype->get_range());
 			if (!target && mtype->AlwaysFire == false) {
 				return;
 			}

@@ -86,16 +86,16 @@
 **    Can't hit the units of the same player, that has the
 **    missile fired.
 **
-**  missile_type::Class
+**  missile_type::missile_class
 **
 **    Class of the missile-type, defines the basic effects of the
 **    missile. Look at the different class identifiers for more
-**    information (::MissileClassNone, ...).
+**    information (missile_class::none, ...).
 **
 **  missile_type::NumBounces
 **
 **    This is the number of bounces, and it is only valid with
-**    MissileClassBounce. The missile will hit this many times in
+**    missile_class::bounce. The missile will hit this many times in
 **    a row.
 **
 **  missile_type::StartDelay
@@ -122,7 +122,7 @@
 **    animation step.  The real use of this member depends on the
 **    missile_type::Class
 **    @note This is currently only used by the point-to-point
-**    missiles (::MissileClassPointToPoint, ...).  Perhaps we should
+**    missiles (missile_class::point_to_point, ...).  Perhaps we should
 **    later allow animation scripts for more complex animations.
 **
 **  missile_type::Range
@@ -192,7 +192,7 @@
 **    Missile destination on the map in pixels.  If
 **    Missile::X==Missile::DX and Missile::Y==Missile::DY the missile
 **    stays at its position.  But the movement also depends on
-**    missile_type::Class.
+**    missile_type::missile_class.
 **
 **  Missile::Type
 **
@@ -298,36 +298,26 @@ class LuaCallback;
 --  Missile-type
 ----------------------------------------------------------------------------*/
 
-/**
-**  Missile-class this defines how a missile-type reacts.
-*/
-enum {
-	MissileClassNone,                     /// Missile does nothing
-	MissileClassPointToPoint,             /// Missile flies from x,y to x1,y1
-	MissileClassPointToPointWithHit,      /// Missile flies from x,y to x1,y1 than shows hit animation.
-	MissileClassPointToPointCycleOnce,    /// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
-	MissileClassPointToPointBounce,       /// Missile flies from x,y to x1,y1 than bounces three times.
-	MissileClassStay,                     /// Missile appears at x,y, does it's anim and vanishes.
-	MissileClassCycleOnce,                /// Missile appears at x,y, then cycle through the frames once.
-	MissileClassFire,                     /// Missile doesn't move, than checks the source unit for HP.
-	MissileClassHit,                      /// Missile shows the hit points.
-	MissileClassParabolic,                /// Missile flies from x,y to x1,y1 using a parabolic path
-	MissileClassLandMine,                 /// Missile wait on x,y until a non-air unit comes by, the explodes.
-	MissileClassWhirlwind,                /// Missile appears at x,y, is whirlwind
-	MissileClassFlameShield,              /// Missile surround x,y
-	MissileClassDeathCoil,                /// Missile is death coil.
-	MissileClassTracer,                   /// Missile seeks towards to target unit
-	MissileClassClipToTarget,             /// Missile remains clipped to target's current goal and plays his animation once
-	MissileClassContinious,               /// Missile stays and plays it's animation several times
-	MissileClassStraightFly               /// Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
-};
-
 namespace stratagus {
 
+class sound;
+enum class missile_class;
+
 /// Base structure of missile-types
-class missile_type : public data_entry, public data_type<missile_type>, public CDataType
+class missile_type final : public data_entry, public data_type<missile_type>, public CDataType
 {
 	Q_OBJECT
+
+	Q_PROPERTY(stratagus::missile_class missile_class MEMBER missile_class READ get_missile_class)
+	Q_PROPERTY(QString image_file READ get_image_file_qstring)
+	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
+	Q_PROPERTY(int frames MEMBER frames READ get_frames)
+	Q_PROPERTY(int num_directions MEMBER num_directions READ get_num_directions)
+	Q_PROPERTY(int sleep MEMBER sleep READ get_sleep)
+	Q_PROPERTY(int speed MEMBER speed READ get_speed)
+	Q_PROPERTY(int range MEMBER range READ get_range)
+	Q_PROPERTY(stratagus::sound* fired_sound MEMBER fired_sound READ get_fired_sound)
+	Q_PROPERTY(stratagus::sound* impact_sound MEMBER impact_sound READ get_impact_sound)
 
 public:
 	static constexpr const char *class_identifier = "missile_type";
@@ -336,9 +326,8 @@ public:
 	explicit missile_type(const std::string &identifier);
 	~missile_type();
 
-	static const char *MissileClassNames[];
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void initialize() override;
 	
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
@@ -347,22 +336,100 @@ public:
 
 	void Load(lua_State *l);
 
-	int Width() const { return size.x; }
-	int Height() const { return size.y; }
+	missile_class get_missile_class() const
+	{
+		return this->missile_class;
+	}
 
-	//private:
+	const std::filesystem::path &get_image_file() const
+	{
+		return this->image_file;
+	}
+
+	void set_image_file(const std::filesystem::path &filepath);
+
+	QString get_image_file_qstring() const
+	{
+		return QString::fromStdString(this->get_image_file().string());
+	}
+
+	Q_INVOKABLE void set_image_file(const std::string &filepath)
+	{
+		this->set_image_file(std::filesystem::path(filepath));
+	}
+
+	const QSize &get_frame_size() const
+	{
+		return this->frame_size;
+	}
+
+	int get_frame_width() const
+	{
+		return this->get_frame_size().width();
+	}
+
+	int get_frame_height() const
+	{
+		return this->get_frame_size().height();
+	}
+
+	int get_draw_level() const
+	{
+		return this->draw_level;
+	}
+
+	int get_frames() const
+	{
+		return this->frames;
+	}
+
+	int get_num_directions() const
+	{
+		return this->num_directions;
+	}
+
+	int get_sleep() const
+	{
+		return this->sleep;
+	}
+
+	int get_speed() const
+	{
+		return this->speed;
+	}
+
+	int get_range() const
+	{
+		return this->range;
+	}
+
+	sound *get_fired_sound() const
+	{
+		return this->fired_sound;
+	}
+
+	sound *get_impact_sound() const
+	{
+		return this->impact_sound;
+	}
+
+private:
+	std::filesystem::path image_file;
+	QSize frame_size = QSize(0, 0); //the missile frame size in pixels
+public:
 	int Transparency;          /// missile transparency
-	PixelSize size;            /// missile size in pixels
-	int DrawLevel;             /// Level to draw missile at
-	int SpriteFrames;          /// number of sprite frames in graphic
-	int NumDirections;         /// number of directions missile can face
+private:
+	int draw_level = 0; //level to draw missile at
+	int frames = 0; //number of sprite frames in the graphic
+	int num_directions = 1; //number of directions missile can face
+public:
 	int ChangeVariable;        /// variable to change
 	int ChangeAmount;          /// how many to change
 	bool ChangeMax;            /// modify the max, if value will exceed it
-
-	SoundConfig FiredSound;    /// fired sound
-	SoundConfig ImpactSound;   /// impact sound for this missile-type
-
+private:
+	sound *fired_sound = nullptr; //fired sound
+	sound *impact_sound = nullptr; //impact sound for this missile-type
+public:
 	bool CorrectSphashDamage;  /// restricts the radius damage depending on land, air, naval
 	bool Flip;                 /// flip image when facing left
 	bool CanHitOwner;          /// missile can hit the owner
@@ -377,13 +444,17 @@ public:
 	bool AlwaysHits;		   /// missile never misses
 	//Wyrmgus end
 
-	int Class;                 /// missile class
+private:
+	missile_class missile_class; /// missile class
+public:
 	int NumBounces;            /// number of bounces
 	int MaxBounceSize;		   /// if the unit has a size greater than this, the missile won't bounce further
 	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
 	int StartDelay;            /// missile start delay
-	int Sleep;                 /// missile sleep
-	int Speed;                 /// missile speed
+private:
+	int sleep = 0; //missile sleep
+	int speed = 0; //missile speed
+public:
 	int BlizzardSpeed;         /// speed for blizzard shards
 	//Wyrmgus start
 	int AttackSpeed;		   /// attack speed; used by whirlwind missiles
@@ -394,7 +465,9 @@ public:
 	int MissileStopFlags;      /// On which terrain types missile won't fly
 	NumberDesc *Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
 
-	int Range;                             /// missile damage range
+private:
+	int range = 0; //missile damage range
+public:
 	int SplashFactor;                      /// missile splash divisor
 	std::vector <MissileConfig *> Impact;  /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile

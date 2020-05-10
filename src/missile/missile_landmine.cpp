@@ -78,7 +78,7 @@ void MissileLandMine::Action()
 	}
 	if (!this->AnimWait--) {
 		this->NextMissileFrame(1, 0);
-		this->AnimWait = this->Type->Sleep;
+		this->AnimWait = this->Type->get_sleep();
 	}
 	this->Wait = 1;
 }

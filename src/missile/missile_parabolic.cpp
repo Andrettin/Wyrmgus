@@ -80,20 +80,17 @@ static bool ParabolicMissile(Missile &missile)
 		 pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
 
 		if (missile.Type->Smoke.Missile && missile.CurrentStep) {
-			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-									(int)pos.y + missile.Type->size.y / 2);
-			//Wyrmgus start
-//			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			const PixelPos position((int)pos.x + missile.Type->get_frame_width() / 2,
+									(int)pos.y + missile.Type->get_frame_height() / 2);
 			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position, missile.MapLayer);
-			//Wyrmgus end
-			if (smoke && smoke->Type->NumDirections > 1) {
+			if (smoke && smoke->Type->get_num_directions() > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
 			}
 		}
 
 		if (missile.Type->SmokeParticle && missile.CurrentStep) {
-			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-									(int)pos.y + missile.Type->size.y / 2);
+			const PixelPos position((int)pos.x + missile.Type->get_frame_width() / 2,
+									(int)pos.y + missile.Type->get_frame_height() / 2);
 			missile.Type->SmokeParticle->pushPreamble();
 			missile.Type->SmokeParticle->pushInteger(position.x);
 			missile.Type->SmokeParticle->pushInteger(position.y);
@@ -118,7 +115,7 @@ static bool ParabolicMissile(Missile &missile)
 */
 void MissileParabolic::Action()
 {
-	this->Wait = this->Type->Sleep;
+	this->Wait = this->Type->get_sleep();
 	if (ParabolicMissile(*this)) {
 		this->MissileHit();
 		this->TTL = 0;
