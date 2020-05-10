@@ -629,6 +629,10 @@ namespace stratagus {
 
 sample::sample(const std::filesystem::path &filepath)
 {
+	if (!std::filesystem::exists(filepath)) {
+		throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
+	}
+
 	QAudioDecoder *decoder = new QAudioDecoder;
 	decoder->moveToThread(QApplication::instance()->thread());
 	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
