@@ -869,8 +869,7 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this, scale_factor) == -1) {
-		fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
-		ExitFatal(-1);
+		throw std::runtime_error("Can't load the graphic \"" + this->File + "\".");
 	}
 
 	if (this->custom_scale_factor != 1) {

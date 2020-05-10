@@ -38,6 +38,21 @@ enum class gender {
 	count
 };
 
+inline gender try_string_to_gender(const std::string &str)
+{
+	if (str == "none") {
+		return gender::none;
+	} else if (str == "male") {
+		return gender::male;
+	} else if (str == "female") {
+		return gender::female;
+	} else if (str == "asexual") {
+		return gender::asexual;
+	}
+
+	return gender::none;
+}
+
 inline gender string_to_gender(const std::string &str)
 {
 	if (str == "none") {

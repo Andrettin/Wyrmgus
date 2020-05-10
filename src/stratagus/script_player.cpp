@@ -939,10 +939,9 @@ static int CclDefineCivilization(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				stratagus::gender gender = stratagus::gender::none;
-				try {
-					gender = stratagus::string_to_gender(LuaToString(l, -1, j + 1));
+				gender = stratagus::try_string_to_gender(LuaToString(l, -1, j + 1));
+				if (gender != stratagus::gender::none) {
 					++j;
-				} catch (...) {
 				}
 				
 				civilization->add_personal_name(gender, LuaToString(l, -1, j + 1));
