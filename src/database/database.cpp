@@ -58,6 +58,8 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "time/timeline.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/icon.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -174,6 +176,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
 		} else if (property_class_name == "stratagus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
+		} else if (property_class_name == "stratagus::cursor*") {
+			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
+		} else if (property_class_name == "stratagus::cursor_type") {
+			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
 		} else if (property_class_name == "stratagus::dialogue*") {
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {

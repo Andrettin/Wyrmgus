@@ -47,6 +47,8 @@
 #include "title.h"
 #include "translate.h"
 #include "ui/contenttype.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit/unit.h"
@@ -162,23 +164,6 @@ CUserInterface::CUserInterface() :
 {
 	MouseWarpPos.x = MouseWarpPos.y = -1;
 
-	Point.Name = "cursor-point";
-	Glass.Name = "cursor-glass";
-	Cross.Name = "cursor-cross";
-	YellowHair.Name = "cursor-yellow-hair";
-	GreenHair.Name = "cursor-green-hair";
-	RedHair.Name = "cursor-red-hair";
-	Scroll.Name = "cursor-scroll";
-
-	ArrowE.Name = "cursor-arrow-e";
-	ArrowNE.Name = "cursor-arrow-ne";
-	ArrowN.Name = "cursor-arrow-n";
-	ArrowNW.Name = "cursor-arrow-nw";
-	ArrowW.Name = "cursor-arrow-w";
-	ArrowSW.Name = "cursor-arrow-sw";
-	ArrowS.Name = "cursor-arrow-s";
-	ArrowSE.Name = "cursor-arrow-se";
-
 	NormalFontColor = "light-blue";
 	ReverseFontColor = "yellow";
 }
@@ -227,33 +212,32 @@ void InitUserInterface()
 }
 
 /**
-**  Load Cursor.
-*/
-void CursorConfig::Load()
-{
-	Assert(!Name.empty());
-	Cursor = CursorByIdent(Name);
-	if (Cursor == nullptr) {
-		return ;
-	}
-	Assert(Name == Cursor->Ident);
-}
-
-/**
 **  Load the user interface graphics.
 */
 void CUserInterface::Load()
 {
 	// set the correct UI
 	this->Fillers.clear();
-	if (CPlayer::GetThisPlayer()) {
+
+	const stratagus::civilization *civilization = nullptr;
+	const stratagus::faction *faction = nullptr;
+
+	if (CPlayer::GetThisPlayer() != nullptr) {
 		if (CPlayer::GetThisPlayer()->Faction != -1) {
-			this->Fillers = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->get_ui_fillers();
-		} else if (CPlayer::GetThisPlayer()->Race != -1) {
-			this->Fillers = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_ui_fillers();
+			faction = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction];
+		}
+		
+		if (CPlayer::GetThisPlayer()->Race != -1) {
+			civilization = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race];
 		}
 	}
 	
+	if (faction != nullptr) {
+		this->Fillers = faction->get_ui_fillers();
+	} else if (civilization != nullptr) {
+		this->Fillers = civilization->get_ui_fillers();
+	}
+
 	//  Load graphics
 	for (size_t i = 0; i < this->Fillers.size(); ++i) {
 		this->Fillers.at(i).Load();
@@ -297,22 +281,20 @@ void CUserInterface::Load()
 	//Wyrmgus end
 	
 	//  Resolve cursors
-	Point.Load();
-	Glass.Load();
-	Cross.Load();
-	YellowHair.Load();
-	GreenHair.Load();
-	RedHair.Load();
-	Scroll.Load();
+	for (int i = 0; i < static_cast<int>(stratagus::cursor_type::count); ++i) {
+		auto cursor_type = static_cast<stratagus::cursor_type>(i);
+		stratagus::cursor *cursor = nullptr;
 
-	ArrowE.Load();
-	ArrowNE.Load();
-	ArrowN.Load();
-	ArrowNW.Load();
-	ArrowW.Load();
-	ArrowSW.Load();
-	ArrowS.Load();
-	ArrowSE.Load();
+		if (civilization != nullptr) {
+			cursor = civilization->get_cursor(cursor_type);
+		} else {
+			cursor = stratagus::cursor::get_cursor_by_type(cursor_type);
+		}
+
+		if (cursor != nullptr) {
+			this->cursors[cursor_type] = cursor;
+		}
+	}
 }
 
 

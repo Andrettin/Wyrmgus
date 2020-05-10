@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_built.h"
@@ -67,6 +63,7 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
+#include "ui/cursor.h"
 #include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
@@ -1135,18 +1132,18 @@ void DrawPopups()
 			ba->Value = i;
 			ba->ValueStr = DefaultResourceNames[i];
 			ba->Popup = "popup-resource";
-			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, false);
+			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
 			delete ba;
 			LastDrawnButtonPopup = nullptr;
 		}
 	}
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
-		DrawGenericPopup(_("Food"), UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Food"), UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	if (
@@ -1160,7 +1157,7 @@ void DrawPopups()
 	) {
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
 		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	if (
@@ -1172,7 +1169,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text

@@ -26,10 +26,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/cursor.h"
@@ -42,6 +38,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "translate.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -51,17 +48,6 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "video.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/**
-**  Define cursor-types.
-**
-**  @todo FIXME: Should this be move to ui part?
-*/
-static std::vector<CCursor *> AllCursors;
 
 CursorState CurrentCursorState;    /// current cursor state (point,...)
 ButtonCmd CursorAction;            /// action for selection
@@ -78,104 +64,69 @@ PixelPos CursorStartMapPos;/// position of starting point of selection rectangle
 stratagus::unit_type *CursorBuilding;           /// building cursor
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-CCursor *GameCursor;                 /// current shown cursor-type
+stratagus::cursor *GameCursor = nullptr;                 /// current shown cursor-type
 
 static SDL_Surface *HiddenSurface;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
+
+void cursor::clear()
+{
+	data_type::clear();
+
+	CursorBuilding = nullptr;
+	GameCursor = nullptr;
+	UnitUnderCursor = nullptr;
+}
+
+cursor::cursor(const std::string &identifier) : data_entry(identifier), type(cursor_type::point)
+{
+}
+
+
+cursor::~cursor()
+{
+	CGraphic::Free(this->graphic);
+}
+
+void cursor::initialize()
+{
+	this->graphic = CGraphic::New(this->get_file().string(), this->get_frame_size());
+	this->graphic->Load(false, stratagus::defines::get()->get_scale_factor());
+
+	if (this->get_civilization() != nullptr) {
+		this->get_civilization()->set_cursor(this->get_type(), this);
+	} else {
+		cursor::map_cursor(this->get_type(), this);
+	}
+
+	data_entry::initialize();
+}
+
+void cursor::set_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_file()) {
+		return;
+	}
+
+	this->file = database::get_graphics_path(this->get_module()) / filepath;
+}
+
+}
 
 /**
 **  Get the amount of cursors sprites to load
 */
-int GetCursorsCount(const std::string &race)
+int GetCursorsCount()
 {
 	int count = 0;
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor &cursor = **i;
-
-		//  Only load cursors of this race or universal cursors.
-		if (!cursor.Race.empty() && cursor.Race != race) {
-			continue;
-		}
-
-		if (cursor.G && !cursor.G->IsLoaded()) {
+	for (const stratagus::cursor *cursor : stratagus::cursor::get_all()) {
+		if (cursor->get_graphic() != nullptr && !cursor->get_graphic()->IsLoaded()) {
 			count++;
 		}
 	}
 
 	return count;
-}
-
-/**
-**  Load all cursor sprites.
-**
-**  @param race  Cursor graphics of this race to load.
-*/
-//Wyrmgus start
-//void LoadCursors(const std::string &race)
-void LoadCursors(const std::string civilization_name)
-//Wyrmgus end
-{
-	ShowLoadProgress("%s", _("Loading Cursors"));
-			
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor &cursor = **i;
-
-		//  Only load cursors of this race or universal cursors.
-		//Wyrmgus start
-//		if (!cursor.Race.empty() && cursor.Race != race) {
-		if (!civilization_name.empty() && !cursor.Race.empty() && cursor.Race != civilization_name) {
-		//Wyrmgus end
-			continue;
-		}
-
-		if (cursor.G && !cursor.G->IsLoaded()) {
-			UpdateLoadProgress();
-			cursor.G->Load(false, stratagus::defines::get()->get_scale_factor());
-
-			IncItemsLoaded();
-		}
-	}
-}
-
-/**
-**  Find the cursor of this identifier.
-**
-**  @param ident  Identifier for the cursor (from config files).
-**
-**  @return       Returns the matching cursor.
-**
-**  @note If we have more cursors, we should add hash to find them faster.
-*/
-CCursor *CursorByIdent(const std::string &ident)
-{
-	CCursor *found_cursor = nullptr;
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor &cursor = **i;
-
-		if (cursor.Ident != ident || !cursor.G->IsLoaded()) {
-			continue;
-		}
-
-		if (!CPlayer::GetThisPlayer() && cursor.Race != stratagus::civilization::get_all()[CPlayer::Players[0]->Race]->get_identifier() && !cursor.Race.empty()) {
-			continue;
-		}
-		
-		if (cursor.Race.empty() || !CPlayer::GetThisPlayer() || cursor.Race == stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier()) {
-			found_cursor = &cursor;
-			if (!cursor.Race.empty()) { //if this is a generic cursor, keep searching for a civilization-specific one; stop searching otherwise
-				break;
-			}
-		}
-	}
-	
-	if (!found_cursor) {
-		DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.c_str());
-	}
-	
-	return found_cursor;
 }
 
 /**
@@ -357,7 +308,6 @@ void DrawBuildingCursor()
 	PopClipping();
 }
 
-
 /**
 **  Draw the cursor.
 */
@@ -368,13 +318,6 @@ void DrawCursor()
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->scaled_map_to_screen_pixel_pos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
-	//Wyrmgus start
-	/*
-	} else if (CursorBuilding && CursorOn == cursor_on::map) {
-		// Selecting position for building
-		DrawBuildingCursor();
-	*/
-	//Wyrmgus end
 	}
 
 	//  Cursor may not exist if we are loading a game or something.
@@ -382,13 +325,13 @@ void DrawCursor()
 	if (GameCursor == nullptr) {
 		return;
 	}
-	const PixelPos pos = CursorScreenPos - GameCursor->HotPos * stratagus::defines::get()->get_scale_factor();
+	const PixelPos pos = CursorScreenPos - GameCursor->get_hot_pos() * stratagus::defines::get()->get_scale_factor();
 
 	//  Last, Normal cursor.
-	if (!GameCursor->G->IsLoaded()) {
-		GameCursor->G->Load();
+	if (!GameCursor->get_graphic()->IsLoaded()) {
+		GameCursor->get_graphic()->Load();
 	}
-	GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame, pos.x, pos.y);
+	GameCursor->get_graphic()->DrawFrameClip(GameCursor->get_current_frame(), pos.x, pos.y);
 }
 
 /**
@@ -400,132 +343,14 @@ void CursorAnimate(unsigned ticks)
 {
 	static unsigned last = 0;
 
-	if (!GameCursor || !GameCursor->FrameRate) {
+	if (!GameCursor || !GameCursor->get_frame_rate()) {
 		return;
 	}
-	if (ticks > last + GameCursor->FrameRate) {
-		last = ticks + GameCursor->FrameRate;
-		GameCursor->SpriteFrame++;
-		if ((GameCursor->SpriteFrame & 127) >= GameCursor->G->NumFrames) {
-			GameCursor->SpriteFrame = 0;
+	if (ticks > last + GameCursor->get_frame_rate()) {
+		last = ticks + GameCursor->get_frame_rate();
+		GameCursor->increment_current_frame();
+		if ((GameCursor->get_frame_rate() & 127) >= GameCursor->get_graphic()->NumFrames) {
+			GameCursor->reset_current_frame();
 		}
 	}
-}
-
-/**
-**  Setup the cursor part.
-*/
-void InitVideoCursors()
-{
-}
-
-/**
-**  Cleanup cursor module
-*/
-void CleanCursors()
-{
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CGraphic::Free((**i).G);
-		delete *i;
-	}
-	AllCursors.clear();
-
-	CursorBuilding = nullptr;
-	GameCursor = nullptr;
-	UnitUnderCursor = nullptr;
-}
-
-/**
-**  Define a cursor.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineCursor(lua_State *l)
-{
-	std::string name;
-	std::string race;
-	std::string file;
-	PixelPos hotpos(0, 0);
-	int w = 0;
-	int h = 0;
-	int rate = 0;
-
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_pushnil(l);
-	while (lua_next(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		if (!strcmp(value, "Name")) {
-			name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Race")) {
-			race = LuaToString(l, -1);
-		} else if (!strcmp(value, "File")) {
-			file = LuaToString(l, -1);
-		} else if (!strcmp(value, "HotSpot")) {
-			CclGetPos(l, &hotpos.x, &hotpos.y);
-		} else if (!strcmp(value, "Size")) {
-			CclGetPos(l, &w, &h);
-		} else if (!strcmp(value, "Rate")) {
-			rate = LuaToNumber(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-		lua_pop(l, 1);
-	}
-
-	Assert(!name.empty() && !file.empty() && w && h);
-
-	if (race == "any") {
-		race.clear();
-	}
-
-	//
-	//  Look if this kind of cursor already exists.
-	//
-	CCursor *ct = nullptr;
-	for (size_t i = 0; i < AllCursors.size(); ++i) {
-		//  Race not same, not found.
-		if (AllCursors[i]->Race != race) {
-			continue;
-		}
-		if (AllCursors[i]->Ident == name) {
-			ct = AllCursors[i];
-			break;
-		}
-	}
-
-	//
-	//  Not found, make a new slot.
-	//
-	if (!ct) {
-		ct = new CCursor();
-		AllCursors.push_back(ct);
-		ct->Ident = name;
-		ct->Race = race;
-	}
-	ct->G = CGraphic::New(file, w, h);
-	ct->HotPos = hotpos;
-	ct->FrameRate = rate;
-
-	return 0;
-}
-
-/**
-**  Set the current game cursor.
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameCursor(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	GameCursor = CursorByIdent(LuaToString(l, 1));
-	return 0;
-}
-
-void CursorCclRegister()
-{
-	lua_register(Lua, "DefineCursor", CclDefineCursor);
-	lua_register(Lua, "SetGameCursor", CclSetGameCursor);
 }

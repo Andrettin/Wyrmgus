@@ -197,6 +197,8 @@ extern void beos_init(int argc, char **argv);
 #include "time/timeline.h"
 #include "title.h"
 #include "translate.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_manager.h"
@@ -268,10 +270,6 @@ void PreMenuSetup()
 
 	LoadFonts();
 
-	InitVideoCursors();
-
-	LoadCursors();
-
 	InitSettings();
 
 	InitUserInterface();
@@ -295,7 +293,7 @@ static int MenuLoop()
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	CurrentCursorState = CursorState::Point;
-	GameCursor = UI.Point.Cursor;
+	GameCursor = nullptr;
 
 	// FIXME delete this when switching to full guichan GUI
 	const std::string filename = LibraryFileName("scripts/guichan.lua");

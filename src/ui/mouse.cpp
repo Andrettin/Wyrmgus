@@ -61,6 +61,7 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -1307,7 +1308,7 @@ void HandleMouseExit()
 	// FIXME: couldn't define a hour-glass that easily, so used pointer
 	CursorScreenPos.x = Video.Width / 2;
 	CursorScreenPos.y = Video.Height / 2;
-	GameCursor = UI.Point.Cursor;
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 }
 
 /**
@@ -1365,13 +1366,13 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	//  Move map.
-	if (GameCursor == UI.Scroll.Cursor) {
+	if (GameCursor == UI.get_cursor(stratagus::cursor_type::scroll)) {
 		MouseScrollMap(cursorPos);
 		return;
 	}
 
 	UnitUnderCursor = nullptr;
-	GameCursor = UI.Point.Cursor;  // Reset
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);  // Reset
 	HandleMouseOn(cursorPos);
 
 	//  Make the piemenu "follow" the mouse
@@ -1508,7 +1509,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				}
 			}
 			if (has_terrain_resource) {
-				GameCursor = UI.YellowHair.Cursor;
+				GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
 			}
 		}
 		//Wyrmgus end
@@ -1532,34 +1533,16 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//  Selecting target.
 	if (CurrentCursorState == CursorState::Select) {
 		if (CursorOn == cursor_on::map || CursorOn == cursor_on::minimap) {
-			if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
-				GameCursor = CursorByIdent(CustomCursor);
-			} else {
-				GameCursor = UI.YellowHair.Cursor;
-			}
+			GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
 			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (UnitUnderCursor->Player == CPlayer::GetThisPlayer() ||
 					CPlayer::GetThisPlayer()->IsAllied(*UnitUnderCursor)) {
-					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
-						GameCursor = CursorByIdent(CustomCursor);
-					} else {
-						//Wyrmgus start
-//						GameCursor = UI.YellowHair.Cursor;
-						GameCursor = UI.GreenHair.Cursor;
-						//Wyrmgus end
-					}
+					GameCursor = UI.get_cursor(stratagus::cursor_type::green_hair);
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
-					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
-						GameCursor = CursorByIdent(CustomCursor);
-					} else {
-						//Wyrmgus start
-//						GameCursor = UI.YellowHair.Cursor;
-						GameCursor = UI.RedHair.Cursor;
-						//Wyrmgus end
-					}
+					GameCursor = UI.get_cursor(stratagus::cursor_type::red_hair);
 				}
 			}
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
@@ -1583,7 +1566,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() && UnitUnderCursor->Player != CPlayer::GetThisPlayer()
 				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
-				GameCursor = UI.RedHair.Cursor;
+				GameCursor = UI.get_cursor(stratagus::cursor_type::red_hair);
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() &&
 				(
@@ -1591,9 +1574,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
 				)
 			) {
-				GameCursor = UI.YellowHair.Cursor;
+				GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
 			} else {
-				GameCursor = UI.Glass.Cursor;
+				GameCursor = UI.get_cursor(stratagus::cursor_type::magnifying_glass);
 			}
 			//Wyrmgus end
 		}
@@ -2247,7 +2230,7 @@ static void UISelectStateButtonDown(unsigned)
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentCursorState = CursorState::Point;
-		GameCursor = UI.Point.Cursor;
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 		CustomCursor.clear();
 		CurrentButtonLevel = nullptr;
 		UI.ButtonPanel.Update();
@@ -2276,7 +2259,7 @@ static void UISelectStateButtonDown(unsigned)
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
 			CurrentCursorState = CursorState::Point;
-			GameCursor = UI.Point.Cursor;
+			GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 			CustomCursor.clear();
 			CurrentButtonLevel = nullptr;
 			UI.ButtonPanel.Update();
@@ -2301,15 +2284,10 @@ static void UISelectStateButtonDown(unsigned)
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentCursorState = CursorState::Point;
-	if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
-		GameCursor = CursorByIdent(CustomCursor);
-	} else {
-		GameCursor = UI.YellowHair.Cursor;
-	}
+	GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
 	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 }
-
 
 static void UIHandleButtonDown_OnMap(unsigned button)
 {
@@ -2375,7 +2353,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 
 	if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
 		UnitUnderCursor = nullptr;
-		GameCursor = UI.Point.Cursor;  // Reset
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point);  // Reset
 		CursorStartScreenPos = CursorScreenPos;
 		if (!Selected.empty() && Selected[0]->Player == CPlayer::GetThisPlayer() && CurrentCursorState == CursorState::Point) {
 			CurrentCursorState = CursorState::PieMenu;
@@ -2407,11 +2385,11 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 	} else if (MouseButtons & LeftButton) { // enter select mode
 		CursorStartScreenPos = CursorScreenPos;
 		CursorStartMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
-		GameCursor = UI.Cross.Cursor;
+		GameCursor = UI.get_cursor(stratagus::cursor_type::cross);
 		CurrentCursorState = CursorState::Rectangle;
 	} else if (MouseButtons & MiddleButton) {// enter move map mode
 		CursorStartScreenPos = CursorScreenPos;
-		GameCursor = UI.Scroll.Cursor;
+		GameCursor = UI.get_cursor(stratagus::cursor_type::scroll);
 		//Wyrmgus start
 		UnitUnderCursor = nullptr;
 		//Wyrmgus end
@@ -2854,8 +2832,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	//  Move map.
 	//
-	if (GameCursor == UI.Scroll.Cursor) {
-		GameCursor = UI.Point.Cursor;
+	if (GameCursor == UI.get_cursor(stratagus::cursor_type::scroll)) {
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 		return;
 	}
 
@@ -3155,7 +3133,7 @@ void UIHandleButtonUp(unsigned button)
 
 		CursorStartScreenPos.x = 0;
 		CursorStartScreenPos.y = 0;
-		GameCursor = UI.Point.Cursor;
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 		CurrentCursorState = CursorState::Point;
 	}
 }

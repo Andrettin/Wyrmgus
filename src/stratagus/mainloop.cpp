@@ -72,6 +72,8 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -523,7 +525,7 @@ void GameMainLoop()
 	SetCallbacks(&GameCallbacks);
 
 	SetVideoSync();
-	GameCursor = UI.Point.Cursor;
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 	//Wyrmgus start
 	GameEstablishing = false;
 	//Wyrmgus end

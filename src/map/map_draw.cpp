@@ -42,6 +42,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "translate.h"
+#include "ui/cursor.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
@@ -391,7 +392,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	int height = font.Height() + 6;
 	CLabel label(font, "white", "red");
 	int x;
-	int y = std::min<int>(GameCursor->G->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
+	int y = std::min<int>(GameCursor->get_graphic()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = CPlayer::GetThisPlayer();
 
 	if (unit && unit->IsAliveOnMap()) {
@@ -409,7 +410,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 //		width = font.getWidth(unit->Type->Name) + 10;
 		width = font.getWidth(unit->GetTypeName()) + 10;
 		//Wyrmgus end
-		x = std::min<int>(GameCursor->G->Width + pos.x, vp.BottomRightPos.x - 1 - width);
+		x = std::min<int>(GameCursor->get_graphic()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		//Wyrmgus start
@@ -419,7 +420,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
 		width = font.getWidth(str) + 10;
-		x = std::min<int>(GameCursor->G->Width + pos.x, vp.BottomRightPos.x - 1 - width);
+		x = std::min<int>(GameCursor->get_graphic()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		label.DrawCentered(x + width / 2, y + 3, str);

@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "editor.h"
@@ -60,6 +56,8 @@
 #include "sound/sound_server.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -1557,9 +1555,9 @@ void EditorUpdateDisplay()
 */
 static void EditorCallbackButtonUp(unsigned button)
 {
-	if (GameCursor == UI.Scroll.Cursor) {
+	if (GameCursor == UI.get_cursor(stratagus::cursor_type::scroll)) {
 		// Move map.
-		GameCursor = UI.Point.Cursor; // Reset
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point); // Reset
 		return;
 	}
 
@@ -1778,7 +1776,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
 			CursorStartScreenPos = CursorScreenPos;
-			GameCursor = UI.Scroll.Cursor;
+			GameCursor = UI.get_cursor(stratagus::cursor_type::scroll);
 			//Wyrmgus start
 			UnitUnderCursor = nullptr;
 			//Wyrmgus end
@@ -2165,7 +2163,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	const PixelPos screenPos = pos;
 
 	// Move map.
-	if (GameCursor == UI.Scroll.Cursor) {
+	if (GameCursor == UI.get_cursor(stratagus::cursor_type::scroll)) {
 		Vec2i tilePos = UI.MouseViewport->MapPos;
 
 		// FIXME: Support with CTRL for faster scrolling.
@@ -2255,7 +2253,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	MouseScrollState = ScrollNone;
-	GameCursor = UI.Point.Cursor;
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 	CursorOn = cursor_on::unknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
@@ -2670,7 +2668,7 @@ void EditorMainLoop()
 
 		SetVideoSync();
 
-		GameCursor = UI.Point.Cursor;
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 		current_interface_state = interface_state::normal;
 		Editor.State = EditorSelecting;
 		UI.SelectedViewport = UI.Viewports;
@@ -2717,7 +2715,7 @@ void EditorMainLoop()
 		PreMenuSetup();
 
 		current_interface_state = interface_state::menu;
-		GameCursor = UI.Point.Cursor;
+		GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 
 		Video.ClearScreen();
 	}

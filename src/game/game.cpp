@@ -89,6 +89,7 @@
 #include "time/calendar.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -1364,7 +1365,7 @@ void CalculateItemsToLoad()
 	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		if (CPlayer::GetThisPlayer()) {
-			itemsToLoad+= GetCursorsCount(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier());
+			itemsToLoad+= GetCursorsCount();
 		}
 		itemsToLoad+= GetUnitTypesCount();
 		itemsToLoad+= GetDecorationsCount();
@@ -1620,10 +1621,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	SetPlayersPalette();
 
-	//Wyrmgus start
-//	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
-	LoadCursors();
-	//Wyrmgus end
 	UnitUnderCursor = NoUnitP;
 
 	//Wyrmgus start

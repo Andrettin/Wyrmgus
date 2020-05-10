@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cursor.h - The cursors header file. */
-//
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2020 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,115 +27,139 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**  @class CCursor cursor.h
-**
-**  \#include "cursor.h"
-**
-**  This structure contains all information about a cursor.
-**  The cursor changes depending of the current user input state.
-**  A cursor can have transparent areas and color cycle animated.
-**
-**  The cursor-type structure members:
-**
-**  CCursor::Ident
-**
-**    Unique identifier of the cursor, used to reference it in config
-**    files and during startup. Don't use this in game, use instead
-**    the pointer to this structure.
-**
-**  CCursor::Race
-**
-**    Owning Race of this cursor ("human", "orc", "alliance",
-**    "mythical", ...). If null, this cursor could be used by any
-**    race.
-**
-**  CCursor::HotPos
-**
-**    Hot spot of the cursor in pixels. Relative to the sprite origin
-**    (0,0). The hot spot of a cursor is the point to which Stratagus
-**    refers in tracking the cursor's position.
-**
-**  CCursor::SpriteFrame
-**
-**    Current displayed cursor frame.
-**    From 0 to CCursor::G::NumFrames.
-**
-**  CCursor::FrameRate
-**
-**    Rate of changing the frames. The "rate" tells the engine how
-**    many milliseconds to hold each frame of the animation.
-**
-**    @note  This is the first time that for timing ms are used! I would
-**           change it to display frames.
-**
-**  CCursor::G
-**
-**    Contains the sprite of the cursor, loaded from CCursor::File.
-**    This can be a multicolor image with alpha or transparency.
-*/
-
-/**
-**  @class CursorConfig cursor.h
-**
-**  \#include "cursor.h"
-**
-**  This structure contains all information to reference/use a cursor.
-**  It is normally used in other config structures.
-**
-**  CursorConfig::Name
-**
-**    Name to reference this cursor-type. Used while initialization.
-**    (See CCursor::Ident)
-**
-**  CursorConfig::Cursor
-**
-**    Pointer to this cursor-type. Used while runtime.
-*/
-
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include <vec2i.h>
 
 class CGraphic;
 enum class ButtonCmd;
 
 namespace stratagus {
-	class unit_type;
-}
+
+class civilization;
+class unit_type;
+enum class cursor_type;
 
 /// Private type which specifies the cursor-type
-class CCursor
+class cursor final : public data_entry, public data_type<cursor>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(stratagus::cursor_type type MEMBER type READ get_type)
+	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(QString file READ get_file_qstring)
+	Q_PROPERTY(QPoint hot_pos MEMBER hot_pos READ get_hot_pos)
+	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
+	Q_PROPERTY(int frame_rate MEMBER frame_rate READ get_frame_rate)
+
 public:
-	CCursor() : HotPos(0, 0) {}
+	static constexpr const char *class_identifier = "cursor";
+	static constexpr const char *database_folder = "cursors";
 
-	std::string Ident;  /// Identifier to reference it
-	std::string Race;   /// Race name
+	static void clear();
 
-	PixelPos HotPos;     /// Hot point
+	static cursor *get_cursor_by_type(const cursor_type type)
+	{
+		auto find_iterator = cursor::cursors_by_type.find(type);
+		if (find_iterator != cursor::cursors_by_type.end()) {
+			return find_iterator->second;
+		}
 
-	int SpriteFrame = 0;  /// Current displayed cursor frame
-	int FrameRate = 0;    /// Rate of changing the frames
+		return nullptr;
+	}
 
-	// --- FILLED UP ---
+	static void map_cursor(const cursor_type type, cursor *cursor)
+	{
+		if (cursor::cursors_by_type.contains(type)) {
+			throw std::runtime_error("Another cursor is already registered for type \"" + std::to_string(static_cast<int>(type)) + "\".");
+		}
 
-	CGraphic *G = nullptr; /// Cursor sprite image
+		cursor::cursors_by_type[type] = cursor;
+	}
+
+private:
+	static inline std::map<cursor_type, cursor *> cursors_by_type;
+
+public:
+	explicit cursor(const std::string &identifier);
+	~cursor();
+
+	virtual void initialize() override;
+
+	cursor_type get_type() const
+	{
+		return this->type;
+	}
+
+	civilization *get_civilization() const
+	{
+		return this->civilization;
+	}
+
+	const std::filesystem::path &get_file() const
+	{
+		return this->file;
+	}
+
+	void set_file(const std::filesystem::path &filepath);
+
+	QString get_file_qstring() const
+	{
+		return QString::fromStdString(this->get_file().string());
+	}
+
+	Q_INVOKABLE void set_file(const std::string &filepath)
+	{
+		this->set_file(std::filesystem::path(filepath));
+	}
+
+	CGraphic *get_graphic() const
+	{
+		return this->graphic;
+	}
+
+	const QPoint &get_hot_pos() const
+	{
+		return this->hot_pos;
+	}
+
+	const QSize &get_frame_size() const
+	{
+		return this->frame_size;
+	}
+
+	int get_current_frame() const
+	{
+		return this->current_frame;
+	}
+
+	void increment_current_frame()
+	{
+		this->current_frame++;
+	}
+
+	void reset_current_frame()
+	{
+		this->current_frame = 0;
+	}
+
+	int get_frame_rate() const
+	{
+		return this->frame_rate;
+	}
+
+private:
+	cursor_type type;
+	stratagus::civilization *civilization = nullptr;
+	std::filesystem::path file;
+	CGraphic *graphic = nullptr; /// Cursor sprite image
+	QPoint hot_pos = QPoint(0, 0);     /// Hot point
+	QSize frame_size = QSize(0, 0);
+	int current_frame = 0;  /// Current displayed cursor frame
+	int frame_rate = 0;    /// Rate of changing the frames
 };
 
-/// Cursor config reference
-class CursorConfig
-{
-public:
-	CursorConfig() : Cursor(nullptr) {}
-
-	void Load();
-
-	std::string Name; /// Config cursor-type name
-	CCursor *Cursor;  /// Cursor-type pointer
-};
+}
 
 /// Cursor state
 enum class CursorState {
@@ -147,36 +169,19 @@ enum class CursorState {
 	PieMenu     /// Displaying Pie Menu
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern CursorState CurrentCursorState;  /// current cursor state (point,...)
 extern ButtonCmd CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
 extern stratagus::unit_type *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button
 
-extern CCursor *GameCursor;     /// cursor-type
+extern stratagus::cursor *GameCursor;     /// cursor-type
 extern PixelPos CursorScreenPos; /// cursor position on screen
 extern PixelPos CursorStartScreenPos; /// rectangle started on screen
 extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /// Get amount of cursors to load
-extern int GetCursorsCount(const std::string &racename);
-
-/// Load all cursors
-//Wyrmgus start
-//extern void LoadCursors(const std::string &racename);
-extern void LoadCursors(const std::string civilization_name = "");
-//Wyrmgus end
-
-/// Cursor by identifier
-extern CCursor *CursorByIdent(const std::string &ident);
+extern int GetCursorsCount();
 
 /// Draw any cursor
 extern void DrawCursor();
@@ -187,9 +192,5 @@ extern void DrawBuildingCursor();
 /// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
 
-/// Initialize the cursor module
-extern void InitVideoCursors();
 /// Cleanup the cursor module
 extern void CleanCursors();
-
-extern void CursorCclRegister();

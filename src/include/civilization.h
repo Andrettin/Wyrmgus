@@ -165,6 +165,17 @@ public:
 		return this->develops_to;
 	}
 
+	cursor *get_cursor(const cursor_type type) const;
+
+	void set_cursor(const cursor_type type, cursor *cursor)
+	{
+		if (this->cursors.contains(type)) {
+			throw std::runtime_error("Another cursor is already registered for type \"" + std::to_string(static_cast<int>(type)) + "\".");
+		}
+
+		this->cursors[type] = cursor;
+	}
+
 	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 
@@ -281,6 +292,7 @@ private:
 	bool playable = true; //civilizations are playable by default
 	std::vector<civilization *> develops_from; //from which civilizations this civilization develops
 	std::vector<civilization *> develops_to; //to which civilizations this civilization develops
+	std::map<cursor_type, cursor *> cursors;
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade

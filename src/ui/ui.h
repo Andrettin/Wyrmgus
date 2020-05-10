@@ -36,14 +36,9 @@
 #include "map/minimap.h"
 #include "script.h"
 #include "viewport.h"
-#include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CContentType;
 class CFile;
@@ -53,9 +48,10 @@ class CPopup;
 class CUnit;
 class LuaActionListener;
 
-/*----------------------------------------------------------------------------
---  Definitions
-----------------------------------------------------------------------------*/
+namespace stratagus {
+	class cursor;
+	enum class cursor_type;
+}
 
 enum class TextAlignment {
 	Undefined,
@@ -235,7 +231,7 @@ public:
 	void Load();
 	bool OnGraphic(int x, int y) const;
 
-	CGraphic *G = nullptr;         /// Graphic
+	CGraphic *G = nullptr;   /// Graphic
 	int X = 0;               /// X coordinate
 	int Y = 0;               /// Y coordinate
 private:
@@ -270,7 +266,6 @@ private:
 	void DoClicked_CallbackAction(int button);
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_ExperienceUpgradeTo(int button);
-	void DoClicked_RallyPoint(int button);
 	void DoClicked_Faction(int button);
 	void DoClicked_Quest(int button);
 	void DoClicked_Buy(int button);
@@ -364,6 +359,17 @@ public:
 	~CUserInterface();
 
 	void Load();
+
+	stratagus::cursor *get_cursor(const stratagus::cursor_type cursor_type) const
+	{
+		auto find_iterator = this->cursors.find(cursor_type);
+
+		if (find_iterator != this->cursors.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No cursor found for type \"" + std::to_string(static_cast<int>(cursor_type)) + "\".");
+	}
 
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
@@ -479,22 +485,8 @@ public:
 	//
 	//  Cursors used.
 	//
-	CursorConfig Point;                 /// General pointing cursor
-	CursorConfig Glass;                 /// HourGlass, system is waiting
-	CursorConfig Cross;                 /// Multi-select cursor.
-	CursorConfig YellowHair;            /// Yellow action,attack cursor.
-	CursorConfig GreenHair;             /// Green action,attack cursor.
-	CursorConfig RedHair;               /// Red action,attack cursor.
-	CursorConfig Scroll;                /// Cursor for scrolling map around.
-
-	CursorConfig ArrowE;                /// Cursor pointing east
-	CursorConfig ArrowNE;               /// Cursor pointing north east
-	CursorConfig ArrowN;                /// Cursor pointing north
-	CursorConfig ArrowNW;               /// Cursor pointing north west
-	CursorConfig ArrowW;                /// Cursor pointing west
-	CursorConfig ArrowSW;               /// Cursor pointing south west
-	CursorConfig ArrowS;                /// Cursor pointing south
-	CursorConfig ArrowSE;               /// Cursor pointing south east
+private:
+	std::map<stratagus::cursor_type, stratagus::cursor *> cursors;
 
 	/// @todo could use different sounds/speech for the errors
 	/// Is in gamesounds?
@@ -502,6 +494,7 @@ public:
 	/// SoundConfig PlacementSuccess;       /// played on placements success
 	/// SoundConfig Click;                  /// click noice used often
 
+public:
 	CGraphic *VictoryBackgroundG;       /// Victory background graphic
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };

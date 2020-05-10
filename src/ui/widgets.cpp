@@ -38,6 +38,7 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/ui.h"
 #include "widgets.h"
 #include "network.h"
@@ -2773,7 +2774,7 @@ int MenuScreen::run(bool loop)
 	running = true;
 
 	CurrentCursorState = CursorState::Point;
-	GameCursor = UI.Point.Cursor;
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 	CursorOn = cursor_on::unknown;
 
 	CallbackMusicOn();

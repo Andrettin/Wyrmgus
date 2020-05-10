@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "achievement.h"
@@ -80,6 +76,7 @@
 #include "time/timeline.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/cursor.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -112,7 +109,6 @@ void CleanModules()
 	CleanMessages();
 
 	stratagus::database::get()->clear();
-	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();
 	FreeAi();
@@ -168,7 +164,6 @@ void InitModules()
 	SyncHash = 0;
 
 	CallbackMusicOn();
-	InitVideoCursors();
 	InitUserInterface();
 	InitPlayers();
 	InitMissileTypes();
@@ -197,10 +192,6 @@ void InitModules()
 void LoadModules()
 {
 	LoadFonts();
-	//Wyrmgus start
-//	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
-	LoadCursors();
-	//Wyrmgus end
 	UI.Load();
 	//Wyrmgus start
 	stratagus::terrain_type::LoadTerrainTypeGraphics();

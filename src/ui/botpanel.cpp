@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/ui.h"
@@ -75,6 +71,8 @@
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit/unit.h"
@@ -131,7 +129,7 @@ void InitButtons()
 int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 			  ButtonCmd action, const std::string &value, void* actionCb, const ButtonCheckFunc func,
 			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
-			  const std::string &sound, const std::string &cursor, const std::string &umask,
+			  const std::string &sound, const std::string &umask,
 			  //Wyrmgus start
 //			  const std::string &popup, bool alwaysShow)
 			  const std::string &popup, bool alwaysShow, const std::string &mod_file)
@@ -224,7 +222,6 @@ int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 			Exit(1);
 		}
 	}
-	ba->ButtonCursor = cursor;
 	ba->Popup = popup;
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
@@ -1900,12 +1897,7 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 {
 	// Select target.
 	CurrentCursorState = CursorState::Select;
-	if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
-		GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
-		CustomCursor = CurrentButtons[button].ButtonCursor;
-	} else {
-		GameCursor = UI.YellowHair.Cursor;
-	}
+	GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
 	CursorAction = CurrentButtons[button].Action;
 	CursorValue = CurrentButtons[button].Value;
 	CurrentButtonLevel = CButtonLevel::CancelButtonLevel; // the cancel-only button level
@@ -2038,7 +2030,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
-	GameCursor = UI.Point.Cursor;
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 }

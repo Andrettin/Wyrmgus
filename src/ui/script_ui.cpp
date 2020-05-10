@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/ui.h"
@@ -47,6 +43,8 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
@@ -55,10 +53,6 @@
 #include "unit/unit_type.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 std::string ClickMissile;		/// FIXME:docu
 std::string DamageMissile;		/// FIXME:docu
 std::map<std::string, ButtonStyle *> ButtonStyleHash;
@@ -66,10 +60,6 @@ std::map<std::string, ButtonStyle *> ButtonStyleHash;
 static int HandleCount = 1;		/// Lua handler count
 
 CPreference Preference;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Set speed of key scroll
@@ -1041,8 +1031,6 @@ static int CclDefineButton(lua_State *l)
 			ba.Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "CommentSound")) {
 			ba.CommentSound.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ButtonCursor")) {
-			ba.ButtonCursor = LuaToString(l, -1);
 		} else if (!strcmp(value, "Popup")) {
 			ba.Popup = LuaToString(l, -1);
 		} else if (!strcmp(value, "ForUnit")) {
@@ -1073,8 +1061,8 @@ static int CclDefineButton(lua_State *l)
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload,
 			  ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name,
 			  //Wyrmgus start
-//			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
-			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow, ba.Mod);
+//			  ba.UnitMask, ba.Popup, ba.AlwaysShow);
+			  ba.UnitMask, ba.Popup, ba.AlwaysShow, ba.Mod);
 			  //Wyrmgus end
 	return 0;
 }
@@ -1091,7 +1079,7 @@ void SelectionChanged()
 	LastDrawnButtonPopup = nullptr;
 
 	UI.ButtonPanel.Update();
-	GameCursor = UI.Point.Cursor;
+	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 	UI.ButtonPanel.Update();
@@ -1313,7 +1301,6 @@ static int CclGetIcons(lua_State *l)
 */
 void UserInterfaceCclRegister()
 {
-	CursorCclRegister();
 	lua_register(Lua, "AddMessage", CclAddMessage);
 	//Wyrmgus start
 	lua_register(Lua, "AddObjective", CclAddObjective);

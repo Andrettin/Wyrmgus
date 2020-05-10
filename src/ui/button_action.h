@@ -82,7 +82,6 @@ public:
 	std::string Hint;           /// tip texts
 	std::string Description;    /// description shown on status bar (optional)
 	SoundConfig CommentSound;   /// Sound comment used when you press the button
-	std::string ButtonCursor;   /// Custom cursor for button action (for example, to set spell target)
 	std::string Popup;          /// Popup screen used for button
 	std::string Mod;			/// Mod to which this button belongs to
 };
@@ -108,7 +107,7 @@ extern void CleanButtons();
 extern int AddButton(int pos, CButtonLevel *level, const std::string &IconIdent,
 					 ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
 					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
-					 const std::string &sound, const std::string &cursor, const std::string &umask,
+					 const std::string &sound, const std::string &umask,
 					 //Wyrmgus start
 //					 const std::string &popup, bool alwaysShow);
 					 const std::string &popup, bool alwaysShow, const std::string &mod_file);

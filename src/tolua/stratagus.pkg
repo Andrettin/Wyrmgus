@@ -29,6 +29,7 @@ $#include "script.h"
 //Wyrmgus end
 $#include "sound/sound.h"
 $#include "sound/sound_server.h"
+$#include "ui/cursor.h"
 $#include "ui/ui.h"
 $#include "unit/unit.h"
 $#include "unit/unit_manager.h"

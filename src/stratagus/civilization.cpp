@@ -32,6 +32,7 @@
 #include "player.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
+#include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
@@ -396,6 +397,20 @@ CCurrency *civilization::GetCurrency() const
 	}
 	
 	return nullptr;
+}
+
+cursor *civilization::get_cursor(const cursor_type type) const
+{
+	auto find_iterator = this->cursors.find(type);
+	if (find_iterator != this->cursors.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_parent_civilization() != nullptr) {
+		return this->get_parent_civilization()->get_cursor(type);
+	}
+
+	return cursor::get_cursor_by_type(type);
 }
 
 std::vector<CForceTemplate *> civilization::GetForceTemplates(const ForceType force_type) const
