@@ -115,7 +115,7 @@ void CGrandStrategyGame::DrawInterface()
 				CLabel(GetSmallFont()).Draw(x + 18, y + 1 + 2, resource_stored_string);
 			}
 			
-			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + UI.Resources[stored_resources[i]].G->getGraphicWidth()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + UI.Resources[stored_resources[i]].G->getGraphicHeight())) {
+			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + UI.Resources[stored_resources[i]].G->get_width()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + UI.Resources[stored_resources[i]].G->get_height())) {
 				if (stored_resources[i] == ResearchCost) {
 					hovered_research_icon.x = x;
 					hovered_research_icon.y = y;

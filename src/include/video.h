@@ -68,6 +68,13 @@ class CGraphic : public gcn::Image
 	};
 
 public:
+	static std::map<std::string, CGraphic *> graphics_by_filepath;
+	static std::list<CGraphic *> graphics;
+
+protected:
+	static inline std::shared_mutex mutex;
+
+public:
 	CGraphic(const std::filesystem::path &filepath) : filepath(filepath)
 	{
 		if (filepath.empty()) {
@@ -90,9 +97,7 @@ public:
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
-#endif
 	void DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
@@ -100,13 +105,10 @@ public:
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClipX(const GLuint *textures, unsigned frame, int x, int y) const;
-#endif
 	void DrawFrameClipX(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
-
 
 	static CGraphic *New(const std::string &filepath, const int w = 0, const int h = 0);
 
@@ -142,10 +144,6 @@ public:
 	//guichan
 	virtual int getWidth() const override { return Width; }
 	virtual int getHeight() const override { return Height; }
-	//Wyrmgus start
-	int getGraphicWidth() const { return GraphicWidth; }
-	int getGraphicHeight() const { return GraphicHeight; }
-	//Wyrmgus end
 
 	QSize get_size() const
 	{
@@ -251,23 +249,21 @@ public:
 	int GraphicWidth = 0;			/// Original graphic width
 	int GraphicHeight = 0;			/// Original graphic height
 	int Refs = 1;					/// Uses of this graphic
-	stratagus::time_of_day *TimeOfDay = nullptr;		/// Time of day for this graphic
-	bool Resized = false;				/// Image has been resized
+	bool Resized = false;			/// Image has been resized
 public:
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat TextureWidth = 0.f;      /// Width of the texture
 	GLfloat TextureHeight = 0.f;     /// Height of the texture
 	GLuint *textures = nullptr;          /// Texture names
 	GLuint *grayscale_textures = nullptr;
 	std::map<CColor, GLuint *> texture_color_modifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
-#endif
 private:
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool player_color = false;
 
 	friend class CFont;
 	friend int LoadGraphicPNG(CGraphic *g, const int scale_factor);
+	friend void FreeGraphics();
 };
 
 class CPlayerColorGraphic : public CGraphic
@@ -277,7 +273,7 @@ protected:
 	{
 	}
 
-	virtual ~CPlayerColorGraphic();
+	virtual ~CPlayerColorGraphic() override;
 
 public:
 	void DrawPlayerColorSub(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);

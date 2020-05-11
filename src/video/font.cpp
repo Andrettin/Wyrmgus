@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "font.h"
@@ -40,10 +36,6 @@
 #include "util/image_util.h"
 #include "util/util.h"
 #include "video.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 typedef std::map<std::string, CFont *> FontMap;
 static FontMap Fonts;  /// Font mappings
@@ -867,7 +859,11 @@ void CFont::FreeOpenGL()
 		for (FontColorGraphicMap::iterator it = FontColorGraphics[this].begin();
 			 it != FontColorGraphics[this].end(); ++it) {
 			CGraphic &g = *it->second;
-			glDeleteTextures(g.NumTextures, g.textures);
+			if (g.textures != nullptr) {
+				glDeleteTextures(g.NumTextures, g.textures);
+				delete[] g.textures;
+				g.textures = nullptr;
+			}
 		}
 	}
 }

@@ -52,16 +52,19 @@
 #include "video.h"
 #include "xbrz.h"
 
-static int HashCount;
-static std::map<std::string, CGraphic *> GraphicHash;
-static std::list<CGraphic *> Graphics;
+std::map<std::string, CGraphic *> CGraphic::graphics_by_filepath;
+std::list<CGraphic *> CGraphic::graphics;
 
 CGraphic::~CGraphic()
 {
-	// No more uses of this graphic
 	if (this->textures != nullptr) {
 		glDeleteTextures(this->NumTextures, this->textures);
 		delete[] this->textures;
+	}
+
+	if (this->grayscale_textures != nullptr) {
+		glDeleteTextures(this->NumTextures, this->grayscale_textures);
+		delete[] this->grayscale_textures;
 	}
 
 	for (const auto &kv_pair : this->texture_color_modifications) {
@@ -400,9 +403,6 @@ void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
 void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	//Wyrmgus start
-	//DoDrawFrameClipX(Textures, frame, x, y);
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		DoDrawFrameClipX(this->textures, frame, x, y);
 	} else {
@@ -411,8 +411,6 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const stratagus::tim
 		}
 		DoDrawFrameClipX(this->get_textures(time_of_day->ColorModification), frame, x, y);
 	}
-	//Wyrmgus end
-#endif
 }
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
@@ -481,12 +479,14 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const stratagus::player_colo
 */
 CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 {
+	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
+
 	if (filepath.empty()) {
 		throw std::runtime_error("CGraphic::New() called with an empty filepath.");
 	}
 
 	const std::string library_filepath = LibraryFileName(filepath.c_str());
-	CGraphic *&g = GraphicHash[library_filepath];
+	CGraphic *g = CGraphic::graphics_by_filepath[library_filepath];
 	if (g == nullptr) {
 		g = new CGraphic(library_filepath);
 		if (!g) {
@@ -498,6 +498,7 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 		g->Width = w;
 		g->Height = h;
 		g->original_frame_size = QSize(w, h);
+		CGraphic::graphics_by_filepath[g->HashFile] = g;
 	} else {
 		++g->Refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
@@ -517,12 +518,14 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 */
 CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const int w, const int h)
 {
+	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
+
 	if (filepath.empty()) {
 		throw std::runtime_error("CPlayerColorGraphic::New() called with an empty filepath.");
 	}
 
 	const std::string file = LibraryFileName(filepath.c_str());
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
+	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(CGraphic::graphics_by_filepath[file]);
 	if (g == nullptr) {
 		g = new CPlayerColorGraphic(file);
 		if (!g) {
@@ -534,7 +537,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 		g->Width = w;
 		g->Height = h;
 		g->original_frame_size = QSize(w, h);
-		GraphicHash[g->HashFile] = g;
+		CGraphic::graphics_by_filepath[g->HashFile] = g;
 	} else {
 		++g->Refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
@@ -583,12 +586,14 @@ const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *p
 */
 CGraphic *CGraphic::Get(const std::string &filename)
 {
+	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
+
 	if (filename.empty()) {
 		return nullptr;
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
-	CGraphic *&g = GraphicHash[file];
+	CGraphic *&g = CGraphic::graphics_by_filepath[file];
 
 	return g;
 }
@@ -602,12 +607,14 @@ CGraphic *CGraphic::Get(const std::string &filename)
 */
 CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 {
+	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
+
 	if (filename.empty()) {
 		return nullptr;
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
+	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(CGraphic::graphics_by_filepath[file]);
 
 	return g;
 }
@@ -859,7 +866,7 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 		MakeTexture(this, true);
 	}
 
-	Graphics.push_back(this);
+	CGraphic::graphics.push_back(this);
 
 	GenFramesMap();
 
@@ -902,14 +909,19 @@ void CGraphic::Free(CGraphic *g)
 		return;
 	}
 
-	Assert(g->Refs);
+	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
+
+	if (g->Refs <= 0) {
+		throw std::runtime_error("Tried to free an already-freed graphic.");
+	}
 
 	--g->Refs;
-	if (g->Refs > 0) {
-		Graphics.remove(g);
+	if (g->Refs == 0) {
+		// No more uses of this graphic
+		CGraphic::graphics.remove(g);
 
 		if (!g->HashFile.empty()) {
-			GraphicHash.erase(g->HashFile);
+			CGraphic::graphics_by_filepath.erase(g->HashFile);
 		}
 
 		delete g;
@@ -923,18 +935,25 @@ void CGraphic::Free(CGraphic *g)
 */
 void FreeOpenGLGraphics()
 {
-	std::list<CGraphic *>::iterator i;
-	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
-		if ((*i)->textures) {
-			glDeleteTextures((*i)->NumTextures, (*i)->textures);
+	for (CGraphic *graphic : CGraphic::graphics) {
+		if (graphic->textures) {
+			glDeleteTextures(graphic->NumTextures, graphic->textures);
+			delete[] graphic->textures;
+			graphic->textures = nullptr;
 		}
 		
-		for (const auto &kv_pair : (*i)->texture_color_modifications) {
-			glDeleteTextures((*i)->NumTextures, kv_pair.second);
+		if (graphic->grayscale_textures) {
+			glDeleteTextures(graphic->NumTextures, graphic->grayscale_textures);
+			delete[] graphic->grayscale_textures;
+			graphic->grayscale_textures = nullptr;
 		}
-		(*i)->texture_color_modifications.clear();
 		
-		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
+		for (const auto &kv_pair : graphic->texture_color_modifications) {
+			glDeleteTextures(graphic->NumTextures, kv_pair.second);
+		}
+		graphic->texture_color_modifications.clear();
+		
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
 		if (cg) {
 			for (const auto &kv_pair : cg->player_color_textures) {
 				glDeleteTextures(cg->NumTextures, kv_pair.second);
@@ -956,20 +975,25 @@ void FreeOpenGLGraphics()
 */
 void ReloadGraphics()
 {
-	std::list<CGraphic *>::iterator i;
-	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
-		if ((*i)->textures) {
-			delete[](*i)->textures;
-			(*i)->textures = nullptr;
-			MakeTexture(*i);
+	for (CGraphic *graphic : CGraphic::graphics) {
+		if (graphic->textures) {
+			delete[] graphic->textures;
+			graphic->textures = nullptr;
+			MakeTexture(graphic);
 		}
 		
-		for (const auto &kv_pair : (*i)->texture_color_modifications) {
+		if (graphic->grayscale_textures) {
+			delete[] graphic->grayscale_textures;
+			graphic->grayscale_textures = nullptr;
+			MakeTexture(graphic, true);
+		}
+		
+		for (const auto &kv_pair : graphic->texture_color_modifications) {
 			delete[] kv_pair.second;
 		}
-		(*i)->texture_color_modifications.clear();
+		graphic->texture_color_modifications.clear();
 				
-		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
 		if (cg) {
 			for (const auto &kv_pair : cg->player_color_texture_color_modifications) {
 				for (const auto &sub_kv_pair : kv_pair.second) {
@@ -1284,6 +1308,13 @@ void CGraphic::Resize(int w, int h)
 		MakeTexture(this);
 	}
 
+	if (this->grayscale_textures) {
+		glDeleteTextures(NumTextures, this->grayscale_textures);
+		delete[] this->grayscale_textures;
+		this->grayscale_textures = nullptr;
+		MakeTexture(this, true);
+	}
+
 	GenFramesMap();
 }
 
@@ -1310,6 +1341,12 @@ void CGraphic::SetOriginalSize()
 		this->textures = nullptr;
 	}
 
+	if (this->grayscale_textures) {
+		glDeleteTextures(NumTextures, this->grayscale_textures);
+		delete[] this->grayscale_textures;
+		this->grayscale_textures = nullptr;
+	}
+
 	this->Width = this->Height = 0;
 	this->image = QImage();
 	this->Load();
@@ -1319,10 +1356,14 @@ void CGraphic::SetOriginalSize()
 
 void FreeGraphics()
 {
+	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
+
 	std::map<std::string, CGraphic *>::iterator i;
-	while (!GraphicHash.empty()) {
-		i = GraphicHash.begin();
+	while (!CGraphic::graphics_by_filepath.empty()) {
+		i = CGraphic::graphics_by_filepath.begin();
+		lock.unlock();
 		CGraphic::Free((*i).second);
+		lock.lock();
 	}
 }
 

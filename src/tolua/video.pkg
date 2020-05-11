@@ -26,12 +26,10 @@ public:
 	static void Free(CGraphic *);
 	void Load(const bool grayscale = false, const int scale_factor = 1);
 	void Resize(int w, int h);
-	//Wyrmgus start
-	virtual int getWidth();
-	virtual int getHeight();
-	int getGraphicWidth();
-	int getGraphicHeight();
-	//Wyrmgus end
+	int get_frame_width() const;
+	int get_frame_height() const;
+	int get_width() const;
+	int get_height() const;
 };
 
 class CPlayerColorGraphic : public CGraphic
