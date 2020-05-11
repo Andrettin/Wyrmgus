@@ -2370,6 +2370,10 @@ void AiCheckDockConstruction()
 		return;
 	}
 
+	if (AiPlayer->Player->Faction == -1) {
+		return;
+	}
+
 	stratagus::unit_type *dock_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("dock"));
 	if (dock_type == nullptr) {
 		return;
