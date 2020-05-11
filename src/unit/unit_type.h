@@ -988,15 +988,15 @@ public:
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
-	LuaCallback *DeathExplosion;
-	LuaCallback *OnHit;             /// lua function called when unit is hit
-	LuaCallback *OnEachCycle;       /// lua function called every cycle
-	LuaCallback *OnEachSecond;      /// lua function called every second
-	LuaCallback *OnInit;            /// lua function called on unit init
+	LuaCallback *DeathExplosion = nullptr;
+	LuaCallback *OnHit = nullptr; //lua function called when unit is hit
+	LuaCallback *OnEachCycle = nullptr; //lua function called every cycle
+	LuaCallback *OnEachSecond = nullptr; //lua function called every second
+	LuaCallback *OnInit = nullptr; //lua function called on unit init
 
 	int TeleportCost;               /// mana used for teleportation
-	LuaCallback *TeleportEffectIn;   /// lua function to create effects before teleportation
-	LuaCallback *TeleportEffectOut;  /// lua function to create effects after teleportation
+	LuaCallback *TeleportEffectIn = nullptr;   /// lua function to create effects before teleportation
+	LuaCallback *TeleportEffectOut = nullptr;  /// lua function to create effects after teleportation
 
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 

@@ -68,9 +68,21 @@ extern bool enableOAML;
 */
 CMapLayer::CMapLayer(const QSize &size) : size(size)
 {
-	const int max_tile_index = this->get_width() * this->get_height();
+	if (size.width() > MaxMapWidth) {
+		throw std::runtime_error("Tried to create a map layer with width (" + std::to_string(size.width()) + ") greater than the maximum (" + std::to_string(MaxMapWidth) + ").");
+	}
 
-	this->Fields = new CMapField[max_tile_index];
+	if (size.height() > MaxMapHeight) {
+		throw std::runtime_error("Tried to create a map layer with height (" + std::to_string(size.height()) + ") greater than the maximum (" + std::to_string(MaxMapHeight) + ").");
+	}
+
+	const int max_tile_index = size.width() * size.height();
+
+	try {
+		this->Fields = new CMapField[max_tile_index];
+	} catch (const std::bad_alloc &) {
+		std::throw_with_nested(std::runtime_error("Failed to allocate map layer with a tile area of " + std::to_string(max_tile_index) + ", for " + std::to_string(max_tile_index * sizeof(CMapField)) + " bytes in total."));
+	}
 }
 
 /**

@@ -520,8 +520,7 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	Faction(-1), TerrainType(nullptr),
 	//Wyrmgus end
 	StillFrame(0),
-	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
-	TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
+	TeleportCost(0),
 	Construction(nullptr), RepairHP(0),
 	BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0),
