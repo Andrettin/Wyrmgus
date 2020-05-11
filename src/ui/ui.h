@@ -218,7 +218,16 @@ public:
 		*this = filler;
 	}
 
-	CFiller(CFiller &&filler) = default;
+	CFiller(CFiller &&filler)
+	{
+		this->G = filler.G;
+		this->X = filler.X;
+		this->Y = filler.Y;
+		this->loaded = filler.loaded;
+
+		filler.G = nullptr;
+	}
+
 	~CFiller();
 
 	CFiller &operator =(const CFiller &other_filler);
