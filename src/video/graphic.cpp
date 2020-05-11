@@ -259,7 +259,7 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const stratagus::time
 		DoDrawFrameClip(this->textures, frame, x, y, show_percent);
 	} else {
 		if (this->get_textures(time_of_day->ColorModification) == nullptr) {
-			MakeTexture(this, time_of_day);
+			MakeTexture(this, false, time_of_day);
 		}
 		DoDrawFrameClip(this->get_textures(time_of_day->ColorModification), frame, x, y, show_percent);
 	}
@@ -407,7 +407,7 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const stratagus::tim
 		DoDrawFrameClipX(this->textures, frame, x, y);
 	} else {
 		if (this->get_textures(time_of_day->ColorModification) == nullptr) {
-			MakeTexture(this, time_of_day);
+			MakeTexture(this, false, time_of_day);
 		}
 		DoDrawFrameClipX(this->get_textures(time_of_day->ColorModification), frame, x, y);
 	}
@@ -860,10 +860,10 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 		}
 	}
 	
-	MakeTexture(this);
+	MakeTexture(this, false, nullptr);
 
 	if (create_grayscale_textures) {
-		MakeTexture(this, true);
+		MakeTexture(this, true, nullptr);
 	}
 
 	CGraphic::graphics.push_back(this);
@@ -979,13 +979,13 @@ void ReloadGraphics()
 		if (graphic->textures) {
 			delete[] graphic->textures;
 			graphic->textures = nullptr;
-			MakeTexture(graphic);
+			MakeTexture(graphic, false, nullptr);
 		}
 		
 		if (graphic->grayscale_textures) {
 			delete[] graphic->grayscale_textures;
 			graphic->grayscale_textures = nullptr;
-			MakeTexture(graphic, true);
+			MakeTexture(graphic, true, nullptr);
 		}
 		
 		for (const auto &kv_pair : graphic->texture_color_modifications) {
@@ -1116,12 +1116,10 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.data());
 
-#ifdef DEBUG
-	int x;
-	if ((x = glGetError())) {
-		DebugPrint("glTexImage2D(%x)\n" _C_ x);
+	const int error_code = glGetError();
+	if (error_code != GL_NO_ERROR) {
+		throw std::runtime_error("glTexImage2D failed with error code " + std::to_string(error_code) + ".");
 	}
-#endif
 }
 
 static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
@@ -1305,14 +1303,14 @@ void CGraphic::Resize(int w, int h)
 		glDeleteTextures(NumTextures, this->textures);
 		delete[] this->textures;
 		this->textures = nullptr;
-		MakeTexture(this);
+		MakeTexture(this, false, nullptr);
 	}
 
 	if (this->grayscale_textures) {
 		glDeleteTextures(NumTextures, this->grayscale_textures);
 		delete[] this->grayscale_textures;
 		this->grayscale_textures = nullptr;
-		MakeTexture(this, true);
+		MakeTexture(this, true, nullptr);
 	}
 
 	GenFramesMap();

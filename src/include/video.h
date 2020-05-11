@@ -543,7 +543,7 @@ extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 /// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic, const bool grayscale = false, const stratagus::time_of_day *time_of_day = nullptr);
+extern void MakeTexture(CGraphic *graphic, const bool grayscale, const stratagus::time_of_day *time_of_day);
 //Wyrmgus start
 extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end

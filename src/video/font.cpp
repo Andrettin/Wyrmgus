@@ -806,7 +806,7 @@ void CFont::MakeFontColorTextures() const
 			image = stratagus::image::scale(image, scale_factor, g.get_original_frame_size());
 		}
 
-		MakeTexture(newg.get());
+		MakeTexture(newg.get(), false, nullptr);
 
 		FontColorGraphics[this][fc] = std::move(newg);
 	}
