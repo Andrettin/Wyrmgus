@@ -1,5 +1,4 @@
 $using namespace gcn;
-$using namespace stratagus;
 
 #include "font.h"
 
@@ -207,11 +206,6 @@ class CUserInterface
 };
 
 extern CUserInterface UI;
-
-class icon
-{
-	static stratagus::icon *Get(const std::string ident);
-};
 
 extern ButtonStyle *FindButtonStyle(const std::string style);
 
