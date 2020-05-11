@@ -46,6 +46,8 @@ public:
 	{
 	}
 
+	virtual ~named_data_entry() {}
+
 	const std::string &get_name() const
 	{
 		return this->name;

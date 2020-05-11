@@ -49,6 +49,8 @@ public:
 	{
 	}
 
+	virtual ~detailed_data_entry() {}
+
 	const std::string &get_description() const
 	{
 		return this->description;
