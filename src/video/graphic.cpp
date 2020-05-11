@@ -500,7 +500,7 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 		g->original_frame_size = QSize(w, h);
 		CGraphic::graphics_by_filepath[g->HashFile] = g;
 	} else {
-		++g->Refs;
+		++g->refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
 
@@ -539,7 +539,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 		g->original_frame_size = QSize(w, h);
 		CGraphic::graphics_by_filepath[g->HashFile] = g;
 	} else {
-		++g->Refs;
+		++g->refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
 
@@ -911,12 +911,12 @@ void CGraphic::Free(CGraphic *g)
 
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
-	if (g->Refs <= 0) {
+	if (g->refs <= 0) {
 		throw std::runtime_error("Tried to free an already-freed graphic.");
 	}
 
-	--g->Refs;
-	if (g->Refs == 0) {
+	--g->refs;
+	if (g->refs == 0) {
 		// No more uses of this graphic
 		CGraphic::graphics.remove(g);
 

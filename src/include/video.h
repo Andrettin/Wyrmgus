@@ -248,7 +248,9 @@ public:
 	int NumFrames = 1;				/// Number of frames
 	int GraphicWidth = 0;			/// Original graphic width
 	int GraphicHeight = 0;			/// Original graphic height
-	int Refs = 1;					/// Uses of this graphic
+protected:
+	int refs = 1;					/// Uses of this graphic
+public:
 	bool Resized = false;			/// Image has been resized
 public:
 	GLfloat TextureWidth = 0.f;      /// Width of the texture

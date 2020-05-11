@@ -421,7 +421,7 @@ void Exit(int err)
 #endif
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
-	exit(err);
+	QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
 }
 
 /**
