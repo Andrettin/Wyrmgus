@@ -31,7 +31,6 @@
 #pragma once
 
 #include "sound/sound.h"
-#include "util/qunique_ptr.h"
 
 #include <QAudioBuffer>
 #include <QAudioDecoder>
@@ -74,7 +73,7 @@ public:
 private:
 	static inline std::unique_ptr<QEventLoop> decoding_loop;
 	static inline int decoding_loop_counter = 0;
-	static inline std::vector<qunique_ptr<QAudioDecoder>> decoders;
+	static inline std::vector<std::unique_ptr<QAudioDecoder>> decoders;
 
 public:
 	explicit sample(const std::filesystem::path &filepath);

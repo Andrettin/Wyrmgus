@@ -627,7 +627,7 @@ sample::sample(const std::filesystem::path &filepath)
 
 void sample::decode(const std::filesystem::path &filepath)
 {
-	auto decoder = make_qunique<QAudioDecoder>();
+	auto decoder = std::make_unique<QAudioDecoder>();
 	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
 
 	QAudioDecoder *decoder_ptr = decoder.get();
