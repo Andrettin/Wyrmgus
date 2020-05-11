@@ -628,7 +628,6 @@ sample::sample(const std::filesystem::path &filepath)
 void sample::decode(const std::filesystem::path &filepath)
 {
 	auto decoder = make_qunique<QAudioDecoder>();
-	decoder->moveToThread(QApplication::instance()->thread());
 	decoder->setSourceFilename(QString::fromStdString(filepath.string()));
 
 	QAudioDecoder *decoder_ptr = decoder.get();

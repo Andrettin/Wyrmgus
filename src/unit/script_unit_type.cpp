@@ -2814,6 +2814,14 @@ static int CclDefineVariables(lua_State *l)
 		++j;
 		DefineVariableField(l, UnitTypeVar.Variable[index], j + 1);
 	}
+
+	//update previously-defined unit types
+	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (size_t i = unit_type->DefaultStat.Variables.size(); i < UnitTypeVar.GetNumberVariable(); ++i) {
+			unit_type->DefaultStat.Variables.push_back(UnitTypeVar.Variable[i]);
+		}
+	}
+
 	return 0;
 }
 

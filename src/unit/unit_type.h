@@ -542,14 +542,14 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
+	CBuildRestrictionAddOn() : Offset(0, 0) {}
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init();
 	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	Vec2i Offset;           /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
-	stratagus::unit_type *Parent;      /// building that is unit is an addon too.
+	stratagus::unit_type *Parent = nullptr;      /// building that is unit is an addon too.
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction
@@ -565,13 +565,13 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
+	CBuildRestrictionOnTop() : ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init();
 	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	std::string ParentName;  /// building that is unit is an addon too.
-	stratagus::unit_type *Parent;       /// building that is unit is an addon too.
+	stratagus::unit_type *Parent = nullptr;       /// building that is unit is an addon too.
 	int ReplaceOnDie: 1;     /// recreate the parent on destruction
 	int ReplaceOnBuild: 1;   /// remove the parent, or just build over it.
 };
@@ -905,7 +905,7 @@ public:
 	}
 
 public:
-	const unit_type *Parent;				/// Parent unit type
+	const unit_type *Parent = nullptr;				/// Parent unit type
 	//Wyrmgus start
 private:
 	stratagus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)

@@ -2204,12 +2204,14 @@ void CPlayer::Clear()
 	//Wyrmgus end
 	this->minimap_color = QColor();
 	this->UpgradeTimers.Clear();
-	for (int i = 0; i < MaxCosts; ++i) {
+	for (size_t i = 0; i < MaxCosts; ++i) {
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
 		this->SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
-		//Wyrmgus start
-		this->Prices[i] = stratagus::resource::get_all()[i]->BasePrice;
-		//Wyrmgus end
+		if (i < stratagus::resource::get_all().size()) {
+			this->Prices[i] = stratagus::resource::get_all()[i]->BasePrice;
+		} else {
+			this->Prices[i] = 0;
+		}
 	}
 	this->SpeedBuild = SPEEDUP_FACTOR;
 	this->SpeedTrain = SPEEDUP_FACTOR;
