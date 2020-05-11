@@ -2275,6 +2275,10 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
+	if (AiPlayer->Player->Faction == -1) {
+		return;
+	}
+
 	stratagus::unit_type *town_hall_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
 	if (town_hall_type == nullptr) {
 		return;
