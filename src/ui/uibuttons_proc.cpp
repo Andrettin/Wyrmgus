@@ -59,7 +59,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text, const stratagus::player_color *player_color, bool transparent, int show_percent)
+				  const std::string &text, const bool grayscale, const stratagus::player_color *player_color, bool transparent, int show_percent)
 {
 	ButtonStyleProperties *p;
 
@@ -89,7 +89,9 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	if (pimage->Sprite) {
 		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
 
-		if (colorGraphic && player_color != nullptr) {
+		if (grayscale) {
+			pimage->Sprite->DrawGrayscaleFrameClip(pimage->Frame, x, y, show_percent);
+		} else if (colorGraphic && player_color != nullptr) {
 			if (transparent) {
 				colorGraphic->DrawPlayerColorFrameClipTrans(player_color, pimage->Frame, x, y, 64, nullptr, show_percent);
 			} else {

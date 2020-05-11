@@ -181,7 +181,7 @@ namespace gcn
                                int dstX, int dstY, int width,
 							   //Wyrmgus start
 //                               int height) = 0;
-                               int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0) = 0;
+                               int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) = 0;
 							   //Wyrmgus end
         /**
          * Draws an image. A simplified version of the other drawImage.

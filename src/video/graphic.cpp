@@ -106,6 +106,13 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 #endif
 }
 
+void CGraphic::DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const
+{
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	DrawTexture(this, this->grayscale_textures, gx, gy, gx + w, gy + h, x, y, 0);
+#endif
+}
+
 CPlayerColorGraphic::~CPlayerColorGraphic()
 {
 	for (const auto &kv_pair : this->player_color_textures) {
@@ -135,6 +142,14 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surfa
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
 	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y, surface);
+}
+
+void CGraphic::DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) const
+{
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawGrayscaleSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
 
 void CPlayerColorGraphic::DrawPlayerColorSubClip(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
@@ -237,7 +252,6 @@ void CGraphic::DoDrawFrameClip(const GLuint *textures,
 */
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		DoDrawFrameClip(this->textures, frame, x, y, show_percent);
 	} else {
@@ -246,7 +260,6 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const stratagus::time
 		}
 		DoDrawFrameClip(this->get_textures(time_of_day->ColorModification), frame, x, y, show_percent);
 	}
-#endif
 }
 
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
@@ -265,6 +278,11 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const
 	DrawFrameClip(frame, x, y, time_of_day, surface, show_percent);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 #endif
+}
+
+void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent)
+{
+	DoDrawFrameClip(this->grayscale_textures, frame, x, y, show_percent);
 }
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, int show_percent)
@@ -525,54 +543,6 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 	return g;
 }
 
-/**
-**  Make a new graphic object.  Don't reuse a graphic from the hash table.
-**
-**  @param file  Filename
-**  @param w     Width of a frame (optional)
-**  @param h     Height of a frame (optional)
-**
-**  @return      New graphic object
-*/
-CGraphic *CGraphic::ForceNew(const std::filesystem::path &filepath, int w, int h)
-{
-	CGraphic *g = new CGraphic(filepath);
-	if (!g) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
-	int bufSize = filepath.string().size() + 32;
-	char *hashfile = new char[bufSize];
-	snprintf(hashfile, bufSize, "%s%d", filepath.string().c_str(), HashCount++);
-	g->HashFile = hashfile;
-	delete[] hashfile;
-	g->Width = w;
-	g->Height = h;
-	g->original_frame_size = QSize(w, h);
-	GraphicHash[g->HashFile] = g;
-
-	return g;
-}
-
-/**
-**  Clone a graphic
-**
-**  @param grayscale  Make grayscale texture
-*/
-CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
-{
-	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->get_filepath(), this->Resized ? 0 : this->Width, this->Resized ? 0 : this->Height);
-
-	if (this->IsLoaded()) {
-		g->Load(grayscale);
-		if (this->Resized) {
-			g->Resize(this->GraphicWidth, this->GraphicHeight);
-		}
-	}
-
-	return g;
-}
-
 const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *player_color) const
 {
 	if (!this->has_player_color() || player_color == nullptr || player_color == stratagus::defines::get()->get_conversible_player_color()) {
@@ -602,37 +572,6 @@ const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *p
 	}
 
 	return nullptr;
-}
-
-
-/**
-**  Make a new player color graphic object.  Don't reuse a graphic from the
-**  hash table.
-**
-**  @param file  Filename
-**  @param w     Width of a frame (optional)
-**  @param h     Height of a frame (optional)
-**
-**  @return      New graphic object
-*/
-CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::filesystem::path &filepath, int w, int h)
-{
-	CPlayerColorGraphic *g = new CPlayerColorGraphic(filepath);
-	if (!g) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
-	size_t bufSize = filepath.string().size() + 32;
-	char *hashfile = new char[bufSize];
-	snprintf(hashfile, bufSize, "%s%d", filepath.string().c_str(), HashCount++);
-	g->HashFile = hashfile;
-	delete[] hashfile;
-	g->Width = w;
-	g->Height = h;
-	g->original_frame_size = QSize(w, h);
-	GraphicHash[g->HashFile] = g;
-
-	return g;
 }
 
 /**
@@ -857,7 +796,7 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 **
 **  @param grayscale  Make a grayscale surface
 */
-void CGraphic::Load(const bool grayscale, const int scale_factor)
+void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor)
 {
 	if (this->IsLoaded()) {
 		return;
@@ -896,15 +835,6 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
-	if (grayscale) {
-		this->Grayscale = true;
-		if (Preference.SepiaForGrayscale) {
-			ApplySepiaScale(this->image);
-		} else {
-			ApplyGrayScale(this->image);
-		}
-	}
-
 	this->player_color = false;
 	const stratagus::color_set color_set = stratagus::image::get_colors(this->get_image());
 	for (const QColor &color : color_set) {
@@ -924,6 +854,11 @@ void CGraphic::Load(const bool grayscale, const int scale_factor)
 	}
 	
 	MakeTexture(this);
+
+	if (create_grayscale_textures) {
+		MakeTexture(this, true);
+	}
+
 	Graphics.push_back(this);
 
 	GenFramesMap();
@@ -1098,12 +1033,10 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
 	
-	if (!g->Grayscale) { // don't alter the colors of grayscale graphics
-		if (time_of_day && time_of_day->HasColorModification()) {
-			time_of_day_red = time_of_day->ColorModification.R;
-			time_of_day_green = time_of_day->ColorModification.G;
-			time_of_day_blue = time_of_day->ColorModification.B;
-		}
+	if (time_of_day && time_of_day->HasColorModification()) {
+		time_of_day_red = time_of_day->ColorModification.R;
+		time_of_day_green = time_of_day->ColorModification.G;
+		time_of_day_blue = time_of_day->ColorModification.B;
 	}
 	//Wyrmgus end
 
@@ -1138,10 +1071,6 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 			dst_blue = src_blue;
 			dst_alpha = src_alpha;
 
-			if (g->Grayscale) {
-				continue;
-			}
-
 			if (time_of_day_red != 0) {
 				dst_red = std::max<int>(0, std::min<int>(255, dst_red + time_of_day_red));
 			}
@@ -1171,7 +1100,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 #endif
 }
 
-static void MakeTextures(CGraphic *g, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
+static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
 {
 	int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
 	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
@@ -1196,6 +1125,9 @@ static void MakeTextures(CGraphic *g, const stratagus::player_color *player_colo
 		if (time_of_day && time_of_day->HasColorModification()) {
 			textures = g->texture_color_modifications[time_of_day->ColorModification] = new GLuint[g->NumTextures];
 			glGenTextures(g->NumTextures, g->texture_color_modifications[time_of_day->ColorModification]);
+		} else if (grayscale) {
+			textures = g->grayscale_textures = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->grayscale_textures);
 		} else {
 			textures = g->textures = new GLuint[g->NumTextures];
 			glGenTextures(g->NumTextures, g->textures);
@@ -1213,7 +1145,13 @@ static void MakeTextures(CGraphic *g, const stratagus::player_color *player_colo
 		image = image.convertToFormat(QImage::Format_RGBA8888);
 	}
 
-	if (!g->Grayscale && player_color != nullptr && g->has_player_color()) {
+	if (grayscale) {
+		if (Preference.SepiaForGrayscale) {
+			ApplySepiaScale(image);
+		} else {
+			ApplyGrayScale(image);
+		}
+	} else if (player_color != nullptr && g->has_player_color()) {
 		const int bpp = image.depth() / 8;
 		unsigned char *image_data = image.bits();
 		const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
@@ -1263,17 +1201,14 @@ static void MakeTextures(CGraphic *g, const stratagus::player_color *player_colo
 **
 **  @param g  The graphic object.
 */
-//Wyrmgus start
-//void MakeTexture(CGraphic *g)
-void MakeTexture(CGraphic *g, const stratagus::time_of_day *time_of_day)
-//Wyrmgus end
+void MakeTexture(CGraphic *g, const bool grayscale, const stratagus::time_of_day *time_of_day)
 {
-	//Wyrmgus start
-//	if (g->Textures) {
-//		return;
-//	}
 	if (time_of_day && time_of_day->HasColorModification()) {
 		if (g->get_textures(time_of_day->ColorModification) != nullptr) {
+			return;
+		}
+	} else if (grayscale) {
+		if (g->grayscale_textures) {
 			return;
 		}
 	} else {
@@ -1281,9 +1216,8 @@ void MakeTexture(CGraphic *g, const stratagus::time_of_day *time_of_day)
 			return;
 		}
 	}
-	//Wyrmgus end
 
-	MakeTextures(g, nullptr, time_of_day);
+	MakeTextures(g, grayscale, nullptr, time_of_day);
 }
 
 void MakePlayerColorTexture(CPlayerColorGraphic *g, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
@@ -1294,7 +1228,7 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, const stratagus::player_colo
 		}
 
 		if (!g->has_player_color() || player_color == nullptr || player_color == stratagus::defines::get()->get_conversible_player_color()) {
-			MakeTextures(g, nullptr, time_of_day);
+			MakeTextures(g, false, nullptr, time_of_day);
 			return;
 		}
 	} else {
@@ -1303,7 +1237,7 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, const stratagus::player_colo
 		}
 	}
 
-	MakeTextures(g, player_color, time_of_day);
+	MakeTextures(g, false, player_color, time_of_day);
 }
 
 #endif

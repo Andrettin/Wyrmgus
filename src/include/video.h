@@ -80,7 +80,9 @@ public:
 	// Draw
 	void DrawClip(int x, int y) const;
 	void DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
+	void DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
+	void DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 					  unsigned char alpha, SDL_Surface *surface = nullptr) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
@@ -94,6 +96,7 @@ public:
 	void DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent = 100);
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
@@ -112,12 +115,11 @@ public:
 		return CGraphic::New(filepath, size.width(), size.height());
 	}
 
-	static CGraphic *ForceNew(const std::filesystem::path &filepath, int w = 0, int h = 0);
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
 
-	void Load(const bool grayscale = false, const int scale_factor = 1);
+	void Load(const bool create_grayscale_textures = false, const int scale_factor = 1);
 	void Resize(int w, int h);
 	void SetOriginalSize();
 
@@ -225,6 +227,12 @@ public:
 		return nullptr;
 	}
 
+	const GLuint *get_grayscale_textures() const
+	{
+		return this->grayscale_textures;
+	}
+
+
 private:
 	std::filesystem::path filepath;
 public:
@@ -245,14 +253,12 @@ public:
 	int Refs = 1;					/// Uses of this graphic
 	stratagus::time_of_day *TimeOfDay = nullptr;		/// Time of day for this graphic
 	bool Resized = false;				/// Image has been resized
-	//Wyrmgus start
-	bool Grayscale = false;
-	//Wyrmgus end
 public:
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat TextureWidth = 0.f;      /// Width of the texture
 	GLfloat TextureHeight = 0.f;     /// Height of the texture
 	GLuint *textures = nullptr;          /// Texture names
+	GLuint *grayscale_textures = nullptr;
 	std::map<CColor, GLuint *> texture_color_modifications;	/// Textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 #endif
@@ -288,11 +294,8 @@ public:
 		return CPlayerColorGraphic::New(filepath, size.width(), size.height());
 	}
 
-	static CPlayerColorGraphic *ForceNew(const std::filesystem::path &filepath, int w = 0, int h = 0);
 	static CPlayerColorGraphic *Get(const std::string &file);
 
-	CPlayerColorGraphic *Clone(bool grayscale = false) const;
-	
 	const GLuint *get_textures(const stratagus::player_color *player_color) const;
 	const GLuint *get_textures(const stratagus::player_color *player_color, const CColor &color_modification) const;
 
@@ -544,10 +547,7 @@ extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 /// Make an OpenGL texture
-//Wyrmgus start
-//extern void MakeTexture(CGraphic *graphic);
-extern void MakeTexture(CGraphic *graphic, const stratagus::time_of_day *time_of_day = nullptr);
-//Wyrmgus end
+extern void MakeTexture(CGraphic *graphic, const bool grayscale = false, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus start
 extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end

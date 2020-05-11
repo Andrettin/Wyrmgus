@@ -126,7 +126,7 @@ public:
 	/// Draw icon
 	void DrawIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
 	/// Draw grayscale icon
-	void DrawGrayscaleIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
+	void DrawGrayscaleIcon(const PixelPos &pos) const;
 	/// Draw cooldown spell
 	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const;
 	/// Draw icon of a unit
@@ -138,7 +138,6 @@ private:
 
 public:
 	CPlayerColorGraphic *G = nullptr; //graphic data
-	CPlayerColorGraphic *GScale = nullptr; //icon when drawn grayscaled
 private:
 	std::filesystem::path file;
 	int frame = 0; //frame number in the icon's image

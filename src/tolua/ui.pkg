@@ -211,7 +211,6 @@ extern CUserInterface UI;
 class icon
 {
 	static stratagus::icon *Get(const std::string ident);
-	CPlayerColorGraphic *GScale;
 };
 
 extern ButtonStyle *FindButtonStyle(const std::string style);
@@ -339,6 +338,7 @@ class PlayerColorImageWidget : public Widget
 	PlayerColorImageWidget(CPlayerColorGraphic *image, const std::string playercolor);
 	
 	void setImageOrigin(int x, int y);
+	void setGrayscale(bool grayscale);
 };
 //Wyrmgus end
 
@@ -388,6 +388,7 @@ class PlayerColorImageButton : public Button
 	void setPressedFrameImage(CGraphic *image);
 	void setTransparency(int alpha);
 	void setImageOrigin(int x, int y);
+	void setGrayscale(bool grayscale);
 };
 // Wyrmgus end
 

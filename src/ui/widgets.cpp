@@ -243,7 +243,7 @@ void MyOpenGLGraphics::_endDraw()
 }
 
 void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height, const stratagus::player_color *player_color, unsigned int transparency)
+								 int dstX, int dstY, int width, int height, const stratagus::player_color *player_color, unsigned int transparency, bool grayscale)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -260,6 +260,9 @@ void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
 //									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	if (player_color != nullptr) {
 		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player_color, srcX, srcY, width, height,
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+	} else if (grayscale) {
+		((CGraphic *)image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	} else {
 		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
@@ -350,7 +353,7 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 		player_color = stratagus::player_color::get(WidgetPlayerColor);
 	}
 	
-	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color, 0, this->grayscale);
 }
 //Wyrmgus end
 
@@ -642,7 +645,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency);
+								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency, this->grayscale);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -656,7 +659,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), player_color, Transparency);
+								img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -667,7 +670,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), player_color, Transparency);
+							img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale);
 		if (Transparency) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}

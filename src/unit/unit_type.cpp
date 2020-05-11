@@ -2605,7 +2605,7 @@ void InitUnitType(stratagus::unit_type &type)
 void LoadUnitTypeSprite(stratagus::unit_type &type)
 {
 	if (!type.ShadowFile.empty()) {
-		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
+		type.ShadowSprite = CGraphic::New(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
 		type.ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 	}
 

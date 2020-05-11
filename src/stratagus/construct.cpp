@@ -102,7 +102,7 @@ void CConstruction::Load()
 	this->ShadowHeight = this->ShadowFile.Height;
 	if (!file.empty()) {
 		UpdateLoadProgress();
-		this->ShadowSprite = CGraphic::ForceNew(file, this->ShadowWidth, this->ShadowHeight);
+		this->ShadowSprite = CGraphic::New(file, this->ShadowWidth, this->ShadowHeight);
 		this->ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}

@@ -59,7 +59,7 @@ public:
 	virtual void _endDraw();
 
 	virtual void drawImage(gcn::Image *image, int srcX, int srcY,
-						   int dstX, int dstY, int width, int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0);
+						   int dstX, int dstY, int width, int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false);
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);
@@ -98,8 +98,14 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
+	void setGrayscale(bool grayscale)
+	{
+		this->grayscale = grayscale;
+	}
+
 	std::string WidgetPlayerColor;
 	Vec2i ImageOrigin;
+	bool grayscale = false;
 };
 //Wyrmgus end
 
@@ -167,6 +173,11 @@ public:
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
+	void setGrayscale(bool grayscale)
+	{
+		this->grayscale = grayscale;
+	}
+
 	gcn::Image *normalImage;
 	gcn::Image *pressedImage;
 	gcn::Image *disabledImage;
@@ -175,6 +186,7 @@ public:
 	std::string ButtonPlayerColor;
 	int Transparency;
 	Vec2i ImageOrigin;
+	bool grayscale = false;
 };
 //Wyrmgus end
 
