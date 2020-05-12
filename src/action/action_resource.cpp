@@ -1374,11 +1374,11 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	//update quests
 	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->ObjectiveType == ObjectiveType::GatherResource) {
+		if (quest_objective->get_objective_type() == ObjectiveType::GatherResource) {
 			if (quest_objective->Resource == rindex) {
-				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->Quantity);
+				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->get_quantity());
 			} else if (quest_objective->Resource == this->CurrentResource) {
-				objective->Counter = std::min(objective->Counter + unit.ResourcesHeld, quest_objective->Quantity);
+				objective->Counter = std::min(objective->Counter + unit.ResourcesHeld, quest_objective->get_quantity());
 			}
 		}
 	}

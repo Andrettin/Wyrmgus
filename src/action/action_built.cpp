@@ -183,7 +183,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
 
-		if (quest_objective->ObjectiveType != ObjectiveType::BuildUnits) {
+		if (quest_objective->get_objective_type() != ObjectiveType::BuildUnits) {
 			continue;
 		}
 
@@ -195,7 +195,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			continue;
 		}
 
-		objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
+		objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 	}
 	
 	unit.UnderConstruction = 0;
