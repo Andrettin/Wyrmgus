@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/interface.h"
@@ -51,6 +47,7 @@
 #include "replay.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
+#include "sound/unit_sound_type.h"
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/cursor.h"
@@ -535,7 +532,7 @@ void UiFindIdleWorker()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);
+		PlayUnitSound(*Selected[0], stratagus::unit_sound_type::selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -572,7 +569,7 @@ void UiFindLevelUpUnit()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);
+		PlayUnitSound(*Selected[0], stratagus::unit_sound_type::selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -595,7 +592,7 @@ void UiFindHeroUnit(int hero_index)
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
-	PlayUnitSound(*Selected[0], UnitVoiceGroup::Selected);
+	PlayUnitSound(*Selected[0], stratagus::unit_sound_type::selected);
 	SelectionChanged();
 	if (unit->MapLayer != UI.CurrentMapLayer) {
 		ChangeCurrentMapLayer(unit->MapLayer->ID);

@@ -41,6 +41,7 @@
 #include "mod.h"
 #include "missile.h"
 #include "sound/sound_server.h"
+#include "sound/unit_sound_type.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/container_util.h"
@@ -144,20 +145,20 @@ static stratagus::sample *ChooseSample(stratagus::sound *sound, bool selection, 
 }
 
 /**
-**  Maps a UnitVoiceGroup to a sound*.
+**  Maps a unit_sound_type to a sound*.
 **
 **  @param unit    Sound initiator
 **  @param voice   Type of sound wanted
 **
 **  @return        Sound identifier
 */
-static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
+static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus::unit_sound_type unit_sound_type)
 {
 	//Wyrmgus start
 	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 	//Wyrmgus end
-	switch (voice) {
-		case UnitVoiceGroup::Acknowledging:
+	switch (unit_sound_type) {
+		case stratagus::unit_sound_type::acknowledging:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Acknowledgement.Sound;
 			if (unit.Type->MapSound.Acknowledgement.Sound) {
@@ -172,7 +173,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return nullptr;
 			}
 			//Wyrmgus end
-		case UnitVoiceGroup::Attack:
+		case stratagus::unit_sound_type::attack:
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			//Wyrmgus start
@@ -184,29 +185,29 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				if (civilization->UnitSounds.Attack.Sound) {
 					return civilization->UnitSounds.Attack.Sound;
 				} else {
-					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+					return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 				}
 			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return unit.Type->MapSound.Acknowledgement.Sound;
-				return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+				return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 				//Wyrmgus end
 			}
 		//Wyrmgus start
-		case UnitVoiceGroup::Idle:
+		case stratagus::unit_sound_type::idle:
 			return unit.Type->MapSound.Idle.Sound;
-		case UnitVoiceGroup::Hit:
+		case stratagus::unit_sound_type::hit:
 			return unit.Type->MapSound.Hit.Sound;
-		case UnitVoiceGroup::Miss:
+		case stratagus::unit_sound_type::miss:
 			if (unit.Type->MapSound.Miss.Sound) {
 				return unit.Type->MapSound.Miss.Sound;
 			} else {
 				return unit.Type->MapSound.Hit.Sound;
 			}
-		case UnitVoiceGroup::FireMissile:
+		case stratagus::unit_sound_type::fire_missile:
 			return unit.Type->MapSound.FireMissile.Sound;
-		case UnitVoiceGroup::Step:
+		case stratagus::unit_sound_type::step:
 			if (unit.Type->MapSound.StepMud.Sound && ((mf.getFlag() & MapFieldMud) || (mf.getFlag() & MapFieldSnow))) {
 				return unit.Type->MapSound.StepMud.Sound;
 			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.getFlag() & MapFieldDirt) || (mf.getFlag() & MapFieldIce))) {
@@ -220,10 +221,10 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 			} else {
 				return unit.Type->MapSound.Step.Sound;
 			}
-		case UnitVoiceGroup::Used:
+		case stratagus::unit_sound_type::used:
 			return unit.Type->MapSound.Used.Sound;
 		//Wyrmgus end
-		case UnitVoiceGroup::Build:
+		case stratagus::unit_sound_type::build:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Build.Sound;
 			if (unit.Type->MapSound.Build.Sound) {
@@ -237,14 +238,14 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				if (civilization->UnitSounds.Build.Sound) {
 					return civilization->UnitSounds.Build.Sound;
 				} else {
-					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+					return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 				}
 			//Wyrmgus end
 			} else {
-				return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+				return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 			}
 			//Wyrmgus end
-		case UnitVoiceGroup::Ready:
+		case stratagus::unit_sound_type::ready:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Ready.Sound;
 			if (unit.Type->MapSound.Ready.Sound) {
@@ -259,7 +260,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return nullptr;
 			}
 			//Wyrmgus end
-		case UnitVoiceGroup::Selected:
+		case stratagus::unit_sound_type::selected:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Selected.Sound;
 			if (unit.Type->MapSound.Selected.Sound) {
@@ -274,7 +275,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return nullptr;
 			}
 			//Wyrmgus end
-		case UnitVoiceGroup::HelpMe:
+		case stratagus::unit_sound_type::help:
 			//Wyrmgus start
 //			return unit.Type->MapSound.Help.Sound;
 			if (unit.Type->MapSound.Help.Sound) {
@@ -293,19 +294,19 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				return nullptr;
 			}
 			//Wyrmgus end
-		case UnitVoiceGroup::Dying:
+		case stratagus::unit_sound_type::dying:
 			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
 			} else {
 				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
-		case UnitVoiceGroup::WorkCompleted:
+		case stratagus::unit_sound_type::work_completed:
 			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
-		case UnitVoiceGroup::Building:
+		case stratagus::unit_sound_type::construction:
 			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
-		case UnitVoiceGroup::Docking:
+		case stratagus::unit_sound_type::docking:
 			return GameSounds.Docking.Sound;
-		case UnitVoiceGroup::Repairing:
+		case stratagus::unit_sound_type::repairing:
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			//Wyrmgus start
@@ -317,16 +318,16 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 				if (civilization->UnitSounds.Repair.Sound) {
 					return civilization->UnitSounds.Repair.Sound;
 				} else {
-					return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+					return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 				}
 			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return unit.Type->MapSound.Acknowledgement.Sound;
-				return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+				return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 				//Wyrmgus end
 			}
-		case UnitVoiceGroup::Harvesting:
+		case stratagus::unit_sound_type::harvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitAction::Resource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
@@ -341,13 +342,13 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup 
 						if (civilization->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
 							return civilization->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
 						} else {
-							return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+							return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 						}
 					//Wyrmgus end
 					} else {
 						//Wyrmgus start
 //						return unit.Type->MapSound.Acknowledgement.Sound;
-						return ChooseUnitVoiceSound(unit, UnitVoiceGroup::Acknowledging);
+						return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
 						//Wyrmgus end
 					}
 				}
@@ -421,27 +422,28 @@ static char CalculateStereo(const CUnit &unit)
 **  @param unit   Sound initiator, unit speaking
 **  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
+void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_sound_type)
 {
 	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
 	
-	if (unit.Variable[STUN_INDEX].Value > 0 && voice != UnitVoiceGroup::Hit && voice != UnitVoiceGroup::Miss && voice != UnitVoiceGroup::FireMissile && voice != UnitVoiceGroup::Step && voice != UnitVoiceGroup::Dying) { //don't speak if stunned
+	if (unit.Variable[STUN_INDEX].Value > 0 && stratagus::is_voice_unit_sound_type(unit_sound_type)) { //don't speak if stunned
 		return;
 	}
 	
-	stratagus::sound *sound = ChooseUnitVoiceSound(unit, voice);
+	stratagus::sound *sound = ChooseUnitVoiceSound(unit, unit_sound_type);
 	if (!sound) {
 		return;
 	}
 
-	bool selection = (voice == UnitVoiceGroup::Selected || voice == UnitVoiceGroup::Building);
+	bool selection = (unit_sound_type == stratagus::unit_sound_type::selected || unit_sound_type == stratagus::unit_sound_type::construction);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	
 	//Wyrmgus start
 //	if (UnitSoundIsPlaying(&source)) {
-	if (voice != UnitVoiceGroup::Hit && voice != UnitVoiceGroup::Miss && voice != UnitVoiceGroup::FireMissile && voice != UnitVoiceGroup::Step && UnitSoundIsPlaying(&source)) {
+	//don't speak if already speaking
+	if (stratagus::is_voice_unit_sound_type(unit_sound_type) && UnitSoundIsPlaying(&source)) {
 	//Wyrmgus end
 		return;
 	}
@@ -452,11 +454,11 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	}
 	//Wyrmgus start
 //	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->range) * sound->VolumePercent / 100);
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), stratagus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100);
 	//Wyrmgus end
 	SetChannelStereo(channel, CalculateStereo(unit));
 	//Wyrmgus start
-	SetChannelVoiceGroup(channel, voice);
+	SetChannelVoiceGroup(channel, unit_sound_type);
 	//Wyrmgus end
 }
 

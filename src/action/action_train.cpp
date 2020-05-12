@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_train.h"
@@ -45,6 +41,7 @@
 #include "player.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
+#include "sound/unit_sound_type.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -56,10 +53,6 @@
 
 /// How many resources the player gets back if canceling training
 static constexpr int CancelTrainingCostsFactor = 100;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 COrder *COrder::NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player)
 {
@@ -408,7 +401,7 @@ static void AnimateActionTrain(CUnit &unit)
 		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 
 		if (&player == CPlayer::GetThisPlayer()) {
-			PlayUnitSound(*newUnit, UnitVoiceGroup::Ready);
+			PlayUnitSound(*newUnit, stratagus::unit_sound_type::ready);
 		}
 		if (newUnit->Player->AiEnabled) {
 			AiTrainingComplete(unit, *newUnit);

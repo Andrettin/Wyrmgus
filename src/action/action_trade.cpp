@@ -44,6 +44,7 @@
 #include "pathfinder.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "sound/unit_sound_type.h"
 #include "spells.h"
 #include "translate.h"
 #include "ui/ui.h"
@@ -218,7 +219,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.get_scaled_map_pixel_pos_center());
 					}
-					PlayUnitSound(*goal->ConnectingDestination, UnitVoiceGroup::Used);
+					PlayUnitSound(*goal->ConnectingDestination, stratagus::unit_sound_type::used);
 				} else if (goal->Spell != nullptr) {
 					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
@@ -265,7 +266,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 				this->Finished = true;
 				return;
 			}
-			PlayUnitSound(*goal, UnitVoiceGroup::Used);
+			PlayUnitSound(*goal, stratagus::unit_sound_type::used);
 			if (goal->Type->BoolFlag[POWERUP_INDEX].value || stratagus::is_consumable_item_class(goal->Type->get_item_class())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);

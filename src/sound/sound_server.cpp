@@ -39,6 +39,9 @@
 //Wyrmgus start
 #include "grand_strategy.h" //for playing faction music
 #include "player.h" //for playing faction music
+//Wyrmgus end
+#include "sound/unit_sound_type.h"
+//Wyrmgus start
 #include "ui/interface.h" //for player faction music
 //Wyrmgus end
 #include "unit/unit.h"
@@ -69,7 +72,7 @@ struct SoundChannel {
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 	//Wyrmgus start
-	UnitVoiceGroup Voice;  /// Voice group of this channel (for identifying voice types)
+	stratagus::unit_sound_type Voice;  /// Voice group of this channel (for identifying voice types)
 	//Wyrmgus end
 
 	bool Playing;          /// channel is currently playing
@@ -401,8 +404,8 @@ bool UnitSoundIsPlaying(Origin *origin)
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
 		if (
 			origin && Channels[i].Playing
-			&& Channels[i].Voice != UnitVoiceGroup::None
-			&& Channels[i].Voice != UnitVoiceGroup::Hit && Channels[i].Voice != UnitVoiceGroup::Miss && Channels[i].Voice != UnitVoiceGroup::FireMissile && Channels[i].Voice != UnitVoiceGroup::Step
+			&& Channels[i].Voice != stratagus::unit_sound_type::none
+			&& stratagus::is_voice_unit_sound_type(Channels[i].Voice)
 			&& Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			&& origin->Id == Channels[i].Unit->Id
 		) {
@@ -431,7 +434,7 @@ static void ChannelFinished(int channel)
 	Channels[channel].Unit = nullptr;
 	
 	//Wyrmgus start
-	Channels[channel].Voice = UnitVoiceGroup::None;
+	Channels[channel].Voice = stratagus::unit_sound_type::none;
 	//Wyrmgus end
 	Channels[channel].Playing = false;
 	Channels[channel].Point = NextFreeChannel;
@@ -451,7 +454,7 @@ static int FillChannel(stratagus::sample *sample, unsigned char volume, char ste
 	Channels[NextFreeChannel].Volume = volume;
 	Channels[NextFreeChannel].Point = 0;
 	//Wyrmgus start
-	Channels[NextFreeChannel].Voice = UnitVoiceGroup::None;
+	Channels[NextFreeChannel].Voice = stratagus::unit_sound_type::none;
 	//Wyrmgus end
 	Channels[NextFreeChannel].Playing = true;
 	Channels[NextFreeChannel].Sample = sample;
@@ -531,7 +534,7 @@ int SetChannelStereo(int channel, int stereo)
 **
 **  @param channel  Channel to set
 */
-void SetChannelVoiceGroup(int channel, UnitVoiceGroup voice)
+void SetChannelVoiceGroup(int channel, const stratagus::unit_sound_type voice)
 {
 	if (channel < 0 || channel >= MaxChannels) {
 		return;
@@ -1075,7 +1078,7 @@ int InitSound()
 		Channels[i].Unit = nullptr;
 		Channels[i].Volume = 0;
 		Channels[i].Stereo = 0;
-		Channels[i].Voice = UnitVoiceGroup::None;
+		Channels[i].Voice = stratagus::unit_sound_type::none;
 		Channels[i].Playing = false;
 		//Wyrmgus end
 	}

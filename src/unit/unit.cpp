@@ -74,6 +74,7 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unitsound.h"
+#include "sound/unit_sound_type.h"
 #include "spells.h"
 #include "time/time_of_day.h"
 #include "translate.h"
@@ -6637,7 +6638,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		return;
 	}
 
-	PlayUnitSound(unit, UnitVoiceGroup::Dying);
+	PlayUnitSound(unit, stratagus::unit_sound_type::dying);
 
 	//
 	// Catapults,... explodes.
@@ -6709,7 +6710,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
 				table[i]->Anim.Unbreakable = 0;
-				PlayUnitSound(*table[i], UnitVoiceGroup::Dying);
+				PlayUnitSound(*table[i], stratagus::unit_sound_type::dying);
 				table[i]->Remove(nullptr);
 				UnitLost(*table[i]);
 				UnitClearOrders(*table[i]);
@@ -6892,7 +6893,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
-				PlayUnitSound(target, UnitVoiceGroup::HelpMe);
+				PlayUnitSound(target, stratagus::unit_sound_type::help);
 				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
 			}
 		}

@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_still.h"
@@ -58,6 +54,7 @@
 //Wyrmgus start
 #include "sound/sound.h"
 //Wyrmgus end
+#include "sound/unit_sound_type.h"
 #include "species.h"
 #include "spells.h"
 #include "unit/unit.h"
@@ -530,7 +527,7 @@ bool AutoAttack(CUnit &unit)
 				UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 			}
 			if (SyncRand(100000) == 0) {
-				PlayUnitSound(unit, UnitVoiceGroup::Idle);
+				PlayUnitSound(unit, stratagus::unit_sound_type::idle);
 			}
 			unit.StepCount = 0;
 			break;

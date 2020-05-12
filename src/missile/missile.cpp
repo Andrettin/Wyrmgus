@@ -50,6 +50,7 @@
 //Wyrmgus end
 #include "sound/sound.h"
 #include "sound/unitsound.h"
+#include "sound/unit_sound_type.h"
 #include "spells.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -772,7 +773,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				if (CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
-					PlayUnitSound(unit, UnitVoiceGroup::Hit);
+					PlayUnitSound(unit, stratagus::unit_sound_type::hit);
 					damage = CalculateDamageStats(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr);
 					//Wyrmgus end
 					CMap::Map.HitWall(goalPos,
@@ -803,7 +804,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (goal->IsAlive()) {
 				HitUnit_NormalHitSpecialDamageEffects(unit, *goal);
 			}
-			PlayUnitSound(unit, UnitVoiceGroup::Hit);
+			PlayUnitSound(unit, stratagus::unit_sound_type::hit);
 			
 			//apply Thorns damage if attacker is at melee range
 			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
@@ -816,7 +817,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				HitUnit(goal, unit, thorns_damage);
 			}
 		} else {
-			PlayUnitSound(unit, UnitVoiceGroup::Miss);
+			PlayUnitSound(unit, stratagus::unit_sound_type::miss);
 		}
 		//Wyrmgus end
 		return;
@@ -876,7 +877,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		}
 	}
 	
-	PlayUnitSound(unit, UnitVoiceGroup::FireMissile);
+	PlayUnitSound(unit, stratagus::unit_sound_type::fire_missile);
 }
 
 /**

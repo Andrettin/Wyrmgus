@@ -296,6 +296,7 @@ set(sound_SRCS
 	src/sound/sound_id.cpp
 	src/sound/sound_server.cpp
 	src/sound/unitsound.cpp
+	src/sound/unit_sound_type.cpp
 )
 source_group(sound FILES ${sound_SRCS})
 
@@ -673,6 +674,7 @@ set(stratagus_sound_HDRS
 	src/sound/sound.h
 	src/sound/sound_server.h
 	src/sound/unitsound.h
+	src/sound/unit_sound_type.h
 )
 
 set(stratagus_spell_HDRS

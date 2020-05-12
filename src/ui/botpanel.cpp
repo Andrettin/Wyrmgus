@@ -67,6 +67,7 @@
 //Wyrmgus end
 #include "script/trigger.h"
 #include "sound/sound.h"
+#include "sound/unit_sound_type.h"
 #include "spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
@@ -85,10 +86,6 @@
 #include "upgrade/upgrade.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 /// Last drawn popup : used to speed up drawing
 ButtonAction *LastDrawnButtonPopup;
 /// for unit buttons sub-menus etc.
@@ -97,10 +94,6 @@ CButtonLevel *CurrentButtonLevel = nullptr;
 std::vector<ButtonAction *> UnitButtonTable;
 /// Pointer to current buttons
 std::vector<ButtonAction> CurrentButtons;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Initialize the buttons.
@@ -2347,7 +2340,7 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 	for (size_t i = 0; i < Selected.size(); ++i) {
 		CUnit *connection_destination = Selected[i]->ConnectingDestination;
 		if (connection_destination != nullptr) {
-			PlayUnitSound(*connection_destination, UnitVoiceGroup::Used);
+			PlayUnitSound(*connection_destination, stratagus::unit_sound_type::used);
 			Selected[i]->Blink = 4;
 			connection_destination->Blink = 4;
 			UnSelectUnit(*Selected[i]);

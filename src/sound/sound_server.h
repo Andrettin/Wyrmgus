@@ -40,6 +40,8 @@ static constexpr int SOUND_BUFFER_SIZE = 65536;
 
 namespace stratagus {
 
+enum class unit_sound_type;
+
 /**
 **  RAW samples.
 */
@@ -107,17 +109,13 @@ private:
 
 }
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);
 /// Set the channel stereo
 extern int SetChannelStereo(int channel, int stereo);
 //Wyrmgus start
 /// Set the channel voice group
-extern void SetChannelVoiceGroup(int channel, UnitVoiceGroup voice);
+extern void SetChannelVoiceGroup(int channel, const stratagus::unit_sound_type unit_sound_type);
 //Wyrmgus end
 /// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));

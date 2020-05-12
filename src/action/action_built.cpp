@@ -48,6 +48,7 @@
 #include "quest.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "sound/unit_sound_type.h"
 #include "translate.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -287,29 +288,21 @@ static void Finish(COrder_Built &order, CUnit &unit)
 //	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	//Wyrmgus end
 	if (&player == CPlayer::GetThisPlayer()) {
-		//Wyrmgus start
-		/*
 		if (type.MapSound.Ready.Sound) {
-			PlayUnitSound(unit, UnitVoiceGroup::Ready);
-		} else if (worker) {
-			PlayUnitSound(*worker, UnitVoiceGroup::WorkCompleted);
-		*/
-		if (type.MapSound.Ready.Sound) {
-			PlayUnitSound(unit, UnitVoiceGroup::Ready);
+			PlayUnitSound(unit, stratagus::unit_sound_type::ready);
 		}
 		if (worker) {
 			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
-				PlayUnitSound(*worker, UnitVoiceGroup::WorkCompleted);
+				PlayUnitSound(*worker, stratagus::unit_sound_type::work_completed);
 			}
-		//Wyrmgus end
 		} else {
 			//Wyrmgus start
 			// why play the under-construction sound if the building has just been completed?
-//			PlayUnitSound(unit, UnitVoiceGroup::Building);
+//			PlayUnitSound(unit, stratagus::unit_sound_type::construction);
 			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
 				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
-						PlayUnitSound(*table[i], UnitVoiceGroup::WorkCompleted);
+						PlayUnitSound(*table[i], stratagus::unit_sound_type::work_completed);
 						break;
 					}
 				}

@@ -171,15 +171,12 @@ void MapUnitSounds()
 		civilization->UnitSounds.Idle.MapSound();
 		civilization->UnitSounds.Build.MapSound();
 		civilization->UnitSounds.Ready.MapSound();
-		civilization->UnitSounds.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
 		civilization->UnitSounds.Repair.MapSound();
 		for (int j = 0; j < MaxCosts; ++j) {
 			civilization->UnitSounds.Harvest[j].MapSound();
 		}
 		civilization->UnitSounds.Help.MapSound();
-		civilization->UnitSounds.Help.SetSoundRange(INFINITE_SOUND_RANGE);
 		civilization->UnitSounds.HelpTown.MapSound();
-		civilization->UnitSounds.HelpTown.SetSoundRange(INFINITE_SOUND_RANGE);
 	}
 
 	// Parse all units sounds.
@@ -188,7 +185,6 @@ void MapUnitSounds()
 
 		unit_type->MapSound.Selected.MapSound();
 		unit_type->MapSound.Acknowledgement.MapSound();
-		// unit_type->Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
 		unit_type->MapSound.Attack.MapSound();
 		//Wyrmgus start
 		unit_type->MapSound.Idle.MapSound();
@@ -205,13 +201,11 @@ void MapUnitSounds()
 		//Wyrmgus end
 		unit_type->MapSound.Build.MapSound();
 		unit_type->MapSound.Ready.MapSound();
-		unit_type->MapSound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
 		unit_type->MapSound.Repair.MapSound();
 		for (int i = 0; i < MaxCosts; ++i) {
 			unit_type->MapSound.Harvest[i].MapSound();
 		}
 		unit_type->MapSound.Help.MapSound();
-		unit_type->MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
 
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 			unit_type->MapSound.Dead[i].MapSound();

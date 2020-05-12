@@ -41,34 +41,6 @@ class Missile;
 static constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
 
 /**
-**  Voice groups for a unit
-*/
-enum class UnitVoiceGroup {
-	None = -1,
-	Selected,          /// If selected
-	Acknowledging,     /// Acknowledge command
-	Ready,             /// Command completed
-	HelpMe,            /// If attacked
-	Dying,             /// If killed
-	WorkCompleted,     /// only worker, work completed
-	Building,          /// only for building under construction
-	Docking,           /// only for transport reaching coast
-	Repairing,         /// repairing
-	Harvesting,        /// harvesting
-	Attack,            /// Attack command
-	//Wyrmgus start
-	Idle,				/// Idle sound
-	Hit,				/// Hit another unit
-	Miss,				/// Attacked another unit, but missed
-	FireMissile,		/// Fire a missile at another unit
-	Step,				/// Stepped
-	Used,				/// Used (for items)
-	//Wyrmgus end
-	Build              /// worker goes to build a building
-};
-
-
-/**
 **  Global game sounds, not associated to any unit-type
 */
 class GameSound
@@ -112,6 +84,7 @@ extern stratagus::sound *RegisterSound(const std::string &identifier, const std:
 namespace stratagus {
 
 class sample;
+enum class unit_sound_type;
 
 class sound final : public data_entry, public data_type<sound>
 {
@@ -229,7 +202,7 @@ extern int DistanceSilent;
 /// Calculates volume level
 extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group);
+extern void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_sound_type);
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, stratagus::sound *sound);
 /// Play a missile sound
