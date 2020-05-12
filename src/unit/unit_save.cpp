@@ -425,8 +425,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 	}
 	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer) {
-		file.printf(",\n  \"rally-point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
-		file.printf(",\n  \"rally-point-map-layer\", %d, ", unit.RallyPointMapLayer->ID);
+		file.printf(",\n  \"rally_point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
+		file.printf(",\n  \"rally_point_map_layer\", %d, ", unit.RallyPointMapLayer->ID);
 	}
 	if (unit.Character != nullptr && unit.CurrentAction() != UnitAction::Die && !unit.Destroyed) {
 		if (!unit.Character->Custom) {

@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ai.h"
@@ -46,10 +42,12 @@
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
+#include "util/vector_util.h"
 
 /**
 **  Insert new unit-type element.
@@ -353,7 +351,10 @@ static void InitAiHelper(AiHelper &aiHelper)
 	}
 
 	for (const stratagus::button *button : stratagus::button::get_all()) {
-		const std::vector<stratagus::unit_type *> &unitmask = getUnitTypeFromString(button->UnitMask);
+		std::vector<stratagus::unit_type *> unitmask = getUnitTypeFromString(button->UnitMask);
+		for (const stratagus::unit_class *unit_class : button->get_unit_classes()) {
+			stratagus::vector::merge(unitmask, unit_class->get_unit_types());
+		}
 
 		switch (button->Action) {
 			case ButtonCmd::Repair :

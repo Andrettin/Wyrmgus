@@ -957,7 +957,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "auto-spell-cast")) {
 		SendCommandAutoSpellCast(*unit, num, arg1);
 	//Wyrmgus start
-	} else if (!strcmp(action, "rally-point")) {
+	} else if (!strcmp(action, "rally_point")) {
 		SendCommandRallyPoint(*unit, pos);
 	} else if (!strcmp(action, "quest")) {
 		SendCommandQuest(*unit, stratagus::quest::get(val));

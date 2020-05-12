@@ -721,13 +721,13 @@ static int CclUnit(lua_State *l)
 			++j;
 			int individual_upgrade_quantity = LuaToNumber(l, 2, j + 1);
 			unit->SetIndividualUpgrade(individual_upgrade, individual_upgrade_quantity);
-		} else if (!strcmp(value, "rally-point")) {
+		} else if (!strcmp(value, "rally_point")) {
 			int rally_point_x = LuaToNumber(l, 2, j + 1);
 			++j;
 			int rally_point_y = LuaToNumber(l, 2, j + 1);
 			unit->RallyPointPos.x = rally_point_x;
 			unit->RallyPointPos.y = rally_point_y;
-		} else if (!strcmp(value, "rally-point-map-layer")) {
+		} else if (!strcmp(value, "rally_point_map_layer")) {
 			unit->RallyPointMapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)];
 		//Wyrmgus end
 		} else {

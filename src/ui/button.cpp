@@ -36,6 +36,7 @@
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 #include "util/string_util.h"
@@ -75,7 +76,7 @@ void button::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			const ButtonCmd button_action_id = GetButtonActionIdByName(value);
 			if (button_action_id != ButtonCmd::None) {
-				button->Action = ButtonCmd(button_action_id);
+				button->Action = button_action_id;
 			} else {
 				fprintf(stderr, "Invalid button action: \"%s\".\n", value.c_str());
 			}
@@ -144,7 +145,6 @@ void button::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			button->CommentSound.Name = value;
 		} else if (key == "popup") {
-			value = FindAndReplaceString(value, "_", "-");
 			button->Popup = value;
 		} else if (key == "for_unit") {
 			if (value == "*") {
@@ -160,6 +160,45 @@ void button::ProcessConfigData(const CConfigData *config_data)
 		} else {
 			fprintf(stderr, "Invalid button property: \"%s\".\n", key.c_str());
 		}
+	}
+}
+
+void button::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "action") {
+		const ButtonCmd button_action_id = GetButtonActionIdByName(value);
+		if (button_action_id != ButtonCmd::None) {
+			this->Action = button_action_id;
+		} else {
+			throw std::runtime_error("Invalid button action: \"" + value + "\".");
+		}
+	} else if (key == "key") {
+		this->Key = GetHotKey(value);
+	} else if (key == "hint") {
+		this->Hint = value;
+	} else if (key == "popup") {
+		this->Popup = value;
+	} else if (key == "icon") {
+		this->Icon.Name = value;
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void button::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "unit_classes") {
+		for (const std::string &value : values) {
+			this->unit_classes.push_back(unit_class::get(value));
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
@@ -392,7 +431,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 		case ButtonCmd::Unload:
 			return "unload";
 		case ButtonCmd::RallyPoint:
-			return "rally-point";
+			return "rally_point";
 		case ButtonCmd::Faction:
 			return "faction";
 		case ButtonCmd::Quest:
@@ -464,7 +503,7 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::UpgradeTo;
 	} else if (button_action == "unload") {
 		return ButtonCmd::Unload;
-	} else if (button_action == "rally-point") {
+	} else if (button_action == "rally_point") {
 		return ButtonCmd::RallyPoint;
 	} else if (button_action == "faction") {
 		return ButtonCmd::Faction;

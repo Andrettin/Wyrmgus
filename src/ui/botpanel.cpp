@@ -84,6 +84,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
+#include "util/vector_util.h"
 #include "video.h"
 
 /// Last drawn popup : used to speed up drawing
@@ -1534,7 +1535,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 		//Wyrmgus start
 		bool used_by_all = true;
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i])) {
+			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i]) && !stratagus::vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
 				used_by_all = false;
 				break;
 			}
@@ -1610,7 +1611,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// any unit or unit in list
 		if (button->UnitMask[0] != '*'
-			&& !strstr(button->UnitMask.c_str(), unit_ident)) {
+			&& !strstr(button->UnitMask.c_str(), unit_ident) && !stratagus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
 			continue;
 		}
 		//Wyrmgus start
@@ -1681,7 +1682,7 @@ void CButtonPanel::Update()
 			}
 			char unit_ident[128];
 			sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
-			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident)) {
+			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident) && !stratagus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
 				continue;
 			}
 

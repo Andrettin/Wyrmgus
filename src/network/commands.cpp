@@ -153,7 +153,7 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("rally-point", &unit, 0, pos.x, pos.y, NoUnitP, nullptr, -1);
+		CommandLog("rally_point", &unit, 0, pos.x, pos.y, NoUnitP, nullptr, -1);
 		CommandRallyPoint(unit, pos, z);
 	} else {
 		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, 0);
@@ -902,7 +902,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 //			CommandLog("move", &unit, status, pos.x, pos.y, NoUnitP, nullptr, -1);
 //			CommandMove(unit, pos, status);
 			if (!unit.CanMove()) { //FIXME: find better way to identify whether the unit should move or set a rally point
-				CommandLog("rally-point", &unit, status, pos.x, pos.y, NoUnitP, nullptr, -1);
+				CommandLog("rally_point", &unit, status, pos.x, pos.y, NoUnitP, nullptr, -1);
 				CommandRallyPoint(unit, pos);
 			} else {
 				CommandLog("move", &unit, status, pos.x, pos.y, NoUnitP, nullptr, -1);

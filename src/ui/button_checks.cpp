@@ -44,6 +44,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
+#include "util/vector_util.h"
 
 /**
 **  ButtonCheck for button enabled, always true.
@@ -497,7 +498,7 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const stratagus::button &button
 
 		char unit_ident[128];
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
-		if (other_button->UnitMask[0] != '*' && !strstr(other_button->UnitMask.c_str(), unit_ident)) {
+		if (other_button->UnitMask[0] != '*' && !strstr(other_button->UnitMask.c_str(), unit_ident) && !stratagus::vector::contains(other_button->get_unit_classes(), unit.Type->get_unit_class())) {
 			continue;
 		}
 		

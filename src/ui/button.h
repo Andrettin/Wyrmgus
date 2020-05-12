@@ -42,6 +42,8 @@ int CclDefineButton(lua_State *l);
 namespace stratagus {
 
 class button;
+class unit_class;
+
 typedef bool (*button_check_func)(const CUnit &, const button &);
 
 class button : public data_entry, public data_type<button>
@@ -72,6 +74,7 @@ public:
 		this->Allowed = other_button.Allowed;
 		this->AllowStr = other_button.AllowStr;
 		this->UnitMask = other_button.UnitMask;
+		this->unit_classes = other_button.unit_classes;
 		this->Icon = other_button.Icon;
 		this->Key = other_button.Key;
 		this->Hint = other_button.Hint;
@@ -83,6 +86,8 @@ public:
 		return *this;
 	}
 
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
 	int get_pos() const
@@ -96,6 +101,11 @@ public:
 	int GetKey() const;
 	std::string GetHint() const;
 
+	const std::vector<unit_class *> &get_unit_classes() const
+	{
+		return this->unit_classes;
+	}
+
 	int pos = 0; //button position in the grid
 	CButtonLevel *Level = nullptr;		/// requires button level
 	bool AlwaysShow = false;			/// button is always shown but drawn grayscale if not available
@@ -106,7 +116,10 @@ public:
 
 	button_check_func Allowed = nullptr;    /// Check if this button is allowed
 	std::string AllowStr;       /// argument for allowed
-	std::string UnitMask;       /// for which units is it available
+	std::string UnitMask;       //for which units is it available
+private:
+	std::vector<unit_class *> unit_classes; //unit classes for which the button is available
+public:
 	IconConfig Icon;      		/// icon to display
 	int Key = 0;                    /// alternative on keyboard
 	std::string Hint;           /// tip texts

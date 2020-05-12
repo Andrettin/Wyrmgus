@@ -982,7 +982,7 @@ void DrawPopups()
 					ba->Hint = unit_name;
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*UnitUnderCursor);
-					ba->Popup = "popup-unit-under-cursor";
+					ba->Popup = "popup_unit_under_cursor";
 					DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
@@ -1014,7 +1014,7 @@ void DrawPopups()
 			ba.Hint = Selected[0]->GetMessageName();
 			ba.Action = ButtonCmd::Unit;
 			ba.Value = UnitNumber(*Selected[0]);
-			ba.Popup = "popup-unit";
+			ba.Popup = "popup_unit";
 			DrawPopup(ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 			LastDrawnButtonPopup = nullptr;
 		}
@@ -1059,7 +1059,7 @@ void DrawPopups()
 					ba->Level = CButtonLevel::InventoryButtonLevel;
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*uins);
-					ba->Popup = "popup-item-inventory";
+					ba->Popup = "popup_item_inventory";
 					DrawPopup(*ba, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
@@ -1131,7 +1131,7 @@ void DrawPopups()
 			ba->Action = ButtonCmd::ProduceResource;
 			ba->Value = i;
 			ba->ValueStr = DefaultResourceNames[i];
-			ba->Popup = "popup-resource";
+			ba->Popup = "popup_resource";
 			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
 			delete ba;
 			LastDrawnButtonPopup = nullptr;
@@ -1909,7 +1909,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		ba->Hint = unit.GetMessageName();
 		ba->Action = ButtonUnit;
 		ba->Value = UnitNumber(unit);
-		ba->Popup = "popup-unit";
+		ba->Popup = "popup_unit";
 		DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		delete ba;
 		LastDrawnButtonPopup = nullptr;

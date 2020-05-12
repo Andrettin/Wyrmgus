@@ -1273,7 +1273,7 @@ void unit_type::initialize()
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
 		button_definition += "\tAction = \"move\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tPopup = \"popup_commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
 		button_definition += "\tHint = _(\"~!Move\"),\n";
 		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
@@ -1285,7 +1285,7 @@ void unit_type::initialize()
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
 		button_definition += "\tAction = \"stop\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tPopup = \"popup_commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
 		button_definition += "\tHint = _(\"~!Stop\"),\n";
 		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
@@ -1297,7 +1297,7 @@ void unit_type::initialize()
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
 		button_definition += "\tAction = \"attack\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tPopup = \"popup_commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
 		button_definition += "\tHint = _(\"~!Attack\"),\n";
 		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
@@ -1309,7 +1309,7 @@ void unit_type::initialize()
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tPopup = \"popup_commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
 		button_definition += "\tHint = _(\"~!Patrol\"),\n";
 		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
@@ -1321,7 +1321,7 @@ void unit_type::initialize()
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
 		button_definition += "\tAction = \"stand-ground\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tPopup = \"popup_commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
 		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
 		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";

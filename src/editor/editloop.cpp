@@ -2049,7 +2049,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			CurrentButtons[j]->Action = ButtonCmd::EditorUnit;
 			CurrentButtons[j]->ValueStr = Editor.ShownUnitTypes[i]->Ident;
 			CurrentButtons[j]->Value = Editor.ShownUnitTypes[i]->Slot;
-			CurrentButtons[j]->Popup = "popup-unit";
+			CurrentButtons[j]->Popup = "popup_unit";
 		}
 		//Wyrmgus end
 		if (x < screenPos.x && screenPos.x < x + IconWidth
