@@ -62,7 +62,7 @@
 #include "species.h"
 #include "spells.h"
 #include "time/season.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

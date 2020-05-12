@@ -31,7 +31,7 @@
 
 #include "player.h"
 #include "time/calendar.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

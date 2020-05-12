@@ -63,7 +63,7 @@
 #include "script.h"
 #include "species.h"
 #include "time/calendar.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"

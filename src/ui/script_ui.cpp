@@ -40,7 +40,7 @@
 #include "spells.h"
 #include "title.h"
 #include "util/util.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
 #include "ui/cursor.h"
@@ -52,6 +52,8 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "video.h"
+
+#include <QUuid>
 
 std::string ClickMissile;		/// FIXME:docu
 std::string DamageMissile;		/// FIXME:docu
@@ -917,7 +919,12 @@ static int CclDefineButton(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	ButtonAction ba;
+
+	//generate UUID as an identifier for the Lua-defined button
+	const QUuid uuid = QUuid::createUuid();
+	const std::string identifier = uuid.toString(QUuid::WithoutBraces).toStdString();
+
+	stratagus::button *button = stratagus::button::add(identifier, nullptr);
 
 	//
 	// Parse the arguments
@@ -926,18 +933,18 @@ static int CclDefineButton(lua_State *l)
 	while (lua_next(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Pos")) {
-			ba.Pos = LuaToNumber(l, -1);
+			button->pos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Level")) {
-			ba.Level = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
+			button->Level = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
 		} else if (!strcmp(value, "AlwaysShow")) {
-			ba.AlwaysShow = LuaToBoolean(l, -1);
+			button->AlwaysShow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			ba.Icon.Name = LuaToString(l, -1);
+			button->Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
 			value = LuaToString(l, -1);
 			const ButtonCmd button_action_id = GetButtonActionIdByName(std::string(value));
 			if (button_action_id != ButtonCmd::None) {
-				ba.Action = ButtonCmd(button_action_id);
+				button->Action = button_action_id;
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
@@ -947,7 +954,7 @@ static int CclDefineButton(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isfunction(l, -1)) {
-				ba.Payload = new LuaCallback(l, -1);
+				button->Payload = new LuaCallback(l, -1);
 			} else {
 				char buf[64];
 				const char *s2;
@@ -958,52 +965,52 @@ static int CclDefineButton(lua_State *l)
 				} else {
 					s2 = lua_tostring(l, -1);
 				}
-				ba.ValueStr = s2;
+				button->ValueStr = s2;
 			}
 		} else if (!strcmp(value, "Allowed")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "check-true")) {
-				ba.Allowed = ButtonCheckTrue;
+				button->Allowed = ButtonCheckTrue;
 			} else if (!strcmp(value, "check-false")) {
-				ba.Allowed = ButtonCheckFalse;
+				button->Allowed = ButtonCheckFalse;
 			} else if (!strcmp(value, "check-upgrade")) {
-				ba.Allowed = ButtonCheckUpgrade;
+				button->Allowed = ButtonCheckUpgrade;
 			} else if (!strcmp(value, "check-upgrade-not")) {
-				ba.Allowed = ButtonCheckUpgradeNot;
+				button->Allowed = ButtonCheckUpgradeNot;
 			} else if (!strcmp(value, "check-upgrade-or")) {
-				ba.Allowed = ButtonCheckUpgradeOr;
+				button->Allowed = ButtonCheckUpgradeOr;
 			} else if (!strcmp(value, "check-individual-upgrade")) {
-				ba.Allowed = ButtonCheckIndividualUpgrade;
+				button->Allowed = ButtonCheckIndividualUpgrade;
 			} else if (!strcmp(value, "check-individual-upgrade-or")) {
-				ba.Allowed = ButtonCheckIndividualUpgradeOr;
+				button->Allowed = ButtonCheckIndividualUpgradeOr;
 			} else if (!strcmp(value, "check-unit-variable")) {
-				ba.Allowed = ButtonCheckUnitVariable;
+				button->Allowed = ButtonCheckUnitVariable;
 			} else if (!strcmp(value, "check-units-or")) {
-				ba.Allowed = ButtonCheckUnitsOr;
+				button->Allowed = ButtonCheckUnitsOr;
 			} else if (!strcmp(value, "check-units-and")) {
-				ba.Allowed = ButtonCheckUnitsAnd;
+				button->Allowed = ButtonCheckUnitsAnd;
 			} else if (!strcmp(value, "check-units-not")) {
-				ba.Allowed = ButtonCheckUnitsNot;
+				button->Allowed = ButtonCheckUnitsNot;
 			} else if (!strcmp(value, "check-network")) {
-				ba.Allowed = ButtonCheckNetwork;
+				button->Allowed = ButtonCheckNetwork;
 			} else if (!strcmp(value, "check-no-network")) {
-				ba.Allowed = ButtonCheckNoNetwork;
+				button->Allowed = ButtonCheckNoNetwork;
 			} else if (!strcmp(value, "check-no-work")) {
-				ba.Allowed = ButtonCheckNoWork;
+				button->Allowed = ButtonCheckNoWork;
 			} else if (!strcmp(value, "check-no-research")) {
-				ba.Allowed = ButtonCheckNoResearch;
+				button->Allowed = ButtonCheckNoResearch;
 			} else if (!strcmp(value, "check-attack")) {
-				ba.Allowed = ButtonCheckAttack;
+				button->Allowed = ButtonCheckAttack;
 			} else if (!strcmp(value, "check-upgrade-to")) {
-				ba.Allowed = ButtonCheckUpgradeTo;
+				button->Allowed = ButtonCheckUpgradeTo;
 			} else if (!strcmp(value, "check-research")) {
-				ba.Allowed = ButtonCheckResearch;
+				button->Allowed = ButtonCheckResearch;
 			} else if (!strcmp(value, "check-single-research")) {
-				ba.Allowed = ButtonCheckSingleResearch;
+				button->Allowed = ButtonCheckSingleResearch;
 			} else if (!strcmp(value, "check-has-inventory")) {
-				ba.Allowed = ButtonCheckHasInventory;
+				button->Allowed = ButtonCheckHasInventory;
 			} else if (!strcmp(value, "check-has-sub-buttons")) {
-				ba.Allowed = ButtonCheckHasSubButtons;
+				button->Allowed = ButtonCheckHasSubButtons;
 			} else {
 				LuaError(l, "Unsupported action: %s" _C_ value);
 			}
@@ -1021,23 +1028,23 @@ static int CclDefineButton(lua_State *l)
 					allowstr += ",";
 				}
 			}
-			ba.AllowStr = allowstr;
+			button->AllowStr = allowstr;
 		} else if (!strcmp(value, "Key")) {
 			std::string key(LuaToString(l, -1));
-			ba.Key = GetHotKey(key);
+			button->Key = GetHotKey(key);
 		} else if (!strcmp(value, "Hint")) {
-			ba.Hint = LuaToString(l, -1);
+			button->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
-			ba.Description = LuaToString(l, -1);
+			button->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "CommentSound")) {
-			ba.CommentSound.Name = LuaToString(l, -1);
+			button->CommentSound.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Popup")) {
-			ba.Popup = LuaToString(l, -1);
+			button->Popup = LuaToString(l, -1);
 		} else if (!strcmp(value, "ForUnit")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			// FIXME: ba.UnitMask shouldn't be a string
+			// FIXME: button->UnitMask shouldn't be a string
 			std::string umask = ",";
 			const unsigned subargs = lua_rawlen(l, -1);
 			for (unsigned int k = 0; k < subargs; ++k) {
@@ -1045,25 +1052,20 @@ static int CclDefineButton(lua_State *l)
 				umask += s2;
 				umask += ",";
 			}
-			ba.UnitMask = umask;
-			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
-				ba.UnitMask = "*";
+			button->UnitMask = umask;
+			if (!strncmp(button->UnitMask.c_str(), ",*,", 3)) {
+				button->UnitMask = "*";
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Mod")) {
-			ba.Mod = LuaToString(l, -1);
+			button->Mod = LuaToString(l, -1);
 		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
-	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload,
-			  ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name,
-			  //Wyrmgus start
-//			  ba.UnitMask, ba.Popup, ba.AlwaysShow);
-			  ba.UnitMask, ba.Popup, ba.AlwaysShow, ba.Mod);
-			  //Wyrmgus end
+
 	return 0;
 }
 

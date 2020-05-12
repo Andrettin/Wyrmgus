@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include <csignal>
 
 #include "stratagus.h"
@@ -65,7 +61,7 @@
 #include "spells.h"
 #include "time/timeline.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -73,10 +69,6 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
@@ -3571,14 +3563,13 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			other_unit_type->AiDrops.erase(std::remove(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), unit_type), other_unit_type->AiDrops.end());
 		}
 	}
-	int buttons_size = UnitButtonTable.size();
+	const int buttons_size = stratagus::button::get_all().size();
 	for (int j = (buttons_size - 1); j >= 0; --j) {
-		if (UnitButtonTable[j]->UnitMask.find(unit_type->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
-			UnitButtonTable[j]->UnitMask = FindAndReplaceString(UnitButtonTable[j]->UnitMask, unit_type->Ident + ",", "");
+		if (stratagus::button::get_all()[j]->UnitMask.find(unit_type->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
+			stratagus::button::get_all()[j]->UnitMask = FindAndReplaceString(stratagus::button::get_all()[j]->UnitMask, unit_type->Ident + ",", "");
 		}
-		if (UnitButtonTable[j]->Value == unit_type->Slot && UnitButtonTable[j]->ValueStr == unit_type->Ident) {
-			delete UnitButtonTable[j];
-			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
+		if (stratagus::button::get_all()[j]->Value == unit_type->Slot && stratagus::button::get_all()[j]->ValueStr == unit_type->Ident) {
+			stratagus::button::remove(stratagus::button::get_all()[j]);
 		}
 	}
 	stratagus::unit_type::remove(unit_type);

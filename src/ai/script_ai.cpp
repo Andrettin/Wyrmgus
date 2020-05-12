@@ -43,7 +43,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -319,8 +319,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.NavalTransporters.clear();
 	//Wyrmgus end
 	
-	extern std::vector<ButtonAction *> UnitButtonTable;
-
 	std::vector<stratagus::unit_type *> reparableUnits = getReparableUnits();
 	std::vector<stratagus::unit_type *> supplyUnits = getSupplyUnits();
 	std::vector<stratagus::unit_type *> mineUnits = getMineUnits();
@@ -354,11 +352,10 @@ static void InitAiHelper(AiHelper &aiHelper)
 		}
 	}
 
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		const ButtonAction &button = *UnitButtonTable[i];
-		const std::vector<stratagus::unit_type *> &unitmask = getUnitTypeFromString(button.UnitMask);
+	for (const stratagus::button *button : stratagus::button::get_all()) {
+		const std::vector<stratagus::unit_type *> &unitmask = getUnitTypeFromString(button->UnitMask);
 
-		switch (button.Action) {
+		switch (button->Action) {
 			case ButtonCmd::Repair :
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					for (std::vector<stratagus::unit_type *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
@@ -367,7 +364,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			case ButtonCmd::Build: {
-				stratagus::unit_type *buildingType = stratagus::unit_type::get(button.ValueStr);
+				stratagus::unit_type *buildingType = stratagus::unit_type::get(button->ValueStr);
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Build, buildingType->Slot, (**j));
@@ -375,7 +372,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Train : {
-				stratagus::unit_type *trainingType = stratagus::unit_type::get(button.ValueStr);
+				stratagus::unit_type *trainingType = stratagus::unit_type::get(button->ValueStr);
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Train, trainingType->Slot, (**j));
@@ -383,7 +380,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::UpgradeTo : {
-				stratagus::unit_type *upgradeToType = stratagus::unit_type::get(button.ValueStr);
+				stratagus::unit_type *upgradeToType = stratagus::unit_type::get(button->ValueStr);
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, **j);
@@ -395,7 +392,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Research : {
-				int researchId = UpgradeIdByIdent(button.ValueStr);
+				int researchId = UpgradeIdByIdent(button->ValueStr);
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Research, researchId, **j);
@@ -408,7 +405,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			}
 			//Wyrmgus start
 			case ButtonCmd::SellResource : {
-				int resource = GetResourceIdByName(button.ValueStr.c_str());
+				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.SellMarkets, resource - 1, **j);
@@ -416,7 +413,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::BuyResource : {
-				int resource = GetResourceIdByName(button.ValueStr.c_str());
+				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, **j);
@@ -424,7 +421,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::ProduceResource : {
-				int resource = GetResourceIdByName(button.ValueStr.c_str());
+				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.ProducedResources, (**j).Slot, resource);
@@ -432,7 +429,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::ExperienceUpgradeTo : {
-				stratagus::unit_type *upgradeToType = stratagus::unit_type::get(button.ValueStr);
+				stratagus::unit_type *upgradeToType = stratagus::unit_type::get(button->ValueStr);
 
 				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.ExperienceUpgrades, (**j).Slot, *upgradeToType);
@@ -440,7 +437,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::LearnAbility : {
-				CUpgrade *ability = CUpgrade::get(button.ValueStr);
+				CUpgrade *ability = CUpgrade::get(button->ValueStr);
 
 				if (ability->is_ability()) {
 					for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {

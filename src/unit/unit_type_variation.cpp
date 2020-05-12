@@ -36,7 +36,7 @@
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "video.h"
 
 CUnitTypeVariation::~CUnitTypeVariation()

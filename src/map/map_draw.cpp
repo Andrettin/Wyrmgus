@@ -553,60 +553,6 @@ void CViewport::Draw() const
 	*/
 	//Wyrmgus end
 
-	//
-	// Draw unit's name popup
-	//
-	//Wyrmgus start
-	/*
-	//Wyrmgus start
-//	if (CursorOn == cursor_on::map && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
-	if (CursorOn == cursor_on::map && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
-	//Wyrmgus end
-		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
-		//Wyrmgus start
-//		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
-		const bool isMapFieldVisile = Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*ThisPlayer);
-		//Wyrmgus end
-
-		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
-			//Wyrmgus start
-//			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
-			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
-//			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = Map.tile_pos_to_scaled_map_pixel_pos_top_left(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
-			unit_center_pos = scaled_map_to_screen_pixel_pos(unit_center_pos);
-			std::string unit_name;
-			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
-				if (!UnitUnderCursor->Identified) {
-					unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
-				} else {
-					unit_name = UnitUnderCursor->GetName();
-				}
-			} else {
-				unit_name = UnitUnderCursor->GetTypeName();
-			}
-			if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-				unit_name += " (" + UnitUnderCursor->Player->Name + ")";
-			}
-			//hackish way to make the popup appear correctly for the unit under cursor
-			ButtonAction *ba = new ButtonAction;
-			ba->Hint = unit_name;
-			ba->Action = ButtonUnit;
-			ba->Value = UnitNumber(*UnitUnderCursor);
-			ba->Popup = "popup-unit-under-cursor";
-			DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
-			delete ba;
-			LastDrawnButtonPopup = nullptr;
-			//Wyrmgus end
-		//Wyrmgus start
-//		} else if (!isMapFieldVisile) {
-//			ShowUnitName(*this, CursorScreenPos, nullptr, true);
-		//Wyrmgus end
-		}
-	}
-	*/
-	//Wyrmgus end
-
 	DrawBorder();
 	PopClipping();
 }

@@ -45,7 +45,7 @@
 #include "script/trigger.h"
 #include "time/season.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -578,7 +578,7 @@ std::string trigger_dependency::get_string(const std::string &prefix) const
 **
 **  @return        True if available, false otherwise.
 */
-std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
+std::string PrintDependencies(const CPlayer &player, const stratagus::button &button)
 {
 	std::string rules;
 

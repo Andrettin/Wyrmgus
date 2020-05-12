@@ -508,11 +508,7 @@ public:
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };
 
-extern std::vector<ButtonAction> CurrentButtons;  /// Current Selected Buttons
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+extern std::vector<std::unique_ptr<stratagus::button>> CurrentButtons;  /// Current Selected Buttons
 
 extern CUserInterface UI;                           /// The user interface
 
@@ -529,12 +525,6 @@ extern const char DefaultGroupKeys[];         /// Default group keys
 extern std::string UiGroupKeys;               /// Up to 11 keys used for group selection
 
 extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
-
-// only exported to save them
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Initialize the ui
 extern void InitUserInterface();

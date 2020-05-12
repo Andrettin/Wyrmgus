@@ -59,7 +59,7 @@
 #include "sound/unit_sound_type.h"
 #include "spells.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
@@ -1119,7 +1119,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	for (unsigned int j = 0; j < buttonCount; ++j) {
 		if (UI.ButtonPanel.Buttons[j].Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
-			if (!CurrentButtons.empty() && CurrentButtons[j].Pos != -1) {
+			if (!CurrentButtons.empty() && CurrentButtons[j]->get_pos() != -1) {
 				ButtonUnderCursor = j;
 				CursorOn = cursor_on::button;
 				return;
@@ -3172,7 +3172,7 @@ void DrawPieMenu()
 		CurrentCursorState = CursorState::Point;
 		return;
 	}
-	std::vector<ButtonAction> &buttons(CurrentButtons);
+	const std::vector<std::unique_ptr<stratagus::button>> &buttons(CurrentButtons);
 	CLabel label(GetGameFont());
 	CViewport *vp = UI.SelectedViewport;
 	PushClipping();
@@ -3185,39 +3185,33 @@ void DrawPieMenu()
 									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2);
 	}
 	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 9; ++i) {
-		if (buttons[i].Pos != -1) {
+		if (buttons[i]->get_pos() != -1) {
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 			const PixelPos pos(x, y);
 
 			bool gray = false;
 			for (size_t j = 0; j != Selected.size(); ++j) {
-				if (!IsButtonAllowed(*Selected[j], buttons[i])) {
+				if (!IsButtonAllowed(*Selected[j], *buttons[i])) {
 					gray = true;
 					break;
 				}
 			}
 			// Draw icon
 			if (gray) {
-				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
+				buttons[i]->Icon.Icon->DrawGrayscaleIcon(pos);
 			} else {
-				buttons[i].Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color());
+				buttons[i]->Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color());
 			}
 
 			// Tutorial show command key in icons
 			if (UI.ButtonPanel.ShowCommandKey) {
 				const char *text;
 
-				//Wyrmgus start
-//				if (buttons[i].Key == 27) {
-				if (buttons[i].GetKey() == 27) {
-				//Wyrmgus end
+				if (buttons[i]->GetKey() == 27) {
 					text = "ESC";
 				} else {
-					//Wyrmgus start
-//					buf[0] = toupper(buttons[i].Key);
-					buf[0] = toupper(buttons[i].GetKey());
-					//Wyrmgus end
+					buf[0] = toupper(buttons[i]->GetKey());
 					text = (const char *)buf;
 				}
 				label.DrawClip(x + 4, y + 4, text);
@@ -3228,11 +3222,11 @@ void DrawPieMenu()
 	PopClipping();
 
 	int i = GetPieUnderCursor();
-	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
+	if (i != -1 && KeyState != KeyStateInput && buttons[i]->get_pos() != -1) {
 		if (!Preference.NoStatusLineTooltips) {
-			UpdateStatusLineForButton(buttons[i]);
+			UpdateStatusLineForButton(*buttons[i]);
 		}
-		DrawPopup(buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
+		DrawPopup(*buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
 }
 
@@ -3247,7 +3241,7 @@ static void HandlePieMenuMouseSelection()
 
 	int pie = GetPieUnderCursor();
 	if (pie != -1) {
-		const ButtonCmd action = CurrentButtons[pie].Action;
+		const ButtonCmd action = CurrentButtons[pie]->Action;
 		UI.ButtonPanel.DoClicked(pie);
 		if (action == ButtonCmd::Button) {
 			// there is a submenu => stay in piemenu mode

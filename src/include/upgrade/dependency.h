@@ -89,11 +89,11 @@ class CConfigData;
 class CPlayer;
 class CUnit;
 class CUpgrade;
-class ButtonAction;
 
 namespace stratagus {
 
 class age;
+class button;
 class character;
 class faction;
 class season;
@@ -354,7 +354,7 @@ private:
 extern void DependenciesCclRegister();
 
 /// Print all unit dependencies into string
-extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &button);
+extern std::string PrintDependencies(const CPlayer &player, const stratagus::button &button);
 extern void AddDependency(const int rule_type, const std::string &target, const int required_rule_type, const std::string &required, const int count, const int or_flag, const bool is_predependency);
 
 /// Check dependencies for player

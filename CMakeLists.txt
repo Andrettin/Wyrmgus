@@ -379,7 +379,7 @@ source_group(time FILES ${time_SRCS})
 
 set(ui_SRCS
 	src/ui/botpanel.cpp
-	src/ui/button_action.cpp
+	src/ui/button.cpp
 	src/ui/button_checks.cpp
 	src/ui/button_level.cpp
 	src/ui/contenttype.cpp
@@ -705,7 +705,7 @@ set(stratagus_time_HDRS
 )
 
 set(stratagus_ui_HDRS
-	src/ui/button_action.h
+	src/ui/button.h
 	src/ui/button_cmd.h
 	src/ui/button_level.h
 	src/ui/contenttype.h

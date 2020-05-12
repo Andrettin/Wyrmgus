@@ -59,7 +59,7 @@
 #include "time/season_schedule.h"
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"
@@ -239,7 +239,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		
 		if (config_data->Tag == "button") {
 			if (!define_only) {
-				ButtonAction::ProcessConfigData(config_data);
+				stratagus::button::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "button_level") {
 			CButtonLevel *button_level = CButtonLevel::GetOrAddButtonLevel(ident);

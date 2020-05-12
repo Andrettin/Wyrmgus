@@ -88,7 +88,7 @@
 #include "text.h"
 #include "time/calendar.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

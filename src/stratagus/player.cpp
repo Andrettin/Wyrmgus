@@ -79,7 +79,7 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start
@@ -2446,26 +2446,26 @@ void CPlayer::update_quest_pool()
 void CPlayer::available_quests_changed()
 {
 	if (this == CPlayer::GetThisPlayer()) {
-		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-			if (UnitButtonTable[i]->Action != ButtonCmd::Quest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
+		for (stratagus::button *button : stratagus::button::get_all()) {
+			if (button->Action != ButtonCmd::Quest || button->Value >= (int) this->AvailableQuests.size()) {
 				continue;
 			}
 			
-			const stratagus::quest *quest = this->AvailableQuests[UnitButtonTable[i]->Value];
-			UnitButtonTable[i]->Hint = "Quest: " + quest->get_name();
-			UnitButtonTable[i]->Description = quest->get_description() + "\n \nObjectives:";
+			const stratagus::quest *quest = this->AvailableQuests[button->Value];
+			button->Hint = "Quest: " + quest->get_name();
+			button->Description = quest->get_description() + "\n \nObjectives:";
 			for (size_t j = 0; j < quest->Objectives.size(); ++j) {
-				UnitButtonTable[i]->Description += "\n- " + quest->Objectives[j]->get_objective_string();
+				button->Description += "\n- " + quest->Objectives[j]->get_objective_string();
 			}
 			for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j) {
-				UnitButtonTable[i]->Description += "\n" + quest->ObjectiveStrings[j];
+				button->Description += "\n" + quest->ObjectiveStrings[j];
 			}
 			const std::string rewards_string = quest->get_rewards_string();
 			if (!rewards_string.empty()) {
-				UnitButtonTable[i]->Description += "\n \nRewards:\n" + rewards_string;
+				button->Description += "\n \nRewards:\n" + rewards_string;
 			}
 			if (!quest->Hint.empty()) {
-				UnitButtonTable[i]->Description += "\n \nHint: " + quest->Hint;
+				button->Description += "\n \nHint: " + quest->Hint;
 			}
 			if (quest->HighestCompletedDifficulty > DifficultyNoDifficulty) {
 				std::string highest_completed_difficulty;
@@ -2478,7 +2478,7 @@ void CPlayer::available_quests_changed()
 				} else if (quest->HighestCompletedDifficulty == DifficultyBrutal) {
 					highest_completed_difficulty = "Brutal";
 				}
-				UnitButtonTable[i]->Description += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;
+				button->Description += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;
 			}
 			
 		}

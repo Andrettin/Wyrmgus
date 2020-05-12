@@ -25,149 +25,225 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
-#include "ui/button_action.h"
+#include "ui/button.h"
 
 #include "config.h"
 #include "faction.h"
 #include "script/trigger.h"
+#include "spells.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "upgrade/upgrade.h"
 #include "util/string_util.h"
 #include "video.h"
 #include "widgets.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+#include <QUuid>
+
+namespace stratagus {
 
 /**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data
 */
-void ButtonAction::ProcessConfigData(const CConfigData *config_data)
+void button::ProcessConfigData(const CConfigData *config_data)
 {
-	ButtonAction ba;
+	const QUuid uuid = QUuid::createUuid();
+	const std::string identifier = uuid.toString(QUuid::WithoutBraces).toStdString();
+
+	stratagus::button *button = stratagus::button::add(identifier, nullptr);
 	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "pos") {
-			ba.Pos = std::stoi(value);
+			button->pos = std::stoi(value);
 		} else if (key == "level") {
 			value = FindAndReplaceString(value, "_", "-");
-			ba.Level = CButtonLevel::GetButtonLevel(value);
+			button->Level = CButtonLevel::GetButtonLevel(value);
 		} else if (key == "always_show") {
-			ba.AlwaysShow = string::to_bool(value);
+			button->AlwaysShow = string::to_bool(value);
 		} else if (key == "icon") {
-			ba.Icon.Name = value;
+			button->Icon.Name = value;
 		} else if (key == "action") {
 			value = FindAndReplaceString(value, "_", "-");
 			const ButtonCmd button_action_id = GetButtonActionIdByName(value);
 			if (button_action_id != ButtonCmd::None) {
-				ba.Action = ButtonCmd(button_action_id);
+				button->Action = ButtonCmd(button_action_id);
 			} else {
 				fprintf(stderr, "Invalid button action: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "value") {
 			value = FindAndReplaceString(value, "_", "-");
-			ba.ValueStr = value;
+			button->ValueStr = value;
 		} else if (key == "allowed") {
 			if (value == "check_true") {
-				ba.Allowed = ButtonCheckTrue;
+				button->Allowed = ButtonCheckTrue;
 			} else if (value == "check_false") {
-				ba.Allowed = ButtonCheckFalse;
+				button->Allowed = ButtonCheckFalse;
 			} else if (value == "check_upgrade") {
-				ba.Allowed = ButtonCheckUpgrade;
+				button->Allowed = ButtonCheckUpgrade;
 			} else if (value == "check_upgrade_not") {
-				ba.Allowed = ButtonCheckUpgradeNot;
+				button->Allowed = ButtonCheckUpgradeNot;
 			} else if (value == "check_upgrade_or") {
-				ba.Allowed = ButtonCheckUpgradeOr;
+				button->Allowed = ButtonCheckUpgradeOr;
 			} else if (value == "check_individual_upgrade") {
-				ba.Allowed = ButtonCheckIndividualUpgrade;
+				button->Allowed = ButtonCheckIndividualUpgrade;
 			} else if (value == "check_individual_upgrade_or") {
-				ba.Allowed = ButtonCheckIndividualUpgradeOr;
+				button->Allowed = ButtonCheckIndividualUpgradeOr;
 			} else if (value == "check_unit_variable") {
-				ba.Allowed = ButtonCheckUnitVariable;
+				button->Allowed = ButtonCheckUnitVariable;
 			} else if (value == "check_units_or") {
-				ba.Allowed = ButtonCheckUnitsOr;
+				button->Allowed = ButtonCheckUnitsOr;
 			} else if (value == "check_units_and") {
-				ba.Allowed = ButtonCheckUnitsAnd;
+				button->Allowed = ButtonCheckUnitsAnd;
 			} else if (value == "check_units_not") {
-				ba.Allowed = ButtonCheckUnitsNot;
+				button->Allowed = ButtonCheckUnitsNot;
 			} else if (value == "check_network") {
-				ba.Allowed = ButtonCheckNetwork;
+				button->Allowed = ButtonCheckNetwork;
 			} else if (value == "check_no_network") {
-				ba.Allowed = ButtonCheckNoNetwork;
+				button->Allowed = ButtonCheckNoNetwork;
 			} else if (value == "check_no_work") {
-				ba.Allowed = ButtonCheckNoWork;
+				button->Allowed = ButtonCheckNoWork;
 			} else if (value == "check_no_research") {
-				ba.Allowed = ButtonCheckNoResearch;
+				button->Allowed = ButtonCheckNoResearch;
 			} else if (value == "check_attack") {
-				ba.Allowed = ButtonCheckAttack;
+				button->Allowed = ButtonCheckAttack;
 			} else if (value == "check_upgrade_to") {
-				ba.Allowed = ButtonCheckUpgradeTo;
+				button->Allowed = ButtonCheckUpgradeTo;
 			} else if (value == "check_research") {
-				ba.Allowed = ButtonCheckResearch;
+				button->Allowed = ButtonCheckResearch;
 			} else if (value == "check_single_research") {
-				ba.Allowed = ButtonCheckSingleResearch;
+				button->Allowed = ButtonCheckSingleResearch;
 			} else if (value == "check_has_inventory") {
-				ba.Allowed = ButtonCheckHasInventory;
+				button->Allowed = ButtonCheckHasInventory;
 			} else if (value == "check_has_sub_buttons") {
-				ba.Allowed = ButtonCheckHasSubButtons;
+				button->Allowed = ButtonCheckHasSubButtons;
 			} else {
 				fprintf(stderr, "Invalid button check: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "allow_arg") {
 			value = FindAndReplaceString(value, "_", "-");
-			if (!ba.AllowStr.empty()) {
-				ba.AllowStr += ",";
+			if (!button->AllowStr.empty()) {
+				button->AllowStr += ",";
 			}
-			ba.AllowStr += value;
+			button->AllowStr += value;
 		} else if (key == "key") {
-			ba.Key = GetHotKey(value);
+			button->Key = GetHotKey(value);
 		} else if (key == "hint") {
-			ba.Hint = value;
+			button->Hint = value;
 		} else if (key == "description") {
-			ba.Description = value;
+			button->Description = value;
 		} else if (key == "comment_sound") {
 			value = FindAndReplaceString(value, "_", "-");
-			ba.CommentSound.Name = value;
+			button->CommentSound.Name = value;
 		} else if (key == "popup") {
 			value = FindAndReplaceString(value, "_", "-");
-			ba.Popup = value;
+			button->Popup = value;
 		} else if (key == "for_unit") {
 			if (value == "*") {
-				ba.UnitMask = value;
+				button->UnitMask = value;
 			} else {
 				value = FindAndReplaceString(value, "_", "-");
-				if (ba.UnitMask.empty()) {
-					ba.UnitMask += ",";
+				if (button->UnitMask.empty()) {
+					button->UnitMask += ",";
 				}
-				ba.UnitMask += value;
-				ba.UnitMask += ",";
+				button->UnitMask += value;
+				button->UnitMask += ",";
 			}
 		} else {
 			fprintf(stderr, "Invalid button property: \"%s\".\n", key.c_str());
 		}
 	}
-	
-	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload, ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name, ba.UnitMask, ba.Popup, ba.AlwaysShow, ba.Mod);
 }
 
-void ButtonAction::SetTriggerData() const
+void button::initialize()
+{
+	if (!this->ValueStr.empty()) {
+		switch (this->Action) {
+			case ButtonCmd::SpellCast:
+				this->Value = CSpell::GetSpell(this->ValueStr)->Slot;
+#ifdef DEBUG
+				if (ba->Value < 0) {
+					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
+					Assert(ba->Value >= 0);
+				}
+#endif
+				break;
+			case ButtonCmd::Train:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+			case ButtonCmd::Research:
+				this->Value = UpgradeIdByIdent(this->ValueStr);
+				break;
+				//Wyrmgus start
+			case ButtonCmd::LearnAbility:
+				this->Value = UpgradeIdByIdent(this->ValueStr);
+				break;
+			case ButtonCmd::ExperienceUpgradeTo:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+				//Wyrmgus end
+			case ButtonCmd::UpgradeTo:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+			case ButtonCmd::Build:
+				this->Value = UnitTypeIdByIdent(this->ValueStr);
+				break;
+				//Wyrmgus start
+			case ButtonCmd::ProduceResource:
+				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				break;
+			case ButtonCmd::SellResource:
+				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				break;
+			case ButtonCmd::BuyResource:
+				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				break;
+				//Wyrmgus end
+			case ButtonCmd::Button:
+				if (CButtonLevel::GetButtonLevel(this->ValueStr)) {
+					this->Value = CButtonLevel::GetButtonLevel(this->ValueStr)->ID;
+				} else {
+					this->Value = 0;
+				}
+				break;
+			default:
+				this->Value = atoi(this->ValueStr.c_str());
+				break;
+		}
+	} else {
+		this->Value = 0;
+	}
+
+	if (!this->CommentSound.Name.empty()) {
+		this->CommentSound.MapSound();
+	}
+
+	if (!this->Popup.empty()) {
+		CPopup *popup = PopupByIdent(this->Popup);
+		if (!popup) {
+			throw std::runtime_error("Popup \"" + this->Popup + "\" hasn't defined.");
+		}
+	}
+
+	// FIXME: here should be added costs to the hint
+	// FIXME: johns: show should be nice done?
+	if (this->UnitMask[0] != '*') {
+		this->UnitMask = "," + this->UnitMask + ",";
+	}
+}
+
+void button::SetTriggerData() const
 {
 	if (this->Action != ButtonCmd::Unit && this->Action != ButtonCmd::Buy) {
-		TriggerData.Type = stratagus::unit_type::get_all()[this->Value];
+		TriggerData.Type = unit_type::get_all()[this->Value];
 	} else {
 		TriggerData.Type = UnitManager.GetSlotUnit(this->Value).Type;
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
@@ -175,14 +251,14 @@ void ButtonAction::SetTriggerData() const
 	if (this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility) {
 		TriggerData.Upgrade = CUpgrade::get_all()[this->Value];
 	} else if (this->Action == ButtonCmd::Faction) {
-		TriggerData.Faction = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
-		if (!stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::try_get(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+		TriggerData.Faction = faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
+		if (!faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::try_get(faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
 }
 
-void ButtonAction::CleanTriggerData() const
+void button::CleanTriggerData() const
 {
 	TriggerData.Type = nullptr;
 	TriggerData.Unit = nullptr;
@@ -191,7 +267,7 @@ void ButtonAction::CleanTriggerData() const
 	TriggerData.Faction = nullptr;
 }
 
-int ButtonAction::GetLevelID() const
+int button::GetLevelID() const
 {
 	if (this->Level) {
 		return this->Level->ID;
@@ -200,7 +276,7 @@ int ButtonAction::GetLevelID() const
 	}
 }
 
-int ButtonAction::GetKey() const
+int button::GetKey() const
 {
 	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
 		return 0;
@@ -211,48 +287,48 @@ int ButtonAction::GetKey() const
 	}
 	
 	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0) {
-		if (this->Pos == 1) {
+		if (this->get_pos() == 1) {
 			return 'q';
-		} else if (this->Pos == 2) {
+		} else if (this->get_pos() == 2) {
 			return 'w';
-		} else if (this->Pos == 3) {
+		} else if (this->get_pos() == 3) {
 			return 'e';
-		} else if (this->Pos == 4) {
+		} else if (this->get_pos() == 4) {
 			return 'r';
-		} else if (this->Pos == 5) {
+		} else if (this->get_pos() == 5) {
 			return 'a';
-		} else if (this->Pos == 6) {
+		} else if (this->get_pos() == 6) {
 			return 's';
-		} else if (this->Pos == 7) {
+		} else if (this->get_pos() == 7) {
 			return 'd';
-		} else if (this->Pos == 8) {
+		} else if (this->get_pos() == 8) {
 			return 'f';
-		} else if (this->Pos == 9) {
+		} else if (this->get_pos() == 9) {
 			return 'z';
-		} else if (this->Pos == 10) {
+		} else if (this->get_pos() == 10) {
 			return 'x';
-		} else if (this->Pos == 11) {
+		} else if (this->get_pos() == 11) {
 			return 'c';
-		} else if (this->Pos == 12) {
+		} else if (this->get_pos() == 12) {
 			return 'v';
-		} else if (this->Pos == 13) {
+		} else if (this->get_pos() == 13) {
 			return 't';
-		} else if (this->Pos == 14) {
+		} else if (this->get_pos() == 14) {
 			return 'g';
-		} else if (this->Pos == 15) {
+		} else if (this->get_pos() == 15) {
 			return 'b';
-		} else if (this->Pos == 16) {
+		} else if (this->get_pos() == 16) {
 			return 'y';
 		}
 	}
 	return this->Key;
 }
 
-std::string ButtonAction::GetHint() const
+std::string button::GetHint() const
 {
 	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
-		hint = FindAndReplaceString(hint, "~!", "");
+		string::replace(hint, "~!", "");
 		return hint;
 	}
 
@@ -262,7 +338,7 @@ std::string ButtonAction::GetHint() const
 	
 	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
-		hint = FindAndReplaceString(hint, "~!", "");
+		string::replace(hint, "~!", "");
 		hint += " (~!";
 		hint += CapitalizeString(SdlKey2Str(this->GetKey()));
 		hint += ")";
@@ -270,6 +346,8 @@ std::string ButtonAction::GetHint() const
 	}
 	
 	return this->Hint;
+}
+
 }
 
 std::string GetButtonActionNameById(const ButtonCmd button_action)

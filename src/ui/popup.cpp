@@ -43,7 +43,7 @@
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/ui.h"
 //Wyrmgus start
 #include "unit/unit.h"
@@ -58,7 +58,7 @@
 #include "upgrade/upgrade_class.h"
 #include "video.h"
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
+/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const stratagus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw("");
@@ -99,7 +99,7 @@
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction &button, int *) const
+/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const stratagus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw;
@@ -129,7 +129,7 @@
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
+/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -190,7 +190,7 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const
+/* virtual */ int CPopupContentTypeText::GetWidth(const stratagus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
@@ -230,7 +230,7 @@
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeText::GetHeight(const ButtonAction &button, int *) const
+/* virtual */ int CPopupContentTypeText::GetHeight(const stratagus::button &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
@@ -255,7 +255,7 @@
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
+/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
@@ -307,7 +307,7 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) const
+/* virtual */ int CPopupContentTypeCosts::GetWidth(const stratagus::button &button, int *Costs) const
 {
 	int popupWidth = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -349,7 +349,7 @@
 	return popupWidth;
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetHeight(const ButtonAction &button, int *Costs) const
+/* virtual */ int CPopupContentTypeCosts::GetHeight(const stratagus::button &button, int *Costs) const
 {
 	int popupHeight = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -362,7 +362,7 @@
 	return std::max(popupHeight, font.Height());
 }
 
-/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const ButtonAction &button, int *Costs) const
+/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const stratagus::button &button, int *Costs) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -431,17 +431,17 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 {
 }
 
-/* virtual */ int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const
+/* virtual */ int CPopupContentTypeLine::GetWidth(const stratagus::button &button, int *Costs) const
 {
 	return this->Width;
 }
 
-/* virtual */ int CPopupContentTypeLine::GetHeight(const ButtonAction &button, int *Costs) const
+/* virtual */ int CPopupContentTypeLine::GetHeight(const stratagus::button &button, int *Costs) const
 {
 	return this->Height;
 }
 
-/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const
+/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const
 {
 	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
@@ -467,7 +467,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	}
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetWidth(const ButtonAction &button, int *) const
+/* virtual */ int CPopupContentTypeVariable::GetWidth(const stratagus::button &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
@@ -486,13 +486,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	return font.getWidth(text);
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetHeight(const ButtonAction &, int *) const
+/* virtual */ int CPopupContentTypeVariable::GetHeight(const stratagus::button &, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	return font.Height();
 }
 
-/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const ButtonAction &button, int *) const
+/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const stratagus::button &button, int *) const
 {
 	std::string text;										// Optional text to display.
 	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.

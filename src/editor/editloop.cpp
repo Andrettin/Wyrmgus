@@ -55,7 +55,7 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"
@@ -914,7 +914,7 @@ static void DrawUnitIcons()
 			if (i == (int) Editor.ShownUnitTypes.size()) {
 				DrawGenericPopup("Create Unit Type", UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
 			} else {
-				DrawPopup(CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+				DrawPopup(*CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
 			}
 		}
 		
@@ -2041,16 +2041,15 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		//Wyrmgus start
 		if (i < (int) Editor.ShownUnitTypes.size()) {
 			if (j >= CurrentButtons.size()) {
-				ButtonAction &ba = *(new ButtonAction);
-				CurrentButtons.push_back(ba);
+				CurrentButtons.push_back(std::make_unique<stratagus::button>());
 			}
-			CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->get_name();
-			CurrentButtons[j].Pos = j;
-			CurrentButtons[j].Level = 0;
-			CurrentButtons[j].Action = ButtonCmd::EditorUnit;
-			CurrentButtons[j].ValueStr = Editor.ShownUnitTypes[i]->Ident;
-			CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->Slot;
-			CurrentButtons[j].Popup = "popup-unit";
+			CurrentButtons[j]->Hint = Editor.ShownUnitTypes[i]->get_name();
+			CurrentButtons[j]->pos = j;
+			CurrentButtons[j]->Level = 0;
+			CurrentButtons[j]->Action = ButtonCmd::EditorUnit;
+			CurrentButtons[j]->ValueStr = Editor.ShownUnitTypes[i]->Ident;
+			CurrentButtons[j]->Value = Editor.ShownUnitTypes[i]->Slot;
+			CurrentButtons[j]->Popup = "popup-unit";
 		}
 		//Wyrmgus end
 		if (x < screenPos.x && screenPos.x < x + IconWidth

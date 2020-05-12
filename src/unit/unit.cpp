@@ -78,7 +78,7 @@
 #include "spells.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_find.h"

@@ -60,7 +60,7 @@
 #include "time/season.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
 #include "ui/cursor.h"
@@ -978,7 +978,7 @@ void DrawPopups()
 						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
-					ButtonAction *ba = new ButtonAction;
+					stratagus::button *ba = new stratagus::button;
 					ba->Hint = unit_name;
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*UnitUnderCursor);
@@ -1010,7 +1010,7 @@ void DrawPopups()
 			}
 			
 			//hackish way to make the popup appear correctly for the single selected unit
-			ButtonAction ba;
+			stratagus::button ba;
 			ba.Hint = Selected[0]->GetMessageName();
 			ba.Action = ButtonCmd::Unit;
 			ba.Value = UnitNumber(*Selected[0]);
@@ -1046,7 +1046,7 @@ void DrawPopups()
 						UI.StatusLine.Set(uins->GetTypeName());
 					}
 					//hackish way to make the popup appear correctly for the inventory item
-					ButtonAction *ba = new ButtonAction;
+					stratagus::button *ba = new stratagus::button;
 					if (!uins->Name.empty() && uins->Identified) {
 						ba->Hint = uins->Name;
 					} else {
@@ -1055,7 +1055,7 @@ void DrawPopups()
 							ba->Hint += " (Unidentified)";
 						}
 					}
-					ba->Pos = j;
+					ba->pos = j;
 					ba->Level = CButtonLevel::InventoryButtonLevel;
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*uins);
@@ -1078,12 +1078,12 @@ void DrawPopups()
 				//Wyrmgus start
 	//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
 				ButtonUnderCursor == i && KeyState != KeyStateInput
-				&& CurrentButtons[i].Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], CurrentButtons[i])) {
+				&& CurrentButtons[i]->Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], *CurrentButtons[i])) {
 				//Wyrmgus end
 					if (!Preference.NoStatusLineTooltips) {
-						UpdateStatusLineForButton(CurrentButtons[i]);
+						UpdateStatusLineForButton(*CurrentButtons[i]);
 					}
-					DrawPopup(CurrentButtons[i], UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
+					DrawPopup(*CurrentButtons[i], UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 			}
 		}
 	}
@@ -1126,7 +1126,7 @@ void DrawPopups()
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].TextX + UI.Resources[i].Font->Width(UI.Resources[i].Text)) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
 			//hackish way to make the popup appear correctly for the resource
-			ButtonAction *ba = new ButtonAction;
+			stratagus::button *ba = new stratagus::button;
 			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
 			ba->Action = ButtonCmd::ProduceResource;
 			ba->Value = i;
@@ -1905,7 +1905,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		}
 		
 		//hackish way to make the popup appear correctly for the single selected unit
-		ButtonAction *ba = new ButtonAction;
+		stratagus::button *ba = new stratagus::button;
 		ba->Hint = unit.GetMessageName();
 		ba->Action = ButtonUnit;
 		ba->Value = UnitNumber(unit);

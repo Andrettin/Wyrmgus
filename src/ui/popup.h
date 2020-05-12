@@ -40,11 +40,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class ButtonAction;
 class CFont;
 class CPopup;
 
 namespace stratagus {
+	class button;
 	class unit_class;
 	class upgrade_class;
 }
@@ -139,11 +139,11 @@ public:
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const = 0;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const = 0;
 	/// Get the content's width
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const = 0;
+	virtual int GetWidth(const stratagus::button &button, int *Costs) const = 0;
 	/// Get the content's height
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const = 0;
+	virtual int GetHeight(const stratagus::button &button, int *Costs) const = 0;
 
 	virtual void Parse(lua_State *l) = 0;
 
@@ -175,10 +175,10 @@ public:
 	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(nullptr) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
+	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -203,10 +203,10 @@ public:
 	}
 	//Wyrmgus end
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
+	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -225,10 +225,10 @@ public:
 	CPopupContentTypeCosts() : Font(nullptr), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
+	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -243,10 +243,10 @@ public:
 	CPopupContentTypeLine();
 	virtual ~CPopupContentTypeLine() {}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
+	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -266,10 +266,10 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
+	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 

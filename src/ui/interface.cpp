@@ -49,7 +49,7 @@
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/ui.h"
@@ -58,10 +58,6 @@
 #include "unit/unit_type.h"
 #include "video.h"
 #include "widgets.h"
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
 
 /// Scrolling area (<= 15 y)
 //Wyrmgus start
@@ -83,10 +79,6 @@
 //#define SCROLL_RIGHT  (Video.Width - 16)
 #define SCROLL_RIGHT  (Video.Width - 7)
 //Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 static Vec2i SavedMapPosition[3];				/// Saved map position
 static char Input[80];							/// line input for messages/long commands
@@ -641,7 +633,7 @@ std::string GetCurrentButtonValueStr()
 		return "";
 	}
 	
-	return CurrentButtons[ButtonUnderCursor].ValueStr;
+	return CurrentButtons[ButtonUnderCursor]->ValueStr;
 }
 //Wyrmgus end
 

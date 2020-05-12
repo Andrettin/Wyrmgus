@@ -63,7 +63,7 @@
 #include "species.h"
 #include "spells.h"
 #include "translate.h"
-#include "ui/button_action.h"
+#include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit/unit_class.h"
@@ -1685,20 +1685,19 @@ void unit_type::UpdateDefaultBoolFlags()
 //Wyrmgus start
 void unit_type::RemoveButtons(const ButtonCmd button_action, const std::string &mod_file)
 {
-	int buttons_size = UnitButtonTable.size();
+	int buttons_size = stratagus::button::get_all().size();
 	for (int i = (buttons_size - 1); i >= 0; --i) {
-		if (button_action != ButtonCmd::None && UnitButtonTable[i]->Action != button_action) {
+		if (button_action != ButtonCmd::None && stratagus::button::get_all()[i]->Action != button_action) {
 			continue;
 		}
-		if (!mod_file.empty() && UnitButtonTable[i]->Mod != mod_file) {
+		if (!mod_file.empty() && stratagus::button::get_all()[i]->Mod != mod_file) {
 			continue;
 		}
 		
-		if (UnitButtonTable[i]->UnitMask == ("," + this->Ident + ",")) { //delete the appropriate buttons
-			delete UnitButtonTable[i];
-			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[i]), UnitButtonTable.end());
-		} else if (UnitButtonTable[i]->UnitMask.find(this->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of the appropriate buttons
-			UnitButtonTable[i]->UnitMask = FindAndReplaceString(UnitButtonTable[i]->UnitMask, this->Ident + ",", "");
+		if (stratagus::button::get_all()[i]->UnitMask == ("," + this->Ident + ",")) { //delete the appropriate buttons
+			stratagus::button::remove(stratagus::button::get_all()[i]);
+		} else if (stratagus::button::get_all()[i]->UnitMask.find(this->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of the appropriate buttons
+			stratagus::button::get_all()[i]->UnitMask = FindAndReplaceString(stratagus::button::get_all()[i]->UnitMask, this->Ident + ",", "");
 		}
 	}
 }
