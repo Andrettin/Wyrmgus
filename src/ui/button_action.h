@@ -55,9 +55,6 @@ typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(nullptr), AlwaysShow(false), Value(0), Payload(nullptr),
-		Allowed(nullptr), Key(0) {}
-	
 	static void ProcessConfigData(const CConfigData *config_data);
 
 	void SetTriggerData() const;
@@ -66,19 +63,19 @@ public:
 	int GetKey() const;
 	std::string GetHint() const;
 
-	int Pos;					/// button position in the grid
-	CButtonLevel *Level;		/// requires button level
-	bool AlwaysShow;			/// button is always shown but drawn grayscale if not available
+	int Pos = 0;					/// button position in the grid
+	CButtonLevel *Level = nullptr;		/// requires button level
+	bool AlwaysShow = false;			/// button is always shown but drawn grayscale if not available
 	ButtonCmd Action = ButtonCmd::Move;	/// command on button press
-	int Value;					/// extra value for command
-	void *Payload;
+	int Value = 0;					/// extra value for command
+	void *Payload = nullptr;
 	std::string ValueStr;		/// keep original value string
 
-	ButtonCheckFunc Allowed;    /// Check if this button is allowed
+	ButtonCheckFunc Allowed = nullptr;    /// Check if this button is allowed
 	std::string AllowStr;       /// argument for allowed
 	std::string UnitMask;       /// for which units is it available
 	IconConfig Icon;      		/// icon to display
-	int Key;                    /// alternative on keyboard
+	int Key = 0;                    /// alternative on keyboard
 	std::string Hint;           /// tip texts
 	std::string Description;    /// description shown on status bar (optional)
 	SoundConfig CommentSound;   /// Sound comment used when you press the button

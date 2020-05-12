@@ -69,7 +69,6 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "always_show") {
 			ba.AlwaysShow = string::to_bool(value);
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
 			ba.Icon.Name = value;
 		} else if (key == "action") {
 			value = FindAndReplaceString(value, "_", "-");

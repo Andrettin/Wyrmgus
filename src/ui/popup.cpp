@@ -631,53 +631,6 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "ButtonValue")) {
 			condition->ButtonValue = LuaToString(l, -1);
 		} else if (!strcmp(key, "ButtonAction")) {
-			//Wyrmgus start
-			/*
-			const char *value = LuaToString(l, -1);
-			if (!strcmp(value, "move")) {
-				condition->ButtonAction = ButtonMove;
-			} else if (!strcmp(value, "stop")) {
-				condition->ButtonAction = ButtonStop;
-			} else if (!strcmp(value, "attack")) {
-				condition->ButtonAction = ButtonAttack;
-			} else if (!strcmp(value, "repair")) {
-				condition->ButtonAction = ButtonRepair;
-			} else if (!strcmp(value, "harvest")) {
-				condition->ButtonAction = ButtonHarvest;
-			} else if (!strcmp(value, "button")) {
-				condition->ButtonAction = ButtonButton;
-			} else if (!strcmp(value, "build")) {
-				condition->ButtonAction = ButtonBuild;
-			} else if (!strcmp(value, "train-unit")) {
-				condition->ButtonAction = ButtonTrain;
-			} else if (!strcmp(value, "patrol")) {
-				condition->ButtonAction = ButtonPatrol;
-			} else if (!strcmp(value, "stand-ground")) {
-				condition->ButtonAction = ButtonStandGround;
-			} else if (!strcmp(value, "attack-ground")) {
-				condition->ButtonAction = ButtonAttackGround;
-			} else if (!strcmp(value, "return-goods")) {
-				condition->ButtonAction = ButtonReturn;
-			} else if (!strcmp(value, "cast-spell")) {
-				condition->ButtonAction = ButtonSpellCast;
-			} else if (!strcmp(value, "research")) {
-				condition->ButtonAction = ButtonResearch;
-			} else if (!strcmp(value, "upgrade-to")) {
-				condition->ButtonAction = ButtonUpgradeTo;
-			} else if (!strcmp(value, "unload")) {
-				condition->ButtonAction = ButtonUnload;
-			} else if (!strcmp(value, "cancel")) {
-				condition->ButtonAction = ButtonCancel;
-			} else if (!strcmp(value, "cancel-upgrade")) {
-				condition->ButtonAction = ButtonCancelUpgrade;
-			} else if (!strcmp(value, "cancel-train-unit")) {
-				condition->ButtonAction = ButtonCancelTrain;
-			} else if (!strcmp(value, "cancel-build")) {
-				condition->ButtonAction = ButtonCancelBuild;
-			} else {
-				LuaError(l, "Unsupported button action: %s" _C_ value);
-			}
-			*/
 			std::string value = LuaToString(l, -1);
 			ButtonCmd button_action_id = GetButtonActionIdByName(value);
 			if (button_action_id != ButtonCmd::None) {
