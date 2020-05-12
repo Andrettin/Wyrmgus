@@ -257,7 +257,7 @@ class unit_type_dependency : public dependency
 {
 public:
 	unit_type_dependency() {}
-	unit_type_dependency(const unit_type *unit_type, const int count) : UnitType(unit_type), Count(count) {}
+	unit_type_dependency(const unit_type *unit_type, const int count) : unit_type(unit_type), count(count) {}
 	
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -265,8 +265,9 @@ public:
 	virtual std::string get_string(const std::string &prefix = "") const override;
 
 private:
-	const unit_type *UnitType = nullptr;
-	int Count = 1;		/// How many of the unit type are required
+	const unit_type *unit_type = nullptr;
+	int count = 1; //how many of the unit type are required
+	const site *settlement = nullptr; //in which settlement the unit should be located
 };
 
 class upgrade_dependency : public dependency

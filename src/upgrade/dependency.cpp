@@ -48,6 +48,7 @@
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
+#include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -302,9 +303,11 @@ void unit_type_dependency::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "unit_type") {
-		this->UnitType = unit_type::get(value);
+		this->unit_type = unit_type::get(value);
 	} else if (key == "count") {
-		this->Count = std::stoi(value);
+		this->count = std::stoi(value);
+	} else if (key == "settlement") {
+		this->settlement = site::get(value);
 	} else {
 		throw std::runtime_error("Invalid unit type dependency property: \"" + property.get_key() + "\".");
 	}
@@ -315,9 +318,9 @@ void unit_type_dependency::ProcessConfigDataProperty(const std::pair<std::string
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "unit_type") {
-		this->UnitType = unit_type::get(value);
+		this->unit_type = unit_type::get(value);
 	} else if (key == "count") {
-		this->Count = std::stoi(value);
+		this->count = std::stoi(value);
 	} else {
 		fprintf(stderr, "Invalid unit type dependency property: \"%s\".\n", key.c_str());
 	}
@@ -329,15 +332,41 @@ bool unit_type_dependency::check(const CPlayer *player, bool ignore_units) const
 		return true;
 	}
 	
-	return player->GetUnitTypeCount(this->UnitType) >= this->Count;
+	if (this->settlement != nullptr) {
+		if (!player->HasSettlement(this->settlement)) {
+			return false;
+		}
+
+		std::vector<CUnit *> units;
+		FindPlayerUnitsByType(*player, *this->unit_type, units);
+
+		int counter = 0;
+		for (const CUnit *unit : units) {
+			if (unit->settlement == this->settlement) {
+				counter++;
+
+				if (counter >= this->count) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	} else {
+		return player->GetUnitTypeCount(this->unit_type) >= this->count;
+	}
 }
 
 std::string unit_type_dependency::get_string(const std::string &prefix) const
 {
-	std::string str = prefix + this->UnitType->get_name();
+	std::string str = prefix + this->unit_type->get_name();
 	
-	if (this->Count > 1) {
-		str += '(' + std::to_string(this->Count) + ')';
+	if (this->count > 1) {
+		str += '(' + std::to_string(this->count) + ')';
+	}
+
+	if (this->settlement != nullptr) {
+		str += " in " + settlement->get_name();
 	}
 	
 	str += '\n';
