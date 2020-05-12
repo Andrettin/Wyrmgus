@@ -88,9 +88,7 @@ std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type)
 	} else if (objective_type == ObjectiveType::HaveResource) {
 		return "have_resource";
 	} else if (objective_type == ObjectiveType::BuildUnits) {
-		return "build-units";
-	} else if (objective_type == ObjectiveType::BuildUnitsOfClass) {
-		return "build-units-of-class";
+		return "build_units";
 	} else if (objective_type == ObjectiveType::DestroyUnits) {
 		return "destroy_units";
 	} else if (objective_type == ObjectiveType::ResearchUpgrade) {
@@ -116,10 +114,8 @@ ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 		return ObjectiveType::GatherResource;
 	} else if (objective_type == "have_resource") {
 		return ObjectiveType::HaveResource;
-	} else if (objective_type == "build-units") {
+	} else if (objective_type == "build_units") {
 		return ObjectiveType::BuildUnits;
-	} else if (objective_type == "build-units-of-class") {
-		return ObjectiveType::BuildUnitsOfClass;
 	} else if (objective_type == "destroy_units") {
 		return ObjectiveType::DestroyUnits;
 	} else if (objective_type == "research-upgrade") {
@@ -139,13 +135,22 @@ ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 	return ObjectiveType::None;
 }
 
+CQuestObjective::CQuestObjective(const ObjectiveType objective_type, const stratagus::quest *quest)
+	: objective_type(objective_type), quest(quest), index(quest->Objectives.size())
+{
+	if (objective_type == ObjectiveType::HeroMustSurvive) {
+		this->quantity = 0;
+	}
+}
 
 void CQuestObjective::process_sml_property(const stratagus::sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "objective_string") {
+	if (key == "quantity") {
+		this->quantity = std::stoi(value);
+	} else if (key == "objective_string") {
 		this->objective_string = value;
 	} else if (key == "settlement") {
 		this->settlement = stratagus::site::get(value);
@@ -203,17 +208,14 @@ void quest::process_sml_scope(const sml_data &scope)
 
 	if (tag == "objectives") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			CQuestObjective *objective = new CQuestObjective(this->Objectives.size());
-			objective->Quest = this;
-			this->Objectives.push_back(objective);
+			const ObjectiveType objective_type = GetQuestObjectiveTypeIdByName(child_scope.get_tag());
 
-			objective->ObjectiveType = GetQuestObjectiveTypeIdByName(child_scope.get_tag());
-			if (objective->ObjectiveType == ObjectiveType::None) {
+			if (objective_type == ObjectiveType::None) {
 				throw std::runtime_error("Objective type doesn't exist.");
 			}
-			if (objective->ObjectiveType == ObjectiveType::HeroMustSurvive) {
-				objective->Quantity = 0;
-			}
+
+			CQuestObjective *objective = new CQuestObjective(objective_type, this);
+			this->Objectives.push_back(objective);
 
 			database::process_sml_data(objective, child_scope);
 		});

@@ -2886,12 +2886,18 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				
 				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 					const CQuestObjective *quest_objective = objective->get_quest_objective();
-					if (
-						(quest_objective->ObjectiveType == ObjectiveType::BuildUnits && stratagus::vector::contains(quest_objective->UnitTypes, &type))
-						|| (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class()))
-					) {
-						objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
+
+					if (quest_objective->get_objective_type() != ObjectiveType::BuildUnits) {
+						continue;
 					}
+
+					if (!stratagus::vector::contains(quest_objective->UnitTypes, &type) && !stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
+						continue;
+					}
+
+					//only buildings can belong to settlements, so we don't need to check to see whether the settlement is correct here
+
+					objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 				}
 			}
 		}
@@ -6992,17 +6998,17 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
 		if (
 			(
-				quest_objective->ObjectiveType == ObjectiveType::DestroyUnits
+				quest_objective->get_objective_type() == ObjectiveType::DestroyUnits
 				&& (stratagus::vector::contains(quest_objective->UnitTypes, target.Type) || stratagus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
 				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
 			)
-			|| (quest_objective->ObjectiveType == ObjectiveType::DestroyHero && target.Character && quest_objective->get_character() == target.Character)
-			|| (quest_objective->ObjectiveType == ObjectiveType::DestroyUnique && target.Unique && quest_objective->Unique == target.Unique)
+			|| (quest_objective->get_objective_type() == ObjectiveType::DestroyHero && target.Character && quest_objective->get_character() == target.Character)
+			|| (quest_objective->get_objective_type() == ObjectiveType::DestroyUnique && target.Unique && quest_objective->Unique == target.Unique)
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {
-				objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
+				objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 			}
-		} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyFaction) {
+		} else if (quest_objective->get_objective_type() == ObjectiveType::DestroyFaction) {
 			const CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 			
 			if (faction_player) {

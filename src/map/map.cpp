@@ -1100,10 +1100,15 @@ bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z)
 
 	for (int addy = 0; addy < type.get_tile_height(); ++addy) {
 		for (int addx = 0; addx < type.get_tile_width(); ++addx) {
-			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
-				|| CMap::Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
+			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false) {
 				return false;
 			}
+
+			const CMapField *tile = CMap::Map.Field(pos.x + addx + index, z);
+			if (tile->CheckMask(mask) == true || tile->Terrain == nullptr) {
+				return false;
+			}
+			
 		}
 		//Wyrmgus start
 //		index += CMap::Map.Info.MapWidth;

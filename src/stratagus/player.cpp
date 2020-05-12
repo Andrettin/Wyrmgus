@@ -814,7 +814,7 @@ void CPlayer::Save(CFile &file) const
 			file.printf(" ");
 		}
 		file.printf("{");
-		file.printf("\"quest\", \"%s\",", objective->get_quest_objective()->Quest->get_identifier().c_str());
+		file.printf("\"quest\", \"%s\",", objective->get_quest_objective()->get_quest()->get_identifier().c_str());
 		file.printf("\"objective-index\", %d,", objective->get_quest_objective()->get_index());
 		file.printf("\"counter\", %d,", objective->Counter);
 		file.printf("},");
@@ -2493,11 +2493,11 @@ void CPlayer::update_current_quests()
 {
 	for (CPlayerQuestObjective *objective : this->QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->ObjectiveType == ObjectiveType::HaveResource) {
-			objective->Counter = std::min(this->get_resource(stratagus::resource::get_all()[quest_objective->Resource], STORE_BOTH), quest_objective->Quantity);
-		} else if (quest_objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
+		if (quest_objective->get_objective_type() == ObjectiveType::HaveResource) {
+			objective->Counter = std::min(this->get_resource(stratagus::resource::get_all()[quest_objective->Resource], STORE_BOTH), quest_objective->get_quantity());
+		} else if (quest_objective->get_objective_type() == ObjectiveType::ResearchUpgrade) {
 			objective->Counter = UpgradeIdAllowed(*this, quest_objective->Upgrade->ID) == 'R' ? 1 : 0;
-		} else if (quest_objective->ObjectiveType == ObjectiveType::RecruitHero) {
+		} else if (quest_objective->get_objective_type() == ObjectiveType::RecruitHero) {
 			objective->Counter = this->HasHero(quest_objective->get_character()) ? 1 : 0;
 		}
 	}
@@ -2605,7 +2605,7 @@ void CPlayer::remove_current_quest(stratagus::quest *quest)
 	stratagus::vector::remove(this->CurrentQuests, quest);
 	
 	for (int i = (this->QuestObjectives.size()  - 1); i >= 0; --i) {
-		if (this->QuestObjectives[i]->get_quest_objective()->Quest == quest) {
+		if (this->QuestObjectives[i]->get_quest_objective()->get_quest() == quest) {
 			stratagus::vector::remove(this->QuestObjectives, this->QuestObjectives[i]);
 		}
 	}
@@ -2622,24 +2622,20 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 	}
 	
 	int recruit_heroes_quantity = 0;
-	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
-		CQuestObjective *objective = quest->Objectives[i];
-		if (objective->ObjectiveType == ObjectiveType::BuildUnits || objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
+	for (CQuestObjective *objective : quest->Objectives) {
+		if (objective->get_objective_type() == ObjectiveType::BuildUnits) {
 			std::vector<const stratagus::unit_type *> unit_types = objective->UnitTypes;
 
-			if (objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-				unit_types.clear();
-				for (const stratagus::unit_class *unit_class : objective->get_unit_classes()) {
-					const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
-					if (unit_type == nullptr) {
-						continue;
-					}
-					unit_types.push_back(unit_type);
+			for (const stratagus::unit_class *unit_class : objective->get_unit_classes()) {
+				const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+				if (unit_type == nullptr) {
+					continue;
 				}
+				unit_types.push_back(unit_type);
+			}
 
-				if (unit_types.empty()) {
-					return false;
-				}
+			if (unit_types.empty()) {
+				return false;
 			}
 
 			bool validated = false;
@@ -2658,7 +2654,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 			if (!validated) {
 				return false;
 			}
-		} else if (objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
+		} else if (objective->get_objective_type() == ObjectiveType::ResearchUpgrade) {
 			const CUpgrade *upgrade = objective->Upgrade;
 			
 			bool has_researcher = this->HasUpgradeResearcher(upgrade);
@@ -2669,23 +2665,19 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 						continue;
 					}
 						
-					if (second_objective->ObjectiveType == ObjectiveType::BuildUnits || second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
+					if (second_objective->get_objective_type() == ObjectiveType::BuildUnits) {
 						std::vector<const stratagus::unit_type *> unit_types = second_objective->UnitTypes;
 
-						if (second_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-							unit_types.clear();
-
-							for (const stratagus::unit_class *unit_class : second_objective->get_unit_classes()) {
-								const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
-								if (unit_type == nullptr) {
-									continue;
-								}
-								unit_types.push_back(unit_type);
-							}
-
-							if (unit_types.empty()) {
+						for (const stratagus::unit_class *unit_class : second_objective->get_unit_classes()) {
+							const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+							if (unit_type == nullptr) {
 								continue;
 							}
+							unit_types.push_back(unit_type);
+						}
+
+						if (unit_types.empty()) {
+							continue;
 						}
 
 						for (const stratagus::unit_type *unit_type : unit_types) {
@@ -2705,12 +2697,12 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
 				return false;
 			}
-		} else if (objective->ObjectiveType == ObjectiveType::RecruitHero) {
+		} else if (objective->get_objective_type() == ObjectiveType::RecruitHero) {
 			if (!this->can_recruit_hero(objective->get_character(), true)) {
 				return false;
 			}
 			recruit_heroes_quantity++;
-		} else if (objective->ObjectiveType == ObjectiveType::DestroyUnits || objective->ObjectiveType == ObjectiveType::DestroyHero || objective->ObjectiveType == ObjectiveType::DestroyUnique) {
+		} else if (objective->get_objective_type() == ObjectiveType::DestroyUnits || objective->get_objective_type() == ObjectiveType::DestroyHero || objective->get_objective_type() == ObjectiveType::DestroyUnique) {
 			if (objective->get_faction() != nullptr) {
 				CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
@@ -2722,16 +2714,16 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 				}
 			}
 			
-			if (objective->ObjectiveType == ObjectiveType::DestroyHero) {
+			if (objective->get_objective_type() == ObjectiveType::DestroyHero) {
 				if (objective->get_character()->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
-			} else if (objective->ObjectiveType == ObjectiveType::DestroyUnique) {
+			} else if (objective->get_objective_type() == ObjectiveType::DestroyUnique) {
 				if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
 			}
-		} else if (objective->ObjectiveType == ObjectiveType::DestroyFaction) {
+		} else if (objective->get_objective_type() == ObjectiveType::DestroyFaction) {
 			CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
 			if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 				return false;
@@ -2767,10 +2759,10 @@ bool CPlayer::has_completed_quest(const stratagus::quest *quest)
 	
 	for (const CPlayerQuestObjective *objective : this->QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->Quest != quest) {
+		if (quest_objective->get_quest() != quest) {
 			continue;
 		}
-		if (quest_objective->Quantity > 0 && objective->Counter < quest_objective->Quantity) {
+		if (quest_objective->get_quantity() > 0 && objective->Counter < quest_objective->get_quantity()) {
 			return false;
 		}
 	}
@@ -2796,28 +2788,25 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 
 	for (CPlayerQuestObjective *objective : this->QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->Quest != quest) {
+		if (quest_objective->get_quest() != quest) {
 			continue;
 		}
-		if (quest_objective->ObjectiveType == ObjectiveType::BuildUnits || quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-			if (objective->Counter < quest_objective->Quantity) {
+		if (quest_objective->get_objective_type() == ObjectiveType::BuildUnits) {
+			if (objective->Counter < quest_objective->get_quantity()) {
 				std::vector<const stratagus::unit_type *> unit_types = quest_objective->UnitTypes;
-				if (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-					unit_types.clear();
 
-					for (const stratagus::unit_class *unit_class : quest_objective->get_unit_classes()) {
-						const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
-						if (unit_type == nullptr) {
-							continue;
-						}
-						unit_types.push_back(unit_type);
+				for (const stratagus::unit_class *unit_class : quest_objective->get_unit_classes()) {
+					const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+					if (unit_type == nullptr) {
+						continue;
 					}
-
-					if (unit_types.empty()) {
-						return "You can no longer produce the required unit.";
-					}
+					unit_types.push_back(unit_type);
 				}
-				
+
+				if (unit_types.empty()) {
+					return "You can no longer produce the required unit.";
+				}
+
 				bool validated = false;
 				std::string validation_error;
 				for (const stratagus::unit_type *unit_type : unit_types) {
@@ -2838,7 +2827,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 					return validation_error;
 				}
 			}
-		} else if (quest_objective->ObjectiveType == ObjectiveType::ResearchUpgrade) {
+		} else if (quest_objective->get_objective_type() == ObjectiveType::ResearchUpgrade) {
 			const CUpgrade *upgrade = quest_objective->Upgrade;
 			
 			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
@@ -2847,26 +2836,23 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 				if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
 					for (CPlayerQuestObjective *second_objective : this->QuestObjectives) {
 						const CQuestObjective *second_quest_objective = second_objective->get_quest_objective();
-						if (second_quest_objective->Quest != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->Quantity) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
+						if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
 							continue;
 						}
 						
-						if (second_quest_objective->ObjectiveType == ObjectiveType::BuildUnits || second_quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
+						if (second_quest_objective->get_objective_type() == ObjectiveType::BuildUnits) {
 							std::vector<const stratagus::unit_type *> unit_types = second_quest_objective->UnitTypes;
-							if (second_quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass) {
-								unit_types.clear();
 
-								for (const stratagus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
-									const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
-									if (unit_type == nullptr) {
-										continue;
-									}
-									unit_types.push_back(unit_type);
-								}
-
-								if (unit_types.empty()) {
+							for (const stratagus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
+								const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+								if (unit_type == nullptr) {
 									continue;
 								}
+								unit_types.push_back(unit_type);
+							}
+
+							if (unit_types.empty()) {
+								continue;
 							}
 
 							for (const stratagus::unit_type *unit_type : unit_types) {
@@ -2887,12 +2873,12 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 					return "You can no longer research the required upgrade.";
 				}
 			}
-		} else if (quest_objective->ObjectiveType == ObjectiveType::RecruitHero) {
+		} else if (quest_objective->get_objective_type() == ObjectiveType::RecruitHero) {
 			if (!this->HasHero(quest_objective->get_character()) && !this->can_recruit_hero(quest_objective->get_character(), true)) {
 				return "The hero can no longer be recruited.";
 			}
-		} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyUnits || quest_objective->ObjectiveType == ObjectiveType::DestroyHero || quest_objective->ObjectiveType == ObjectiveType::DestroyUnique) {
-			if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->Quantity) {
+		} else if (quest_objective->get_objective_type() == ObjectiveType::DestroyUnits || quest_objective->get_objective_type() == ObjectiveType::DestroyHero || quest_objective->get_objective_type() == ObjectiveType::DestroyUnique) {
+			if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->get_quantity()) {
 				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return "The target no longer exists.";
@@ -2903,16 +2889,16 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 				}
 			}
 			
-			if (quest_objective->ObjectiveType == ObjectiveType::DestroyHero) {
+			if (quest_objective->get_objective_type() == ObjectiveType::DestroyHero) {
 				if (objective->Counter == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
-			} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyUnique) {
+			} else if (quest_objective->get_objective_type() == ObjectiveType::DestroyUnique) {
 				if (objective->Counter == 0 && quest_objective->Unique->CanDrop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
 			}
-		} else if (quest_objective->ObjectiveType == ObjectiveType::DestroyFaction) {
+		} else if (quest_objective->get_objective_type() == ObjectiveType::DestroyFaction) {
 			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {

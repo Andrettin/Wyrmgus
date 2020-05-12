@@ -41,7 +41,8 @@ int random::generate_in_range(const int min_value, const int max_value)
 {
 	//we have to use the Boost number distribution here since it is portable (has the same result with different compilers), which the standard library's isn't
 	boost::random::uniform_int_distribution<int> distribution(min_value, max_value);
-	return distribution(this->engine);
+	int result = distribution(this->engine);
+	return result;
 }
 
 

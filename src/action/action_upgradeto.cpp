@@ -357,7 +357,6 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 	unit.UpdateSoldUnits();
 	//Wyrmgus end
 	
-	//Wyrmgus start
 	/*
 	//
 	// Update possible changed buttons.
@@ -379,18 +378,24 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 		if (!unit.UnderConstruction) {
 			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 				const CQuestObjective *quest_objective = objective->get_quest_objective();
-				if (
-					(quest_objective->ObjectiveType == ObjectiveType::BuildUnits && stratagus::vector::contains(quest_objective->UnitTypes, &newtype))
-					|| (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && stratagus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class()))
-				) {
-					if (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == unit.settlement) {
-						objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
-					}
+
+				if (quest_objective->ObjectiveType != ObjectiveType::BuildUnits) {
+					continue;
 				}
+
+				if (!stratagus::vector::contains(quest_objective->UnitTypes, &newtype) && !stratagus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class())) {
+					continue;
+				}
+
+				if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit.settlement) {
+					continue;
+				}
+
+				objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
 			}
 		}
 	}
-	//Wyrmgus end
+
 	return 1;
 }
 

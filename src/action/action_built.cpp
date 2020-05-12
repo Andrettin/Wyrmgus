@@ -168,10 +168,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const stratagus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
-	//Wyrmgus start
-//	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
 	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
-	//Wyrmgus end
 
 	// HACK: the building is ready now
 	//Wyrmgus start
@@ -185,16 +182,21 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	
 	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 		const CQuestObjective *quest_objective = objective->get_quest_objective();
-		if (
-			(quest_objective->ObjectiveType == ObjectiveType::BuildUnits && stratagus::vector::contains(quest_objective->UnitTypes, &type))
-			|| (quest_objective->ObjectiveType == ObjectiveType::BuildUnitsOfClass && stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class()))
-		) {
-			if (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == unit.settlement) {
-				objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
-			}
+
+		if (quest_objective->ObjectiveType != ObjectiveType::BuildUnits) {
+			continue;
 		}
+
+		if (!stratagus::vector::contains(quest_objective->UnitTypes, &type) && !stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
+			continue;
+		}
+
+		if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit.settlement) {
+			continue;
+		}
+
+		objective->Counter = std::min(objective->Counter + 1, quest_objective->Quantity);
 	}
-	//Wyrmgus end
 	
 	unit.UnderConstruction = 0;
 	if (unit.Frame < 0) {

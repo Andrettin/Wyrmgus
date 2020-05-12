@@ -150,9 +150,7 @@ static int CclDefineQuest(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CQuestObjective *objective = new CQuestObjective(quest->Objectives.size());
-				objective->Quest = quest;
-				quest->Objectives.push_back(objective);
+				CQuestObjective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
@@ -161,17 +159,18 @@ static int CclDefineQuest(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "objective-type")) {
-						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, k + 1));
-						if (objective->ObjectiveType == ObjectiveType::None) {
+						const ObjectiveType objective_type = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, k + 1));
+
+						if (objective_type == ObjectiveType::None) {
 							LuaError(l, "Objective type doesn't exist.");
 						}
-						if (objective->ObjectiveType == ObjectiveType::HeroMustSurvive) {
-							objective->Quantity = 0;
-						}
+
+						objective = new CQuestObjective(objective_type, quest);
+						quest->Objectives.push_back(objective);
 					} else if (!strcmp(value, "objective-string")) {
 						objective->objective_string = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "quantity")) {
-						objective->Quantity = LuaToNumber(l, -1, k + 1);
+						objective->quantity = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource")) {
 						int resource = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						if (resource == -1) {

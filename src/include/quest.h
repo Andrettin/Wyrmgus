@@ -56,7 +56,6 @@ enum class ObjectiveType {
 	GatherResource,
 	HaveResource,
 	BuildUnits,
-	BuildUnitsOfClass,
 	DestroyUnits,
 	ResearchUpgrade,
 	RecruitHero,
@@ -69,16 +68,29 @@ enum class ObjectiveType {
 class CQuestObjective
 {
 public:
-	CQuestObjective(const int index) : index(index)
-	{
-	}
+	CQuestObjective(const ObjectiveType objective_type, const stratagus::quest *quest);
 
 	void process_sml_property(const stratagus::sml_property &property);
 	void process_sml_scope(const stratagus::sml_data &scope);
 
+	ObjectiveType get_objective_type() const
+	{
+		return this->objective_type;
+	}
+
+	const stratagus::quest *get_quest() const
+	{
+		return this->quest;
+	}
+
 	int get_index() const
 	{
 		return this->index;
+	}
+
+	int get_quantity() const
+	{
+		return this->quantity;
 	}
 
 	const std::string &get_objective_string() const
@@ -107,16 +119,14 @@ public:
 	}
 
 private:
+	ObjectiveType objective_type = ObjectiveType::None;
+	const stratagus::quest *quest = nullptr;
 	int index = -1;
+	int quantity = 1;
 public:
-	ObjectiveType ObjectiveType = ObjectiveType::None;
-	int Quantity = 1;
 	int Resource = -1;
 private:
 	std::string objective_string;
-public:
-	stratagus::quest *Quest = nullptr;
-private:
 	std::vector<const stratagus::unit_class *> unit_classes;
 public:
 	std::vector<const stratagus::unit_type *> UnitTypes;
