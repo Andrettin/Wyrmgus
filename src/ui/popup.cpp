@@ -27,15 +27,12 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/popup.h"
 
 #include "database/defines.h"
+#include "faction.h"
 #include "font.h"
 #include "player.h"
 #include "script/trigger.h"
@@ -502,19 +499,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	CLabel label(font, this->TextColor, this->HighlightColor);
 
 	if (this->Text) {
-		//Wyrmgus start
-//		TriggerData.Type = UnitTypes[button.Value];
 		button.SetTriggerData();
 		int resource = button.Value;
 		if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 			TriggerData.Resource = &resource;
 		}
-		//Wyrmgus end
 		text = EvalString(this->Text);
-		//Wyrmgus start
-//		TriggerData.Type = nullptr;
 		button.CleanTriggerData();
-		//Wyrmgus end
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
@@ -524,39 +515,63 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 	if (this->Index != -1) {
 		int value;
-		if (button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy) {
-			value = stratagus::unit_type::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
-			if (value >= 0 && IsBonusVariable(this->Index)) {
-				x += label.Draw(x, y, "+");
-			}
-		} else {
-			if (
-				UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value
-				&& this->Index != HITPOINTHEALING_INDEX
-				&& UnitManager.GetSlotUnit(button.Value).Container
-				&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
-			) {
-				value = UnitManager.GetSlotUnit(button.Value).Container->GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
-				if (value >= 0) {
-					x += label.Draw(x, y, "+");
+
+		const stratagus::unit_class *unit_class = nullptr;
+		const stratagus::unit_type *unit_type = nullptr;
+		switch (button.Action) {
+			case ButtonCmd::TrainClass:
+				unit_class = stratagus::unit_class::get_all()[button.Value];
+				if (Selected[0]->Player->Faction != -1) {
+					unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
 				}
-			} else if (UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr) {
-				value = UnitManager.GetSlotUnit(button.Value).GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
-				if (value >= 0) {
-					x += label.Draw(x, y, "+");
-				}
-			} else {
-				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
+				break;
+			case ButtonCmd::Unit:
+			case ButtonCmd::Buy:
+				unit_type = UnitManager.GetSlotUnit(button.Value).Type;
+				break;
+			default:
+				unit_type = stratagus::unit_type::get_all()[button.Value];
+				break;
+		}
+
+		switch (button.Action) {
+			case ButtonCmd::Unit:
+			case ButtonCmd::Buy:
 				if (
-					(UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonCmd::Buy)
-					|| IsBonusVariable(this->Index)
-				) {
+					unit_type->BoolFlag[ITEM_INDEX].value
+					&& this->Index != HITPOINTHEALING_INDEX
+					&& UnitManager.GetSlotUnit(button.Value).Container
+					&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
+					) {
+					value = UnitManager.GetSlotUnit(button.Value).Container->GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {
 						x += label.Draw(x, y, "+");
 					}
+				} else if (UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr) {
+					value = UnitManager.GetSlotUnit(button.Value).GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
+					if (value >= 0) {
+						x += label.Draw(x, y, "+");
+					}
+				} else {
+					value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
+					if (
+						(unit_type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonCmd::Buy)
+						|| IsBonusVariable(this->Index)
+						) {
+						if (value >= 0) {
+							x += label.Draw(x, y, "+");
+						}
+					}
 				}
-			}
+				break;
+			default:
+				value = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
+				if (value >= 0 && IsBonusVariable(this->Index)) {
+					x += label.Draw(x, y, "+");
+				}
+				break;
 		}
+
 		x += label.Draw(x, y, value);
 		if (IsPercentageVariable(this->Index)) {
 			x += label.Draw(x, y, "%");

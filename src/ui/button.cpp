@@ -334,19 +334,33 @@ void button::initialize()
 
 void button::SetTriggerData() const
 {
-	if (this->Action != ButtonCmd::Unit && this->Action != ButtonCmd::Buy) {
-		TriggerData.Type = unit_type::get_all()[this->Value];
-	} else {
-		TriggerData.Type = UnitManager.GetSlotUnit(this->Value).Type;
-		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
-	}
-	if (this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility) {
-		TriggerData.Upgrade = CUpgrade::get_all()[this->Value];
-	} else if (this->Action == ButtonCmd::Faction) {
-		TriggerData.Faction = faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
-		if (!faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::try_get(faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
-		}
+	const stratagus::unit_class *unit_class = nullptr;
+
+	switch (this->Action) {
+		case ButtonCmd::TrainClass:
+			unit_class = stratagus::unit_class::get_all()[this->Value];
+			if (Selected[0]->Player->Faction != -1) {
+				TriggerData.Type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			}
+			break;
+		case ButtonCmd::Research:
+		case ButtonCmd::LearnAbility:
+			TriggerData.Upgrade = CUpgrade::get_all()[this->Value];
+			break;
+		case ButtonCmd::Unit:
+		case ButtonCmd::Buy:
+			TriggerData.Type = UnitManager.GetSlotUnit(this->Value).Type;
+			TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
+			break;
+		case ButtonCmd::Faction:
+			TriggerData.Faction = faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
+			if (!faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+				TriggerData.Upgrade = CUpgrade::try_get(faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+			}
+			break;
+		default:
+			TriggerData.Type = unit_type::get_all()[this->Value];
+			break;
 	}
 }
 

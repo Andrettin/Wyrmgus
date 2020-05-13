@@ -674,18 +674,31 @@ static void GetPopupSize(const CPopup &popup, const stratagus::button &button,
 	popupWidth = popup.MarginX;
 	popupHeight = popup.MarginY;
 
+	const stratagus::unit_class *unit_class = nullptr;
+	const stratagus::unit_type *unit_type = nullptr;
+
+	switch (button.Action) {
+		case ButtonCmd::TrainClass:
+			unit_class = stratagus::unit_class::get_all()[button.Value];
+			if (Selected[0]->Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			}
+			break;
+		case ButtonCmd::Unit:
+		case ButtonCmd::Buy:
+			unit_type = UnitManager.GetSlotUnit(button.Value).Type;
+			break;
+		default:
+			unit_type = stratagus::unit_type::get_all()[button.Value];
+			break;
+	}
+
 	for (std::vector<CPopupContentType *>::const_iterator it = popup.Contents.begin();
 		 it != popup.Contents.end();
 		 ++it) {
 		CPopupContentType &content = **it;
 
-		//Wyrmgus start
-//		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
-		if (
-			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, stratagus::unit_type::get_all()[button.Value]))
-			|| ((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && CanShowPopupContent(content.Condition, button, UnitManager.GetSlotUnit(button.Value).Type))
-		) {
-		//Wyrmgus end
+		if (CanShowPopupContent(content.Condition, button, unit_type)) {
 			// Automatically write the calculated coordinates.
 			content.pos.x = contentWidth + content.MarginX;
 			content.pos.y = popupHeight + content.MarginY;
@@ -801,13 +814,18 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		 it != popup->Contents.end(); ++it) {
 		const CPopupContentType &content = **it;
 
-		//Wyrmgus start
-//		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
-		if (
-			(button.Action != ButtonCmd::Unit && button.Action != ButtonCmd::Buy && CanShowPopupContent(content.Condition, button, stratagus::unit_type::get_all()[button.Value]))
-			|| ((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && CanShowPopupContent(content.Condition, button, UnitManager.GetSlotUnit(button.Value).Type))
-		) {
-		//Wyrmgus end
+		bool can_show_popup_content = false;
+		switch (button.Action) {
+			case ButtonCmd::Unit:
+			case ButtonCmd::Buy:
+				can_show_popup_content = CanShowPopupContent(content.Condition, button, UnitManager.GetSlotUnit(button.Value).Type);
+				break;
+			default:
+				can_show_popup_content = CanShowPopupContent(content.Condition, button, unit_type);
+				break;
+		}
+
+		if (can_show_popup_content) {
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
 		}
 	}
