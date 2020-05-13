@@ -44,6 +44,7 @@ enum class ButtonCmd {
 	Stop,           /// order stop
 	Button,         /// choose other button set
 	Train,          /// order train
+	TrainClass, //train order (unit class)
 	StandGround,    /// order stand ground
 	Return,         /// order return goods
 	Research,       /// order reseach

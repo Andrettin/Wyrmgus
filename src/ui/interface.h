@@ -339,8 +339,6 @@ extern void ToggleShowMessages();
 extern void DrawTimer();
 /// Update the timer
 extern void UpdateTimer();
-/// Update the status line with hints from the button
-extern void UpdateStatusLineForButton(const stratagus::button &button);
 /// Draw the Pie Menu
 extern void DrawPieMenu();
 /// Draw the button popup

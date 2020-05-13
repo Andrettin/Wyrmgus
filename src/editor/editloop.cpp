@@ -2054,26 +2054,6 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		//Wyrmgus end
 		if (x < screenPos.x && screenPos.x < x + IconWidth
 			&& y < screenPos.y && screenPos.y < y + IconHeight) {
-			//Wyrmgus start
-			/*
-			char buf[256];
-			snprintf(buf, sizeof(buf), "%s \"%s\"",
-					 Editor.ShownUnitTypes[i]->Ident.c_str(),
-					 Editor.ShownUnitTypes[i]->Name.c_str());
-			UI.StatusLine.Set(buf);
-			*/
-			if (!Preference.NoStatusLineTooltips) {
-				char buf[256];
-				if (i == (int) Editor.ShownUnitTypes.size()) {
-					snprintf(buf, sizeof(buf), "Create Unit Type");
-				} else {
-					snprintf(buf, sizeof(buf), "%s \"%s\"",
-							 Editor.ShownUnitTypes[i]->Ident.c_str(),
-							 Editor.ShownUnitTypes[i]->get_name().c_str());
-				}
-				UI.StatusLine.Set(buf);
-			}
-			//Wyrmgus end
 			Editor.CursorUnitIndex = i;
 			return true;
 		}

@@ -77,6 +77,7 @@
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
@@ -428,7 +429,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
 			return false;
 		}
 	}
@@ -732,12 +733,13 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 	int Costs[ManaResCost + 1];
 	memset(Costs, 0, sizeof(Costs));
 
+	const stratagus::unit_class *unit_class = nullptr;
+	stratagus::unit_type *unit_type = nullptr;
+	int type_costs[MaxCosts];
+
 	switch (button.Action) {
 		case ButtonCmd::Research:
-			//Wyrmgus start
-//			memcpy(Costs, CUpgrade::get_all()[button.Value]->Costs, sizeof(CUpgrade::get_all()[button.Value]->Costs));
 			CPlayer::GetThisPlayer()->GetUpgradeCosts(CUpgrade::get_all()[button.Value], Costs);
-			//Wyrmgus end
 			break;
 		case ButtonCmd::SpellCast:
 			memcpy(Costs, CSpell::Spells[button.Value]->Costs, sizeof(CSpell::Spells[button.Value]->Costs));
@@ -746,22 +748,26 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		case ButtonCmd::Build:
 		case ButtonCmd::Train:
 		case ButtonCmd::UpgradeTo:
-			//Wyrmgus start
-//			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
-//				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
-//			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
-			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(stratagus::unit_type::get_all()[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button.Value]) != 0);
+			unit_type = stratagus::unit_type::get_all()[button.Value];
+
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
-			Costs[FoodCost] = stratagus::unit_type::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
-			//Wyrmgus end
+			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
 			break;
-		//Wyrmgus start
+		case ButtonCmd::TrainClass:
+			unit_class = stratagus::unit_class::get_all()[button.Value];
+			if (Selected[0]->Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			}
+
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
+			memcpy(Costs, type_costs, sizeof(type_costs));
+			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
+			break;
 		case ButtonCmd::Buy:
 			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
 			Costs[CopperCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
 			break;
-		//Wyrmgus end
 		default:
 			break;
 	}
@@ -1028,18 +1034,35 @@ void CButtonPanel::Draw()
 
 		//Wyrmgus start
 		const stratagus::icon *button_icon = button->Icon.Icon;
+		const CPlayer *player = Selected[0]->Player;
+		const stratagus::faction *player_faction = player->Faction != -1 ? stratagus::faction::get_all()[player->Faction] : nullptr;
+
+		stratagus::unit_type *button_unit_type = nullptr;
+		switch (button->Action) {
+			case ButtonCmd::Train:
+			case ButtonCmd::Build:
+			case ButtonCmd::UpgradeTo:
+			case ButtonCmd::ExperienceUpgradeTo:
+				button_unit_type = stratagus::unit_type::get_all()[button->Value];
+				break;
+			case ButtonCmd::TrainClass:
+				if (player_faction != nullptr) {
+					button_unit_type = player_faction->get_class_unit_type(stratagus::unit_class::get_all()[button->Value]);
+				}
+				break;
+		}
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
 		if (button->Icon.Name.empty() && button->Action == ButtonCmd::Attack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(button->Action) != nullptr) {
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(button->Action);
 		} else if (button->Icon.Name.empty() && Selected[0]->GetButtonIcon(button->Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(button->Action);
-		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && stratagus::unit_type::get_all()[button->Value]->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !stratagus::unit_type::get_all()[button->Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
-			button_icon = stratagus::unit_type::get_all()[button->Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && stratagus::unit_type::get_all()[button->Value]->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !stratagus::unit_type::get_all()[button->Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
-			button_icon = stratagus::unit_type::get_all()[button->Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !stratagus::unit_type::get_all()[button->Value]->Icon.Name.empty()) {
-			button_icon = stratagus::unit_type::get_all()[button->Value]->Icon.Icon;
+		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
+			button_icon = button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
+			button_icon = button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
+			button_icon = button_unit_type->Icon.Icon;
 		} else if (button->Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(button->Value).GetIcon().Icon;
 		} else if (button->Action == ButtonCmd::Research && button->Icon.Name.empty() && CUpgrade::get_all()[button->Value]->get_icon()) {
@@ -1079,16 +1102,16 @@ void CButtonPanel::Draw()
 												   pos, buf, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button));
 												   
 				if (
-					(button->Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button->Value]) != 0)
+					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(button_unit_type) != 0)
 					|| button->Action == ButtonCmd::SellResource || button->Action == ButtonCmd::BuyResource
 				) {
 					std::string number_string;
-					if (button->Action == ButtonCmd::Train && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button->Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string((long long) Selected[0]->GetUnitStock(stratagus::unit_type::get_all()[button->Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button->Value]));
+					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(button_unit_type));
 					} else if (button->Action == ButtonCmd::SellResource) {
-						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(button->Value));
+						number_string = std::to_string(Selected[0]->Player->GetEffectiveResourceSellPrice(button->Value));
 					} else if (button->Action == ButtonCmd::BuyResource) {
-						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceBuyPrice(button->Value));
+						number_string = std::to_string(Selected[0]->Player->GetEffectiveResourceBuyPrice(button->Value));
 					}
 					std::string oldnc;
 					std::string oldrc;
@@ -1111,27 +1134,6 @@ void CButtonPanel::Draw()
 			}
 		}
 	}
-	//
-	//  Update status line for this button and draw popups
-	//
-	//Wyrmgus start
-	/*
-	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
-		if (ButtonAreaUnderCursor == ButtonAreaButton &&
-			//Wyrmgus start
-//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			ButtonUnderCursor == i && KeyState != KeyStateInput
-			&& buttons[i].Level == CurrentButtonLevel) {
-			//Wyrmgus end
-				if (!Preference.NoStatusLineTooltips) {
-					UpdateStatusLineForButton(buttons[i]);
-				}
-				DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i].X,
-					UI.ButtonPanel.Buttons[i].Y);
-		}
-	}
-	*/
-	//Wyrmgus end
 	
 	//Wyrmgus start
 	if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
@@ -1156,43 +1158,6 @@ void CButtonPanel::Draw()
 	}
 	//Wyrmgus end
 }
-
-/**
-**  Update the status line with hints from the button
-**
-**  @param button  Button
-*/
-void UpdateStatusLineForButton(const stratagus::button &button)
-{
-	UI.StatusLine.Set(button.GetHint());
-	switch (button.Action) {
-		case ButtonCmd::Build:
-		case ButtonCmd::Train:
-		case ButtonCmd::UpgradeTo: {
-			// FIXME: store pointer in button table!
-			//Wyrmgus start
-//			const CUnitStats &stats = UnitTypes[button.Value]->Stats[CPlayer::GetThisPlayer()->Index];
-//			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
-			int type_costs[MaxCosts];
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(stratagus::unit_type::get_all()[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(stratagus::unit_type::get_all()[button.Value]) != 0);
-			UI.StatusLine.SetCosts(0, stratagus::unit_type::get_all()[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value * (stratagus::unit_type::get_all()[button.Value]->TrainQuantity ? stratagus::unit_type::get_all()[button.Value]->TrainQuantity : 1), type_costs);
-			//Wyrmgus end
-			break;
-		}
-		case ButtonCmd::Research:
-			UI.StatusLine.SetCosts(0, 0, CUpgrade::get_all()[button.Value]->Costs);
-			break;
-		case ButtonCmd::SpellCast:
-			UI.StatusLine.SetCosts(CSpell::Spells[button.Value]->ManaCost, 0, CSpell::Spells[button.Value]->Costs);
-			break;
-		default:
-			UI.StatusLine.ClearCosts();
-			break;
-	}
-}
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Check if the button is allowed for the unit.
@@ -1226,6 +1191,9 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 		return false;
 	}
 	//Wyrmgus end
+
+	const stratagus::unit_class *unit_class = nullptr;
+	stratagus::unit_type *unit_type = nullptr;
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
@@ -1305,6 +1273,27 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			} else {
 				res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			}
+			break;
+		case ButtonCmd::TrainClass:
+			// Check if building queue is enabled
+			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
+				break;
+			}
+
+			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			if (unit.Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
+			}
+
+			if (unit_type == nullptr) {
+				break;
+			}
+
+			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(unit_type)) {
+				break;
+			}
+
+			res = CheckDependencies(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
 			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, true);
@@ -1388,6 +1377,9 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 		}
 	}
 
+	const stratagus::unit_class *unit_class = nullptr;
+	stratagus::unit_type *unit_type = nullptr;
+
 	// Check button-specific cases
 	switch (buttonaction.Action) {
 		case ButtonCmd::Stop:
@@ -1420,6 +1412,12 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			} else {
 				res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			}
+			break;
+		case ButtonCmd::TrainClass:
+			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
+
+			res = CheckDependencies(unit_type, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
 			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
@@ -1926,44 +1924,29 @@ void CButtonPanel::DoClicked_Build(int button)
 	}
 }
 
-void CButtonPanel::DoClicked_Train(int button)
+void CButtonPanel::DoClicked_Train(const std::unique_ptr<stratagus::button> &button)
 {
-	// FIXME: store pointer in button table!
-	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button]->Value];
-	// FIXME: Johns: I want to place commands in queue, even if not
-	// FIXME:        enough resources are available.
+	const stratagus::unit_class *unit_class = nullptr;
+	stratagus::unit_type *unit_type = nullptr;
+
+	switch (button->Action) {
+		case ButtonCmd::Train:
+			// FIXME: store pointer in button table!
+			unit_type = stratagus::unit_type::get_all()[button->Value];
+			break;
+		case ButtonCmd::TrainClass:
+			unit_class = stratagus::unit_class::get_all()[button->Value];
+			if (Selected[0]->Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			}
+			break;
+		default:
+			break;
+	}
+
 	// FIXME: training queue full check is not correct for network.
 	// FIXME: this can be correct written, with a little more code.
-	//Wyrmgus start
-	/*
-	if (Selected[0]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
-		//Wyrmgus start
-//		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-		ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-		//Wyrmgus end
-	//Wyrmgus start
-//	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
-	} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
-	//Wyrmgus end
-		//PlayerSubUnitType(player,type);
-		//Wyrmgus start
-//		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
-		SendCommandTrainUnit(*Selected[0], type, ThisPlayer->Index, !(KeyModifiers & ModifierShift));
-		//Wyrmgus end
-		UI.StatusLine.Clear();
-		UI.StatusLine.ClearCosts();
-	//Wyrmgus start
-//	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
-//		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
-//			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
-//		}
-	} else if (ThisPlayer->CheckLimits(type) == -3) {
-		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
-		}
-	//Wyrmgus end
-	}
-	*/
+
 	int best_training_place = 0;
 	int lowest_queue = Selected[0]->Orders.size();
 	
@@ -1982,8 +1965,8 @@ void CButtonPanel::DoClicked_Train(int button)
 		}
 	}
 	
-	if (type.BoolFlag[RAIL_INDEX].value) {
-		bool has_adjacent_rail = Selected[best_training_place]->HasAdjacentRailForUnitType(&type);
+	if (unit_type->BoolFlag[RAIL_INDEX].value) {
+		bool has_adjacent_rail = Selected[best_training_place]->HasAdjacentRailForUnitType(unit_type);
 		if (!has_adjacent_rail) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
@@ -2000,11 +1983,11 @@ void CButtonPanel::DoClicked_Train(int button)
 		if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].GetUnitStock(&type) != 0)) {
-			SendCommandTrainUnit(*Selected[best_training_place], type, CPlayer::GetThisPlayer()->Index, FlushCommands);
+		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].GetUnitStock(unit_type) != 0)) {
+			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->Index, FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(type) == -3) {
+		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) == -3) {
 			if (GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound) {
 				PlayGameSound(GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			}
@@ -2306,7 +2289,10 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::CancelTrain: { DoClicked_CancelTrain(); break; }
 		case ButtonCmd::CancelBuild: { DoClicked_CancelBuild(); break; }
 		case ButtonCmd::Build: { DoClicked_Build(button); break; }
-		case ButtonCmd::Train: { DoClicked_Train(button); break; }
+		case ButtonCmd::Train:
+		case ButtonCmd::TrainClass:
+			DoClicked_Train(CurrentButtons[button]);
+			break;
 		case ButtonCmd::UpgradeTo: { DoClicked_UpgradeTo(button); break; }
 		case ButtonCmd::Research: { DoClicked_Research(button); break; }
 		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button); break; }

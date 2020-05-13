@@ -3223,9 +3223,6 @@ void DrawPieMenu()
 
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i]->get_pos() != -1) {
-		if (!Preference.NoStatusLineTooltips) {
-			UpdateStatusLineForButton(*buttons[i]);
-		}
 		DrawPopup(*buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
 }

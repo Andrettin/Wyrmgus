@@ -29,10 +29,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "unit/unit_cache.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"
@@ -41,10 +37,6 @@
 #undef Wait
 #endif
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CUnit;
 class CUpgrade;
 class CPlayer;
@@ -52,6 +44,7 @@ enum class ForceType;
 
 namespace stratagus {
 	class site;
+	class unit_class;
 	class unit_type;
 }
 
@@ -337,7 +330,7 @@ public:
 	std::string Script;				/// Script executed
 	unsigned long SleepCycles = 0;	/// Cycles to sleep
 
-	AiForceManager Force;			/// Forces controlled by AI
+	class AiForceManager Force;			/// Forces controlled by AI
 
 	// resource manager
 	int Reserve[MaxCosts];			/// Resources to keep in reserve
@@ -377,11 +370,36 @@ public:
 class AiHelper
 {
 public:
-	/**
-	** The index is the unit that should be trained, giving a table of all
-	** units/buildings which could train this unit.
-	*/
-	std::vector<std::vector<stratagus::unit_type *> > Train;
+	const std::vector<stratagus::unit_type *> &get_trainers(const stratagus::unit_type *unit_type) const
+	{
+		static std::vector<stratagus::unit_type *> empty_vector;
+
+		auto find_iterator = this->trainers.find(unit_type);
+		if (find_iterator != this->trainers.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const stratagus::unit_class *> &get_trainer_classes(const stratagus::unit_class *unit_class) const
+	{
+		static std::vector<const stratagus::unit_class *> empty_vector;
+
+		auto find_iterator = this->trainer_classes.find(unit_class);
+		if (find_iterator != this->trainer_classes.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	//unit types associated with lists of other unit types which can train them
+	std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> trainers;
+
+	//unit classes associated with lists of other unit classes which can train them
+	std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> trainer_classes;
+
 	/**
 	** The index is the unit that should be build, giving a table of all
 	** units/buildings which could build this unit.

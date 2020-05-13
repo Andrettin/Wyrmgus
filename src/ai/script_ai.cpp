@@ -70,6 +70,26 @@ static void AiHelperInsert(std::vector<std::vector<stratagus::unit_type *> > &ta
 	table[n].push_back(&base);
 }
 
+static void AiHelperInsert(std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> &table,
+	const stratagus::unit_type *key, stratagus::unit_type *target)
+{
+	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+		return;
+	}
+
+	table[key].push_back(target);
+}
+
+static void AiHelperInsert(std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> &table,
+	const stratagus::unit_class *key, const stratagus::unit_class *target)
+{
+	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+		return;
+	}
+
+	table[key].push_back(target);
+}
+
 //Wyrmgus start
 /**
 **  Insert new upgrade element.
@@ -299,7 +319,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 {
 	//Wyrmgus start
 	//free AI helper (except for equivs) before initializing, in case this is a re-definition
-	AiHelpers.Train.clear();
+	AiHelpers.trainers.clear();
+	AiHelpers.trainer_classes.clear();
 	AiHelpers.Build.clear();
 	AiHelpers.Upgrade.clear();
 	AiHelpers.Research.clear();
@@ -373,10 +394,18 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Train : {
-				stratagus::unit_type *trainingType = stratagus::unit_type::get(button->ValueStr);
+				stratagus::unit_type *trained_type = stratagus::unit_type::get(button->ValueStr);
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Train, trainingType->Slot, (**j));
+				for (stratagus::unit_type *trainer : unitmask) {
+					AiHelperInsert(aiHelper.trainers, trained_type, trainer);
+				}
+				break;
+			}
+			case ButtonCmd::TrainClass : {
+				stratagus::unit_class *trained_class = stratagus::unit_class::get(button->ValueStr);
+
+				for (stratagus::unit_class *trainer : button->get_unit_classes()) {
+					AiHelperInsert(aiHelper.trainer_classes, trained_class, trainer);
 				}
 				break;
 			}

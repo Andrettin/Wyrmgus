@@ -654,7 +654,7 @@ public:
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false), NoStatusLineTooltips(false),
+		DeselectInMine(false),
 		//Wyrmgus start
 		PlayerColorCircle(false), SepiaForGrayscale(false),
 		ShowPathlines(false),
@@ -675,7 +675,6 @@ public:
 	bool StereoSound;        /// Enables/disables stereo sound effects	
 	bool MineNotifications;  /// Show mine is running low/depleted messages
 	bool DeselectInMine;     /// Deselect peasants in mines
-	bool NoStatusLineTooltips;	/// Don't show messages on status line
 	//Wyrmgus start
 	bool SepiaForGrayscale;		/// Use a sepia filter for grayscale icons
 	bool PlayerColorCircle;		/// Show a player color circle below each unit

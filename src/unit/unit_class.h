@@ -53,6 +53,11 @@ public:
 	{
 	}
 
+	int get_index() const
+	{
+		return this->index;
+	}
+
 	const std::vector<unit_type *> &get_unit_types() const
 	{
 		return this->unit_types;

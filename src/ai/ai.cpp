@@ -130,10 +130,6 @@
 ** Called if AI unit has completed research of an upgrade or spell.
 */
 
-/*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ai.h"
@@ -174,10 +170,6 @@
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
 
 int AiSleepCycles;              /// Ai sleeps # cycles
 
@@ -719,7 +711,8 @@ void FreeAi()
 	AiTypes.clear();
 
 	//  Free AiHelpers.
-	AiHelpers.Train.clear();
+	AiHelpers.trainers.clear();
+	AiHelpers.trainer_classes.clear();
 	AiHelpers.Build.clear();
 	AiHelpers.Upgrade.clear();
 	AiHelpers.Research.clear();

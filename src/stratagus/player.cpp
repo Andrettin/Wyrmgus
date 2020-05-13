@@ -1685,10 +1685,24 @@ bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::
 				return true;
 			}
 		}
-	} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Train.size()) {
-		for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Train[type->Slot][j]) > 0) {
+	} else if (!type->BoolFlag[BUILDING_INDEX].value) {
+		for (const stratagus::unit_type *builder : AiHelpers.get_trainers(type)) {
+			if (this->GetUnitTypeCount(builder) > 0) {
 				return true;
+			}
+		}
+
+		if (this->Faction != -1) {
+			for (const stratagus::unit_class *builder_class : AiHelpers.get_trainer_classes(type->get_unit_class())) {
+				const stratagus::unit_type *builder = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+
+				if (builder == nullptr) {
+					continue;
+				}
+
+				if (this->GetUnitTypeCount(builder) > 0) {
+					return true;
+				}
 			}
 		}
 	}
@@ -4211,7 +4225,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 		player.HasNeutralFactionType()
 		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
-		if (stratagus::faction::get_all()[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::Buy) || std::find(this->Deities.begin(), this->Deities.end(), stratagus::faction::get_all()[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (stratagus::faction::get_all()[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || stratagus::vector::contains(this->Deities, stratagus::faction::get_all()[player.Faction]->HolyOrderDeity)) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}

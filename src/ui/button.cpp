@@ -268,6 +268,9 @@ void button::initialize()
 			case ButtonCmd::Train:
 				this->Value = UnitTypeIdByIdent(this->ValueStr);
 				break;
+			case ButtonCmd::TrainClass:
+				this->Value = stratagus::unit_class::get(this->ValueStr)->get_index();
+				break;
 			case ButtonCmd::Research:
 				this->Value = UpgradeIdByIdent(this->ValueStr);
 				break;
@@ -367,7 +370,7 @@ int button::GetLevelID() const
 
 int button::GetKey() const
 {
-	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
+	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
 		return 0;
 	}
 
@@ -375,7 +378,7 @@ int button::GetKey() const
 		return this->Key;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0) {
 		if (this->get_pos() == 1) {
 			return 'q';
 		} else if (this->get_pos() == 2) {
@@ -415,7 +418,7 @@ int button::GetKey() const
 
 std::string button::GetHint() const
 {
-	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
+	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
 		string::replace(hint, "~!", "");
 		return hint;
@@ -425,7 +428,7 @@ std::string button::GetHint() const
 		return this->Hint;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
 		string::replace(hint, "~!", "");
 		hint += " (~!";
@@ -460,6 +463,8 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "build";
 		case ButtonCmd::Train:
 			return "train-unit";
+		case ButtonCmd::TrainClass:
+			return "train_unit_class";
 		case ButtonCmd::Patrol:
 			return "patrol";
 		case ButtonCmd::StandGround:
@@ -533,6 +538,8 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::Build;
 	} else if (button_action == "train-unit") {
 		return ButtonCmd::Train;
+	} else if (button_action == "train_unit_class") {
+		return ButtonCmd::TrainClass;
 	} else if (button_action == "patrol") {
 		return ButtonCmd::Patrol;
 	} else if (button_action == "stand-ground" || button_action == "stand_ground") {
@@ -590,5 +597,5 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 
 bool IsNeutralUsableButtonAction(const ButtonCmd button_action)
 {
-	return button_action == ButtonCmd::Train || button_action == ButtonCmd::CancelTrain || button_action == ButtonCmd::Buy || button_action == ButtonCmd::SellResource || button_action == ButtonCmd::BuyResource || button_action == ButtonCmd::Research;
+	return button_action == ButtonCmd::Train || button_action == ButtonCmd::TrainClass || button_action == ButtonCmd::CancelTrain || button_action == ButtonCmd::Buy || button_action == ButtonCmd::SellResource || button_action == ButtonCmd::BuyResource || button_action == ButtonCmd::Research;
 }

@@ -161,10 +161,6 @@ namespace gcn
 		{
 			if ((*iter)->hasMouse() && (*iter)->getTooltip() != "")
 			{
-				if (!Preference.NoStatusLineTooltips) {
-					CLabel label(GetGameFont());
-					label.Draw(2 + 16, Video.Height + 2 - 16, (*iter)->getTooltip());
-				}
 				int popup_x;
 				int popup_y;
 				(*iter)->getAbsolutePosition(popup_x, popup_y);

@@ -693,15 +693,6 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			// don't draw the mana bar when within transporters, as there's not enough space for it
 			//Wyrmgus end
 		}
-		if (ButtonAreaUnderCursor == ButtonAreaTransporting
-			&& static_cast<size_t>(ButtonUnderCursor) == j) {
-			//Wyrmgus start
-//			UI.StatusLine.Set(uins->Type->Name);
-			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(uins->GetMessageName());
-			}
-			//Wyrmgus end
-		}
 		++j;
 	}
 }
@@ -993,10 +984,6 @@ void DrawPopups()
 					if (mf.get_owner() != nullptr && mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race) != mf.TerrainFeature->CulturalNames.end()) {
 						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race)->second;
 					}
-					if (!Preference.NoStatusLineTooltips) {
-						CLabel label(GetGameFont());
-						label.Draw(2 + 16, Video.Height + 2 - 16, terrain_feature_name);
-					}
 					DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
 				}
 			}
@@ -1005,10 +992,6 @@ void DrawPopups()
 	
 	if (Selected.size() == 1) {
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(Selected[0]->GetMessageName());
-			}
-			
 			//hackish way to make the popup appear correctly for the single selected unit
 			stratagus::button ba;
 			ba.Hint = Selected[0]->GetMessageName();
@@ -1042,9 +1025,6 @@ void DrawPopups()
 				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->get_player_color());
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
-					if (!Preference.NoStatusLineTooltips) {
-						UI.StatusLine.Set(uins->GetTypeName());
-					}
 					//hackish way to make the popup appear correctly for the inventory item
 					stratagus::button *ba = new stratagus::button;
 					if (!uins->Name.empty() && uins->Identified) {
@@ -1080,9 +1060,6 @@ void DrawPopups()
 				ButtonUnderCursor == i && KeyState != KeyStateInput
 				&& CurrentButtons[i]->Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], *CurrentButtons[i])) {
 				//Wyrmgus end
-					if (!Preference.NoStatusLineTooltips) {
-						UpdateStatusLineForButton(*CurrentButtons[i]);
-					}
 					DrawPopup(*CurrentButtons[i], UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 			}
 		}
@@ -1091,10 +1068,6 @@ void DrawPopups()
 	if (UI.IdleWorkerButton && !CPlayer::GetThisPlayer()->FreeWorkers.empty()) {
 		if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
 			std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
-			if (!Preference.NoStatusLineTooltips) {
-				CLabel label(GetGameFont());
-				label.Draw((2 + 16) *stratagus::defines::get()->get_scale_factor(), Video.Height + (2 - 16) * stratagus::defines::get()->get_scale_factor(), idle_worker_tooltip);
-			}
 			DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 		}
 	}
@@ -1102,10 +1075,6 @@ void DrawPopups()
 	if (UI.LevelUpUnitButton && !CPlayer::GetThisPlayer()->LevelUpUnits.empty()) {
 		if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
 			std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
-			if (!Preference.NoStatusLineTooltips) {
-				CLabel label(GetGameFont());
-				label.Draw((2 + 16) *stratagus::defines::get()->get_scale_factor(), Video.Height + (2 - 16) * stratagus::defines::get()->get_scale_factor(), level_up_unit_tooltip);
-			}
 			DrawGenericPopup(level_up_unit_tooltip, UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 		}
 	}
@@ -1114,10 +1083,6 @@ void DrawPopups()
 		if (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) { //if the mouse is hovering over the level up unit button, draw a tooltip
 			std::string custom_hero_unit_tooltip = _("Select");
 			custom_hero_unit_tooltip += " " + CPlayer::GetThisPlayer()->Heroes[i]->GetMessageName();
-			if (!Preference.NoStatusLineTooltips) {
-				CLabel label(GetGameFont());
-				label.Draw((2 + 16) * stratagus::defines::get()->get_scale_factor(), Video.Height + (2 - 16) * stratagus::defines::get()->get_scale_factor(), custom_hero_unit_tooltip);
-			}
 			DrawGenericPopup(custom_hero_unit_tooltip, UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
 		}
 	}
@@ -1900,9 +1865,6 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		//Wyrmgus start
 //		UI.StatusLine.Set(unit.Type->Name);
-		if (!Preference.NoStatusLineTooltips) {
-			UI.StatusLine.Set(unit.GetMessageName());
-		}
 		
 		//hackish way to make the popup appear correctly for the single selected unit
 		stratagus::button *ba = new stratagus::button;
@@ -1945,10 +1907,6 @@ static void InfoPanel_draw_multiple_selection()
 				text_color = "fire";
 			} else if (Selected[i]->Prefix != nullptr || Selected[i]->Suffix != nullptr) {
 				text_color = "light-blue";
-			}
-//			UI.StatusLine.Set(Selected[i]->Type->Name);
-			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(Selected[i]->GetMessageName());
 			}
 			DrawGenericPopup(Selected[i]->GetMessageName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, text_color);
 			//Wyrmgus end

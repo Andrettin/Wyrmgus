@@ -29,7 +29,6 @@ class CPreference
 	bool StereoSound;
 	bool MineNotifications;
 	bool DeselectInMine;
-	bool NoStatusLineTooltips;
 	//Wyrmgus start
 	bool SepiaForGrayscale;
 	bool PlayerColorCircle;
