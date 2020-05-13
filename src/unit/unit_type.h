@@ -872,6 +872,7 @@ public:
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	const std::string &GetDefaultName(const CPlayer *player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
+	const std::string &get_default_button_key(const CPlayer *player) const;
 	bool CanExperienceUpgradeTo(const unit_type *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(faction *faction, const gender gender) const;
@@ -902,6 +903,11 @@ public:
 	unit_type *get_corpse_type() const
 	{
 		return this->corpse_type;
+	}
+
+	const std::string &get_button_key() const
+	{
+		return this->button_key;
 	}
 
 public:
@@ -1041,7 +1047,9 @@ public:
 	stratagus::button_level *ButtonLevel;		/// Level of this unit's button
 	std::string ButtonPopup;		/// Popup of this unit's button
 	std::string ButtonHint;			/// Hint of this unit's button
-	std::string ButtonKey;			/// Hotkey of this unit's button
+private:
+	std::string button_key;			/// Hotkey of this unit's button
+public:
 //	int StartingResources;          /// Amount of Resources on build
 	std::vector<int> StartingResources;          /// Amount of Resources on build
 	//Wyrmgus end

@@ -656,7 +656,7 @@ void unit_type::process_sml_property(const sml_property &property)
 		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 		this->DefaultStat.Variables[PRIORITY_INDEX].Max = std::stoi(value);
 	} else if (key == "button_key") {
-		this->ButtonKey = value;
+		this->button_key = value;
 	} else if (key == "button_hint") {
 		this->ButtonHint = value;
 	} else if (key == "type") {
@@ -1266,7 +1266,7 @@ void unit_type::initialize()
 		if (!this->Trains[i]->ButtonPopup.empty()) {
 			button_definition += "\tPopup = \"" + this->Trains[i]->ButtonPopup + "\",\n";
 		}
-		button_definition += "\tKey = \"" + this->Trains[i]->ButtonKey + "\",\n";
+		button_definition += "\tKey = \"" + this->Trains[i]->get_button_key() + "\",\n";
 		button_definition += "\tHint = \"" + this->Trains[i]->ButtonHint + "\",\n";
 		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
 		button_definition += "})";
@@ -1485,7 +1485,7 @@ void unit_type::SetParent(const unit_type *parent_type)
 	this->ButtonLevel = parent_type->ButtonLevel;
 	this->ButtonPopup = parent_type->ButtonPopup;
 	this->ButtonHint = parent_type->ButtonHint;
-	this->ButtonKey = parent_type->ButtonKey;
+	this->button_key = parent_type->button_key;
 	this->BurnPercent = parent_type->BurnPercent;
 	this->BurnDamageRate = parent_type->BurnDamageRate;
 	this->PoisonDrain = parent_type->PoisonDrain;
@@ -1593,6 +1593,7 @@ void unit_type::SetParent(const unit_type *parent_type)
 		
 		variation->VariationId = parent_variation->VariationId;
 		variation->TypeName = parent_variation->TypeName;
+		variation->button_key = parent_variation->button_key;
 		variation->File = parent_variation->File;
 		for (unsigned int i = 0; i < MaxCosts; ++i) {
 			variation->FileWhenLoaded[i] = parent_variation->FileWhenLoaded[i];
@@ -1850,6 +1851,16 @@ CPlayerColorGraphic *unit_type::GetDefaultLayerSprite(const CPlayer *player, int
 		return this->LayerSprites[image_layer];
 	} else {
 		return nullptr;
+	}
+}
+
+const std::string &unit_type::get_default_button_key(const CPlayer *player) const
+{
+	const CUnitTypeVariation *variation = this->GetDefaultVariation(player);
+	if (variation != nullptr && !variation->get_button_key().empty()) {
+		return variation->get_button_key();
+	} else {
+		return this->get_button_key();
 	}
 }
 

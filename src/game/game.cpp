@@ -539,10 +539,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (unit_type->ButtonPos != 0 && (!unit_type->Parent || unit_type->ButtonPos != unit_type->Parent->ButtonPos)) {
 				f->printf("\tButtonPos = %d,\n", unit_type->ButtonPos);
 			}
-			if (!unit_type->ButtonKey.empty() && (!unit_type->Parent || unit_type->ButtonKey != unit_type->Parent->ButtonKey)) {
-				f->printf("\tButtonKey = \"%s\",\n", unit_type->ButtonKey.c_str());
+			if (!unit_type->get_button_key().empty() && (!unit_type->Parent || unit_type->get_button_key() != unit_type->Parent->get_button_key())) {
+				f->printf("\tButtonKey = \"%s\",\n", unit_type->get_button_key().c_str());
 			}
-			if (!unit_type->ButtonHint.empty() && (!unit_type->Parent || unit_type->ButtonKey != unit_type->Parent->ButtonHint)) {
+			if (!unit_type->ButtonHint.empty() && (!unit_type->Parent || unit_type->ButtonHint != unit_type->Parent->ButtonHint)) {
 				f->printf("\tButtonHint = \"%s\",\n", unit_type->ButtonHint.c_str());
 			}
 			

@@ -410,7 +410,7 @@ int button::get_key() const
 		const CUnit *unit = this->get_unit();
 		const unit_type *unit_type = this->get_value_unit_type(unit);
 		if (unit_type != nullptr) {
-			key = GetHotKey(unit_type->ButtonKey);
+			key = GetHotKey(unit_type->get_default_button_key(unit->Player));
 		}
 	}
 
@@ -491,7 +491,7 @@ std::string button::get_hint() const
 
 			std::string unit_type_name = unit_type->GetDefaultName(unit->Player);
 			if (show_key && Preference.HotkeySetup == 0) {
-				std::string button_key = unit_type->ButtonKey;
+				std::string button_key = unit_type->get_default_button_key(unit->Player);
 				const size_t key_pos = string::ci_find(unit_type_name, button_key);
 				if (key_pos != std::string::npos) {
 					unit_type_name.insert(key_pos, "~!");

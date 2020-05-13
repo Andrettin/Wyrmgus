@@ -758,6 +758,8 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "type-name")) {
 						variation->TypeName = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "button-key")) {
+						variation->button_key = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {
 						variation->File = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
@@ -1105,7 +1107,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "ButtonHint")) {
 			type->ButtonHint = LuaToString(l, -1);
 		} else if (!strcmp(value, "ButtonKey")) {
-			type->ButtonKey = LuaToString(l, -1);
+			type->button_key = LuaToString(l, -1);
 		} else if (!strcmp(value, "Trains")) {
 			type->RemoveButtons(ButtonCmd::Train);
 			type->RemoveButtons(ButtonCmd::Build);
@@ -2333,7 +2335,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->ButtonPos);
 		return 1;
 	} else if (!strcmp(data, "ButtonKey")) {
-		lua_pushstring(l, type->ButtonKey.c_str());
+		lua_pushstring(l, type->get_button_key().c_str());
 		return 1;
 	} else if (!strcmp(data, "ButtonHint")) {
 		lua_pushstring(l, type->ButtonHint.c_str());
@@ -4161,7 +4163,7 @@ static int CclSetModTrains(lua_State *l)
 		if (!type->ModTrains[mod_file][i]->ButtonPopup.empty()) {
 			button_definition += "\tPopup = \"" + type->ModTrains[mod_file][i]->ButtonPopup + "\",\n";
 		}
-		button_definition += "\tKey = \"" + type->ModTrains[mod_file][i]->ButtonKey + "\",\n";
+		button_definition += "\tKey = \"" + type->ModTrains[mod_file][i]->get_button_key() + "\",\n";
 		button_definition += "\tHint = \"" + type->ModTrains[mod_file][i]->ButtonHint + "\",\n";
 		button_definition += "\tMod = \"" + mod_file + "\",\n";
 		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";

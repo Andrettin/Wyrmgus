@@ -87,6 +87,8 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "type_name") {
 			this->TypeName = value;
+		} else if (key == "button_key") {
+			this->button_key = value;
 		} else if (key == "file") {
 			this->File = CMod::GetCurrentModPath() + value;
 		} else if (key == "shadow_file") {

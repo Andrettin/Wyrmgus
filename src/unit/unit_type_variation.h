@@ -56,11 +56,19 @@ public:
 	~CUnitTypeVariation();
 
 	void ProcessConfigData(const CConfigData *config_data);
+
+	const std::string &get_button_key() const
+	{
+		return this->button_key;
+	}
 	
 	int ID = -1;					/// The variation's index within the appropriate variation vector of its unit type
 	int ImageLayer = -1;			/// The image layer to which the variation belongs (if any)
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
+private:
+	std::string button_key;
+public:
 	std::string File;				/// Variation's graphics.
 	std::string ShadowFile;			/// Variation's shadow graphics.
 	std::string LightFile;			/// Variation's light graphics.
@@ -95,4 +103,7 @@ public:
 	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
 	
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
+
+	friend int CclDefineUnitType(lua_State *l);
+	friend class stratagus::unit_type;
 };
