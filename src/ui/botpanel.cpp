@@ -747,7 +747,31 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 	memset(Costs, 0, sizeof(Costs));
 
 	const stratagus::unit_class *unit_class = nullptr;
-	stratagus::unit_type *unit_type = nullptr;
+	const stratagus::unit_type *unit_type = nullptr;
+
+	switch (button.Action) {
+		case ButtonCmd::Build:
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo:
+			unit_type = stratagus::unit_type::get_all()[button.Value];
+			break;
+		case ButtonCmd::TrainClass:
+			unit_class = stratagus::unit_class::get_all()[button.Value];
+			if (Selected[0]->Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			}
+			break;
+		case ButtonCmd::Salvage:
+			unit_type = Selected[0]->Type;
+			break;
+		case ButtonCmd::Buy:
+		case ButtonCmd::Unit:
+			unit_type = UnitManager.GetSlotUnit(button.Value).Type;
+			break;
+		default:
+			break;
+	}
+
 	int type_costs[MaxCosts];
 
 	switch (button.Action) {
@@ -760,19 +784,8 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::Train:
-		case ButtonCmd::UpgradeTo:
-			unit_type = stratagus::unit_type::get_all()[button.Value];
-
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
-			memcpy(Costs, type_costs, sizeof(type_costs));
-			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
-			break;
 		case ButtonCmd::TrainClass:
-			unit_class = stratagus::unit_class::get_all()[button.Value];
-			if (Selected[0]->Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
-			}
-
+		case ButtonCmd::UpgradeTo:
 			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
@@ -814,18 +827,7 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		 it != popup->Contents.end(); ++it) {
 		const CPopupContentType &content = **it;
 
-		bool can_show_popup_content = false;
-		switch (button.Action) {
-			case ButtonCmd::Unit:
-			case ButtonCmd::Buy:
-				can_show_popup_content = CanShowPopupContent(content.Condition, button, UnitManager.GetSlotUnit(button.Value).Type);
-				break;
-			default:
-				can_show_popup_content = CanShowPopupContent(content.Condition, button, unit_type);
-				break;
-		}
-
-		if (can_show_popup_content) {
+		if (CanShowPopupContent(content.Condition, button, unit_type)) {
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
 		}
 	}
