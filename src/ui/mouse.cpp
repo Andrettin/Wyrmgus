@@ -70,6 +70,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
+#include "util/vector_util.h"
 #include "video.h"
 #include "widgets.h"
 #include "world.h"
@@ -333,7 +334,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 						if (CheckDependencies(unit_type, unit.Player)) {
-							if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
+							if (stratagus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
 								dest.Blink = 4;
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
 								if (!acknowledged) {
@@ -497,7 +498,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == settlement_site_unit_type && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
-				if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
+				if (stratagus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
 					dest->Blink = 4;
 					SendCommandBuildBuilding(unit, dest->tilePos, *unit_type, flush, dest->MapLayer->ID);
 					if (!acknowledged) {
@@ -2141,10 +2142,7 @@ static void SendCommand(const Vec2i &tilePos)
 			//Wyrmgus end
 				PlayUnitSound(*Selected[i], stratagus::unit_sound_type::repairing);
 				break;
-			//Wyrmgus start
-//			} else if (CursorAction == ButtonCmd::Build && Selected[i]->Type->MapSound.Build.Sound) {
-			} else if (CursorAction == ButtonCmd::Build) {
-			//Wyrmgus end
+			} else if (CursorAction == ButtonCmd::Build || CursorAction == ButtonCmd::BuildClass) {
 				PlayUnitSound(*Selected[i], stratagus::unit_sound_type::build);
 				break;
 			//Wyrmgus start

@@ -1679,33 +1679,37 @@ stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Ve
 
 bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement) const
 {
-	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
-		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Build[type->Slot][j]) > 0) {
-				return true;
-			}
+	const std::vector<stratagus::unit_type *> *builders = nullptr;
+	const std::vector<const stratagus::unit_class *> *builder_classes = nullptr;
+
+	if (type->BoolFlag[BUILDING_INDEX].value) {
+		builders = &AiHelpers.get_builders(type);
+		builder_classes = &AiHelpers.get_builder_classes(type->get_unit_class());
+	} else {
+		builders = &AiHelpers.get_trainers(type);
+		builder_classes = &AiHelpers.get_trainer_classes(type->get_unit_class());
+	}
+
+	for (const stratagus::unit_type *builder : *builders) {
+		if (this->GetUnitTypeCount(builder) > 0) {
+			return true;
 		}
-	} else if (!type->BoolFlag[BUILDING_INDEX].value) {
-		for (const stratagus::unit_type *builder : AiHelpers.get_trainers(type)) {
+	}
+
+	if (this->Faction != -1) {
+		for (const stratagus::unit_class *builder_class : *builder_classes) {
+			const stratagus::unit_type *builder = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+
+			if (builder == nullptr) {
+				continue;
+			}
+
 			if (this->GetUnitTypeCount(builder) > 0) {
 				return true;
 			}
 		}
-
-		if (this->Faction != -1) {
-			for (const stratagus::unit_class *builder_class : AiHelpers.get_trainer_classes(type->get_unit_class())) {
-				const stratagus::unit_type *builder = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
-
-				if (builder == nullptr) {
-					continue;
-				}
-
-				if (this->GetUnitTypeCount(builder) > 0) {
-					return true;
-				}
-			}
-		}
 	}
+
 	if (type->Slot < (int) AiHelpers.Upgrade.size()) {
 		for (size_t j = 0; j < AiHelpers.Upgrade[type->Slot].size(); ++j) {
 			if (this->GetUnitTypeCount(AiHelpers.Upgrade[type->Slot][j]) > 0) {
@@ -2090,22 +2094,41 @@ std::string CPlayer::GetCharacterTitleName(const int title_type, const stratagus
 	return "";
 }
 
-void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const stratagus::unit_type *building)
+std::set<int> CPlayer::get_builder_landmasses(const stratagus::unit_type *building) const
 {
-	for (unsigned int i = 0; i < AiHelpers.Build[building->Slot].size(); ++i) {
-		if (this->GetUnitTypeAiActiveCount(AiHelpers.Build[building->Slot][i])) {
-			std::vector<CUnit *> worker_table;
+	std::set<int> builder_landmasses;
 
-			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->Slot][i], worker_table, true);
+	for (const stratagus::unit_type *builder_type : AiHelpers.get_builders(building)) {
+		if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
+			std::vector<CUnit *> builder_table;
 
-			for (size_t j = 0; j != worker_table.size(); ++j) {
-				int worker_landmass = CMap::Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer->ID);
-				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
-					worker_landmasses.push_back(worker_landmass);
+			FindPlayerUnitsByType(*this, *builder_type, builder_table, true);
+
+			for (const CUnit *builder : builder_table) {
+				const int landmass = CMap::Map.GetTileLandmass(builder->tilePos, builder->MapLayer->ID);
+				builder_landmasses.insert(landmass);
+			}
+		}
+	}
+
+	if (this->Faction != -1) {
+		for (const stratagus::unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
+			const stratagus::unit_type *builder_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+
+			if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
+				std::vector<CUnit *> builder_table;
+
+				FindPlayerUnitsByType(*this, *builder_type, builder_table, true);
+
+				for (const CUnit *builder : builder_table) {
+					const int landmass = CMap::Map.GetTileLandmass(builder->tilePos, builder->MapLayer->ID);
+					builder_landmasses.insert(landmass);
 				}
 			}
 		}
 	}
+
+	return builder_landmasses;
 }
 
 std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()

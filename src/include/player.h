@@ -267,7 +267,7 @@ public:
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
-	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const stratagus::unit_type *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
+	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
 	std::vector<CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end
 

@@ -429,7 +429,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
 			return false;
 		}
 	}
@@ -441,7 +441,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->BuildingRulesString != CONDITION_TRUE) {
-		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Build && type && !type->BuildingRulesString.empty())) {
+		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass) && type && !type->BuildingRulesString.empty())) {
 			return false;
 		}
 	}
@@ -678,6 +678,7 @@ static void GetPopupSize(const CPopup &popup, const stratagus::button &button,
 	const stratagus::unit_type *unit_type = nullptr;
 
 	switch (button.Action) {
+		case ButtonCmd::BuildClass:
 		case ButtonCmd::TrainClass:
 			unit_class = stratagus::unit_class::get_all()[button.Value];
 			if (Selected[0]->Player->Faction != -1) {
@@ -755,6 +756,7 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		case ButtonCmd::UpgradeTo:
 			unit_type = stratagus::unit_type::get_all()[button.Value];
 			break;
+		case ButtonCmd::BuildClass:
 		case ButtonCmd::TrainClass:
 			unit_class = stratagus::unit_class::get_all()[button.Value];
 			if (Selected[0]->Player->Faction != -1) {
@@ -783,6 +785,7 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 			Costs[ManaResCost] = CSpell::Spells[button.Value]->ManaCost;
 			break;
 		case ButtonCmd::Build:
+		case ButtonCmd::BuildClass:
 		case ButtonCmd::Train:
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
@@ -1061,6 +1064,7 @@ void CButtonPanel::Draw()
 			case ButtonCmd::ExperienceUpgradeTo:
 				button_unit_type = stratagus::unit_type::get_all()[button->Value];
 				break;
+			case ButtonCmd::BuildClass:
 			case ButtonCmd::TrainClass:
 				if (player_faction != nullptr) {
 					button_unit_type = player_faction->get_class_unit_type(stratagus::unit_class::get_all()[button->Value]);
@@ -1075,9 +1079,9 @@ void CButtonPanel::Draw()
 			button_icon = Selected[0]->GetButtonIcon(button->Action);
 		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
 			button_icon = button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
 			button_icon = button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
 			button_icon = button_unit_type->Icon.Icon;
 		} else if (button->Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(button->Value).GetIcon().Icon;
@@ -1311,6 +1315,18 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 
 			res = CheckDependencies(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
+		case ButtonCmd::BuildClass:
+			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			if (unit.Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
+			}
+
+			if (unit_type == nullptr) {
+				break;
+			}
+
+			res = CheckDependencies(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			break;
 		case ButtonCmd::ExperienceUpgradeTo:
 			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, true);
 			if (res && unit.Character != nullptr) {
@@ -1430,6 +1446,7 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			}
 			break;
 		case ButtonCmd::TrainClass:
+		case ButtonCmd::BuildClass:
 			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
 			unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
 
@@ -1925,14 +1942,30 @@ void CButtonPanel::DoClicked_CancelBuild()
 	UI.StatusLine.ClearCosts();
 }
 
-void CButtonPanel::DoClicked_Build(int button)
+void CButtonPanel::DoClicked_Build(const std::unique_ptr<stratagus::button> &button)
 {
-	// FIXME: store pointer in button table!
-	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button]->Value];
-	if (!CPlayer::GetThisPlayer()->CheckUnitType(type)) {
+	const stratagus::unit_class *unit_class = nullptr;
+	stratagus::unit_type *unit_type = nullptr;
+
+	switch (button->Action) {
+		case ButtonCmd::Build:
+			// FIXME: store pointer in button table!
+			unit_type = stratagus::unit_type::get_all()[button->Value];
+			break;
+		case ButtonCmd::BuildClass:
+			unit_class = stratagus::unit_class::get_all()[button->Value];
+			if (Selected[0]->Player->Faction != -1) {
+				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			}
+			break;
+		default:
+			break;
+	}
+
+	if (!CPlayer::GetThisPlayer()->CheckUnitType(*unit_type)) {
 		UI.StatusLine.Set(_("Select Location"));
 		UI.StatusLine.ClearCosts();
-		CursorBuilding = &type;
+		CursorBuilding = unit_type;
 		// FIXME: check is this check necessary?
 		CurrentButtonLevel = stratagus::defines::get()->get_cancel_button_level(); // the cancel-only button level
 		UI.ButtonPanel.Update();
@@ -2303,7 +2336,10 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::CancelUpgrade: { DoClicked_CancelUpgrade(); break; }
 		case ButtonCmd::CancelTrain: { DoClicked_CancelTrain(); break; }
 		case ButtonCmd::CancelBuild: { DoClicked_CancelBuild(); break; }
-		case ButtonCmd::Build: { DoClicked_Build(button); break; }
+		case ButtonCmd::Build:
+		case ButtonCmd::BuildClass:
+			DoClicked_Build(CurrentButtons[button]);
+			break;
 		case ButtonCmd::Train:
 		case ButtonCmd::TrainClass:
 			DoClicked_Train(CurrentButtons[button]);

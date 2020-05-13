@@ -268,7 +268,7 @@ private:
 	void DoClicked_CancelUpgrade();
 	void DoClicked_CancelTrain();
 	void DoClicked_CancelBuild();
-	void DoClicked_Build(int button);
+	void DoClicked_Build(const std::unique_ptr<stratagus::button> &button);
 	void DoClicked_Train(const std::unique_ptr<stratagus::button> &button);
 	void DoClicked_UpgradeTo(int button);
 	void DoClicked_Research(int button);

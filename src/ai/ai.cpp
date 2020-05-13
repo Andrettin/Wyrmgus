@@ -714,7 +714,8 @@ void FreeAi()
 	//  Free AiHelpers.
 	AiHelpers.trainers.clear();
 	AiHelpers.trainer_classes.clear();
-	AiHelpers.Build.clear();
+	AiHelpers.builders.clear();
+	AiHelpers.builder_classes.clear();
 	AiHelpers.Upgrade.clear();
 	AiHelpers.Research.clear();
 	AiHelpers.Repair.clear();

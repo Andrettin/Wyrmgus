@@ -394,17 +394,42 @@ public:
 		return empty_vector;
 	}
 
+	const std::vector<stratagus::unit_type *> &get_builders(const stratagus::unit_type *unit_type) const
+	{
+		static std::vector<stratagus::unit_type *> empty_vector;
+
+		auto find_iterator = this->builders.find(unit_type);
+		if (find_iterator != this->builders.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const stratagus::unit_class *> &get_builder_classes(const stratagus::unit_class *unit_class) const
+	{
+		static std::vector<const stratagus::unit_class *> empty_vector;
+
+		auto find_iterator = this->builder_classes.find(unit_class);
+		if (find_iterator != this->builder_classes.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
 	//unit types associated with lists of other unit types which can train them
 	std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> trainers;
 
 	//unit classes associated with lists of other unit classes which can train them
 	std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> trainer_classes;
 
-	/**
-	** The index is the unit that should be build, giving a table of all
-	** units/buildings which could build this unit.
-	*/
-	std::vector<std::vector<stratagus::unit_type *> > Build;
+	//(building) unit types associated with lists of other unit types which can build them
+	std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> builders;
+
+	//(building) unit classes associated with lists of other unit classes which can build them
+	std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> builder_classes;
+
 	/**
 	** The index is the upgrade that should be made, giving a table of all
 	** units/buildings which could do the upgrade.

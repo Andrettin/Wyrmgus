@@ -412,27 +412,36 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &t
 		return false;
 	}
 
-	//Wyrmgus start
-	std::vector<std::vector<stratagus::unit_type *> > *tablep;
+	const std::vector<std::vector<stratagus::unit_type *>> *tablep = nullptr;
+
+	const std::vector<stratagus::unit_type *> *builders = nullptr;
+	const std::vector<const stratagus::unit_class *> *builder_classes = nullptr;
+
 	if (type.BoolFlag[BUILDING_INDEX].value) {
 		if (
 			include_upgrade
-			&& (type.Slot >= (int) AiHelpers.Build.size() || AiHelpers.Build[type.Slot].empty())
+			&& AiHelpers.get_builders(&type).empty() && AiHelpers.get_builder_classes(type.get_unit_class()).empty()
 			&& type.Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type.Slot].empty()
 		) {
 			tablep = &AiHelpers.Upgrade;
 		} else {
-			tablep = &AiHelpers.Build;
+			builders = &AiHelpers.get_builders(&type);
+			builder_classes = &AiHelpers.get_builder_classes(type.get_unit_class());
 		}
 	} else {
-		for (const stratagus::unit_type *builder : AiHelpers.get_trainers(&type)) {
+		builders = &AiHelpers.get_trainers(&type);
+		builder_classes = &AiHelpers.get_trainer_classes(type.get_unit_class());
+	}
+
+	if (builders != nullptr) {
+		for (const stratagus::unit_type *builder : *builders) {
 			if (player.GetUnitTypeAiActiveCount(builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, *builder))) {
 				return true;
 			}
 		}
 
 		if (type.get_unit_class() != nullptr && player.Faction != -1) {
-			for (const stratagus::unit_class *builder_class : AiHelpers.get_trainer_classes(type.get_unit_class())) {
+			for (const stratagus::unit_class *builder_class : *builder_classes) {
 				const stratagus::unit_type *builder = stratagus::faction::get_all()[player.Faction]->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
@@ -447,12 +456,13 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &t
 
 		return false;
 	}
+
 	if (type.Slot >= (int) (*tablep).size()) {
 		return false;
 	}
-//	const size_t size = AiHelpers.Build[type.Slot].size();
+
 	const size_t size = (*tablep)[type.Slot].size();
-	//Wyrmgus end
+
 	for (const stratagus::unit_type *builder : (*tablep)[type.Slot]) {
 		if (player.GetUnitTypeAiActiveCount(builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, *builder))) {
 			return true;
@@ -1001,70 +1011,58 @@ static int AiMakeUnit(stratagus::unit_type &typeToMake, const Vec2i &nearPos, in
 	// Iterate them
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
 		stratagus::unit_type &type = *stratagus::unit_type::get_all()[usableTypes[currentType]];
-		int n;
-		std::vector<std::vector<stratagus::unit_type *> > *tablep;
+
+		const std::vector<stratagus::unit_type *> *builders = nullptr;
+		const std::vector<const stratagus::unit_class *> *builder_classes = nullptr;
+
 		//
 		// Check if we have a place for building or a unit to build.
 		//
 		if (type.BoolFlag[BUILDING_INDEX].value) {
-			n = AiHelpers.Build.size();
-			tablep = &AiHelpers.Build;
+			builders = &AiHelpers.get_builders(&type);
+			builder_classes = &AiHelpers.get_builder_classes(type.get_unit_class());
 		} else {
-			for (stratagus::unit_type *trainer : AiHelpers.get_trainers(&type)) {
-				if (AiPlayer->Player->GetUnitTypeAiActiveCount(trainer)) {
-					if (AiTrainUnit(*trainer, type, landmass, settlement)) {
+			builders = &AiHelpers.get_trainers(&type);
+			builder_classes = &AiHelpers.get_trainer_classes(type.get_unit_class());
+		}
+
+		for (stratagus::unit_type *builder : *builders) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder)) {
+				if (type.BoolFlag[BUILDING_INDEX].value) {
+					if (AiBuildBuilding(*builder, type, nearPos, z, landmass, settlement)) {
+						return 1;
+					}
+				} else {
+					if (AiTrainUnit(*builder, type, landmass, settlement)) {
 						return 1;
 					}
 				}
 			}
+		}
 
-			if (AiPlayer->Player->Faction != -1) {
-				for (const stratagus::unit_class *trainer_class : AiHelpers.get_trainer_classes(type.get_unit_class())) {
-					const stratagus::unit_type *trainer = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(trainer_class);
+		if (AiPlayer->Player->Faction != -1) {
+			for (const stratagus::unit_class *builder_class : *builder_classes) {
+				const stratagus::unit_type *builder = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
 
-					if (trainer == nullptr) {
-						continue;
-					}
+				if (builder == nullptr) {
+					continue;
+				}
 
-					if (AiPlayer->Player->GetUnitTypeAiActiveCount(trainer)) {
-						if (AiTrainUnit(*trainer, type, landmass, settlement)) {
+				if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder)) {
+					if (type.BoolFlag[BUILDING_INDEX].value) {
+						if (AiBuildBuilding(*builder, type, nearPos, z, landmass, settlement)) {
+							return 1;
+						}
+					} else {
+						if (AiTrainUnit(*builder, type, landmass, settlement)) {
 							return 1;
 						}
 					}
 				}
 			}
-
-			continue;
-		}
-		if (type.Slot >= n) { // Oops not known.
-			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n"
-					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
-			continue;
-		}
-		std::vector<stratagus::unit_type *> &table = (*tablep)[type.Slot];
-		if (table.empty()) { // Oops not known.
-			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n"
-					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
-			continue;
-		}
-
-		for (unsigned int i = 0; i < table.size(); ++i) {
-			//
-			// The type for builder/trainer is available
-			//
-			if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])) {
-				if (type.BoolFlag[BUILDING_INDEX].value) {
-					if (AiBuildBuilding(*table[i], type, nearPos, z, landmass, settlement)) {
-						return 1;
-					}
-				} else {
-					if (AiTrainUnit(*table[i], type, landmass, settlement)) {
-						return 1;
-					}
-				}
-			}
 		}
 	}
+
 	return 0;
 }
 
@@ -1356,8 +1354,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const stratagus::resource *res
 				stratagus::unit_type &type = *AiHelpers.Mines[mine->GivesResource][i];
 
 				if (
-					type.Slot < (int) AiHelpers.Build.size()
-					&& std::find(AiHelpers.Build[type.Slot].begin(), AiHelpers.Build[type.Slot].end(), unit.Type) != AiHelpers.Build[type.Slot].end()
+					(stratagus::vector::contains(AiHelpers.get_builders(&type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(type.get_unit_class()), unit.Type->get_unit_class()))
 					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer->ID)
 				) {
 					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer->ID);
@@ -2141,23 +2138,6 @@ static void AiCheckPathwayConstruction()
 		return;
 	}
 	
-	int n_t = AiHelpers.Build.size();
-	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Build;
-	for (size_t i = 0; i != pathway_types.size(); ++i) {
-		if (pathway_types[i]->Slot >= n_t) { // Oops not known.
-			DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
-					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
-			return;
-		}
-		
-		std::vector<stratagus::unit_type *> &table = tablep[pathway_types[i]->Slot];
-		if (table.empty()) { // Oops not known.
-			DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
-					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
-			return;
-		}
-	}
-	
 	const int n = AiPlayer->Player->GetUnitCount();
 	int k = 0;
 	
@@ -2310,15 +2290,33 @@ static void AiCheckPathwayConstruction()
 						//
 						// Find a free worker, who can build pathways for this building
 						//
-						for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
+						for (const stratagus::unit_type *builder_type : AiHelpers.get_builders(pathway_types[p])) {
 							//
 							// The type is available
 							//
-							if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[pathway_types[p]->Slot][j])) {
-								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
+							if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
+								if (AiBuildBuilding(*builder_type, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
 									built_pathway = true;
 									built_pathway_for_building = true;
 									break;
+								}
+							}
+						}
+
+						if (!built_pathway && AiPlayer->Player->Faction != -1) {
+							for (const stratagus::unit_class *builder_class : AiHelpers.get_builder_classes(pathway_types[p]->get_unit_class())) {
+								const stratagus::unit_type *builder_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+
+								if (builder_type == nullptr) {
+									continue;
+								}
+
+								if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
+									if (AiBuildBuilding(*builder_type, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
+										built_pathway = true;
+										built_pathway_for_building = true;
+										break;
+									}
 								}
 							}
 						}
@@ -2362,24 +2360,8 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	int n_t = AiHelpers.Build.size();
-	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Build;
-	if (town_hall_type->Slot >= n_t) { // Oops not known.
-		DebugPrint("%d: AiCheckSettlementConstruction I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
-		return;
-	}
-		
-	std::vector<stratagus::unit_type *> &table = tablep[town_hall_type->Slot];
-	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiCheckSettlementConstruction II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
-		return;
-	}
-
 	//check in which landmasses this player has workers
-	std::vector<int> worker_landmasses;
-	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, town_hall_type);
+	const std::set<int> builder_landmasses = AiPlayer->Player->get_builder_landmasses(town_hall_type);
 						
 	//check settlement units to see if can build in one
 	for (size_t i = 0; i < CMap::Map.site_units.size(); ++i) {
@@ -2398,7 +2380,7 @@ void AiCheckSettlementConstruction()
 		}
 		
 		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
-		if (std::find(worker_landmasses.begin(), worker_landmasses.end(), settlement_landmass) == worker_landmasses.end()) {
+		if (!builder_landmasses.contains(settlement_landmass)) {
 			continue;
 		}
 		
@@ -2411,20 +2393,37 @@ void AiCheckSettlementConstruction()
 		}
 		
 		bool requested_settlement = false;
+
 		//
 		// Find a free worker who can build a settlement on this site
 		//
-		for (unsigned int j = 0; j < tablep[town_hall_type->Slot].size(); ++j) {
+		for (const stratagus::unit_type *builder_type : AiHelpers.get_builders(town_hall_type)) {
 			//
 			// The type is available
 			//
-			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
 				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 				requested_settlement = true;
 				break;
 			}
 		}
-		
+
+		if (!requested_settlement && AiPlayer->Player->Faction != -1) {
+			for (const stratagus::unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
+				const stratagus::unit_type *builder_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+
+				if (builder_type == nullptr) {
+					continue;
+				}
+
+				if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
+					AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+					requested_settlement = true;
+					break;
+				}
+			}
+		}
+
 		if (requested_settlement) {
 			break;
 		}
@@ -2458,25 +2457,20 @@ void AiCheckDockConstruction()
 	}
 
 	//check in which landmasses this player has workers
-	std::vector<int> worker_landmasses;
-	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, dock_type);
+	const std::set<int> builder_landmasses = AiPlayer->Player->get_builder_landmasses(dock_type);
 
-	std::vector<int> neighbor_water_landmasses; //water "landmasses" neighboring the landmasses where the player has workers
-	for (size_t i = 0; i < worker_landmasses.size(); ++i) {
-		int worker_landmass = worker_landmasses[i];
-		for (size_t j = 0; j < CMap::Map.BorderLandmasses[worker_landmass].size(); ++j) {
-			int border_landmass = CMap::Map.BorderLandmasses[worker_landmass][j];
-			if (std::find(neighbor_water_landmasses.begin(), neighbor_water_landmasses.end(), border_landmass) == neighbor_water_landmasses.end()) {
-				neighbor_water_landmasses.push_back(border_landmass);
-			}
+	std::set<int> neighbor_water_landmasses; //water "landmasses" neighboring the landmasses where the player has workers
+	for (const int builder_landmass : builder_landmasses) {
+		for (size_t j = 0; j < CMap::Map.BorderLandmasses[builder_landmass].size(); ++j) {
+			int border_landmass = CMap::Map.BorderLandmasses[builder_landmass][j];
+			neighbor_water_landmasses.insert(border_landmass);
 		}
 	}
 	
 	std::vector<CUnit *> dock_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *dock_type, dock_table, true);
 	
-	for (size_t i = 0; i < neighbor_water_landmasses.size(); ++i) {
-		int water_landmass = neighbor_water_landmasses[i];
+	for (const int water_landmass : neighbor_water_landmasses) {
 		if (CMap::Map.BorderLandmasses[water_landmass].size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
 			continue;
 		}
@@ -2627,7 +2621,7 @@ void AiCheckBuildings()
 	
 	stratagus::unit_type *unit_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
 	
-	if (unit_type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[unit_type->Slot].empty()) { //constructed by worker
+	if (!AiHelpers.get_builders(unit_type).empty() || !AiHelpers.get_builder_classes(unit_type->get_unit_class()).empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);
 	} else if (unit_type->Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[unit_type->Slot].empty()) { //upgraded to from another building
 		AiAddUpgradeToRequest(*unit_type);

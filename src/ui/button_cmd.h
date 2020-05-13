@@ -37,6 +37,7 @@ enum class ButtonCmd {
 	Repair,         /// order repair
 	Harvest,        /// order harvest
 	Build,          /// order build
+	BuildClass, //build order (unit class)
 	Patrol,         /// order patrol
 	AttackGround,   /// order attack ground
 	SpellCast,      /// order cast spell

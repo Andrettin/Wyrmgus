@@ -511,6 +511,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		const stratagus::unit_type *unit_type = nullptr;
 		switch (button.Action) {
 			case ButtonCmd::TrainClass:
+			case ButtonCmd::BuildClass:
 				unit_class = stratagus::unit_class::get_all()[button.Value];
 				if (Selected[0]->Player->Faction != -1) {
 					unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
